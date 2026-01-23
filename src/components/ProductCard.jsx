@@ -1,31 +1,44 @@
-import React from "react";
+import React, { useMemo } from "react";
+import { formatIDR } from "../lib/format";
+import { useCart } from "../context/CartContext";
 
-function formatIDR(n) {
-  return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(n);
-}
+export default function ProductCard({ product }) {
+  const { add } = useCart();
 
-export default function ProductCard({ item, waNumber }) {
-  const text = encodeURIComponent(
-    `Halo kak, saya mau pesan:\n- ${item.name}\nHarga: ${formatIDR(item.price)}\n\nDari imzaqi.store`
-  );
-
-  const waLink = `https://wa.me/${waNumber}?text=${text}`;
+  const variants = useMemo(() => (product?.product_variants || []).slice().sort((a,b) => (a.sort_order||0)-(b.sort_order||0)), [product]);
 
   return (
-    <div className="card">
-      <div className="card-top">
-        <div>
-          <div className="card-title">{item.name}</div>
-          <div className="card-desc">{item.desc}</div>
+    <div className="product-card">
+      <div className="product-head">
+        <div className="product-title">
+          <div className="product-name">{product.name}</div>
+          <div className="product-desc">{product.description}</div>
         </div>
-        {item.badge ? <div className="badge">{item.badge}</div> : null}
+        <div className="product-badge">Full Garansi*</div>
       </div>
 
-      <div className="card-bottom">
-        <div className="price">{formatIDR(item.price)}</div>
-        <a className="btn" href={waLink} target="_blank" rel="noreferrer">
-          Beli via WhatsApp
-        </a>
+      <div className="variant-list">
+        {variants.map(v => (
+          <div key={v.id} className="variant-row">
+            <div className="variant-meta">
+              <div className="variant-name">{v.name}</div>
+              <div className="variant-sub">{v.duration_label}{v.guarantee_text ? ` • ${v.guarantee_text}` : ""}</div>
+            </div>
+            <div className="variant-right">
+              <div className="variant-price">{formatIDR(v.price_idr)}</div>
+              <button
+                className="btn btn-sm"
+                onClick={() => add({
+                  ...v,
+                  product_id: product.id,
+                  product_name: product.name,
+                }, 1)}
+              >
+                + Keranjang
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );
