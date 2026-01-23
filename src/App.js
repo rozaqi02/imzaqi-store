@@ -17,10 +17,25 @@ function AnalyticsBridge() {
   return null;
 }
 
+// ✅ NEW: smooth scroll to top on route change
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  React.useEffect(() => {
+    // pakai requestAnimationFrame biar aman setelah render route baru
+    requestAnimationFrame(() => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }, [pathname]);
+
+  return null;
+}
+
 export default function App() {
   return (
     <BrowserRouter>
       <AnalyticsBridge />
+      <ScrollToTop />
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
