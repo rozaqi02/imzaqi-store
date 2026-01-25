@@ -18,7 +18,6 @@
 .env.test.local
 .env.production.local
 .env
-qris_payment.jpeg
 
 npm-debug.log*
 yarn-debug.log*
