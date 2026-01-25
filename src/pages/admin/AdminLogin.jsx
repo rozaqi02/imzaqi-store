@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
+import { usePageMeta } from "../../hooks/usePageMeta";
+import { useToast } from "../../context/ToastContext";
 
 export default function AdminLogin() {
   const nav = useNavigate();
+  const toast = useToast();
   const [email, setEmail] = useState("rojaki1419@gmail.com");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
@@ -14,11 +17,13 @@ export default function AdminLogin() {
     });
   }, [nav]);
 
+  usePageMeta({ title: "Admin Login", description: "Halaman login admin untuk mengelola produk, promo, dan order." });
+
   async function onLogin(e) {
     e.preventDefault();
     setMsg("");
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) { setMsg(error.message); return; }
+    if (error) { setMsg(error.message); toast.error("Login gagal"); return; }
     if (data?.session) nav("/admin/dashboard");
   }
 

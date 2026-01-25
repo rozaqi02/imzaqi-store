@@ -3,10 +3,19 @@ import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
 import { fetchProducts } from "../lib/api";
 import { Link } from "react-router-dom";
+import EmptyState from "../components/EmptyState";
+import { usePageMeta } from "../hooks/usePageMeta";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [error, setError] = useState("");
+
+  usePageMeta({
+    title: "Home",
+    description:
+      "Hidden gem aplikasi premium murah + bergaransi. Pilih produk, checkout QRIS, upload bukti bayar, lalu pantau status order.",
+  });
 
   useEffect(() => {
     let alive = true;
@@ -18,6 +27,7 @@ export default function Home() {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn(e);
+        setError("Gagal memuat produk. Coba cek koneksi & refresh.");
       } finally {
         if (alive) setLoading(false);
       }
@@ -47,9 +57,28 @@ export default function Home() {
               <div className="skeleton card" />
               <div className="skeleton card" />
             </>
-          ) : featured.map(p => (
-            <ProductCard key={p.id} product={p} />
-          ))}
+          ) : error ? (
+            <div className="card pad" style={{ gridColumn: "1 / -1" }}>
+              <EmptyState
+                icon="📡"
+                title="Produk belum bisa dimuat"
+                description={error}
+                primaryAction={{ label: "Refresh", onClick: () => window.location.reload() }}
+                secondaryAction={{ label: "Lihat Status Order", to: "/status" }}
+              />
+            </div>
+          ) : featured.length === 0 ? (
+            <div className="card pad" style={{ gridColumn: "1 / -1" }}>
+              <EmptyState
+                icon="🛍️"
+                title="Belum ada produk aktif"
+                description="Admin belum mengaktifkan produk. Coba lagi nanti ya."
+                secondaryAction={{ label: "Cek Status Order", to: "/status" }}
+              />
+            </div>
+          ) : (
+            featured.map((p) => <ProductCard key={p.id} product={p} />)
+          )}
         </div>
       </section>
 

@@ -1,10 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "../../lib/supabaseClient";
 import { fetchProducts, fetchPromoCodes, fetchSettings, fetchTestimonials, upsertSetting } from "../../lib/api";
-import { formatIDR, slugify } from "../../lib/format";
-import { useNavigate } from "react-router-dom";
+import { formatIDR } from "../../lib/format";
+import { usePageMeta } from "../../hooks/usePageMeta";
+import { useToast } from "../../context/ToastContext";
 
-const BUCKET = "imzaqi-public";
+const BUCKET_ICONS = "product-icons";      // public
+const BUCKET_TESTIMONIALS = "testimonials"; // public
+const BUCKET_PAYMENT = "payment-proofs";    // public
 
 function TabButton({ active, onClick, children }) {
   return (
@@ -14,123 +18,107 @@ function TabButton({ active, onClick, children }) {
   );
 }
 
+function prettyStatus(status) {
+  const s = String(status || "pending");
+  const map = {
+    pending: "Pending",
+    processing: "Diproses",
+    done: "Sukses",
+    // kompatibilitas status lama
+    paid_reported: "Pending",
+    cancelled: "Dibatalkan",
+  };
+  return map[s] || s;
+}
+
 export default function AdminDashboard() {
   const nav = useNavigate();
-  const [session, setSession] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
+  const toast = useToast();
+  usePageMeta({ title: "Admin Dashboard", description: "Dashboard admin untuk kelola produk, testimoni, promo, dan order." });
   const [tab, setTab] = useState("produk");
   const [msg, setMsg] = useState("");
 
-  // data
   const [products, setProducts] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
-  const [settings, setSettings] = useState({});
   const [promos, setPromos] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [settings, setSettings] = useState({});
 
-  async function refreshAll() {
-    const [p, t, s, pc] = await Promise.all([
-      fetchProducts({ includeInactive: true }),
-      fetchTestimonials({ includeInactive: true }),
-      fetchSettings(),
-      fetchPromoCodes(),
-    ]);
-    setProducts(p);
-    setTestimonials(t);
-    setSettings(s);
-    setPromos(pc);
-  }
+  const [promoBulk, setPromoBulk] = useState("");
+  const waNumber = settings?.whatsapp?.number || "6283136049987";
+
+  const [openOrder, setOpenOrder] = useState("");
 
   useEffect(() => {
-    let alive = true;
-    (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!alive) return;
-      const sess = data?.session || null;
-      setSession(sess);
-      if (!sess) return;
-
-      // Check admin privileges via RPC (recommended)
-      // NOTE: ensure DB function `public.is_admin()` is SECURITY DEFINER and granted to authenticated.
-      let ok = false;
-      const { data: okRpc, error: okRpcErr } = await supabase.rpc("is_admin");
-      if (!okRpcErr) {
-        ok = !!okRpc;
-      } else {
-        // Fallback: read own row (works only if RLS allows selecting your own admin row)
-        const { data: adminRow } = await supabase
-          .from("admin_users")
-          .select("user_id")
-          .eq("user_id", sess.user.id)
-          .maybeSingle();
-        ok = !!adminRow?.user_id;
-      }
-      setIsAdmin(ok);
-      if (!ok) return;
-
-      await refreshAll();
-
-      // load orders (admin only)
-      const { data: o } = await supabase.from("orders").select("id,created_at,total_idr,status,items").order("created_at", { ascending: false }).limit(50);
-      setOrders(o || []);
-    })();
-    return () => { alive = false; };
-  }, []);
-
-  const waNumber = useMemo(() => settings?.whatsapp?.number || "6283136049987", [settings]);
+    supabase.auth.getSession().then(({ data }) => {
+      if (!data?.session) nav("/admin");
+    });
+  }, [nav]);
 
   async function logout() {
     await supabase.auth.signOut();
     nav("/admin");
   }
 
-  if (!session) {
-    return (
-      <div className="page">
-        <section className="section">
-          <div className="container">
-            <div className="card pad">
-              <h1 className="h2">Belum login</h1>
-              <p className="muted">Silakan login dulu.</p>
-              <button className="btn" onClick={() => nav("/admin")}>Ke Login</button>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
+  async function refreshAll() {
+    setMsg("");
+    const tid = toast.loading("Memuat data dashboard…");
+    try {
+      const [p, t, pr, s] = await Promise.all([
+        fetchProducts({ includeInactive: true }),
+        fetchTestimonials({ includeInactive: true }),
+        fetchPromoCodes(),
+        fetchSettings(),
+      ]);
+      setProducts(p);
+      setTestimonials(t);
+      setPromos(pr);
+      setSettings(s);
+      await refreshOrders();
+      toast.remove(tid);
+      toast.success("Dashboard ter-update", { duration: 2200 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal memuat data admin");
+      setMsg(e?.message || String(e));
+    }
   }
 
-  if (!isAdmin) {
-    return (
-      <div className="page">
-        <section className="section">
-          <div className="container">
-            <div className="card pad">
-              <h1 className="h2">Akses Admin</h1>
-              <p className="muted">
-                Akun ini belum memiliki akses admin.
-                Jika kamu pemilik toko, pastikan akun kamu sudah diberi akses admin.
-              </p>
-              <button className="btn btn-ghost" onClick={logout}>Logout</button>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
+  async function refreshOrders() {
+    try {
+      const { data, error } = await supabase
+        .from("orders")
+        .select("id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url")
+        .order("created_at", { ascending: false })
+        .limit(60);
+      if (error) throw error;
+      setOrders(data || []);
+    } catch (e) {
+      setOrders([]);
+      // jangan spam msg kalau user belum tambah kolom
+      // eslint-disable-next-line no-console
+      console.warn(e);
+    }
   }
+
+  useEffect(() => {
+    refreshAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // ======== Actions: Products ========
   async function createProduct() {
-    setMsg("");
     const name = prompt("Nama produk? (contoh: Netflix)");
     if (!name) return;
-    const slug = slugify(prompt("Slug? (contoh: netflix)") || name);
+    const slug = prompt("Slug? (contoh: netflix)") || name.toLowerCase().replace(/\s+/g, "-");
     if (!slug) return;
 
+    setMsg("");
     const { error } = await supabase.from("products").insert({
       name,
       slug,
       description: "",
+      icon_url: null,
       is_active: true,
       sort_order: 100,
     });
@@ -189,40 +177,75 @@ export default function AdminDashboard() {
     await refreshAll();
   }
 
-  // ======== Actions: Testimonials ========
-  async function uploadToBucket(file, folder = "testimonials") {
-    // Requires Storage bucket BUCKET and policies allowing admin write
+  async function uploadToBucket(bucket, file, folder) {
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
-    const path = `${folder}/${Date.now()}-${Math.random().toString(16).slice(2)}.${ext}`;
+    const safeExt = ["jpg","jpeg","png","webp"].includes(ext) ? ext : "jpg";
+    const path = `${folder}/${Date.now()}-${Math.random().toString(16).slice(2)}.${safeExt}`;
 
-    const { error: upErr } = await supabase.storage.from(BUCKET).upload(path, file, {
+    const { error: upErr } = await supabase.storage.from(bucket).upload(path, file, {
       cacheControl: "3600",
       upsert: false,
     });
     if (upErr) throw upErr;
 
-    const { data } = supabase.storage.from(BUCKET).getPublicUrl(path);
+    const { data } = supabase.storage.from(bucket).getPublicUrl(path);
     return data.publicUrl;
   }
 
-  async function addTestimonial(e) {
+  async function uploadProductIcon(product, file) {
+    setMsg("");
+    try {
+      const url = await uploadToBucket(BUCKET_ICONS, file, "icons");
+      const { error } = await supabase.from("products").update({ icon_url: url }).eq("id", product.id);
+      if (error) throw error;
+      await refreshAll();
+      setMsg("Ikon produk berhasil diupload.");
+    } catch (e) {
+      setMsg("Upload ikon gagal. Pastikan bucket Storage public sudah dibuat. Detail: " + (e?.message || e));
+    }
+  }
+
+  // ======== Actions: Testimonials (multi) ========
+  async function addTestimonials(e) {
     e.preventDefault();
     setMsg("");
 
-    const file = e.target.elements.file.files[0];
-    const caption = e.target.elements.caption.value;
+    const files = Array.from(e.target.elements.files.files || []);
+    const caption = e.target.elements.caption.value || "";
 
-    if (!file) { setMsg("Pilih file gambar dulu."); return; }
+    if (files.length === 0) { setMsg("Pilih minimal 1 gambar."); return; }
+
+    // validasi type sederhana
+    for (const f of files) {
+      const t = (f.type || "").toLowerCase();
+      if (!(t.includes("jpeg") || t.includes("jpg") || t.includes("png") || t.includes("webp"))) {
+        setMsg("Format harus .jpeg/.jpg/.png (atau webp).");
+        return;
+      }
+    }
 
     try {
-      const image_url = await uploadToBucket(file, "testimonials");
-      const { error } = await supabase.from("testimonials").insert({ image_url, caption, is_active: true, sort_order: 100 });
+      const urls = [];
+      for (const f of files) {
+        const u = await uploadToBucket(BUCKET_TESTIMONIALS, f, "testimonials");
+        urls.push(u);
+      }
+
+      const payload = urls.map((u) => ({
+        image_url: u,
+        caption,
+        is_active: true,
+        sort_order: 100,
+      }));
+
+      const { error } = await supabase.from("testimonials").insert(payload);
       if (error) throw error;
+
       e.target.reset();
       await refreshAll();
       setMsg("Testimoni berhasil ditambahkan.");
     } catch (err) {
-      setMsg("Upload gagal. Pastikan bucket & policy Storage sudah dibuat. Detail: " + (err?.message || err));
+      setMsg("Upload testimoni gagal. Pastikan bucket & policy Storage sudah dibuat. Detail: " + (err?.message || err));
     }
   }
 
@@ -244,24 +267,69 @@ export default function AdminDashboard() {
   // ======== Actions: Settings ========
   async function saveWhatsApp(number) {
     setMsg("");
-    await upsertSetting("whatsapp", { number });
-    setSettings(await fetchSettings());
-    setMsg("WhatsApp disimpan.");
+    try {
+      await upsertSetting("whatsapp", { number: String(number || "").trim() });
+      setSettings(await fetchSettings());
+      setMsg("WhatsApp disimpan.");
+    } catch (e) {
+      setMsg(e?.message || String(e));
+    }
   }
 
-
-  // ======== Actions: Promo ========
-  async function upsertPromo(code, percent, is_active) {
+  // ======== Actions: Promo (multi add) ========
+  async function bulkUpsertPromo() {
     setMsg("");
-    const { error } = await supabase.from("promo_codes").upsert({
-      code: String(code || "").trim().toUpperCase(),
-      percent: Number(percent || 0),
-      is_active: !!is_active,
-    }, { onConflict: "code" });
-    if (error) { setMsg(error.message); return; }
-    await refreshAll();
-    setMsg("Promo disimpan.");
+    const lines = String(promoBulk || "").split(/\r?\n/).map((x) => x.trim()).filter(Boolean);
+    if (lines.length === 0) { setMsg("Isi dulu list promo-nya."); return; }
+
+    const payload = [];
+    for (const line of lines) {
+      // format: CODE,30,true  | CODE 30 | CODE,30
+      const parts = line.split(/[,\s]+/).map((x) => x.trim()).filter(Boolean);
+      const code = (parts[0] || "").toUpperCase();
+      const percent = Number(parts[1] || 0);
+      const active = parts[2] ? ["1","true","yes","aktif"].includes(parts[2].toLowerCase()) : true;
+      if (!code) continue;
+      payload.push({ code, percent: Math.max(0, Math.min(90, percent)), is_active: active });
+    }
+
+    if (payload.length === 0) { setMsg("Tidak ada data promo valid."); return; }
+
+    try {
+      const { error } = await supabase.from("promo_codes").upsert(payload, { onConflict: "code" });
+      if (error) throw error;
+      await refreshAll();
+      setMsg(`Berhasil import ${payload.length} promo.`);
+      setPromoBulk("");
+    } catch (e) {
+      setMsg("Gagal import promo: " + (e?.message || e));
+    }
   }
+
+  async function quickUpdatePromo(code, patch) {
+    setMsg("");
+    try {
+      const { error } = await supabase.from("promo_codes").update(patch).eq("code", code);
+      if (error) throw error;
+      await refreshAll();
+    } catch (e) {
+      setMsg(e?.message || String(e));
+    }
+  }
+
+  // ======== Actions: Orders ========
+  async function updateOrderStatus(order_code, status) {
+    setMsg("");
+    try {
+      const { error } = await supabase.from("orders").update({ status }).eq("order_code", order_code);
+      if (error) throw error;
+      await refreshOrders();
+    } catch (e) {
+      setMsg("Gagal update status: " + (e?.message || e));
+    }
+  }
+
+  const activeCount = useMemo(() => products.filter(p => p.is_active).length, [products]);
 
   return (
     <div className="page">
@@ -269,7 +337,7 @@ export default function AdminDashboard() {
         <div className="container section-head">
           <div>
             <h1 className="h1">Admin Dashboard</h1>
-            <p className="muted">Kelola produk, harga, testimoni, promo, dan setting checkout.</p>
+            <p className="muted">Kelola produk, ikon, testimoni, promo, dan order.</p>
           </div>
           <button className="btn btn-ghost" onClick={logout}>Logout</button>
         </div>
@@ -278,9 +346,9 @@ export default function AdminDashboard() {
           <div className="tabs">
             <TabButton active={tab === "produk"} onClick={() => setTab("produk")}>Produk</TabButton>
             <TabButton active={tab === "testimoni"} onClick={() => setTab("testimoni")}>Testimoni</TabButton>
-            <TabButton active={tab === "settings"} onClick={() => setTab("settings")}>Settings</TabButton>
             <TabButton active={tab === "promo"} onClick={() => setTab("promo")}>Promo</TabButton>
             <TabButton active={tab === "orders"} onClick={() => setTab("orders")}>Orders</TabButton>
+            <TabButton active={tab === "settings"} onClick={() => setTab("settings")}>Settings</TabButton>
           </div>
 
           {msg ? <div className="hint">{msg}</div> : null}
@@ -288,29 +356,60 @@ export default function AdminDashboard() {
           {tab === "produk" ? (
             <div className="card pad">
               <div className="row between">
-                <h2 className="h3">Kelola Produk</h2>
+                <div>
+                  <h2 className="h3">Kelola Produk</h2>
+                  <div className="hint subtle">{activeCount} aktif • Bucket ikon: <code>{BUCKET_ICONS}</code> (public)</div>
+                </div>
                 <button className="btn btn-sm" onClick={createProduct}>+ Produk</button>
               </div>
 
               <div className="admin-list">
                 {products.map(p => (
                   <div key={p.id} className="admin-item">
-                    <div className="row between">
-                      <div>
-                        <div className="admin-title">{p.name} <span className="muted">/{p.slug}</span></div>
-                        <div className="muted">{p.description || "—"}</div>
+                    <div className="row between" style={{ alignItems: "flex-start" }}>
+                      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                        {p.icon_url ? (
+                          <img src={p.icon_url} alt={`${p.name} icon`} className="admin-product-icon" />
+                        ) : (
+                          <div className="admin-product-icon admin-product-icon-fallback">{(p.name || "P").slice(0,1).toUpperCase()}</div>
+                        )}
+
+                        <div>
+                          <div className="admin-title">{p.name} <span className="muted">/{p.slug}</span></div>
+                          <div className="muted">{p.description || "—"}</div>
+
+                          <div className="row" style={{ gap: 10, marginTop: 10, flexWrap: "wrap" }}>
+                            <label className="chip" style={{ cursor: "pointer" }}>
+                              Upload ikon
+                              <input
+                                type="file"
+                                accept="image/png,image/jpeg,image/jpg,image/webp"
+                                style={{ display: "none" }}
+                                onChange={(e) => {
+                                  const f = e.target.files?.[0];
+                                  if (f) uploadProductIcon(p, f);
+                                  e.target.value = "";
+                                }}
+                              />
+                            </label>
+
+                            <button className="btn btn-ghost btn-sm" onClick={() => updateProduct({ id: p.id, is_active: !p.is_active })}>
+                              {p.is_active ? "Nonaktif" : "Aktifkan"}
+                            </button>
+
+                            <button className="btn btn-ghost btn-sm" onClick={() => {
+                              const name = prompt("Nama baru", p.name) || p.name;
+                              const description = prompt("Deskripsi", p.description || "") || "";
+                              updateProduct({ id: p.id, name, description });
+                            }}>Edit</button>
+
+                            <button className="btn btn-danger btn-sm" onClick={() => deleteProduct(p.id)}>Hapus</button>
+                          </div>
+                        </div>
                       </div>
+
                       <div className="row">
-                        <button className="btn btn-ghost btn-sm" onClick={() => addVariant(p)}>+ Varian</button>
-                        <button className="btn btn-ghost btn-sm" onClick={() => updateProduct({ id: p.id, is_active: !p.is_active })}>
-                          {p.is_active ? "Nonaktif" : "Aktifkan"}
-                        </button>
-                        <button className="btn btn-ghost btn-sm" onClick={() => {
-                          const name = prompt("Nama baru", p.name) || p.name;
-                          const description = prompt("Deskripsi", p.description || "") || "";
-                          updateProduct({ id: p.id, name, description });
-                        }}>Edit</button>
-                        <button className="btn btn-danger btn-sm" onClick={() => deleteProduct(p.id)}>Hapus</button>
+                        <button className="btn btn-sm" onClick={() => addVariant(p)}>+ Varian</button>
                       </div>
                     </div>
 
@@ -321,7 +420,7 @@ export default function AdminDashboard() {
                             <div className="variant-name">{v.name}</div>
                             <div className="muted">{v.duration_label} {v.guarantee_text ? `• ${v.guarantee_text}` : ""}</div>
                           </div>
-                          <div className="row">
+                          <div className="row" style={{ flexWrap: "wrap" }}>
                             <input
                               className="input input-sm"
                               type="number"
@@ -356,13 +455,13 @@ export default function AdminDashboard() {
 
           {tab === "testimoni" ? (
             <div className="card pad">
-              <h2 className="h3">Kelola Testimoni</h2>
+              <h2 className="h3">Kelola Testimoni (multi upload)</h2>
 
-              <form className="form" onSubmit={addTestimonial}>
-                <label className="label">Upload gambar (jpg/png)</label>
-                <input name="file" type="file" accept="image/*" className="input" />
+              <form className="form" onSubmit={addTestimonials}>
+                <label className="label">Upload gambar (jpeg/jpg/png)</label>
+                <input name="files" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" className="input" multiple />
 
-                <label className="label">Caption (opsional)</label>
+                <label className="label">Caption (opsional, akan dipakai untuk semua)</label>
                 <input name="caption" className="input" placeholder="contoh: Terima kasih, fast respon!" />
 
                 <button className="btn" type="submit">Upload</button>
@@ -385,89 +484,224 @@ export default function AdminDashboard() {
               </div>
 
               <div className="hint subtle">
-                Storage bucket yang disarankan: <code>{BUCKET}</code> (public), folder <code>testimonials/</code>.
-              </div>
-            </div>
-          ) : null}
-
-          {tab === "settings" ? (
-            <div className="card pad">
-              <h2 className="h3">Settings Checkout</h2>
-
-              <div className="prose-grid">
-                <div className="prose-card">
-                  <h3>WhatsApp</h3>
-                  <p className="muted">Gunakan format internasional tanpa tanda + (contoh: 62813...).</p>
-                  <input className="input" defaultValue={waNumber} onBlur={(e) => saveWhatsApp(e.target.value)} />
-                  <div className="hint subtle">Auto-save saat keluar dari input.</div>
-                </div>
-
-                <div className="prose-card">
-                  <h3>Pembayaran QRIS</h3>
-                  <p className="muted">
-                    QRIS ditampilkan dari file <b>qris_payment.jpeg</b> di folder <b>public</b> (frontend).
-                    Untuk mengganti QRIS, cukup replace file tersebut lalu deploy ulang.
-                  </p>
-                </div>
-              </div>
-
-              <div className="hint subtle">
-                Upload QRIS juga butuh Storage bucket + policy. Kalau belum, lihat panduan SQL policy di chat.
+                Bucket testimoni: <code>{BUCKET_TESTIMONIALS}</code> (public), folder <code>testimonials/</code>.
               </div>
             </div>
           ) : null}
 
           {tab === "promo" ? (
             <div className="card pad">
-              <h2 className="h3">Promo</h2>
-              <p className="muted">Default: DISKON30 = diskon 30% untuk semua harga.</p>
+              <h2 className="h3">Promo (multi-add)</h2>
+              <p className="muted">
+                Isi beberapa baris, contoh:
+                <br />
+                <code>DISKON30,30,true</code><br />
+                <code>NEW10 10</code>
+              </p>
 
-              <div className="promo-admin">
-                <div className="row">
-                  <input className="input" id="promo_code" defaultValue="DISKON30" />
-                  <input className="input" id="promo_percent" type="number" min="0" max="90" defaultValue={promos.find(p => p.code === "DISKON30")?.percent ?? 30} />
-                  <label className="checkbox">
-                    <input type="checkbox" id="promo_active" defaultChecked={promos.find(p => p.code === "DISKON30")?.is_active ?? true} />
-                    aktif
-                  </label>
-                  <button className="btn" onClick={() => {
-                    const code = document.getElementById("promo_code").value;
-                    const percent = document.getElementById("promo_percent").value;
-                    const active = document.getElementById("promo_active").checked;
-                    upsertPromo(code, percent, active);
-                  }}>Simpan</button>
-                </div>
+              <label className="label">Import promo (multi-line)</label>
+              <textarea
+                className="input"
+                style={{ minHeight: 140, resize: "vertical" }}
+                value={promoBulk}
+                onChange={(e) => setPromoBulk(e.target.value)}
+                placeholder={"DISKON30,30,true\nNEW10,10,true\nHEMAT5 5"}
+              />
 
-                <div className="divider" />
-                <div className="hint subtle">
-                  Promo lain bisa ditambahkan via SQL / UI lanjut. Untuk versi ini fokus 1 kode.
+              <div className="row" style={{ gap: 10, marginTop: 10, flexWrap: "wrap" }}>
+                <button className="btn" onClick={bulkUpsertPromo}>Import</button>
+                <button className="btn btn-ghost" onClick={() => setPromoBulk("")}>Clear</button>
+              </div>
+
+              <div className="divider" />
+
+              <h3 className="h3">Daftar promo</h3>
+              {promos.length === 0 ? <div className="hint subtle">Belum ada promo.</div> : (
+                <div className="admin-list">
+                  {promos.map(p => (
+                    <div key={p.code} className="admin-item">
+                      <div className="row between" style={{ alignItems: "center" }}>
+                        <div>
+                          <div className="admin-title">{p.code}</div>
+                          <div className="muted">Diskon {p.percent}%</div>
+                        </div>
+                        <div className="row" style={{ flexWrap: "wrap" }}>
+                          <input
+                            className="input input-sm"
+                            type="number"
+                            min="0"
+                            max="90"
+                            defaultValue={p.percent}
+                            onBlur={(e) => quickUpdatePromo(p.code, { percent: Number(e.target.value || 0) })}
+                          />
+                          <button className="btn btn-ghost btn-sm" onClick={() => quickUpdatePromo(p.code, { is_active: !p.is_active })}>
+                            {p.is_active ? "Nonaktif" : "Aktifkan"}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
+              )}
+
+              <div className="hint subtle">
+                Validasi promo di frontend memakai RPC <code>validate_promo</code>. Pastikan function itu tetap ada.
               </div>
             </div>
           ) : null}
 
           {tab === "orders" ? (
             <div className="card pad">
-              <h2 className="h3">Orders terbaru</h2>
-              <div className="muted">Menampilkan 50 order terakhir (klik “Sudah bayar”).</div>
+              <div className="row between">
+                <div>
+                  <h2 className="h3">Orders</h2>
+                  <div className="muted">Menampilkan 60 order terakhir.</div>
+                </div>
+                <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>Refresh</button>
+              </div>
 
               <div className="divider" />
 
-              {orders.length === 0 ? <div className="hint">Belum ada order.</div> : (
+              {orders.length === 0 ? (
+                <div className="hint subtle">
+                  Belum ada order (atau kolom baru belum ditambahkan). Pastikan tabel orders punya kolom <code>order_code</code> & <code>payment_proof_url</code>.
+                </div>
+              ) : (
                 <div className="orders">
-                  {orders.map(o => (
-                    <div key={o.id} className="order-row">
-                      <div>
-                        <div className="order-id">{o.id}</div>
-                        <div className="muted">{new Date(o.created_at).toLocaleString("id-ID")} • {o.status}</div>
+                  {orders.map(o => {
+                    const code = o.order_code || o.id;
+                    const isOpen = openOrder === code;
+                    return (
+                      <div key={code} className="order-card">
+                        <button className="order-top" onClick={() => setOpenOrder(isOpen ? "" : code)}>
+                          <div>
+                            <div className="order-id">{o.order_code || "(tanpa kode)"}</div>
+                            <div className="muted">{new Date(o.created_at).toLocaleString("id-ID")} • {prettyStatus(o.status)}</div>
+                          </div>
+                          <div className="order-total">{formatIDR(o.total_idr)}</div>
+                        </button>
+
+                        {isOpen ? (
+                          <div className="order-body">
+                            <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+                              <label className="muted">Status</label>
+                              <select
+                                className="input"
+                                style={{ height: 38, width: 220 }}
+                                value={o.status === "paid_reported" ? "pending" : (o.status || "pending")}
+                                onChange={(e) => updateOrderStatus(o.order_code, e.target.value)}
+                              >
+                                <option value="pending">Pending</option>
+                                <option value="processing">Diproses</option>
+                                <option value="done">Sukses</option>
+                              </select>
+
+                              {o.promo_code ? (
+                                <div className="status-badge">
+                                  <span className="dot dot-paid_reported" />
+                                  <b>{o.promo_code}</b>
+                                </div>
+                              ) : null}
+                            </div>
+
+                            <div className="divider" />
+
+                            <div className="order-split">
+                              <div>
+                                <div className="h3">Item</div>
+                                <div className="status-items" style={{ marginTop: 10 }}>
+                                  {(o.items || []).map((it, idx) => (
+                                    <div key={idx} className="status-item">
+                                      <div>
+                                        <div className="status-title">{it.product_name}</div>
+                                        <div className="status-sub">{it.variant_name} • {it.duration_label} • Qty {it.qty}</div>
+                                      </div>
+                                      <div className="order-total">{formatIDR((it.price_idr || 0) * (it.qty || 0))}</div>
+                                    </div>
+                                  ))}
+                                </div>
+
+                                <div className="divider" />
+
+                                <div className="totals">
+                                  <div className="tot-row"><span>Subtotal</span><b>{formatIDR(o.subtotal_idr || 0)}</b></div>
+                                  <div className="tot-row"><span>Diskon</span><b>- {formatIDR(Math.round(((o.subtotal_idr || 0) * (o.discount_percent || 0)) / 100))}</b></div>
+                                  <div className="tot-row tot-big"><span>Total</span><b>{formatIDR(o.total_idr || 0)}</b></div>
+                                </div>
+                              </div>
+
+                              <div>
+                                <div className="h3">Bukti bayar</div>
+                                {o.payment_proof_url ? (
+                                  <a href={o.payment_proof_url} target="_blank" rel="noreferrer" className="proof-wrap">
+                                    <img src={o.payment_proof_url} alt="bukti bayar" className="proof-img" />
+                                    <div className="hint subtle">Klik untuk membuka ukuran penuh</div>
+                                  </a>
+                                ) : (
+                                  <div className="hint subtle">Belum ada bukti bayar.</div>
+                                )}
+
+                                <div className="divider" />
+
+                                <a
+                                  className="btn btn-ghost btn-wide"
+                                  href={`https://wa.me/${waNumber}?text=${encodeURIComponent(`Halo kak, saya admin imzaqi.store. Untuk order ${o.order_code || ""} statusnya: ${prettyStatus(o.status)}.`)}`}
+                                  target="_blank"
+                                  rel="noreferrer"
+                                >
+                                  Chat WA (template)
+                                </a>
+
+                                <div className="hint subtle">
+                                  Nomor WA diset dari Settings (key: whatsapp).
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
                       </div>
-                      <div className="order-total">{formatIDR(o.total_idr)}</div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
+
+              <div className="hint subtle" style={{ marginTop: 10 }}>
+                Bucket bukti bayar: <code>{BUCKET_PAYMENT}</code> (public), folder <code>proofs/</code>.
+              </div>
             </div>
           ) : null}
+
+          {tab === "settings" ? (
+            <div className="card pad">
+              <h2 className="h3">Settings</h2>
+
+              <div className="prose-grid">
+                <div className="prose-card">
+                  <h3>WhatsApp Admin</h3>
+                  <p className="muted">Gunakan format internasional tanpa tanda + (contoh: 62813...).</p>
+                  <input className="input" defaultValue={waNumber} onBlur={(e) => saveWhatsApp(e.target.value)} />
+                  <div className="hint subtle">Auto-save saat keluar dari input.</div>
+                </div>
+
+                <div className="prose-card">
+                  <h3>QRIS</h3>
+                  <p className="muted">
+                    QRIS ditampilkan dari file <b>qris_payment.jpeg</b> di folder <b>public</b>.
+                    Untuk mengganti QRIS, cukup replace file tersebut lalu deploy ulang.
+                  </p>
+                </div>
+
+                <div className="prose-card">
+                  <h3>Catatan Storage</h3>
+                  <p className="muted">
+                    Pastikan 3 bucket ini sudah dibuat dan public:
+                    <br /><code>{BUCKET_ICONS}</code>, <code>{BUCKET_TESTIMONIALS}</code>, <code>{BUCKET_PAYMENT}</code>.
+                  </p>
+                </div>
+              </div>
+            </div>
+          ) : null}
+
         </div>
       </section>
     </div>

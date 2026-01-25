@@ -1,9 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { fetchTestimonials } from "../lib/api";
+import EmptyState from "../components/EmptyState";
+import { usePageMeta } from "../hooks/usePageMeta";
 
 export default function Testimonials() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
+  const [error, setError] = useState("");
+
+  usePageMeta({
+    title: "Testimoni",
+    description: "Testimoni pelanggan Imzaqi Store. Admin upload real-time dari dashboard.",
+  });
 
   useEffect(() => {
     let alive = true;
@@ -15,6 +23,7 @@ export default function Testimonials() {
       } catch (e) {
         // eslint-disable-next-line no-console
         console.warn(e);
+        setError("Gagal memuat testimoni. Coba refresh.");
       } finally {
         if (alive) setLoading(false);
       }
@@ -38,8 +47,30 @@ export default function Testimonials() {
             <div className="skeleton card tall" />
             <div className="skeleton card tall" />
           </div>
+        ) : error ? (
+          <div className="container">
+            <div className="card pad">
+              <EmptyState
+                icon="📡"
+                title="Testimoni belum bisa dimuat"
+                description={error}
+                primaryAction={{ label: "Refresh", onClick: () => window.location.reload() }}
+                secondaryAction={{ label: "Kembali ke Home", to: "/" }}
+              />
+            </div>
+          </div>
         ) : items.length === 0 ? (
-          <div className="container hint">Belum ada testimoni. Admin bisa upload dari dashboard.</div>
+          <div className="container">
+            <div className="card pad">
+              <EmptyState
+                icon="🧾"
+                title="Belum ada testimoni"
+                description="Admin bisa upload dari dashboard. Kalau kamu sudah pernah beli, makasih banget ya 🙏"
+                primaryAction={{ label: "Belanja dulu", to: "/produk" }}
+                secondaryAction={{ label: "Cek Status Order", to: "/status" }}
+              />
+            </div>
+          </div>
         ) : (
           <div className="container masonry">
             {items.map(t => (

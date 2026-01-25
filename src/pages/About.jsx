@@ -1,6 +1,13 @@
 import React from "react";
+import { usePageMeta } from "../hooks/usePageMeta";
 
 export default function About() {
+  usePageMeta({
+    title: "Tentang",
+    description:
+      "Tentang Imzaqi Store: alur beli cepat (pilih paket → bayar QRIS → upload bukti → cek status).",
+  });
+
   return (
     <div className="page">
       <section className="section reveal">
