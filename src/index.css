@@ -832,11 +832,8 @@ body{
 }
 
 /* Hero center + typewriter */
-.hero-center{
-  position:relative;
-  padding: 100px 0 26px;
-  overflow:hidden;
-}
+.hero-center{ padding-top: 120px; } /* angka ini */
+
 .hero-center-inner{
   position:relative;
   z-index:2;

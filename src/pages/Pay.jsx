@@ -153,7 +153,7 @@ export default function Pay() {
 
   const waUrl = useMemo(() => {
     const text = encodeURIComponent(
-      `Halo kak, saya sudah bayar.\n\nID Order: ${orderCode || "(menunggu)"}\n\n${summaryText}\n\nMohon diproses ya 🙏`
+      `Halo kak, saya sudah bayar.\n\nID Order: ${orderCode || "(menunggu)"}\n\n${summaryText}\n\nMohon diproses yaa`
     );
     return `https://wa.me/${waNumber}?text=${text}`;
   }, [waNumber, orderCode, summaryText]);
@@ -225,14 +225,15 @@ export default function Pay() {
       status: "pending",
     };
 
-    const { data, error } = await supabase
-      .from("orders")
-      .insert(payload)
-      .select("id,order_code")
-      .single();
+const { error } = await supabase
+  .from("orders")
+  .insert(payload);
 
-    if (error) throw error;
-    return data;
+if (error) throw error;
+
+// kamu sudah punya nextCode, jadi ga perlu ambil balik dari DB
+return { order_code: nextCode };
+
   }
 
   async function onConfirmPaid() {
@@ -271,7 +272,7 @@ export default function Pay() {
       }
       if (!final) throw new Error("Gagal membuat ID order unik. Coba lagi.");
 
-      setOrderCode(final.order_code || code);
+      setOrderCode(code);
       setOk(true);
       toast.remove(loadingId);
       toast.success("ID order berhasil dibuat", {
