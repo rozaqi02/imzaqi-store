@@ -48,7 +48,9 @@ export default function Footer() {
       </div>
 
       <div className="footer-bottom">
-        © {year} imzaqi.store — All rights reserved.
+        <div className="container">
+          © {year} imzaqi.store — All rights reserved.
+        </div>
       </div>
     </footer>
   );

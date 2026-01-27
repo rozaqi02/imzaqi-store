@@ -44,8 +44,8 @@ button,input{font:inherit}
 body.nav-open{overflow:hidden}
 
 .container{
-  width:min(1240px, calc(100% - 32px));
-  margin:0 auto;
+  width: min(1100px, 100%);
+  margin: 0 auto;
 }
 
 .app-shell{
@@ -55,7 +55,45 @@ body.nav-open{overflow:hidden}
 }
 
 .app-main{
-  flex:1;
+  padding-left: calc(clamp(16px, 4vw, 40px) + env(safe-area-inset-left));
+  padding-right: calc(clamp(16px, 4vw, 40px) + env(safe-area-inset-right));
+}
+
+.app-main > *{
+  position: relative;
+  z-index: 2;
+}
+
+/* =========================
+   EDGE FADE (DEPTH FEEL)
+========================= */
+.app-main::before,
+.app-main::after{
+  content:"";
+  position:fixed;
+  top:0;
+  bottom:0;
+  width: clamp(16px, 6vw, 80px);
+  pointer-events:none;
+  z-index:1;
+}
+
+.app-main::before{
+  left:0;
+  background: linear-gradient(
+    to right,
+    rgba(3,22,15,.55),
+    rgba(3,22,15,0)
+  );
+}
+
+.app-main::after{
+  right:0;
+  background: linear-gradient(
+    to left,
+    rgba(3,22,15,.55),
+    rgba(3,22,15,0)
+  );
 }
 
 /* Header */
@@ -66,6 +104,8 @@ body.nav-open{overflow:hidden}
   backdrop-filter: blur(10px);
   background: rgba(3, 22, 15, .65);
   border-bottom:1px solid var(--line);
+  padding-left: calc(16px + env(safe-area-inset-left));
+  padding-right: calc(16px + env(safe-area-inset-right));
 }
 
 .header-inner{
@@ -73,7 +113,7 @@ body.nav-open{overflow:hidden}
   align-items:center;
   justify-content:space-between;
   gap:16px;
-  padding:14px 0;
+  padding:10px 0;
 }
 
 .brand{
@@ -1293,7 +1333,6 @@ body{
   z-index:9998;
 }
 
-/* Sidebar mobile – basic abu-abu */
 .mobile-menu{
   position:fixed;
   top:0;
@@ -1301,14 +1340,27 @@ body{
   bottom:0;
   width: 78vw;
   max-width: 320px;
-  background: #1f2328; /* abu-abu solid */
-  padding: 20px 16px;
+
+  padding:
+    calc(20px + env(safe-area-inset-top))
+    calc(20px + env(safe-area-inset-right))
+    calc(24px + env(safe-area-inset-bottom))
+    calc(20px + env(safe-area-inset-left));
+
+  background: #1f2328;
   display:flex;
   flex-direction:column;
-  gap:10px;
+  gap:12px;
   z-index:9999;
   animation: slideIn .22s ease-out both;
 }
+
+.mobile-menu a{
+  text-align:left;
+  font-size:16px;
+  letter-spacing:.2px;
+}
+
 
 @keyframes slideIn{
   from{transform: translateX(100%)}
@@ -1331,4 +1383,18 @@ body{
 /* Lock scroll */
 body.nav-open{
   overflow:hidden;
+}
+
+@media (max-width: 680px){
+  .header-inner{
+    padding-top: 12px;
+    padding-bottom: 12px;
+  }
+}
+
+@media (max-width: 680px){
+  .header{
+    padding-left: 18px;
+    padding-right: 18px;
+  }
 }
