@@ -1,3 +1,4 @@
+// src/lib/visitor.js
 export function getVisitorId() {
   const key = "imzaqi_visitor_id";
   let v = localStorage.getItem(key);

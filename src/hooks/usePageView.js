@@ -1,39 +1,27 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
-import { getVisitorIdAsUUID } from "../lib/visitor";
 
-// NOTE: diekspor sebagai named + default biar kompatibel:
-// - import { usePageView } from "...";
-// - import usePageView from "...";
-export function usePageView(pathname) {
+export function usePageView(path) {
+  // Gunakan ref untuk mencegah double-count di React.StrictMode (development mode)
+  const initialized = useRef(false);
+
   useEffect(() => {
-    let cancelled = false;
-
-    (async () => {
+    if (initialized.current) return;
+    
+    // Fungsi untuk menambah counter via RPC
+    async function hit() {
       try {
-        const visitor_id = getVisitorIdAsUUID();
-        const payload = {
-          visitor_id,
-          path: pathname || window.location.pathname,
-          referrer: document.referrer || null,
-          user_agent: navigator.userAgent || null,
-        };
-
-        const { error } = await supabase.from("page_views").insert(payload);
-
-        // jangan bikin crash kalau gagal
-        if (!cancelled && error) {
-          console.warn("page_view insert failed:", error.message);
-        }
+        await supabase.rpc("increment_view");
       } catch (e) {
-        if (!cancelled) console.warn("page_view error:", e);
+        console.error("Gagal update view", e);
       }
-    })();
+    }
 
-    return () => {
-      cancelled = true;
-    };
-  }, [pathname]);
+    hit();
+    initialized.current = true;
+    
+    // Reset ref jika path berubah (opsional, tergantung mau hitung per halaman atau per sesi)
+    // Kalau mau hitung setiap ganti halaman, hapus baris "if (initialized...)" di atas 
+    // dan biarkan useEffect jalan tiap [path] berubah.
+  }, [path]);
 }
-
-export default usePageView;

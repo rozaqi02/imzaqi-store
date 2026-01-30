@@ -1,3 +1,4 @@
+// src/pages/Pay.jsx
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
@@ -209,31 +210,25 @@ export default function Pay() {
     return data.publicUrl;
   }
 
-  async function createOrder(payment_proof_url, nextCode) {
+  async function createOrderWithStock(payment_proof_url, nextCode) {
     const visitor_id = getVisitorIdAsUUID();
 
-    const payload = {
-      visitor_id,
-      order_code: nextCode,
-      items,
-      promo_code: promo?.code || null,
-      subtotal_idr: subtotal,
-      discount_percent: promo?.percent || 0,
-      total_idr: total,
-      payment_proof_url,
-      // Status awal (admin nanti bisa update: pending -> processing -> done)
-      status: "pending",
-    };
+    // Gunakan RPC function untuk create order dengan stock check
+    const { data, error } = await supabase.rpc('create_order_with_stock_check', {
+      p_visitor_id: visitor_id,
+      p_order_code: nextCode,
+      p_items: items,
+      p_promo_code: promo?.code || null,
+      p_subtotal_idr: subtotal,
+      p_discount_percent: promo?.percent || 0,
+      p_total_idr: total,
+      p_payment_proof_url: payment_proof_url,
+      p_status: 'pending'
+    });
 
-const { error } = await supabase
-  .from("orders")
-  .insert(payload);
+    if (error) throw error;
 
-if (error) throw error;
-
-// kamu sudah punya nextCode, jadi ga perlu ambil balik dari DB
-return { order_code: nextCode };
-
+    return { order_code: nextCode, order_id: data };
   }
 
   async function onConfirmPaid() {
@@ -262,11 +257,17 @@ return { order_code: nextCode };
       for (let i = 0; i < 10; i++) {
         code = makeOrderCode(4); // IMZ-xxxx
         try {
-          final = await createOrder(proofUrl, code);
+          final = await createOrderWithStock(proofUrl, code);
           break;
         } catch (e) {
-          // 23505 = unique_violation
+          // 23505 = unique_violation (order_code sudah ada)
           if (e?.code === "23505") continue;
+          
+          // P0001 = raise_exception dari function (stock habis)
+          if (e?.code === "P0001" || e?.message?.toLowerCase().includes("stock")) {
+            throw new Error(e.message || "Stock tidak mencukupi untuk beberapa produk");
+          }
+          
           throw e;
         }
       }
@@ -285,7 +286,13 @@ return { order_code: nextCode };
     } catch (e) {
       toast.remove(loadingId);
       const msg = e?.message || String(e);
-      if (msg.toLowerCase().includes("order_code") || msg.toLowerCase().includes("payment_proof_url") || msg.toLowerCase().includes("promo_code")) {
+      
+      // Handle stock error
+      if (msg.toLowerCase().includes("stock")) {
+        const t = "Stock tidak mencukupi untuk beberapa produk. Silakan cek keranjang dan coba lagi.";
+        setErr(t + "\nDetail: " + msg);
+        toast.error(t);
+      } else if (msg.toLowerCase().includes("order_code") || msg.toLowerCase().includes("payment_proof_url") || msg.toLowerCase().includes("promo_code")) {
         const t = "Database belum siap (kolom baru belum ditambahkan). Jalankan file SQL setup yang ada di project.";
         setErr(t + " Detail: " + msg);
         toast.error(t);
@@ -296,6 +303,10 @@ return { order_code: nextCode };
           "Detail: " + msg
         );
         toast.error("Gagal memproses karena policy Supabase (RLS).");
+      } else if (msg.toLowerCase().includes("create_order_with_stock_check")) {
+        const t = "Function create_order_with_stock_check belum dibuat. Jalankan stock_migration.sql di Supabase SQL Editor.";
+        setErr(t + " Detail: " + msg);
+        toast.error(t);
       } else {
         setErr("Gagal memproses. Pastikan bucket Storage sudah dibuat & public. Detail: " + msg);
         toast.error("Gagal memproses pembayaran. Coba lagi ya.");

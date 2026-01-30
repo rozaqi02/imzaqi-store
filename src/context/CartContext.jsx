@@ -21,10 +21,11 @@ export function CartProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-  const api = useMemo(() => ({
+const api = useMemo(() => ({
     items,
 
     add(variant, qty = 1) {
+      // ... kode add tetap sama ...
       setItems(prev => {
         const i = prev.findIndex(x => x.variant_id === variant.id);
         if (i >= 0) {
@@ -59,6 +60,12 @@ export function CartProvider({ children }) {
     subtotal() {
       return items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0);
     },
+
+    // TAMBAHKAN INI (Alias agar cart.total() jalan)
+    total() {
+      return items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0);
+    },
+
   }), [items]);
 
   return <CartContext.Provider value={api}>{children}</CartContext.Provider>;

@@ -43,6 +43,301 @@ button,input{font:inherit}
 /* Lock scroll when mobile drawer opened */
 body.nav-open{overflow:hidden}
 
+/* =========================
+   MOBILE SIDEBAR (FRAMER MOTION ENHANCED)
+========================= */
+.mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 22, 15, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  z-index: 999;
+  touch-action: none;
+}
+
+.mobile-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: min(340px, 88vw);
+  /* Gradient background yang match dengan tema */
+  background: 
+    radial-gradient(600px 400px at 80% 20%, rgba(0,194,208,.08) 0%, rgba(0,194,208,0) 70%),
+    linear-gradient(180deg, rgba(11, 18, 32, 0.97) 0%, rgba(3, 22, 15, 0.97) 100%);
+  backdrop-filter: blur(24px) saturate(180%);
+  -webkit-backdrop-filter: blur(24px) saturate(180%);
+  border-left: 1px solid rgba(0, 194, 208, 0.15);
+  box-shadow: 
+    -20px 0 80px rgba(0, 0, 0, 0.6),
+    -1px 0 0 rgba(0, 194, 208, 0.1) inset;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  padding-top: 80px;
+  gap: 6px;
+  /* Safe area untuk notch */
+  padding-right: calc(24px + env(safe-area-inset-right));
+  padding-bottom: calc(32px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  /* Smooth scrolling */
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+/* Custom scrollbar untuk sidebar */
+.mobile-menu::-webkit-scrollbar {
+  width: 6px;
+}
+.mobile-menu::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 10px;
+  margin: 10px;
+}
+.mobile-menu::-webkit-scrollbar-thumb {
+  background: rgba(0, 194, 208, 0.3);
+  border-radius: 10px;
+}
+.mobile-menu::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 194, 208, 0.5);
+}
+
+/* Menu Link Styling */
+.mobile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  border-radius: 15px;
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  color: rgba(234, 255, 245, 0.85);
+  border: 1px solid transparent;
+  position: relative;
+  overflow: hidden;
+  transition: none; /* Framer Motion handles transitions */
+}
+
+/* Shimmer effect on hover */
+.mobile-menu a::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    110deg,
+    transparent 30%,
+    rgba(0, 194, 208, 0.2) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.mobile-menu a:hover::before {
+  transform: translateX(100%);
+}
+
+/* Active state indicator */
+.mobile-menu a .active-indicator {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 24px;
+  background: linear-gradient(180deg, #4fffc8, rgba(0, 194, 208, 0.8));
+  border-radius: 0 4px 4px 0;
+  box-shadow: 0 0 12px rgba(0, 194, 208, 0.5);
+}
+
+.mobile-menu a.active {
+  background: rgba(0, 194, 208, 0.12);
+  border-color: rgba(0, 194, 208, 0.3);
+  color: #4fffc8;
+  box-shadow: 
+    0 4px 20px rgba(0, 194, 208, 0.15),
+    0 0 0 1px rgba(0, 194, 208, 0.1) inset;
+}
+
+/* Icon styling */
+.mobile-menu a .menu-icon {
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  opacity: 0.7;
+  flex-shrink: 0;
+}
+
+.mobile-menu a:hover .menu-icon,
+.mobile-menu a.active .menu-icon {
+  opacity: 1;
+}
+
+/* Close button */
+.mobile-menu-close {
+  position: absolute;
+  top: 22px;
+  right: 22px;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(234, 255, 245, 0.9);
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  z-index: 10;
+  /* Safe area untuk notch */
+  right: calc(22px + env(safe-area-inset-right));
+  transition: none; /* Framer Motion handles this */
+}
+
+.mobile-menu-close:hover {
+  background: rgba(255, 90, 122, 0.12);
+  border-color: rgba(255, 90, 122, 0.3);
+  color: #ff5a7a;
+  box-shadow: 0 4px 16px rgba(255, 90, 122, 0.2);
+}
+
+.mobile-menu-close svg {
+  width: 20px;
+  height: 20px;
+}
+
+/* Menu Header */
+.mobile-menu-header {
+  margin-bottom: 24px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid rgba(0, 194, 208, 0.12);
+  background: linear-gradient(
+    135deg,
+    rgba(0, 194, 208, 0.03) 0%,
+    rgba(0, 138, 148, 0.02) 100%
+  );
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 194, 208, 0.08);
+}
+
+.mobile-menu-header h3 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #eafff5 0%, #4fffc8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: 0.5px;
+}
+
+.mobile-menu-header p {
+  margin: 6px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+/* Divider */
+.mobile-menu-divider {
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(0, 194, 208, 0.15) 50%,
+    transparent 100%
+  );
+  margin: 16px 0;
+  position: relative;
+}
+
+.mobile-menu-divider::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: rgba(0, 194, 208, 0.4);
+  border-radius: 50%;
+  box-shadow: 0 0 8px rgba(0, 194, 208, 0.5);
+}
+
+/* Menu Footer */
+.mobile-menu-footer {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+}
+
+.menu-footer-text {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: rgba(234, 255, 245, 0.7);
+  letter-spacing: 0.5px;
+}
+
+.menu-footer-version {
+  margin: 4px 0 0;
+  font-size: 11px;
+  color: var(--muted);
+  font-weight: 500;
+  opacity: 0.6;
+}
+
+/* Touch feedback untuk mobile */
+@media (hover: none) {
+  .mobile-menu a:active {
+    background: rgba(255, 255, 255, 0.08);
+    transform: scale(0.98);
+  }
+}
+
+/* Optimizations */
+.mobile-menu,
+.mobile-backdrop {
+  will-change: transform, opacity;
+}
+
+/* Swipe indicator (visual hint) */
+.mobile-menu::after {
+  content: "";
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 10px;
+  opacity: 0.5;
+}
+
+/* Responsive adjustments */
+@media (max-width: 380px) {
+  .mobile-menu {
+    width: 92vw;
+    padding: 20px;
+    padding-top: 70px;
+  }
+  
+  .mobile-menu-header h3 {
+    font-size: 18px;
+  }
+  
+  .mobile-menu a {
+    padding: 13px 16px;
+    font-size: 14px;
+  }
+}
+
 .container{
   width: min(1100px, 100%);
   margin: 0 auto;
@@ -472,11 +767,6 @@ body.nav-open{overflow:hidden}
   grid-template-columns: repeat(3, 1fr);
   gap:14px;
 }
-.grid-2{
-  display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap:14px;
-}
 
 /* Product */
 .product-card{padding:16px}
@@ -688,7 +978,6 @@ body.nav-open{overflow:hidden}
   .hero-inner{grid-template-columns: 1fr}
   .checkout-grid{grid-template-columns:1fr}
   .grid-3{grid-template-columns:1fr}
-  .grid-2{grid-template-columns:1fr}
   .info-strip{grid-template-columns:1fr}
   .prose-grid{grid-template-columns:1fr}
   .admin-grid{grid-template-columns: repeat(2, 1fr)}
@@ -1396,5 +1685,1056 @@ body.nav-open{
   .header{
     padding-left: 18px;
     padding-right: 18px;
+  }
+}
+
+/* =========================
+   HEADER CONTROLS & ANIMATION
+========================= */
+
+.layout-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center; /* Sejajar vertikal di tengah */
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+/* Wrapper untuk Judul (agar tidak tergeser) */
+.header-title {
+  flex: 1 1 auto; /* Mengisi ruang kiri */
+  min-width: 200px;
+}
+
+/* Wrapper untuk Toggle + Search (sebelah kanan) */
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 1 auto; /* Tidak menyusut */
+}
+
+/* Input Search di Header */
+.header-search {
+  width: 260px; /* Lebar fix di desktop biar rapi */
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.header-search:focus {
+  width: 300px; /* Efek memanjang dikit pas diklik */
+  border-color: rgba(0,194,208,0.5);
+  box-shadow: 0 0 0 4px rgba(0,194,208,0.15);
+}
+
+/* Toggle Container */
+.layout-toggles {
+  display: flex;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  gap: 2px;
+}
+
+/* Tombol Toggle dengan Animasi Mulus */
+.toggle-btn {
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 18px;
+  
+  /* Animasi Transisi */
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); /* Efek 'bouncy' dikit */
+}
+
+.toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.toggle-btn.active {
+  background: rgba(0, 194, 208, 0.15);
+  color: #4fffc8;
+  box-shadow: 0 4px 12px rgba(0, 194, 208, 0.15);
+  transform: scale(1.05); /* Sedikit membesar saat aktif */
+}
+
+.toggle-btn:active {
+  transform: scale(0.90); /* Efek 'mendelep' saat ditekan */
+}
+
+/* Responsive: Di HP turun ke bawah */
+@media (max-width: 700px) {
+  .header-controls {
+    width: 100%;
+    justify-content: space-between;
+  }
+  .header-search {
+    width: 100%; /* Full width di HP */
+    flex: 1;
+  }
+}
+
+/* =========================
+   GRID vs LIST LAYOUT LOGIC
+   (Wajib ada agar toggle berfungsi)
+========================= */
+
+.product-grid-container {
+  display: grid;
+  gap: 16px;
+  /* HAPUS BARIS INI: transition: all 0.3s ease; */
+  /* Framer Motion yang akan menangani animasinya sekarang */
+  min-height: 200px; /* Agar tidak 'gepeng' saat loading/kosong */
+}
+
+/* --- GRID MODE (Default 2 Kolom) --- */
+.grid-mode {
+  grid-template-columns: repeat(2, 1fr);
+}
+@media (max-width: 600px) {
+  .grid-mode { grid-template-columns: 1fr; }
+}
+
+/* --- LIST MODE (1 Kolom Penuh) --- */
+.list-mode {
+  grid-template-columns: 1fr;
+}
+
+/* Mengubah tampilan Card saat mode List */
+.list-mode .card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  text-align: left;
+  gap: 16px;
+  padding: 16px;
+}
+
+/* Mengatur icon produk di mode List */
+.list-mode .product-logo {
+  margin-bottom: 0; /* Reset margin */
+  width: 56px;
+  height: 56px;
+}
+
+/* Mengatur wrapper dalam card agar memanjang */
+.list-mode .product-head {
+  flex: 1; /* Ambil sisa ruang */
+  align-items: center;
+  margin-bottom: 0;
+}
+
+/* Menyesuaikan badge/tombol di mode List (Mobile) */
+@media (max-width: 640px) {
+  .list-mode .card {
+    flex-direction: column; /* Balik ke tumpuk di HP biar rapi */
+    align-items: flex-start;
+  }
+  .list-mode .product-head {
+    width: 100%;
+  }
+}
+
+/* =========================
+   UX IMPROVEMENTS (Tags & Search)
+========================= */
+
+/* Wrapper Input Search agar bisa taruh tombol X */
+.search-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: var(--muted);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  font-size: 10px;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  transition: all 0.2s;
+}
+.search-clear-btn:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Quick Tags Container (Scrollable Horizontal) */
+.quick-tags-scroll {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  /* Hilangkan scrollbar tapi tetap bisa scroll */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE */
+}
+.quick-tags-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+/* Tag Pill Style */
+.tag-pill {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.tag-pill:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: var(--text);
+}
+
+.tag-pill.active {
+  background: rgba(0, 194, 208, 0.15);
+  border-color: rgba(0, 194, 208, 0.4);
+  color: #4fffc8;
+  box-shadow: 0 4px 12px rgba(0, 194, 208, 0.1);
+}
+
+/* Fix skeleton agar tidak loncat */
+.skeleton {
+  animation: fadeUp 0.5s ease both;
+}
+
+/* =========================
+   NEW UI/UX ENHANCEMENTS
+========================= */
+
+/* 1. Breadcrumbs */
+.breadcrumbs {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.breadcrumbs a:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.breadcrumbs span {
+  opacity: 0.5;
+}
+.breadcrumbs .current {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* 2. Sort Dropdown & Result Count */
+.controls-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.result-count {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 500;
+}
+.result-count b { color: var(--text); }
+
+.sort-select {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+}
+.sort-select:focus {
+  border-color: var(--accent);
+}
+.sort-select option {
+  background: var(--bg1); /* Agar dropdown gelap */
+  color: var(--text);
+}
+
+/* 3. Back To Top Button */
+.back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 44px;
+  height: 44px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  box-shadow: 0 10px 30px rgba(124, 58, 237, 0.4);
+  cursor: pointer;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+.back-to-top.show {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+.back-to-top:hover {
+  transform: translateY(-4px);
+}
+
+/* 4. Sticky Cart (Mobile) */
+/* Kita pakai styling .sticky-cta yang sudah ada, 
+   tapi kita pastikan logic React-nya benar. */
+
+/* 5. Suggestions Buttons in Empty State */
+.suggestion-chips {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 12px;
+  flex-wrap: wrap;
+}
+.chip-btn {
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.chip-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+/* ========================================
+   TAMBAHAN CSS UNTUK STOCK MANAGEMENT
+   ======================================== 
+   Tambahkan CSS ini ke file App.css atau index.css
+*/
+
+/* Stock badges */
+.stock-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-left: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.stock-badge.in-stock {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+}
+
+.stock-badge.limited-stock {
+  background: rgba(251, 191, 36, 0.15);
+  color: #fbbf24;
+}
+
+.stock-badge.low-stock {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  animation: pulse-stock 2s ease-in-out infinite;
+}
+
+.stock-badge.out-of-stock {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+}
+
+@keyframes pulse-stock {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+/* Variant row yang out of stock */
+.variant-row.out-of-stock-variant {
+  opacity: 0.6;
+  position: relative;
+}
+
+.variant-row.out-of-stock-variant::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(239, 68, 68, 0.3);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Disabled button style */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #6b7280;
+}
+
+.btn:disabled:hover {
+  background: #6b7280;
+  transform: none;
+}
+
+/* Admin variant display dengan stock info */
+.variant-admin-left .muted b {
+  color: #22c55e;
+  font-weight: 600;
+}
+
+/* Stock input di admin */
+.input-sm[type="number"] {
+  -moz-appearance: textfield;
+}
+
+.input-sm[type="number"]::-webkit-outer-spin-button,
+.input-sm[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .stock-badge {
+    font-size: 10px;
+    padding: 2px 6px;
+    margin-left: 6px;
+  }
+  
+  .variant-row.out-of-stock-variant::after {
+    display: none; /* Hide strikethrough on mobile for better UX */
+  }
+}
+
+/* Stock warning toast (optional - jika ingin custom toast untuk stock) */
+.toast.stock-warning {
+  border-left: 3px solid #f97316;
+}
+
+.toast.stock-error {
+  border-left: 3px solid #ef4444;
+}
+
+/* ========================================
+   MODERN PRODUCT CARD STYLES
+   Ultra-premium design dengan Framer Motion
+   ======================================== */
+
+/* Main Card Container */
+.product-card-modern {
+  position: relative;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.03) 100%
+  );
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 24px;
+  padding: 24px;
+  overflow: hidden;
+  box-shadow: 
+    0 10px 40px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.1) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.5) inset;
+  transition: box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card-modern:hover {
+  box-shadow: 
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(0, 194, 208, 0.2),
+    0 1px 0 rgba(255, 255, 255, 0.15) inset;
+}
+
+/* Glow Effect */
+.card-glow {
+  position: absolute;
+  inset: -100px;
+  background: radial-gradient(
+    circle at center,
+    rgba(0, 194, 208, 0.15) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Header Section */
+.product-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.product-header-left {
+  display: flex;
+  gap: 14px;
+  flex: 1;
+  min-width: 0;
+}
+
+.product-logo-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.product-logo-modern {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  object-fit: cover;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.05) inset;
+}
+
+.product-logo-fallback-modern {
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(0, 194, 208, 0.2), rgba(0, 138, 148, 0.15));
+  border: 1px solid rgba(0, 194, 208, 0.3);
+  display: grid;
+  place-items: center;
+  font-size: 24px;
+  font-weight: 800;
+  color: #4fffc8;
+  box-shadow: 0 4px 16px rgba(0, 194, 208, 0.2);
+}
+
+.product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.product-name-modern {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: #f8fafc;
+  line-height: 1.3;
+  margin-bottom: 4px;
+}
+
+.product-desc-modern {
+  margin: 0;
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Badges */
+.product-badges {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+
+.guarantee-badge,
+.trending-badge {
+  padding: 5px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  white-space: nowrap;
+}
+
+.guarantee-badge {
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border: 1px solid rgba(34, 197, 94, 0.3);
+}
+
+.trending-badge {
+  background: rgba(249, 115, 22, 0.15);
+  color: #f97316;
+  border: 1px solid rgba(249, 115, 22, 0.3);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px rgba(249, 115, 22, 0.5);
+  }
+}
+
+/* Variants Container */
+.variants-container-modern {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Individual Variant Card */
+.variant-card-modern {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 16px;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.variant-card-modern:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(0, 194, 208, 0.3);
+  box-shadow: 
+    0 4px 16px rgba(0, 0, 0, 0.2),
+    0 0 0 1px rgba(0, 194, 208, 0.1) inset;
+}
+
+.variant-card-modern.variant-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  position: relative;
+}
+
+.variant-card-modern.variant-disabled::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 10px,
+    rgba(239, 68, 68, 0.05) 10px,
+    rgba(239, 68, 68, 0.05) 20px
+  );
+  pointer-events: none;
+}
+
+.variant-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.variant-info-left {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.variant-header-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.variant-name-modern {
+  font-size: 15px;
+  font-weight: 700;
+  color: #f8fafc;
+  letter-spacing: 0.2px;
+}
+
+.variant-details {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  font-size: 13px;
+  color: #94a3b8;
+}
+
+.variant-duration {
+  font-weight: 600;
+}
+
+.variant-guarantee {
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+/* Stock Badge Modern */
+.stock-badge-modern {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  position: relative;
+  border: 1px solid currentColor;
+  white-space: nowrap;
+  text-transform: uppercase;
+}
+
+.stock-icon {
+  font-size: 12px;
+  line-height: 1;
+}
+
+.stock-label {
+  line-height: 1;
+}
+
+.stock-pulse {
+  position: absolute;
+  inset: -2px;
+  border-radius: 8px;
+  border: 2px solid currentColor;
+  opacity: 0.5;
+}
+
+.stock-badge-modern.low-stock {
+  animation: shake 3s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-2px); }
+  20%, 40%, 60%, 80% { transform: translateX(2px); }
+}
+
+/* Stock Progress Bar */
+.stock-progress-container {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.stock-progress-bar {
+  flex: 1;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  position: relative;
+}
+
+.stock-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  position: relative;
+  box-shadow: 
+    0 0 8px currentColor,
+    0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+}
+
+.stock-progress-fill::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.stock-progress-text {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-weight: 700;
+  min-width: 60px;
+  justify-content: flex-end;
+}
+
+.stock-count {
+  font-size: 16px;
+  color: #f8fafc;
+}
+
+.stock-unit {
+  font-size: 11px;
+  color: #94a3b8;
+  opacity: 0.7;
+}
+
+/* Variant Action Area */
+.variant-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.variant-price-modern {
+  font-size: 18px;
+  font-weight: 900;
+  color: #4fffc8;
+  letter-spacing: -0.5px;
+  text-shadow: 0 0 20px rgba(79, 255, 200, 0.3);
+}
+
+.btn-add-cart-modern {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #00c2d0 0%, #008a94 100%);
+  border: 1px solid rgba(79, 255, 200, 0.3);
+  color: #fff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  box-shadow: 
+    0 4px 12px rgba(0, 194, 208, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.2) inset;
+  white-space: nowrap;
+}
+
+.btn-add-cart-modern:hover {
+  background: linear-gradient(135deg, #00d4e2 0%, #009aa4 100%);
+  box-shadow: 
+    0 6px 20px rgba(0, 194, 208, 0.4),
+    0 1px 0 rgba(255, 255, 255, 0.3) inset;
+}
+
+.btn-add-cart-modern.btn-disabled {
+  background: rgba(239, 68, 68, 0.2);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-add-cart-modern span {
+  line-height: 1;
+}
+
+/* Expand Button */
+.variant-expand-btn {
+  position: absolute;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  width: 32px;
+  height: 20px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  font-size: 12px;
+  color: #94a3b8;
+  transition: all 0.2s ease;
+}
+
+.variant-expand-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(0, 194, 208, 0.3);
+  color: #4fffc8;
+}
+
+/* Card Footer */
+.product-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.footer-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 600;
+}
+
+.stat-icon {
+  font-size: 14px;
+}
+
+.stat-text {
+  letter-spacing: 0.2px;
+}
+
+/* ========================================
+   RESPONSIVE DESIGN
+   ======================================== */
+
+@media (max-width: 768px) {
+  .product-card-modern {
+    padding: 20px;
+  }
+
+  .product-card-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .product-badges {
+    flex-direction: row;
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .product-logo-modern,
+  .product-logo-fallback-modern {
+    width: 48px;
+    height: 48px;
+  }
+
+  .product-name-modern {
+    font-size: 16px;
+  }
+
+  .variant-main {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .variant-action {
+    flex-direction: row;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .variant-price-modern {
+    font-size: 16px;
+  }
+
+  .product-card-footer {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .product-card-modern {
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .variant-card-modern {
+    padding: 14px;
+  }
+
+  .stock-badge-modern {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+
+  .btn-add-cart-modern {
+    padding: 8px 14px;
+    font-size: 12px;
+  }
+}
+
+/* ========================================
+   DARK MODE ENHANCEMENTS
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+  .product-card-modern {
+    box-shadow: 
+      0 10px 40px rgba(0, 0, 0, 0.6),
+      0 1px 0 rgba(255, 255, 255, 0.08) inset;
+  }
+
+  .product-card-modern:hover {
+    box-shadow: 
+      0 20px 60px rgba(0, 0, 0, 0.7),
+      0 0 0 1px rgba(0, 194, 208, 0.3),
+      0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  }
+}
+
+/* ========================================
+   PRINT STYLES
+   ======================================== */
+
+@media print {
+  .product-card-modern {
+    border: 1px solid #ccc;
+    background: white;
+    color: black;
+    box-shadow: none;
+  }
+
+  .card-glow,
+  .btn-add-cart-modern,
+  .variant-expand-btn {
+    display: none;
   }
 }

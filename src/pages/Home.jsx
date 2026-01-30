@@ -1,33 +1,41 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+// Framer Motion DIHAPUS agar stabil
+
 import Hero from "../components/Hero";
 import ProductCard from "../components/ProductCard";
-import { fetchProducts } from "../lib/api";
-import { Link } from "react-router-dom";
+import { fetchProducts, fetchTopSellingIds } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [topIds, setTopIds] = useState([]);
   const [error, setError] = useState("");
+  const [layout, setLayout] = useState("grid");
 
   usePageMeta({
     title: "Home",
-    description:
-      "Hidden gem aplikasi premium murah + bergaransi. Pilih produk, checkout QRIS, upload bukti bayar, lalu pantau status order.",
+    description: "Hidden gem aplikasi premium murah + bergaransi.",
   });
 
+  // Fetch Data
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
-        const data = await fetchProducts();
+        const [data, ranking] = await Promise.all([
+          fetchProducts(),
+          fetchTopSellingIds()
+        ]);
+        
         if (!alive) return;
         setProducts(data);
+        setTopIds(ranking);
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn(e);
-        setError("Gagal memuat produk. Coba cek koneksi & refresh.");
+        setError("Gagal memuat produk.");
       } finally {
         if (alive) setLoading(false);
       }
@@ -35,54 +43,92 @@ export default function Home() {
     return () => { alive = false; };
   }, []);
 
-  const featured = useMemo(() => products.slice(0, 3), [products]);
+  // Logika Produk Populer (LIMIT 3)
+  const popularProducts = useMemo(() => {
+    if (products.length === 0) return [];
+    
+    const sorted = [...products].sort((a, b) => {
+      const rankA = topIds.indexOf(a.id);
+      const rankB = topIds.indexOf(b.id);
+
+      // Prioritaskan yang ada di ranking
+      if (rankA !== -1 && rankB === -1) return -1;
+      if (rankA === -1 && rankB !== -1) return 1;
+      if (rankA !== -1 && rankB !== -1) return rankA - rankB;
+      
+      // Fallback ke sort_order default
+      return a.sort_order - b.sort_order;
+    });
+
+    return sorted.slice(0, 3);
+  }, [products, topIds]);
 
   return (
     <div className="page">
       <Hero />
 
-      <section className="section reveal">
-        <div className="container section-head">
-          <div>
-            <h2 className="h2">Produk populer</h2>
-            <p className="muted">Harga mengikuti pricelist terbaru. Kamu bisa checkout kapan saja.</p>
+      <section className="section">
+        <div className="container">
+          
+          {/* Header Section */}
+          <div className="layout-header">
+            <div>
+              <h2 className="h2">Produk Terlaris 🔥</h2>
+              <p className="muted">Top 3 produk paling banyak dicari bulan ini.</p>
+            </div>
+            
+            {/* Toggle Buttons (Standard HTML Button) */}
+            <div className="layout-toggles">
+              <button 
+                className={`toggle-btn ${layout === 'grid' ? 'active' : ''}`}
+                onClick={() => setLayout('grid')}
+                title="Grid View"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+              </button>
+              <button 
+                className={`toggle-btn ${layout === 'list' ? 'active' : ''}`}
+                onClick={() => setLayout('list')}
+                title="List View"
+              >
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+              </button>
+            </div>
           </div>
-          <Link className="btn btn-ghost" to="/produk">Lihat semua</Link>
-        </div>
 
-        <div className="container grid-3">
-          {loading ? (
-            <>
-              <div className="skeleton card" />
-              <div className="skeleton card" />
-              <div className="skeleton card" />
-            </>
-          ) : error ? (
-            <div className="card pad" style={{ gridColumn: "1 / -1" }}>
-              <EmptyState
-                icon="📡"
-                title="Produk belum bisa dimuat"
-                description={error}
-                primaryAction={{ label: "Refresh", onClick: () => window.location.reload() }}
-                secondaryAction={{ label: "Lihat Status Order", to: "/status" }}
-              />
-            </div>
-          ) : featured.length === 0 ? (
-            <div className="card pad" style={{ gridColumn: "1 / -1" }}>
-              <EmptyState
-                icon="🛍️"
-                title="Belum ada produk aktif"
-                description="Admin belum mengaktifkan produk. Coba lagi nanti ya."
-                secondaryAction={{ label: "Cek Status Order", to: "/status" }}
-              />
-            </div>
-          ) : (
-            featured.map((p) => <ProductCard key={p.id} product={p} />)
-          )}
+          {/* GRID UTAMA (Standard Div) */}
+          <div className={`product-grid-container ${layout === 'grid' ? 'grid-mode' : 'list-mode'}`}>
+            {loading ? (
+              // Skeleton (3 biji)
+              <>
+                <div className="skeleton card" />
+                <div className="skeleton card" />
+                <div className="skeleton card" />
+              </>
+            ) : error ? (
+              <div className="card pad" style={{ gridColumn: "1 / -1" }}>
+                <EmptyState icon="📡" title="Gagal memuat" description={error} />
+              </div>
+            ) : popularProducts.length === 0 ? (
+              <div className="card pad" style={{ gridColumn: "1 / -1" }}>
+                <EmptyState icon="🛍️" title="Belum ada produk aktif" />
+              </div>
+            ) : (
+              // Render Produk
+              popularProducts.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))
+            )}
+          </div>
+
+          <div style={{ marginTop: 32, textAlign: 'center' }}>
+            <Link className="btn btn-ghost" to="/produk">Lihat semua produk →</Link>
+          </div>
         </div>
       </section>
 
-      <section className="section reveal">
+      {/* Info Strip */}
+      <section className="section">
         <div className="container info-strip">
           <div className="info-item">
             <div className="info-title">Checkout QRIS</div>
@@ -94,7 +140,7 @@ export default function Home() {
           </div>
           <div className="info-item">
             <div className="info-title">Harga selalu terbaru</div>
-            <div className="info-sub">Pricelist diperbarui berkala. Kamu selalu dapat harga terkini.</div>
+            <div className="info-sub">Pricelist diperbarui berkala. Selalu dapat harga terkini.</div>
           </div>
         </div>
       </section>
