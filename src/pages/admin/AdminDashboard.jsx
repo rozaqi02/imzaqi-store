@@ -88,7 +88,8 @@ export default function AdminDashboard() {
     try {
       const { data, error } = await supabase
         .from("orders")
-        .select("id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url")
+        // REVISI STEP 1: Menambahkan customer_whatsapp di select
+        .select("id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp")
         .order("created_at", { ascending: false })
         .limit(60);
       if (error) throw error;
@@ -142,30 +143,30 @@ export default function AdminDashboard() {
     await refreshAll();
   }
 
-async function addVariant(prod) {
-  setMsg("");
-  const name = prompt(`Nama varian baru untuk ${prod.name}`, "Default");
-  if (!name) return;
+  async function addVariant(prod) {
+    setMsg("");
+    const name = prompt(`Nama varian baru untuk ${prod.name}`, "Default");
+    if (!name) return;
 
-  const duration_label = prompt("Durasi (contoh: 30 hari)", "30 hari") || "30 hari";
-  const price_idr = Number(prompt("Harga (IDR)", "25000") || 0);
-  const guarantee_text = prompt("Teks garansi (opsional)", "") || "";
-  const stock = Number(prompt("Stock awal", "100") || 0); // TAMBAH INI
+    const duration_label = prompt("Durasi (contoh: 30 hari)", "30 hari") || "30 hari";
+    const price_idr = Number(prompt("Harga (IDR)", "25000") || 0);
+    const guarantee_text = prompt("Teks garansi (opsional)", "") || "";
+    const stock = Number(prompt("Stock awal", "100") || 0);
 
-  const { error } = await supabase.from("product_variants").insert({
-    product_id: prod.id,
-    name,
-    duration_label,
-    price_idr,
-    guarantee_text,
-    stock, // TAMBAH INI
-    is_active: true,
-    sort_order: 100,
-  });
+    const { error } = await supabase.from("product_variants").insert({
+      product_id: prod.id,
+      name,
+      duration_label,
+      price_idr,
+      guarantee_text,
+      stock,
+      is_active: true,
+      sort_order: 100,
+    });
 
-  if (error) { setMsg(error.message); return; }
-  await refreshAll();
-}
+    if (error) { setMsg(error.message); return; }
+    await refreshAll();
+  }
 
   async function updateVariant(v) {
     setMsg("");
@@ -221,7 +222,6 @@ async function addVariant(prod) {
 
     if (files.length === 0) { setMsg("Pilih minimal 1 gambar."); return; }
 
-    // validasi type sederhana
     for (const f of files) {
       const t = (f.type || "").toLowerCase();
       if (!(t.includes("jpeg") || t.includes("jpg") || t.includes("png") || t.includes("webp"))) {
@@ -290,7 +290,6 @@ async function addVariant(prod) {
 
     const payload = [];
     for (const line of lines) {
-      // format: CODE,30,true  | CODE 30 | CODE,30
       const parts = line.split(/[,\s]+/).map((x) => x.trim()).filter(Boolean);
       const code = (parts[0] || "").toUpperCase();
       const percent = Number(parts[1] || 0);
@@ -361,31 +360,31 @@ async function addVariant(prod) {
 
           {tab === "produk" ? (
             <div className="card pad">
-<div className="row between">
-  <div>
-    <h2 className="h3">Kelola Produk</h2>
-    <div className="hint subtle">{activeCount} aktif • Bucket ikon: <code>{BUCKET_ICONS}</code> (public)</div>
-  </div>
-  <div className="row" style={{ gap: 10 }}>
-    <button className="btn btn-sm btn-ghost" onClick={async () => {
-      const amount = Number(prompt("Tambah stock untuk SEMUA varian (angka):", "50") || 0);
-      if (amount <= 0) return;
-      if (!window.confirm(`Tambah ${amount} stock untuk semua varian?`)) return;
-      
-      const allVariants = products.flatMap(p => p.product_variants || []);
-      for (const v of allVariants) {
-        await supabase.from("product_variants")
-          .update({ stock: (v.stock || 0) + amount })
-          .eq("id", v.id);
-      }
-      await refreshAll();
-      toast.success(`Stock ditambah ${amount} untuk semua varian`);
-    }}>
-      + Stock Semua
-    </button>
-    <button className="btn btn-sm" onClick={createProduct}>+ Produk</button>
-  </div>
-</div>
+              <div className="row between">
+                <div>
+                  <h2 className="h3">Kelola Produk</h2>
+                  <div className="hint subtle">{activeCount} aktif • Bucket ikon: <code>{BUCKET_ICONS}</code> (public)</div>
+                </div>
+                <div className="row" style={{ gap: 10 }}>
+                  <button className="btn btn-sm btn-ghost" onClick={async () => {
+                    const amount = Number(prompt("Tambah stock untuk SEMUA varian (angka):", "50") || 0);
+                    if (amount <= 0) return;
+                    if (!window.confirm(`Tambah ${amount} stock untuk semua varian?`)) return;
+                    
+                    const allVariants = products.flatMap(p => p.product_variants || []);
+                    for (const v of allVariants) {
+                      await supabase.from("product_variants")
+                        .update({ stock: (v.stock || 0) + amount })
+                        .eq("id", v.id);
+                    }
+                    await refreshAll();
+                    toast.success(`Stock ditambah ${amount} untuk semua varian`);
+                  }}>
+                    + Stock Semua
+                  </button>
+                  <button className="btn btn-sm" onClick={createProduct}>+ Produk</button>
+                </div>
+              </div>
 
               <div className="admin-list">
                 {products.map(p => (
@@ -437,57 +436,57 @@ async function addVariant(prod) {
                       </div>
                     </div>
 
-<div className="variant-admin">
-  {(p.product_variants || []).map(v => (
-    <div key={v.id} className="variant-admin-row">
-      <div className="variant-admin-left">
-        <div className="variant-name">{v.name}</div>
-        <div className="muted">{v.duration_label} {v.guarantee_text ? `• ${v.guarantee_text}` : ""}</div>
-        <div className="muted">Stock: <b>{v.stock || 0}</b> • Terjual: {v.sold_count || 0}</div>
-      </div>
-      <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
-        <input
-          className="input input-sm"
-          type="number"
-          defaultValue={v.price_idr}
-          onBlur={(e) => updateVariant({ id: v.id, price_idr: Number(e.target.value || 0) })}
-          title="Ubah harga lalu klik keluar (blur)"
-          placeholder="Harga"
-          style={{ width: 120 }}
-        />
-        <input
-          className="input input-sm"
-          type="number"
-          min="0"
-          defaultValue={v.stock || 0}
-          onBlur={(e) => updateVariant({ id: v.id, stock: Number(e.target.value || 0) })}
-          title="Ubah stock lalu klik keluar (blur)"
-          placeholder="Stock"
-          style={{ width: 100 }}
-        />
-        <button className="btn btn-ghost btn-sm" onClick={() => updateVariant({ id: v.id, is_active: !v.is_active })}>
-          {v.is_active ? "Nonaktif" : "Aktifkan"}
-        </button>
-        <button className="btn btn-ghost btn-sm" onClick={() => {
-          const name = prompt("Nama varian", v.name) || v.name;
-          const duration_label = prompt("Durasi", v.duration_label) || v.duration_label;
-          const guarantee_text = prompt("Garansi", v.guarantee_text || "") || "";
-          updateVariant({ id: v.id, name, duration_label, guarantee_text });
-        }}>Edit</button>
-        <button className="btn btn-danger btn-sm" onClick={() => deleteVariant(v.id)}>Hapus</button>
-      </div>
-    </div>
-  ))}
-  {(p.product_variants || []).length === 0 ? <div className="hint subtle">Belum ada varian.</div> : null}
-</div>
+                    <div className="variant-admin">
+                      {(p.product_variants || []).map(v => (
+                        <div key={v.id} className="variant-admin-row">
+                          <div className="variant-admin-left">
+                            <div className="variant-name">{v.name}</div>
+                            <div className="muted">{v.duration_label} {v.guarantee_text ? `• ${v.guarantee_text}` : ""}</div>
+                            <div className="muted">Stock: <b>{v.stock || 0}</b> • Terjual: {v.sold_count || 0}</div>
+                          </div>
+                          <div className="row" style={{ flexWrap: "wrap", gap: 8 }}>
+                            <input
+                              className="input input-sm"
+                              type="number"
+                              defaultValue={v.price_idr}
+                              onBlur={(e) => updateVariant({ id: v.id, price_idr: Number(e.target.value || 0) })}
+                              title="Ubah harga lalu klik keluar (blur)"
+                              placeholder="Harga"
+                              style={{ width: 120 }}
+                            />
+                            <input
+                              className="input input-sm"
+                              type="number"
+                              min="0"
+                              defaultValue={v.stock || 0}
+                              onBlur={(e) => updateVariant({ id: v.id, stock: Number(e.target.value || 0) })}
+                              title="Ubah stock lalu klik keluar (blur)"
+                              placeholder="Stock"
+                              style={{ width: 100 }}
+                            />
+                            <button className="btn btn-ghost btn-sm" onClick={() => updateVariant({ id: v.id, is_active: !v.is_active })}>
+                              {v.is_active ? "Nonaktif" : "Aktifkan"}
+                            </button>
+                            <button className="btn btn-ghost btn-sm" onClick={() => {
+                              const name = prompt("Nama varian", v.name) || v.name;
+                              const duration_label = prompt("Durasi", v.duration_label) || v.duration_label;
+                              const guarantee_text = prompt("Garansi", v.guarantee_text || "") || "";
+                              updateVariant({ id: v.id, name, duration_label, guarantee_text });
+                            }}>Edit</button>
+                            <button className="btn btn-danger btn-sm" onClick={() => deleteVariant(v.id)}>Hapus</button>
+                          </div>
+                        </div>
+                      ))}
+                      {(p.product_variants || []).length === 0 ? <div className="hint subtle">Belum ada varian.</div> : null}
+                    </div>
                   </div>
                 ))}
               </div>
 
-<div className="hint subtle">
-  Tip: Edit harga atau stock → ubah angka → klik keluar dari input (blur) untuk auto-save.
-  Stock akan otomatis berkurang saat ada order baru.
-</div>
+              <div className="hint subtle">
+                Tip: Edit harga atau stock → ubah angka → klik keluar dari input (blur) untuk auto-save.
+                Stock akan otomatis berkurang saat ada order baru.
+              </div>
             </div>
           ) : null}
 
@@ -602,7 +601,7 @@ async function addVariant(prod) {
 
               {orders.length === 0 ? (
                 <div className="hint subtle">
-                  Belum ada order (atau kolom baru belum ditambahkan). Pastikan tabel orders punya kolom <code>order_code</code> & <code>payment_proof_url</code>.
+                  Belum ada order. Pastikan tabel orders punya kolom <code>order_code</code> & <code>payment_proof_url</code>.
                 </div>
               ) : (
                 <div className="orders">
@@ -679,6 +678,34 @@ async function addVariant(prod) {
                                   <div className="hint subtle">Belum ada bukti bayar.</div>
                                 )}
 
+                                {/* REVISI STEP 2/3/4: Menambahkan Customer WhatsApp field disini */}
+                                {o.customer_whatsapp && (
+                                  <div style={{ marginTop: 16, borderTop: '1px solid #eee', paddingTop: 12 }}>
+                                    <div className="muted" style={{ marginBottom: 4, fontSize: '13px' }}>Nomor WhatsApp Customer:</div>
+                                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                      <a
+                                        href={`https://wa.me/${o.customer_whatsapp.replace(/\D/g, '')}`}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        className="btn btn-ghost btn-sm"
+                                        style={{ color: '#25d366', fontWeight: 500 }}
+                                      >
+                                        📱 {o.customer_whatsapp}
+                                      </a>
+                                      <button
+                                        className="btn btn-ghost btn-sm"
+                                        title="Salin Nomor"
+                                        onClick={() => {
+                                          navigator.clipboard.writeText(o.customer_whatsapp);
+                                          toast.success('Nomor WA disalin');
+                                        }}
+                                      >
+                                        📋
+                                      </button>
+                                    </div>
+                                  </div>
+                                )}
+
                                 <div className="divider" />
 
                                 <a
@@ -687,7 +714,7 @@ async function addVariant(prod) {
                                   target="_blank"
                                   rel="noreferrer"
                                 >
-                                  Chat WA (template)
+                                  Chat WA (Template Admin)
                                 </a>
 
                                 <div className="hint subtle">
