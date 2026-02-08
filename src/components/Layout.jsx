@@ -11,6 +11,10 @@ export default function Layout({ children }) {
 
   return (
     <div className="app-shell">
+      {/* Global super premium background layers (fixed) */}
+      <div className="global-bg" aria-hidden="true" />
+      <div className="global-noise" aria-hidden="true" />
+
       <Header />
       <main className="app-main">
         <div key={location.pathname} className="route-transition">
