@@ -6,6 +6,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NetworkBridge from "./components/NetworkBridge";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
+import ProductDetail from "./pages/ProductDetail";
 import About from "./pages/About";
 import Testimonials from "./pages/Testimonials";
 import Checkout from "./pages/Checkout";
@@ -48,6 +49,7 @@ export default function App() {
       <Layout>
         <Routes>
           <Route path="/" element={<Home />} />
+          <Route path="/produk/:slug" element={<ProductDetail />} />
           <Route path="/produk" element={<Products />} />
           <Route path="/tentang" element={<About />} />
           <Route path="/testimoni" element={<Testimonials />} />

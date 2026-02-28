@@ -1,0 +1,32 @@
+.promo-row{display:flex;gap:10px;margin-top:12px;}
+.cart-actions{display:flex;align-items:center;gap:10px;}
+.qty{width:72px;height:36px;border-radius:12px;border:1px/**/solid/**/rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:var(--text);padding:0/**/10px;}
+@media (max-width: 680px){.promo-row{flex-direction:column;}}
+.checkout-pro{display:grid;grid-template-columns:1.3fr/**/.7fr;gap:14px;align-items:start;}
+.checkout-summary{position:sticky;top:92px;}
+@media (max-width: 920px){.checkout-pro{grid-template-columns:1fr;}.checkout-summary{position:static;}}
+.qty-wrap{display:flex;align-items:center;gap:8px;}
+.qty-btn{width:34px;height:34px;border-radius:12px;border:1px/**/solid/**/rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(232,252,255,.92);cursor:pointer;font-weight:900;}
+.qty-btn:hover{background:rgba(255,255,255,.06);}
+.trust-callout{margin-top:12px;}
+.trust-row{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* Checkout (v3) — more artistic / gen‑Z */
+.checkout3-hero{padding-top:88px;position:relative;overflow:hidden;}
+.checkout3-hero::before{content:"";position:absolute;inset:-24% -10%;background:
+  radial-gradient(900px 460px at 12% 10%, rgba(31,128,224,.18), rgba(0,0,0,0) 62%),
+  radial-gradient(820px 520px at 86% 18%, rgba(0,194,208,.12), rgba(0,0,0,0) 58%),
+  radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%);
+opacity:.95;pointer-events:none;}
+
+.checkout3 .section-head{position:relative;z-index:1;}
+.checkout3 .checkout-pro{position:relative;z-index:1;}
+
+.checkout3 .card.pad{background:rgba(255,255,255,.04);border-color:rgba(255,255,255,.12);box-shadow:0 20px 80px rgba(0,0,0,.28);} 
+.checkout3 .checkout-summary .card{background:rgba(12,16,28,.46);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);} 
+
+.checkout3 .btn.btn-primary{box-shadow:0 16px 46px rgba(31,128,224,.18);} 
+
+@media (max-width: 920px){
+  .checkout3-hero{padding-top:78px;}
+}

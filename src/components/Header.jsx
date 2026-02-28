@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -99,7 +99,13 @@ const secondaryItems = [
 
 function MobileMenu({ open, onClose }) {
   const menuRef = useRef(null);
+  const openRef = useRef(open);
   const location = useLocation();
+
+  // Keep latest `open` value for effects that should only react to pathname changes
+  useEffect(() => {
+    openRef.current = open;
+  }, [open]);
 
   // Close on escape key
   useEffect(() => {
@@ -112,12 +118,12 @@ function MobileMenu({ open, onClose }) {
     return () => window.removeEventListener("keydown", handleEscape);
   }, [open, onClose]);
 
-  // Auto-close on route change
+  // Auto-close on route change (only when pathname changes, not when `open` toggles)
   useEffect(() => {
-    if (open) {
+    if (openRef.current) {
       onClose();
     }
-  }, [location.pathname]);
+  }, [location.pathname, onClose]);
 
   // Focus management
   useEffect(() => {
@@ -354,7 +360,7 @@ function MobileMenu({ open, onClose }) {
               variants={itemVariants}
             >
               <p className="menu-footer-text">imzaqi.store</p>
-              <p className="menu-footer-version">v1.0</p>
+              <p className="menu-footer-version">v2.0</p>
             </motion.div>
           </motion.nav>
         </>
@@ -368,6 +374,8 @@ export default function Header() {
   const { items } = useCart();
   const cartCount = useMemo(() => items.reduce((s, x) => s + x.qty, 0), [items]);
   const [open, setOpen] = useState(false);
+  const handleOpen = useCallback(() => setOpen(true), []);
+  const handleClose = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
     document.body.classList.toggle("nav-open", open);
@@ -411,7 +419,7 @@ export default function Header() {
 
             <motion.button
               className="nav-toggle"
-              onClick={() => setOpen(true)}
+              onClick={handleOpen}
               aria-label="Buka menu"
               aria-expanded={open}
               whileHover={{ scale: 1.05 }}
@@ -435,7 +443,7 @@ export default function Header() {
       </header>
 
       {/* MOBILE SIDEBAR (PORTAL) */}
-      <MobileMenu open={open} onClose={() => setOpen(false)} />
+      <MobileMenu open={open} onClose={handleClose} />
     </>
   );
 }

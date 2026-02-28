@@ -215,7 +215,7 @@ export default function Hero() {
                 role="listbox"
               >
                 {suggestions.map((sug) => (
-                  <button key={sug} className="suggestion-item" onClick={() => goSearch(sug)} type="button" role="option">
+                  <button key={sug} className="suggestion-item" onClick={() => goSearch(sug)} type="button" role="option" aria-selected={false}>
                     {sug}
                   </button>
                 ))}

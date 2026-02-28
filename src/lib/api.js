@@ -3,7 +3,9 @@ import { supabase } from "./supabaseClient";
 export async function fetchProducts({ includeInactive = false } = {}) {
   const q = supabase
     .from("products")
-    .select("id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,price_idr,guarantee_text,is_active,sort_order,stock,sold_count)")
+    .select(
+      "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count)"
+    )
     .order("sort_order", { ascending: true })
     .order("sort_order", { foreignTable: "product_variants", ascending: true });
 
@@ -12,6 +14,23 @@ export async function fetchProducts({ includeInactive = false } = {}) {
   const { data, error } = await q;
   if (error) throw error;
   return data || [];
+}
+
+export async function fetchProductBySlug(slug, { includeInactive = false } = {}) {
+  let q = supabase
+    .from("products")
+    .select(
+      "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count)"
+    )
+    .eq("slug", slug);
+
+  if (!includeInactive) q = q.eq("is_active", true);
+
+  q = q.order("sort_order", { foreignTable: "product_variants", ascending: true }).single();
+
+  const { data, error } = await q;
+  if (error) throw error;
+  return data;
 }
 
 export async function fetchTestimonials({ includeInactive = false } = {}) {

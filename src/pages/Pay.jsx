@@ -1,5 +1,5 @@
 // File: src/pages/Pay.jsx
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
@@ -24,7 +24,7 @@ function calcTotal(subtotal, percent) {
 function QRISSkeleton() {
   return (
     <div className="qris-skeleton" role="status" aria-label="Memuat QRIS">
-      <div className="skeleton-shimmer" style={{ width: '100%', height: 300, borderRadius: 8, backgroundColor: '#f0f0f0' }} />
+      <div className="qris-skeletonBox" />
     </div>
   );
 }
@@ -88,7 +88,7 @@ function OrderSuccessModal({ open, orderCode, onClose, waUrl, statusUrl, onCopie
             </div>
           )}
 
-          <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
+          <div className="row wrap">
             <button 
               className={`btn ${copied ? 'btn-success' : 'btn-ghost'}`}
               onClick={copy}
@@ -114,12 +114,12 @@ function FileUploadPreview({ file, previewUrl, onRemove, uploading }) {
   if (!file && !previewUrl) return null;
 
   return (
-    <div className="file-preview-card animate-slide-up" style={{ marginTop: 12, border: '1px solid #eee', padding: 12, borderRadius: 8 }}>
-      <div className="file-preview-header" style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8 }}>
-        <div className="file-info" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <Check className="icon-success" size={16} color="green" />
-          <span className="file-name" style={{ fontSize: 13, fontWeight: 500 }}>{file?.name}</span>
-          <span className="file-size" style={{ fontSize: 12, color: '#666' }}>{file ? (file.size / 1024).toFixed(0) : 0} KB</span>
+    <div className="file-preview-card animate-slide-up">
+      <div className="file-preview-header">
+        <div className="file-info">
+          <Check className="icon-success" size={16} />
+          <span className="file-name">{file?.name}</span>
+          <span className="file-size">{file ? (file.size / 1024).toFixed(0) : 0} KB</span>
         </div>
         {!uploading && (
           <button className="icon-btn icon-btn-sm" onClick={onRemove} type="button">
@@ -130,17 +130,17 @@ function FileUploadPreview({ file, previewUrl, onRemove, uploading }) {
       
       {/* Pastikan gambar muncul */}
       {previewUrl && (
-        <div className="proof-preview" style={{ width: '100%', overflow: 'hidden', borderRadius: 6, border: '1px solid #f0f0f0' }}>
+        <div className="proof-preview">
           <img 
             src={previewUrl} 
             alt="Preview bukti pembayaran" 
-            style={{ width: '100%', height: 'auto', display: 'block', maxHeight: 300, objectFit: 'contain' }}
+            className="proof-preview-img"
           />
         </div>
       )}
 
       {uploading && (
-        <div className="upload-progress" style={{ marginTop: 8, display: 'flex', alignItems: 'center', gap: 8, fontSize: 13, color: '#666' }}>
+        <div className="upload-progress">
           <Loader className="spinner" size={16} />
           <span>Mengupload...</span>
         </div>
@@ -157,13 +157,13 @@ export default function Pay() {
 
   usePageMeta({ title: "Pembayaran", description: "Scan QRIS, upload bukti, dan konfirmasi." });
 
-  const [snapshot, setSnapshot] = useState(cart.items);
+  const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
   
   useEffect(() => {
-    if (cart.items.length > 0) setSnapshot(cart.items);
+    if (Array.isArray(cart.items) && cart.items.length > 0) setSnapshot(cart.items);
   }, [cart.items]);
 
-  const items = snapshot || [];
+  const items = snapshot;
   const subtotal = useMemo(() => items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0), [items]);
   const { discount, total } = calcTotal(subtotal, promo.percent);
 
@@ -350,8 +350,8 @@ export default function Pay() {
   const canSubmit = !busy && file && customerWhatsApp && isWaValid;
 
   return (
-    <div className="page with-sticky-cta">
-      <section className="section reveal">
+    <div className="page with-sticky-cta pay3">
+      <section className="section reveal pay3-section">
         <div className="container section-head">
           <div>
             <h1 className="h1">Pembayaran</h1>
@@ -388,7 +388,7 @@ export default function Pay() {
             <div className="divider" />
 
             {/* Area QRIS dengan Error Handling & Skeleton */}
-            <div className="qris-wrap" style={{ minHeight: 300, display: 'flex', justifyContent: 'center' }}>
+            <div className="qris-wrap pay3-qris">
               {!qrisLoaded && <QRISSkeleton />}
               <img 
                 src={qrisUrl} 
@@ -399,11 +399,11 @@ export default function Pay() {
                   e.target.style.display = 'none'; // Hide broken image
                   // Fallback if image fails
                 }}
-                style={{ display: qrisLoaded ? 'block' : 'none', maxWidth: '100%', height: 'auto' }}
+                style={{ display: qrisLoaded ? 'block' : 'none' }}
               />
             </div>
 
-            <div className="row" style={{ gap: 10, marginTop: 10, flexWrap: "wrap" }}>
+            <div className="row wrap mt10">
               <a className="btn btn-ghost btn-sm" href={qrisUrl} target="_blank" rel="noreferrer">
                 Buka QRIS Fullscreen
               </a>
@@ -417,7 +417,7 @@ export default function Pay() {
             </label>
             
             {!file ? (
-              <label className="file-upload-area" style={{ cursor: 'pointer' }}>
+              <label className="upload-drop" style={{ cursor: 'pointer' }}>
                 <input
                   className="input"
                   type="file"
@@ -429,9 +429,9 @@ export default function Pay() {
                   }}
                   style={{ display: 'none' }}
                 />
-                <div style={{ textAlign: 'center', padding: 20, border: '2px dashed #ddd', borderRadius: 8 }}>
-                  <Upload size={32} style={{ margin: '0 auto 10px', color: '#999' }} />
-                  <div><b>Klik untuk upload</b></div>
+                <div className="upload-dropInner">
+                  <Upload size={32} className="upload-ic" />
+                  <div className="upload-title"><b>Klik untuk upload</b></div>
                   <div className="hint subtle">JPG/PNG/WEBP (max 5MB)</div>
                 </div>
               </label>
@@ -446,12 +446,12 @@ export default function Pay() {
             )}
 
             {err && (
-              <div className="alert alert-error" style={{ marginTop: 16 }}>
+              <div className="alert alert-error mt16">
                 <AlertCircle size={20} /> {err}
               </div>
             )}
 
-            <div className="row" style={{ gap: 10, marginTop: 16, flexWrap: "wrap" }}>
+            <div className="row wrap mt16">
               <button 
                 className="btn btn-primary"
                 disabled={!canSubmit}
@@ -464,7 +464,7 @@ export default function Pay() {
           </div>
 
           {/* Right Column: Summary */}
-          <div className="card pad">
+          <div className="card pad pay3-right">
             <h3 className="h3">Ringkasan belanja</h3>
             <div className="cart-list">
               {items.map((x) => (

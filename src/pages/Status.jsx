@@ -33,6 +33,36 @@ function prettyStatus(status) {
   return map[s] || s;
 }
 
+function buildTimeline(status) {
+  const s = String(status || "pending");
+  // cancelled: show a shorter timeline
+  if (s === "cancelled") {
+    return {
+      steps: [
+        { key: "pending", label: "Pending" },
+        { key: "cancelled", label: "Dibatalkan" },
+      ],
+      activeIndex: 1,
+    };
+  }
+  const steps = [
+    { key: "pending", label: "Pending" },
+    { key: "processing", label: "Diproses" },
+    { key: "done", label: "Sukses" },
+  ];
+  const activeIndex = s === "done" ? 2 : s === "processing" ? 1 : 0;
+  return { steps, activeIndex };
+}
+
+function statusTone(status) {
+  const s = String(status || "pending");
+  if (s === "done") return "done";
+  if (s === "processing") return "processing";
+  if (s === "cancelled") return "cancelled";
+  // paid_reported & pending
+  return "pending";
+}
+
 export default function Status() {
   const [searchParams, setSearchParams] = useSearchParams();
   const param = searchParams.get("order") || "";
@@ -143,13 +173,27 @@ export default function Status() {
     }
   }
 
+  const timeline = useMemo(() => buildTimeline(order?.status), [order?.status]);
+  const tone = statusTone(order?.status);
+  const discountIDR = useMemo(() => {
+    const sub = Number(order?.subtotal_idr || 0);
+    const pct = Number(order?.discount_percent || 0);
+    return Math.round((sub * pct) / 100);
+  }, [order?.subtotal_idr, order?.discount_percent]);
+
   return (
-    <div className="page">
-      <section className="section reveal">
-        <div className="container section-head">
-          <div>
-            <h1 className="h1">Status Order</h1>
-            <p className="muted">Masukkan ID order untuk melihat status & rincian pembelian.</p>
+    <div className="page status3">
+      <section className="section reveal status3-hero">
+        <div className="container">
+          <div className="status2-head">
+            <div>
+              <h1 className="h1">Status Order</h1>
+              <p className="muted">Masukkan ID order untuk melihat progres & rincian pembelian.</p>
+            </div>
+            <div className="status2-headActions">
+              <Link className="btn btn-ghost btn-sm" to="/produk">Produk</Link>
+              <Link className="btn btn-ghost btn-sm" to="/checkout">Checkout</Link>
+            </div>
           </div>
         </div>
 
@@ -157,22 +201,32 @@ export default function Status() {
           <CheckoutSteps current="status" />
         </div>
 
-        <div className="container status-grid">
-          <div className="card pad">
-            <label className="label">ID Order</label>
-            <div className="row" style={{ gap: 10, flexWrap: "wrap" }}>
-              <input
-                className="input"
-                placeholder="contoh: IMZ-ABCD"
-                value={input}
-                onChange={(e) => setInput(e.target.value.toUpperCase())}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") lookup(input);
-                }}
-              />
+        <div className="container status2-grid">
+          {/* LEFT: search */}
+          <aside className="status2-card" aria-label="Pencarian order">
+            <div className="status2-cardTitle">Cari ID Order</div>
+            <div className="status2-cardSub">Contoh format: <b className="mono">IMZ-ABCD</b></div>
+
+            <div className="status2-searchRow">
+              <div className="status2-inputWrap">
+                <span className="status2-prefix" aria-hidden="true">IMZ-</span>
+                <input
+                  className="input status2-input"
+                  inputMode="text"
+                  autoCapitalize="characters"
+                  placeholder="ABCD"
+                  value={String(input || "").replace(/^IMZ-/, "")}
+                  onChange={(e) => setInput(normalizeOrderCode(`IMZ-${e.target.value}`))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") lookup(input);
+                  }}
+                />
+              </div>
+
               <button className="btn" onClick={() => lookup(input)} disabled={loading}>
-                {loading ? "Mencari..." : "Cari"}
+                {loading ? "Mencari..." : "Cek"}
               </button>
+
               <button
                 className="btn btn-ghost"
                 type="button"
@@ -192,95 +246,145 @@ export default function Status() {
               </button>
             </div>
 
-            {msg ? <div className="hint" style={{ marginTop: 10 }}>{msg}</div> : null}
+            <div className="status2-msg" aria-live="polite">
+              {msg ? <div className="hint">{msg}</div> : <div className="hint subtle"> </div>}
+            </div>
 
             <div className="divider" />
 
-            <div className="hint subtle">
-              Tips: ID order muncul setelah kamu klik <b>Aku sudah bayar</b> di halaman pembayaran.
+            <div className="status2-tips">
+              <div className="status2-tip">
+                <div className="status2-tipIcon" aria-hidden="true">💡</div>
+                <div>
+                  <div className="status2-tipTitle">Di mana lihat ID order?</div>
+                  <div className="status2-tipText">ID order muncul setelah kamu klik <b>Aku sudah bayar</b> di halaman pembayaran.</div>
+                </div>
+              </div>
+              <div className="status2-tip">
+                <div className="status2-tipIcon" aria-hidden="true">🔒</div>
+                <div>
+                  <div className="status2-tipTitle">Aman</div>
+                  <div className="status2-tipText">Halaman ini hanya menampilkan ringkasan order berdasarkan ID-mu.</div>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <div className="card pad">
+            <div className="divider" />
+
+            <a className="btn btn-ghost btn-wide" href={waUrl} target="_blank" rel="noreferrer">
+              Tanya Admin via WhatsApp
+            </a>
+          </aside>
+
+          {/* RIGHT: result */}
+          <section className="status2-card" aria-label="Hasil status order">
             {!order ? (
-              <EmptyState
-                icon={msg ? "⚠️" : "📦"}
-                title={msg ? "Belum ada data order" : "Cek status order"}
-                description={msg || "Masukkan ID order di sebelah kiri. Setelah ketemu, kamu bisa lihat status + rincian pembelian di sini."}
-                primaryAction={{ label: "Buka Checkout", to: "/checkout" }}
-                secondaryAction={{ label: "Pilih Produk", to: "/produk" }}
-              />
+              <div className="status2-empty">
+                <EmptyState
+                  icon={msg ? "⚠️" : "📦"}
+                  title={msg ? "Belum ada data order" : "Masukkan ID order"}
+                  description={msg || "Setelah ID order ketemu, kamu akan melihat status, rincian item, dan total pembayaran di sini."}
+                  primaryAction={{ label: "Buka Checkout", to: "/checkout" }}
+                  secondaryAction={{ label: "Pilih Produk", to: "/produk" }}
+                />
+              </div>
             ) : (
               <>
-                <div className="status-badge">
+                <div className={`status2-pill ${tone}`}>
                   <StatusDot status={order.status} />
-                  <b>{prettyStatus(order.status)}</b>
+                  <span className="status2-pillLabel">{prettyStatus(order.status)}</span>
+                  <span className="status2-pillSep" aria-hidden="true">•</span>
+                  <button
+                    className="status2-codeBtn"
+                    type="button"
+                    onClick={async () => {
+                      try {
+                        await navigator.clipboard.writeText(order.order_code);
+                        toast.success("ID order disalin", { duration: 1600 });
+                      } catch {
+                        toast.error("Gagal menyalin. Salin manual ya.");
+                      }
+                    }}
+                    title="Salin ID order"
+                  >
+                    <span className="mono">{order.order_code}</span>
+                    <span className="status2-copy" aria-hidden="true">⧉</span>
+                  </button>
                 </div>
 
-                <div className="status-flow" aria-label="Tahapan order">
-                  {(() => {
-                    const flow = ["pending", "processing", "done"];
-                    const raw = String(order.status || "pending");
-                    const idx = raw === "done" ? 2 : raw === "processing" ? 1 : 0;
-                    return flow.map((k, i) => (
+                <div className="status2-timeline" aria-label="Tahapan order">
+                  {timeline.steps.map((st, i) => {
+                    const isDone = i < timeline.activeIndex;
+                    const isActive = i === timeline.activeIndex;
+                    return (
                       <div
-                        key={k}
+                        key={st.key}
                         className={
-                          i < idx
-                            ? "flow-step done"
-                            : i === idx
-                              ? "flow-step active"
-                              : "flow-step"
+                          "status2-step" + (isDone ? " done" : "") + (isActive ? " active" : "")
                         }
                       >
-                        <span className="flow-dot" aria-hidden="true">{i < idx ? "✓" : i + 1}</span>
-                        <span className="flow-label">{prettyStatus(k)}</span>
+                        <div className="status2-stepDot" aria-hidden="true">
+                          {isDone ? "✓" : i + 1}
+                        </div>
+                        <div className="status2-stepText">
+                          <div className="status2-stepTitle">{st.label}</div>
+                          <div className="status2-stepSub">
+                            {isActive ? "Sedang berjalan" : isDone ? "Selesai" : "Menunggu"}
+                          </div>
+                        </div>
                       </div>
-                    ));
-                  })()}
+                    );
+                  })}
                 </div>
 
-                <div className="status-meta">
-                  <div className="kv">
-                    <span className="muted">ID Order</span>
-                    <b className="mono">{order.order_code}</b>
+                <div className="status2-kvGrid">
+                  <div className="status2-kv">
+                    <div className="status2-k">Tanggal</div>
+                    <div className="status2-v">{new Date(order.created_at).toLocaleString("id-ID")}</div>
                   </div>
-                  <div className="kv">
-                    <span className="muted">Tanggal</span>
-                    <b>{new Date(order.created_at).toLocaleString("id-ID")}</b>
+                  <div className="status2-kv">
+                    <div className="status2-k">Subtotal</div>
+                    <div className="status2-v">{formatIDR(order.subtotal_idr || 0)}</div>
                   </div>
-                  <div className="kv">
-                    <span className="muted">Subtotal</span>
-                    <b>{formatIDR(order.subtotal_idr || 0)}</b>
+                  <div className="status2-kv">
+                    <div className="status2-k">Diskon</div>
+                    <div className="status2-v">- {formatIDR(discountIDR)}</div>
                   </div>
-                  <div className="kv">
-                    <span className="muted">Diskon</span>
-                    <b>- {formatIDR(Math.round(((order.subtotal_idr || 0) * (order.discount_percent || 0)) / 100))}</b>
-                  </div>
-                  <div className="kv">
-                    <span className="muted">Total</span>
-                    <b>{formatIDR(order.total_idr || 0)}</b>
+                  <div className="status2-kv">
+                    <div className="status2-k">Total</div>
+                    <div className="status2-v total">{formatIDR(order.total_idr || 0)}</div>
                   </div>
                   {order.promo_code ? (
-                    <div className="kv">
-                      <span className="muted">Promo</span>
-                      <b>{order.promo_code} ({order.discount_percent || 0}%)</b>
+                    <div className="status2-kv span2">
+                      <div className="status2-k">Promo</div>
+                      <div className="status2-v">
+                        <b>{order.promo_code}</b> • {order.discount_percent || 0}%
+                      </div>
                     </div>
                   ) : null}
                 </div>
 
                 <div className="divider" />
 
-                <div className="status-items">
+                <div className="status2-itemsHead">
+                  <div>
+                    <div className="status2-itemsTitle">Item yang dibeli</div>
+                    <div className="status2-itemsSub">Ringkasan produk & varian.</div>
+                  </div>
+                </div>
+
+                <div className="status2-items">
                   {(order.items || []).map((it, idx) => (
-                    <div key={idx} className="status-item">
-                      <div>
-                        <div className="status-title">{it.product_name}</div>
-                        <div className="status-sub">
+                    <div key={idx} className="status2-item">
+                      <div className="status2-itemLeft">
+                        <div className="status2-itemName">{it.product_name}</div>
+                        <div className="status2-itemMeta">
                           {it.variant_name} • {it.duration_label} • Qty {it.qty}
                         </div>
                       </div>
-                      <div className="order-total">{formatIDR((it.price_idr || 0) * (it.qty || 0))}</div>
+                      <div className="status2-itemRight">
+                        {formatIDR((it.price_idr || 0) * (it.qty || 0))}
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -288,20 +392,16 @@ export default function Status() {
                 <div className="divider" />
 
                 <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
-                  Hubungi Admin Untuk Orderanku
+                  Hubungi Admin untuk Orderanku
                 </a>
 
-                <div className="row" style={{ gap: 10, marginTop: 10, flexWrap: "wrap" }}>
-                  <Link className="btn btn-ghost btn-sm" to="/produk">
-                    Belanja lagi
-                  </Link>
-                  <Link className="btn btn-ghost btn-sm" to="/checkout">
-                    Lihat keranjang
-                  </Link>
+                <div className="status2-footerActions">
+                  <Link className="btn btn-ghost btn-sm" to="/produk">Belanja lagi</Link>
+                  <Link className="btn btn-ghost btn-sm" to="/checkout">Lihat keranjang</Link>
                 </div>
               </>
             )}
-          </div>
+          </section>
         </div>
       </section>
     </div>

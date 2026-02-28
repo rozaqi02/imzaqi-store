@@ -1,0 +1,138 @@
+/*
+  Disney+ inspired theme overrides.
+  NOTE: This is not a copy of Disney+ assets; only a similar dark UI theme with solid background.
+*/
+
+:root{
+  /* Solid background */
+  --bg0:#040714;
+  --bg1:#040714;
+  --bg2:#0b1020;
+
+  /* Surfaces */
+  --card:rgba(255,255,255,.06);
+  --card2:rgba(255,255,255,.08);
+  --line:rgba(255,255,255,.12);
+
+  /* Text */
+  --text:rgba(255,255,255,.92);
+  --muted:rgba(255,255,255,.72);
+
+  /* Brand accent (Disney+ like blue) */
+  --accent:#1f80e0;
+  --accent2:#63a9ff;
+
+  --danger:#ff3b5c;
+  --shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+html,body{
+  background:var(--bg0) !important;
+}
+
+body{
+  color:var(--text) !important;
+  /* Avenir (if available) + Inter fallback */
+  font-family:"Avenir Next",Avenir,Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji" !important;
+  letter-spacing:.1px;
+}
+
+/* Remove global gradients, keep subtle noise only */
+.global-bg{background:var(--bg0) !important;}
+.global-bg::after{content:none !important;}
+
+.global-noise{
+  opacity:0.035 !important;
+  mix-blend-mode:overlay !important;
+}
+
+/* Remove side vignette gradients from the app main */
+.app-main::before,.app-main::after{content:none !important;display:none !important;}
+
+/* Header like streaming apps */
+.header{
+  background:rgba(4,7,20,.86) !important;
+  border-bottom:1px solid rgba(255,255,255,.10) !important;
+}
+
+.brand-img{filter:none !important;}
+
+.nav a{color:rgba(255,255,255,.82) !important;}
+.nav a:hover{color:rgba(255,255,255,.95) !important;}
+.nav a.active{color:#fff !important;}
+.nav a::after{background:linear-gradient(90deg, rgba(31,128,224,0), rgba(31,128,224,.95), rgba(31,128,224,0)) !important;}
+
+.pill{
+  background:rgba(31,128,224,.18) !important;
+  border-color:rgba(31,128,224,.35) !important;
+}
+
+/* Buttons */
+.btn{
+  background:linear-gradient(135deg, rgba(31,128,224,1), rgba(99,169,255,1)) !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+  color:#fff !important;
+  box-shadow:0 14px 40px rgba(31,128,224,.16) !important;
+}
+
+.btn:hover{filter:brightness(1.04) !important;}
+
+.btn.btn-ghost,.btn-ghost{
+  background:rgba(255,255,255,.06) !important;
+  border:1px solid rgba(255,255,255,.14) !important;
+  color:rgba(255,255,255,.92) !important;
+  box-shadow:none !important;
+}
+
+.btn.btn-ghost:hover,.btn-ghost:hover{
+  background:rgba(255,255,255,.10) !important;
+  border-color:rgba(255,255,255,.18) !important;
+}
+
+.btn.btn-danger,.btn-danger{
+  background:rgba(255,59,92,.12) !important;
+  border-color:rgba(255,59,92,.35) !important;
+  color:#ff3b5c !important;
+  box-shadow:none !important;
+}
+
+.btn.btn-danger:hover,.btn-danger:hover{
+  background:rgba(255,59,92,.16) !important;
+}
+
+/* Inputs */
+.input{
+  background:rgba(255,255,255,.06) !important;
+  border-color:rgba(255,255,255,.12) !important;
+  color:rgba(255,255,255,.92) !important;
+}
+.input::placeholder{color:rgba(255,255,255,.55) !important;}
+.input:focus{
+  border-color:rgba(31,128,224,.55) !important;
+  box-shadow:0 0 0 4px rgba(31,128,224,.15) !important;
+}
+
+/* Cards */
+.card{
+  background:rgba(255,255,255,.04) !important;
+  border-color:rgba(255,255,255,.10) !important;
+}
+
+/* Reduce overly colorful glows from older theme */
+.card-glow{opacity:.28 !important;}
+
+/* Mobile menu */
+.mobile-menu{background:rgba(12,14,30,.98) !important;border-left:1px solid rgba(255,255,255,.10) !important;}
+.mobile-menu a.active{background:rgba(31,128,224,.16) !important;border-color:rgba(31,128,224,.30) !important;color:#fff !important;}
+.mobile-backdrop{background:rgba(0,0,0,.62) !important;}
+
+/* Status pills */
+.status2-pill.success,.status2-pill.done{background:rgba(35,196,125,.14) !important;border-color:rgba(35,196,125,.28) !important;color:rgba(255,255,255,.92) !important;}
+.status2-pill.pending{background:rgba(31,128,224,.14) !important;border-color:rgba(31,128,224,.28) !important;color:rgba(255,255,255,.92) !important;}
+.status2-pill.cancelled{background:rgba(255,59,92,.14) !important;border-color:rgba(255,59,92,.28) !important;color:rgba(255,255,255,.92) !important;}
+
+/* Accent usage */
+.back-to-top{background:var(--accent) !important;box-shadow:0 10px 30px rgba(31,128,224,.35) !important;}
+
+/* Selection */
+::selection{background:rgba(31,128,224,.35);}

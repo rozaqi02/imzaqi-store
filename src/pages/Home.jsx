@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 // Framer Motion DIHAPUS agar stabil
 
 import Hero from "../components/Hero";
-import ProductCard from "../components/ProductCard";
+import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingIds } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -116,7 +116,7 @@ export default function Home() {
             ) : (
               // Render Produk
               popularProducts.map((p) => (
-                <ProductCard key={p.id} product={p} />
+                <ProductTile key={p.id} product={p} />
               ))
             )}
           </div>

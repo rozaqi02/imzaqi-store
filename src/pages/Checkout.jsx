@@ -64,8 +64,8 @@ export default function Checkout() {
   }
 
   return (
-    <div className="page with-sticky-cta">
-      <section className="section reveal">
+    <div className="page with-sticky-cta checkout3">
+      <section className="section reveal checkout3-hero">
         <div className="container section-head">
           <div>
             <h1 className="h1">Checkout</h1>

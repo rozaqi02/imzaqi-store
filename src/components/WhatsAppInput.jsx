@@ -51,7 +51,8 @@ export default function WhatsAppInput({
   }, [internalValue, onValidChange]);
 
   useEffect(() => {
-    if (value !== internalValue) setInternalValue(value);
+    // Sync internal state only when the controlled `value` prop changes
+    setInternalValue((prev) => (value !== prev ? value : prev));
   }, [value]);
 
   const handleChange = (e) => {

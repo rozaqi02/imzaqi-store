@@ -1,0 +1,238 @@
+.statusHead{
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom: 10px;
+}
+
+.statusHeadActions{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.statusLayout{
+  display:grid;
+  grid-template-columns: 420px 1fr;
+  gap:14px;
+  align-items:start;
+}
+
+@media (max-width: 980px){
+  .statusLayout{grid-template-columns: 1fr;}
+}
+
+.statusSearchCard{position: sticky; top: 82px;}
+@media (max-width: 980px){
+  .statusSearchCard{position: static;}
+}
+
+.statusSearchTop{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom: 8px;
+}
+
+.statusSearchTitle{font-weight:1000; font-size:16px;}
+.statusSearchDesc{color: rgba(167,201,187,.92); font-size:13px; margin-top:4px; line-height:1.45}
+
+.statusHintChip{
+  width:42px;
+  height:42px;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  display:grid;
+  place-items:center;
+  flex:0 0 auto;
+}
+
+.statusSearchRow{display:flex; gap:10px; align-items:center; flex-wrap:wrap;}
+.statusSearchRow .input{flex:1 1 240px; min-width: 220px;}
+.statusSearchRow .btn{flex:0 0 auto;}
+
+.statusMsg{
+  margin-top: 12px;
+  padding: 12px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,90,122,.08);
+  color: rgba(255,215,222,.92);
+  line-height: 1.4;
+}
+
+/* =========
+   SUMMARY
+=========== */
+.statusSummary{
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.12);
+  padding: 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap:12px;
+  overflow:hidden;
+  position:relative;
+  background:
+    radial-gradient(500px 160px at 10% 0%, rgba(0,194,208,.18), rgba(0,194,208,0) 62%),
+    linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
+}
+
+.statusSummary::after{
+  content:"";
+  position:absolute;
+  inset:-40% -50% auto auto;
+  width: 240px;
+  height: 240px;
+  background: radial-gradient(circle at 30% 30%, rgba(124,58,237,.16), rgba(124,58,237,0) 62%);
+  pointer-events:none;
+}
+
+.statusSummaryLeft{position:relative; z-index:1;}
+.statusSummaryRight{position:relative; z-index:1; text-align:right;}
+
+.statusPill{
+  display:inline-flex;
+  align-items:center;
+  gap:10px;
+  padding: 8px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+}
+
+.statusSummaryTitle{margin-top: 10px; font-weight:1000; font-size: 16px;}
+.statusSummarySub{margin-top: 4px; color: rgba(167,201,187,.92); font-size: 13px;}
+
+.statusTotalLabel{color: rgba(167,201,187,.92); font-size: 12px;}
+.statusTotalValue{font-weight:1100; font-size: 20px; letter-spacing: .2px; margin-top: 2px;}
+
+.statusSummary--done{border-color: rgba(0,194,208,.22)}
+.statusSummary--processing{border-color: rgba(59,130,246,.22)}
+.statusSummary--pending{border-color: rgba(255,255,255,.12)}
+.statusSummary--cancelled{border-color: rgba(255,90,122,.28)}
+
+/* =========
+   DOT
+=========== */
+.statusDot{
+  width:10px;
+  height:10px;
+  border-radius:999px;
+  box-shadow: 0 0 0 4px rgba(255,255,255,.06);
+}
+.statusDot--done{background: rgba(0,194,208,.95); box-shadow: 0 0 0 4px rgba(0,194,208,.16)}
+.statusDot--processing{background: rgba(59,130,246,.95); box-shadow: 0 0 0 4px rgba(59,130,246,.16)}
+.statusDot--pending{background: rgba(255,255,255,.68); box-shadow: 0 0 0 4px rgba(255,255,255,.10)}
+.statusDot--cancelled{background: rgba(255,90,122,.95); box-shadow: 0 0 0 4px rgba(255,90,122,.16)}
+
+/* =========
+   TIMELINE
+=========== */
+.statusTimeline{margin-top: 12px; display:flex; flex-direction:column; gap: 10px;}
+
+.statusTimeItem{
+  display:grid;
+  grid-template-columns: 32px 1fr;
+  gap: 12px;
+  align-items:start;
+  padding: 12px;
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+}
+
+.statusTimeItem.active{border-color: rgba(0,194,208,.30); background: rgba(0,194,208,.06)}
+.statusTimeItem.done{border-color: rgba(0,194,208,.18); background: rgba(255,255,255,.02)}
+
+.statusTimeRail{display:flex; flex-direction:column; align-items:center;}
+.statusTimeDot{
+  width: 28px;
+  height: 28px;
+  border-radius: 12px;
+  display:grid;
+  place-items:center;
+  font-weight: 1000;
+  border:1px solid rgba(255,255,255,.12);
+  background: rgba(255,255,255,.04);
+  color: rgba(234,255,245,.92);
+}
+.statusTimeItem.active .statusTimeDot{background: rgba(0,194,208,.22); border-color: rgba(0,194,208,.35); color: #032235}
+.statusTimeItem.done .statusTimeDot{background: rgba(0,194,208,.12); border-color: rgba(0,194,208,.22)}
+
+.statusTimeLine{
+  width: 2px;
+  height: 22px;
+  border-radius: 2px;
+  margin-top: 8px;
+  background: rgba(255,255,255,.10);
+}
+.statusTimeItem.done .statusTimeLine{background: rgba(0,194,208,.20)}
+
+.statusTimeLabel{font-weight:1000;}
+.statusTimeDesc{margin-top: 4px; color: rgba(167,201,187,.92); font-size: 13px; line-height: 1.45}
+
+.statusCancel{
+  padding: 12px;
+  border-radius: 18px;
+  border:1px solid rgba(255,90,122,.22);
+  background: rgba(255,90,122,.08);
+}
+.statusCancelBadge{display:inline-flex; padding:6px 10px; border-radius: 999px; border:1px solid rgba(255,90,122,.28); background: rgba(255,90,122,.10); font-weight: 1000;}
+.statusCancelText{margin-top: 8px; color: rgba(255,215,222,.92); font-size: 13px; line-height: 1.45}
+
+/* =========
+   META + ITEMS
+=========== */
+.statusMeta{margin-top: 12px;}
+.statusMetaGrid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap: 10px;
+}
+@media (max-width: 520px){
+  .statusMetaGrid{grid-template-columns: 1fr;}
+}
+
+.statusMetaActions{display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;}
+
+.statusItems{margin-top: 2px;}
+.statusItemsHead{display:flex; justify-content:space-between; align-items:flex-end; gap:12px; margin-bottom: 10px;}
+.statusItemsTitle{font-weight: 1000;}
+.statusItemsCount{color: rgba(167,201,187,.92); font-size: 13px;}
+
+.statusItemsList{display:flex; flex-direction:column; gap: 10px;}
+
+.statusItemRow{
+  display:flex;
+  justify-content:space-between;
+  align-items:flex-start;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+}
+
+.statusItemName{font-weight:1000;}
+.statusItemSub{margin-top: 4px; color: rgba(167,201,187,.92); font-size: 13px; line-height: 1.35}
+
+.statusItemRight{white-space:nowrap;}
+
+.statusBottomLinks{display:flex; gap:10px; flex-wrap:wrap; margin-top: 10px;}
+
+/* Small helpers (scoped by import order) */
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; letter-spacing: .3px;}
+.kv{
+  padding: 12px;
+  border-radius: 18px;
+  border:1px solid rgba(255,255,255,.10);
+  background: rgba(255,255,255,.03);
+  display:flex;
+  flex-direction:column;
+  gap: 4px;
+}
