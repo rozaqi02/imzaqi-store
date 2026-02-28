@@ -45,7 +45,7 @@ export default function AdminLogin() {
               <button className="btn btn-wide" type="submit">Login</button>
               {msg ? <div className="hint">{msg}</div> : null}
               <div className="hint subtle">
-                Setelah berhasil login, disarankan ganti password.
+                Ini khusus admin jaki loh ya
               </div>
             </form>
           </div>

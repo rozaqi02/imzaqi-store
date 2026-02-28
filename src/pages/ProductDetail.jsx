@@ -31,6 +31,9 @@ export default function ProductDetail() {
   const [product, setProduct] = useState(null);
   const [error, setError] = useState("");
 
+  // Qty selector per varian (permintaan: ada opsi - / + pada jumlah belanjaan)
+  const [qtyById, setQtyById] = useState({});
+
   usePageMeta({
     title: product?.name ? `${product.name} • Detail Produk` : "Detail Produk",
     description: product?.description || "Lihat detail produk dan pilih paket.",
@@ -66,9 +69,28 @@ export default function ProductDetail() {
       .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   }, [product]);
 
+  function getMaxQty(variant) {
+    const s = Number(variant?.stock ?? 0);
+    if (!Number.isFinite(s)) return 99;
+    if (s <= 0) return 1;
+    return Math.min(99, s);
+  }
+
+  function getQty(variant) {
+    const q = Number(qtyById?.[variant.id] ?? 1);
+    if (!Number.isFinite(q)) return 1;
+    return Math.max(1, Math.min(getMaxQty(variant), q));
+  }
+
+  function setQty(variant, next) {
+    const max = getMaxQty(variant);
+    const safe = Math.max(1, Math.min(max, Number(next) || 1));
+    setQtyById((prev) => ({ ...prev, [variant.id]: safe }));
+  }
+
   const icon = product?.icon_url;
 
-  function handleAdd(variant) {
+  function handleAdd(variant, qty = 1) {
     const stock = variant.stock ?? 999;
 
     if (stock === 0) {
@@ -82,13 +104,16 @@ export default function ProductDetail() {
         product_id: product.id,
         product_name: product.name,
       },
-      1
+      qty
     );
 
     toast.success(`${variant.name} • ${formatIDR(variant.price_idr)}`, {
       title: "✓ Ditambahkan ke keranjang",
       duration: 2200,
     });
+
+    // Reset qty agar tidak "kecolongan" saat pindah varian
+    setQty(variant, 1);
   }
 
   const pageVariants = {
@@ -176,6 +201,10 @@ export default function ProductDetail() {
                 {variants.map((v) => {
                   const stock = v.stock ?? 999;
                   const out = stock === 0;
+                  const qty = getQty(v);
+                  const maxQty = getMaxQty(v);
+                  const canDec = qty > 1;
+                  const canInc = qty < maxQty;
 
                   return (
                     <motion.div
@@ -203,14 +232,40 @@ export default function ProductDetail() {
                         <div className="variant-price">{formatIDR(v.price_idr)}</div>
                       </div>
 
-                      <button
-                        className={"btn btn-sm variant-add " + (out ? "btn-disabled" : "")}
-                        type="button"
-                        onClick={() => handleAdd(v)}
-                        disabled={out}
-                      >
-                        {out ? "Habis" : "Tambah"}
-                      </button>
+                      <div className="variant-foot">
+                        <div className="variant-qty" aria-label={`Jumlah untuk ${v.name}`}>
+                          <button
+                            type="button"
+                            className="qty-btn"
+                            onClick={() => setQty(v, qty - 1)}
+                            disabled={out || !canDec}
+                            aria-label="Kurangi jumlah"
+                          >
+                            −
+                          </button>
+                          <div className="qty-num" aria-label="Jumlah">
+                            {qty}
+                          </div>
+                          <button
+                            type="button"
+                            className="qty-btn"
+                            onClick={() => setQty(v, qty + 1)}
+                            disabled={out || !canInc}
+                            aria-label="Tambah jumlah"
+                          >
+                            +
+                          </button>
+                        </div>
+
+                        <button
+                          className={"btn btn-sm variant-add " + (out ? "btn-disabled" : "")}
+                          type="button"
+                          onClick={() => handleAdd(v, qty)}
+                          disabled={out}
+                        >
+                          {out ? "Habis" : qty > 1 ? `Tambah (${qty})` : "Tambah"}
+                        </button>
+                      </div>
                     </motion.div>
                   );
                 })}

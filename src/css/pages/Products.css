@@ -2,8 +2,8 @@
 
 .products3-hero{padding-top:88px;padding-bottom:18px;position:relative;overflow:hidden;}
 .products3-hero::before{content:"";position:absolute;inset:-24% -10%;background:
-  radial-gradient(900px 460px at 18% 10%, rgba(31,128,224,.22), rgba(0,0,0,0) 62%),
-  radial-gradient(820px 520px at 82% 20%, rgba(0,194,208,.14), rgba(0,0,0,0) 58%),
+  radial-gradient(900px 460px at 18% 10%, rgba(22,199,166,.22), rgba(0,0,0,0) 62%),
+  radial-gradient(820px 520px at 82% 20%, rgba(0,214,180,.14), rgba(0,0,0,0) 58%),
   radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%);
 opacity:.95;pointer-events:none;}
 
@@ -61,12 +61,12 @@ opacity:.95;pointer-events:none;}
 /* Card */
 .pcard{display:flex;gap:12px;align-items:flex-start;padding:14px;border-radius:22px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);box-shadow:0 18px 70px rgba(0,0,0,.26);color:var(--text);transition:transform .18s ease, background .18s ease, border-color .18s ease;position:relative;overflow:hidden;}
 .pcard::before{content:"";position:absolute;inset:-1px;opacity:0;pointer-events:none;background:
-  radial-gradient(420px 160px at 20% 10%, rgba(31,128,224,.16), rgba(0,0,0,0) 55%),
-  radial-gradient(460px 160px at 80% 30%, rgba(0,194,208,.10), rgba(0,0,0,0) 55%);
+  radial-gradient(420px 160px at 20% 10%, rgba(22,199,166,.16), rgba(0,0,0,0) 55%),
+  radial-gradient(460px 160px at 80% 30%, rgba(0,214,180,.10), rgba(0,0,0,0) 55%);
 transition:opacity .18s ease;}
-.pcard:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);border-color:rgba(31,128,224,.28);}
+.pcard:hover{transform:translateY(-2px);background:rgba(255,255,255,.06);border-color:rgba(22,199,166,.28);}
 .pcard:hover::before{opacity:1;}
-.pcard:focus-visible{outline:2px solid rgba(31,128,224,.55);outline-offset:3px;}
+.pcard:focus-visible{outline:2px solid rgba(22,199,166,.55);outline-offset:3px;}
 
 .pcard.grid{flex-direction:column;}
 .pcard.list{align-items:center;}
@@ -118,21 +118,21 @@ transition:opacity .18s ease;}
 .pfilters-chips{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px;}
 .chip{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.84);cursor:pointer;font-weight:1000;}
 .chip:hover{background:rgba(255,255,255,.06);}
-.chip.active{border-color:rgba(31,128,224,.36);background:rgba(31,128,224,.14);color:#fff;}
+.chip.active{border-color:rgba(22,199,166,.36);background:rgba(22,199,166,.14);color:#fff;}
 .chip-ic{opacity:.9;}
 
 .toggle{position:relative;display:inline-flex;align-items:center;}
 .toggle input{position:absolute;opacity:0;pointer-events:none;}
 .toggle-ui{width:44px;height:26px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);display:block;position:relative;cursor:pointer;transition:background .18s ease,border-color .18s ease;}
 .toggle-ui::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:999px;background:rgba(255,255,255,.86);transition:transform .18s ease;}
-.toggle input:checked + .toggle-ui{background:rgba(31,128,224,.28);border-color:rgba(31,128,224,.40);}
+.toggle input:checked + .toggle-ui{background:rgba(22,199,166,.28);border-color:rgba(22,199,166,.40);}
 .toggle input:checked + .toggle-ui::after{transform:translateX(18px);}
 
 .range{margin-top:10px;position:relative;padding:10px 0 0;}
 .range-track{height:10px;border-radius:999px;}
 .range-input{position:absolute;left:0;right:0;top:0;width:100%;height:28px;background:transparent;pointer-events:all;-webkit-appearance:none;appearance:none;}
-.range-input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(31,128,224,.95);box-shadow:0 8px 20px rgba(0,0,0,.28);cursor:pointer;}
-.range-input::-moz-range-thumb{width:18px;height:18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(31,128,224,.95);box-shadow:0 8px 20px rgba(0,0,0,.28);cursor:pointer;}
+.range-input::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:18px;height:18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(22,199,166,.95);box-shadow:0 8px 20px rgba(0,0,0,.28);cursor:pointer;}
+.range-input::-moz-range-thumb{width:18px;height:18px;border-radius:999px;border:1px solid rgba(255,255,255,.25);background:rgba(22,199,166,.95);box-shadow:0 8px 20px rgba(0,0,0,.28);cursor:pointer;}
 
 .range-values{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:10px;}
 .range-pill{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-size:12px;font-weight:1000;}
@@ -144,7 +144,7 @@ transition:opacity .18s ease;}
 .pfilters-view{display:flex;gap:10px;margin-top:10px;}
 .viewbtn{display:inline-flex;gap:8px;align-items:center;justify-content:center;height:40px;padding:0 14px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.84);cursor:pointer;font-weight:1000;}
 .viewbtn:hover{background:rgba(255,255,255,.06);}
-.viewbtn.active{border-color:rgba(31,128,224,.36);background:rgba(31,128,224,.14);color:#fff;}
+.viewbtn.active{border-color:rgba(22,199,166,.36);background:rgba(22,199,166,.14);color:#fff;}
 
 .pfilters-actions{padding-top:12px;}
 
@@ -155,6 +155,15 @@ transition:opacity .18s ease;}
 .pfilters-sheetTitle{font-weight:1100;letter-spacing:.2px;font-size:16px;}
 .pfilters-sheetBody{padding:14px;overflow:auto;}
 .pfilters-sheetFoot{padding:12px 14px;border-top:1px solid rgba(255,255,255,.10);}
+
+/* Fix dropdown option readability on Windows/Chrome dark theme.
+   Native <select> option popups often render with white background;
+   force option text to dark so it stays readable. */
+.products3-sort option,
+.pfilters-select option{
+  color:#0b1020;
+  background:#ffffff;
+}
 
 /* show filter button only on mobile */
 @media (min-width: 921px){

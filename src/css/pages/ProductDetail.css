@@ -33,7 +33,7 @@
 }
 
 .variant-tile{border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);padding:14px;display:flex;flex-direction:column;gap:12px;}
-.variant-tile:hover{border-color:rgba(31,128,224,.26);background:rgba(255,255,255,.05);}
+.variant-tile:hover{border-color:rgba(22,199,166,.26);background:rgba(255,255,255,.05);}
 .variant-tile.disabled{opacity:.65;}
 
 .variant-tile-top{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;}
@@ -46,7 +46,19 @@
 
 .variant-price{font-weight:1000;white-space:nowrap;}
 
-.variant-add{width:100%;}
+.variant-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.variant-add{flex:1 1 auto;}
+
+.variant-qty{display:flex;align-items:center;gap:10px;height:40px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);padding:0 8px;flex:0 0 auto;}
+.qty-btn{width:34px;height:34px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:rgba(255,255,255,.92);cursor:pointer;font-weight:1100;display:grid;place-items:center;}
+.qty-btn:hover{background:rgba(255,255,255,.06);}
+.qty-btn:disabled{opacity:.45;cursor:not-allowed;}
+.qty-num{min-width:30px;text-align:center;font-weight:1100;}
+
+@media (max-width: 520px){
+  .variant-foot{flex-direction:column;align-items:stretch;}
+  .variant-qty{justify-content:center;}
+}
 
 /* Stock pill */
 .stock-pill{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);color:rgba(255,255,255,.86);}

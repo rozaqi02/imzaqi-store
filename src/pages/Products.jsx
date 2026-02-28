@@ -45,7 +45,7 @@ function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
   const left = max <= min ? 0 : ((valueMin - min) / (max - min)) * 100;
   const right = max <= min ? 100 : ((valueMax - min) / (max - min)) * 100;
   const trackStyle = {
-    background: `linear-gradient(90deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.12) ${left}%, rgba(31,128,224,.65) ${left}%, rgba(31,128,224,.65) ${right}%, rgba(255,255,255,.12) ${right}%, rgba(255,255,255,.12) 100%)`,
+    background: `linear-gradient(90deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.12) ${left}%, rgba(22,199,166,.65) ${left}%, rgba(22,199,166,.65) ${right}%, rgba(255,255,255,.12) ${right}%, rgba(255,255,255,.12) 100%)`,
   };
 
   return (
@@ -423,12 +423,6 @@ export default function Products() {
     return sorted;
   }, [cats, enriched, inStockOnly, price.min, price.max, priceBounds.max, query, sort]);
 
-  const activeCount = useMemo(() => enriched.filter((p) => p?.is_active).length, [enriched]);
-  const minStartingPrice = useMemo(() => {
-    const xs = enriched.map((p) => p._minPrice).filter((n) => Number.isFinite(n) && n > 0);
-    return xs.length ? Math.min(...xs) : 0;
-  }, [enriched]);
-
   const activeFiltersCount =
     (query ? 1 : 0) +
     (cats.length ? 1 : 0) +
@@ -449,21 +443,6 @@ export default function Products() {
               <p className="products3-sub">
                 Pilih aplikasi yang kamu mau — klik untuk buka detail paket & tambah ke keranjang.
               </p>
-            </div>
-
-            <div className="products3-heroStats" aria-label="Ringkasan katalog">
-              <div className="pstat">
-                <div className="pstat-k">Produk aktif</div>
-                <div className="pstat-v">{activeCount}</div>
-              </div>
-              <div className="pstat">
-                <div className="pstat-k">Mulai dari</div>
-                <div className="pstat-v">{minStartingPrice ? formatIDR(minStartingPrice) : "—"}</div>
-              </div>
-              <div className="pstat">
-                <div className="pstat-k">Filter aktif</div>
-                <div className="pstat-v">{activeFiltersCount}</div>
-              </div>
             </div>
           </div>
 

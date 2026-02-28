@@ -13,14 +13,14 @@
 }
 
 .admin-brand{display:flex;gap:12px;align-items:center;padding:10px;border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
-.admin-logo{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-weight:1000;background:rgba(31,128,224,.14);border:1px solid rgba(31,128,224,.30);}
+.admin-logo{width:44px;height:44px;border-radius:16px;display:grid;place-items:center;font-weight:1000;background:rgba(22,199,166,.14);border:1px solid rgba(22,199,166,.30);}
 .admin-brand-title{font-weight:1000;}
 .admin-brand-sub{color:rgba(255,255,255,.68);font-size:12px;margin-top:2px;}
 
 .admin-nav{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
 .admin-nav-btn{width:100%;text-align:left;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);color:rgba(255,255,255,.86);padding:10px 12px;font-weight:900;cursor:pointer;transition:all .18s ease;}
 .admin-nav-btn:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);}
-.admin-nav-btn.active{background:rgba(31,128,224,.16);border-color:rgba(31,128,224,.34);color:#fff;box-shadow:0 10px 30px rgba(31,128,224,.18);}
+.admin-nav-btn.active{background:rgba(22,199,166,.16);border-color:rgba(22,199,166,.34);color:#fff;box-shadow:0 10px 30px rgba(22,199,166,.18);}
 
 .admin-sidebar-actions{display:flex;flex-direction:column;gap:8px;margin-top:14px;}
 
@@ -48,7 +48,7 @@
 
 .admin-product-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 12px;border-radius:18px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);cursor:pointer;transition:all .18s ease;}
 .admin-product-row:hover{background:rgba(255,255,255,.06);border-color:rgba(255,255,255,.16);}
-.admin-product-row.active{background:rgba(31,128,224,.14);border-color:rgba(31,128,224,.32);}
+.admin-product-row.active{background:rgba(22,199,166,.14);border-color:rgba(22,199,166,.32);}
 
 .admin-product-row-left{display:flex;gap:10px;align-items:center;min-width:0;}
 .admin-product-icon{width:36px;height:36px;border-radius:12px;object-fit:cover;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.06);}
@@ -95,10 +95,10 @@
 .admin-order-body{padding:0 14px 14px;}
 .admin-order-items{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
 .admin-order-item{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;border:1px dashed rgba(255,255,255,.12);border-radius:16px;padding:10px 12px;background:rgba(255,255,255,.02);}
-.admin-proof{display:inline-flex;align-items:center;justify-content:center;height:40px;border-radius:14px;border:1px solid rgba(31,128,224,.28);background:rgba(31,128,224,.12);font-weight:900;color:#fff;}
+.admin-proof{display:inline-flex;align-items:center;justify-content:center;height:40px;border-radius:14px;border:1px solid rgba(22,199,166,.28);background:rgba(22,199,166,.12);font-weight:900;color:#fff;}
 
 .admin-status{height:26px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);display:inline-flex;align-items:center;font-size:12px;font-weight:900;}
-.admin-status.pending{background:rgba(31,128,224,.14);border-color:rgba(31,128,224,.28);} 
+.admin-status.pending{background:rgba(22,199,166,.14);border-color:rgba(22,199,166,.28);} 
 .admin-status.processing{background:rgba(255,193,7,.12);border-color:rgba(255,193,7,.28);} 
 .admin-status.done{background:rgba(35,196,125,.12);border-color:rgba(35,196,125,.28);} 
 .admin-status.cancelled{background:rgba(255,59,92,.12);border-color:rgba(255,59,92,.28);} 

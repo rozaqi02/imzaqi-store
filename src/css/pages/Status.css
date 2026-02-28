@@ -20,18 +20,18 @@
 .status2-pillLabel{font-weight:1100;}
 .status2-pillSep{opacity:.6;}
 .status2-codeBtn{margin-left:auto;border:none;background:transparent;color:rgba(234,255,245,.92);display:flex;align-items:center;gap:10px;cursor:pointer;padding:6px/**/10px;border-radius:999px;border:1px/**/solid/**/rgba(255,255,255,.10);}
-.status2-codeBtn:hover{background:rgba(255,255,255,.04);border-color:rgba(0,194,208,.18);}
+.status2-codeBtn:hover{background:rgba(255,255,255,.04);border-color:rgba(0,214,180,.18);}
 .status2-copy{opacity:.8;}
 .status2-pill.pending{border-color:rgba(255,255,255,.14);}
-.status2-pill.processing{border-color:rgba(0,194,208,.26);background:rgba(0,194,208,.06);}
+.status2-pill.processing{border-color:rgba(0,214,180,.26);background:rgba(0,214,180,.06);}
 .status2-pill.done{border-color:rgba(34,197,94,.28);background:rgba(34,197,94,.06);}
 .status2-pill.cancelled{border-color:rgba(239,68,68,.30);background:rgba(239,68,68,.06);}
 .status2-timeline{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;}
 .status2-step{flex:1/**/1/**/170px;display:flex;gap:10px;align-items:center;padding:12px;border-radius:18px;border:1px/**/solid/**/rgba(255,255,255,.10);background:rgba(255,255,255,.03);}
-.status2-step.active{border-color:rgba(0,194,208,.30);background:rgba(0,194,208,.06);}
-.status2-step.done{border-color:rgba(0,194,208,.20);background:rgba(255,255,255,.02);}
+.status2-step.active{border-color:rgba(0,214,180,.30);background:rgba(0,214,180,.06);}
+.status2-step.done{border-color:rgba(0,214,180,.20);background:rgba(255,255,255,.02);}
 .status2-stepDot{width:34px;height:34px;border-radius:14px;display:grid;place-items:center;font-weight:1100;border:1px/**/solid/**/rgba(255,255,255,.12);background:rgba(255,255,255,.04);flex:0/**/0/**/auto;}
-.status2-step.active .status2-stepDot{background:rgba(0,194,208,.22);border-color:rgba(0,194,208,.35);color:#032235;}
+.status2-step.active .status2-stepDot{background:rgba(0,214,180,.22);border-color:rgba(0,214,180,.35);color:#032235;}
 .status2-stepTitle{font-weight:1100;line-height:1.1;}
 .status2-stepSub{font-size:12px;color:rgba(234,255,245,.72);margin-top:4px;}
 .status2-kvGrid{display:grid;grid-template-columns:repeat(2, 1fr);gap:10px;margin-top:10px;}
@@ -54,8 +54,8 @@
 /* Status (v3) — gen‑Z glow */
 .status3-hero{padding-top:88px;position:relative;overflow:hidden;}
 .status3-hero::before{content:"";position:absolute;inset:-24% -10%;background:
-  radial-gradient(860px 420px at 18% 10%, rgba(31,128,224,.18), rgba(0,0,0,0) 62%),
-  radial-gradient(820px 520px at 86% 22%, rgba(0,194,208,.12), rgba(0,0,0,0) 58%),
+  radial-gradient(860px 420px at 18% 10%, rgba(22,199,166,.18), rgba(0,0,0,0) 62%),
+  radial-gradient(820px 520px at 86% 22%, rgba(0,214,180,.12), rgba(0,0,0,0) 58%),
   radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%);
 opacity:.95;pointer-events:none;}
 

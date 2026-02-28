@@ -19,8 +19,8 @@
   --muted:rgba(255,255,255,.72);
 
   /* Brand accent (Disney+ like blue) */
-  --accent:#1f80e0;
-  --accent2:#63a9ff;
+  --accent:#16c7a6;
+  --accent2:#6af5d0;
 
   --danger:#ff3b5c;
   --shadow:0 20px 60px rgba(0,0,0,.45);
@@ -60,19 +60,19 @@ body{
 .nav a{color:rgba(255,255,255,.82) !important;}
 .nav a:hover{color:rgba(255,255,255,.95) !important;}
 .nav a.active{color:#fff !important;}
-.nav a::after{background:linear-gradient(90deg, rgba(31,128,224,0), rgba(31,128,224,.95), rgba(31,128,224,0)) !important;}
+.nav a::after{background:linear-gradient(90deg, rgba(22,199,166,0), rgba(22,199,166,.95), rgba(22,199,166,0)) !important;}
 
 .pill{
-  background:rgba(31,128,224,.18) !important;
-  border-color:rgba(31,128,224,.35) !important;
+  background:rgba(22,199,166,.18) !important;
+  border-color:rgba(22,199,166,.35) !important;
 }
 
 /* Buttons */
 .btn{
-  background:linear-gradient(135deg, rgba(31,128,224,1), rgba(99,169,255,1)) !important;
+  background:linear-gradient(135deg, rgba(22,199,166,1), rgba(106,245,208,1)) !important;
   border:1px solid rgba(255,255,255,.14) !important;
   color:#fff !important;
-  box-shadow:0 14px 40px rgba(31,128,224,.16) !important;
+  box-shadow:0 14px 40px rgba(22,199,166,.16) !important;
 }
 
 .btn:hover{filter:brightness(1.04) !important;}
@@ -108,8 +108,8 @@ body{
 }
 .input::placeholder{color:rgba(255,255,255,.55) !important;}
 .input:focus{
-  border-color:rgba(31,128,224,.55) !important;
-  box-shadow:0 0 0 4px rgba(31,128,224,.15) !important;
+  border-color:rgba(22,199,166,.55) !important;
+  box-shadow:0 0 0 4px rgba(22,199,166,.15) !important;
 }
 
 /* Cards */
@@ -123,16 +123,16 @@ body{
 
 /* Mobile menu */
 .mobile-menu{background:rgba(12,14,30,.98) !important;border-left:1px solid rgba(255,255,255,.10) !important;}
-.mobile-menu a.active{background:rgba(31,128,224,.16) !important;border-color:rgba(31,128,224,.30) !important;color:#fff !important;}
+.mobile-menu a.active{background:rgba(22,199,166,.16) !important;border-color:rgba(22,199,166,.30) !important;color:#fff !important;}
 .mobile-backdrop{background:rgba(0,0,0,.62) !important;}
 
 /* Status pills */
 .status2-pill.success,.status2-pill.done{background:rgba(35,196,125,.14) !important;border-color:rgba(35,196,125,.28) !important;color:rgba(255,255,255,.92) !important;}
-.status2-pill.pending{background:rgba(31,128,224,.14) !important;border-color:rgba(31,128,224,.28) !important;color:rgba(255,255,255,.92) !important;}
+.status2-pill.pending{background:rgba(22,199,166,.14) !important;border-color:rgba(22,199,166,.28) !important;color:rgba(255,255,255,.92) !important;}
 .status2-pill.cancelled{background:rgba(255,59,92,.14) !important;border-color:rgba(255,59,92,.28) !important;color:rgba(255,255,255,.92) !important;}
 
 /* Accent usage */
-.back-to-top{background:var(--accent) !important;box-shadow:0 10px 30px rgba(31,128,224,.35) !important;}
+.back-to-top{background:var(--accent) !important;box-shadow:0 10px 30px rgba(22,199,166,.35) !important;}
 
 /* Selection */
-::selection{background:rgba(31,128,224,.35);}
+::selection{background:rgba(22,199,166,.35);}

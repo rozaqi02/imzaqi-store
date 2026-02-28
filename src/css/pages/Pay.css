@@ -3,8 +3,8 @@
 .qris-img{border-radius:12px;width:100%;height:auto;}
 .pay3-section{padding-top:88px;position:relative;overflow:hidden;}
 .pay3-section::before{content:"";position:absolute;inset:-24% -10%;background:
-  radial-gradient(860px 420px at 18% 10%, rgba(31,128,224,.18), rgba(0,0,0,0) 62%),
-  radial-gradient(820px 520px at 86% 22%, rgba(0,194,208,.12), rgba(0,0,0,0) 58%),
+  radial-gradient(860px 420px at 18% 10%, rgba(22,199,166,.18), rgba(0,0,0,0) 62%),
+  radial-gradient(820px 520px at 86% 22%, rgba(0,214,180,.12), rgba(0,0,0,0) 58%),
   radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%);
 opacity:.95;pointer-events:none;}
 
@@ -23,7 +23,7 @@ opacity:.95;pointer-events:none;}
 
 /* Upload dropzone */
 .upload-drop{display:block;border-radius:18px;border:1px dashed rgba(255,255,255,.18);background:rgba(255,255,255,.03);padding:14px;transition:background .18s ease,border-color .18s ease;}
-.upload-drop:hover{background:rgba(255,255,255,.05);border-color:rgba(31,128,224,.32);} 
+.upload-drop:hover{background:rgba(255,255,255,.05);border-color:rgba(22,199,166,.32);} 
 .upload-dropInner{text-align:center;padding:10px 10px 6px;}
 .upload-ic{display:block;margin:0 auto 10px;opacity:.85;}
 .upload-title{font-weight:1000;}
