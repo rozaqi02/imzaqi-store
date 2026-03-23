@@ -59,14 +59,10 @@ opacity:.95;pointer-events:none;}
 .checkout-min-go{margin-top:4px;}
 .checkout-min-actions{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap;}
 
-@media (max-width: 920px){
+@media (max-width: 720px){
   .checkout-min-hero{padding-top:0;}
   .checkout-min-grid{grid-template-columns:1fr;}
   .checkout-min-side{position:static;}
-}
-
-@media (max-width: 720px){
-  .checkout-min-stats{grid-template-columns:1fr;}
   .checkout-min-item{grid-template-columns:1fr;}
   .checkout-min-itemSide{align-items:flex-start;}
   .checkout-min-remove{width:100%;}

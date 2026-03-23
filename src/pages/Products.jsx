@@ -68,7 +68,7 @@ function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
     <div className="catalog-range" aria-label="Filter harga">
       <div className="catalog-rangeTrack" style={trackStyle} />
       <input
-        className="catalog-rangeInput"
+        className="catalog-rangeInput is-min"
         type="range"
         min={min}
         max={max}
@@ -81,7 +81,7 @@ function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
         aria-label="Harga minimum"
       />
       <input
-        className="catalog-rangeInput"
+        className="catalog-rangeInput is-max"
         type="range"
         min={min}
         max={max}
@@ -414,7 +414,6 @@ export default function Products() {
     (priceReady && (price.min !== priceBounds.min || price.max !== priceBounds.max) ? 1 : 0) +
     (sort !== "reco" ? 1 : 0);
 
-  const topSold = useMemo(() => Math.max(...enriched.map((item) => Number(item._sold || 0)), 0), [enriched]);
   const skeletonCount = view === "list" ? 6 : 8;
 
   return (
@@ -426,21 +425,6 @@ export default function Products() {
               <div className="catalog-eyebrow">Katalog produk</div>
               <h1 className="h1 catalog-title">Cari yang cocok.</h1>
               <p className="catalog-sub">Filter cepat. Harga jelas. Masuk ke paket dalam satu tap.</p>
-            </div>
-
-            <div className="catalog-metrics">
-              <div className="catalog-metric">
-                <strong>{enriched.length}</strong>
-                <span>Total</span>
-              </div>
-              <div className="catalog-metric">
-                <strong>{activeFiltersCount}</strong>
-                <span>Filter</span>
-              </div>
-              <div className="catalog-metric">
-                <strong>{topSold}</strong>
-                <span>Top sold</span>
-              </div>
             </div>
           </div>
 
@@ -567,7 +551,7 @@ export default function Products() {
                   const sold = Number(product._sold || 0);
                   const low = stock > 0 && stock <= 5;
                   const hot = sold >= 10;
-                  const displayPrice = product._minPrice ? `Rp${formatCompactIDR(product._minPrice)}` : "-";
+                  const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
 
                   return (
                     <Link
@@ -621,7 +605,7 @@ export default function Products() {
                           </span>
                           <span>
                             <span>{sold}</span>
-                            <span>sold</span>
+                            <span>terjual</span>
                           </span>
                         </div>
 

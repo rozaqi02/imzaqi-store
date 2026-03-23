@@ -286,6 +286,7 @@ export default function Header() {
   const { items } = useCart();
   const cartCount = useMemo(() => items.reduce((s, x) => s + x.qty, 0), [items]);
   const [open, setOpen] = useState(false);
+  const location = useLocation();
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
 
@@ -308,9 +309,6 @@ export default function Header() {
             <NavLink to="/tentang">Tentang</NavLink>
             <NavLink to="/testimoni">Testimoni</NavLink>
             <NavLink to="/status">Status</NavLink>
-            <NavLink to="/admin" className="nav-admin">
-              Admin
-            </NavLink>
           </nav>
 
           <div className="header-actions">
@@ -328,6 +326,21 @@ export default function Header() {
                   </motion.span>
                 ) : null}
               </Link>
+            </motion.div>
+
+            <motion.div
+              className="desktop-only"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <NavLink
+                to="/admin"
+                className={`header-iconAction${location.pathname.startsWith("/admin") ? " active" : ""}`}
+                aria-label="Admin"
+                title="Admin"
+              >
+                <Shield size={18} strokeWidth={2.1} />
+              </NavLink>
             </motion.div>
 
             <motion.button

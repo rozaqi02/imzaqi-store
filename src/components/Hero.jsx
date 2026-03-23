@@ -55,15 +55,40 @@ function renderTypedWithHighlight(typedText) {
 export default function Hero() {
   const nav = useNavigate();
   const { totalViews, todayViews, totalOrders, todayOrders } = useLiveStats();
-  const [typed, setTyped] = useState("");
+  const [typed, setTyped] = useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return "";
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)")?.matches;
+    const coarse = window.matchMedia("(max-width: 920px), (pointer: coarse)")?.matches;
+    return reduce || coarse ? HERO_TEXT : "";
+  });
   const [index, setIndex] = useState([]);
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const [lightMotion, setLightMotion] = useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return false;
+    return window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
+  });
   const wrapRef = useRef(null);
 
   useEffect(() => {
+    if (!window.matchMedia) return undefined;
+
+    const query = window.matchMedia("(max-width: 920px), (pointer: coarse)");
+    const update = () => setLightMotion(query.matches);
+    update();
+
+    if (query.addEventListener) {
+      query.addEventListener("change", update);
+      return () => query.removeEventListener("change", update);
+    }
+
+    query.addListener(update);
+    return () => query.removeListener(update);
+  }, []);
+
+  useEffect(() => {
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    if (reduce) {
+    if (reduce || lightMotion) {
       setTyped(HERO_TEXT);
       return undefined;
     }
@@ -76,7 +101,7 @@ export default function Hero() {
     }, 34);
 
     return () => window.clearInterval(timer);
-  }, []);
+  }, [lightMotion]);
 
   useEffect(() => {
     let alive = true;
@@ -136,50 +161,28 @@ export default function Hero() {
     { icon: ShieldCheck, label: "Pantau" },
   ];
 
+  const fadeProps = lightMotion ? {} : { initial: "hidden", animate: "visible", variants: fadeUp };
+
   return (
     <section className="hero hero-minimal full-bleed">
       <div className="container hero-minimal-grid">
-        <div className="hero-copy">
-          <motion.div
-            custom={0}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="hero-eyebrow"
-          >
+        <div className="hero-copy hero-copy-centered">
+          <motion.div custom={0} {...fadeProps} className="hero-eyebrow">
             Premium apps store
           </motion.div>
 
-          <motion.h1
-            custom={1}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="hero-title hero-title-minimal"
-          >
+          <motion.h1 custom={1} {...fadeProps} className="hero-title hero-title-minimal">
             <span className="typewriter">
               {renderTypedWithHighlight(typed)}
               <span className="cursor" aria-hidden="true" />
             </span>
           </motion.h1>
 
-          <motion.p
-            custom={2}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="hero-sub hero-sub-minimal"
-          >
+          <motion.p custom={2} {...fadeProps} className="hero-sub hero-sub-minimal">
             Cari, pilih, bayar, upload.
           </motion.p>
 
-          <motion.div
-            custom={3}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="hero-rail"
-          >
+          <motion.div custom={3} {...fadeProps} className="hero-rail">
             {flow.map((item) => {
               const Icon = item.icon;
               return (
@@ -193,108 +196,105 @@ export default function Hero() {
             })}
           </motion.div>
 
-          <motion.div
-            custom={4}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="hero-search hero-search-minimal"
-            ref={wrapRef}
-          >
-            <div className="hero-search-shell">
-              <span className="hero-search-icon" aria-hidden="true">
-                <Search size={16} />
-              </span>
+          <motion.div custom={4} {...fadeProps} className="hero-commandCard">
+            <div className="hero-search hero-search-minimal" ref={wrapRef}>
+              <div className="hero-search-shell">
+                <span className="hero-search-icon" aria-hidden="true">
+                  <Search size={16} />
+                </span>
 
-              <input
-                className="input hero-search-input"
-                placeholder="Cari Netflix, Canva, ChatGPT"
-                value={q}
-                aria-label="Cari produk"
-                onFocus={() => setOpen(true)}
-                onChange={(e) => {
-                  setQ(e.target.value);
-                  setOpen(true);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") goSearch();
-                  if (e.key === "Escape") setOpen(false);
-                }}
-              />
-
-              {q ? (
-                <button
-                  type="button"
-                  className="hero-search-clear"
-                  onClick={() => {
-                    setQ("");
-                    setOpen(false);
+                <input
+                  className="input hero-search-input"
+                  placeholder="Cari Netflix, Canva, ChatGPT"
+                  value={q}
+                  aria-label="Cari produk"
+                  onFocus={() => setOpen(true)}
+                  onChange={(e) => {
+                    setQ(e.target.value);
+                    setOpen(true);
                   }}
-                  aria-label="Hapus pencarian"
-                >
-                  x
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") goSearch();
+                    if (e.key === "Escape") setOpen(false);
+                  }}
+                />
+
+                {q ? (
+                  <button
+                    type="button"
+                    className="hero-search-clear"
+                    onClick={() => {
+                      setQ("");
+                      setOpen(false);
+                    }}
+                    aria-label="Hapus pencarian"
+                  >
+                    x
+                  </button>
+                ) : null}
+
+                <button className="btn hero-search-btn" onClick={() => goSearch()} type="button">
+                  <ArrowRight size={16} />
                 </button>
-              ) : null}
 
-              <button className="btn hero-search-btn" onClick={() => goSearch()} type="button">
-                <ArrowRight size={16} />
-              </button>
-
-              {open && suggestions.length > 0 ? (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  className="suggestions suggestions-minimal"
-                  role="listbox"
-                >
-                  {suggestions.map((sug) => (
-                    <button
-                      key={sug}
-                      className="suggestion-item"
-                      onClick={() => goSearch(sug)}
-                      type="button"
-                      role="option"
-                      aria-selected={false}
-                    >
-                      <Search size={14} />
-                      <span>{sug}</span>
-                    </button>
-                  ))}
-                </motion.div>
-              ) : null}
+                {open && suggestions.length > 0 ? (
+                  <motion.div
+                    initial={lightMotion ? false : { opacity: 0, y: 10 }}
+                    animate={lightMotion ? undefined : { opacity: 1, y: 0 }}
+                    exit={lightMotion ? undefined : { opacity: 0, y: 10 }}
+                    className="suggestions suggestions-minimal"
+                    role="listbox"
+                  >
+                    {suggestions.map((sug) => (
+                      <button
+                        key={sug}
+                        className="suggestion-item"
+                        onClick={() => goSearch(sug)}
+                        type="button"
+                        role="option"
+                        aria-selected={false}
+                      >
+                        <Search size={14} />
+                        <span>{sug}</span>
+                      </button>
+                    ))}
+                  </motion.div>
+                ) : null}
+              </div>
             </div>
-          </motion.div>
 
-          <motion.div
-            custom={5}
-            initial="hidden"
-            animate="visible"
-            variants={fadeUp}
-            className="hero-ctas hero-ctas-minimal"
-          >
-            <Link className="btn" to="/produk">
-              <ScanSearch size={16} />
-              <span>Produk</span>
-            </Link>
-            <Link className="btn btn-ghost" to="/checkout">
-              <Zap size={16} />
-              <span>Checkout</span>
-            </Link>
+            <motion.div custom={5} {...fadeProps} className="hero-ctas hero-ctas-minimal">
+              <Link className="btn" to="/produk">
+                <ScanSearch size={16} />
+                <span>Produk</span>
+              </Link>
+              <Link className="btn btn-ghost" to="/checkout">
+                <Zap size={16} />
+                <span>Checkout</span>
+              </Link>
+            </motion.div>
           </motion.div>
 
           <motion.div
             className="hero-stats hero-stats-minimal"
-            initial="hidden"
-            animate="visible"
-            variants={{ visible: { transition: { staggerChildren: 0.08, delayChildren: 0.5 } } }}
+            initial={lightMotion ? undefined : "hidden"}
+            animate={lightMotion ? undefined : "visible"}
+            variants={
+              lightMotion
+                ? undefined
+                : { visible: { transition: { staggerChildren: 0.08, delayChildren: 0.5 } } }
+            }
           >
             {stats.map((item, idx) => (
               <motion.div
                 key={item.label}
                 className="stat stat-minimal"
-                variants={{ hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }}
-                whileHover={{ y: -4 }}
+                variants={
+                  lightMotion
+                    ? undefined
+                    : { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }
+                }
+                whileHover={lightMotion ? undefined : { y: -4 }}
                 custom={idx}
               >
                 <div className="stat-num">
@@ -305,54 +305,6 @@ export default function Hero() {
             ))}
           </motion.div>
         </div>
-
-        <motion.div
-          className="hero-visual"
-          initial={{ opacity: 0, scale: 0.96, y: 18 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="hero-panel">
-            <div className="hero-panelHead">
-              <div className="hero-panelDots">
-                <span />
-                <span />
-                <span />
-              </div>
-              <div className="hero-panelLabel">Order flow</div>
-            </div>
-
-            <div className="hero-flowStack">
-              {flow.map((item, idx) => {
-                const Icon = item.icon;
-                return (
-                  <motion.div
-                    key={item.label}
-                    className="hero-flowCard"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.35 + idx * 0.08, duration: 0.45 }}
-                  >
-                    <div className="hero-flowIcon">
-                      <Icon size={16} />
-                    </div>
-                    <div className="hero-flowText">
-                      <strong>{item.label}</strong>
-                      <span />
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-
-            <div className="hero-panelBars" aria-hidden="true">
-              <span style={{ height: "34%" }} />
-              <span style={{ height: "52%" }} />
-              <span style={{ height: "68%" }} />
-              <span style={{ height: "82%" }} />
-            </div>
-          </div>
-        </motion.div>
       </div>
     </section>
   );

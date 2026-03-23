@@ -9,7 +9,11 @@ export function useRevealOnScroll(dep) {
 
     const prefersReduced =
       window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (prefersReduced) {
+    const prefersPerf =
+      window.matchMedia &&
+      (window.matchMedia("(max-width: 920px)").matches || window.matchMedia("(pointer: coarse)").matches);
+
+    if (prefersReduced || prefersPerf) {
       // Ensure reveal elements are visible without animation.
       document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
       return undefined;

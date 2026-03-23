@@ -23,10 +23,10 @@ function StockPill({ stock }) {
   const n = Number(stock ?? 0);
   const safe = Number.isFinite(n) ? n : 0;
 
-  if (safe <= 0) return <span className="stock-pill out">0</span>;
+  if (safe <= 0) return <span className="stock-pill out">Stok: 0</span>;
 
   const cls = safe <= 5 ? "low" : safe <= 20 ? "mid" : "ok";
-  return <span className={`stock-pill ${cls}`}>{safe}</span>;
+  return <span className={`stock-pill ${cls}`}>Stok: {safe}</span>;
 }
 
 export default function ProductDetail() {
@@ -81,13 +81,13 @@ export default function ProductDetail() {
       .filter((n) => Number.isFinite(n) && n > 0);
 
     const totalStock = variants.reduce((sum, item) => sum + Number(item?.stock || 0), 0);
-    const withGuarantee = variants.filter((item) => item?.guarantee_text).length;
+    const totalSold = variants.reduce((sum, item) => sum + Number(item?.sold_count || 0), 0);
 
     return {
       minPrice: prices.length ? Math.min(...prices) : 0,
       maxPrice: prices.length ? Math.max(...prices) : 0,
       totalStock,
-      withGuarantee,
+      totalSold,
     };
   }, [variants]);
 
@@ -150,10 +150,10 @@ export default function ProductDetail() {
       iconClass: "is-stock",
     },
     {
-      icon: ShieldCheck,
-      value: summary.withGuarantee,
-      label: "Garansi",
-      iconClass: "is-guarantee",
+      icon: ShoppingCart,
+      value: summary.totalSold,
+      label: "Terjual",
+      iconClass: "is-sold",
     },
   ];
 

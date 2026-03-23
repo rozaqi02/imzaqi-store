@@ -216,7 +216,7 @@
     radial-gradient(circle at top, rgba(123, 92, 255, 0.12), rgba(123, 92, 255, 0) 52%);
 }
 
-@media (max-width: 920px) {
+@media (max-width: 720px) {
   .about-miniStats,
   .about-valuesGrid,
   .about-flowGrid {

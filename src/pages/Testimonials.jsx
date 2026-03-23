@@ -19,7 +19,10 @@ export default function Testimonials() {
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
-  const [view, setView] = useState("masonry");
+  const [view, setView] = useState(() => {
+    if (typeof window === "undefined" || !window.matchMedia) return "masonry";
+    return window.matchMedia("(max-width: 720px)").matches ? "grid" : "masonry";
+  });
   const [limit, setLimit] = useState(18);
   const [activeIdx, setActiveIdx] = useState(-1);
 

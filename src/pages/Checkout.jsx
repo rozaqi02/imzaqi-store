@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, Percent, ShieldCheck, ShoppingBag, WalletCards } from "lucide-react";
+import { ArrowRight, ShieldCheck, ShoppingBag, WalletCards } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
@@ -12,14 +12,6 @@ import { usePageMeta } from "../hooks/usePageMeta";
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
   return { discount, total: Math.max(0, subtotal - discount) };
-}
-
-function VisualStep({ icon: Icon, active }) {
-  return (
-    <div className={"checkout-min-step" + (active ? " active" : "")}>
-      <Icon size={16} />
-    </div>
-  );
 }
 
 export default function Checkout() {
@@ -46,12 +38,6 @@ export default function Checkout() {
   }, [promo]);
 
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
-
-  const quickStats = [
-    { label: "Item", value: itemCount, icon: ShoppingBag },
-    { label: "Diskon", value: promoPercent ? `${promoPercent}%` : "-", icon: Percent },
-    { label: "Total", value: formatIDR(total), icon: WalletCards },
-  ];
 
   async function onApplyPromo() {
     const raw = String(code || "").trim();
@@ -87,26 +73,6 @@ export default function Checkout() {
           <div className="checkout-min-head">
             <div>
               <h1 className="h1">Checkout</h1>
-              <div className="checkout-min-visual">
-                <VisualStep icon={ShoppingBag} active />
-                <div className="checkout-min-line" />
-                <VisualStep icon={WalletCards} active={cart.items.length > 0} />
-                <div className="checkout-min-line" />
-                <VisualStep icon={ShieldCheck} active={cart.items.length > 0} />
-              </div>
-            </div>
-
-            <div className="checkout-min-stats" aria-label="Ringkasan cepat">
-              {quickStats.map((stat) => {
-                const Icon = stat.icon;
-                return (
-                  <div key={stat.label} className="checkout-min-stat">
-                    <Icon size={16} />
-                    <span>{stat.label}</span>
-                    <b>{stat.value}</b>
-                  </div>
-                );
-              })}
             </div>
           </div>
         </div>
@@ -199,7 +165,7 @@ export default function Checkout() {
               <div className="checkout-min-promoRow">
                 <input
                   className="input"
-                  placeholder="DISC50"
+                  placeholder="Masukkan kode promo di sini"
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase())}
                 />
@@ -239,14 +205,12 @@ export default function Checkout() {
                 <span>Subtotal</span>
                 <b>{formatIDR(subtotal)}</b>
               </div>
-              <div className="checkout-min-row">
-                <span>Diskon</span>
-                <b>- {formatIDR(discount)}</b>
-              </div>
-              <div className="checkout-min-row strong">
-                <span>Bayar</span>
-                <b>{formatIDR(total)}</b>
-              </div>
+              {discount > 0 ? (
+                <div className="checkout-min-row">
+                  <span>Diskon</span>
+                  <b>- {formatIDR(discount)}</b>
+                </div>
+              ) : null}
             </div>
 
             <div className="checkout-min-icons" aria-label="Langkah berikutnya">

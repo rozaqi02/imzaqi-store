@@ -192,7 +192,7 @@ export default function Status() {
           <div className="status-heroTop">
             <div className="status-heroCopy">
               <div className="status-kicker">Status</div>
-              <h1 className="h1 status-title">Track order.</h1>
+              <h1 className="h1 status-title">Track orderanmu.</h1>
               <p className="status-sub">ID masuk, status keluar.</p>
             </div>
 

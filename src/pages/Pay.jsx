@@ -9,9 +9,9 @@ import {
   Loader,
   MessageSquare,
   Phone,
-  QrCode,
   Receipt,
   Upload,
+  WalletCards,
   X,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
@@ -146,14 +146,6 @@ function FileUploadPreview({ file, previewUrl, onRemove, uploading }) {
   );
 }
 
-function MiniStep({ icon: Icon, active, done }) {
-  return (
-    <div className={"pay-min-step" + (active ? " active" : "") + (done ? " done" : "")}>
-      <Icon size={15} />
-    </div>
-  );
-}
-
 export default function Pay() {
   const nav = useNavigate();
   const cart = useCart();
@@ -239,11 +231,10 @@ export default function Pay() {
 
   const statusUrl = orderCode ? `/status?order=${encodeURIComponent(orderCode)}` : "/status";
 
-  const completionSteps = [
-    { icon: Phone, active: !!customerWhatsApp, done: isWaValid },
-    { icon: FileText, active: !!noteText, done: !!noteText },
-    { icon: QrCode, active: qrisLoaded, done: qrisLoaded },
-    { icon: Upload, active: !!file, done: !!file },
+  const quickSummary = [
+    { icon: Receipt, label: "Item", value: itemCount },
+    { icon: MessageSquare, label: "Promo", value: promoPercent ? `${promoPercent}%` : "-" },
+    { icon: WalletCards, label: "Harus dibayar", value: formatIDR(total), strong: true },
   ];
 
   function onPickFile(fileObject) {
@@ -380,28 +371,21 @@ export default function Pay() {
           <div className="pay-min-head">
             <div>
               <h1 className="h1">Bayar</h1>
-              <div className="pay-min-steps" aria-label="Progress">
-                {completionSteps.map((step, index) => (
-                  <React.Fragment key={index}>
-                    <MiniStep icon={step.icon} active={step.active} done={step.done} />
-                    {index < completionSteps.length - 1 ? <div className="pay-min-stepLine" /> : null}
-                  </React.Fragment>
-                ))}
-              </div>
             </div>
 
             <div className="pay-min-quick">
-              <div className="pay-min-quickCell">
-                <Receipt size={16} />
-                <span>{itemCount}</span>
-              </div>
-              <div className="pay-min-quickCell">
-                <MessageSquare size={16} />
-                <span>{promoPercent ? `${promoPercent}%` : "-"}</span>
-              </div>
-              <div className="pay-min-quickCell strong">
-                <span>{formatIDR(total)}</span>
-              </div>
+              {quickSummary.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <div key={item.label} className={`pay-min-quickCell ${item.strong ? "strong" : ""}`}>
+                    <div className="pay-min-quickTop">
+                      <Icon size={15} />
+                      <small>{item.label}</small>
+                    </div>
+                    <span>{item.value}</span>
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -447,16 +431,25 @@ export default function Pay() {
 
             <div className="pay-min-paybox">
               <div className="pay-min-payMeta">
+                <div className="pay-min-totalLabel">Nominal yang harus dibayar</div>
                 <div className="pay-min-total">{formatIDR(total)}</div>
+                <div className="pay-min-totalHint">Scan QRIS sesuai nominal ini.</div>
                 <div className="pay-min-breakdown">
                   <div className="pay-min-row">
-                    <span>Subtotal</span>
+                    <span>Subtotal sebelum promo</span>
                     <b>{formatIDR(subtotal)}</b>
                   </div>
-                  <div className="pay-min-row">
-                    <span>Diskon</span>
-                    <b>- {formatIDR(discount)}</b>
-                  </div>
+                  {discount > 0 ? (
+                    <div className="pay-min-row">
+                      <span>Potongan promo</span>
+                      <b>- {formatIDR(discount)}</b>
+                    </div>
+                  ) : (
+                    <div className="pay-min-row">
+                      <span>Potongan promo</span>
+                      <b>-</b>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -600,7 +593,7 @@ export default function Pay() {
       {!ok ? (
         <div className="sticky-cta">
           <div className="sticky-cta-left">
-            <div className="sticky-cta-title">Bayar</div>
+            <div className="sticky-cta-title">Bayar sekarang</div>
             <div className="sticky-cta-value">{formatIDR(total)}</div>
           </div>
           <button className="btn" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
