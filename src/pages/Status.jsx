@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
   CheckCircle2,
   Clipboard,
@@ -179,11 +179,6 @@ export default function Status() {
   }
 
   const StatusIcon = statusMeta.icon;
-  const heroSteps = [
-    { key: "produk", title: "Pilih", icon: Package },
-    { key: "bayar", title: "Proses", icon: Sparkles },
-    { key: "status", title: "Pantau", icon: CheckCircle2 },
-  ];
 
   return (
     <div className="page status-shell">
@@ -195,39 +190,13 @@ export default function Status() {
               <h1 className="h1 status-title">Track orderanmu.</h1>
               <p className="status-sub">ID masuk, status keluar.</p>
             </div>
-
-            <div className="status-heroActions">
-              <Link className="btn btn-ghost btn-sm" to="/produk">
-                Produk
-              </Link>
-              <Link className="btn btn-ghost btn-sm" to="/checkout">
-                Checkout
-              </Link>
-            </div>
           </div>
 
           <div className="status-command">
-            <div className="status-commandSearch">
-              <div className="status-commandBox">
-                <Search size={16} />
-                <input
-                  className="input status-commandInput"
-                  inputMode="text"
-                  autoCapitalize="characters"
-                  placeholder="IMZ-ABCD"
-                  value={input}
-                  onChange={(e) => setInput(normalizeOrderCode(e.target.value))}
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") lookup(input);
-                  }}
-                />
-              </div>
-
-              <button className="btn" type="button" onClick={() => lookup(input)} disabled={loading}>
-                {loading ? "Cari..." : "Cek"}
-              </button>
+            <div className="status-commandLabelRow">
+              <span className="status-commandLabel">ID Order</span>
               <button
-                className="btn btn-ghost"
+                className="status-commandPaste"
                 type="button"
                 onClick={async () => {
                   try {
@@ -244,18 +213,25 @@ export default function Status() {
               </button>
             </div>
 
-            <div className="status-commandRail" aria-hidden="true">
-              {heroSteps.map((step) => {
-                const Icon = step.icon;
-                return (
-                  <div key={step.key} className={"status-commandStep" + (step.key === "status" ? " active" : "")}>
-                    <span>
-                      <Icon size={16} />
-                    </span>
-                    <strong>{step.title}</strong>
-                  </div>
-                );
-              })}
+            <div className="status-commandSearch">
+              <div className="status-commandBox">
+                <Search size={16} />
+                <input
+                  className="input status-commandInput"
+                  inputMode="text"
+                  autoCapitalize="characters"
+                  placeholder="Masukkan ID order (contoh: IMZ-ABCD)"
+                  value={input}
+                  onChange={(e) => setInput(normalizeOrderCode(e.target.value))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") lookup(input);
+                  }}
+                />
+              </div>
+
+              <button className="btn status-commandBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
+                {loading ? "Mencari..." : "Cek status"}
+              </button>
             </div>
           </div>
 
@@ -270,22 +246,6 @@ export default function Status() {
                 <span>{message ? "!" : "IMZ"}</span>
                 <strong>{message ? "Belum ketemu" : "Tempel ID"}</strong>
                 <small>{message || "Status tampil di sini."}</small>
-              </div>
-
-              <div className="status-emptyRow">
-                <Link className="btn" to="/produk">
-                  Produk
-                </Link>
-                <Link className="btn btn-ghost" to="/checkout">
-                  Checkout
-                </Link>
-              </div>
-
-              <div className="status-emptyDots" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-                <span />
               </div>
             </section>
           ) : (

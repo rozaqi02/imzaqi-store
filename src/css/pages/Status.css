@@ -22,9 +22,8 @@
 .status-heroTop {
   display: flex;
   align-items: end;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: 16px;
-  flex-wrap: wrap;
   margin-bottom: 18px;
 }
 
@@ -48,15 +47,9 @@
   font-size: 16px;
 }
 
-.status-heroActions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
 .status-command {
   display: grid;
-  gap: 16px;
+  gap: 12px;
   padding: 18px;
   border-radius: 30px;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -66,9 +59,41 @@
   box-shadow: 0 26px 90px rgba(0, 0, 0, 0.22);
 }
 
+.status-commandLabelRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.status-commandLabel {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.status-commandPaste {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(234, 255, 245, 0.9);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.status-commandPaste:hover {
+  border-color: rgba(0, 214, 180, 0.22);
+  background: rgba(0, 214, 180, 0.12);
+}
+
 .status-commandSearch {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   align-items: center;
 }
@@ -84,12 +109,19 @@
   background: rgba(255, 255, 255, 0.04);
 }
 
+.status-commandBox:focus-within {
+  border-color: rgba(0, 214, 180, 0.28);
+  box-shadow: 0 0 0 3px rgba(0, 214, 180, 0.08);
+}
+
 .status-commandInput {
   height: 100%;
   border: 0;
   background: transparent;
   box-shadow: none;
   padding-left: 0;
+  font-size: 15px;
+  letter-spacing: 0.02em;
 }
 
 .status-commandInput:focus {
@@ -97,43 +129,11 @@
   box-shadow: none;
 }
 
-.status-commandRail {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.status-commandStep {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  min-height: 52px;
-  padding: 0 16px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
-  font-weight: 900;
-}
-
-.status-commandStep span {
-  width: 30px;
-  height: 30px;
-  display: grid;
-  place-items: center;
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #92ffeb;
-}
-
-.status-commandStep.active {
-  border-color: rgba(0, 214, 180, 0.24);
-  background: rgba(0, 214, 180, 0.1);
-}
-
-.status-commandStep.active span {
-  background: linear-gradient(135deg, #9fffe5, #1ed0ae);
-  color: #042925;
+.status-commandBtn {
+  min-height: 56px;
+  border-radius: 18px;
+  padding: 0 18px;
+  white-space: nowrap;
 }
 
 .status-message {
@@ -211,37 +211,6 @@
   margin-top: 10px;
   color: rgba(255, 255, 255, 0.62);
   font-size: 15px;
-}
-
-.status-emptyRow {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-top: 20px;
-}
-
-.status-emptyDots {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  margin-top: 24px;
-}
-
-.status-emptyDots span {
-  width: 56px;
-  height: 8px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.status-emptyDots span:nth-child(2),
-.status-emptyDots span:nth-child(3) {
-  background: linear-gradient(90deg, rgba(0, 214, 180, 0.7), rgba(123, 92, 255, 0.5));
 }
 
 .status-resultGrid {
@@ -553,6 +522,14 @@
     grid-template-columns: 1fr;
   }
 
+  .status-commandLabelRow {
+    flex-wrap: wrap;
+  }
+
+  .status-commandPaste {
+    width: 100%;
+  }
+
   .status-sideStack {
     position: static;
   }
@@ -561,11 +538,6 @@
   .status-metricGrid,
   .status-balanceBar {
     grid-template-columns: 1fr;
-  }
-
-  .status-commandRail {
-    grid-template-columns: 1fr;
-    gap: 10px;
   }
 
   .status-orderHero,

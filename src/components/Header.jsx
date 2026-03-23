@@ -272,7 +272,7 @@ function MobileMenu({ open, onClose }) {
               variants={itemVariants}
             >
               <p className="menu-footer-text">imzaqi.store</p>
-              <p className="menu-footer-version">v3.0</p>
+              <p className="menu-footer-version">v3.1</p>
             </motion.div>
           </motion.nav>
         </>
