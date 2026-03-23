@@ -1,6 +1,19 @@
-// File: src/pages/Pay.jsx
 import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate } from "react-router-dom";
+import {
+  Check,
+  CheckCircle2,
+  FileText,
+  Info,
+  Loader,
+  MessageSquare,
+  Phone,
+  QrCode,
+  Receipt,
+  Upload,
+  X,
+} from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -11,16 +24,13 @@ import { makeOrderCode } from "../lib/orderCode";
 import CheckoutSteps from "../components/CheckoutSteps";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
-// STEP 1: Import WhatsAppInput
 import WhatsAppInput from "../components/WhatsAppInput";
-import { Check, X, Upload, Loader, Info, AlertCircle } from "lucide-react";
 
 function calcTotal(subtotal, percent) {
-  const disc = Math.round((subtotal * (percent || 0)) / 100);
-  return { discount: disc, total: Math.max(0, subtotal - disc) };
+  const discount = Math.round((subtotal * (percent || 0)) / 100);
+  return { discount, total: Math.max(0, subtotal - discount) };
 }
 
-// Skeleton loader untuk QRIS
 function QRISSkeleton() {
   return (
     <div className="qris-skeleton" role="status" aria-label="Memuat QRIS">
@@ -29,122 +39,117 @@ function QRISSkeleton() {
   );
 }
 
-// STEP 7: Update Success Modal (add customerWhatsApp props)
-function OrderSuccessModal({ open, orderCode, onClose, waUrl, statusUrl, onCopied, customerWhatsApp }) {
+function OrderSuccessModal({ open, orderCode, customerWhatsApp, notes, waUrl, statusUrl, onClose, onCopied }) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    if (open && typeof window !== 'undefined' && window.confetti) {
+    if (open && typeof window !== "undefined" && window.confetti) {
       window.confetti({
-        particleCount: 100,
+        particleCount: 90,
         spread: 70,
-        origin: { y: 0.6 }
+        origin: { y: 0.6 },
       });
     }
   }, [open]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  async function copy() {
+  async function copyCode() {
     try {
       await navigator.clipboard.writeText(orderCode);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+      onCopied?.();
     } catch {
-      // Fallback
+      // Ignore clipboard failure.
     }
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    if (typeof onCopied === "function") onCopied();
   }
 
-  return (
-    <div className="modal-backdrop animate-fade-in" role="dialog" aria-modal="true">
-      <div className="modal animate-scale-up">
+  return createPortal(
+    <div className="modal-backdrop pay-overlay" onMouseDown={onClose} role="presentation">
+      <div className="modal pay-successModal" role="dialog" aria-modal="true" aria-label="Order berhasil" onMouseDown={(e) => e.stopPropagation()}>
         <div className="modal-head">
           <div>
-            <div className="modal-title">
-              <Check className="icon-success" size={24} style={{ marginRight: 8 }} />
-              Order berhasil dibuat
-            </div>
-            <div className="modal-sub">Simpan ID order untuk cek status.</div>
+            <div className="modal-title">Order aktif</div>
+            <div className="modal-sub">{orderCode}</div>
           </div>
-          <button className="icon-btn" onClick={onClose}>✕</button>
+          <button className="icon-btn" type="button" onClick={onClose} aria-label="Tutup">
+            <X size={18} />
+          </button>
         </div>
 
         <div className="modal-body">
-          <div className="success-badge">
-            <Check size={48} />
+          <div className="pay-successIcon">
+            <CheckCircle2 size={34} />
           </div>
 
-          <div className="order-code">
-            <div className="muted">ID Order</div>
-            <div className="order-code-value">{orderCode}</div>
-          </div>
-
-          {/* Menampilkan nomor WA di modal success */}
-          {customerWhatsApp && (
-            <div className="info-box" style={{ marginBottom: 16 }}>
-              <Info size={16} />
-              <span>Admin akan menghubungi ke: <b>{customerWhatsApp}</b></span>
+          <div className="pay-successGrid">
+            <div className="pay-successCell">
+              <span>WA</span>
+              <b>{customerWhatsApp}</b>
             </div>
-          )}
+            <div className="pay-successCell">
+              <span>Catatan</span>
+              <b>{notes ? "Terkirim" : "-"}</b>
+            </div>
+          </div>
 
           <div className="row wrap">
-            <button 
-              className={`btn ${copied ? 'btn-success' : 'btn-ghost'}`}
-              onClick={copy}
-              disabled={copied}
-            >
-              {copied ? <><Check size={16} /> Tersalin</> : 'Salin ID'}
+            <button className="btn btn-ghost" type="button" onClick={copyCode}>
+              {copied ? "Tersalin" : "Salin ID"}
             </button>
-            <a className="btn btn-primary" href={waUrl} target="_blank" rel="noreferrer">
-              Hubungi admin
+            <a className="btn" href={waUrl} target="_blank" rel="noreferrer">
+              Admin
             </a>
             <Link className="btn btn-ghost" to={statusUrl}>
-              Cek Status
+              Status
             </Link>
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }
 
-// Komponen Preview File - Diperbaiki logic displaynya
 function FileUploadPreview({ file, previewUrl, onRemove, uploading }) {
   if (!file && !previewUrl) return null;
 
   return (
-    <div className="file-preview-card animate-slide-up">
+    <div className="file-preview-card">
       <div className="file-preview-header">
         <div className="file-info">
-          <Check className="icon-success" size={16} />
+          <Check size={16} />
           <span className="file-name">{file?.name}</span>
-          <span className="file-size">{file ? (file.size / 1024).toFixed(0) : 0} KB</span>
+          <span className="file-size">{file ? `${(file.size / 1024).toFixed(0)} KB` : ""}</span>
         </div>
-        {!uploading && (
-          <button className="icon-btn icon-btn-sm" onClick={onRemove} type="button">
+        {!uploading ? (
+          <button className="icon-btn icon-btn-sm" onClick={onRemove} type="button" aria-label="Hapus file">
             <X size={16} />
           </button>
-        )}
+        ) : null}
       </div>
-      
-      {/* Pastikan gambar muncul */}
-      {previewUrl && (
-        <div className="proof-preview">
-          <img 
-            src={previewUrl} 
-            alt="Preview bukti pembayaran" 
-            className="proof-preview-img"
-          />
-        </div>
-      )}
 
-      {uploading && (
+      {previewUrl ? (
+        <div className="proof-preview">
+          <img src={previewUrl} alt="Preview bukti pembayaran" className="proof-preview-img" />
+        </div>
+      ) : null}
+
+      {uploading ? (
         <div className="upload-progress">
           <Loader className="spinner" size={16} />
           <span>Mengupload...</span>
         </div>
-      )}
+      ) : null}
+    </div>
+  );
+}
+
+function MiniStep({ icon: Icon, active, done }) {
+  return (
+    <div className={"pay-min-step" + (active ? " active" : "") + (done ? " done" : "")}>
+      <Icon size={15} />
     </div>
   );
 }
@@ -155,104 +160,127 @@ export default function Pay() {
   const { promo } = usePromo();
   const toast = useToast();
 
-  usePageMeta({ title: "Pembayaran", description: "Scan QRIS, upload bukti, dan konfirmasi." });
+  usePageMeta({
+    title: "Pembayaran",
+    description: "Pembayaran QRIS, upload bukti, dan konfirmasi order.",
+  });
 
   const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
-  
+
   useEffect(() => {
     if (Array.isArray(cart.items) && cart.items.length > 0) setSnapshot(cart.items);
   }, [cart.items]);
 
   const items = snapshot;
-  const subtotal = useMemo(() => items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0), [items]);
-  const { discount, total } = calcTotal(subtotal, promo.percent);
+  const promoPercent = Number(promo?.percent || 0);
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price_idr * item.qty, 0), [items]);
+  const { discount, total } = calcTotal(subtotal, promoPercent);
+  const itemCount = useMemo(() => items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [items]);
 
-  // Settings & WhatsApp State
   const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" } });
   const waNumber = settings?.whatsapp?.number || "6283136049987";
   const qrisUrl = "/qris_payment.jpeg";
 
-  // STEP 2: State WhatsApp
-  const [customerWhatsApp, setCustomerWhatsApp] = useState('');
+  const [customerWhatsApp, setCustomerWhatsApp] = useState("");
   const [isWaValid, setIsWaValid] = useState(false);
+  const [notes, setNotes] = useState("");
 
-  // Form States
   const [file, setFile] = useState(null);
   const [previewUrl, setPreviewUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [err, setErr] = useState("");
+  const [errorText, setErrorText] = useState("");
   const [ok, setOk] = useState(false);
   const [orderCode, setOrderCode] = useState("");
   const [qrisLoaded, setQrisLoaded] = useState(false);
 
-  // Effect untuk Preview URL Object
   useEffect(() => {
     if (!file) {
       setPreviewUrl("");
       return;
     }
-    const url = URL.createObjectURL(file);
-    setPreviewUrl(url);
-    // Cleanup memory
-    return () => URL.revokeObjectURL(url);
+
+    const objectUrl = URL.createObjectURL(file);
+    setPreviewUrl(objectUrl);
+    return () => URL.revokeObjectURL(objectUrl);
   }, [file]);
 
   useEffect(() => {
-    fetchSettings().then((s) => setSettings({ whatsapp: s.whatsapp || { number: "6283136049987" } })).catch(() => {});
+    fetchSettings()
+      .then((result) => setSettings({ whatsapp: result.whatsapp || { number: "6283136049987" } }))
+      .catch(() => {});
   }, []);
 
   useEffect(() => {
     if (!ok && items.length === 0) nav("/checkout", { replace: true });
   }, [items.length, nav, ok]);
 
-  // STEP 6: Update summaryText (tambahkan customerWhatsApp)
+  const noteText = useMemo(() => String(notes || "").trim(), [notes]);
+
   const summaryText = useMemo(() => {
-    const lines = items.map((x) => `- ${x.product_name} • ${x.variant_name} (${x.duration_label}) x${x.qty} = ${formatIDR(x.price_idr * x.qty)}`);
-    lines.push(`Subtotal: ${formatIDR(subtotal)}`);
-    if (promo?.percent) lines.push(`Promo ${promo.code}: -${promo.percent}%`);
-    lines.push(`Total: ${formatIDR(total)}`);
-    if (customerWhatsApp) lines.push(`\nKontak WA: ${customerWhatsApp}`);
-    return lines.join("\n");
-  }, [items, subtotal, total, promo, customerWhatsApp]);
+    const rows = items.map(
+      (item) =>
+        `- ${item.product_name} / ${item.variant_name} / ${item.duration_label} x${item.qty} = ${formatIDR(item.price_idr * item.qty)}`
+    );
+    rows.push(`Subtotal: ${formatIDR(subtotal)}`);
+    rows.push(`Diskon: ${formatIDR(discount)}`);
+    rows.push(`Total: ${formatIDR(total)}`);
+    if (customerWhatsApp) rows.push(`WA: ${customerWhatsApp}`);
+    if (noteText) rows.push(`Catatan: ${noteText}`);
+    return rows.join("\n");
+  }, [customerWhatsApp, discount, items, noteText, subtotal, total]);
 
   const waUrl = useMemo(() => {
     const text = encodeURIComponent(
-      `Halo kak, saya sudah bayar.\n\nID Order: ${orderCode || "(menunggu)"}\nKontak WA: ${customerWhatsApp || "-"}\n\n${summaryText}\n\nMohon diproses yaa`
+      `Halo, saya sudah bayar.\n\nID Order: ${orderCode || "(menunggu)"}\n${summaryText}\n\nMohon diproses.`
     );
     return `https://wa.me/${waNumber}?text=${text}`;
-  }, [waNumber, orderCode, summaryText, customerWhatsApp]);
+  }, [orderCode, summaryText, waNumber]);
 
   const statusUrl = orderCode ? `/status?order=${encodeURIComponent(orderCode)}` : "/status";
 
-  function onPickFile(fileObj) {
-    setErr("");
-    if (!fileObj) { setFile(null); return; }
+  const completionSteps = [
+    { icon: Phone, active: !!customerWhatsApp, done: isWaValid },
+    { icon: FileText, active: !!noteText, done: !!noteText },
+    { icon: QrCode, active: qrisLoaded, done: qrisLoaded },
+    { icon: Upload, active: !!file, done: !!file },
+  ];
 
-    const ext = String(fileObj.name.split(".").pop() || "").toLowerCase();
+  function onPickFile(fileObject) {
+    setErrorText("");
+    if (!fileObject) {
+      setFile(null);
+      return;
+    }
+
+    const ext = String(fileObject.name.split(".").pop() || "").toLowerCase();
     if (!["jpg", "jpeg", "png", "webp"].includes(ext)) {
-      toast.error("Format file harus JPG/JPEG/PNG/WEBP.");
+      toast.error("File harus JPG, JPEG, PNG, atau WEBP.");
       setFile(null);
       return;
     }
-    if (fileObj.size > 5 * 1024 * 1024) {
-      toast.error("File terlalu besar (max 5MB).");
+    if (fileObject.size > 5 * 1024 * 1024) {
+      toast.error("Maksimal 5MB.");
       setFile(null);
       return;
     }
-    setFile(fileObj);
+
+    setFile(fileObject);
   }
 
-  async function uploadProof(fileObj) {
+  async function uploadProof(fileObject) {
     setUploading(true);
     try {
-      const ext = (fileObj.name.split(".").pop() || "jpg").toLowerCase();
-      const safeExt = ["jpg","jpeg","png","webp"].includes(ext) ? ext : "jpg";
-      const visitor_id = getVisitorIdAsUUID();
-      const path = `proofs/${visitor_id}/${Date.now()}-${Math.random().toString(16).slice(2)}.${safeExt}`;
+      const ext = (fileObject.name.split(".").pop() || "jpg").toLowerCase();
+      const safeExt = ["jpg", "jpeg", "png", "webp"].includes(ext) ? ext : "jpg";
+      const visitorId = getVisitorIdAsUUID();
+      const path = `proofs/${visitorId}/${Date.now()}-${Math.random().toString(16).slice(2)}.${safeExt}`;
 
-      const { error: upErr } = await supabase.storage.from("payment-proofs").upload(path, fileObj, { cacheControl: "3600", upsert: false });
-      if (upErr) throw upErr;
+      const { error } = await supabase.storage.from("payment-proofs").upload(path, fileObject, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+      if (error) throw error;
 
       const { data } = supabase.storage.from("payment-proofs").getPublicUrl(path);
       return data.publicUrl;
@@ -261,87 +289,83 @@ export default function Pay() {
     }
   }
 
-  // STEP 3: Update createOrderWithStock (include p_customer_whatsapp)
-  async function createOrderWithStock(payment_proof_url, nextCode) {
-    const visitor_id = getVisitorIdAsUUID();
-
-    const { data, error } = await supabase.rpc('create_order_with_stock_check', {
-      p_visitor_id: visitor_id,
+  async function createOrderWithStock(paymentProofUrl, nextCode) {
+    const visitorId = getVisitorIdAsUUID();
+    const payload = {
+      p_visitor_id: visitorId,
       p_order_code: nextCode,
       p_items: items,
       p_promo_code: promo?.code || null,
       p_subtotal_idr: subtotal,
-      p_discount_percent: promo?.percent || 0,
+      p_discount_percent: promoPercent,
       p_total_idr: total,
-      p_payment_proof_url: payment_proof_url,
-      p_customer_whatsapp: customerWhatsApp // ✅ DITAMBAHKAN
-    });
+      p_payment_proof_url: paymentProofUrl,
+      p_customer_whatsapp: customerWhatsApp,
+    };
 
-    if (error) throw error;
-    if (!data || data.length === 0) throw new Error("Gagal membuat order");
-    
+    const rpcPayload = noteText ? { ...payload, p_notes: noteText } : payload;
+    const { data, error } = await supabase.rpc("create_order_with_stock_check", rpcPayload);
+
+    if (error) {
+      const message = error?.message || String(error);
+      if (noteText && (message.includes("notes") || message.includes("p_notes") || message.includes("function"))) {
+        throw new Error("Fitur catatan belum aktif di database.");
+      }
+      throw error;
+    }
+
+    if (!data || data.length === 0) throw new Error("Gagal membuat order.");
     return data[0];
   }
 
-  // STEP 4: Update onConfirmPaid (validasi WA di awal)
   async function onConfirmPaid() {
-    setErr("");
+    setErrorText("");
 
-    // ✅ VALIDASI WA DI AWAL
     if (!customerWhatsApp || !isWaValid) {
-      const t = "Mohon isi nomor WhatsApp dengan benar";
-      setErr(t);
-      toast.error(t);
+      const text = "Isi WhatsApp yang valid.";
+      setErrorText(text);
+      toast.error(text);
       return;
     }
 
     if (!file) {
-      const t = "Wajib upload screenshot bukti pembayaran dulu.";
-      setErr(t);
-      toast.error(t);
+      const text = "Upload bukti dulu.";
+      setErrorText(text);
+      toast.error(text);
       return;
     }
 
     setBusy(true);
-    const loadingId = toast.loading("Memproses order…");
-    
+    const loadingId = toast.loading("Memproses order...");
+
     try {
       const proofUrl = await uploadProof(file);
-      let final;
-      let code = "";
-      
-      // Retry logic for unique order code
-      for (let i = 0; i < 5; i++) {
-        code = makeOrderCode(4);
+      let createdOrder = null;
+      let generatedCode = "";
+
+      for (let index = 0; index < 5; index += 1) {
+        generatedCode = makeOrderCode(4);
         try {
-          final = await createOrderWithStock(proofUrl, code);
+          createdOrder = await createOrderWithStock(proofUrl, generatedCode);
           break;
-        } catch (e) {
-          if (e?.code === "23505") continue; // Unique violation, retry
-          throw e; // Other errors, throw
+        } catch (error) {
+          if (error?.code === "23505") continue;
+          throw error;
         }
       }
-      
-      if (!final) throw new Error("Gagal membuat ID order unik.");
 
-      setOrderCode(code);
+      if (!createdOrder) throw new Error("Gagal membuat ID order.");
+
+      setOrderCode(generatedCode);
       setOk(true);
-      toast.remove(loadingId);
-      toast.success("Order berhasil dibuat!");
       cart.clear();
-      
-    } catch (e) {
       toast.remove(loadingId);
-      const msg = e?.message || String(e);
-      setErr("Gagal: " + msg);
-      
-      if (msg.includes("customer_whatsapp")) {
-        toast.error("Database error: Kolom WhatsApp belum ada.");
-      } else if (msg.includes("stock")) {
-        toast.error("Stock tidak mencukupi.");
-      } else {
-        toast.error("Gagal memproses order.");
-      }
+      toast.success("Order berhasil dibuat.");
+    } catch (error) {
+      const message = error?.message || String(error);
+      setErrorText(message);
+      toast.remove(loadingId);
+      toast.error(message.includes("catatan") ? message : "Gagal memproses order.");
     } finally {
       setBusy(false);
     }
@@ -350,12 +374,35 @@ export default function Pay() {
   const canSubmit = !busy && file && customerWhatsApp && isWaValid;
 
   return (
-    <div className="page with-sticky-cta pay3">
-      <section className="section reveal pay3-section">
-        <div className="container section-head">
-          <div>
-            <h1 className="h1">Pembayaran</h1>
-            <p className="muted">Isi nomor WhatsApp, scan QRIS, upload bukti, lalu konfirmasi.</p>
+    <div className="page with-sticky-cta pay-min">
+      <section className="section reveal pay-min-hero">
+        <div className="container">
+          <div className="pay-min-head">
+            <div>
+              <h1 className="h1">Bayar</h1>
+              <div className="pay-min-steps" aria-label="Progress">
+                {completionSteps.map((step, index) => (
+                  <React.Fragment key={index}>
+                    <MiniStep icon={step.icon} active={step.active} done={step.done} />
+                    {index < completionSteps.length - 1 ? <div className="pay-min-stepLine" /> : null}
+                  </React.Fragment>
+                ))}
+              </div>
+            </div>
+
+            <div className="pay-min-quick">
+              <div className="pay-min-quickCell">
+                <Receipt size={16} />
+                <span>{itemCount}</span>
+              </div>
+              <div className="pay-min-quickCell">
+                <MessageSquare size={16} />
+                <span>{promoPercent ? `${promoPercent}%` : "-"}</span>
+              </div>
+              <div className="pay-min-quickCell strong">
+                <span>{formatIDR(total)}</span>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -363,164 +410,213 @@ export default function Pay() {
           <CheckoutSteps current="pay" />
         </div>
 
-        <div className="container pay-grid">
-          <div className="card pad">
-            
-            {/* STEP 5: WhatsApp Input SEBELUM Total */}
-            <WhatsAppInput
-              value={customerWhatsApp}
-              onChange={setCustomerWhatsApp}
-              onValidChange={setIsWaValid}
-              required
-              autoFocus
-              rememberLast
-              showHelper
-            />
-
-            <div className="divider" />
-
-            <h3 className="h3">Total yang harus dibayar</h3>
-            <div className="pay-total">{formatIDR(total)}</div>
-            <div className="hint subtle">
-              Subtotal: <b>{formatIDR(subtotal)}</b> • Diskon: <b>-{formatIDR(discount)}</b>
-            </div>
-
-            <div className="divider" />
-
-            {/* Area QRIS dengan Error Handling & Skeleton */}
-            <div className="qris-wrap pay3-qris">
-              {!qrisLoaded && <QRISSkeleton />}
-              <img 
-                src={qrisUrl} 
-                alt="QRIS pembayaran" 
-                className="qris-img"
-                onLoad={() => setQrisLoaded(true)}
-                onError={(e) => {
-                  e.target.style.display = 'none'; // Hide broken image
-                  // Fallback if image fails
-                }}
-                style={{ display: qrisLoaded ? 'block' : 'none' }}
+        <div className="container pay-min-grid">
+          <section className="card pad pay-min-main">
+            <div className="pay-min-block">
+              <div className="pay-min-blockHead">
+                <Phone size={16} />
+                <span>Kontak</span>
+              </div>
+              <WhatsAppInput
+                value={customerWhatsApp}
+                onChange={setCustomerWhatsApp}
+                onValidChange={setIsWaValid}
+                required
+                autoFocus
+                rememberLast
               />
             </div>
 
-            <div className="row wrap mt10">
+            <div className="pay-min-block">
+              <div className="pay-min-blockHead">
+                <FileText size={16} />
+                <span>Catatan</span>
+              </div>
+              <textarea
+                className="input pay-min-notes"
+                rows={3}
+                maxLength={400}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Opsional"
+              />
+              <div className="pay-min-noteMeta">
+                <span>{notes.length}/400</span>
+              </div>
+            </div>
+
+            <div className="pay-min-paybox">
+              <div className="pay-min-payMeta">
+                <div className="pay-min-total">{formatIDR(total)}</div>
+                <div className="pay-min-breakdown">
+                  <div className="pay-min-row">
+                    <span>Subtotal</span>
+                    <b>{formatIDR(subtotal)}</b>
+                  </div>
+                  <div className="pay-min-row">
+                    <span>Diskon</span>
+                    <b>- {formatIDR(discount)}</b>
+                  </div>
+                </div>
+              </div>
+
+              <div className="qris-wrap pay-min-qris">
+                {!qrisLoaded ? <QRISSkeleton /> : null}
+                <img
+                  src={qrisUrl}
+                  alt="QRIS pembayaran"
+                  className="qris-img"
+                  onLoad={() => setQrisLoaded(true)}
+                  onError={(event) => {
+                    event.target.style.display = "none";
+                  }}
+                  style={{ display: qrisLoaded ? "block" : "none" }}
+                />
+              </div>
+            </div>
+
+            <div className="row wrap pay-min-links">
               <a className="btn btn-ghost btn-sm" href={qrisUrl} target="_blank" rel="noreferrer">
-                Buka QRIS Fullscreen
+                QRIS
+              </a>
+              <a className="btn btn-ghost btn-sm" href={waUrl} target="_blank" rel="noreferrer">
+                Admin
               </a>
             </div>
 
-            <div className="divider" />
-
-            <label className="label">
-              <Upload size={16} style={{ marginRight: 6 }} />
-              Upload bukti pembayaran <span className="required">*</span>
-            </label>
-            
-            {!file ? (
-              <label className="upload-drop" style={{ cursor: 'pointer' }}>
-                <input
-                  className="input"
-                  type="file"
-                  accept="image/*"
-                  onChange={(e) => {
-                    const f = e.target.files?.[0];
-                    if (f) onPickFile(f);
-                    e.target.value = "";
-                  }}
-                  style={{ display: 'none' }}
-                />
-                <div className="upload-dropInner">
-                  <Upload size={32} className="upload-ic" />
-                  <div className="upload-title"><b>Klik untuk upload</b></div>
-                  <div className="hint subtle">JPG/PNG/WEBP (max 5MB)</div>
-                </div>
-              </label>
-            ) : (
-              // Menampilkan preview dengan komponen yang diperbaiki
-              <FileUploadPreview
-                file={file}
-                previewUrl={previewUrl}
-                onRemove={() => { setFile(null); setPreviewUrl(""); }}
-                uploading={uploading}
-              />
-            )}
-
-            {err && (
-              <div className="alert alert-error mt16">
-                <AlertCircle size={20} /> {err}
+            <div className="pay-min-block">
+              <div className="pay-min-blockHead">
+                <Upload size={16} />
+                <span>Bukti</span>
               </div>
-            )}
+
+              {!file ? (
+                <label className="upload-drop pay-min-upload">
+                  <input
+                    className="input"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => {
+                      const selectedFile = e.target.files?.[0];
+                      if (selectedFile) onPickFile(selectedFile);
+                      e.target.value = "";
+                    }}
+                    style={{ display: "none" }}
+                  />
+                  <div className="upload-dropInner">
+                    <Upload size={26} className="upload-ic" />
+                    <div className="upload-title">
+                      <b>Upload</b>
+                    </div>
+                    <div className="hint subtle">JPG / PNG / WEBP</div>
+                  </div>
+                </label>
+              ) : (
+                <FileUploadPreview
+                  file={file}
+                  previewUrl={previewUrl}
+                  onRemove={() => {
+                    setFile(null);
+                    setPreviewUrl("");
+                  }}
+                  uploading={uploading}
+                />
+              )}
+            </div>
+
+            {errorText ? (
+              <div className="alert alert-error mt16">
+                <Info size={18} /> {errorText}
+              </div>
+            ) : null}
 
             <div className="row wrap mt16">
-              <button 
-                className="btn btn-primary"
-                disabled={!canSubmit}
-                onClick={onConfirmPaid}
-              >
-                {busy ? <><Loader className="spinner" size={18} /> Memproses...</> : <><Check size={18} /> Aku sudah bayar</>}
+              <button className="btn btn-wide" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
+                {busy ? (
+                  <>
+                    <Loader className="spinner" size={16} /> Proses
+                  </>
+                ) : (
+                  <>
+                    <Check size={16} /> Konfirmasi
+                  </>
+                )}
               </button>
-              <Link className="btn btn-ghost" to="/checkout">Kembali</Link>
+              <Link className="btn btn-ghost btn-wide" to="/checkout">
+                Kembali
+              </Link>
             </div>
-          </div>
+          </section>
 
-          {/* Right Column: Summary */}
-          <div className="card pad pay3-right">
-            <h3 className="h3">Ringkasan belanja</h3>
-            <div className="cart-list">
-              {items.map((x) => (
-                <div key={x.variant_id} className="cart-row">
-                  <div className="cart-meta">
-                    <div className="cart-title">{x.product_name}</div>
-                    <div className="cart-sub">{x.variant_name} • {x.duration_label}</div>
-                    <div className="cart-sub">{formatIDR(x.price_idr)} × {x.qty}</div>
+          <aside className="card pad pay-min-side">
+            <div className="pay-min-sideHead">
+              <span>Order</span>
+              <b>{itemCount}</b>
+            </div>
+
+            <div className="pay-min-list">
+              {items.map((item) => (
+                <div key={item.variant_id} className="pay-min-listItem">
+                  <div>
+                    <div className="pay-min-listTitle">{item.product_name}</div>
+                    <div className="pay-min-listMeta">
+                      <span>{item.variant_name}</span>
+                      <span>{item.duration_label}</span>
+                      <span>x{item.qty}</span>
+                    </div>
                   </div>
-                  <div className="order-total">{formatIDR(x.price_idr * x.qty)}</div>
+                  <b>{formatIDR(item.price_idr * item.qty)}</b>
                 </div>
               ))}
             </div>
 
             <div className="divider" />
 
-            <div className="totals">
-              <div className="tot-row"><span>Subtotal</span><b>{formatIDR(subtotal)}</b></div>
-              <div className="tot-row"><span>Diskon</span><b>- {formatIDR(discount)}</b></div>
-              <div className="tot-row tot-big"><span>Total</span><b>{formatIDR(total)}</b></div>
+            <div className="pay-min-sideStats">
+              <div className="pay-min-sideStat">
+                <span>Promo</span>
+                <b>{promoPercent ? promo?.code : "-"}</b>
+              </div>
+              <div className="pay-min-sideStat">
+                <span>WA</span>
+                <b>{customerWhatsApp || "-"}</b>
+              </div>
+              <div className="pay-min-sideStat">
+                <span>Catatan</span>
+                <b>{noteText ? "Ada" : "-"}</b>
+              </div>
             </div>
 
-            <div className="divider" />
-
-            <a className="btn btn-ghost btn-wide" href={waUrl} target="_blank" rel="noreferrer">
-              Chat admin (opsional)
-            </a>
-          </div>
+            {noteText ? (
+              <div className="pay-min-noteCard">
+                <div className="pay-min-noteLabel">Catatan</div>
+                <p>{noteText}</p>
+              </div>
+            ) : null}
+          </aside>
         </div>
       </section>
 
-      {/* Sticky CTA for Mobile */}
-      {!ok && (
+      {!ok ? (
         <div className="sticky-cta">
           <div className="sticky-cta-left">
-            <div className="sticky-cta-title">Total</div>
+            <div className="sticky-cta-title">Bayar</div>
             <div className="sticky-cta-value">{formatIDR(total)}</div>
           </div>
-          <button 
-            className="btn btn-primary"
-            disabled={!canSubmit}
-            onClick={onConfirmPaid}
-          >
-            {busy ? "Memproses..." : "Aku sudah bayar"}
+          <button className="btn" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
+            {busy ? "Proses" : "Konfirmasi"}
           </button>
         </div>
-      )}
+      ) : null}
 
-      {/* STEP 8: Success Modal dengan customerWhatsApp props */}
       <OrderSuccessModal
         open={ok}
         orderCode={orderCode}
-        customerWhatsApp={customerWhatsApp} // ✅ DITAMBAHKAN
-        onClose={() => setOk(false)}
+        customerWhatsApp={customerWhatsApp}
+        notes={noteText}
         waUrl={waUrl}
         statusUrl={statusUrl}
+        onClose={() => setOk(false)}
         onCopied={() => toast.success("ID order disalin")}
       />
     </div>

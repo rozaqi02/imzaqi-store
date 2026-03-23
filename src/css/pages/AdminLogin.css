@@ -1,1 +1,87 @@
-.narrow{width:min(520px, calc(100% - 32px));margin:0/**/auto;}
+.narrow {
+  width: min(740px, calc(100% - 32px));
+  margin: 0 auto;
+}
+
+.admin-loginShell {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.9fr) minmax(0, 1.1fr);
+  overflow: hidden;
+  border-radius: 28px;
+}
+
+.admin-loginAside,
+.admin-loginFormWrap {
+  padding: 24px;
+}
+
+.admin-loginAside {
+  display: grid;
+  align-content: start;
+  gap: 16px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.14), rgba(0, 214, 180, 0) 45%);
+  border-right: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.admin-loginBadge {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.admin-loginSub {
+  margin: 0;
+  color: rgba(234, 255, 245, 0.68);
+  line-height: 1.6;
+}
+
+.admin-loginSignals {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-loginSignal {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(234, 255, 245, 0.84);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-loginFormWrap {
+  display: grid;
+  align-content: center;
+}
+
+.admin-loginForm {
+  gap: 8px;
+}
+
+@media (max-width: 760px) {
+  .admin-loginShell {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-loginAside {
+    border-right: 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}

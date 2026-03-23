@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Box, ClipboardList, Settings2, Star, Tags } from "lucide-react";
 
 import Modal from "../../components/Modal";
 import EmptyState from "../../components/EmptyState";
@@ -18,6 +19,17 @@ import { useToast } from "../../context/ToastContext";
 
 const BUCKET_ICONS = "product-icons"; // public
 const BUCKET_TESTIMONIALS = "testimonials"; // public
+const CATEGORY_OPTIONS = [
+  { value: "streaming", label: "Streaming" },
+  { value: "music", label: "Music" },
+  { value: "tools", label: "Tools" },
+  { value: "learning", label: "Belajar" },
+  { value: "other", label: "Lainnya" },
+];
+const CATEGORY_LABELS = CATEGORY_OPTIONS.reduce((acc, option) => {
+  acc[option.value] = option.label;
+  return acc;
+}, {});
 
 function prettyStatus(status) {
   const s = String(status || "pending");
@@ -39,6 +51,28 @@ function StatusBadge({ status }) {
   return <span className={"admin-status " + cls}>{prettyStatus(s)}</span>;
 }
 
+const TAB_ICONS = {
+  products: Box,
+  orders: ClipboardList,
+  promos: Tags,
+  testimonials: Star,
+  settings: Settings2,
+};
+
+function getOrderItemCount(order) {
+  return (order?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0);
+}
+
+function getOrderDiscountAmount(order) {
+  const subtotal = Number(order?.subtotal_idr || 0);
+  const total = Number(order?.total_idr || 0);
+  return Math.max(0, subtotal - total);
+}
+
+function prettyCategory(category) {
+  return CATEGORY_LABELS[String(category || "other").toLowerCase()] || CATEGORY_LABELS.other;
+}
+
 export default function AdminDashboard() {
   const nav = useNavigate();
   const toast = useToast();
@@ -54,6 +88,7 @@ export default function AdminDashboard() {
 
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
+  const [adminNoteDrafts, setAdminNoteDrafts] = useState({});
   const [promos, setPromos] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [settings, setSettings] = useState({});
@@ -68,6 +103,7 @@ export default function AdminDashboard() {
   const [newProduct, setNewProduct] = useState({
     name: "",
     slug: "",
+    category: "other",
     description: "",
     sort_order: 100,
     is_active: true,
@@ -110,13 +146,26 @@ export default function AdminDashboard() {
   }
 
   async function refreshOrders() {
-    const { data, error } = await supabase
+    let query = supabase
       .from("orders")
       .select(
-        "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp"
+        "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp,notes,admin_note"
       )
       .order("created_at", { ascending: false })
       .limit(80);
+
+    let { data, error } = await query;
+
+    // Keep dashboard usable if database migration for `notes` has not been run yet.
+    if (error && /(notes|admin_note)/i.test(String(error?.message || ""))) {
+      ({ data, error } = await supabase
+        .from("orders")
+        .select(
+          "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp"
+        )
+        .order("created_at", { ascending: false })
+        .limit(80));
+    }
 
     if (error) throw error;
     setOrders(data || []);
@@ -165,6 +214,14 @@ export default function AdminDashboard() {
     setSelectedProductId(products[0].id);
   }, [products, selectedProductId]);
 
+  useEffect(() => {
+    const next = {};
+    (orders || []).forEach((order) => {
+      next[order.id] = String(order.admin_note || "");
+    });
+    setAdminNoteDrafts(next);
+  }, [orders]);
+
   const filteredProducts = useMemo(() => {
     const q = String(productQuery || "").trim().toLowerCase();
     if (!q) return products;
@@ -185,6 +242,20 @@ export default function AdminDashboard() {
       .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   }, [selectedProduct]);
 
+  const dashboardStats = useMemo(() => {
+    const activeProducts = (products || []).filter((product) => product.is_active).length;
+    const pendingOrders = (orders || []).filter((order) => String(order.status || "pending") === "pending").length;
+    const activePromos = (promos || []).filter((promo) => promo.is_active).length;
+    const activeTestimonials = (testimonials || []).filter((item) => item.is_active).length;
+
+    return [
+      { key: "products", label: "Produk aktif", value: activeProducts },
+      { key: "orders", label: "Order pending", value: pendingOrders },
+      { key: "promos", label: "Promo aktif", value: activePromos },
+      { key: "testimonials", label: "Testimoni aktif", value: activeTestimonials },
+    ];
+  }, [orders, products, promos, testimonials]);
+
   // Keep an editable form in sync with the selected product
   useEffect(() => {
     if (!selectedProduct) {
@@ -196,6 +267,7 @@ export default function AdminDashboard() {
       id: selectedProduct.id,
       name: selectedProduct.name || "",
       slug: selectedProduct.slug || "",
+      category: selectedProduct.category || "other",
       description: selectedProduct.description || "",
       icon_url: selectedProduct.icon_url || "",
       is_active: !!selectedProduct.is_active,
@@ -224,6 +296,7 @@ export default function AdminDashboard() {
     setNewProduct({
       name: "",
       slug: "",
+      category: "other",
       description: "",
       sort_order: 100,
       is_active: true,
@@ -249,6 +322,7 @@ export default function AdminDashboard() {
         .insert({
           name,
           slug,
+          category: String(newProduct.category || "other"),
           description: String(newProduct.description || ""),
           icon_url: null,
           is_active: !!newProduct.is_active,
@@ -277,6 +351,7 @@ export default function AdminDashboard() {
     const payload = {
       name: String(productForm.name || "").trim(),
       slug: String(productForm.slug || "").trim() || slugify(productForm.name),
+      category: String(productForm.category || "other"),
       description: String(productForm.description || ""),
       icon_url: productForm.icon_url ? String(productForm.icon_url) : null,
       is_active: !!productForm.is_active,
@@ -482,6 +557,25 @@ export default function AdminDashboard() {
     }
   }
 
+  async function saveOrderAdminNote(orderId) {
+    const tid = toast.loading("Simpan catatan...");
+    setMsg("");
+
+    try {
+      const admin_note = String(adminNoteDrafts[orderId] || "").trim() || null;
+      const { error } = await supabase.from("orders").update({ admin_note }).eq("id", orderId);
+      if (error) throw error;
+
+      await refreshOrders();
+      toast.remove(tid);
+      toast.success("Catatan admin disimpan", { duration: 1200 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal simpan catatan admin");
+      setMsg(e?.message || String(e));
+    }
+  }
+
   // ===== Promo actions =====
   const [promoBulk, setPromoBulk] = useState("");
 
@@ -643,12 +737,15 @@ export default function AdminDashboard() {
 
   // ===== Render =====
   const tabs = [
-    { id: "products", label: "Produk" },
-    { id: "orders", label: "Orders" },
-    { id: "promos", label: "Promo" },
-    { id: "testimonials", label: "Testimoni" },
-    { id: "settings", label: "Settings" },
+    { id: "products", label: "Produk", hint: "Produk & varian" },
+    { id: "orders", label: "Orders", hint: "Status & catatan" },
+    { id: "promos", label: "Promo", hint: "Kode diskon" },
+    { id: "testimonials", label: "Testimoni", hint: "Bukti pelanggan" },
+    { id: "settings", label: "Settings", hint: "WA & QRIS" },
   ];
+
+  const activeTab = tabs.find((item) => item.id === tab) || tabs[0];
+  const ActiveTabIcon = TAB_ICONS[activeTab.id] || Box;
 
   return (
     <div className="page admin-page">
@@ -670,7 +767,13 @@ export default function AdminDashboard() {
                   className={"admin-nav-btn " + (tab === t.id ? "active" : "")}
                   onClick={() => setTab(t.id)}
                 >
-                  {t.label}
+                  <span className="admin-nav-icon">
+                    {React.createElement(TAB_ICONS[t.id] || Box, { size: 16 })}
+                  </span>
+                  <span className="admin-nav-copy">
+                    <strong>{t.label}</strong>
+                    <small>{t.hint}</small>
+                  </span>
                 </button>
               ))}
             </nav>
@@ -687,12 +790,36 @@ export default function AdminDashboard() {
 
           <main className="admin-main">
             <div className="admin-topbar">
-              <div>
-                <h1 className="h2">Dashboard</h1>
-                <div className="muted">Kelola produk & order lebih cepat.</div>
+              <div className="admin-topbarCopy">
+                <div className="admin-topbar-eyebrow">{activeTab.label}</div>
+                <h1 className="h2">Dashboard Admin</h1>
+                <div className="muted">Kelola produk, order, promo, dan testimoni dari satu tempat.</div>
               </div>
 
-              {loading ? <span className="admin-loading">Memuat…</span> : null}
+              <div className="admin-topbar-current">
+                <span className="admin-topbar-currentIcon">
+                  <ActiveTabIcon size={16} />
+                </span>
+                <div>
+                  <strong>{activeTab.label}</strong>
+                  <span>{loading ? "Sinkronisasi data..." : activeTab.hint}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="admin-stats">
+              {dashboardStats.map((stat) => {
+                const StatIcon = TAB_ICONS[stat.key] || Box;
+                return (
+                  <div key={stat.key} className="admin-statCard">
+                    <span className="admin-statIcon">
+                      <StatIcon size={16} />
+                    </span>
+                    <span className="admin-statLabel">{stat.label}</span>
+                    <strong className="admin-statValue">{stat.value}</strong>
+                  </div>
+                );
+              })}
             </div>
 
             {msg ? (
@@ -741,6 +868,7 @@ export default function AdminDashboard() {
                             <div>
                               <div className="admin-product-name">{p.name}</div>
                               <div className="admin-product-sub">/{p.slug}</div>
+                              <div className="admin-categoryTag">{prettyCategory(p.category)}</div>
                             </div>
                           </div>
 
@@ -808,6 +936,21 @@ export default function AdminDashboard() {
                             />
                           </label>
 
+                          <label className="admin-field">
+                            <span>Kategori</span>
+                            <select
+                              className="input"
+                              value={productForm.category}
+                              onChange={(e) => setProductForm((p) => ({ ...p, category: e.target.value }))}
+                            >
+                              {CATEGORY_OPTIONS.map((option) => (
+                                <option key={option.value} value={option.value}>
+                                  {option.label}
+                                </option>
+                              ))}
+                            </select>
+                          </label>
+
                           <label className="admin-field admin-field-full">
                             <span>Deskripsi Produk</span>
                             <textarea
@@ -868,6 +1011,7 @@ export default function AdminDashboard() {
                                 id: selectedProduct.id,
                                 name: selectedProduct.name || "",
                                 slug: selectedProduct.slug || "",
+                                category: selectedProduct.category || "other",
                                 description: selectedProduct.description || "",
                                 icon_url: selectedProduct.icon_url || "",
                                 is_active: !!selectedProduct.is_active,
@@ -938,7 +1082,7 @@ export default function AdminDashboard() {
                 <div className="admin-panel-head">
                   <div>
                     <div className="admin-panel-title">Orders</div>
-                    <div className="admin-panel-sub">Pantau pesanan, cek bukti bayar, ubah status.</div>
+                    <div className="admin-panel-sub">Pantau pesanan, cek bukti bayar, lihat catatan customer, dan ubah status.</div>
                   </div>
                   <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>
                     Refresh Orders
@@ -952,8 +1096,12 @@ export default function AdminDashboard() {
                     </div>
                   ) : (
                     <div className="admin-orders">
-                      {orders.map((o) => (
-                        <div key={o.id} className="admin-order-card">
+                      {orders.map((o) => {
+                        const itemCount = getOrderItemCount(o);
+                        const discountAmount = getOrderDiscountAmount(o);
+
+                        return (
+                          <div key={o.id} className="admin-order-card">
                           <div className="admin-order-top">
                             <div>
                               <div className="admin-order-code">{o.order_code || o.id}</div>
@@ -995,6 +1143,47 @@ export default function AdminDashboard() {
                               ))}
                             </div>
 
+                            <div className="admin-order-pricing">
+                              <div className="admin-order-priceRow">
+                                <span>Jumlah item</span>
+                                <b>{itemCount}</b>
+                              </div>
+                              <div className="admin-order-priceRow">
+                                <span>Subtotal</span>
+                                <b>{formatIDR(o.subtotal_idr)}</b>
+                              </div>
+                              <div className="admin-order-priceRow">
+                                <span>Diskon {o.discount_percent ? `(${o.discount_percent}%)` : ""}</span>
+                                <b>- {formatIDR(discountAmount)}</b>
+                              </div>
+                              <div className="admin-order-priceRow total">
+                                <span>Total bayar</span>
+                                <b>{formatIDR(o.total_idr)}</b>
+                              </div>
+                              {o.promo_code ? <div className="admin-order-promo">Promo terpakai: {o.promo_code}</div> : null}
+                            </div>
+
+                            <div className={"admin-order-notes" + (o.notes ? "" : " empty")}>
+                              <div className="admin-order-notesTitle">Catatan customer</div>
+                              <div>{o.notes || "Tidak ada catatan tambahan."}</div>
+                            </div>
+
+                            <div className="admin-order-adminNote">
+                              <div className="admin-order-notesTitle">Catatan admin ke customer</div>
+                              <textarea
+                                className="input admin-textarea"
+                                rows={3}
+                                value={adminNoteDrafts[o.id] || ""}
+                                onChange={(e) => setAdminNoteDrafts((prev) => ({ ...prev, [o.id]: e.target.value }))}
+                                placeholder="Status tambahan, instruksi, atau info penting untuk customer."
+                              />
+                              <div className="admin-order-adminActions">
+                                <button className="btn btn-sm" type="button" onClick={() => saveOrderAdminNote(o.id)}>
+                                  Simpan Catatan
+                                </button>
+                              </div>
+                            </div>
+
                             {o.payment_proof_url ? (
                               <a className="admin-proof" href={o.payment_proof_url} target="_blank" rel="noreferrer">
                                 Lihat bukti bayar
@@ -1005,8 +1194,9 @@ export default function AdminDashboard() {
                               </div>
                             )}
                           </div>
-                        </div>
-                      ))}
+                          </div>
+                        );
+                      })}
                     </div>
                   )}
                 </div>
@@ -1182,6 +1372,21 @@ export default function AdminDashboard() {
               onChange={(e) => setNewProduct((p) => ({ ...p, slug: e.target.value }))}
               placeholder="netflix"
             />
+          </label>
+
+          <label className="admin-field">
+            <span>Kategori</span>
+            <select
+              className="input"
+              value={newProduct.category}
+              onChange={(e) => setNewProduct((p) => ({ ...p, category: e.target.value }))}
+            >
+              {CATEGORY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label className="admin-field admin-field-full">

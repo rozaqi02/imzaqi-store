@@ -1,15 +1,21 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
+import { ArrowUpRight, Layers3, PackageCheck } from "lucide-react";
 import { formatIDR } from "../lib/format";
 
 export default function ProductTile({ product }) {
-  const minPrice = useMemo(() => {
-    const prices = (product?.product_variants || [])
-      .filter((v) => v?.is_active)
+  const summary = useMemo(() => {
+    const activeVariants = (product?.product_variants || []).filter((v) => v?.is_active);
+    const prices = activeVariants
       .map((v) => Number(v.price_idr || 0))
       .filter((n) => Number.isFinite(n) && n > 0);
-    if (prices.length === 0) return null;
-    return Math.min(...prices);
+    const totalStock = activeVariants.reduce((sum, item) => sum + Number(item?.stock || 0), 0);
+
+    return {
+      minPrice: prices.length ? Math.min(...prices) : null,
+      variantsCount: activeVariants.length,
+      totalStock,
+    };
   }, [product]);
 
   return (
@@ -25,13 +31,31 @@ export default function ProductTile({ product }) {
 
         <div className="product-tile-main">
           <div className="product-tile-name">{product.name}</div>
-          {product.description ? <div className="product-tile-desc">{product.description}</div> : null}
+          <div className="product-tile-desc">
+            {product.description || "Pilih paket dan checkout."}
+          </div>
         </div>
+
+        <span className="product-tile-arrow">
+          <ArrowUpRight size={18} />
+        </span>
       </div>
 
       <div className="product-tile-bottom">
-        <div className="product-tile-meta">{minPrice ? `Mulai dari ${formatIDR(minPrice)}` : "Lihat paket"}</div>
-        <div className="product-tile-cta">Detail →</div>
+        <div className="product-tile-pills">
+          <span className="product-tile-pill">
+            <Layers3 size={13} />
+            <span>{summary.variantsCount || 0}</span>
+          </span>
+          <span className="product-tile-pill">
+            <PackageCheck size={13} />
+            <span>{summary.totalStock || 0}</span>
+          </span>
+        </div>
+
+        <div className="product-tile-price">
+          {summary.minPrice ? formatIDR(summary.minPrice) : "Lihat paket"}
+        </div>
       </div>
     </Link>
   );

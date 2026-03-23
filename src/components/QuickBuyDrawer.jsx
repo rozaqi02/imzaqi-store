@@ -1,20 +1,21 @@
 import React, { useMemo } from "react";
+import { createPortal } from "react-dom";
+import { Link } from "react-router-dom";
 import { formatIDR } from "../lib/format";
 import { useCart } from "../context/CartContext";
-import { Link } from "react-router-dom";
 
 export default function QuickBuyDrawer({ open, onClose, product }) {
   const cart = useCart();
 
   const variants = useMemo(() => {
-    const v = (product?.product_variants || []).slice();
-    v.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
-    return v;
+    const list = (product?.product_variants || []).slice();
+    list.sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
+    return list;
   }, [product]);
 
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
+  return createPortal(
     <div className="drawer-backdrop" onMouseDown={onClose} role="presentation">
       <div className="drawer" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true">
         <div className="drawer-head">
@@ -22,26 +23,28 @@ export default function QuickBuyDrawer({ open, onClose, product }) {
             <div className="drawer-title">{product?.name || "Pilih paket"}</div>
             <div className="drawer-sub">Klik varian untuk tambah ke keranjang.</div>
           </div>
-          <button className="icon-btn" onClick={onClose} aria-label="Tutup">✕</button>
+          <button className="icon-btn" onClick={onClose} aria-label="Tutup" type="button">
+            X
+          </button>
         </div>
 
         <div className="drawer-body">
-          {variants.map((v) => (
+          {variants.map((variant) => (
             <button
-              key={v.id}
+              key={variant.id}
               className="drawer-item"
-              onClick={() =>
-                cart.add({ ...v, product_id: product.id, product_name: product.name }, 1)
-              }
+              type="button"
+              onClick={() => cart.add({ ...variant, product_id: product.id, product_name: product.name }, 1)}
             >
               <div className="drawer-item-left">
-                <div className="drawer-item-name">{v.name}</div>
+                <div className="drawer-item-name">{variant.name}</div>
                 <div className="drawer-item-sub">
-                  {v.duration_label}{v.guarantee_text ? ` • ${v.guarantee_text}` : ""}
+                  {variant.duration_label}
+                  {variant.guarantee_text ? ` - ${variant.guarantee_text}` : ""}
                 </div>
               </div>
               <div className="drawer-item-right">
-                <b>{formatIDR(v.price_idr)}</b>
+                <b>{formatIDR(variant.price_idr)}</b>
                 <span className="mini">+ keranjang</span>
               </div>
             </button>
@@ -49,10 +52,15 @@ export default function QuickBuyDrawer({ open, onClose, product }) {
         </div>
 
         <div className="drawer-foot">
-          <Link className="btn btn-wide" to="/checkout" onClick={onClose}>Lanjut Checkout</Link>
-          <button className="btn btn-ghost btn-wide" onClick={() => cart.clear()}>Kosongkan Keranjang</button>
+          <Link className="btn btn-wide" to="/checkout" onClick={onClose}>
+            Lanjut Checkout
+          </Link>
+          <button className="btn btn-ghost btn-wide" onClick={() => cart.clear()} type="button">
+            Kosongkan Keranjang
+          </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, Percent, ShieldCheck, ShoppingBag, WalletCards } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
@@ -9,8 +10,16 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 
 function calcTotal(subtotal, percent) {
-  const disc = Math.round((subtotal * (percent || 0)) / 100);
-  return { discount: disc, total: Math.max(0, subtotal - disc) };
+  const discount = Math.round((subtotal * (percent || 0)) / 100);
+  return { discount, total: Math.max(0, subtotal - discount) };
+}
+
+function VisualStep({ icon: Icon, active }) {
+  return (
+    <div className={"checkout-min-step" + (active ? " active" : "")}>
+      <Icon size={16} />
+    </div>
+  );
 }
 
 export default function Checkout() {
@@ -19,16 +28,16 @@ export default function Checkout() {
   const { promo, apply, clear } = usePromo();
   const toast = useToast();
 
+  const promoPercent = Number(promo?.percent || 0);
   const subtotal = cart.subtotal();
-  const { discount, total } = calcTotal(subtotal, promo.percent);
+  const { discount, total } = calcTotal(subtotal, promoPercent);
 
   const [code, setCode] = useState(() => promo?.code || "");
   const [msg, setMsg] = useState("");
 
   usePageMeta({
     title: "Checkout",
-    description:
-      "Periksa keranjang, pakai kode promo (opsional), lalu lanjut ke pembayaran QRIS + upload bukti bayar.",
+    description: "Ringkasan order sebelum masuk ke halaman pembayaran.",
   });
 
   useEffect(() => {
@@ -36,42 +45,69 @@ export default function Checkout() {
     setCode((prev) => (prev ? prev : next));
   }, [promo]);
 
+  const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
+
+  const quickStats = [
+    { label: "Item", value: itemCount, icon: ShoppingBag },
+    { label: "Diskon", value: promoPercent ? `${promoPercent}%` : "-", icon: Percent },
+    { label: "Total", value: formatIDR(total), icon: WalletCards },
+  ];
+
   async function onApplyPromo() {
     const raw = String(code || "").trim();
     if (!raw) {
-      const t = "Kode promo masih kosong.";
-      setMsg(t);
-      toast.error(t);
+      const text = "Kode promo kosong.";
+      setMsg(text);
+      toast.error(text);
       return;
     }
 
     setMsg("");
-    const res = await apply(raw);
-    setMsg(res.message);
-    if (res.ok) toast.success(res.message);
-    else toast.error(res.message);
+    const result = await apply(raw);
+    setMsg(result.message);
+    if (result.ok) toast.success(result.message);
+    else toast.error(result.message);
   }
-
-  const itemCount = useMemo(() => cart.items.reduce((s, x) => s + x.qty, 0), [cart.items]);
 
   function goPay() {
     if (cart.items.length === 0) {
-      setMsg("Keranjang masih kosong.");
-      toast.error("Keranjang masih kosong.");
+      const text = "Keranjang masih kosong.";
+      setMsg(text);
+      toast.error(text);
       return;
     }
+
     nav("/bayar");
   }
 
   return (
-    <div className="page with-sticky-cta checkout3">
-      <section className="section reveal checkout3-hero">
-        <div className="container section-head">
-          <div>
-            <h1 className="h1">Checkout</h1>
-            <p className="muted">
-              Periksa keranjang kamu. Kalau sudah benar, klik <b>Bayar sekarang</b> untuk masuk ke halaman QRIS.
-            </p>
+    <div className="page with-sticky-cta checkout-min">
+      <section className="section reveal checkout-min-hero">
+        <div className="container">
+          <div className="checkout-min-head">
+            <div>
+              <h1 className="h1">Checkout</h1>
+              <div className="checkout-min-visual">
+                <VisualStep icon={ShoppingBag} active />
+                <div className="checkout-min-line" />
+                <VisualStep icon={WalletCards} active={cart.items.length > 0} />
+                <div className="checkout-min-line" />
+                <VisualStep icon={ShieldCheck} active={cart.items.length > 0} />
+              </div>
+            </div>
+
+            <div className="checkout-min-stats" aria-label="Ringkasan cepat">
+              {quickStats.map((stat) => {
+                const Icon = stat.icon;
+                return (
+                  <div key={stat.label} className="checkout-min-stat">
+                    <Icon size={16} />
+                    <span>{stat.label}</span>
+                    <b>{stat.value}</b>
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
@@ -79,37 +115,38 @@ export default function Checkout() {
           <CheckoutSteps current="checkout" />
         </div>
 
-        <div className="container checkout-pro">
-          <div className="card pad">
-            <div className="row between">
+        <div className="container checkout-min-grid">
+          <section className="card pad checkout-min-main">
+            <div className="checkout-min-sectionHead">
               <h3 className="h3">Keranjang</h3>
-              <div className="muted">{itemCount} item</div>
+              <span className="checkout-min-badge">{itemCount}</span>
             </div>
 
             {cart.items.length === 0 ? (
               <EmptyState
-                icon="🛒"
-                title="Keranjang kamu masih kosong"
-                description="Pilih produk dulu dari halaman Produk, lalu balik lagi ke sini untuk checkout."
-                primaryAction={{ label: "Pilih Produk", to: "/produk" }}
-                secondaryAction={{ label: "Cek Status Order", to: "/status" }}
+                icon="Bag"
+                title="Keranjang kosong"
+                description="Pilih produk dulu."
+                primaryAction={{ label: "Produk", to: "/produk" }}
+                secondaryAction={{ label: "Status", to: "/status" }}
               />
             ) : (
-              <div className="cart-list">
+              <div className="checkout-min-items">
                 {cart.items.map((item) => (
-                  <div key={item.variant_id} className="cart-row">
-                    <div className="cart-meta">
-                      <div className="cart-title">{item.product_name}</div>
-                      <div className="cart-sub">
-                        {item.variant_name} • {item.duration_label}
+                  <div key={item.variant_id} className="checkout-min-item">
+                    <div className="checkout-min-itemInfo">
+                      <div className="checkout-min-itemTitle">{item.product_name}</div>
+                      <div className="checkout-min-itemMeta">
+                        <span>{item.variant_name}</span>
+                        <span>{item.duration_label}</span>
                       </div>
-                      <div className="cart-sub">{formatIDR(item.price_idr)}</div>
                     </div>
 
-                    <div className="cart-actions">
-                      <div className="qty-wrap">
+                    <div className="checkout-min-itemSide">
+                      <div className="checkout-min-itemPrice">{formatIDR(item.price_idr * item.qty)}</div>
+                      <div className="checkout-min-qty">
                         <button className="qty-btn" onClick={() => cart.setQty(item.variant_id, item.qty - 1)} aria-label="Kurangi">
-                          −
+                          -
                         </button>
                         <input
                           className="qty"
@@ -123,33 +160,34 @@ export default function Checkout() {
                           +
                         </button>
                       </div>
-
-                      <button
-                        className="btn btn-ghost btn-sm"
-                        onClick={() => {
-                          cart.remove(item.variant_id);
-                          toast.info(`${item.product_name} dihapus`, {
-                            title: "Keranjang",
-                            actionLabel: "Undo",
-                            duration: 6000,
-                            onAction: () =>
-                              cart.add(
-                                {
-                                  id: item.variant_id,
-                                  product_id: item.product_id,
-                                  product_name: item.product_name,
-                                  name: item.variant_name,
-                                  duration_label: item.duration_label,
-                                  price_idr: item.price_idr,
-                                },
-                                item.qty
-                              ),
-                          });
-                        }}
-                      >
-                        Hapus
-                      </button>
                     </div>
+
+                    <button
+                      className="btn btn-ghost btn-sm checkout-min-remove"
+                      type="button"
+                      onClick={() => {
+                        cart.remove(item.variant_id);
+                        toast.info(`${item.product_name} dihapus`, {
+                          title: "Keranjang",
+                          actionLabel: "Undo",
+                          duration: 6000,
+                          onAction: () =>
+                            cart.add(
+                              {
+                                id: item.variant_id,
+                                product_id: item.product_id,
+                                product_name: item.product_name,
+                                name: item.variant_name,
+                                duration_label: item.duration_label,
+                                price_idr: item.price_idr,
+                              },
+                              item.qty
+                            ),
+                        });
+                      }}
+                    >
+                      Hapus
+                    </button>
                   </div>
                 ))}
               </div>
@@ -157,24 +195,25 @@ export default function Checkout() {
 
             <div className="divider" />
 
-            <div className="promo-block">
-              <div className="promo-row">
+            <div className="checkout-min-promo">
+              <div className="checkout-min-promoRow">
                 <input
                   className="input"
-                  placeholder="Kode promo (contoh: DISC50)"
+                  placeholder="DISC50"
                   value={code}
                   onChange={(e) => setCode(e.target.value.toUpperCase())}
                 />
-                <button className="btn btn-sm" onClick={onApplyPromo}>
-                  Terapkan
+                <button className="btn btn-sm" type="button" onClick={onApplyPromo}>
+                  Pakai
                 </button>
-                {promo.percent ? (
+                {promoPercent ? (
                   <button
                     className="btn btn-ghost btn-sm"
+                    type="button"
                     onClick={() => {
                       clear();
-                      toast.info("Promo direset.");
                       setMsg("");
+                      toast.info("Promo direset.");
                     }}
                   >
                     Reset
@@ -183,77 +222,72 @@ export default function Checkout() {
               </div>
               {msg ? <div className="hint">{msg}</div> : null}
             </div>
-          </div>
+          </section>
 
-          <div className="card pad checkout-summary">
-            <h3 className="h3">Ringkasan</h3>
+          <aside className="card pad checkout-min-side">
+            <div className="checkout-min-sideTop">
+              <div className="checkout-min-totalLabel">Total</div>
+              <div className="checkout-min-totalValue">{formatIDR(total)}</div>
+            </div>
 
-            <div className="totals">
-              <div className="tot-row">
+            <div className="checkout-min-meter" aria-hidden="true">
+              <span style={{ width: `${subtotal ? Math.max(18, (total / subtotal) * 100) : 100}%` }} />
+            </div>
+
+            <div className="checkout-min-breakdown">
+              <div className="checkout-min-row">
                 <span>Subtotal</span>
                 <b>{formatIDR(subtotal)}</b>
               </div>
-              <div className="tot-row">
+              <div className="checkout-min-row">
                 <span>Diskon</span>
                 <b>- {formatIDR(discount)}</b>
               </div>
-              <div className="tot-row tot-big">
-                <span>Total</span>
+              <div className="checkout-min-row strong">
+                <span>Bayar</span>
                 <b>{formatIDR(total)}</b>
               </div>
             </div>
 
-            {promo?.percent ? (
-              <div className="hint subtle">
-                Promo aktif: <b>{promo.code}</b> ({promo.percent}%)
+            <div className="checkout-min-icons" aria-label="Langkah berikutnya">
+              <div className="checkout-min-iconCard">
+                <ShoppingBag size={16} />
+                <span>Cek</span>
               </div>
-            ) : (
-              <div className="hint subtle">
-                Kamu bisa pakai kode promo kalau ada.
+              <div className="checkout-min-iconCard">
+                <WalletCards size={16} />
+                <span>Bayar</span>
               </div>
-            )}
+              <div className="checkout-min-iconCard">
+                <ShieldCheck size={16} />
+                <span>Upload</span>
+              </div>
+            </div>
 
-            <div className="divider" />
-
-            <button className="btn btn-wide" onClick={goPay} disabled={cart.items.length === 0}>
-              Bayar sekarang
+            <button className="btn btn-wide checkout-min-go" type="button" onClick={goPay} disabled={cart.items.length === 0}>
+              <span>Lanjut</span>
+              <ArrowRight size={16} />
             </button>
 
-            <div className="row" style={{ gap: 10, marginTop: 10, flexWrap: "wrap" }}>
+            <div className="checkout-min-actions">
               <Link className="btn btn-ghost btn-sm" to="/produk">
-                + Tambah produk
+                Produk
               </Link>
               <Link className="btn btn-ghost btn-sm" to="/status">
-                Cek status order
+                Status
               </Link>
             </div>
-
-            <div className="hint subtle">
-              Setelah klik, kamu akan masuk ke halaman QRIS + upload bukti pembayaran.
-            </div>
-
-            <div className="trust-callout">
-              <div className="trust-row">
-                <span className="trust-pill">🔒 Bukti bayar tersimpan</span>
-                <span className="trust-pill">⚡ Proses cepat</span>
-                <span className="trust-pill">✅ Garansi paket</span>
-              </div>
-              <div className="hint subtle" style={{ marginTop: 8 }}>
-                Tip: setelah order jadi, kamu akan dapat <b>ID Order</b> untuk pantau proses.
-              </div>
-            </div>
-          </div>
+          </aside>
         </div>
       </section>
 
-      {/* Mobile sticky CTA */}
       <div className="sticky-cta" aria-label="Ringkasan checkout">
         <div className="sticky-cta-left">
           <div className="sticky-cta-title">Total</div>
           <div className="sticky-cta-value">{formatIDR(total)}</div>
         </div>
-        <button className="btn" onClick={goPay} disabled={cart.items.length === 0}>
-          Bayar
+        <button className="btn" onClick={goPay} disabled={cart.items.length === 0} type="button">
+          Lanjut
         </button>
       </div>
     </div>

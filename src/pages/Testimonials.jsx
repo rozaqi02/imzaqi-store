@@ -1,6 +1,15 @@
 import React, { useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Grid2x2,
+  LayoutGrid,
+  Search,
+  X,
+} from "lucide-react";
 import { fetchTestimonials } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -9,17 +18,14 @@ export default function Testimonials() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
-
   const [q, setQ] = useState("");
-  const [view, setView] = useState("masonry"); // "masonry" | "grid"
+  const [view, setView] = useState("masonry");
   const [limit, setLimit] = useState(18);
-
-  // Lightbox
   const [activeIdx, setActiveIdx] = useState(-1);
 
   usePageMeta({
     title: "Testimoni",
-    description: "Testimoni pelanggan Imzaqi Store. Admin upload real-time dari dashboard.",
+    description: "Bukti order pelanggan Imzaqi Store.",
   });
 
   useEffect(() => {
@@ -30,13 +36,13 @@ export default function Testimonials() {
         if (!alive) return;
         setItems(Array.isArray(data) ? data : []);
       } catch (e) {
-        // eslint-disable-next-line no-console
         console.warn(e);
-        setError("Gagal memuat testimoni. Coba refresh.");
+        setError("Gagal memuat testimoni.");
       } finally {
         if (alive) setLoading(false);
       }
     })();
+
     return () => {
       alive = false;
     };
@@ -53,16 +59,9 @@ export default function Testimonials() {
   }, [items, q]);
 
   useEffect(() => {
-    // reset pagination saat search / ganti view
     setLimit(18);
   }, [q, view]);
 
-  const shown = useMemo(() => filtered.slice(0, limit), [filtered, limit]);
-  const hasMore = shown.length < filtered.length;
-
-  const total = items.length;
-
-  // Keyboard control for lightbox
   useEffect(() => {
     function onKey(e) {
       if (activeIdx < 0) return;
@@ -70,92 +69,86 @@ export default function Testimonials() {
       if (e.key === "ArrowLeft") setActiveIdx((i) => (i <= 0 ? filtered.length - 1 : i - 1));
       if (e.key === "ArrowRight") setActiveIdx((i) => (i >= filtered.length - 1 ? 0 : i + 1));
     }
+
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [activeIdx, filtered.length]);
 
+  const shown = useMemo(() => filtered.slice(0, limit), [filtered, limit]);
+  const hasMore = shown.length < filtered.length;
   const active = activeIdx >= 0 ? filtered[activeIdx] : null;
 
   return (
     <div className="page">
-      <section className="section reveal testi-hero-premium">
+      <section className="section reveal testi-minimal-hero">
         <div className="container center">
-          <div className="testi-badge">
-            <span aria-hidden="true">🧾</span>
-            Testimoni Pelanggan
-          </div>
+          <h1 className="h1 testi-minimal-title">Real screenshots. Quick scan.</h1>
+          <p className="testi-minimal-sub">Tap untuk zoom.</p>
 
-          <h1 className="h1 testi-title-premium">
-            Bukti real kalau belanja akun premium bisa{" "}
-            <span className="hero-accent">aman & rapi</span>
-          </h1>
-
-          <p className="testi-sub-premium">
-            Ini sebagian cerita pelanggan setelah checkout QRIS — bukti bayar diupload, status jelas, dan garansi jalan.
-          </p>
-
-          <div className="testi-metrics-premium">
-            <div className="metric-card">
-              <div className="metric-big">{total.toLocaleString("id-ID")}</div>
-              <div className="metric-label">Total testimoni</div>
+          <div className="testi-miniStats">
+            <div className="testi-miniStat">
+              <strong>{items.length.toLocaleString("id-ID")}</strong>
+              <span>Total</span>
             </div>
-            <div className="metric-card">
-              <div className="metric-big">Real</div>
-              <div className="metric-label">Upload admin</div>
+            <div className="testi-miniStat">
+              <strong>Real</strong>
+              <span>Admin upload</span>
             </div>
-            <div className="metric-card">
-              <div className="metric-big">Live</div>
-              <div className="metric-label">Tampil real-time</div>
+            <div className="testi-miniStat">
+              <strong>Live</strong>
+              <span>Update cepat</span>
             </div>
           </div>
 
-          <div className="testi-cta-row">
-            <Link className="btn" to="/produk">Lihat Produk</Link>
-            <Link className="btn btn-ghost" to="/status">Cek Status</Link>
+          <div className="testi-miniCta">
+            <Link className="btn" to="/produk">
+              Produk
+            </Link>
+            <Link className="btn btn-ghost" to="/status">
+              Status
+            </Link>
           </div>
         </div>
       </section>
 
       <section className="section reveal">
         <div className="container">
-          <div className="card pad testi-toolbar-premium">
-            <div className="testi-toolbar-left">
-              <div className="testi-search-wrap">
-                <span className="testi-search-icon" aria-hidden="true">⌕</span>
-                <input
-                  className="input testi-search-input"
-                  placeholder="Cari testimoni (caption / keyword)…"
-                  value={q}
-                  onChange={(e) => setQ(e.target.value)}
-                />
-                {q ? (
-                  <button type="button" className="testi-clear" onClick={() => setQ("")} aria-label="Clear">
-                    ×
-                  </button>
-                ) : null}
-              </div>
-
-              <div className="muted" style={{ fontSize: 13 }}>
-                Menampilkan <b>{shown.length.toLocaleString("id-ID")}</b> dari{" "}
-                <b>{filtered.length.toLocaleString("id-ID")}</b>
-              </div>
+          <div className="testi-toolbar">
+            <div className="testi-searchShell">
+              <Search size={16} className="testi-searchIcon" />
+              <input
+                className="input testi-searchInput"
+                placeholder="Cari caption"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+              />
+              {q ? (
+                <button type="button" className="testi-clear" onClick={() => setQ("")} aria-label="Hapus">
+                  <X size={14} />
+                </button>
+              ) : null}
             </div>
 
-            <div className="testi-toolbar-right">
-              <button
-                type="button"
-                className={`tab-btn ${view === "masonry" ? "active" : ""}`}
-                onClick={() => setView("masonry")}
-              >
-                Masonry
-              </button>
-              <button
-                type="button"
-                className={`tab-btn ${view === "grid" ? "active" : ""}`}
-                onClick={() => setView("grid")}
-              >
-                Grid
-              </button>
+            <div className="testi-toolbarMeta">
+              <div className="testi-count">{loading ? "..." : filtered.length}</div>
+              <div className="testi-viewSwitch">
+                <button
+                  type="button"
+                  className={`tab-btn ${view === "masonry" ? "active" : ""}`}
+                  onClick={() => setView("masonry")}
+                  aria-label="Masonry"
+                >
+                  <LayoutGrid size={15} />
+                </button>
+                <button
+                  type="button"
+                  className={`tab-btn ${view === "grid" ? "active" : ""}`}
+                  onClick={() => setView("grid")}
+                  aria-label="Grid"
+                >
+                  <Grid2x2 size={15} />
+                </button>
+              </div>
             </div>
           </div>
 
@@ -168,46 +161,41 @@ export default function Testimonials() {
           ) : error ? (
             <div className="card pad" style={{ marginTop: 14 }}>
               <EmptyState
-                icon="📡"
+                icon="!"
                 title="Testimoni belum bisa dimuat"
                 description={error}
                 primaryAction={{ label: "Refresh", onClick: () => window.location.reload() }}
-                secondaryAction={{ label: "Kembali ke Home", to: "/" }}
               />
             </div>
           ) : filtered.length === 0 ? (
             <div className="card pad" style={{ marginTop: 14 }}>
               <EmptyState
-                icon="🧾"
-                title="Belum ada testimoni"
-                description="Admin bisa upload dari dashboard. Kalau kamu sudah pernah beli, makasih banget ya 🙏"
-                primaryAction={{ label: "Belanja dulu", to: "/produk" }}
-                secondaryAction={{ label: "Cek Status Order", to: "/status" }}
+                icon="-"
+                title="Belum ada hasil"
+                description="Coba kata kunci lain."
+                primaryAction={{ label: "Reset", onClick: () => setQ("") }}
               />
             </div>
           ) : (
             <>
               <div className={view === "masonry" ? "testi-masonry" : "testi-grid"}>
-                {shown.map((t, idx) => {
-                  const realIdx = idx; // karena shown adalah slice awal dari filtered
-                  return (
-                    <button
-                      key={t.id}
-                      className="testi-tile"
-                      type="button"
-                      onClick={() => setActiveIdx(realIdx)}
-                      aria-label="Buka testimoni"
-                    >
-                      <div className="testi-img-wrap">
-                        <img src={t.image_url} alt={t.caption || "testimoni"} loading="lazy" />
-                        <div className="testi-hover">
-                          <div className="testi-zoom">Klik untuk zoom</div>
-                        </div>
+                {shown.map((item, idx) => (
+                  <button
+                    key={item.id}
+                    className="testi-tile"
+                    type="button"
+                    onClick={() => setActiveIdx(idx)}
+                    aria-label="Buka testimoni"
+                  >
+                    <div className="testi-imgWrap">
+                      <img src={item.image_url} alt={item.caption || "testimoni"} loading="lazy" />
+                      <div className="testi-overlay">
+                        <span className="testi-overlayPill">Zoom</span>
+                        {item.caption ? <span className="testi-captionPill">{item.caption}</span> : null}
                       </div>
-                      {t.caption ? <div className="testi-caption">{t.caption}</div> : null}
-                    </button>
-                  );
-                })}
+                    </div>
+                  </button>
+                ))}
               </div>
 
               {hasMore ? (
@@ -222,58 +210,64 @@ export default function Testimonials() {
         </div>
       </section>
 
-      {/* Lightbox */}
       <AnimatePresence>
-        {active ? (
-          <motion.div
-            className="lightbox-backdrop"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onMouseDown={(e) => {
-              if (e.target === e.currentTarget) setActiveIdx(-1);
-            }}
-          >
-            <motion.div
-              className="lightbox"
-              initial={{ opacity: 0, y: 10, scale: 0.985 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 10, scale: 0.985 }}
-              transition={{ duration: 0.22 }}
-            >
-              <button className="lightbox-close" type="button" onClick={() => setActiveIdx(-1)} aria-label="Close">
-                ×
-              </button>
-
-              {filtered.length > 1 ? (
-                <>
+        {active && typeof document !== "undefined"
+          ? createPortal(
+              <motion.div
+                className="lightbox-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onMouseDown={(e) => {
+                  if (e.target === e.currentTarget) setActiveIdx(-1);
+                }}
+              >
+                <motion.div
+                  className="lightbox"
+                  initial={{ opacity: 0, y: 12, scale: 0.985 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: 12, scale: 0.985 }}
+                  transition={{ duration: 0.22 }}
+                >
                   <button
-                    className="lightbox-nav prev"
+                    className="lightbox-close"
                     type="button"
-                    onClick={() => setActiveIdx((i) => (i <= 0 ? filtered.length - 1 : i - 1))}
-                    aria-label="Previous"
+                    onClick={() => setActiveIdx(-1)}
+                    aria-label="Close"
                   >
-                    ‹
+                    <X size={18} />
                   </button>
-                  <button
-                    className="lightbox-nav next"
-                    type="button"
-                    onClick={() => setActiveIdx((i) => (i >= filtered.length - 1 ? 0 : i + 1))}
-                    aria-label="Next"
-                  >
-                    ›
-                  </button>
-                </>
-              ) : null}
 
-              <div className="lightbox-body">
-                <img className="lightbox-img" src={active.image_url} alt={active.caption || "testimoni"} />
-                {active.caption ? <div className="lightbox-caption">{active.caption}</div> : null}
-                <div className="lightbox-hint">ESC untuk tutup • ← → untuk navigasi</div>
-              </div>
-            </motion.div>
-          </motion.div>
-        ) : null}
+                  {filtered.length > 1 ? (
+                    <>
+                      <button
+                        className="lightbox-nav prev"
+                        type="button"
+                        onClick={() => setActiveIdx((i) => (i <= 0 ? filtered.length - 1 : i - 1))}
+                        aria-label="Previous"
+                      >
+                        <ChevronLeft size={20} />
+                      </button>
+                      <button
+                        className="lightbox-nav next"
+                        type="button"
+                        onClick={() => setActiveIdx((i) => (i >= filtered.length - 1 ? 0 : i + 1))}
+                        aria-label="Next"
+                      >
+                        <ChevronRight size={20} />
+                      </button>
+                    </>
+                  ) : null}
+
+                  <div className="lightbox-body">
+                    <img className="lightbox-img" src={active.image_url} alt={active.caption || "testimoni"} />
+                    {active.caption ? <div className="lightbox-caption">{active.caption}</div> : null}
+                  </div>
+                </motion.div>
+              </motion.div>,
+              document.body
+            )
+          : null}
       </AnimatePresence>
     </div>
   );

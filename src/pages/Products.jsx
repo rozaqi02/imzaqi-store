@@ -1,5 +1,22 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link, useSearchParams } from "react-router-dom";
+import {
+  ArrowRight,
+  Blocks,
+  CircleAlert,
+  Film,
+  Flame,
+  GraduationCap,
+  Grid2x2,
+  List,
+  Music4,
+  Package2,
+  Search,
+  SlidersHorizontal,
+  Sparkles,
+  X,
+} from "lucide-react";
 
 import { fetchProducts } from "../lib/api";
 import EmptyState from "../components/EmptyState";
@@ -8,15 +25,17 @@ import { useCart } from "../context/CartContext";
 import { formatIDR } from "../lib/format";
 
 const CATEGORIES = [
-  { key: "streaming", label: "Streaming", emoji: "🎬" },
-  { key: "music", label: "Music", emoji: "🎧" },
-  { key: "tools", label: "Tools", emoji: "🧩" },
-  { key: "learning", label: "Belajar", emoji: "📚" },
-  { key: "other", label: "Lainnya", emoji: "✨" },
+  { key: "streaming", label: "Streaming", icon: Film },
+  { key: "music", label: "Music", icon: Music4 },
+  { key: "tools", label: "Tools", icon: Blocks },
+  { key: "learning", label: "Belajar", icon: GraduationCap },
+  { key: "other", label: "Lainnya", icon: Sparkles },
 ];
 
-function inferCategory(p) {
-  const blob = `${p?.slug || ""} ${p?.name || ""}`.toLowerCase();
+function inferCategory(product) {
+  const explicit = String(product?.category || "").trim().toLowerCase();
+  if (explicit) return explicit;
+  const blob = `${product?.slug || ""} ${product?.name || ""}`.toLowerCase();
   if (/(netflix|disney|hotstar|prime|viu|vidio|iqiyi|bstation)/.test(blob)) return "streaming";
   if (/(spotify|youtube)/.test(blob)) return "music";
   if (/(canva|capcut|chatgpt|zoom|getcontact)/.test(blob)) return "tools";
@@ -24,35 +43,32 @@ function inferCategory(p) {
   return "other";
 }
 
-function clamp(n, a, b) {
-  const x = Number(n);
-  if (!Number.isFinite(x)) return a;
-  return Math.max(a, Math.min(b, x));
+function clamp(n, min, max) {
+  const value = Number(n);
+  if (!Number.isFinite(value)) return min;
+  return Math.max(min, Math.min(max, value));
 }
 
 function formatCompactIDR(n) {
-  const x = Number(n || 0);
-  if (!Number.isFinite(x)) return "0";
-  // 1000 -> 1k, 10000 -> 10k
-  if (x >= 1000000) return `${Math.round(x / 100000) / 10}jt`;
-  if (x >= 1000) return `${Math.round(x / 100) / 10}k`;
-  return String(x);
+  const value = Number(n || 0);
+  if (!Number.isFinite(value)) return "0";
+  if (value >= 1000000) return `${Math.round(value / 100000) / 10}jt`;
+  if (value >= 1000) return `${Math.round(value / 100) / 10}k`;
+  return String(value);
 }
 
 function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
-  // Two-thumb range slider using two range inputs.
-  // valueMin <= valueMax
   const left = max <= min ? 0 : ((valueMin - min) / (max - min)) * 100;
   const right = max <= min ? 100 : ((valueMax - min) / (max - min)) * 100;
   const trackStyle = {
-    background: `linear-gradient(90deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.12) ${left}%, rgba(22,199,166,.65) ${left}%, rgba(22,199,166,.65) ${right}%, rgba(255,255,255,.12) ${right}%, rgba(255,255,255,.12) 100%)`,
+    background: `linear-gradient(90deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.12) ${left}%, rgba(22,199,166,.78) ${left}%, rgba(22,199,166,.78) ${right}%, rgba(255,255,255,.12) ${right}%, rgba(255,255,255,.12) 100%)`,
   };
 
   return (
-    <div className="range" aria-label="Filter harga">
-      <div className="range-track" style={trackStyle} />
+    <div className="catalog-range" aria-label="Filter harga">
+      <div className="catalog-rangeTrack" style={trackStyle} />
       <input
-        className="range-input"
+        className="catalog-rangeInput"
         type="range"
         min={min}
         max={max}
@@ -65,7 +81,7 @@ function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
         aria-label="Harga minimum"
       />
       <input
-        className="range-input"
+        className="catalog-rangeInput"
         type="range"
         min={min}
         max={max}
@@ -78,10 +94,10 @@ function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
         aria-label="Harga maksimum"
       />
 
-      <div className="range-values">
-        <span className="range-pill">{formatCompactIDR(valueMin)}</span>
-        <span className="range-sep">—</span>
-        <span className="range-pill">{formatCompactIDR(valueMax)}</span>
+      <div className="catalog-rangeValues">
+        <span>{formatCompactIDR(valueMin)}</span>
+        <span>-</span>
+        <span>{formatCompactIDR(valueMax)}</span>
       </div>
     </div>
   );
@@ -105,120 +121,108 @@ function FilterPanel({
   compact = false,
 }) {
   return (
-    <div className={compact ? "pfilters pfilters-compact" : "pfilters"}>
-      <div className="pfilters-section">
-        <div className="pfilters-label">Pencarian</div>
-        <div className="pfilters-search">
+    <div className={`catalog-filter ${compact ? "compact" : ""}`}>
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterLabel">Cari</div>
+        <div className="catalog-filterSearch">
+          <Search size={15} />
           <input
-            className="input pfilters-searchInput"
+            className="input catalog-filterInput"
             value={query}
-            placeholder="Cari Netflix, Canva, ChatGPT…"
+            placeholder="Netflix, Canva, ChatGPT"
             onChange={(e) => setQuery(e.target.value)}
           />
           {query ? (
-            <button
-              type="button"
-              className="pfilters-clear"
-              onClick={() => setQuery("")}
-              aria-label="Hapus pencarian"
-              title="Hapus"
-            >
-              ×
+            <button type="button" className="catalog-filterClear" onClick={() => setQuery("")} aria-label="Hapus">
+              <X size={14} />
             </button>
           ) : null}
         </div>
-        <div className="hint subtle">Tip: tekan <b>/</b> untuk fokus ke search.</div>
       </div>
 
-      <div className="pfilters-section">
-        <div className="pfilters-label">Kategori</div>
-        <div className="pfilters-chips" role="list">
-          {CATEGORIES.map((c) => {
-            const active = cats.includes(c.key);
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterLabel">Kategori</div>
+        <div className="catalog-chipGrid">
+          {CATEGORIES.map((category) => {
+            const Icon = category.icon;
+            const active = cats.includes(category.key);
             return (
               <button
-                key={c.key}
+                key={category.key}
                 type="button"
-                className={"chip " + (active ? "active" : "")}
-                onClick={() => toggleCat(c.key)}
-                role="listitem"
+                className={`catalog-chip ${active ? "active" : ""}`}
+                onClick={() => toggleCat(category.key)}
                 aria-pressed={active}
               >
-                <span className="chip-ic" aria-hidden="true">{c.emoji}</span>
-                {c.label}
+                <Icon size={14} />
+                <span>{category.label}</span>
               </button>
             );
           })}
         </div>
       </div>
 
-      <div className="pfilters-section">
-        <div className="pfilters-row">
-          <div className="pfilters-label">Hanya yang ready</div>
-          <label className="toggle">
-            <input
-              type="checkbox"
-              checked={inStockOnly}
-              onChange={(e) => setInStockOnly(e.target.checked)}
-            />
-            <span className="toggle-ui" aria-hidden="true" />
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterRow">
+          <span className="catalog-filterLabel">Ready</span>
+          <label className="catalog-toggle">
+            <input type="checkbox" checked={inStockOnly} onChange={(e) => setInStockOnly(e.target.checked)} />
+            <span className="catalog-toggleUi" aria-hidden="true" />
           </label>
         </div>
-        <div className="hint subtle">Filter ini menghitung dari total stok varian yang aktif.</div>
       </div>
 
-      <div className="pfilters-section">
-        <div className="pfilters-label">Harga</div>
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterLabel">Harga</div>
         <Range
           min={priceBounds.min}
           max={priceBounds.max}
           valueMin={price.min}
           valueMax={price.max}
           step={1000}
-          onChange={(r) => setPrice(r)}
+          onChange={(next) => setPrice(next)}
         />
-        <div className="pfilters-priceText">
-          Menampilkan produk dengan harga <b>mulai</b> antara <b>{formatIDR(price.min)}</b> – <b>{formatIDR(price.max)}</b>.
-        </div>
       </div>
 
-      <div className="pfilters-section">
-        <div className="pfilters-label">Urutkan</div>
-        <select className="input pfilters-select" value={sort} onChange={(e) => setSort(e.target.value)}>
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterLabel">Urutkan</div>
+        <select className="input catalog-filterSelect" value={sort} onChange={(e) => setSort(e.target.value)}>
           <option value="reco">Rekomendasi</option>
           <option value="popular">Terlaris</option>
           <option value="price_asc">Harga termurah</option>
           <option value="price_desc">Harga termahal</option>
           <option value="stock_desc">Stok terbanyak</option>
-          <option value="name">Nama A → Z</option>
+          <option value="name">Nama A-Z</option>
         </select>
       </div>
 
-      <div className="pfilters-section">
-        <div className="pfilters-label">Tampilan</div>
-        <div className="pfilters-view">
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterLabel">Tampilan</div>
+        <div className="catalog-viewSwitch">
           <button
             type="button"
-            className={"viewbtn " + (view === "grid" ? "active" : "")}
+            className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
             onClick={() => setView("grid")}
             aria-pressed={view === "grid"}
           >
-            ⬚ Grid
+            <Grid2x2 size={15} />
+            <span>Grid</span>
           </button>
           <button
             type="button"
-            className={"viewbtn " + (view === "list" ? "active" : "")}
+            className={`catalog-viewBtn ${view === "list" ? "active" : ""}`}
             onClick={() => setView("list")}
             aria-pressed={view === "list"}
           >
-            ☰ List
+            <List size={15} />
+            <span>List</span>
           </button>
         </div>
       </div>
 
-      <div className="pfilters-actions">
+      <div className="catalog-filterBlock no-border">
         <button type="button" className="btn btn-ghost btn-wide" onClick={onReset}>
-          Reset filter
+          Reset
         </button>
       </div>
     </div>
@@ -230,25 +234,24 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
-
-  const qParam = params.get("q") || "";
-  const [query, setQuery] = useState(qParam);
-
-  const searchRef = useRef(null);
-
-  const { items, subtotal } = useCart();
-  const cartItemCount = items?.reduce((s, x) => s + (x.qty || 0), 0) || 0;
-
   const [cats, setCats] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
   const [sort, setSort] = useState("reco");
   const [view, setView] = useState("grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [price, setPrice] = useState({ min: 0, max: 0 });
+  const [priceReady, setPriceReady] = useState(false);
+
+  const qParam = params.get("q") || "";
+  const [query, setQuery] = useState(qParam);
+  const searchRef = useRef(null);
+
+  const { items, subtotal } = useCart();
+  const cartItemCount = items?.reduce((sum, item) => sum + (item.qty || 0), 0) || 0;
 
   usePageMeta({
     title: "Produk",
-    description:
-      "Jelajahi produk (dengan filter & ikon), lalu klik untuk buka detail paket dan tambah ke keranjang.",
+    description: "Katalog produk dengan filter cepat dan paket yang mudah dipilih.",
   });
 
   useEffect(() => {
@@ -273,11 +276,10 @@ export default function Products() {
     };
   }, []);
 
-  // Keep query in URL (shareable link)
   useEffect(() => {
     const next = String(query || "").trim();
-    const cur = params.get("q") || "";
-    if (next === cur) return;
+    const current = params.get("q") || "";
+    if (next === current) return;
 
     if (!next) {
       params.delete("q");
@@ -290,7 +292,6 @@ export default function Products() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query]);
 
-  // Keyboard shortcut: "/" to focus search
   useEffect(() => {
     function onKey(e) {
       if (e.key === "/" && !e.metaKey && !e.ctrlKey && !e.altKey) {
@@ -306,48 +307,33 @@ export default function Products() {
   }, [filtersOpen]);
 
   const enriched = useMemo(() => {
-    return (products || []).map((p) => {
-      const vars = (p?.product_variants || [])
+    return (products || []).map((product) => {
+      const vars = (product?.product_variants || [])
         .slice()
-        .filter((v) => v?.is_active)
+        .filter((variant) => variant?.is_active)
         .sort((a, b) => (a?.sort_order || 0) - (b?.sort_order || 0));
 
       const prices = vars
-        .map((v) => Number(v?.price_idr || 0))
-        .filter((n) => Number.isFinite(n) && n > 0);
-
-      const minPrice = prices.length ? Math.min(...prices) : 0;
-      const maxPrice = prices.length ? Math.max(...prices) : 0;
-
-      const stock = vars.reduce((s, v) => s + Number(v?.stock || 0), 0);
-      const sold = vars.reduce((s, v) => s + Number(v?.sold_count || 0), 0);
-      const durations = Array.from(
-        new Set(vars.map((v) => String(v?.duration_label || "").trim()).filter(Boolean))
-      );
+        .map((variant) => Number(variant?.price_idr || 0))
+        .filter((value) => Number.isFinite(value) && value > 0);
 
       return {
-        ...p,
+        ...product,
         _vars: vars,
-        _minPrice: minPrice,
-        _maxPrice: maxPrice,
-        _stock: stock,
-        _sold: sold,
-        _durations: durations,
-        _category: inferCategory(p),
+        _minPrice: prices.length ? Math.min(...prices) : 0,
+        _maxPrice: prices.length ? Math.max(...prices) : 0,
+        _stock: vars.reduce((sum, variant) => sum + Number(variant?.stock || 0), 0),
+        _sold: vars.reduce((sum, variant) => sum + Number(variant?.sold_count || 0), 0),
+        _category: inferCategory(product),
       };
     });
   }, [products]);
 
   const priceBounds = useMemo(() => {
-    const prices = enriched.map((p) => p._minPrice).filter((n) => Number.isFinite(n) && n > 0);
+    const prices = enriched.map((item) => item._minPrice).filter((value) => Number.isFinite(value) && value > 0);
     if (!prices.length) return { min: 0, max: 0 };
-    const min = Math.min(...prices);
-    const max = Math.max(...prices);
-    return { min, max };
+    return { min: Math.min(...prices), max: Math.max(...prices) };
   }, [enriched]);
-
-  const [price, setPrice] = useState({ min: 0, max: 0 });
-  const [priceReady, setPriceReady] = useState(false);
 
   useEffect(() => {
     if (!priceReady && priceBounds.max > 0) {
@@ -356,7 +342,6 @@ export default function Products() {
     }
   }, [priceBounds.min, priceBounds.max, priceReady]);
 
-  // keep range clamped when bounds change
   useEffect(() => {
     if (!priceReady) return;
     setPrice((prev) => ({
@@ -366,7 +351,7 @@ export default function Products() {
   }, [priceBounds.min, priceBounds.max, priceReady]);
 
   function toggleCat(key) {
-    setCats((prev) => (prev.includes(key) ? prev.filter((x) => x !== key) : [...prev, key]));
+    setCats((prev) => (prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]));
   }
 
   function resetFilters() {
@@ -380,48 +365,47 @@ export default function Products() {
 
   const filtered = useMemo(() => {
     const s = String(query || "").trim().toLowerCase();
-    let list = (enriched || []).filter((p) => p?.is_active);
+    let list = (enriched || []).filter((item) => item?.is_active);
 
-    if (cats.length) list = list.filter((p) => cats.includes(p._category));
-    if (inStockOnly) list = list.filter((p) => Number(p._stock || 0) > 0);
+    if (cats.length) list = list.filter((item) => cats.includes(item._category));
+    if (inStockOnly) list = list.filter((item) => Number(item._stock || 0) > 0);
 
     if (priceBounds.max > 0) {
-      list = list.filter((p) => {
-        const mp = Number(p._minPrice || 0);
-        if (!mp) return true;
-        return mp >= price.min && mp <= price.max;
+      list = list.filter((item) => {
+        const minPrice = Number(item._minPrice || 0);
+        if (!minPrice) return true;
+        return minPrice >= price.min && minPrice <= price.max;
       });
     }
 
     if (s) {
-      list = list.filter((p) => {
-        const name = String(p?.name || "").toLowerCase();
-        const slug = String(p?.slug || "").replace(/-/g, " ").toLowerCase();
-        const desc = String(p?.description || "").toLowerCase();
-        const variants = (p?._vars || [])
-          .map((v) => `${v?.name || ""} ${v?.duration_label || ""}`.toLowerCase())
+      list = list.filter((item) => {
+        const name = String(item?.name || "").toLowerCase();
+        const slug = String(item?.slug || "").replace(/-/g, " ").toLowerCase();
+        const desc = String(item?.description || "").toLowerCase();
+        const variants = (item?._vars || [])
+          .map((variant) => `${variant?.name || ""} ${variant?.duration_label || ""}`.toLowerCase())
           .join(" ");
         return name.includes(s) || slug.includes(s) || desc.includes(s) || variants.includes(s);
       });
     }
 
-    // sort
     const byName = (a, b) => String(a?.name || "").localeCompare(String(b?.name || ""), "id");
     const byReco = (a, b) => (a?.sort_order || 0) - (b?.sort_order || 0);
     const byPopular = (a, b) => (b?._sold || 0) - (a?._sold || 0) || byReco(a, b);
-    const byMinPriceAsc = (a, b) => (a?._minPrice || 0) - (b?._minPrice || 0) || byReco(a, b);
-    const byMinPriceDesc = (a, b) => (b?._minPrice || 0) - (a?._minPrice || 0) || byReco(a, b);
+    const byPriceAsc = (a, b) => (a?._minPrice || 0) - (b?._minPrice || 0) || byReco(a, b);
+    const byPriceDesc = (a, b) => (b?._minPrice || 0) - (a?._minPrice || 0) || byReco(a, b);
     const byStockDesc = (a, b) => (b?._stock || 0) - (a?._stock || 0) || byReco(a, b);
 
     const sorted = list.slice();
     if (sort === "popular") sorted.sort(byPopular);
-    else if (sort === "price_asc") sorted.sort(byMinPriceAsc);
-    else if (sort === "price_desc") sorted.sort(byMinPriceDesc);
+    else if (sort === "price_asc") sorted.sort(byPriceAsc);
+    else if (sort === "price_desc") sorted.sort(byPriceDesc);
     else if (sort === "stock_desc") sorted.sort(byStockDesc);
     else if (sort === "name") sorted.sort(byName);
     else sorted.sort(byReco);
     return sorted;
-  }, [cats, enriched, inStockOnly, price.min, price.max, priceBounds.max, query, sort]);
+  }, [cats, enriched, inStockOnly, price.max, price.min, priceBounds.max, query, sort]);
 
   const activeFiltersCount =
     (query ? 1 : 0) +
@@ -430,64 +414,76 @@ export default function Products() {
     (priceReady && (price.min !== priceBounds.min || price.max !== priceBounds.max) ? 1 : 0) +
     (sort !== "reco" ? 1 : 0);
 
-  const skeletonCount = view === "list" ? 6 : 10;
+  const topSold = useMemo(() => Math.max(...enriched.map((item) => Number(item._sold || 0)), 0), [enriched]);
+  const skeletonCount = view === "list" ? 6 : 8;
 
   return (
     <div className={cartItemCount > 0 ? "page with-sticky-cta" : "page"}>
-      <section className="section products3-hero reveal">
+      <section className="section catalog-hero reveal">
         <div className="container">
-          <div className="products3-heroTop">
+          <div className="catalog-heroGrid">
             <div>
-              <div className="products3-badge">Katalog</div>
-              <h1 className="h1 products3-title">Produk</h1>
-              <p className="products3-sub">
-                Pilih aplikasi yang kamu mau — klik untuk buka detail paket & tambah ke keranjang.
-              </p>
+              <div className="catalog-eyebrow">Katalog produk</div>
+              <h1 className="h1 catalog-title">Cari yang cocok.</h1>
+              <p className="catalog-sub">Filter cepat. Harga jelas. Masuk ke paket dalam satu tap.</p>
+            </div>
+
+            <div className="catalog-metrics">
+              <div className="catalog-metric">
+                <strong>{enriched.length}</strong>
+                <span>Total</span>
+              </div>
+              <div className="catalog-metric">
+                <strong>{activeFiltersCount}</strong>
+                <span>Filter</span>
+              </div>
+              <div className="catalog-metric">
+                <strong>{topSold}</strong>
+                <span>Top sold</span>
+              </div>
             </div>
           </div>
 
-          <div className="products3-toolbar">
-            <div className="products3-searchWrap">
-              <span className="products3-searchIc" aria-hidden="true">⌕</span>
+          <div className="catalog-command">
+            <div className="catalog-commandSearch">
+              <Search size={16} className="catalog-commandIcon" />
               <input
                 ref={searchRef}
-                className="input products3-search"
+                className="input catalog-commandInput"
                 value={query}
-                placeholder="Cari produk / varian / durasi…"
+                placeholder="Cari produk, varian, atau durasi"
                 onChange={(e) => setQuery(e.target.value)}
               />
               {query ? (
-                <button className="products3-clear" onClick={() => setQuery("")} type="button" aria-label="Hapus pencarian">
-                  ×
+                <button
+                  className="catalog-commandClear"
+                  onClick={() => setQuery("")}
+                  type="button"
+                  aria-label="Hapus pencarian"
+                >
+                  <X size={14} />
                 </button>
               ) : null}
             </div>
 
-            <div className="products3-actions">
+            <div className="catalog-commandActions">
+              <select className="input catalog-commandSort" value={sort} onChange={(e) => setSort(e.target.value)}>
+                <option value="reco">Rekomendasi</option>
+                <option value="popular">Terlaris</option>
+                <option value="price_asc">Harga termurah</option>
+                <option value="price_desc">Harga termahal</option>
+                <option value="stock_desc">Stok terbanyak</option>
+                <option value="name">Nama A-Z</option>
+              </select>
+
               <button
                 type="button"
-                className="btn btn-ghost products3-filterBtn"
+                className="btn btn-ghost catalog-filterBtn"
                 onClick={() => setFiltersOpen(true)}
               >
-                Filter{activeFiltersCount ? ` (${activeFiltersCount})` : ""}
-              </button>
-              <div className="products3-sortDesktop">
-                <select className="input products3-sort" value={sort} onChange={(e) => setSort(e.target.value)}>
-                  <option value="reco">Rekomendasi</option>
-                  <option value="popular">Terlaris</option>
-                  <option value="price_asc">Harga termurah</option>
-                  <option value="price_desc">Harga termahal</option>
-                  <option value="stock_desc">Stok terbanyak</option>
-                  <option value="name">Nama A → Z</option>
-                </select>
-              </div>
-              <button
-                type="button"
-                className="btn btn-ghost products3-reset"
-                onClick={resetFilters}
-                title="Reset"
-              >
-                Reset
+                <SlidersHorizontal size={16} />
+                <span>Filter</span>
+                {activeFiltersCount ? <span className="catalog-filterBtnCount">{activeFiltersCount}</span> : null}
               </button>
             </div>
           </div>
@@ -495,8 +491,8 @@ export default function Products() {
       </section>
 
       <section className="section reveal" style={{ paddingTop: 0 }}>
-        <div className="container products3-layout">
-          <aside className="products3-sidebar" aria-label="Filter produk">
+        <div className="container catalog-layout">
+          <aside className="catalog-sidebar" aria-label="Filter produk">
             <FilterPanel
               query={query}
               setQuery={setQuery}
@@ -515,30 +511,42 @@ export default function Products() {
             />
           </aside>
 
-          <div className="products3-content">
-            <div className="products3-activeBar" aria-label="Filter yang aktif">
-              <div className="products3-count">
-                {loading ? "Memuat…" : `${filtered.length} produk`}
+          <div className="catalog-content">
+            <div className="catalog-contentBar">
+              <div className="catalog-contentMeta">
+                <strong>{loading ? "..." : filtered.length}</strong>
+                <span>produk</span>
               </div>
-              <div className="products3-viewDesktop">
-                <button type="button" className={"viewbtn " + (view === "grid" ? "active" : "")} onClick={() => setView("grid")}>
-                  ⬚
+
+              <div className="catalog-contentActions">
+                <button
+                  type="button"
+                  className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
+                  onClick={() => setView("grid")}
+                  aria-label="Grid"
+                >
+                  <Grid2x2 size={15} />
                 </button>
-                <button type="button" className={"viewbtn " + (view === "list" ? "active" : "")} onClick={() => setView("list")}>
-                  ☰
+                <button
+                  type="button"
+                  className={`catalog-viewBtn ${view === "list" ? "active" : ""}`}
+                  onClick={() => setView("list")}
+                  aria-label="List"
+                >
+                  <List size={15} />
                 </button>
               </div>
             </div>
 
-            <div className={"products3-grid " + (view === "list" ? "list" : "grid")} role="list">
+            <div className={`catalog-grid ${view === "list" ? "list" : "grid"}`} role="list">
               {loading ? (
                 Array.from({ length: skeletonCount }).map((_, idx) => (
-                  <div key={idx} className={"pcard pcard-skeleton " + (view === "list" ? "list" : "grid")} role="listitem" />
+                  <div key={idx} className={`catalog-cardSkeleton ${view === "list" ? "list" : "grid"}`} role="listitem" />
                 ))
               ) : error ? (
                 <div className="card pad" style={{ gridColumn: "1 / -1" }}>
                   <EmptyState
-                    icon="📡"
+                    icon="!"
                     title="Gagal memuat"
                     description={error}
                     primaryAction={{ label: "Refresh", onClick: () => window.location.reload() }}
@@ -547,62 +555,80 @@ export default function Products() {
               ) : filtered.length === 0 ? (
                 <div className="card pad" style={{ gridColumn: "1 / -1" }}>
                   <EmptyState
-                    icon="🤔"
+                    icon="-"
                     title="Tidak ditemukan"
                     description={query ? `Tidak ada produk untuk "${query}".` : "Coba ubah filter atau reset."}
                     primaryAction={{ label: "Reset Filter", onClick: resetFilters }}
                   />
                 </div>
               ) : (
-                filtered.map((p) => {
-                  const stock = Number(p._stock || 0);
-                  const sold = Number(p._sold || 0);
+                filtered.map((product) => {
+                  const stock = Number(product._stock || 0);
+                  const sold = Number(product._sold || 0);
                   const low = stock > 0 && stock <= 5;
                   const hot = sold >= 10;
-                  const hasIcon = Boolean(p.icon_url);
+                  const displayPrice = product._minPrice ? `Rp${formatCompactIDR(product._minPrice)}` : "-";
 
                   return (
                     <Link
-                      key={p.id}
-                      to={`/produk/${p.slug}`}
-                      className={"pcard " + (view === "list" ? "list" : "grid")}
+                      key={product.id}
+                      to={`/produk/${product.slug}`}
+                      className={`catalog-card ${view === "list" ? "list" : "grid"}`}
                       role="listitem"
-                      aria-label={`Buka detail ${p.name}`}
+                      aria-label={`Buka detail ${product.name}`}
                     >
-                      <div className="pcard-icon">
-                        {hasIcon ? (
-                          <img src={p.icon_url} alt="" loading="lazy" />
-                        ) : (
-                          <div className="pcard-fallback" aria-hidden="true">
-                            {String(p?.name || "P").slice(0, 1).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="pcard-body">
-                        <div className="pcard-top">
-                          <div className="pcard-title">{p.name}</div>
-                          <div className="pcard-badges" aria-label="Badge">
-                            {hot ? <span className="badge hot">🔥 Terlaris</span> : null}
-                            {low ? <span className="badge low">⚠️ Stok {stock}</span> : null}
-                            {!stock ? <span className="badge out">⛔ Habis</span> : null}
-                          </div>
+                      <div className="catalog-cardCover">
+                        <div className="catalog-cardIcon">
+                          {product.icon_url ? (
+                            <img src={product.icon_url} alt="" loading="lazy" />
+                          ) : (
+                            <span>{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>
+                          )}
                         </div>
 
-                        <div className="pcard-desc">
-                          {p.description ? p.description : "Klik untuk lihat paket & durasi."}
-                        </div>
-
-                        <div className="pcard-meta">
-                          <span className="meta-pill">Mulai {p._minPrice ? formatIDR(p._minPrice) : "—"}</span>
-                          <span className="meta-pill">Varian {p._vars?.length || 0}</span>
-                          <span className="meta-pill">Stok {stock}</span>
+                        <div className="catalog-cardStatus">
+                          {hot ? (
+                            <span className="catalog-status hot">
+                              <Flame size={13} />
+                              <span>Hot</span>
+                            </span>
+                          ) : null}
+                          {low ? (
+                            <span className="catalog-status warn">
+                              <CircleAlert size={13} />
+                              <span>{stock}</span>
+                            </span>
+                          ) : null}
                         </div>
                       </div>
 
-                      <div className="pcard-cta" aria-hidden="true">
-                        <span>Lihat detail</span>
-                        <span className="pcard-arrow">→</span>
+                      <div className="catalog-cardBody">
+                        <div className="catalog-cardHead">
+                          <div>
+                            <div className="catalog-cardTitle">{product.name}</div>
+                          </div>
+                          <div className="catalog-cardPrice">{displayPrice}</div>
+                        </div>
+
+                        <div className="catalog-cardMeta">
+                          <span>
+                            <Package2 size={13} />
+                            <span>{product._vars?.length || 0} varian</span>
+                          </span>
+                          <span>
+                            <span>{stock}</span>
+                            <span>stok</span>
+                          </span>
+                          <span>
+                            <span>{sold}</span>
+                            <span>sold</span>
+                          </span>
+                        </div>
+
+                        <div className="catalog-cardFoot">
+                          <span>Lihat paket</span>
+                          <ArrowRight size={15} />
+                        </div>
                       </div>
                     </Link>
                   );
@@ -613,62 +639,65 @@ export default function Products() {
         </div>
       </section>
 
-      {/* Mobile filters drawer */}
-      {filtersOpen ? (
-        <div className="pfilters-backdrop" onMouseDown={() => setFiltersOpen(false)} role="presentation">
-          <div className="pfilters-sheet" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Filter produk">
-            <div className="pfilters-sheetHead">
-              <div>
-                <div className="pfilters-sheetTitle">Filter</div>
-                <div className="hint subtle">Atur kategori, harga, urutan, dan tampilan.</div>
+      {filtersOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div className="catalog-sheetBackdrop" onMouseDown={() => setFiltersOpen(false)} role="presentation">
+              <div className="catalog-sheet" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Filter produk">
+                <div className="catalog-sheetHandle" aria-hidden="true" />
+                <div className="catalog-sheetHead">
+                  <div>
+                    <div className="catalog-sheetTitle">Filter produk</div>
+                    <div className="catalog-sheetSub">Sapu, pilih, lalu lanjut.</div>
+                  </div>
+                  <button className="catalog-sheetClose" type="button" onClick={() => setFiltersOpen(false)} aria-label="Tutup">
+                    <X size={18} />
+                  </button>
+                </div>
+
+                <div className="catalog-sheetBody">
+                  <FilterPanel
+                    compact
+                    query={query}
+                    setQuery={setQuery}
+                    cats={cats}
+                    toggleCat={toggleCat}
+                    inStockOnly={inStockOnly}
+                    setInStockOnly={setInStockOnly}
+                    priceBounds={priceBounds}
+                    price={price}
+                    setPrice={setPrice}
+                    sort={sort}
+                    setSort={setSort}
+                    view={view}
+                    setView={setView}
+                    onReset={resetFilters}
+                  />
+                </div>
+
+                <div className="catalog-sheetFoot">
+                  <button type="button" className="btn btn-wide" onClick={() => setFiltersOpen(false)}>
+                    Terapkan
+                  </button>
+                </div>
               </div>
-              <button className="icon-btn" type="button" onClick={() => setFiltersOpen(false)} aria-label="Tutup">
-                ✕
-              </button>
-            </div>
+            </div>,
+            document.body
+          )
+        : null}
 
-            <div className="pfilters-sheetBody">
-              <FilterPanel
-                compact
-                query={query}
-                setQuery={setQuery}
-                cats={cats}
-                toggleCat={toggleCat}
-                inStockOnly={inStockOnly}
-                setInStockOnly={setInStockOnly}
-                priceBounds={priceBounds}
-                price={price}
-                setPrice={setPrice}
-                sort={sort}
-                setSort={setSort}
-                view={view}
-                setView={setView}
-                onReset={resetFilters}
-              />
-            </div>
-
-            <div className="pfilters-sheetFoot">
-              <button type="button" className="btn btn-wide" onClick={() => setFiltersOpen(false)}>
-                Terapkan
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      {cartItemCount > 0 && (
+      {cartItemCount > 0 ? (
         <div className="sticky-cta">
           <div className="sticky-cta-left">
             <div className="sticky-cta-title">Keranjang</div>
             <div className="sticky-cta-value">
-              {cartItemCount} item • {formatIDR(subtotal())}
+              {cartItemCount} item | {formatIDR(subtotal())}
             </div>
           </div>
           <Link className="btn" to="/checkout">
             Checkout
           </Link>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }
