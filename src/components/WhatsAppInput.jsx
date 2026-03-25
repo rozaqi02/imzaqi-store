@@ -27,7 +27,11 @@ export default function WhatsAppInput({
   required = true,
   autoFocus = false,
   disabled = false,
+  label = 'Nomor WhatsApp',
   placeholder = 'Contoh: 081234567890',
+  helperText = 'Format: 08xxx atau +62xxx',
+  className = '',
+  compact = false,
   rememberLast = true,
 }) {
   const [internalValue, setInternalValue] = useState(value);
@@ -86,11 +90,12 @@ export default function WhatsAppInput({
 
   const showError = touched && !validation.valid && internalValue !== '';
   const showSuccess = touched && validation.valid;
+  const wrapperClassName = ['whatsapp-input-wrapper', compact ? 'is-compact' : '', className].filter(Boolean).join(' ');
 
   return (
-    <div className="whatsapp-input-wrapper">
+    <div className={wrapperClassName}>
       <label className="label" htmlFor="whatsapp-input">
-        📱 Nomor WhatsApp {required && <span className="required">*</span>}
+        {label} {required && <span className="required">*</span>}
       </label>
       
       <div className={`input-wrapper ${showError ? 'error' : ''} ${showSuccess ? 'success' : ''}`}>
@@ -116,7 +121,7 @@ export default function WhatsAppInput({
 
       {!showError && (
         <div className="hint subtle">
-          Format: <b>08xxx</b> atau <b>+62xxx</b>
+          {helperText}
         </div>
       )}
 

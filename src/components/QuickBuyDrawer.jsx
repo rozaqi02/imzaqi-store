@@ -1,11 +1,12 @@
 import React, { useMemo } from "react";
 import { createPortal } from "react-dom";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { formatIDR } from "../lib/format";
 import { useCart } from "../context/CartContext";
 
 export default function QuickBuyDrawer({ open, onClose, product }) {
   const cart = useCart();
+  const location = useLocation();
 
   const variants = useMemo(() => {
     const list = (product?.product_variants || []).slice();
@@ -52,7 +53,7 @@ export default function QuickBuyDrawer({ open, onClose, product }) {
         </div>
 
         <div className="drawer-foot">
-          <Link className="btn btn-wide" to="/checkout" onClick={onClose}>
+          <Link className="btn btn-wide" to="/checkout" state={{ backgroundLocation: location }} onClick={onClose}>
             Lanjut Checkout
           </Link>
           <button className="btn btn-ghost btn-wide" onClick={() => cart.clear()} type="button">

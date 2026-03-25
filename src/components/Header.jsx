@@ -313,7 +313,7 @@ export default function Header() {
 
           <div className="header-actions">
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link to="/checkout" className="header-cart">
+              <Link to="/checkout" state={{ backgroundLocation: location }} className="header-cart">
                 <CartIcon />
                 {cartCount > 0 ? (
                   <motion.span

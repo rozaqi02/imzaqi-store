@@ -28,11 +28,11 @@
 }
 
 /* Steps: more premium */
-.steps{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
-.step.active{border-color:rgba(22,199,166,.28);background:rgba(22,199,166,.08);} 
-.step.done{border-color:rgba(0,214,180,.20);background:rgba(255,255,255,.03);} 
-.step-dot{border-color:rgba(255,255,255,.14);} 
-.step.active .step-dot{border-color:rgba(22,199,166,.35);background:rgba(22,199,166,.22);color:#06101f;}
+.steps{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.045);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);}
+.step.active{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.07);} 
+.step.done{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.04);} 
+.step-dot{border-color:rgba(255,255,255,.16);} 
+.step.active .step-dot{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.88);color:#071018;}
 
 /* Footer redesign (v3) */
 .footer{position:relative;overflow:hidden;}

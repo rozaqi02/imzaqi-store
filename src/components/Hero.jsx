@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -54,6 +54,7 @@ function renderTypedWithHighlight(typedText) {
 
 export default function Hero() {
   const nav = useNavigate();
+  const location = useLocation();
   const { totalViews, todayViews, totalOrders, todayOrders } = useLiveStats();
   const [typed, setTyped] = useState(() => {
     if (typeof window === "undefined" || !window.matchMedia) return "";
@@ -157,7 +158,7 @@ export default function Hero() {
   const flow = [
     { icon: ScanSearch, label: "Pilih" },
     { icon: CreditCard, label: "Bayar" },
-    { icon: CheckCircle2, label: "Upload" },
+    { icon: CheckCircle2, label: "ID Order" },
     { icon: ShieldCheck, label: "Pantau" },
   ];
 
@@ -179,7 +180,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p custom={2} {...fadeProps} className="hero-sub hero-sub-minimal">
-            Cari, pilih, bayar, upload.
+            Cari, pilih, bayar, pantau.
           </motion.p>
 
           <motion.div custom={3} {...fadeProps} className="hero-rail">
@@ -268,7 +269,7 @@ export default function Hero() {
                 <ScanSearch size={16} />
                 <span>Produk</span>
               </Link>
-              <Link className="btn btn-ghost" to="/checkout">
+              <Link className="btn btn-ghost" to="/checkout" state={{ backgroundLocation: location }}>
                 <Zap size={16} />
                 <span>Checkout</span>
               </Link>

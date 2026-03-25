@@ -1190,7 +1190,7 @@ export default function AdminDashboard() {
                               </a>
                             ) : (
                               <div className="muted" style={{ fontSize: 13 }}>
-                                Belum ada bukti bayar.
+                                Order ini dibuat tanpa upload bukti bayar.
                               </div>
                             )}
                           </div>
@@ -1318,8 +1318,8 @@ export default function AdminDashboard() {
                     <div className="card pad" style={{ marginTop: 10 }}>
                       <b>Catatan</b>
                       <div className="muted" style={{ marginTop: 6, lineHeight: 1.7 }}>
-                        QRIS ditampilkan dari file <b>qris_payment.jpeg</b> di folder <b>public</b>.
-                        Untuk mengganti QRIS, replace file tersebut lalu deploy ulang.
+                        QRIS checkout otomatis dibuat dari <b>REACT_APP_QRIS_BASE</b> agar nominal mengikuti total order.
+                        Jika ingin mengganti QR merchant, ubah base QRIS di environment lalu deploy ulang.
                       </div>
                     </div>
                   </div>

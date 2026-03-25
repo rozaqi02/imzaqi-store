@@ -1,30 +1,12 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, BadgeCheck, CreditCard, LayoutGrid, Rows3, ShieldCheck } from "lucide-react";
+import { ArrowRight, LayoutGrid, Rows3 } from "lucide-react";
 
 import Hero from "../components/Hero";
 import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingIds } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
-
-const SIGNALS = [
-  {
-    icon: CreditCard,
-    title: "QRIS",
-    text: "Scan and pay",
-  },
-  {
-    icon: ShieldCheck,
-    title: "Garansi",
-    text: "Sesuai paket",
-  },
-  {
-    icon: BadgeCheck,
-    title: "Status",
-    text: "Track by code",
-  },
-];
 
 export default function Home() {
   const [loading, setLoading] = useState(true);
@@ -79,27 +61,6 @@ export default function Home() {
   return (
     <div className="page">
       <Hero />
-
-      <section className="section">
-        <div className="container">
-          <div className="home-strip">
-            {SIGNALS.map((item) => {
-              const Icon = item.icon;
-              return (
-                <div key={item.title} className="home-stripCard">
-                  <span className="home-stripIcon">
-                    <Icon size={16} />
-                  </span>
-                  <div>
-                    <div className="home-stripTitle">{item.title}</div>
-                    <div className="home-stripText">{item.text}</div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
 
       <section className="section">
         <div className="container">

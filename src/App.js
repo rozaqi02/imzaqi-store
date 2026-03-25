@@ -25,7 +25,9 @@ function AnalyticsBridge() {
 
 // smooth scroll to top on route change
 function ScrollToTop() {
-  const { pathname } = useLocation();
+  const location = useLocation();
+  const displayLocation = location.state?.backgroundLocation || location;
+  const pathname = displayLocation.pathname;
 
   React.useEffect(() => {
     const reduce = typeof window !== "undefined" &&
@@ -39,6 +41,46 @@ function ScrollToTop() {
   return null;
 }
 
+function AppRoutes() {
+  const location = useLocation();
+  const backgroundLocation = location.state?.backgroundLocation;
+  const displayLocation = backgroundLocation || location;
+
+  return (
+    <Layout routeKey={displayLocation.pathname}>
+      <Routes location={displayLocation}>
+        <Route path="/" element={<Home />} />
+        <Route path="/produk/:slug" element={<ProductDetail />} />
+        <Route path="/produk" element={<Products />} />
+        <Route path="/tentang" element={<About />} />
+        <Route path="/testimoni" element={<Testimonials />} />
+
+        <Route path="/checkout" element={<Checkout />} />
+        <Route path="/bayar" element={<Pay />} />
+        <Route path="/status" element={<Status />} />
+
+        <Route path="/admin" element={<AdminLogin />} />
+        <Route
+          path="/admin/dashboard"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
+
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+
+      {backgroundLocation ? (
+        <Routes>
+          <Route path="/checkout" element={<Checkout />} />
+        </Routes>
+      ) : null}
+    </Layout>
+  );
+}
+
 export default function App() {
   return (
     <BrowserRouter>
@@ -46,31 +88,7 @@ export default function App() {
       <NetworkBridge />
       <ScrollToTop />
       <RouteProgress />
-      <Layout>
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/produk/:slug" element={<ProductDetail />} />
-          <Route path="/produk" element={<Products />} />
-          <Route path="/tentang" element={<About />} />
-          <Route path="/testimoni" element={<Testimonials />} />
-
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/bayar" element={<Pay />} />
-          <Route path="/status" element={<Status />} />
-
-          <Route path="/admin" element={<AdminLogin />} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <AdminDashboard />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </Layout>
+      <AppRoutes />
     </BrowserRouter>
   );
 }

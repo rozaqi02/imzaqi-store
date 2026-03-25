@@ -13,7 +13,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 const FAQ = [
   {
     q: "Flow beli?",
-    a: "Pilih paket, bayar QRIS, upload bukti, lalu pantau status.",
+    a: "Pilih paket, bayar QRIS, dapatkan ID order, lalu pantau status.",
   },
   {
     q: "Garansi?",
@@ -52,7 +52,7 @@ export default function About() {
       {
         icon: Zap,
         title: "Fast",
-        text: "Checkout dan upload dalam satu alur.",
+        text: "Checkout dan bayar dalam satu alur.",
       },
     ],
     []
@@ -70,7 +70,7 @@ export default function About() {
         icon: CreditCard,
         num: "02",
         title: "Bayar",
-        text: "QRIS lalu upload bukti.",
+        text: "QRIS dan simpan ID order.",
       },
       {
         icon: ShieldCheck,
@@ -90,7 +90,7 @@ export default function About() {
             Beli premium apps tanpa teks panjang.
           </h1>
 
-          <p className="about-minimal-sub">Pilih. Bayar. Upload. Pantau.</p>
+          <p className="about-minimal-sub">Pilih. Bayar. Simpan ID. Pantau.</p>
 
           <div className="about-miniStats">
             <div className="about-miniStat">

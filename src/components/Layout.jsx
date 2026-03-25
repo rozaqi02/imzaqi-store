@@ -4,10 +4,11 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 
-export default function Layout({ children }) {
+export default function Layout({ children, routeKey }) {
   const location = useLocation();
+  const revealKey = routeKey || location.pathname;
   // Re-attach reveal observer whenever route changes.
-  useRevealOnScroll(location.pathname);
+  useRevealOnScroll(revealKey);
 
   return (
     <div className="app-shell">
@@ -17,7 +18,7 @@ export default function Layout({ children }) {
 
       <Header />
       <main className="app-main">
-        <div key={location.pathname} className="route-transition">
+        <div key={revealKey} className="route-transition">
           {children}
         </div>
       </main>

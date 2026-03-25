@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Link, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   Blocks,
@@ -230,6 +230,7 @@ function FilterPanel({
 }
 
 export default function Products() {
+  const location = useLocation();
   const [params, setParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
@@ -677,7 +678,7 @@ export default function Products() {
               {cartItemCount} item | {formatIDR(subtotal())}
             </div>
           </div>
-          <Link className="btn" to="/checkout">
+          <Link className="btn" to="/checkout" state={{ backgroundLocation: location }}>
             Checkout
           </Link>
         </div>
