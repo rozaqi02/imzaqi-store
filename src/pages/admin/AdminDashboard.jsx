@@ -248,9 +248,19 @@ export default function AdminDashboard() {
 
   const [promoBulk, setPromoBulk] = useState("");
   const [settingsWhatsApp, setSettingsWhatsApp] = useState("");
+  const [settingsQrisBase, setSettingsQrisBase] = useState("");
+  const [settingsQrisImageUrl, setSettingsQrisImageUrl] = useState("");
   const deferredProductQuery = useDeferredValue(productQuery);
   const deferredOrderQuery = useDeferredValue(orderQuery);
   const waNumber = settings?.whatsapp?.number || "";
+  const savedQrisBase = String(settings?.qris?.base_payload || "").trim();
+  const envQrisBase = String(process.env.REACT_APP_QRIS_BASE || "").trim();
+  const qrisModeLabel = savedQrisBase || envQrisBase ? "Auto aktif" : "Fallback statis";
+  const qrisModeCopy = savedQrisBase
+    ? "Base QR tersimpan di database."
+    : envQrisBase
+      ? "Base QR masih ikut env build."
+      : "Base QR kosong. Checkout akan pakai QR statis.";
 
   // ===== Auth guard =====
   useEffect(() => {
@@ -268,6 +278,12 @@ export default function AdminDashboard() {
   useEffect(() => {
     setSettingsWhatsApp(waNumber);
   }, [waNumber]);
+
+  useEffect(() => {
+    const qris = settings?.qris || {};
+    setSettingsQrisBase(String(qris.base_payload || ""));
+    setSettingsQrisImageUrl(String(qris.image_url || ""));
+  }, [settings]);
 
   async function fetchOrdersData() {
     let query = supabase.from("orders").select(ORDER_SELECT_FULL).order("created_at", { ascending: false }).limit(1000);
@@ -1119,6 +1135,27 @@ export default function AdminDashboard() {
     } catch (e) {
       toast.remove(tid);
       toast.error("Gagal simpan");
+      setMsg(e?.message || String(e));
+    }
+  }
+
+  async function saveQrisSettings(basePayload, imageUrl) {
+    const nextQris = {
+      ...(settings?.qris && typeof settings.qris === "object" ? settings.qris : {}),
+      base_payload: String(basePayload || "").trim(),
+      image_url: String(imageUrl || "").trim(),
+    };
+    const tid = toast.loading("Simpan QRIS…");
+
+    try {
+      await upsertSetting("qris", nextQris);
+      const nextSettings = await fetchSettings();
+      setSettings(nextSettings);
+      toast.remove(tid);
+      toast.success("QRIS disimpan", { duration: 1200 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal simpan QRIS");
       setMsg(e?.message || String(e));
     }
   }
@@ -2243,11 +2280,37 @@ export default function AdminDashboard() {
                         />
                         <div className="hint subtle">Gunakan format angka agar tombol chat customer tetap konsisten.</div>
                       </label>
+
+                      <label className="admin-field admin-field-full">
+                        <span>QRIS Base Payload</span>
+                        <textarea
+                          className="input admin-textarea"
+                          rows={4}
+                          value={settingsQrisBase}
+                          placeholder="000201..."
+                          onChange={(e) => setSettingsQrisBase(e.target.value)}
+                        />
+                        <div className="hint subtle">Dipakai untuk generate QR dengan nominal otomatis.</div>
+                      </label>
+
+                      <label className="admin-field admin-field-full">
+                        <span>Fallback QR Image URL</span>
+                        <input
+                          className="input"
+                          value={settingsQrisImageUrl}
+                          placeholder="https://..."
+                          onChange={(e) => setSettingsQrisImageUrl(e.target.value)}
+                        />
+                        <div className="hint subtle">Opsional. Dipakai jika generator QR otomatis gagal.</div>
+                      </label>
                     </div>
 
                     <div className="admin-form-actions">
                       <button className="btn" type="button" onClick={() => saveWhatsApp(settingsWhatsApp)}>
                         Simpan WhatsApp
+                      </button>
+                      <button className="btn btn-ghost" type="button" onClick={() => saveQrisSettings(settingsQrisBase, settingsQrisImageUrl)}>
+                        Simpan QRIS
                       </button>
                     </div>
                   </div>
@@ -2269,8 +2332,8 @@ export default function AdminDashboard() {
                     </div>
                     <div className="admin-miniCard">
                       <span>QRIS</span>
-                      <strong>Environment based</strong>
-                      <small>QRIS checkout mengikuti base QR dari environment saat deploy.</small>
+                      <strong>{qrisModeLabel}</strong>
+                      <small>{qrisModeCopy}</small>
                     </div>
                     <div className="admin-miniCard">
                       <span>Traffic hari ini</span>

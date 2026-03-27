@@ -66,6 +66,8 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-qrisLocked p{margin:0;line-height:1.6;color:rgba(255,255,255,.48);max-width:24ch;}
 .pay-stageFoot{font-size:12px;color:rgba(255,255,255,.46);text-align:center;}
 .pay-stageNotice{margin-top:-2px;text-align:center;}
+.pay-stageFoot.warning,
+.pay-stageNotice.is-warning{color:#ffd089;}
 
 .pay-orderDesktop{position:sticky;top:92px;display:flex;flex-direction:column;gap:14px;border-radius:28px;background:
   radial-gradient(140% 140% at 0% 0%, rgba(255,255,255,.09), rgba(0,0,0,0) 56%),

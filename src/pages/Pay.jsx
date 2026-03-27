@@ -116,10 +116,12 @@ export default function Pay() {
   const { discount, total } = calcTotal(subtotal, promoPercent);
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [items]);
 
-  const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" } });
+  const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" }, qris: {} });
   const waNumber = settings?.whatsapp?.number || "6283136049987";
-  const qrisBase = process.env.REACT_APP_QRIS_BASE || "";
-  const fallbackQrisUrl = "/qris_payment.jpeg";
+  const qrisBaseFromSettings = String(settings?.qris?.base_payload || "").trim();
+  const qrisBaseFromEnv = String(process.env.REACT_APP_QRIS_BASE || "").trim();
+  const qrisBase = qrisBaseFromSettings || qrisBaseFromEnv;
+  const fallbackQrisUrl = String(settings?.qris?.image_url || "").trim() || "/qris_payment.jpeg";
 
   const [customerWhatsApp, setCustomerWhatsApp] = useState("");
   const [isWaValid, setIsWaValid] = useState(false);
@@ -132,10 +134,16 @@ export default function Pay() {
   const [qrisLoaded, setQrisLoaded] = useState(false);
   const [qrisNotice, setQrisNotice] = useState("");
   const [qrisFailed, setQrisFailed] = useState(false);
+  const [qrisMode, setQrisMode] = useState("idle");
 
   useEffect(() => {
     fetchSettings()
-      .then((result) => setSettings({ whatsapp: result.whatsapp || { number: "6283136049987" } }))
+      .then((result) =>
+        setSettings({
+          whatsapp: result.whatsapp || { number: "6283136049987" },
+          qris: result.qris || {},
+        })
+      )
       .catch(() => {});
   }, []);
 
@@ -147,22 +155,26 @@ export default function Pay() {
       setQrisFailed(false);
       setQrisUrl("");
       setQrisNotice("");
+      setQrisMode("idle");
 
       if (!qrisBase) {
         if (!active) return;
+        setQrisMode("fallback");
         setQrisUrl(fallbackQrisUrl);
-        setQrisNotice("QRIS default ditampilkan.");
+        setQrisNotice("QR statis aktif. Isi QRIS base di admin agar nominal otomatis lagi.");
         return;
       }
 
       try {
         const { dataUrl } = await buildDynamicQrisImage(qrisBase, total);
         if (!active) return;
+        setQrisMode("dynamic");
         setQrisUrl(dataUrl);
       } catch (error) {
         if (!active) return;
+        setQrisMode("fallback");
         setQrisUrl(fallbackQrisUrl);
-        setQrisNotice(error?.message ? `${error.message} QR default ditampilkan.` : "QRIS default ditampilkan.");
+        setQrisNotice(error?.message ? `${error.message} Pakai QR statis.` : "QR statis aktif.");
       }
     }
 
@@ -178,6 +190,12 @@ export default function Pay() {
 
   const noteText = useMemo(() => String(notes || "").trim(), [notes]);
   const canShowQris = Boolean(customerWhatsApp && isWaValid);
+  const isDynamicQris = qrisMode === "dynamic";
+  const qrisFootText = canShowQris
+    ? isDynamicQris
+      ? "Nominal QR otomatis."
+      : "QR statis: bayar sesuai total."
+    : "QR akan terbuka otomatis.";
 
   const summaryText = useMemo(() => {
     const rows = items.map(
@@ -474,8 +492,10 @@ export default function Pay() {
                     )}
                   </div>
 
-                  <div className="pay-stageFoot">{canShowQris ? "Nominal QR sudah otomatis." : "QR akan terbuka otomatis."}</div>
-                  {canShowQris && qrisNotice ? <div className="hint subtle pay-stageNotice">{qrisNotice}</div> : null}
+                  <div className={`pay-stageFoot ${canShowQris && !isDynamicQris ? "warning" : ""}`}>{qrisFootText}</div>
+                  {canShowQris && qrisNotice ? (
+                    <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qrisNotice}</div>
+                  ) : null}
                 </div>
               </div>
             </section>
