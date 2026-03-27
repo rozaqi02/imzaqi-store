@@ -84,10 +84,14 @@ export async function fetchSettings() {
 }
 
 export async function upsertSetting(key, value) {
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("site_settings")
-    .upsert({ key, value }, { onConflict: "key" });
+    .update({ value, updated_at: new Date().toISOString() })
+    .eq("key", key)
+    .select("key")
+    .maybeSingle();
   if (error) throw error;
+  if (!data) throw new Error(`Setting ${key} tidak ditemukan di database.`);
 }
 
 export async function fetchPromoCodes() {
