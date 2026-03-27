@@ -99,7 +99,7 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-overlay{z-index:1400;display:grid;place-items:center;padding:16px;}
 .pay-successModal{width:min(440px,100%);background:rgba(8,14,26,.975);border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 120px rgba(0,0,0,.45);backdrop-filter:blur(20px);}
 .pay-successHead{padding-bottom:8px;}
-.pay-successHero{position:relative;overflow:hidden;border-radius:26px;border:1px solid rgba(22,199,166,.18);background:
+.pay-successHero{position:relative;overflow:hidden;border-radius:26px;border:1px solid rgba(31,215,255,.18);background:
   radial-gradient(120% 120% at 0% 0%, rgba(255,255,255,.12), rgba(0,0,0,0) 58%),
   linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
 padding:24px 18px 20px;text-align:center;}

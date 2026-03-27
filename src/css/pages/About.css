@@ -10,8 +10,8 @@
   inset: -10% 0 auto;
   height: 520px;
   background:
-    radial-gradient(520px 280px at 20% 14%, rgba(0, 214, 180, 0.14), rgba(0, 214, 180, 0) 68%),
-    radial-gradient(520px 280px at 80% 18%, rgba(123, 92, 255, 0.14), rgba(123, 92, 255, 0) 70%);
+    radial-gradient(520px 280px at 20% 14%, rgba(29, 131, 255, 0.14), rgba(29, 131, 255, 0) 68%),
+    radial-gradient(520px 280px at 80% 18%, rgba(75, 98, 255, 0.14), rgba(75, 98, 255, 0) 70%);
   pointer-events: none;
 }
 
@@ -106,8 +106,8 @@
   display: grid;
   place-items: center;
   border-radius: 16px;
-  background: rgba(0, 214, 180, 0.14);
-  color: #83ffe7;
+  background: rgba(29, 131, 255, 0.14);
+  color: #8fd9ff;
 }
 
 .about-valueCard p,
@@ -141,7 +141,7 @@
   inset: auto -20% -30% auto;
   width: 160px;
   height: 160px;
-  background: radial-gradient(circle at center, rgba(0, 214, 180, 0.16), rgba(0, 214, 180, 0));
+  background: radial-gradient(circle at center, rgba(29, 131, 255, 0.16), rgba(29, 131, 255, 0));
   pointer-events: none;
 }
 
@@ -167,7 +167,7 @@
   place-items: center;
   border-radius: 15px;
   background: rgba(255, 255, 255, 0.06);
-  color: #91ffe9;
+  color: #9adfff;
 }
 
 .about-flowCard h3 {
@@ -193,8 +193,8 @@
 }
 
 .about-faqItem.open {
-  border-color: rgba(0, 214, 180, 0.26);
-  background: rgba(0, 214, 180, 0.08);
+  border-color: rgba(29, 131, 255, 0.26);
+  background: rgba(29, 131, 255, 0.08);
 }
 
 .about-faqHead {
@@ -213,7 +213,7 @@
   border-radius: 28px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
-    radial-gradient(circle at top, rgba(123, 92, 255, 0.12), rgba(123, 92, 255, 0) 52%);
+    radial-gradient(circle at top, rgba(75, 98, 255, 0.12), rgba(75, 98, 255, 0) 52%);
 }
 
 @media (max-width: 720px) {
@@ -233,3 +233,4 @@
     max-width: 11ch;
   }
 }
+

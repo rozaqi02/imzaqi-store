@@ -1,6 +1,19 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Box, ClipboardList, Settings2, Star, Tags } from "lucide-react";
+import {
+  AlertTriangle,
+  Box,
+  ChevronDown,
+  ChevronUp,
+  ClipboardList,
+  Eye,
+  LayoutDashboard,
+  Search,
+  Settings2,
+  Star,
+  Tags,
+  Wallet,
+} from "lucide-react";
 
 import Modal from "../../components/Modal";
 import EmptyState from "../../components/EmptyState";
@@ -26,10 +39,30 @@ const CATEGORY_OPTIONS = [
   { value: "learning", label: "Belajar" },
   { value: "other", label: "Lainnya" },
 ];
+const ORDER_STATUS_OPTIONS = [
+  { value: "pending", label: "Pending" },
+  { value: "paid_reported", label: "Lapor Bayar" },
+  { value: "processing", label: "Diproses" },
+  { value: "done", label: "Sukses" },
+  { value: "cancelled", label: "Dibatalkan" },
+];
+const LIVE_ORDER_STATUSES = new Set(["pending", "paid_reported", "processing"]);
+const ANALYTICS_WINDOWS = [
+  { value: "7d", label: "7 hari" },
+  { value: "30d", label: "30 hari" },
+];
+const ORDER_SELECT_FULL =
+  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp,notes,admin_note";
+const ORDER_SELECT_FALLBACK =
+  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp";
 const CATEGORY_LABELS = CATEGORY_OPTIONS.reduce((acc, option) => {
   acc[option.value] = option.label;
   return acc;
 }, {});
+
+function getSafeOrderItems(order) {
+  return Array.isArray(order?.items) ? order.items : [];
+}
 
 function prettyStatus(status) {
   const s = String(status || "pending");
@@ -37,21 +70,27 @@ function prettyStatus(status) {
     pending: "Pending",
     processing: "Diproses",
     done: "Sukses",
-    // kompatibilitas status lama
-    paid_reported: "Pending",
+    paid_reported: "Lapor Bayar",
     cancelled: "Dibatalkan",
   };
   return map[s] || s;
 }
 
-function StatusBadge({ status }) {
+function getStatusTone(status) {
   const s = String(status || "pending");
-  const cls =
-    s === "done" ? "done" : s === "processing" ? "processing" : s === "cancelled" ? "cancelled" : "pending";
-  return <span className={"admin-status " + cls}>{prettyStatus(s)}</span>;
+  if (s === "done") return "done";
+  if (s === "processing") return "processing";
+  if (s === "paid_reported") return "reported";
+  if (s === "cancelled") return "cancelled";
+  return "pending";
+}
+
+function StatusBadge({ status }) {
+  return <span className={"admin-status " + getStatusTone(status)}>{prettyStatus(status)}</span>;
 }
 
 const TAB_ICONS = {
+  overview: LayoutDashboard,
   products: Box,
   orders: ClipboardList,
   promos: Tags,
@@ -60,7 +99,7 @@ const TAB_ICONS = {
 };
 
 function getOrderItemCount(order) {
-  return (order?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0);
+  return getSafeOrderItems(order).reduce((sum, item) => sum + Number(item?.qty || 0), 0);
 }
 
 function getOrderDiscountAmount(order) {
@@ -73,6 +112,76 @@ function prettyCategory(category) {
   return CATEGORY_LABELS[String(category || "other").toLowerCase()] || CATEGORY_LABELS.other;
 }
 
+function formatCompactNumber(value) {
+  return new Intl.NumberFormat("id-ID", {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  }).format(Number(value || 0));
+}
+
+function formatCompactIDR(value) {
+  const amount = Number(value || 0);
+  if (Math.abs(amount) >= 1000000) {
+    return `Rp${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(amount / 1000000)} jt`;
+  }
+  if (Math.abs(amount) >= 1000) {
+    return `Rp${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(amount / 1000)} rb`;
+  }
+  return formatIDR(amount);
+}
+
+function formatPercent(value, digits = 0) {
+  return `${Number(value || 0).toFixed(digits)}%`;
+}
+
+function formatAdminDate(value) {
+  if (!value) return "-";
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return new Intl.DateTimeFormat("id-ID", {
+    timeZone: "Asia/Jakarta",
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function formatDayLabel(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "-";
+  return new Intl.DateTimeFormat("id-ID", {
+    timeZone: "Asia/Jakarta",
+    day: "2-digit",
+    month: "short",
+  }).format(date);
+}
+
+function toDateKeyWIB(value) {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime())) return "";
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
+function normalizeWhatsApp(value) {
+  return String(value || "").replace(/[^\d]/g, "");
+}
+
+function buildWhatsAppLink(value) {
+  const digits = normalizeWhatsApp(value);
+  return digits ? `https://wa.me/${digits}` : "";
+}
+
+function clampPercent(value) {
+  return Math.max(0, Math.min(100, Number(value || 0)));
+}
+
 export default function AdminDashboard() {
   const nav = useNavigate();
   const toast = useToast();
@@ -82,21 +191,33 @@ export default function AdminDashboard() {
     description: "Kelola produk, varian, promo, testimoni, dan pesanan.",
   });
 
-  const [tab, setTab] = useState("products");
+  const [tab, setTab] = useState("overview");
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
+  const [lastSyncedAt, setLastSyncedAt] = useState("");
 
   const [products, setProducts] = useState([]);
   const [orders, setOrders] = useState([]);
   const [adminNoteDrafts, setAdminNoteDrafts] = useState({});
   const [promos, setPromos] = useState([]);
+  const [promoClaims, setPromoClaims] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [settings, setSettings] = useState({});
+  const [storePulse, setStorePulse] = useState({
+    total_views: 0,
+    today_views: 0,
+    total_orders: 0,
+    today_orders: 0,
+  });
+  const [analyticsWindow, setAnalyticsWindow] = useState("7d");
 
   // Products UI state
   const [productQuery, setProductQuery] = useState("");
   const [selectedProductId, setSelectedProductId] = useState("");
   const [productForm, setProductForm] = useState(null);
+  const [orderQuery, setOrderQuery] = useState("");
+  const [orderBucket, setOrderBucket] = useState("all");
+  const [expandedOrderId, setExpandedOrderId] = useState("");
 
   // Product modal
   const [productModalOpen, setProductModalOpen] = useState(false);
@@ -125,6 +246,10 @@ export default function AdminDashboard() {
     sort_order: 100,
   });
 
+  const [promoBulk, setPromoBulk] = useState("");
+  const [settingsWhatsApp, setSettingsWhatsApp] = useState("");
+  const deferredProductQuery = useDeferredValue(productQuery);
+  const deferredOrderQuery = useDeferredValue(orderQuery);
   const waNumber = settings?.whatsapp?.number || "";
 
   // ===== Auth guard =====
@@ -140,35 +265,98 @@ export default function AdminDashboard() {
   }
 
   // ===== Fetching =====
-  async function refreshProducts() {
-    const p = await fetchProducts({ includeInactive: true });
-    setProducts(p);
-  }
+  useEffect(() => {
+    setSettingsWhatsApp(waNumber);
+  }, [waNumber]);
 
-  async function refreshOrders() {
-    let query = supabase
-      .from("orders")
-      .select(
-        "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp,notes,admin_note"
-      )
-      .order("created_at", { ascending: false })
-      .limit(80);
-
+  async function fetchOrdersData() {
+    let query = supabase.from("orders").select(ORDER_SELECT_FULL).order("created_at", { ascending: false }).limit(1000);
     let { data, error } = await query;
 
-    // Keep dashboard usable if database migration for `notes` has not been run yet.
     if (error && /(notes|admin_note)/i.test(String(error?.message || ""))) {
       ({ data, error } = await supabase
         .from("orders")
-        .select(
-          "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp"
-        )
+        .select(ORDER_SELECT_FALLBACK)
         .order("created_at", { ascending: false })
-        .limit(80));
+        .limit(1000));
     }
 
     if (error) throw error;
-    setOrders(data || []);
+    return data || [];
+  }
+
+  async function fetchPromoClaimsData() {
+    try {
+      const { data, error } = await supabase
+        .from("promo_claims")
+        .select("id,visitor_id,code,claimed_at")
+        .order("claimed_at", { ascending: false })
+        .limit(1000);
+
+      if (error) throw error;
+      return data || [];
+    } catch (error) {
+      console.warn("Gagal memuat promo_claims", error);
+      return [];
+    }
+  }
+
+  async function fetchStorePulse() {
+    try {
+      const { data: stats, error } = await supabase.rpc("get_public_stats");
+      if (!error && stats) {
+        return {
+          total_views: Number(stats.total_views || 0),
+          today_views: Number(stats.today_views || 0),
+          total_orders: Number(stats.total_orders || 0),
+          today_orders: Number(stats.today_orders || 0),
+        };
+      }
+    } catch (error) {
+      console.warn("Gagal memuat get_public_stats", error);
+    }
+
+    try {
+      const { data, error } = await supabase.from("site_stats").select("total_views,today_views,last_date").maybeSingle();
+      if (!error && data) {
+        return {
+          total_views: Number(data.total_views || 0),
+          today_views: Number(data.today_views || 0),
+          total_orders: 0,
+          today_orders: 0,
+          last_date: data.last_date || "",
+        };
+      }
+    } catch (error) {
+      console.warn("Gagal memuat site_stats", error);
+    }
+
+    return {
+      total_views: 0,
+      today_views: 0,
+      total_orders: 0,
+      today_orders: 0,
+    };
+  }
+
+  async function loadOrdersAndPulse() {
+    const [nextOrders, nextPulse] = await Promise.all([fetchOrdersData(), fetchStorePulse()]);
+    setOrders(nextOrders);
+    setStorePulse(nextPulse);
+    setLastSyncedAt(new Date().toISOString());
+    return nextOrders;
+  }
+
+  async function refreshProducts() {
+    const nextProducts = await fetchProducts({ includeInactive: true });
+    setProducts(nextProducts);
+    return nextProducts;
+  }
+
+  async function refreshOrders() {
+    const [nextOrders, nextClaims] = await Promise.all([loadOrdersAndPulse(), fetchPromoClaimsData()]);
+    setPromoClaims(nextClaims);
+    return nextOrders;
   }
 
   async function refreshAll() {
@@ -223,14 +411,14 @@ export default function AdminDashboard() {
   }, [orders]);
 
   const filteredProducts = useMemo(() => {
-    const q = String(productQuery || "").trim().toLowerCase();
+    const q = String(deferredProductQuery || "").trim().toLowerCase();
     if (!q) return products;
     return (products || []).filter((p) => {
       const name = String(p.name || "").toLowerCase();
       const slug = String(p.slug || "").toLowerCase();
       return name.includes(q) || slug.includes(q);
     });
-  }, [products, productQuery]);
+  }, [deferredProductQuery, products]);
 
   const selectedProduct = useMemo(() => {
     return (products || []).find((p) => p.id === selectedProductId) || null;
@@ -242,19 +430,219 @@ export default function AdminDashboard() {
       .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   }, [selectedProduct]);
 
-  const dashboardStats = useMemo(() => {
-    const activeProducts = (products || []).filter((product) => product.is_active).length;
-    const pendingOrders = (orders || []).filter((order) => String(order.status || "pending") === "pending").length;
-    const activePromos = (promos || []).filter((promo) => promo.is_active).length;
-    const activeTestimonials = (testimonials || []).filter((item) => item.is_active).length;
+  const allVariants = useMemo(() => {
+    return (products || []).flatMap((product) => product.product_variants || []);
+  }, [products]);
 
+  const analyticsDays = analyticsWindow === "30d" ? 30 : 7;
+
+  const analyticsSummary = useMemo(() => {
+    const now = new Date();
+    const start = new Date(now);
+    start.setDate(start.getDate() - (analyticsDays - 1));
+    start.setHours(0, 0, 0, 0);
+
+    const todayKey = toDateKeyWIB(now);
+    const orderRows = Array.isArray(orders) ? orders : [];
+    const productMap = new Map((products || []).map((product) => [product.id, product]));
+    const trendMap = new Map();
+
+    for (let offset = analyticsDays - 1; offset >= 0; offset -= 1) {
+      const day = new Date(now);
+      day.setDate(day.getDate() - offset);
+      const key = toDateKeyWIB(day);
+      trendMap.set(key, { key, label: formatDayLabel(day), orders: 0, revenue: 0 });
+    }
+
+    const statusMap = ORDER_STATUS_OPTIONS.reduce((acc, option) => {
+      acc[option.value] = 0;
+      return acc;
+    }, {});
+
+    const topProductsMap = new Map();
+    const categoryMap = new Map();
+    const promoUsageMap = new Map();
+
+    let revenueTotal = 0;
+    let revenueWindow = 0;
+    let todayRevenue = 0;
+    let todayOrders = 0;
+    let doneOrders = 0;
+    let pipelineValue = 0;
+    let discountTotal = 0;
+
+    orderRows.forEach((order) => {
+      const status = String(order?.status || "pending");
+      const createdAt = new Date(order?.created_at || Date.now());
+      const total = Number(order?.total_idr || 0);
+      const discountAmount = getOrderDiscountAmount(order);
+      const orderKey = toDateKeyWIB(createdAt);
+      const inWindow = createdAt >= start;
+
+      statusMap[status] = (statusMap[status] || 0) + 1;
+
+      if (LIVE_ORDER_STATUSES.has(status)) {
+        pipelineValue += total;
+      }
+
+      if (status === "done") {
+        revenueTotal += total;
+        doneOrders += 1;
+        discountTotal += discountAmount;
+
+        if (inWindow) revenueWindow += total;
+        if (orderKey === todayKey) todayRevenue += total;
+      }
+
+      if (orderKey === todayKey) {
+        todayOrders += 1;
+      }
+
+      if (inWindow && trendMap.has(orderKey)) {
+        const point = trendMap.get(orderKey);
+        point.orders += 1;
+        if (status === "done") point.revenue += total;
+      }
+
+      if (order?.promo_code) {
+        const code = String(order.promo_code).toUpperCase();
+        const promoEntry = promoUsageMap.get(code) || { code, orders: 0, revenue: 0 };
+        promoEntry.orders += 1;
+        promoEntry.revenue += total;
+        promoUsageMap.set(code, promoEntry);
+      }
+
+      getSafeOrderItems(order).forEach((item) => {
+        const label = String(item?.product_name || item?.variant_name || "Tanpa nama");
+        const qty = Number(item?.qty || 0);
+        const revenue = Number(item?.price_idr || 0) * qty;
+        const productEntry = topProductsMap.get(label) || { name: label, quantity: 0, revenue: 0 };
+        productEntry.quantity += qty;
+        productEntry.revenue += revenue;
+        topProductsMap.set(label, productEntry);
+
+        const productId = item?.product_id;
+        const category = prettyCategory(productMap.get(productId)?.category || "other");
+        const categoryEntry = categoryMap.get(category) || { category, quantity: 0, revenue: 0 };
+        categoryEntry.quantity += qty;
+        categoryEntry.revenue += revenue;
+        categoryMap.set(category, categoryEntry);
+      });
+    });
+
+    const stockAlerts = allVariants
+      .filter((variant) => variant?.is_active && Number(variant?.stock || 0) <= 3)
+      .sort((a, b) => Number(a?.stock || 0) - Number(b?.stock || 0))
+      .slice(0, 6);
+
+    const trend = Array.from(trendMap.values());
+    const maxOrders = Math.max(1, ...trend.map((point) => point.orders));
+    const maxRevenue = Math.max(1, ...trend.map((point) => point.revenue));
+
+    return {
+      revenueTotal,
+      revenueWindow,
+      todayRevenue,
+      todayOrders,
+      doneOrders,
+      pipelineValue,
+      discountTotal,
+      averageOrderValue: doneOrders ? revenueTotal / doneOrders : 0,
+      trend,
+      maxOrders,
+      maxRevenue,
+      statusMap,
+      topProducts: Array.from(topProductsMap.values())
+        .sort((a, b) => b.quantity - a.quantity)
+        .slice(0, 5),
+      categories: Array.from(categoryMap.values())
+        .sort((a, b) => b.revenue - a.revenue)
+        .slice(0, 4),
+      promoUsage: Array.from(promoUsageMap.values())
+        .sort((a, b) => b.orders - a.orders)
+        .slice(0, 5),
+      stockAlerts,
+      conversionRatio: storePulse.total_views ? (orders.length / storePulse.total_views) * 100 : 0,
+      activeProducts: (products || []).filter((product) => product.is_active).length,
+      inactiveProducts: (products || []).filter((product) => !product.is_active).length,
+      activePromos: (promos || []).filter((promo) => promo.is_active).length,
+      activeTestimonials: (testimonials || []).filter((item) => item.is_active).length,
+    };
+  }, [allVariants, analyticsDays, orders, products, promos, storePulse.total_views, testimonials]);
+
+  const dashboardStats = useMemo(() => {
     return [
-      { key: "products", label: "Produk aktif", value: activeProducts },
-      { key: "orders", label: "Order pending", value: pendingOrders },
-      { key: "promos", label: "Promo aktif", value: activePromos },
-      { key: "testimonials", label: "Testimoni aktif", value: activeTestimonials },
+      {
+        key: "revenue",
+        label: `Revenue ${analyticsWindow}`,
+        value: formatCompactIDR(analyticsSummary.revenueWindow),
+        helper: `${analyticsSummary.doneOrders} order sukses`,
+        icon: Wallet,
+      },
+      {
+        key: "pipeline",
+        label: "Butuh tindak lanjut",
+        value: `${orders.filter((order) => LIVE_ORDER_STATUSES.has(String(order.status || "pending"))).length}`,
+        helper: formatCompactIDR(analyticsSummary.pipelineValue),
+        icon: ClipboardList,
+      },
+      {
+        key: "traffic",
+        label: "Views hari ini",
+        value: formatCompactNumber(storePulse.today_views),
+        helper: `${storePulse.today_orders || analyticsSummary.todayOrders} order masuk`,
+        icon: Eye,
+      },
+      {
+        key: "stock",
+        label: "Stok menipis",
+        value: `${analyticsSummary.stockAlerts.length}`,
+        helper: analyticsSummary.stockAlerts.length ? "Perlu restock" : "Semua aman",
+        icon: AlertTriangle,
+      },
     ];
-  }, [orders, products, promos, testimonials]);
+  }, [analyticsSummary, analyticsWindow, orders, storePulse.today_orders, storePulse.today_views]);
+
+  const orderStats = useMemo(() => {
+    return {
+      total: orders.length,
+      live: orders.filter((order) => LIVE_ORDER_STATUSES.has(String(order.status || "pending"))).length,
+      done: orders.filter((order) => String(order.status || "pending") === "done").length,
+      cancelled: orders.filter((order) => String(order.status || "pending") === "cancelled").length,
+    };
+  }, [orders]);
+
+  const filteredOrders = useMemo(() => {
+    const query = String(deferredOrderQuery || "").trim().toLowerCase();
+
+    return (orders || []).filter((order) => {
+      const status = String(order?.status || "pending");
+      const matchesBucket =
+        orderBucket === "all"
+          ? true
+          : orderBucket === "attention"
+            ? LIVE_ORDER_STATUSES.has(status)
+            : status === orderBucket;
+
+      if (!matchesBucket) return false;
+      if (!query) return true;
+
+      const haystacks = [
+        order?.order_code,
+        order?.customer_whatsapp,
+        order?.promo_code,
+        order?.notes,
+        order?.admin_note,
+        ...getSafeOrderItems(order).flatMap((item) => [item?.product_name, item?.variant_name, item?.duration_label]),
+      ];
+
+      return haystacks.some((value) => String(value || "").toLowerCase().includes(query));
+    });
+  }, [deferredOrderQuery, orderBucket, orders]);
+
+  const expandedOrder = useMemo(() => {
+    return filteredOrders.find((order) => order.id === expandedOrderId) || null;
+  }, [expandedOrderId, filteredOrders]);
 
   // Keep an editable form in sync with the selected product
   useEffect(() => {
@@ -577,7 +965,6 @@ export default function AdminDashboard() {
   }
 
   // ===== Promo actions =====
-  const [promoBulk, setPromoBulk] = useState("");
 
   async function addPromoBulk() {
     const lines = String(promoBulk || "")
@@ -726,6 +1113,7 @@ export default function AdminDashboard() {
     try {
       await upsertSetting("whatsapp", { number: n });
       setSettings(await fetchSettings());
+      setSettingsWhatsApp(n);
       toast.remove(tid);
       toast.success("Disimpan", { duration: 1200 });
     } catch (e) {
@@ -737,15 +1125,24 @@ export default function AdminDashboard() {
 
   // ===== Render =====
   const tabs = [
-    { id: "products", label: "Produk", hint: "Produk & varian" },
-    { id: "orders", label: "Orders", hint: "Status & catatan" },
-    { id: "promos", label: "Promo", hint: "Kode diskon" },
+    { id: "overview", label: "Overview", hint: "Analitik dan ringkasan toko" },
+    { id: "products", label: "Produk", hint: "Katalog dan paket" },
+    { id: "orders", label: "Orders", hint: "Antrean order dan follow-up" },
+    { id: "promos", label: "Promo", hint: "Kode diskon dan klaim" },
     { id: "testimonials", label: "Testimoni", hint: "Bukti pelanggan" },
-    { id: "settings", label: "Settings", hint: "WA & QRIS" },
+    { id: "settings", label: "Settings", hint: "WA dan operasional" },
   ];
 
   const activeTab = tabs.find((item) => item.id === tab) || tabs[0];
   const ActiveTabIcon = TAB_ICONS[activeTab.id] || Box;
+  const tabMeta = {
+    overview: `${analyticsSummary.todayOrders} hari ini`,
+    products: `${products.length} produk`,
+    orders: `${orderStats.live} aktif`,
+    promos: `${analyticsSummary.activePromos} aktif`,
+    testimonials: `${analyticsSummary.activeTestimonials} on`,
+    settings: normalizeWhatsApp(settingsWhatsApp || waNumber) ? "WA siap" : "WA kosong",
+  };
 
   return (
     <div className="page admin-page">
@@ -760,12 +1157,25 @@ export default function AdminDashboard() {
               </div>
             </div>
 
+            <div className="admin-sidebarPulseGrid">
+              <div className="admin-sidebarPulse">
+                <span>Hari ini</span>
+                <strong>{analyticsSummary.todayOrders}</strong>
+                <small>order masuk</small>
+              </div>
+              <div className="admin-sidebarPulse">
+                <span>Revenue</span>
+                <strong>{formatCompactIDR(analyticsSummary.todayRevenue)}</strong>
+                <small>update harian</small>
+              </div>
+            </div>
+
             <nav className="admin-nav">
               {tabs.map((t) => (
                 <button
                   key={t.id}
                   className={"admin-nav-btn " + (tab === t.id ? "active" : "")}
-                  onClick={() => setTab(t.id)}
+                  onClick={() => startTransition(() => setTab(t.id))}
                 >
                   <span className="admin-nav-icon">
                     {React.createElement(TAB_ICONS[t.id] || Box, { size: 16 })}
@@ -774,6 +1184,7 @@ export default function AdminDashboard() {
                     <strong>{t.label}</strong>
                     <small>{t.hint}</small>
                   </span>
+                  <span className="admin-nav-badge">{tabMeta[t.id]}</span>
                 </button>
               ))}
             </nav>
@@ -793,7 +1204,7 @@ export default function AdminDashboard() {
               <div className="admin-topbarCopy">
                 <div className="admin-topbar-eyebrow">{activeTab.label}</div>
                 <h1 className="h2">Dashboard Admin</h1>
-                <div className="muted">Kelola produk, order, promo, dan testimoni dari satu tempat.</div>
+                <div className="muted">Tampilan baru yang lebih nyaman di mobile, lebih lega di desktop, dan lebih cepat dibaca saat operasional padat.</div>
               </div>
 
               <div className="admin-topbar-current">
@@ -802,14 +1213,14 @@ export default function AdminDashboard() {
                 </span>
                 <div>
                   <strong>{activeTab.label}</strong>
-                  <span>{loading ? "Sinkronisasi data..." : activeTab.hint}</span>
+                  <span>{loading ? "Sinkronisasi data..." : lastSyncedAt ? `Sync ${formatAdminDate(lastSyncedAt)}` : activeTab.hint}</span>
                 </div>
               </div>
             </div>
 
             <div className="admin-stats">
               {dashboardStats.map((stat) => {
-                const StatIcon = TAB_ICONS[stat.key] || Box;
+                const StatIcon = stat.icon || TAB_ICONS[stat.key] || Box;
                 return (
                   <div key={stat.key} className="admin-statCard">
                     <span className="admin-statIcon">
@@ -817,6 +1228,7 @@ export default function AdminDashboard() {
                     </span>
                     <span className="admin-statLabel">{stat.label}</span>
                     <strong className="admin-statValue">{stat.value}</strong>
+                    <span className="admin-statHelper">{stat.helper}</span>
                   </div>
                 );
               })}
@@ -828,13 +1240,246 @@ export default function AdminDashboard() {
               </div>
             ) : null}
 
+            {tab === "overview" ? (
+              <div className="admin-overview">
+                <div className="admin-panel admin-overviewHero">
+                  <div className="admin-panel-body">
+                    <div className="admin-overviewHeroTop">
+                      <div>
+                        <div className="admin-topbar-eyebrow">Business Snapshot</div>
+                        <div className="admin-heroTitle">Satu layar untuk membaca kondisi toko hari ini.</div>
+                        <div className="admin-panel-sub">
+                          Revenue, order masuk, stok tipis, dan performa promo dibungkus jadi ringkasan yang cepat dipahami.
+                        </div>
+                      </div>
+
+                      <div className="admin-chipRow">
+                        {ANALYTICS_WINDOWS.map((option) => (
+                          <button
+                            key={option.value}
+                            type="button"
+                            className={`admin-chip ${analyticsWindow === option.value ? "active" : ""}`}
+                            onClick={() => setAnalyticsWindow(option.value)}
+                          >
+                            {option.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    <div className="admin-miniGrid admin-miniGridHero">
+                      <div className="admin-miniCard">
+                        <span>Revenue total</span>
+                        <strong>{formatCompactIDR(analyticsSummary.revenueTotal)}</strong>
+                        <small>{analyticsSummary.doneOrders} order sukses</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Revenue hari ini</span>
+                        <strong>{formatCompactIDR(analyticsSummary.todayRevenue)}</strong>
+                        <small>{analyticsSummary.todayOrders} order masuk</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Rata-rata order</span>
+                        <strong>{formatCompactIDR(analyticsSummary.averageOrderValue)}</strong>
+                        <small>Nilai order selesai</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Konversi kasar</span>
+                        <strong>{formatPercent(analyticsSummary.conversionRatio, 1)}</strong>
+                        <small>{formatCompactNumber(storePulse.total_views)} total views</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="admin-overviewGrid">
+                  <div className="admin-panel admin-panelWide">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Tren order dan revenue</div>
+                        <div className="admin-panel-sub">Order masuk dan revenue selesai per hari untuk membaca ritme toko.</div>
+                      </div>
+                    </div>
+
+                    <div className="admin-panel-body">
+                      <div className="admin-chartList">
+                        {analyticsSummary.trend.map((point) => (
+                          <div key={point.key} className="admin-chartRow">
+                            <div className="admin-chartLabel">
+                              <strong>{point.label}</strong>
+                              <small>{point.orders} order</small>
+                            </div>
+                            <div className="admin-chartBars">
+                              <div className="admin-chartTrack">
+                                <span
+                                  className="admin-chartBar orders"
+                                  style={{ width: `${clampPercent((point.orders / analyticsSummary.maxOrders) * 100)}%` }}
+                                />
+                              </div>
+                              <div className="admin-chartTrack">
+                                <span
+                                  className="admin-chartBar revenue"
+                                  style={{ width: `${clampPercent((point.revenue / analyticsSummary.maxRevenue) * 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="admin-chartValue">
+                              <strong>{formatCompactIDR(point.revenue)}</strong>
+                              <small>Revenue</small>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Status order</div>
+                        <div className="admin-panel-sub">Baca distribusi antrean untuk melihat prioritas follow-up.</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      {ORDER_STATUS_OPTIONS.map((option) => {
+                        const count = analyticsSummary.statusMap[option.value] || 0;
+                        const ratio = orders.length ? (count / orders.length) * 100 : 0;
+                        return (
+                          <div key={option.value} className="admin-statusMetric">
+                            <div className="admin-statusMetricTop">
+                              <span>{option.label}</span>
+                              <strong>{count}</strong>
+                            </div>
+                            <div className="admin-progress">
+                              <span style={{ width: `${clampPercent(ratio)}%` }} />
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Produk paling laku</div>
+                        <div className="admin-panel-sub">Dibaca dari item dalam order yang masuk.</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      {analyticsSummary.topProducts.length ? (
+                        analyticsSummary.topProducts.map((item, index) => (
+                          <div key={item.name} className="admin-rankItem">
+                            <div className="admin-rankIndex">#{index + 1}</div>
+                            <div className="admin-rankCopy">
+                              <strong>{item.name}</strong>
+                              <small>{item.quantity} item terjual</small>
+                            </div>
+                            <div className="admin-rankMeta">{formatCompactIDR(item.revenue)}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="admin-emptyInline">Belum ada cukup data penjualan untuk dirangkum.</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Promo dan kategori</div>
+                        <div className="admin-panel-sub">Gabungkan insight kategori, promo aktif, dan klaim promo.</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      <div className="admin-miniGrid">
+                        <div className="admin-miniCard">
+                          <span>Promo aktif</span>
+                          <strong>{analyticsSummary.activePromos}</strong>
+                          <small>{promoClaims.length} total claim</small>
+                        </div>
+                        <div className="admin-miniCard">
+                          <span>Produk aktif</span>
+                          <strong>{analyticsSummary.activeProducts}</strong>
+                          <small>{analyticsSummary.inactiveProducts} nonaktif</small>
+                        </div>
+                      </div>
+
+                      {analyticsSummary.categories.length ? (
+                        analyticsSummary.categories.map((item) => (
+                          <div key={item.category} className="admin-rankItem compact">
+                            <div className="admin-rankCopy">
+                              <strong>{item.category}</strong>
+                              <small>{item.quantity} item</small>
+                            </div>
+                            <div className="admin-rankMeta">{formatCompactIDR(item.revenue)}</div>
+                          </div>
+                        ))
+                      ) : null}
+
+                      {analyticsSummary.promoUsage.length ? (
+                        analyticsSummary.promoUsage.map((item) => (
+                          <div key={item.code} className="admin-rankItem compact">
+                            <div className="admin-rankCopy">
+                              <strong>{item.code}</strong>
+                              <small>{item.orders} order memakai promo ini</small>
+                            </div>
+                            <div className="admin-rankMeta">{formatCompactIDR(item.revenue)}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="admin-emptyInline">Belum ada promo yang dipakai dalam checkout.</div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Traffic dan stok</div>
+                        <div className="admin-panel-sub">Hubungkan traffic halaman dengan kesiapan stok paket.</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      <div className="admin-miniGrid">
+                        <div className="admin-miniCard">
+                          <span>Total views</span>
+                          <strong>{formatCompactNumber(storePulse.total_views)}</strong>
+                          <small>{formatCompactNumber(storePulse.today_views)} views hari ini</small>
+                        </div>
+                        <div className="admin-miniCard">
+                          <span>Pipeline</span>
+                          <strong>{formatCompactIDR(analyticsSummary.pipelineValue)}</strong>
+                          <small>{orderStats.live} order butuh aksi</small>
+                        </div>
+                      </div>
+
+                      {analyticsSummary.stockAlerts.length ? (
+                        analyticsSummary.stockAlerts.map((variant) => (
+                          <div key={variant.id} className="admin-alertItem">
+                            <div>
+                              <strong>{variant.name}</strong>
+                              <small>{variant.duration_label || "Tanpa durasi"}</small>
+                            </div>
+                            <div className="admin-rankMeta">Sisa {variant.stock}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="admin-emptyInline">Belum ada stok kritis. Kondisi katalog cukup aman.</div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
             {tab === "products" ? (
               <div className="admin-products">
                 <div className="admin-panel">
                   <div className="admin-panel-head">
                     <div>
-                      <div className="admin-panel-title">Daftar Produk</div>
-                      <div className="admin-panel-sub">Pilih produk untuk edit & kelola paket.</div>
+                      <div className="admin-panel-title">Daftar produk</div>
+                      <div className="admin-panel-sub">Cari produk, cek status aktif, lalu edit paketnya dari panel sebelah.</div>
                     </div>
                     <button className="btn btn-sm" onClick={openCreateProduct}>
                       + Produk
@@ -848,6 +1493,19 @@ export default function AdminDashboard() {
                       value={productQuery}
                       onChange={(e) => setProductQuery(e.target.value)}
                     />
+
+                    <div className="admin-miniGrid" style={{ marginTop: 14, marginBottom: 14 }}>
+                      <div className="admin-miniCard">
+                        <span>Total produk</span>
+                        <strong>{products.length}</strong>
+                        <small>{analyticsSummary.activeProducts} aktif</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Total varian</span>
+                        <strong>{allVariants.length}</strong>
+                        <small>{analyticsSummary.stockAlerts.length} stok tipis</small>
+                      </div>
+                    </div>
 
                     <div className="admin-list" style={{ marginTop: 10 }}>
                       {(filteredProducts || []).map((p) => (
@@ -1078,6 +1736,276 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "orders" ? (
+              <div className="admin-ordersLayout">
+                <div className="admin-panel">
+                  <div className="admin-panel-head">
+                    <div>
+                      <div className="admin-panel-title">Queue order</div>
+                      <div className="admin-panel-sub">Antrean order dibuat lebih cepat dibaca, dicari, dan di-follow-up dari layar kecil maupun besar.</div>
+                    </div>
+                    <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>
+                      Refresh orders
+                    </button>
+                  </div>
+
+                  <div className="admin-panel-body">
+                    <div className="admin-orderToolbar">
+                      <div className="admin-searchRow">
+                        <Search size={16} />
+                        <input
+                          className="input admin-searchInput"
+                          value={orderQuery}
+                          onChange={(e) => setOrderQuery(e.target.value)}
+                          placeholder="Cari kode, WA, promo, atau nama produk..."
+                        />
+                      </div>
+
+                      <div className="admin-chipRow">
+                        <button type="button" className={`admin-chip ${orderBucket === "all" ? "active" : ""}`} onClick={() => setOrderBucket("all")}>
+                          Semua
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderBucket === "attention" ? "active" : ""}`}
+                          onClick={() => setOrderBucket("attention")}
+                        >
+                          Butuh aksi
+                        </button>
+                        <button type="button" className={`admin-chip ${orderBucket === "done" ? "active" : ""}`} onClick={() => setOrderBucket("done")}>
+                          Selesai
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderBucket === "cancelled" ? "active" : ""}`}
+                          onClick={() => setOrderBucket("cancelled")}
+                        >
+                          Batal
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="admin-miniGrid" style={{ marginTop: 14 }}>
+                      <div className="admin-miniCard">
+                        <span>Total order</span>
+                        <strong>{orderStats.total}</strong>
+                        <small>Semua status</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Perlu aksi</span>
+                        <strong>{orderStats.live}</strong>
+                        <small>{formatCompactIDR(analyticsSummary.pipelineValue)}</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Selesai</span>
+                        <strong>{orderStats.done}</strong>
+                        <small>{formatCompactIDR(analyticsSummary.revenueTotal)}</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Dibatalkan</span>
+                        <strong>{orderStats.cancelled}</strong>
+                        <small>Perlu review bila naik</small>
+                      </div>
+                    </div>
+
+                    {filteredOrders.length === 0 ? (
+                      <div className="card pad" style={{ marginTop: 16 }}>
+                        <EmptyState icon="ORD" title="Order tidak ditemukan" description="Coba ubah filter atau kata kunci pencarian." />
+                      </div>
+                    ) : (
+                      <div className="admin-ordersFeed" style={{ marginTop: 16 }}>
+                        {filteredOrders.map((o) => {
+                          const itemCount = getOrderItemCount(o);
+                          const discountAmount = getOrderDiscountAmount(o);
+                          const isOpen = expandedOrderId === o.id;
+                          const whatsappLink = buildWhatsAppLink(o.customer_whatsapp);
+
+                          return (
+                            <article key={o.id} className={`admin-orderCardModern ${isOpen ? "open" : ""}`}>
+                              <button
+                                type="button"
+                                className="admin-orderSummary"
+                                onClick={() => setExpandedOrderId((prev) => (prev === o.id ? "" : o.id))}
+                              >
+                                <div className="admin-orderSummaryMain">
+                                  <div className="admin-order-code">{o.order_code || o.id}</div>
+                                  <div className="admin-order-sub">
+                                    {formatAdminDate(o.created_at)} • {itemCount} item • {o.customer_whatsapp || "Tanpa WA"}
+                                  </div>
+                                </div>
+
+                                <div className="admin-orderSummarySide">
+                                  <StatusBadge status={o.status} />
+                                  <strong>{formatIDR(o.total_idr)}</strong>
+                                  <span className="admin-chevron">{isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
+                                </div>
+                              </button>
+
+                              {isOpen ? (
+                                <div className="admin-orderBodyModern">
+                                  <div className="admin-orderMetaGrid">
+                                    <div className="admin-orderMetaCard">
+                                      <span>Kontak customer</span>
+                                      <strong>{o.customer_whatsapp || "-"}</strong>
+                                      {whatsappLink ? (
+                                        <a href={whatsappLink} target="_blank" rel="noreferrer">
+                                          Chat WhatsApp
+                                        </a>
+                                      ) : (
+                                        <small>Tidak ada nomor WA</small>
+                                      )}
+                                    </div>
+                                    <div className="admin-orderMetaCard">
+                                      <span>Status sekarang</span>
+                                      <strong>{prettyStatus(o.status)}</strong>
+                                      <small>{o.promo_code ? `Promo ${o.promo_code}` : "Tanpa promo"}</small>
+                                    </div>
+                                    <div className="admin-orderMetaCard">
+                                      <span>Update status</span>
+                                      <select
+                                        className="input admin-select"
+                                        value={String(o.status || "pending")}
+                                        onChange={(e) => updateOrderStatus(o.id, e.target.value)}
+                                      >
+                                        {ORDER_STATUS_OPTIONS.map((option) => (
+                                          <option key={option.value} value={option.value}>
+                                            {option.label}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+                                  </div>
+
+                                  <div className="admin-order-items">
+                                    {getSafeOrderItems(o).map((it, idx) => (
+                                      <div key={`${o.id}-${idx}`} className="admin-order-item">
+                                        <div>
+                                          <b>{it.product_name}</b>
+                                          <div className="muted" style={{ fontSize: 12 }}>
+                                            {it.variant_name} • {it.duration_label}
+                                          </div>
+                                        </div>
+                                        <div className="admin-order-itemPrice">
+                                          <strong>{it.qty}x</strong>
+                                          <span>{formatIDR(it.price_idr)}</span>
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+
+                                  <div className="admin-order-pricing">
+                                    <div className="admin-order-priceRow">
+                                      <span>Subtotal</span>
+                                      <b>{formatIDR(o.subtotal_idr)}</b>
+                                    </div>
+                                    <div className="admin-order-priceRow">
+                                      <span>Diskon {o.discount_percent ? `(${o.discount_percent}%)` : ""}</span>
+                                      <b>- {formatIDR(discountAmount)}</b>
+                                    </div>
+                                    <div className="admin-order-priceRow total">
+                                      <span>Total bayar</span>
+                                      <b>{formatIDR(o.total_idr)}</b>
+                                    </div>
+                                  </div>
+
+                                  <div className={"admin-order-notes" + (o.notes ? "" : " empty")}>
+                                    <div className="admin-order-notesTitle">Catatan customer</div>
+                                    <div>{o.notes || "Tidak ada catatan tambahan."}</div>
+                                  </div>
+
+                                  <div className="admin-order-adminNote">
+                                    <div className="admin-order-notesTitle">Catatan admin</div>
+                                    <textarea
+                                      className="input admin-textarea"
+                                      rows={3}
+                                      value={adminNoteDrafts[o.id] || ""}
+                                      onChange={(e) => setAdminNoteDrafts((prev) => ({ ...prev, [o.id]: e.target.value }))}
+                                      placeholder="Tulis instruksi internal atau bahan follow-up."
+                                    />
+                                    <div className="admin-order-adminActions">
+                                      <button className="btn btn-sm" type="button" onClick={() => saveOrderAdminNote(o.id)}>
+                                        Simpan catatan
+                                      </button>
+                                      {o.payment_proof_url ? (
+                                        <a className="admin-proof" href={o.payment_proof_url} target="_blank" rel="noreferrer">
+                                          Lihat bukti bayar
+                                        </a>
+                                      ) : (
+                                        <span className="muted" style={{ fontSize: 13 }}>
+                                          Tanpa bukti bayar
+                                        </span>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              ) : null}
+                            </article>
+                          );
+                        })}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                <div className="admin-panel admin-sidePanel">
+                  <div className="admin-panel-head">
+                    <div>
+                      <div className="admin-panel-title">Focus panel</div>
+                      <div className="admin-panel-sub">Ringkasan cepat order yang sedang dibuka dan antrean aktif hari ini.</div>
+                    </div>
+                  </div>
+                  <div className="admin-panel-body admin-stack">
+                    {expandedOrder ? (
+                      <>
+                        <div className="admin-miniGrid">
+                          <div className="admin-miniCard">
+                            <span>Order aktif</span>
+                            <strong>{expandedOrder.order_code || expandedOrder.id}</strong>
+                            <small>{prettyStatus(expandedOrder.status)}</small>
+                          </div>
+                          <div className="admin-miniCard">
+                            <span>Total</span>
+                            <strong>{formatCompactIDR(expandedOrder.total_idr)}</strong>
+                            <small>{getOrderItemCount(expandedOrder)} item</small>
+                          </div>
+                        </div>
+
+                        <div className="admin-focusList">
+                          <div className="admin-focusRow">
+                            <span>Masuk</span>
+                            <strong>{formatAdminDate(expandedOrder.created_at)}</strong>
+                          </div>
+                          <div className="admin-focusRow">
+                            <span>Promo</span>
+                            <strong>{expandedOrder.promo_code || "-"}</strong>
+                          </div>
+                          <div className="admin-focusRow">
+                            <span>WhatsApp</span>
+                            <strong>{expandedOrder.customer_whatsapp || "-"}</strong>
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="admin-emptyInline">Buka salah satu order untuk melihat detail cepat di panel ini.</div>
+                    )}
+
+                    <div className="admin-miniGrid">
+                      <div className="admin-miniCard">
+                        <span>Order hari ini</span>
+                        <strong>{analyticsSummary.todayOrders}</strong>
+                        <small>{formatCompactIDR(analyticsSummary.todayRevenue)}</small>
+                      </div>
+                      <div className="admin-miniCard">
+                        <span>Pending + proses</span>
+                        <strong>{orderStats.live}</strong>
+                        <small>Antrian aktif sekarang</small>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : null}
+
+            {false ? (
               <div className="admin-panel">
                 <div className="admin-panel-head">
                   <div>
@@ -1294,33 +2222,60 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "settings" ? (
-              <div className="admin-panel">
-                <div className="admin-panel-head">
-                  <div>
-                    <div className="admin-panel-title">Settings</div>
-                    <div className="admin-panel-sub">Pengaturan sederhana untuk toko.</div>
+              <div className="admin-overviewGrid">
+                <div className="admin-panel admin-panelWide">
+                  <div className="admin-panel-head">
+                    <div>
+                      <div className="admin-panel-title">Settings operasional</div>
+                      <div className="admin-panel-sub">Area ini disederhanakan agar update nomor admin tetap nyaman dilakukan dari mobile.</div>
+                    </div>
+                  </div>
+
+                  <div className="admin-panel-body">
+                    <div className="admin-form-grid">
+                      <label className="admin-field admin-field-full">
+                        <span>WhatsApp Admin</span>
+                        <input
+                          className="input"
+                          value={settingsWhatsApp}
+                          placeholder="62813..."
+                          onChange={(e) => setSettingsWhatsApp(e.target.value)}
+                        />
+                        <div className="hint subtle">Gunakan format angka agar tombol chat customer tetap konsisten.</div>
+                      </label>
+                    </div>
+
+                    <div className="admin-form-actions">
+                      <button className="btn" type="button" onClick={() => saveWhatsApp(settingsWhatsApp)}>
+                        Simpan WhatsApp
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                <div className="admin-panel-body">
-                  <div className="admin-form-grid">
-                    <label className="admin-field admin-field-full">
-                      <span>WhatsApp Admin</span>
-                      <input
-                        className="input"
-                        defaultValue={waNumber}
-                        placeholder="62813..."
-                        onBlur={(e) => saveWhatsApp(e.target.value)}
-                      />
-                      <div className="hint subtle">Auto-save saat keluar dari input.</div>
-                    </label>
+                <div className="admin-panel">
+                  <div className="admin-panel-head">
+                    <div>
+                      <div className="admin-panel-title">Catatan sistem</div>
+                      <div className="admin-panel-sub">Info singkat yang sering dibutuhkan saat operasional.</div>
+                    </div>
+                  </div>
 
-                    <div className="card pad" style={{ marginTop: 10 }}>
-                      <b>Catatan</b>
-                      <div className="muted" style={{ marginTop: 6, lineHeight: 1.7 }}>
-                        QRIS checkout otomatis dibuat dari <b>REACT_APP_QRIS_BASE</b> agar nominal mengikuti total order.
-                        Jika ingin mengganti QR merchant, ubah base QRIS di environment lalu deploy ulang.
-                      </div>
+                  <div className="admin-panel-body admin-stack">
+                    <div className="admin-miniCard">
+                      <span>Last sync</span>
+                      <strong>{lastSyncedAt ? formatAdminDate(lastSyncedAt) : "-"}</strong>
+                      <small>Refresh manual bila data belum terbaru</small>
+                    </div>
+                    <div className="admin-miniCard">
+                      <span>QRIS</span>
+                      <strong>Environment based</strong>
+                      <small>QRIS checkout mengikuti base QR dari environment saat deploy.</small>
+                    </div>
+                    <div className="admin-miniCard">
+                      <span>Traffic hari ini</span>
+                      <strong>{formatCompactNumber(storePulse.today_views)} views</strong>
+                      <small>{storePulse.today_orders || analyticsSummary.todayOrders} order masuk</small>
                     </div>
                   </div>
                 </div>

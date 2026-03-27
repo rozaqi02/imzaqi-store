@@ -9,8 +9,8 @@
   inset: -14% -8% auto;
   height: 560px;
   background:
-    radial-gradient(760px 360px at 18% 12%, rgba(0, 214, 180, 0.14), rgba(0, 0, 0, 0) 64%),
-    radial-gradient(720px 420px at 84% 18%, rgba(123, 92, 255, 0.16), rgba(0, 0, 0, 0) 66%);
+    radial-gradient(760px 360px at 18% 12%, rgba(29, 131, 255, 0.14), rgba(0, 0, 0, 0) 64%),
+    radial-gradient(720px 420px at 84% 18%, rgba(75, 98, 255, 0.16), rgba(0, 0, 0, 0) 66%);
   pointer-events: none;
 }
 
@@ -55,7 +55,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 52%);
+    radial-gradient(circle at top left, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0) 52%);
   box-shadow: 0 26px 90px rgba(0, 0, 0, 0.22);
 }
 
@@ -87,8 +87,8 @@
 }
 
 .status-commandPaste:hover {
-  border-color: rgba(0, 214, 180, 0.22);
-  background: rgba(0, 214, 180, 0.12);
+  border-color: rgba(29, 131, 255, 0.22);
+  background: rgba(29, 131, 255, 0.12);
 }
 
 .status-commandSearch {
@@ -110,8 +110,8 @@
 }
 
 .status-commandBox:focus-within {
-  border-color: rgba(0, 214, 180, 0.28);
-  box-shadow: 0 0 0 3px rgba(0, 214, 180, 0.08);
+  border-color: rgba(29, 131, 255, 0.28);
+  box-shadow: 0 0 0 3px rgba(29, 131, 255, 0.08);
 }
 
 .status-commandInput {
@@ -154,7 +154,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 48%);
+    radial-gradient(circle at top, rgba(29, 131, 255, 0.08), rgba(29, 131, 255, 0) 48%);
   box-shadow: 0 26px 90px rgba(0, 0, 0, 0.2);
 }
 
@@ -172,7 +172,7 @@
   width: 320px;
   height: 320px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(0, 214, 180, 0.2), rgba(0, 214, 180, 0));
+  background: radial-gradient(circle, rgba(29, 131, 255, 0.2), rgba(29, 131, 255, 0));
   pointer-events: none;
 }
 
@@ -196,7 +196,7 @@
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: rgba(255, 255, 255, 0.04);
-  color: #9effe6;
+  color: #a7e4ff;
   font-size: 22px;
   font-weight: 1000;
 }
@@ -249,8 +249,8 @@
 }
 
 .status-orderPill.processing {
-  border-color: rgba(0, 214, 180, 0.24);
-  background: rgba(0, 214, 180, 0.1);
+  border-color: rgba(29, 131, 255, 0.24);
+  background: rgba(29, 131, 255, 0.1);
 }
 
 .status-orderPill.done {
@@ -325,13 +325,13 @@
 }
 
 .status-min-node.active {
-  border-color: rgba(0, 214, 180, 0.22);
-  background: rgba(0, 214, 180, 0.09);
+  border-color: rgba(29, 131, 255, 0.22);
+  background: rgba(29, 131, 255, 0.09);
 }
 
 .status-min-node.done .status-min-nodeDot {
-  border-color: rgba(0, 214, 180, 0.24);
-  background: rgba(0, 214, 180, 0.18);
+  border-color: rgba(29, 131, 255, 0.24);
+  background: rgba(29, 131, 255, 0.18);
 }
 
 .status-progressLine {
@@ -407,7 +407,7 @@
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(0, 214, 180, 0.9), rgba(123, 92, 255, 0.6));
+  background: linear-gradient(90deg, rgba(29, 131, 255, 0.9), rgba(75, 98, 255, 0.6));
 }
 
 .status-itemStack,
@@ -468,7 +468,7 @@
 
 .status-sideCard.emphasis {
   background:
-    linear-gradient(180deg, rgba(0, 214, 180, 0.12), rgba(255, 255, 255, 0.025)),
+    linear-gradient(180deg, rgba(29, 131, 255, 0.12), rgba(255, 255, 255, 0.025)),
     rgba(255, 255, 255, 0.03);
 }
 
@@ -511,7 +511,7 @@
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  background: rgba(0, 214, 180, 0.14);
+  background: rgba(29, 131, 255, 0.14);
   font-weight: 900;
 }
 
@@ -556,3 +556,4 @@
     margin-left: 14px;
   }
 }
+

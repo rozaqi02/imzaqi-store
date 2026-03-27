@@ -1,7 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap");
 
 @import "./css/global.css";
-@import "./css/theme-disney.css";
 
 @import "./css/pages/Home.css";
 @import "./css/pages/Products.css";
@@ -17,3 +16,4 @@
 
 /* Global overrides for final polish */
 @import "./css/overrides-v3.css";
+@import "./css/theme-disney.css";

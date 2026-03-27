@@ -36,10 +36,10 @@
 
 /* Footer redesign (v3) */
 .footer{position:relative;overflow:hidden;}
-.footer::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(22,199,166,.9), rgba(0,214,180,.9), rgba(255,255,255,0));opacity:.85;}
+.footer::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(22,199,166,.9), rgba(29,131,255,.9), rgba(255,255,255,0));opacity:.85;}
 .footer::after{content:"";position:absolute;inset:-30% -10%;background:
   radial-gradient(900px 460px at 10% 20%, rgba(22,199,166,.18), rgba(0,0,0,0) 60%),
-  radial-gradient(820px 520px at 85% 10%, rgba(0,214,180,.12), rgba(0,0,0,0) 58%),
+  radial-gradient(820px 520px at 85% 10%, rgba(29,131,255,.12), rgba(0,0,0,0) 58%),
   radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%);
 pointer-events:none;}
 
@@ -71,3 +71,4 @@ pointer-events:none;}
 @media (max-width: 680px){
   .footer .footer-topbar{margin-bottom:14px;}
 }
+

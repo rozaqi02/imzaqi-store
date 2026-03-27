@@ -7,6 +7,7 @@ import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 export default function Layout({ children, routeKey }) {
   const location = useLocation();
   const revealKey = routeKey || location.pathname;
+  const isAdminDashboardRoute = location.pathname.startsWith("/admin/dashboard");
   // Re-attach reveal observer whenever route changes.
   useRevealOnScroll(revealKey);
 
@@ -17,12 +18,12 @@ export default function Layout({ children, routeKey }) {
       <div className="global-noise" aria-hidden="true" />
 
       <Header />
-      <main className="app-main">
+      <main className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}`}>
         <div key={revealKey} className="route-transition">
           {children}
         </div>
       </main>
-      <Footer />
+      {isAdminDashboardRoute ? null : <Footer />}
     </div>
   );
 }

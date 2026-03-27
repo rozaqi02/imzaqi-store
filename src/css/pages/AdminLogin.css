@@ -21,7 +21,7 @@
   gap: 16px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.14), rgba(0, 214, 180, 0) 45%);
+    radial-gradient(circle at top left, rgba(29, 131, 255, 0.14), rgba(29, 131, 255, 0) 45%);
   border-right: 1px solid rgba(255, 255, 255, 0.08);
 }
 
@@ -85,3 +85,4 @@
     border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   }
 }
+
