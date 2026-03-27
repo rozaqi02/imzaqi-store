@@ -149,9 +149,9 @@ export default function Hero() {
   }
 
   const stats = [
-    { label: "Visit", value: totalViews },
-    { label: "Today", value: todayViews },
-    { label: "Orders", value: totalOrders },
+    { label: "Total Kunjungan", value: totalViews },
+    { label: "Kunjungan Hari Ini", value: todayViews },
+    { label: "Total Order", value: totalOrders },
     { label: "Order hari ini", value: todayOrders },
   ];
 
