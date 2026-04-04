@@ -1,0 +1,2200 @@
+/*
+  Skeuomorphic brand theme modes.
+  This layer sits after theme-disney.css so the project keeps the original
+  green/cyan direction while pushing controls and surfaces into a more
+  tactile, raised look.
+*/
+
+:root,
+:root[data-theme="dark"] {
+  --brand-bg-start: #020611;
+  --brand-bg-end: #040714;
+  --brand-bg-mid: #081229;
+  --brand-aurora-a: rgba(0, 214, 180, 0.16);
+  --brand-aurora-b: rgba(0, 138, 148, 0.2);
+  --brand-card-top: rgba(255, 255, 255, 0.055);
+  --brand-card-bottom: rgba(255, 255, 255, 0.025);
+  --brand-card-spot: rgba(0, 214, 180, 0.12);
+  --brand-surface: rgba(7, 12, 27, 0.78);
+  --brand-surface-strong: rgba(8, 12, 28, 0.92);
+  --brand-line: rgba(0, 194, 208, 0.16);
+  --brand-text: #f4fff9;
+  --brand-muted: #9fd1c5;
+  --brand-subtle: #d9fff1;
+  --brand-icon: #9fffe5;
+  --brand-shadow: 0 22px 68px rgba(0, 0, 0, 0.32);
+  --brand-shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.18);
+  --brand-overlay: rgba(0, 0, 0, 0.56);
+  --brand-header-bg: linear-gradient(180deg, rgba(4, 7, 20, 0.94), rgba(4, 7, 20, 0.78));
+  --brand-menu-bg:
+    radial-gradient(620px 420px at 78% 16%, rgba(0, 214, 180, 0.1) 0%, rgba(0, 214, 180, 0) 72%),
+    linear-gradient(180deg, rgba(8, 12, 28, 0.98), rgba(4, 7, 20, 0.98));
+  --skeu-panel-bg: linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96) 55%, rgba(4, 8, 21, 0.98) 100%);
+  --skeu-panel-shadow:
+    0 28px 60px rgba(0, 0, 0, 0.34),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(0, 194, 208, 0.08);
+  --skeu-control-bg: linear-gradient(180deg, rgba(25, 38, 72, 0.96), rgba(10, 16, 35, 0.94));
+  --skeu-control-shadow:
+    0 16px 30px rgba(0, 0, 0, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 0 0 1px rgba(0, 194, 208, 0.08);
+  --skeu-inset-bg: linear-gradient(180deg, rgba(3, 8, 18, 0.94), rgba(9, 15, 33, 0.82));
+  --skeu-inset-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 1px 0 rgba(255, 255, 255, 0.03);
+  --skeu-pill-bg: linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9));
+  --skeu-accent-shadow:
+    0 20px 34px rgba(0, 214, 180, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -3px 0 rgba(3, 66, 74, 0.36);
+}
+
+:root[data-theme="light"] {
+  --brand-bg-start: #d8fff5;
+  --brand-bg-end: #d5eaff;
+  --brand-bg-mid: #eefaf8;
+  --brand-aurora-a: rgba(0, 214, 180, 0.18);
+  --brand-aurora-b: rgba(0, 138, 148, 0.16);
+  --brand-card-top: rgba(255, 255, 255, 0.8);
+  --brand-card-bottom: rgba(229, 245, 255, 0.64);
+  --brand-card-spot: rgba(0, 214, 180, 0.14);
+  --brand-surface: rgba(247, 252, 255, 0.92);
+  --brand-surface-strong: rgba(250, 253, 255, 0.98);
+  --brand-line: rgba(0, 138, 148, 0.16);
+  --brand-text: #0d2d39;
+  --brand-muted: #395863;
+  --brand-subtle: #123846;
+  --brand-icon: #067b88;
+  --brand-shadow: 0 18px 44px rgba(37, 88, 110, 0.14);
+  --brand-shadow-soft: 0 10px 24px rgba(37, 88, 110, 0.1);
+  --brand-overlay: rgba(9, 26, 40, 0.18);
+  --brand-header-bg: linear-gradient(180deg, rgba(244, 252, 255, 0.9), rgba(223, 241, 248, 0.78));
+  --brand-menu-bg:
+    radial-gradient(620px 420px at 78% 16%, rgba(0, 214, 180, 0.12) 0%, rgba(0, 214, 180, 0) 72%),
+    linear-gradient(180deg, rgba(239, 249, 255, 0.98), rgba(214, 234, 245, 0.96));
+  --skeu-panel-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 247, 251, 0.95) 56%, rgba(221, 240, 246, 0.98) 100%);
+  --skeu-panel-shadow:
+    0 24px 42px rgba(67, 111, 129, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(154, 191, 203, 0.22),
+    0 0 0 1px rgba(0, 138, 148, 0.08);
+  --skeu-control-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(232, 245, 249, 0.94));
+  --skeu-control-shadow:
+    0 12px 24px rgba(67, 111, 129, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(154, 191, 203, 0.24),
+    0 0 0 1px rgba(0, 138, 148, 0.08);
+  --skeu-inset-bg: linear-gradient(180deg, rgba(231, 243, 248, 0.98), rgba(247, 252, 255, 0.92));
+  --skeu-inset-shadow:
+    inset 0 2px 6px rgba(124, 158, 171, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 0 rgba(255, 255, 255, 0.52);
+  --skeu-pill-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(232, 245, 249, 0.8));
+  --skeu-accent-shadow:
+    0 18px 28px rgba(0, 214, 180, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56),
+    inset 0 -3px 0 rgba(0, 122, 130, 0.18);
+}
+
+html,
+body {
+  background:
+    radial-gradient(1200px 620px at 14% -4%, var(--brand-aurora-a) 0%, rgba(0, 214, 180, 0) 54%),
+    radial-gradient(980px 520px at 88% 6%, var(--brand-aurora-b) 0%, rgba(0, 138, 148, 0) 56%),
+    linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-end) 100%) !important;
+  color: var(--brand-text) !important;
+}
+
+body,
+.app-shell {
+  color: var(--brand-text);
+}
+
+::selection {
+  background: rgba(0, 214, 180, 0.22) !important;
+  color: #fff !important;
+}
+
+.global-bg {
+  background:
+    radial-gradient(1150px 560px at 12% -2%, var(--brand-aurora-a), rgba(0, 214, 180, 0) 56%),
+    radial-gradient(980px 540px at 84% 8%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
+    linear-gradient(180deg, var(--brand-bg-start), var(--brand-bg-end)) !important;
+}
+
+.global-bg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    radial-gradient(circle at 84% 18%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 24%);
+  pointer-events: none;
+}
+
+.global-noise {
+  opacity: 0.032 !important;
+  mix-blend-mode: screen !important;
+}
+
+.header,
+.site-header {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg) !important;
+  border-bottom: 1px solid var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.header::after,
+.site-header::after {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0),
+    rgba(79, 255, 200, 0.78),
+    rgba(0, 194, 208, 0.88),
+    rgba(255, 255, 255, 0)
+  ) !important;
+}
+
+.nav a,
+.site-nav a,
+.site-navLink,
+.mobile-menu a,
+.mobile-menu-close,
+.header-cart,
+.header-iconAction,
+.nav-toggle,
+.site-action,
+.site-menuBtn {
+  color: var(--brand-text) !important;
+}
+
+.header-cart,
+.header-iconAction,
+.nav-toggle,
+.site-cartBtn,
+.site-action,
+.site-menuBtn,
+.mobile-menu a,
+.mobile-menu-close,
+.mobile-sheetClose,
+.mobile-sheetLink,
+.mobile-dock-link,
+.mobile-dock-icon {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.nav a:hover,
+.nav a.active,
+.site-nav a:hover,
+.site-nav a.active,
+.site-navLink:hover,
+.site-navLink.active {
+  color: var(--brand-subtle) !important;
+}
+
+.btn,
+.checkout-drawer .btn:not(.btn-ghost),
+.pay-shell .btn:not(.btn-ghost) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
+  border-color: rgba(79, 255, 200, 0.24) !important;
+  color: #032235 !important;
+  box-shadow: var(--skeu-accent-shadow) !important;
+}
+
+.btn.btn-ghost,
+.btn-ghost,
+.checkout-drawer .btn-ghost,
+.pay-shell .btn-ghost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-control-bg) !important;
+  border-color: var(--brand-line) !important;
+  color: var(--brand-text) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.btn.btn-danger,
+.btn-danger {
+  background: rgba(255, 79, 114, 0.12) !important;
+  border-color: rgba(255, 79, 114, 0.28) !important;
+  color: #ff9ab1 !important;
+  box-shadow: none !important;
+}
+
+.input,
+.status-commandBox,
+.catalog-command,
+.catalog-commandInput,
+.admin-searchRow,
+.hero-search-shell,
+.admin-select,
+.admin-textarea,
+textarea.input,
+select.input {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 22%),
+    var(--skeu-inset-bg) !important;
+  border-color: var(--brand-line) !important;
+  color: var(--brand-text) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+}
+
+.input::placeholder,
+.status-commandInput::placeholder,
+.catalog-commandInput::placeholder,
+.hero-search-input::placeholder {
+  color: var(--brand-muted) !important;
+}
+
+.input:focus,
+.catalog-commandInput:focus,
+.status-commandBox:focus-within,
+.hero-search-shell:focus-within,
+.admin-searchRow:focus-within {
+  border-color: rgba(79, 255, 200, 0.36) !important;
+  box-shadow: 0 0 0 4px rgba(0, 214, 180, 0.12) !important;
+}
+
+.card,
+.faq-item,
+.product-detail,
+.status-command,
+.catalog-metric,
+.about-miniStat,
+.about-flowCard,
+.testi-miniStat,
+.admin-loginShell,
+.admin-loginAside,
+.admin-loginSignal,
+.admin-sidebar,
+.admin-panel,
+.admin-statCard,
+.admin-miniCard,
+.admin-orderCardModern,
+.admin-sidePanel,
+.site-footerPanel,
+.mobile-sheet,
+.mobile-sheetMeta,
+.flow-assist,
+.mobile-dock-inner,
+.admin-brand,
+.admin-nav-btn,
+.admin-product-row,
+.admin-promo-row,
+.admin-topbar-current,
+.admin-orderMetaCard {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at top right, var(--brand-card-spot), rgba(0, 214, 180, 0) 52%),
+    var(--skeu-panel-bg) !important;
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.pill,
+.badge,
+.tab-btn.active,
+.toggle-btn.active,
+.product-detail-badge,
+.about-miniBadge,
+.about-sectionBadge,
+.testi-miniBadge,
+.admin-loginBadge,
+.admin-chip.active,
+.admin-product-pill.on,
+.admin-status.pending {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-pill-bg) !important;
+  border-color: rgba(79, 255, 200, 0.24) !important;
+  color: var(--brand-subtle) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.hero-accent,
+.hero-highlight {
+  background: linear-gradient(135deg, #eafff5 0%, #9fffe5 42%, #4fffc8 68%, #00c2d0 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  color: transparent !important;
+}
+
+.muted,
+.hint.subtle,
+.hero-sub-minimal,
+.hero-eyebrow,
+.home-kicker,
+.catalog-sub,
+.status-sub,
+.about-minimal-sub,
+.testi-minimal-sub,
+.product-detail-desc,
+.product-tile-desc,
+.admin-brand-sub,
+.admin-panel-sub,
+.admin-topbar-eyebrow,
+.admin-field > span,
+.admin-product-sub,
+.admin-nav-copy small,
+.admin-topbar-current span,
+.site-footerBottom,
+.site-footerLabel {
+  color: var(--brand-muted) !important;
+}
+
+.site-footerBadge,
+.site-footerMeta span,
+.site-footerList a,
+.site-footerList span,
+.site-footerBrand strong,
+.site-footerBrand span,
+.product-tile-name,
+.catalog-cardFoot,
+.testi-count,
+.menu-footer-text,
+.menu-footer-version {
+  color: var(--brand-text) !important;
+}
+
+.product-tile-price,
+.product-detail-range,
+.variant-price,
+.variant-price-modern,
+.catalog-cardPrice,
+.admin-order-promo,
+.admin-statValue,
+.admin-order-total {
+  color: var(--brand-icon) !important;
+  text-shadow: 0 0 18px rgba(79, 255, 200, 0.12);
+}
+
+.hero-railIcon,
+.catalog-filterBtnCount,
+.catalog-chip.active,
+.catalog-viewBtn.active,
+.about-valueIcon,
+.mobile-sheetLinkIcon,
+.mobile-dock-link.active,
+.mobile-dock-link.active .mobile-dock-icon,
+.about-faqItem.open,
+.status-orderPill.processing,
+.status-min-node.active,
+.admin-nav-btn.active .admin-nav-icon,
+.admin-status.processing,
+.admin-status.done {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 24%),
+    linear-gradient(180deg, rgba(0, 214, 180, 0.22), rgba(0, 138, 148, 0.14)) !important;
+  border-color: rgba(79, 255, 200, 0.24) !important;
+  color: var(--brand-icon) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.mobile-backdrop,
+.checkout-backdrop,
+.catalog-sheetBackdrop,
+.lightbox-backdrop {
+  background: var(--brand-overlay) !important;
+  backdrop-filter: blur(18px) saturate(140%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+}
+
+.mobile-menu {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 18%),
+    var(--skeu-panel-bg) !important;
+  border-left: 1px solid var(--brand-line) !important;
+  box-shadow:
+    -24px 0 80px rgba(0, 0, 0, 0.48),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.22) !important;
+}
+
+.mobile-menu a.active {
+  background: rgba(0, 214, 180, 0.18) !important;
+  border-color: rgba(79, 255, 200, 0.26) !important;
+  color: var(--brand-icon) !important;
+}
+
+.mobile-menu a .active-indicator {
+  background: linear-gradient(180deg, #4fffc8, rgba(0, 214, 180, 0.92), rgba(0, 194, 208, 0.88)) !important;
+  box-shadow: 0 0 12px rgba(0, 214, 180, 0.5) !important;
+}
+
+.route-progress-bar {
+  background: linear-gradient(
+    90deg,
+    rgba(79, 255, 200, 0.16),
+    rgba(79, 255, 200, 0.95),
+    rgba(0, 194, 208, 0.94),
+    rgba(255, 255, 255, 0.12)
+  ) !important;
+}
+
+.theme-toggle {
+  position: relative;
+  width: 58px;
+  height: 32px;
+  padding: 0 7px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-control-bg) !important;
+  border: 1px solid var(--brand-line) !important;
+  color: var(--brand-icon) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  cursor: pointer;
+  transition:
+    transform var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out),
+    background var(--dur-med) var(--ease-out);
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+}
+
+.theme-toggleGlyph {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 13px;
+  height: 13px;
+  opacity: 0.55;
+  transition: opacity var(--dur-med) var(--ease-out);
+}
+
+.theme-toggle.is-dark .theme-toggleGlyph-dark,
+.theme-toggle:not(.is-dark) .theme-toggleGlyph-light {
+  opacity: 1;
+}
+
+.theme-toggleThumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 34%, #00d6b4 56%, #008a94 100%);
+  color: #032235;
+  box-shadow: 0 10px 22px rgba(0, 214, 180, 0.24), 0 1px 0 rgba(255, 255, 255, 0.28) inset, 0 -2px 0 rgba(3, 66, 74, 0.22) inset;
+  transition: transform var(--dur-med) var(--ease-out);
+}
+
+.theme-toggle.is-dark .theme-toggleThumb {
+  transform: translateX(26px);
+}
+
+.theme-toggleThumb svg {
+  width: 13px;
+  height: 13px;
+}
+
+.mobile-menu-footer {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+}
+
+.mobile-menu-footer .theme-toggle {
+  margin-top: 2px;
+}
+
+.flow-assist-eyebrow,
+.flow-assist-desc,
+.mobile-dock-link,
+.mobile-dock-label {
+  color: var(--brand-muted) !important;
+}
+
+.flow-assist-title,
+.flow-assist-badge,
+.mobile-dock-link.active,
+.mobile-dock-link.active .mobile-dock-label {
+  color: var(--brand-text) !important;
+}
+
+.flow-assist-badge {
+  border-color: var(--brand-line) !important;
+}
+
+.flow-assist-badge.emphasis {
+  color: var(--brand-subtle) !important;
+}
+
+.flow-assist-actions {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-control-bg) !important;
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+:root[data-theme="light"] .hero-commandCard,
+:root[data-theme="light"] .stat-minimal,
+:root[data-theme="light"] .catalog-command,
+:root[data-theme="light"] .catalog-filter,
+:root[data-theme="light"] .catalog-card,
+:root[data-theme="light"] .status-command,
+:root[data-theme="light"] .status-emptyCard,
+:root[data-theme="light"] .status-mainCard,
+:root[data-theme="light"] .status-sideCard,
+:root[data-theme="light"] .status-orderHero,
+:root[data-theme="light"] .status-balancePanel,
+:root[data-theme="light"] .status-noteCard,
+:root[data-theme="light"] .status-helpCard,
+:root[data-theme="light"] .status-promoCard,
+:root[data-theme="light"] .status-itemCard,
+:root[data-theme="light"] .checkout-panel,
+:root[data-theme="light"] .checkout-summary,
+:root[data-theme="light"] .checkout-item-card,
+:root[data-theme="light"] .checkout-promo-card,
+:root[data-theme="light"] .pay-card,
+:root[data-theme="light"] .pay-orderDesktop,
+:root[data-theme="light"] .pay-orderMobile,
+:root[data-theme="light"] .qris-wrap,
+:root[data-theme="light"] .pay-successModal,
+:root[data-theme="light"] .product-detail-summaryCard,
+:root[data-theme="light"] .detail-flow,
+:root[data-theme="light"] .testi-toolbar,
+:root[data-theme="light"] .testi-imgWrap,
+:root[data-theme="light"] .catalog-sheet,
+:root[data-theme="light"] .product-card-modern,
+:root[data-theme="light"] .variant-card-modern {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at top right, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 58%),
+    var(--skeu-panel-bg) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+:root[data-theme="light"] .hero-railItem,
+:root[data-theme="light"] .product-tile-pill,
+:root[data-theme="light"] .catalog-chip,
+:root[data-theme="light"] .catalog-cardMeta > span,
+:root[data-theme="light"] .status-orderPill,
+:root[data-theme="light"] .status-itemMeta span,
+:root[data-theme="light"] .status-promoCard span,
+:root[data-theme="light"] .about-miniBadge,
+:root[data-theme="light"] .about-sectionBadge,
+:root[data-theme="light"] .testi-miniBadge,
+:root[data-theme="light"] .detail-flowItem span,
+:root[data-theme="light"] .checkout-summaryBadge,
+:root[data-theme="light"] .checkout-summaryRail span,
+:root[data-theme="light"] .pay-orderPromo,
+:root[data-theme="light"] .pay-statePill,
+:root[data-theme="light"] .admin-mobileTab,
+:root[data-theme="light"] .flow-assist-badge,
+:root[data-theme="light"] .mobile-dock-link,
+:root[data-theme="light"] .mobile-dock-icon {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-pill-bg) !important;
+  border-color: rgba(0, 138, 148, 0.12) !important;
+  color: rgba(15, 49, 64, 0.84) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+:root[data-theme="light"] .hero-railIcon,
+:root[data-theme="light"] .catalog-filterBtnCount,
+:root[data-theme="light"] .about-valueIcon,
+:root[data-theme="light"] .about-flowIcon,
+:root[data-theme="light"] .product-detail-summaryIcon,
+:root[data-theme="light"] .status-emptyHead span,
+:root[data-theme="light"] .status-commandBox > svg,
+:root[data-theme="light"] .catalog-commandIcon,
+:root[data-theme="light"] .testi-searchIcon,
+:root[data-theme="light"] .mobile-menu a .menu-icon,
+:root[data-theme="light"] .mobile-dock-link.active .mobile-dock-icon,
+:root[data-theme="light"] .admin-mobileTabIcon,
+:root[data-theme="light"] .admin-nav-icon {
+  background: rgba(0, 214, 180, 0.12) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: var(--brand-icon) !important;
+}
+
+:root[data-theme="light"] .flow-assist::after {
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(135deg, rgba(0, 214, 180, 0.16), rgba(0, 194, 208, 0.04)) !important;
+}
+
+:root[data-theme="light"] .mobile-menu a,
+:root[data-theme="light"] .mobile-menu-close,
+:root[data-theme="light"] .mobile-menu a .menu-icon {
+  color: rgba(15, 49, 64, 0.84) !important;
+}
+
+:root[data-theme="light"] .mobile-menu a.active,
+:root[data-theme="light"] .admin-mobileTab.active,
+:root[data-theme="light"] .admin-nav-btn.active {
+  color: #0c4050 !important;
+}
+
+:root[data-theme="light"] .hero-eyebrow,
+:root[data-theme="light"] .home-kicker,
+:root[data-theme="light"] .catalog-eyebrow,
+:root[data-theme="light"] .status-kicker,
+:root[data-theme="light"] .about-minimal-sub,
+:root[data-theme="light"] .testi-minimal-sub,
+:root[data-theme="light"] .hero-sub-minimal,
+:root[data-theme="light"] .catalog-sub,
+:root[data-theme="light"] .status-sub,
+:root[data-theme="light"] .product-detail-desc,
+:root[data-theme="light"] .product-tile-desc,
+:root[data-theme="light"] .about-miniStat span,
+:root[data-theme="light"] .testi-miniStat span,
+:root[data-theme="light"] .catalog-metric span,
+:root[data-theme="light"] .catalog-filterLabel,
+:root[data-theme="light"] .status-commandLabel,
+:root[data-theme="light"] .status-message,
+:root[data-theme="light"] .status-emptyHead small,
+:root[data-theme="light"] .status-metricCard span,
+:root[data-theme="light"] .status-balanceBar span,
+:root[data-theme="light"] .status-itemMeta,
+:root[data-theme="light"] .status-noteCard.empty,
+:root[data-theme="light"] .checkout-drawerKicker,
+:root[data-theme="light"] .checkout-drawerSub,
+:root[data-theme="light"] .checkout-main-kicker,
+:root[data-theme="light"] .checkout-item-meta,
+:root[data-theme="light"] .checkout-promo-message,
+:root[data-theme="light"] .checkout-summaryLabel,
+:root[data-theme="light"] .checkout-summaryRow,
+:root[data-theme="light"] .checkout-summaryLink,
+:root[data-theme="light"] .pay-shell-kicker,
+:root[data-theme="light"] .pay-shell-sub,
+:root[data-theme="light"] .pay-cardKicker,
+:root[data-theme="light"] .pay-waField .label,
+:root[data-theme="light"] .pay-waField .hint,
+:root[data-theme="light"] .pay-noteToggle summary,
+:root[data-theme="light"] .pay-noteMeta,
+:root[data-theme="light"] .pay-stageLabel,
+:root[data-theme="light"] .pay-stageHint,
+:root[data-theme="light"] .pay-stageRow,
+:root[data-theme="light"] .pay-stageFoot,
+:root[data-theme="light"] .pay-orderKicker,
+:root[data-theme="light"] .pay-orderItemMeta,
+:root[data-theme="light"] .pay-orderRow,
+:root[data-theme="light"] .pay-orderMobile summary span,
+:root[data-theme="light"] .pay-orderMobile summary b,
+:root[data-theme="light"] .pay-successKicker,
+:root[data-theme="light"] .pay-successLead,
+:root[data-theme="light"] .about-valueCard p,
+:root[data-theme="light"] .about-flowCard p,
+:root[data-theme="light"] .about-faqBody,
+:root[data-theme="light"] .about-flowNum,
+:root[data-theme="light"] .detail-flowItem,
+:root[data-theme="light"] .catalog-cardFoot,
+:root[data-theme="light"] .flow-assist-desc,
+:root[data-theme="light"] .mobile-dock-link,
+:root[data-theme="light"] .product-desc-modern,
+:root[data-theme="light"] .product-desc-modern,
+:root[data-theme="light"] .admin-mobileCopy span,
+:root[data-theme="light"] .admin-mobileTabMeta {
+  color: rgba(50, 82, 91, 0.82) !important;
+}
+
+:root[data-theme="light"] .hero-title-minimal,
+:root[data-theme="light"] .catalog-title,
+:root[data-theme="light"] .status-title,
+:root[data-theme="light"] .about-minimal-title,
+:root[data-theme="light"] .testi-minimal-title,
+:root[data-theme="light"] .status-emptyHead strong,
+:root[data-theme="light"] .status-itemTitle,
+:root[data-theme="light"] .status-sideHead,
+:root[data-theme="light"] .catalog-cardTitle,
+:root[data-theme="light"] .product-name-modern,
+:root[data-theme="light"] .product-tile-name,
+:root[data-theme="light"] .product-detail-title,
+:root[data-theme="light"] .detail-flowItem small,
+:root[data-theme="light"] .checkout-item-name,
+:root[data-theme="light"] .checkout-promo-title,
+:root[data-theme="light"] .checkout-summaryRow b,
+:root[data-theme="light"] .pay-cardTitle,
+:root[data-theme="light"] .pay-stageRow b,
+:root[data-theme="light"] .pay-orderTitle,
+:root[data-theme="light"] .pay-orderItemName,
+:root[data-theme="light"] .pay-orderRow strong,
+:root[data-theme="light"] .pay-orderRow b,
+:root[data-theme="light"] .pay-successCode,
+:root[data-theme="light"] .about-flowCard h3,
+:root[data-theme="light"] .about-faqHead,
+:root[data-theme="light"] .testi-count,
+:root[data-theme="light"] .flow-assist-title,
+:root[data-theme="light"] .mobile-dock-link.active,
+:root[data-theme="light"] .admin-mobileCopy strong,
+:root[data-theme="light"] .admin-mobileTabLabel {
+  color: rgba(15, 49, 64, 0.96) !important;
+}
+
+:root[data-theme="light"] .status-sideCard,
+:root[data-theme="light"] .status-noteCard,
+:root[data-theme="light"] .status-noteCard strong,
+:root[data-theme="light"] .status-noteCard b,
+:root[data-theme="light"] .status-noteCard span {
+  color: rgba(15, 49, 64, 0.92) !important;
+  text-shadow: none !important;
+}
+
+:root[data-theme="light"] .status-sideCard.emphasis .status-noteCard {
+  color: rgba(12, 64, 80, 0.94) !important;
+}
+
+:root[data-theme="light"] .hero-highlight {
+  background: linear-gradient(135deg, #0d3f4e 0%, #00a89a 42%, #00c2d0 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+}
+
+:root[data-theme="light"] .cursor {
+  border-right-color: rgba(0, 138, 148, 0.82) !important;
+}
+
+:root[data-theme="light"] .catalog-cardPrice,
+:root[data-theme="light"] .product-tile-price,
+:root[data-theme="light"] .product-detail-range,
+:root[data-theme="light"] .variant-price,
+:root[data-theme="light"] .variant-price-modern,
+:root[data-theme="light"] .status-metricCard b,
+:root[data-theme="light"] .checkout-summaryTotal,
+:root[data-theme="light"] .pay-stageTotal,
+:root[data-theme="light"] .pay-orderMobile summary strong {
+  color: #0b7b89 !important;
+  text-shadow: none !important;
+}
+
+:root[data-theme="light"] .admin-sidebarPulse,
+:root[data-theme="light"] .admin-variant-row,
+:root[data-theme="light"] .admin-thumb,
+:root[data-theme="light"] .admin-order-item,
+:root[data-theme="light"] .admin-order-pricing,
+:root[data-theme="light"] .admin-order-adminNote,
+:root[data-theme="light"] .admin-order-notes.empty,
+:root[data-theme="light"] .admin-rankItem,
+:root[data-theme="light"] .admin-alertItem,
+:root[data-theme="light"] .admin-focusRow,
+:root[data-theme="light"] .admin-searchRow,
+:root[data-theme="light"] .admin-field-switch,
+:root[data-theme="light"] .admin-mobileBrand,
+:root[data-theme="light"] .admin-chip,
+:root[data-theme="light"] .admin-nav-badge,
+:root[data-theme="light"] .admin-categoryTag,
+:root[data-theme="light"] .admin-chevron {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(232, 245, 249, 0.76)),
+    radial-gradient(circle at top right, rgba(0, 214, 180, 0.06), rgba(0, 214, 180, 0) 60%) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow: 0 12px 28px rgba(67, 111, 129, 0.08) !important;
+}
+
+:root[data-theme="light"] .admin-order-notes {
+  background:
+    linear-gradient(180deg, rgba(235, 252, 248, 0.96), rgba(219, 244, 247, 0.84)),
+    radial-gradient(circle at top right, rgba(0, 194, 208, 0.08), rgba(0, 194, 208, 0) 62%) !important;
+  border-color: rgba(0, 138, 148, 0.16) !important;
+  color: rgba(15, 49, 64, 0.92) !important;
+}
+
+:root[data-theme="light"] .admin-topbarCopy .muted,
+:root[data-theme="light"] .admin-statLabel,
+:root[data-theme="light"] .admin-statHelper,
+:root[data-theme="light"] .admin-miniCard span,
+:root[data-theme="light"] .admin-miniCard small,
+:root[data-theme="light"] .admin-sidebarPulse span,
+:root[data-theme="light"] .admin-sidebarPulse small,
+:root[data-theme="light"] .admin-chartLabel small,
+:root[data-theme="light"] .admin-chartValue small,
+:root[data-theme="light"] .admin-rankCopy small,
+:root[data-theme="light"] .admin-alertItem small,
+:root[data-theme="light"] .admin-emptyInline,
+:root[data-theme="light"] .admin-statusMetricTop span,
+:root[data-theme="light"] .admin-order-sub,
+:root[data-theme="light"] .admin-variant-sub,
+:root[data-theme="light"] .admin-variant-desc,
+:root[data-theme="light"] .admin-promo-sub,
+:root[data-theme="light"] .admin-order-priceRow,
+:root[data-theme="light"] .admin-order-notesTitle,
+:root[data-theme="light"] .admin-orderMetaCard span,
+:root[data-theme="light"] .admin-orderMetaCard small,
+:root[data-theme="light"] .admin-focusRow span {
+  color: rgba(50, 82, 91, 0.84) !important;
+}
+
+:root[data-theme="light"] .admin-brand-title,
+:root[data-theme="light"] .admin-nav-copy strong,
+:root[data-theme="light"] .admin-topbar-current strong,
+:root[data-theme="light"] .admin-panel-title,
+:root[data-theme="light"] .admin-product-name,
+:root[data-theme="light"] .admin-variant-title,
+:root[data-theme="light"] .admin-order-code,
+:root[data-theme="light"] .admin-promo-code,
+:root[data-theme="light"] .admin-heroTitle,
+:root[data-theme="light"] .admin-miniCard strong,
+:root[data-theme="light"] .admin-chartLabel strong,
+:root[data-theme="light"] .admin-chartValue strong,
+:root[data-theme="light"] .admin-rankCopy strong,
+:root[data-theme="light"] .admin-rankMeta,
+:root[data-theme="light"] .admin-statusMetricTop strong,
+:root[data-theme="light"] .admin-sidebarPulse strong,
+:root[data-theme="light"] .admin-focusRow strong,
+:root[data-theme="light"] .admin-order-priceRow b,
+:root[data-theme="light"] .admin-order-item b,
+:root[data-theme="light"] .admin-order-adminNote,
+:root[data-theme="light"] .admin-orderMetaCard strong,
+:root[data-theme="light"] .admin-emptyInline {
+  color: rgba(15, 49, 64, 0.96) !important;
+}
+
+:root[data-theme="light"] .admin-chip,
+:root[data-theme="light"] .admin-nav-badge,
+:root[data-theme="light"] .admin-categoryTag,
+:root[data-theme="light"] .admin-product-pill,
+:root[data-theme="light"] .admin-status,
+:root[data-theme="light"] .admin-orderMetaCard a {
+  color: rgba(12, 64, 80, 0.9) !important;
+}
+
+:root[data-theme="light"] .admin-proof {
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #6ef2d4 0%, #2ee3c3 42%, #00c2d0 100%) !important;
+  color: #083647 !important;
+  box-shadow: 0 14px 28px rgba(0, 194, 208, 0.16) !important;
+}
+
+:root[data-theme="light"] .hero-search-icon,
+:root[data-theme="light"] .hero-search-input,
+:root[data-theme="light"] .hero-search-input::placeholder,
+:root[data-theme="light"] .hero-search-clear,
+:root[data-theme="light"] .suggestion-item,
+:root[data-theme="light"] .catalog-commandInput,
+:root[data-theme="light"] .catalog-filterInput,
+:root[data-theme="light"] .catalog-commandClear,
+:root[data-theme="light"] .catalog-filterClear,
+:root[data-theme="light"] .status-commandPaste,
+:root[data-theme="light"] .status-commandInput,
+:root[data-theme="light"] .testi-searchInput,
+:root[data-theme="light"] .testi-clear,
+:root[data-theme="light"] .checkout-item-remove {
+  color: rgba(20, 59, 72, 0.84) !important;
+}
+
+:root[data-theme="light"] .catalog-metric,
+:root[data-theme="light"] .catalog-filterSearch,
+:root[data-theme="light"] .catalog-cardSkeleton,
+:root[data-theme="light"] .status-metricCard,
+:root[data-theme="light"] .status-min-node,
+:root[data-theme="light"] .status-orderCode,
+:root[data-theme="light"] .about-miniStat,
+:root[data-theme="light"] .about-flowCard,
+:root[data-theme="light"] .about-faqItem,
+:root[data-theme="light"] .about-finalCard,
+:root[data-theme="light"] .testi-miniStat,
+:root[data-theme="light"] .testi-skel,
+:root[data-theme="light"] .lightbox,
+:root[data-theme="light"] .suggestions {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(229, 244, 249, 0.76)),
+    radial-gradient(circle at top right, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 60%) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow: 0 20px 54px rgba(37, 88, 110, 0.12) !important;
+}
+
+:root[data-theme="light"] .lightbox-backdrop,
+:root[data-theme="light"] .catalog-sheetBackdrop {
+  background: rgba(9, 26, 40, 0.24) !important;
+}
+
+:root[data-theme="light"] .status-emptyGlow {
+  background: radial-gradient(circle, rgba(0, 194, 208, 0.18), rgba(0, 194, 208, 0)) !important;
+}
+
+:root[data-theme="light"] .nav-toggle {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(15, 49, 64, 0.9) !important;
+  box-shadow: var(--brand-shadow-soft) !important;
+}
+
+:root[data-theme="light"] .nav-toggle span {
+  background: rgba(15, 49, 64, 0.88) !important;
+}
+
+:root[data-theme="light"] .toggle-btn,
+:root[data-theme="light"] .catalog-viewBtn,
+:root[data-theme="light"] .catalog-status,
+:root[data-theme="light"] .catalog-rangeValues,
+:root[data-theme="light"] .catalog-sheetTitle,
+:root[data-theme="light"] .catalog-sheetClose,
+:root[data-theme="light"] .status-orderCode,
+:root[data-theme="light"] .status-min-node,
+:root[data-theme="light"] .status-min-nodeDot,
+:root[data-theme="light"] .status-commandPaste,
+:root[data-theme="light"] .stat-num,
+:root[data-theme="light"] .about-miniStat strong,
+:root[data-theme="light"] .testi-miniStat strong,
+:root[data-theme="light"] .lightbox-close,
+:root[data-theme="light"] .lightbox-nav,
+:root[data-theme="light"] .lightbox-caption {
+  color: rgba(15, 49, 64, 0.92) !important;
+}
+
+:root[data-theme="light"] .stat-label,
+:root[data-theme="light"] .home-summaryText,
+:root[data-theme="light"] .catalog-metric span,
+:root[data-theme="light"] .catalog-contentMeta span,
+:root[data-theme="light"] .catalog-sheetSub,
+:root[data-theme="light"] .status-orderCodeBlock span,
+:root[data-theme="light"] .status-orderDate span,
+:root[data-theme="light"] .about-miniStat span,
+:root[data-theme="light"] .testi-miniStat span {
+  color: rgba(50, 82, 91, 0.82) !important;
+}
+
+:root[data-theme="light"] .status-noteCard.empty {
+  color: rgba(65, 94, 103, 0.84) !important;
+}
+
+:root[data-theme="light"] .catalog-metric strong,
+:root[data-theme="light"] .catalog-contentMeta strong,
+:root[data-theme="light"] .catalog-sheetTitle,
+:root[data-theme="light"] .status-orderCode,
+:root[data-theme="light"] .status-min-node span,
+:root[data-theme="light"] .about-faqItem,
+:root[data-theme="light"] .product-tile-fallback,
+:root[data-theme="light"] .lightbox-caption {
+  color: rgba(15, 49, 64, 0.96) !important;
+}
+
+:root[data-theme="light"] .toggle-btn.active,
+:root[data-theme="light"] .catalog-chip.active,
+:root[data-theme="light"] .catalog-viewBtn.active {
+  color: #0c4050 !important;
+}
+
+:root[data-theme="light"] .product-tile-arrow,
+:root[data-theme="light"] .catalog-sheetHandle,
+:root[data-theme="light"] .catalog-cardIcon span,
+:root[data-theme="light"] .status-orderCode svg,
+:root[data-theme="light"] .status-min-nodeDot svg,
+:root[data-theme="light"] .lightbox-close svg,
+:root[data-theme="light"] .lightbox-nav svg {
+  color: #0b7b89 !important;
+}
+
+:root[data-theme="light"] .catalog-status,
+:root[data-theme="light"] .status-orderCode,
+:root[data-theme="light"] .status-min-node,
+:root[data-theme="light"] .status-metricCard,
+:root[data-theme="light"] .lightbox-close,
+:root[data-theme="light"] .lightbox-nav {
+  border-color: rgba(0, 138, 148, 0.14) !important;
+}
+
+:root[data-theme="light"] .catalog-viewBtn,
+:root[data-theme="light"] .toggle-btn,
+:root[data-theme="light"] .product-tile-arrow,
+:root[data-theme="light"] .testi-count {
+  background: rgba(255, 255, 255, 0.72) !important;
+  border-color: rgba(0, 138, 148, 0.12) !important;
+}
+
+:root[data-theme="light"] .mobile-menu a .menu-icon,
+:root[data-theme="light"] .admin-mobileTabIcon,
+:root[data-theme="light"] .admin-nav-icon {
+  border: 1px solid rgba(0, 138, 148, 0.14) !important;
+  border-radius: 12px !important;
+}
+
+:root[data-theme="light"] .mobile-menu a.active .menu-icon,
+:root[data-theme="light"] .admin-mobileTab.active .admin-mobileTabIcon,
+:root[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
+  background: rgba(0, 214, 180, 0.16) !important;
+  color: #0c4050 !important;
+}
+
+@media (max-width: 720px) {
+  :root[data-theme="light"] .mobile-menu,
+  :root[data-theme="light"] .mobile-backdrop {
+    backdrop-filter: blur(18px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .header,
+  .site-header {
+    backdrop-filter: blur(18px) saturate(150%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+  }
+
+  .header-inner {
+    gap: 8px;
+  }
+
+  .theme-toggle {
+    width: 56px;
+  }
+}
+
+@media (max-width: 720px) {
+  :root,
+  :root[data-theme="dark"] {
+    --brand-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
+    --brand-shadow-soft: 0 8px 16px rgba(0, 0, 0, 0.14);
+    --skeu-panel-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.26),
+      0 0 0 1px rgba(0, 194, 208, 0.06);
+    --skeu-control-shadow:
+      0 10px 18px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+      0 0 0 1px rgba(0, 194, 208, 0.06);
+    --skeu-accent-shadow:
+      0 12px 20px rgba(0, 214, 180, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.34),
+      inset 0 -2px 0 rgba(3, 66, 74, 0.28);
+  }
+
+  :root[data-theme="light"] {
+    --brand-shadow: 0 12px 20px rgba(67, 111, 129, 0.12);
+    --brand-shadow-soft: 0 8px 14px rgba(67, 111, 129, 0.1);
+    --skeu-panel-shadow:
+      0 12px 22px rgba(67, 111, 129, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -2px 0 rgba(154, 191, 203, 0.2),
+      0 0 0 1px rgba(0, 138, 148, 0.08);
+    --skeu-control-shadow:
+      0 8px 16px rgba(67, 111, 129, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -2px 0 rgba(154, 191, 203, 0.18),
+      0 0 0 1px rgba(0, 138, 148, 0.08);
+    --skeu-accent-shadow:
+      0 10px 18px rgba(0, 214, 180, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.46),
+      inset 0 -2px 0 rgba(0, 122, 130, 0.16);
+  }
+
+  .header,
+  .site-header,
+  .mobile-menu,
+  .mobile-backdrop,
+  .mobile-sheetBackdrop,
+  .mobile-dock-inner,
+  .checkout-backdrop,
+  .catalog-sheetBackdrop,
+  .lightbox-backdrop,
+  .mobile-sheet,
+  .checkout-drawer,
+  .checkout-panel,
+  .pay-card,
+  .pay-orderDesktop,
+  .pay-orderMobile,
+  .pay-successModal,
+  .catalog-sheet,
+  .qris-wrap,
+  .hero-search-shell,
+  .suggestions,
+  .steps,
+  .testi-overlayPill,
+  .testi-captionPill {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .global-noise,
+  .global-bg::after,
+  .btn::before,
+  .mobile-menu a::before {
+    display: none !important;
+  }
+
+  .header,
+  .site-header,
+  .card,
+  .faq-item,
+  .product-detail,
+  .status-command,
+  .catalog-metric,
+  .about-miniStat,
+  .about-flowCard,
+  .testi-miniStat,
+  .admin-loginShell,
+  .admin-loginAside,
+  .admin-loginSignal,
+  .admin-sidebar,
+  .admin-panel,
+  .admin-statCard,
+  .admin-miniCard,
+  .admin-orderCardModern,
+  .admin-sidePanel,
+  .site-footerPanel,
+  .mobile-sheet,
+  .mobile-sheetMeta,
+  .flow-assist,
+  .mobile-dock-inner,
+  .admin-brand,
+  .admin-nav-btn,
+  .admin-product-row,
+  .admin-promo-row,
+  .admin-topbar-current,
+  .admin-orderMetaCard {
+    box-shadow: var(--skeu-panel-shadow) !important;
+  }
+
+  .header-cart,
+  .header-iconAction,
+  .nav-toggle,
+  .site-cartBtn,
+  .site-action,
+  .site-menuBtn,
+  .mobile-menu a,
+  .mobile-menu-close,
+  .mobile-sheetClose,
+  .mobile-sheetLink,
+  .mobile-dock-link,
+  .mobile-dock-icon,
+  .theme-toggle,
+  .btn,
+  .btn-ghost,
+  .input,
+  .status-commandBox,
+  .catalog-command,
+  .catalog-commandInput,
+  .admin-searchRow,
+  .hero-search-shell,
+  .admin-select,
+  .admin-textarea,
+  textarea.input,
+  select.input {
+    box-shadow: var(--skeu-control-shadow) !important;
+  }
+}
+
+:root[data-theme="light"] .mobile-menu-header h3 {
+  background: none !important;
+  -webkit-text-fill-color: #0f3140 !important;
+  color: #0f3140 !important;
+}
+
+:root[data-theme="light"] .mobile-menu-header p {
+  color: rgba(15, 49, 64, 0.72) !important;
+}
+
+:root[data-theme="light"] .mobile-menu a {
+  color: rgba(15, 49, 64, 0.96) !important;
+  font-weight: 800 !important;
+}
+
+:root[data-theme="light"] .mobile-menu a .menu-icon {
+  color: rgba(8, 63, 78, 0.92) !important;
+}
+
+:root[data-theme="light"] .mobile-menu a.active {
+  color: #063848 !important;
+  background:
+    linear-gradient(180deg, rgba(0, 214, 180, 0.2), rgba(0, 194, 208, 0.1)) !important;
+  border-color: rgba(0, 138, 148, 0.24) !important;
+}
+
+:root[data-theme="light"] .mobile-menu-divider {
+  background: linear-gradient(90deg, transparent 0%, rgba(0, 138, 148, 0.26) 50%, transparent 100%) !important;
+}
+
+:root[data-theme="light"] .mobile-menu-footer {
+  border-top-color: rgba(12, 87, 100, 0.14) !important;
+}
+
+:root[data-theme="light"] .checkout-drawer,
+:root[data-theme="light"] .checkout-mobileBar,
+:root[data-theme="light"] .pay-mobileBar {
+  background: #f2fbff !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+:root[data-theme="light"] .checkout-drawerClose,
+:root[data-theme="light"] .checkout-drawerGesture,
+:root[data-theme="light"] .checkout-item-remove {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-control-bg) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(15, 49, 64, 0.9) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+:root[data-theme="light"] .checkout-drawerHandle {
+  background: rgba(11, 123, 137, 0.26) !important;
+  box-shadow: 0 0 0 6px rgba(0, 194, 208, 0.08) !important;
+}
+
+:root[data-theme="light"] .checkout-drawerGestureDot {
+  background: #0b7b89 !important;
+  box-shadow: 0 0 0 6px rgba(0, 194, 208, 0.1), 0 0 18px rgba(0, 194, 208, 0.18) !important;
+}
+
+:root[data-theme="light"] .checkout-mobileBarCopy span,
+:root[data-theme="light"] .pay-mobileBarCopy span {
+  color: rgba(50, 82, 91, 0.78) !important;
+}
+
+:root[data-theme="light"] .checkout-mobileBarCopy strong,
+:root[data-theme="light"] .pay-mobileBarCopy strong,
+:root[data-theme="light"] .checkout-item-price {
+  color: rgba(15, 49, 64, 0.96) !important;
+}
+
+:root[data-theme="light"] .pay-qrisLocked {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(229, 244, 249, 0.78)),
+    radial-gradient(circle at top right, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 60%) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(15, 49, 64, 0.9) !important;
+}
+
+:root[data-theme="light"] .pay-qrisLocked p {
+  color: rgba(50, 82, 91, 0.82) !important;
+}
+
+:root,
+:root[data-theme="dark"] {
+  --checkout-drawer-solid: #081320;
+  --checkout-panel-solid: #101a2b;
+  --checkout-summary-solid: #0d1726;
+  --checkout-card-solid: #132034;
+  --checkout-mobilebar-solid: #0b1524;
+}
+
+:root[data-theme="light"] {
+  --checkout-drawer-solid: #f3fbff;
+  --checkout-panel-solid: #f7fdff;
+  --checkout-summary-solid: #edf8fb;
+  --checkout-card-solid: #f8fdff;
+  --checkout-mobilebar-solid: #f2fbff;
+}
+
+:root,
+:root[data-theme="dark"] {
+  --skeu-panel-shadow:
+    0 34px 74px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.11),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.38),
+    0 0 0 1px rgba(0, 194, 208, 0.08);
+  --skeu-control-shadow:
+    0 18px 32px rgba(0, 0, 0, 0.26),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.34),
+    0 0 0 1px rgba(0, 194, 208, 0.08);
+  --skeu-inset-shadow:
+    inset 0 3px 9px rgba(0, 0, 0, 0.46),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.03);
+  --skeu-accent-shadow:
+    0 22px 38px rgba(0, 214, 180, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.44),
+    inset 0 -3px 0 rgba(3, 66, 74, 0.36);
+}
+
+:root[data-theme="light"] {
+  --skeu-panel-shadow:
+    0 28px 54px rgba(67, 111, 129, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(154, 191, 203, 0.24),
+    0 0 0 1px rgba(0, 138, 148, 0.08);
+  --skeu-control-shadow:
+    0 18px 30px rgba(67, 111, 129, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(154, 191, 203, 0.26),
+    0 0 0 1px rgba(0, 138, 148, 0.08);
+  --skeu-inset-shadow:
+    inset 0 2px 7px rgba(124, 158, 171, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 0 rgba(255, 255, 255, 0.56);
+  --skeu-accent-shadow:
+    0 20px 32px rgba(0, 214, 180, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -3px 0 rgba(0, 122, 130, 0.18);
+}
+
+.btn,
+.btn-ghost,
+.header-cart,
+.header-iconAction,
+.nav-toggle,
+.theme-toggle,
+.mobile-dock-link,
+.mobile-dock-icon,
+.catalog-quickChip,
+.catalog-viewBtn,
+.toggle-btn,
+.product-detail-metaPill,
+.variant-chip,
+.variant-badge,
+.stock-pill,
+.site-footerMeta a {
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.hero-commandCard,
+.stat-minimal,
+.product-tile,
+.catalog-card,
+.flow-assist,
+.site-footerPanel,
+.product-detail,
+.variant-tile,
+.catalog-filter,
+.catalog-command {
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.product-tile-icon,
+.catalog-cardIcon,
+.product-tile-arrow,
+.product-detail-icon,
+.product-detail-note,
+.product-detail-glanceCard,
+.variant-summary,
+.variant-notes,
+.variant-noteItem {
+  border-color: var(--brand-line) !important;
+}
+
+.nav-toggle {
+  display: grid !important;
+  place-items: center;
+}
+
+.nav-toggle svg {
+  width: 18px;
+  height: 18px;
+}
+
+.mobile-menu-lite {
+  width: min(320px, 84vw) !important;
+  max-width: 320px !important;
+  padding:
+    calc(18px + env(safe-area-inset-top))
+    calc(16px + env(safe-area-inset-right))
+    calc(20px + env(safe-area-inset-bottom))
+    16px !important;
+  gap: 12px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 20%),
+    var(--skeu-panel-bg) !important;
+  border-left: 1px solid var(--brand-line) !important;
+  box-shadow:
+    -18px 0 48px rgba(0, 0, 0, 0.22),
+    inset 1px 0 0 rgba(255, 255, 255, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  contain: layout paint style !important;
+  overscroll-behavior: contain !important;
+  will-change: auto !important;
+}
+
+.mobile-menu-stack {
+  display: grid;
+  gap: 10px;
+}
+
+.mobile-menu-lite .mobile-menu-header {
+  margin-bottom: 2px;
+  padding: 16px;
+  border-radius: 22px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  border: 1px solid var(--brand-line) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.mobile-menu-lite .mobile-menu-header h3 {
+  background: none !important;
+  -webkit-text-fill-color: currentColor !important;
+  color: var(--brand-text) !important;
+  letter-spacing: -0.02em;
+}
+
+.mobile-menu-lite .mobile-menu-header p {
+  color: var(--brand-muted) !important;
+}
+
+.mobile-menu-lite a {
+  min-height: 56px;
+  padding: 14px 16px !important;
+  border-radius: 18px !important;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 12px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-control-bg) !important;
+  border: 1px solid var(--brand-line) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  transition:
+    transform 0.16s ease,
+    border-color 0.16s ease,
+    background 0.16s ease !important;
+}
+
+.mobile-menu-lite a .menu-icon {
+  width: 38px !important;
+  height: 38px !important;
+  display: grid !important;
+  place-items: center;
+  border-radius: 14px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-pill-bg) !important;
+  border: 1px solid var(--brand-line) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  color: var(--brand-icon) !important;
+  opacity: 1 !important;
+}
+
+.mobile-menu-lite a .active-indicator {
+  position: static !important;
+  width: 9px !important;
+  height: 9px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #4effda, #00c2d0) !important;
+  box-shadow: 0 0 0 6px rgba(0, 214, 180, 0.08) !important;
+  opacity: 0;
+  transform: scale(0.72);
+  transition:
+    opacity 0.16s ease,
+    transform 0.16s ease;
+}
+
+.mobile-menu-lite a.active {
+  color: var(--brand-text) !important;
+  border-color: rgba(79, 255, 200, 0.22) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 24%),
+    linear-gradient(135deg, rgba(0, 214, 180, 0.18), rgba(0, 194, 208, 0.08)) !important;
+}
+
+.mobile-menu-lite a.active .active-indicator {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.mobile-menu-lite .mobile-menu-divider {
+  margin: 2px 4px;
+}
+
+.mobile-menu-lite .mobile-menu-footer {
+  gap: 8px;
+  justify-items: start;
+  text-align: left;
+}
+
+.mobile-menu-lite .mobile-menu-close {
+  top: calc(18px + env(safe-area-inset-top)) !important;
+  right: calc(16px + env(safe-area-inset-right)) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.toast {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-panel-bg) !important;
+  border-color: var(--brand-line) !important;
+  color: var(--brand-text) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.toast-icon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  border-radius: 12px;
+  border: 1px solid var(--brand-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-pill-bg);
+  box-shadow: var(--skeu-control-shadow);
+}
+
+.toast-icon-success {
+  color: #37ddb8;
+}
+
+.toast-icon-error {
+  color: #ff7a93;
+}
+
+.toast-icon-info {
+  color: var(--brand-icon);
+}
+
+.toast-icon-loading {
+  color: var(--brand-icon);
+}
+
+.toast-icon-loading svg {
+  animation: toastSpin 0.9s linear infinite;
+}
+
+.toast-title {
+  color: var(--brand-text) !important;
+}
+
+.toast-msg {
+  color: var(--brand-muted) !important;
+}
+
+.toast-action,
+.toast-close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toast-action {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-control-bg) !important;
+  border-color: var(--brand-line) !important;
+  color: var(--brand-text) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.toast-close {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-control-bg) !important;
+  border-color: var(--brand-line) !important;
+  color: var(--brand-text) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.site-footerBadge,
+.site-footerHeadline,
+.site-footerLead,
+.site-footerMeta a,
+.site-footerList a,
+.site-footerLabel,
+.site-footerBottom a {
+  transition:
+    color var(--dur-med) var(--ease-out),
+    transform var(--dur-med) var(--ease-out),
+    border-color var(--dur-med) var(--ease-out),
+    background var(--dur-med) var(--ease-out);
+}
+
+.site-footerHeadline,
+.site-footerLead {
+  color: var(--brand-text) !important;
+}
+
+.site-footerLead {
+  color: var(--brand-muted) !important;
+}
+
+.site-footerMeta a,
+.site-footerBottom a {
+  color: var(--brand-text) !important;
+}
+
+.site-footerHeadline,
+.site-footerLead,
+.site-footerLabel,
+.site-footerList a,
+.site-footerBottom a {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.site-footerMeta a {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  height: auto !important;
+  min-height: 0 !important;
+  color: var(--brand-muted) !important;
+}
+
+.site-footerMeta a:hover,
+.site-footerList a:hover,
+.site-footerLabel:hover,
+.site-footerHeadline:hover,
+.site-footerLead:hover,
+.site-footerBottom a:hover {
+  transform: translateY(-1px);
+  color: var(--brand-subtle) !important;
+}
+
+:root[data-theme="light"] .product-detail-desc,
+:root[data-theme="light"] .product-detail-priceHint,
+:root[data-theme="light"] .product-detail-glanceCopy,
+:root[data-theme="light"] .product-detail-note,
+:root[data-theme="light"] .product-detail-cartCopy,
+:root[data-theme="light"] .variants-copy,
+:root[data-theme="light"] .variant-summary,
+:root[data-theme="light"] .variant-noteItem,
+:root[data-theme="light"] .variant-subPrice,
+:root[data-theme="light"] .menu-footer-text,
+:root[data-theme="light"] .menu-footer-version,
+:root[data-theme="light"] .site-footerLead,
+:root[data-theme="light"] .site-footerLabel,
+:root[data-theme="light"] .site-footerMeta a,
+:root[data-theme="light"] .site-footerBottom {
+  color: rgba(43, 72, 82, 0.9) !important;
+}
+
+:root[data-theme="light"] .product-detail-metaPill,
+:root[data-theme="light"] .variants-count,
+:root[data-theme="light"] .variant-chip,
+:root[data-theme="light"] .stock-pill,
+:root[data-theme="light"] .product-detail-cartAction,
+:root[data-theme="light"] .site-footerHeadline,
+:root[data-theme="light"] .site-footerList a,
+:root[data-theme="light"] .site-footerBottom a,
+:root[data-theme="light"] .mobile-menu-lite a,
+:root[data-theme="light"] .mobile-menu-lite .mobile-menu-header h3 {
+  color: rgba(15, 49, 64, 0.96) !important;
+}
+
+@keyframes toastSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 720px) {
+  :root,
+  :root[data-theme="dark"] {
+    --skeu-panel-shadow:
+      0 14px 28px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.24),
+      0 0 0 1px rgba(0, 194, 208, 0.06);
+    --skeu-control-shadow:
+      0 10px 18px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.2),
+      0 0 0 1px rgba(0, 194, 208, 0.06);
+  }
+
+  :root[data-theme="light"] {
+    --skeu-panel-shadow:
+      0 12px 22px rgba(67, 111, 129, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -2px 0 rgba(154, 191, 203, 0.18),
+      0 0 0 1px rgba(0, 138, 148, 0.08);
+    --skeu-control-shadow:
+      0 8px 16px rgba(67, 111, 129, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 -2px 0 rgba(154, 191, 203, 0.16),
+      0 0 0 1px rgba(0, 138, 148, 0.08);
+  }
+
+  .mobile-backdrop {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(2, 9, 18, 0.4) !important;
+  }
+
+  .mobile-menu-lite,
+  .toast,
+  .site-footerPanel,
+  .product-tile,
+  .catalog-card,
+  .product-detail,
+  .variant-tile {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+@media (min-width: 721px) {
+  .nav-toggle {
+    display: none !important;
+  }
+}
+
+.mobile-backdrop-lite {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease;
+}
+
+.mobile-backdrop-lite.is-open,
+.mobile-backdrop-lite.is-closing {
+  pointer-events: auto;
+}
+
+.mobile-backdrop-lite.is-open {
+  opacity: 1;
+}
+
+.mobile-backdrop-lite.is-closing {
+  opacity: 0;
+}
+
+.mobile-menu-lite {
+  animation: none !important;
+  transform: translate3d(104%, 0, 0);
+  opacity: 0;
+  backface-visibility: hidden;
+  pointer-events: none;
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.18s ease;
+}
+
+.mobile-menu-lite.is-open,
+.mobile-menu-lite.is-closing {
+  pointer-events: auto;
+}
+
+.mobile-menu-lite.is-open {
+  transform: translate3d(0, 0, 0);
+  opacity: 1;
+}
+
+.mobile-menu-lite.is-closing {
+  transform: translate3d(22px, 0, 0);
+  opacity: 0;
+}
+
+.mobile-menu-lite a {
+  grid-template-columns: 40px minmax(0, 1fr) 10px !important;
+}
+
+.mobile-menu-lite a .menu-label {
+  min-width: 0;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.mobile-menu-lite .mobile-menu-footer {
+  gap: 10px;
+  justify-items: start;
+}
+
+.mobile-menu-lite .mobile-menu-footer .theme-toggle {
+  align-self: flex-start;
+}
+
+.menu-footer-text {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  text-shadow: none !important;
+}
+
+.site-footerPanel {
+  padding: 26px 28px !important;
+  border-radius: 32px !important;
+}
+
+.site-footerTop {
+  gap: 18px !important;
+  align-items: start !important;
+}
+
+.site-footerIntro {
+  gap: 12px !important;
+}
+
+.site-footerBrand {
+  align-items: center !important;
+  gap: 14px !important;
+}
+
+.site-footerBrand img {
+  width: 54px;
+  height: 54px;
+}
+
+.site-footerBrandCopy {
+  display: grid;
+  gap: 6px;
+}
+
+.site-footerHeadline,
+.site-footerLead,
+.site-footerLabel,
+.site-footerList a,
+.site-footerBottom a,
+.site-footerMeta a {
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+.site-footerHeadline {
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.02;
+}
+
+.site-footerActions .btn {
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.site-footerLead {
+  max-width: 30ch;
+  margin-top: 0 !important;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.site-footerMeta {
+  gap: 16px !important;
+  padding-top: 16px !important;
+}
+
+.site-footerMeta a {
+  position: relative;
+}
+
+.site-footerMeta a + a::before {
+  content: "";
+  position: absolute;
+  left: -10px;
+  top: 50%;
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.35;
+  transform: translateY(-50%);
+}
+
+.site-footerGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 16px !important;
+  padding-top: 18px !important;
+}
+
+.site-footerCol {
+  gap: 8px !important;
+}
+
+.site-footerLabel {
+  font-size: 10px;
+  letter-spacing: 0.14em;
+}
+
+.site-footerList {
+  gap: 8px !important;
+}
+
+.site-footerList a {
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.site-footerBottom {
+  gap: 10px;
+  padding-top: 14px !important;
+  margin-top: 16px !important;
+}
+
+.site-footerBottom a {
+  font-size: 12px;
+}
+
+:root[data-theme="light"] .site-footerPanel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 249, 252, 0.94)),
+    rgba(246, 251, 253, 0.96) !important;
+  border-color: rgba(0, 138, 148, 0.12) !important;
+  box-shadow:
+    0 24px 44px rgba(82, 127, 144, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+}
+
+:root[data-theme="light"] .site-footerTop,
+:root[data-theme="light"] .site-footerBottom,
+:root[data-theme="light"] .mobile-menu-footer {
+  border-color: rgba(8, 108, 122, 0.12) !important;
+}
+
+:root[data-theme="light"] .site-footerBadge {
+  background: rgba(255, 255, 255, 0.84) !important;
+  border-color: rgba(0, 138, 148, 0.12) !important;
+  color: rgba(70, 97, 107, 0.84) !important;
+}
+
+:root[data-theme="light"] .site-footerActions .btn-ghost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
+    rgba(247, 252, 255, 0.94) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(15, 49, 64, 0.92) !important;
+}
+
+:root[data-theme="light"] .site-footerHeadline,
+:root[data-theme="light"] .site-footerList a,
+:root[data-theme="light"] .site-footerBottom a {
+  color: rgba(13, 45, 57, 0.96) !important;
+}
+
+:root[data-theme="light"] .site-footerLead,
+:root[data-theme="light"] .site-footerLabel,
+:root[data-theme="light"] .site-footerMeta a,
+:root[data-theme="light"] .site-footerBottom,
+:root[data-theme="light"] .menu-footer-text {
+  color: rgba(56, 84, 94, 0.9) !important;
+}
+
+:root[data-theme="light"] .toast {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
+    rgba(246, 251, 253, 0.98) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(13, 45, 57, 0.96) !important;
+  box-shadow:
+    0 18px 36px rgba(82, 127, 144, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+}
+
+:root[data-theme="light"] .toast-title,
+:root[data-theme="light"] .toast-msg {
+  color: rgba(13, 45, 57, 0.96) !important;
+}
+
+:root[data-theme="light"] .toast-msg {
+  color: rgba(56, 84, 94, 0.9) !important;
+}
+
+:root[data-theme="light"] .toast-icon {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
+    rgba(249, 253, 255, 0.98) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+:root[data-theme="light"] .toast-action,
+:root[data-theme="light"] .toast-close {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
+    rgba(248, 253, 255, 0.98) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(13, 45, 57, 0.94) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+:root[data-theme="light"] .toast-action:hover,
+:root[data-theme="light"] .toast-close:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 28%),
+    rgba(242, 250, 253, 0.98) !important;
+  color: rgba(10, 115, 119, 0.96) !important;
+}
+
+.checkout-summaryRail {
+  display: none !important;
+}
+
+.sticky-cta {
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.sticky-cta-title,
+.sticky-cta-value {
+  text-shadow: none !important;
+}
+
+:root[data-theme="light"] .sticky-cta {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
+    rgba(246, 251, 253, 0.98) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow:
+    0 18px 38px rgba(82, 127, 144, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root[data-theme="light"] .sticky-cta-title {
+  color: rgba(56, 84, 94, 0.86) !important;
+}
+
+:root[data-theme="light"] .sticky-cta-value {
+  color: rgba(13, 45, 57, 0.98) !important;
+}
+
+:root[data-theme="light"] .qty-btn,
+:root[data-theme="light"] .qty,
+:root[data-theme="light"] .checkout-main-count {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
+    rgba(248, 253, 255, 0.96) !important;
+  border-color: rgba(0, 138, 148, 0.16) !important;
+  color: rgba(15, 49, 64, 0.96) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+:root[data-theme="light"] .qty-btn {
+  font-size: 18px;
+  font-weight: 900;
+}
+
+:root[data-theme="light"] .qty {
+  font-weight: 900;
+}
+
+:root[data-theme="light"] .checkout-summaryBadge,
+:root[data-theme="light"] .checkout-summaryLabel,
+:root[data-theme="light"] .checkout-main-kicker,
+:root[data-theme="light"] .checkout-drawerSub,
+:root[data-theme="light"] .checkout-summaryLink,
+:root[data-theme="light"] .checkout-summaryRow span,
+:root[data-theme="light"] .checkout-promo-title,
+:root[data-theme="light"] .checkout-promo-message {
+  color: rgba(56, 84, 94, 0.88) !important;
+}
+
+:root[data-theme="light"] .checkout-drawerTitle,
+:root[data-theme="light"] .checkout-summaryTotal,
+:root[data-theme="light"] .checkout-summaryRow b,
+:root[data-theme="light"] .checkout-main-title,
+:root[data-theme="light"] .checkout-main-count,
+:root[data-theme="light"] .checkout-item-price {
+  color: rgba(13, 45, 57, 0.98) !important;
+}
+
+:root[data-theme="light"] .pay-shell-kicker,
+:root[data-theme="light"] .pay-cardKicker,
+:root[data-theme="light"] .pay-orderKicker,
+:root[data-theme="light"] .pay-stageLabel,
+:root[data-theme="light"] .pay-waField .label {
+  color: rgba(63, 90, 100, 0.76) !important;
+}
+
+:root[data-theme="light"] .pay-shell-sub,
+:root[data-theme="light"] .pay-waField .hint,
+:root[data-theme="light"] .pay-noteToggle summary,
+:root[data-theme="light"] .pay-noteMeta,
+:root[data-theme="light"] .pay-stageHint,
+:root[data-theme="light"] .pay-stageRow,
+:root[data-theme="light"] .pay-stageFoot,
+:root[data-theme="light"] .pay-orderItemMeta,
+:root[data-theme="light"] .pay-orderRow,
+:root[data-theme="light"] .pay-orderMobile summary span,
+:root[data-theme="light"] .pay-orderMobile summary b,
+:root[data-theme="light"] .pay-successLead,
+:root[data-theme="light"] .pay-qrisLocked p {
+  color: rgba(56, 84, 94, 0.84) !important;
+}
+
+:root[data-theme="light"] .pay-card,
+:root[data-theme="light"] .pay-orderDesktop,
+:root[data-theme="light"] .pay-orderMobile,
+:root[data-theme="light"] .pay-successModal,
+:root[data-theme="light"] .qris-wrap {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 249, 252, 0.94)),
+    rgba(246, 251, 253, 0.96) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+:root[data-theme="light"] .pay-statePill,
+:root[data-theme="light"] .pay-orderPromo,
+:root[data-theme="light"] .pay-orderItem,
+:root[data-theme="light"] .pay-orderMobile summary,
+:root[data-theme="light"] .pay-qrisLocked,
+:root[data-theme="light"] .pay-noteInput,
+:root[data-theme="light"] .pay-waField .input {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 28%),
+    rgba(248, 253, 255, 0.96) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(13, 45, 57, 0.96) !important;
+}
+
+:root[data-theme="light"] .pay-shell-title,
+:root[data-theme="light"] .pay-cardTitle,
+:root[data-theme="light"] .pay-stageTotal,
+:root[data-theme="light"] .pay-orderTitle,
+:root[data-theme="light"] .pay-orderItemName,
+:root[data-theme="light"] .pay-orderRow strong,
+:root[data-theme="light"] .pay-orderRow b,
+:root[data-theme="light"] .pay-stageRow b,
+:root[data-theme="light"] .pay-qrisLocked strong,
+:root[data-theme="light"] .pay-successCode,
+:root[data-theme="light"] .pay-orderMobile summary strong {
+  color: rgba(13, 45, 57, 0.98) !important;
+}
+
+:root[data-theme="light"] .pay-shell .btn-ghost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
+    rgba(247, 252, 255, 0.94) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: rgba(15, 49, 64, 0.92) !important;
+}
+
+@media (max-width: 680px) {
+  .site-footerPanel {
+    padding: 20px !important;
+    border-radius: 26px !important;
+  }
+
+  .site-footerGrid {
+    gap: 14px !important;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-footerMeta {
+    gap: 12px !important;
+  }
+
+  .site-footerMeta a + a::before {
+    display: none;
+  }
+
+  .site-footerGrid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .site-footerBottom {
+    align-items: flex-start !important;
+  }
+}

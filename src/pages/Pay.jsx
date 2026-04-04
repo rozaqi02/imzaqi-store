@@ -60,7 +60,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, onClose, onCopied }) {
         <div className="modal-head pay-successHead">
           <div>
             <div className="modal-title">Order dibuat</div>
-            <div className="modal-sub">Simpan ID ini lalu cek Status.</div>
+            <div className="modal-sub">Simpan ID ini, lalu buka halaman status saat diperlukan.</div>
           </div>
           <button className="icon-btn" type="button" onClick={onClose} aria-label="Tutup">
             <X size={18} />
@@ -74,7 +74,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, onClose, onCopied }) {
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode">{orderCode}</div>
-            <p className="pay-successLead">Gunakan ID ini untuk memantau pesanan.</p>
+            <p className="pay-successLead">ID ini akan dipakai setiap kali kamu ingin mengecek progres order.</p>
           </div>
 
           <div className="pay-successActions">
@@ -101,7 +101,7 @@ export default function Pay() {
 
   usePageMeta({
     title: "Pembayaran",
-    description: "Bayar via QRIS lalu simpan ID order.",
+    description: "Bayar sesuai total, lalu simpan ID order untuk halaman status.",
   });
 
   const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
@@ -193,9 +193,9 @@ export default function Pay() {
   const isDynamicQris = qrisMode === "dynamic";
   const qrisFootText = canShowQris
     ? isDynamicQris
-      ? "Nominal QR otomatis."
-      : "QR statis: bayar sesuai total."
-    : "QR akan terbuka otomatis.";
+      ? "Nominal QR sudah menyesuaikan total."
+      : "QR statis aktif. Bayar sesuai total di ringkasan."
+    : "QR akan terbuka setelah nomor WhatsApp valid.";
 
   const summaryText = useMemo(() => {
     const rows = items.map(
@@ -332,6 +332,29 @@ export default function Pay() {
 
   const canSubmit = !busy && canShowQris;
 
+  function renderMobileBar() {
+    return (
+      <div className="pay-mobileBar">
+        <div className="pay-mobileBarCopy">
+          <span>Total bayar</span>
+          <strong>{formatIDR(total)}</strong>
+        </div>
+
+        <button className="btn pay-mobileBarBtn" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
+          {busy ? (
+            <>
+              <Loader className="spinner" size={16} /> Menyimpan
+            </>
+          ) : (
+            <>
+              <Check size={16} /> Saya sudah bayar
+            </>
+          )}
+        </button>
+      </div>
+    );
+  }
+
   return (
     <div className="page pay-shell">
       <section className="section reveal pay-shell-hero">
@@ -342,7 +365,7 @@ export default function Pay() {
               <span>Pembayaran</span>
             </div>
             <h1 className="h1 pay-shell-title">Pay.</h1>
-            <p className="pay-shell-sub">Scan QR lalu simpan ID order.</p>
+            <p className="pay-shell-sub">Bayar sesuai total, lalu simpan ID order untuk status.</p>
           </div>
         </div>
 
@@ -368,7 +391,7 @@ export default function Pay() {
             <section className="card pad pay-card pay-contactCard">
               <div className="pay-cardHead">
                 <div>
-                  <div className="pay-cardKicker">Kontak</div>
+                  <div className="pay-cardKicker">Kontak order</div>
                   <h2 className="h3 pay-cardTitle">WhatsApp</h2>
                 </div>
                 <span className={`pay-statePill ${canShowQris ? "live" : ""}`}>{canShowQris ? "Ready" : "Locked"}</span>
@@ -391,7 +414,7 @@ export default function Pay() {
               <details className="pay-noteToggle">
                 <summary>
                   <FileText size={14} />
-                  <span>Tambah catatan</span>
+                  <span>Tambah catatan opsional</span>
                 </summary>
                 <div className="pay-noteBody">
                   <textarea
@@ -412,7 +435,7 @@ export default function Pay() {
                 <div className="pay-stageMeta">
                   <div className="pay-stageLabel">Total bayar</div>
                   <div className="pay-stageTotal">{formatIDR(total)}</div>
-                  <div className="pay-stageHint">{canShowQris ? "Scan QR lalu selesaikan pembayaran." : "Isi WhatsApp untuk membuka QR."}</div>
+                  <div className="pay-stageHint">{canShowQris ? "Scan QR, selesaikan pembayaran, lalu simpan ID order." : "Isi WhatsApp dulu untuk membuka QR."}</div>
 
                   <div className="pay-stageRows">
                     <div className="pay-stageRow">
@@ -487,7 +510,7 @@ export default function Pay() {
                       <div className="pay-qrisLocked">
                         <Phone size={24} />
                         <strong>QRIS terkunci</strong>
-                        <p>Isi nomor WhatsApp yang valid dulu.</p>
+                        <p>Isi nomor WhatsApp yang valid agar langkah berikutnya terbuka.</p>
                       </div>
                     )}
                   </div>
@@ -515,6 +538,8 @@ export default function Pay() {
           ) : null}
         </div>
       </section>
+
+      {items.length > 0 ? renderMobileBar() : null}
 
       <OrderSuccessModal
         open={ok}

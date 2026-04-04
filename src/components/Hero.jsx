@@ -13,8 +13,8 @@ import {
 import { fetchProducts } from "../lib/api";
 import { useLiveStats } from "../hooks/useLiveStats";
 
-const HERO_TEXT = "Premium apps. Fast checkout.";
-const HIGHLIGHT = "Fast checkout";
+const HERO_TEXT = "Pilih paket. Bayar rapi.";
+const HIGHLIGHT = "Bayar rapi";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -55,7 +55,7 @@ function renderTypedWithHighlight(typedText) {
 export default function Hero() {
   const nav = useNavigate();
   const location = useLocation();
-  const { totalViews, todayViews, totalOrders, todayOrders } = useLiveStats();
+  const { totalViews, todayViews, totalOrders, weekOrders } = useLiveStats();
   const [typed, setTyped] = useState(() => {
     if (typeof window === "undefined" || !window.matchMedia) return "";
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)")?.matches;
@@ -152,7 +152,7 @@ export default function Hero() {
     { label: "Total Kunjungan", value: totalViews },
     { label: "Kunjungan Hari Ini", value: todayViews },
     { label: "Total Order", value: totalOrders },
-    { label: "Order hari ini", value: todayOrders },
+    { label: "Order Minggu Ini", value: weekOrders },
   ];
 
   const flow = [
@@ -169,7 +169,7 @@ export default function Hero() {
       <div className="container hero-minimal-grid">
         <div className="hero-copy hero-copy-centered">
           <motion.div custom={0} {...fadeProps} className="hero-eyebrow">
-            Premium apps store
+            Imzaqi Store
           </motion.div>
 
           <motion.h1 custom={1} {...fadeProps} className="hero-title hero-title-minimal">
@@ -180,7 +180,7 @@ export default function Hero() {
           </motion.h1>
 
           <motion.p custom={2} {...fadeProps} className="hero-sub hero-sub-minimal">
-            Cari, pilih, bayar, pantau.
+            Dari katalog sampai status order, langkah berikutnya selalu jelas.
           </motion.p>
 
           <motion.div custom={3} {...fadeProps} className="hero-rail">
@@ -206,7 +206,7 @@ export default function Hero() {
 
                 <input
                   className="input hero-search-input"
-                  placeholder="Cari Netflix, Canva, ChatGPT"
+                  placeholder="Cari produk favoritmu"
                   value={q}
                   aria-label="Cari produk"
                   onFocus={() => setOpen(true)}
@@ -267,11 +267,11 @@ export default function Hero() {
             <motion.div custom={5} {...fadeProps} className="hero-ctas hero-ctas-minimal">
               <Link className="btn" to="/produk">
                 <ScanSearch size={16} />
-                <span>Produk</span>
+                <span>Lihat katalog</span>
               </Link>
               <Link className="btn btn-ghost" to="/checkout" state={{ backgroundLocation: location }}>
                 <Zap size={16} />
-                <span>Checkout</span>
+                <span>Buka checkout</span>
               </Link>
             </motion.div>
           </motion.div>

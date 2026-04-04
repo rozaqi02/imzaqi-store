@@ -1,6 +1,66 @@
 import { supabase } from "./supabaseClient";
 
-export async function fetchProducts({ includeInactive = false } = {}) {
+const PUBLIC_CACHE_PREFIX = "imzaqi-public-cache:";
+const publicCacheMemory = new Map();
+
+function safeStorage() {
+  try {
+    return typeof window !== "undefined" ? window.sessionStorage : null;
+  } catch {
+    return null;
+  }
+}
+
+function readPublicCache(key, ttlMs) {
+  const now = Date.now();
+  const memoryEntry = publicCacheMemory.get(key);
+  if (memoryEntry && now - memoryEntry.at < ttlMs) return memoryEntry.data;
+
+  const storage = safeStorage();
+  if (!storage) return null;
+
+  try {
+    const raw = storage.getItem(`${PUBLIC_CACHE_PREFIX}${key}`);
+    if (!raw) return null;
+
+    const parsed = JSON.parse(raw);
+    if (!parsed || now - Number(parsed.at || 0) >= ttlMs) return null;
+
+    publicCacheMemory.set(key, parsed);
+    return parsed.data;
+  } catch {
+    return null;
+  }
+}
+
+function writePublicCache(key, data) {
+  const entry = { at: Date.now(), data };
+  publicCacheMemory.set(key, entry);
+
+  const storage = safeStorage();
+  if (!storage) return;
+
+  try {
+    storage.setItem(`${PUBLIC_CACHE_PREFIX}${key}`, JSON.stringify(entry));
+  } catch {}
+}
+
+function clearPublicCache(key) {
+  publicCacheMemory.delete(key);
+
+  const storage = safeStorage();
+  if (!storage) return;
+
+  try {
+    storage.removeItem(`${PUBLIC_CACHE_PREFIX}${key}`);
+  } catch {}
+}
+
+export async function fetchProducts({ includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
+  const cacheKey = `products:${includeInactive ? "all" : "active"}`;
+  const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
+  if (cached) return cached;
+
   let q = supabase
     .from("products")
     .select(
@@ -27,10 +87,16 @@ export async function fetchProducts({ includeInactive = false } = {}) {
   }
 
   if (error) throw error;
-  return data || [];
+  const result = data || [];
+  if (useCache) writePublicCache(cacheKey, result);
+  return result;
 }
 
-export async function fetchProductBySlug(slug, { includeInactive = false } = {}) {
+export async function fetchProductBySlug(slug, { includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
+  const cacheKey = `product:${includeInactive ? "all" : "active"}:${slug}`;
+  const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
+  if (cached) return cached;
+
   let q = supabase
     .from("products")
     .select(
@@ -58,10 +124,15 @@ export async function fetchProductBySlug(slug, { includeInactive = false } = {})
   }
 
   if (error) throw error;
+  if (useCache && data) writePublicCache(cacheKey, data);
   return data;
 }
 
-export async function fetchTestimonials({ includeInactive = false } = {}) {
+export async function fetchTestimonials({ includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
+  const cacheKey = `testimonials:${includeInactive ? "all" : "active"}`;
+  const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
+  if (cached) return cached;
+
   const q = supabase
     .from("testimonials")
     .select("id,image_url,caption,is_active,sort_order,created_at")
@@ -72,14 +143,21 @@ export async function fetchTestimonials({ includeInactive = false } = {}) {
 
   const { data, error } = await q;
   if (error) throw error;
-  return data || [];
+  const result = data || [];
+  if (useCache) writePublicCache(cacheKey, result);
+  return result;
 }
 
-export async function fetchSettings() {
+export async function fetchSettings({ useCache = true, ttlMs = 30000 } = {}) {
+  const cacheKey = "settings";
+  const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
+  if (cached) return cached;
+
   const { data, error } = await supabase.from("site_settings").select("key,value");
   if (error) throw error;
   const map = {};
   (data || []).forEach(r => { map[r.key] = r.value; });
+  if (useCache) writePublicCache(cacheKey, map);
   return map;
 }
 
@@ -92,6 +170,7 @@ export async function upsertSetting(key, value) {
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new Error(`Setting ${key} tidak ditemukan di database.`);
+  clearPublicCache("settings");
 }
 
 export async function fetchPromoCodes() {
@@ -100,7 +179,11 @@ export async function fetchPromoCodes() {
   return data || [];
 }
 
-export async function fetchTopSellingIds() {
+export async function fetchTopSellingIds({ useCache = true, ttlMs = 45000 } = {}) {
+  const cacheKey = "top-products";
+  const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
+  if (cached) return cached;
+
   // Panggil RPC database
   const { data, error } = await supabase.rpc("get_top_products");
   if (error) {
@@ -108,7 +191,9 @@ export async function fetchTopSellingIds() {
     return [];
   }
   // Kembalikan array ID saja, urut dari yang terlaris
-  return (data || []).map((x) => x.product_id);
+  const result = (data || []).map((x) => x.product_id);
+  if (useCache) writePublicCache(cacheKey, result);
+  return result;
 }
 
 // New: Check stock availability for cart items

@@ -9,12 +9,14 @@ export function useRevealOnScroll(dep) {
 
     const prefersReduced =
       window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const prefersPerf =
+    const coarsePointer =
       window.matchMedia &&
-      (window.matchMedia("(max-width: 920px)").matches || window.matchMedia("(pointer: coarse)").matches);
+      (window.matchMedia("(pointer: coarse)").matches || window.matchMedia("(max-width: 720px)").matches);
+    const saveData = Boolean(navigator.connection && navigator.connection.saveData);
+    const lowMemory = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
 
-    if (prefersReduced || prefersPerf) {
-      // Ensure reveal elements are visible without animation.
+    if (prefersReduced || coarsePointer || saveData || lowMemory) {
+      // Keep mobile and constrained devices responsive by skipping intersection work.
       document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
       return undefined;
     }

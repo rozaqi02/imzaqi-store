@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, Layers3, PackageCheck } from "lucide-react";
 import { formatIDR } from "../lib/format";
 
-export default function ProductTile({ product }) {
+export default function ProductTile({ product, layout = "grid" }) {
   const summary = useMemo(() => {
     const activeVariants = (product?.product_variants || []).filter((v) => v?.is_active);
     const prices = activeVariants
@@ -19,7 +19,7 @@ export default function ProductTile({ product }) {
   }, [product]);
 
   return (
-    <Link to={`/produk/${product.slug}`} className="product-tile">
+    <Link to={`/produk/${product.slug}`} className={`product-tile product-tile--${layout}`}>
       <div className="product-tile-top">
         <div className="product-tile-icon">
           {product.icon_url ? (
@@ -45,11 +45,11 @@ export default function ProductTile({ product }) {
         <div className="product-tile-pills">
           <span className="product-tile-pill">
             <Layers3 size={13} />
-            <span>{summary.variantsCount || 0}</span>
+            <span>{summary.variantsCount || 0} varian</span>
           </span>
           <span className="product-tile-pill">
             <PackageCheck size={13} />
-            <span>{summary.totalStock || 0}</span>
+            <span>{summary.totalStock || 0} stok</span>
           </span>
         </div>
 

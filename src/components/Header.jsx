@@ -1,17 +1,22 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { motion, AnimatePresence } from "framer-motion";
 import {
   Activity,
   Grid2x2,
   House,
   Info,
+  Menu,
   MessageSquareQuote,
+  Moon,
   Shield,
+  SunMedium,
   X,
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { useTheme } from "../context/ThemeContext";
+
+const MOBILE_BREAKPOINT = "(max-width: 720px)";
 
 function CartIcon() {
   return (
@@ -31,273 +36,243 @@ function CartIcon() {
   );
 }
 
-const menuItems = [
+const primaryItems = [
   { to: "/", label: "Home", icon: House },
   { to: "/produk", label: "Produk", icon: Grid2x2 },
   { to: "/tentang", label: "Tentang", icon: Info },
   { to: "/testimoni", label: "Testimoni", icon: MessageSquareQuote },
 ];
 
-const secondaryItems = [
+const utilityItems = [
   { to: "/status", label: "Status", icon: Activity },
   { to: "/admin", label: "Admin", icon: Shield },
 ];
 
-function MobileMenu({ open, onClose }) {
+function ThemeToggleButton({ onToggle, isDark }) {
+  return (
+    <button
+      type="button"
+      className={`theme-toggle${isDark ? " is-dark" : ""}`}
+      onClick={onToggle}
+      aria-label={isDark ? "Aktifkan light mode" : "Aktifkan dark mode"}
+      aria-pressed={isDark}
+      title={isDark ? "Light mode" : "Dark mode"}
+    >
+      <span className="theme-toggleGlyph theme-toggleGlyph-light" aria-hidden="true">
+        <SunMedium size={13} strokeWidth={2.1} />
+      </span>
+      <span className="theme-toggleGlyph theme-toggleGlyph-dark" aria-hidden="true">
+        <Moon size={13} strokeWidth={2.1} />
+      </span>
+      <span className="theme-toggleThumb" aria-hidden="true">
+        {isDark ? <Moon size={16} strokeWidth={2} /> : <SunMedium size={16} strokeWidth={2} />}
+      </span>
+    </button>
+  );
+}
+
+function MenuLink({ item }) {
+  const Icon = item.icon;
+
+  return (
+    <NavLink to={item.to} className={({ isActive }) => (isActive ? "active" : "")}>
+      <span className="menu-icon">
+        <Icon size={18} strokeWidth={2.1} />
+      </span>
+      <span className="menu-label">{item.label}</span>
+      <span className="active-indicator" aria-hidden="true" />
+    </NavLink>
+  );
+}
+
+function MobileMenu({ open, onClose, isDark, toggleTheme }) {
   const menuRef = useRef(null);
-  const openRef = useRef(open);
   const location = useLocation();
+  const previousPathRef = useRef(location.pathname);
+  const closeTimerRef = useRef(null);
+  const openFrameRef = useRef(null);
+  const [phase, setPhase] = useState(open ? "open" : "closed");
 
-  useEffect(() => {
-    openRef.current = open;
-  }, [open]);
-
-  useEffect(() => {
-    const handleEscape = (e) => {
-      if (e.key === "Escape" && open) {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleEscape);
-    return () => window.removeEventListener("keydown", handleEscape);
-  }, [open, onClose]);
-
-  useEffect(() => {
-    if (openRef.current) {
+  const requestClose = useCallback(() => {
+    if (!open || phase === "closing") return;
+    setPhase("closing");
+    window.clearTimeout(closeTimerRef.current);
+    closeTimerRef.current = window.setTimeout(() => {
       onClose();
-    }
-  }, [location.pathname, onClose]);
+      setPhase("closed");
+    }, 180);
+  }, [onClose, open, phase]);
 
   useEffect(() => {
-    if (open && menuRef.current) {
-      const firstButton = menuRef.current.querySelector("button");
-      firstButton?.focus();
+    window.clearTimeout(closeTimerRef.current);
+    window.cancelAnimationFrame(openFrameRef.current);
+
+    if (open) {
+      openFrameRef.current = window.requestAnimationFrame(() => {
+        openFrameRef.current = window.requestAnimationFrame(() => {
+          setPhase("open");
+        });
+      });
+
+      return () => window.cancelAnimationFrame(openFrameRef.current);
     }
+
+    setPhase("closed");
+    return undefined;
   }, [open]);
 
-  const backdropVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: 0.3, ease: [0.16, 1, 0.3, 1] },
+  useEffect(
+    () => () => {
+      window.clearTimeout(closeTimerRef.current);
+      window.cancelAnimationFrame(openFrameRef.current);
     },
-    exit: {
-      opacity: 0,
-      transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] },
-    },
-  };
+    []
+  );
 
-  const menuVariants = {
-    hidden: {
-      x: "100%",
-      opacity: 0,
-    },
-    visible: {
-      x: 0,
-      opacity: 1,
-      transition: {
-        type: "spring",
-        damping: 30,
-        stiffness: 300,
-        mass: 0.8,
-      },
-    },
-    exit: {
-      x: "100%",
-      opacity: 0,
-      transition: {
-        type: "spring",
-        damping: 30,
-        stiffness: 300,
-        mass: 0.8,
-      },
-    },
-  };
+  useEffect(() => {
+    if (!open) return undefined;
 
-  const headerVariants = {
-    hidden: { opacity: 0, y: -10 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { delay: 0.15, duration: 0.3 },
-    },
-    exit: { opacity: 0, y: -10, transition: { duration: 0.15 } },
-  };
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") requestClose();
+    };
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: 20 },
-    visible: (i) => ({
-      opacity: 1,
-      x: 0,
-      transition: {
-        delay: 0.1 + i * 0.05,
-        duration: 0.3,
-        ease: [0.16, 1, 0.3, 1],
-      },
-    }),
-    exit: {
-      opacity: 0,
-      x: 20,
-      transition: { duration: 0.15 },
-    },
-  };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open, requestClose]);
 
-  const closeButtonVariants = {
-    hidden: { scale: 0, rotate: -90 },
-    visible: {
-      scale: 1,
-      rotate: 0,
-      transition: {
-        type: "spring",
-        damping: 15,
-        stiffness: 300,
-        delay: 0.2,
-      },
-    },
-    exit: {
-      scale: 0,
-      rotate: 90,
-      transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] },
-    },
-  };
+  useEffect(() => {
+    if (!open) {
+      previousPathRef.current = location.pathname;
+      return undefined;
+    }
+
+    if (previousPathRef.current !== location.pathname) {
+      requestClose();
+    }
+
+    previousPathRef.current = location.pathname;
+    return undefined;
+  }, [location.pathname, open, requestClose]);
+
+  useEffect(() => {
+    if (!open || phase !== "open" || !menuRef.current) return undefined;
+    const firstInteractive = menuRef.current.querySelector("button, a");
+    firstInteractive?.focus();
+    return undefined;
+  }, [open, phase]);
+
+  if (typeof document === "undefined" || (!open && phase === "closed")) return null;
+
+  const stateClass = phase === "closing" ? "is-closing" : phase === "open" ? "is-open" : "";
+  const backdropClass = `mobile-backdrop mobile-backdrop-lite ${stateClass}`.trim();
+  const menuClass = `mobile-menu mobile-menu-lite ${stateClass}`.trim();
 
   return createPortal(
-    <AnimatePresence mode="wait">
-      {open ? (
-        <>
-          <motion.div
-            className="mobile-backdrop"
-            variants={backdropVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            onClick={onClose}
-            aria-hidden="true"
-          />
+    <>
+      <div className={backdropClass} onClick={requestClose} aria-hidden="true" />
 
-          <motion.nav
-            ref={menuRef}
-            className="mobile-menu"
-            variants={menuVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            drag="x"
-            dragConstraints={{ left: 0, right: 0 }}
-            dragElastic={0.2}
-            onDragEnd={(e, { offset, velocity }) => {
-              if (offset.x > 100 || velocity.x > 500) {
-                onClose();
-              }
-            }}
-            role="navigation"
-            aria-label="Menu navigasi mobile"
-          >
-            <motion.button
-              className="mobile-menu-close"
-              onClick={onClose}
-              aria-label="Tutup menu"
-              variants={closeButtonVariants}
-              whileHover={{ scale: 1.1, rotate: 90 }}
-              whileTap={{ scale: 0.9 }}
-            >
-              <X size={18} strokeWidth={2.2} />
-            </motion.button>
+      <aside ref={menuRef} className={menuClass} role="dialog" aria-modal="true" aria-label="Navigasi mobile">
+        <button className="mobile-menu-close" onClick={requestClose} aria-label="Tutup menu">
+          <X size={18} strokeWidth={2.2} />
+        </button>
 
-            <motion.div className="mobile-menu-header" variants={headerVariants}>
-              <h3>Menu</h3>
-              <p>Navigasi Cepat</p>
-            </motion.div>
+        <div className="mobile-menu-header">
+          <h3>Menu</h3>
+          <p>Akses cepat.</p>
+        </div>
 
-            {menuItems.map((item, i) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.to;
+        <div className="mobile-menu-stack">
+          {primaryItems.map((item) => (
+            <MenuLink key={item.to} item={item} />
+          ))}
+        </div>
 
-              return (
-                <motion.div key={item.to} custom={i} variants={itemVariants}>
-                  <NavLink to={item.to} className={isActive ? "active" : ""}>
-                    <motion.span
-                      className="menu-icon"
-                      whileHover={{ scale: 1.2, rotate: 5 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                    >
-                      <Icon size={18} strokeWidth={2.1} />
-                    </motion.span>
-                    <span>{item.label}</span>
-                    {isActive ? (
-                      <motion.span
-                        className="active-indicator"
-                        layoutId="activeIndicator"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    ) : null}
-                  </NavLink>
-                </motion.div>
-              );
-            })}
+        <div className="mobile-menu-divider" />
 
-            <motion.div className="mobile-menu-divider" custom={menuItems.length} variants={itemVariants} />
+        <div className="mobile-menu-stack">
+          {utilityItems.map((item) => (
+            <MenuLink key={item.to} item={item} />
+          ))}
+        </div>
 
-            {secondaryItems.map((item, i) => {
-              const Icon = item.icon;
-              const isActive = location.pathname === item.to;
-              const customIndex = menuItems.length + 1 + i;
-
-              return (
-                <motion.div key={item.to} custom={customIndex} variants={itemVariants}>
-                  <NavLink to={item.to} className={isActive ? "active" : ""}>
-                    <motion.span
-                      className="menu-icon"
-                      whileHover={{ scale: 1.2, rotate: 5 }}
-                      transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                    >
-                      <Icon size={18} strokeWidth={2.1} />
-                    </motion.span>
-                    <span>{item.label}</span>
-                    {isActive ? (
-                      <motion.span
-                        className="active-indicator"
-                        layoutId="activeIndicator"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    ) : null}
-                  </NavLink>
-                </motion.div>
-              );
-            })}
-
-            <motion.div
-              className="mobile-menu-footer"
-              custom={menuItems.length + secondaryItems.length + 2}
-              variants={itemVariants}
-            >
-              <p className="menu-footer-text">imzaqi.store</p>
-              <p className="menu-footer-version">v3.1</p>
-            </motion.div>
-          </motion.nav>
-        </>
-      ) : null}
-    </AnimatePresence>,
+        <div className="mobile-menu-footer">
+          <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+          <p className="menu-footer-text">Imzaqi Store Web V.3.9</p>
+        </div>
+      </aside>
+    </>,
     document.body
   );
 }
 
 export default function Header() {
   const { items } = useCart();
-  const cartCount = useMemo(() => items.reduce((s, x) => s + x.qty, 0), [items]);
+  const { isDark, toggleTheme } = useTheme();
+  const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
   const [open, setOpen] = useState(false);
+  const [isMobileViewport, setIsMobileViewport] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia(MOBILE_BREAKPOINT).matches : false
+  );
+  const headerRef = useRef(null);
   const location = useLocation();
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
 
   useEffect(() => {
-    document.body.classList.toggle("nav-open", open);
+    document.body.classList.toggle("nav-open", open && isMobileViewport);
     return () => document.body.classList.remove("nav-open");
-  }, [open]);
+  }, [isMobileViewport, open]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    const media = window.matchMedia(MOBILE_BREAKPOINT);
+    const sync = () => setIsMobileViewport(media.matches);
+    sync();
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", sync);
+      return () => media.removeEventListener("change", sync);
+    }
+    media.addListener(sync);
+    return () => media.removeListener(sync);
+  }, []);
+
+  useEffect(() => {
+    if (!isMobileViewport && open) setOpen(false);
+  }, [isMobileViewport, open]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const root = document.documentElement;
+    let frame = 0;
+    let observer;
+
+    const syncHeaderOffset = () => {
+      window.cancelAnimationFrame(frame);
+      frame = window.requestAnimationFrame(() => {
+        const nextHeight = Math.ceil(headerRef.current?.getBoundingClientRect().height || 0);
+        root.style.setProperty("--site-header-offset", `${nextHeight}px`);
+      });
+    };
+
+    syncHeaderOffset();
+    window.addEventListener("resize", syncHeaderOffset);
+
+    if (typeof ResizeObserver !== "undefined" && headerRef.current) {
+      observer = new ResizeObserver(syncHeaderOffset);
+      observer.observe(headerRef.current);
+    }
+
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.removeEventListener("resize", syncHeaderOffset);
+      observer?.disconnect();
+    };
+  }, [location.pathname]);
 
   return (
     <>
-      <header className="header">
+      <header ref={headerRef} className="header">
         <div className="container header-inner">
           <Link to="/" className="brand">
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
@@ -312,63 +287,40 @@ export default function Header() {
           </nav>
 
           <div className="header-actions">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link to="/checkout" state={{ backgroundLocation: location }} className="header-cart">
-                <CartIcon />
-                {cartCount > 0 ? (
-                  <motion.span
-                    className="pill"
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    transition={{ type: "spring", stiffness: 500, damping: 15 }}
-                  >
-                    {cartCount}
-                  </motion.span>
-                ) : null}
-              </Link>
-            </motion.div>
+            <Link to="/checkout" state={{ backgroundLocation: location }} className="header-cart">
+              <CartIcon />
+              {cartCount > 0 ? <span className="pill">{cartCount}</span> : null}
+            </Link>
 
-            <motion.div
-              className="desktop-only"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
+            <div className="desktop-only">
+              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+            </div>
+
+            <NavLink
+              to="/admin"
+              className={`header-iconAction desktop-only${location.pathname.startsWith("/admin") ? " active" : ""}`}
+              aria-label="Admin"
+              title="Admin"
             >
-              <NavLink
-                to="/admin"
-                className={`header-iconAction${location.pathname.startsWith("/admin") ? " active" : ""}`}
-                aria-label="Admin"
-                title="Admin"
+              <Shield size={18} strokeWidth={2.1} />
+            </NavLink>
+
+            {isMobileViewport ? (
+              <button
+                className="nav-toggle"
+                onClick={handleOpen}
+                aria-label="Buka menu"
+                aria-expanded={open}
+                type="button"
               >
-                <Shield size={18} strokeWidth={2.1} />
-              </NavLink>
-            </motion.div>
-
-            <motion.button
-              className="nav-toggle"
-              onClick={handleOpen}
-              aria-label="Buka menu"
-              aria-expanded={open}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-            >
-              <motion.span
-                animate={open ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-              />
-              <motion.span
-                animate={open ? { opacity: 0 } : { opacity: 1 }}
-                transition={{ duration: 0.2 }}
-              />
-              <motion.span
-                animate={open ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.2 }}
-              />
-            </motion.button>
+                <Menu size={18} strokeWidth={2.4} />
+              </button>
+            ) : null}
           </div>
         </div>
       </header>
 
-      <MobileMenu open={open} onClose={handleClose} />
+      {isMobileViewport ? <MobileMenu open={open} onClose={handleClose} isDark={isDark} toggleTheme={toggleTheme} /> : null}
     </>
   );
 }

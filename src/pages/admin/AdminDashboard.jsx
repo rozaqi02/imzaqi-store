@@ -17,6 +17,7 @@ import {
 
 import Modal from "../../components/Modal";
 import EmptyState from "../../components/EmptyState";
+import FlowAssist from "../../components/FlowAssist";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -585,6 +586,11 @@ export default function AdminDashboard() {
       activeTestimonials: (testimonials || []).filter((item) => item.is_active).length,
     };
   }, [allVariants, analyticsDays, orders, products, promos, storePulse.total_views, testimonials]);
+
+  const testimonialsWithoutCaption = useMemo(
+    () => (testimonials || []).filter((item) => item.is_active && !String(item.caption || "").trim()).length,
+    [testimonials]
+  );
 
   const dashboardStats = useMemo(() => {
     return [
@@ -1162,12 +1168,12 @@ export default function AdminDashboard() {
 
   // ===== Render =====
   const tabs = [
-    { id: "overview", label: "Overview", hint: "Analitik dan ringkasan toko" },
-    { id: "products", label: "Produk", hint: "Katalog dan paket" },
-    { id: "orders", label: "Orders", hint: "Antrean order dan follow-up" },
-    { id: "promos", label: "Promo", hint: "Kode diskon dan klaim" },
-    { id: "testimonials", label: "Testimoni", hint: "Bukti pelanggan" },
-    { id: "settings", label: "Settings", hint: "WA dan operasional" },
+    { id: "overview", label: "Ringkasan", hint: "Kondisi toko hari ini" },
+    { id: "products", label: "Produk", hint: "Katalog dan paket aktif" },
+    { id: "orders", label: "Pesanan", hint: "Antrean dan tindak lanjut" },
+    { id: "promos", label: "Promo", hint: "Kode diskon dan penggunaan" },
+    { id: "testimonials", label: "Testimoni", hint: "Bukti pelanggan yang tayang" },
+    { id: "settings", label: "Pengaturan", hint: "WA, QRIS, dan operasional" },
   ];
 
   const activeTab = tabs.find((item) => item.id === tab) || tabs[0];
@@ -1177,9 +1183,14 @@ export default function AdminDashboard() {
     products: `${products.length} produk`,
     orders: `${orderStats.live} aktif`,
     promos: `${analyticsSummary.activePromos} aktif`,
-    testimonials: `${analyticsSummary.activeTestimonials} on`,
+    testimonials: `${analyticsSummary.activeTestimonials} tayang`,
     settings: normalizeWhatsApp(settingsWhatsApp || waNumber) ? "WA siap" : "WA kosong",
   };
+  const syncCopy = loading
+    ? "Menyelaraskan data..."
+    : lastSyncedAt
+      ? `Terakhir sinkron ${formatAdminDate(lastSyncedAt)}`
+      : activeTab.hint;
 
   return (
     <div className="page admin-page">
@@ -1189,8 +1200,8 @@ export default function AdminDashboard() {
             <div className="admin-brand">
               <div className="admin-logo">IM</div>
               <div>
-                <div className="admin-brand-title">Admin Panel</div>
-                <div className="admin-brand-sub">imzaqi-store</div>
+                <div className="admin-brand-title">Ruang Admin</div>
+                <div className="admin-brand-sub">operasional imzaqi.store</div>
               </div>
             </div>
 
@@ -1201,7 +1212,7 @@ export default function AdminDashboard() {
                 <small>order masuk</small>
               </div>
               <div className="admin-sidebarPulse">
-                <span>Revenue</span>
+                <span>Omzet</span>
                 <strong>{formatCompactIDR(analyticsSummary.todayRevenue)}</strong>
                 <small>update harian</small>
               </div>
@@ -1228,20 +1239,61 @@ export default function AdminDashboard() {
 
             <div className="admin-sidebar-actions">
               <button className="btn btn-ghost" type="button" onClick={refreshAll}>
-                Refresh
+                Muat ulang
               </button>
               <button className="btn btn-danger" type="button" onClick={logout}>
-                Logout
+                Keluar
               </button>
             </div>
           </aside>
 
           <main className="admin-main">
+            <div className="admin-mobileControls">
+              <div className="admin-mobileBar">
+                <div className="admin-mobileBrand">
+                  <div className="admin-logo">IM</div>
+                  <div className="admin-mobileCopy">
+                    <strong>Ruang Admin</strong>
+                    <span>{syncCopy}</span>
+                  </div>
+                </div>
+
+                <div className="admin-mobileActions">
+                  <button className="btn btn-ghost btn-sm" type="button" onClick={refreshAll}>
+                    Muat ulang
+                  </button>
+                  <button className="btn btn-danger btn-sm" type="button" onClick={logout}>
+                    Keluar
+                  </button>
+                </div>
+              </div>
+
+              <nav className="admin-mobileTabs" aria-label="Navigasi admin mobile">
+                {tabs.map((t) => {
+                  const MobileTabIcon = TAB_ICONS[t.id] || Box;
+                  return (
+                    <button
+                      key={t.id}
+                      type="button"
+                      className={`admin-mobileTab ${tab === t.id ? "active" : ""}`}
+                      onClick={() => startTransition(() => setTab(t.id))}
+                    >
+                      <span className="admin-mobileTabIcon">
+                        <MobileTabIcon size={15} />
+                      </span>
+                      <span className="admin-mobileTabLabel">{t.label}</span>
+                      <span className="admin-mobileTabMeta">{tabMeta[t.id]}</span>
+                    </button>
+                  );
+                })}
+              </nav>
+            </div>
+
             <div className="admin-topbar">
               <div className="admin-topbarCopy">
                 <div className="admin-topbar-eyebrow">{activeTab.label}</div>
-                <h1 className="h2">Dashboard Admin</h1>
-                <div className="muted">Tampilan baru yang lebih nyaman di mobile, lebih lega di desktop, dan lebih cepat dibaca saat operasional padat.</div>
+                <h1 className="h2">Operasional toko</h1>
+                <div className="muted">Pilih area kerja di kiri. Setiap panel diringkas supaya cepat dipindai saat toko lagi ramai.</div>
               </div>
 
               <div className="admin-topbar-current">
@@ -1250,10 +1302,50 @@ export default function AdminDashboard() {
                 </span>
                 <div>
                   <strong>{activeTab.label}</strong>
-                  <span>{loading ? "Sinkronisasi data..." : lastSyncedAt ? `Sync ${formatAdminDate(lastSyncedAt)}` : activeTab.hint}</span>
+                  <span>{syncCopy}</span>
                 </div>
               </div>
             </div>
+
+            <FlowAssist
+              eyebrow="Konteks kerja"
+              title={`Fokus: ${activeTab.label}.`}
+              description="Ringkasan inti tetap dekat."
+              badges={[
+                { label: tabMeta[activeTab.id], tone: "emphasis", icon: <ActiveTabIcon size={13} /> },
+                `${orderStats.live} order aktif`,
+                `${analyticsSummary.stockAlerts.length} stok menipis`,
+                testimonialsWithoutCaption ? `${testimonialsWithoutCaption} testimoni polos` : "Testimoni rapi",
+              ]}
+              actions={[
+                tab !== "orders"
+                  ? {
+                      label: "Buka pesanan",
+                      onClick: () => startTransition(() => setTab("orders")),
+                      icon: <ClipboardList size={14} />,
+                    }
+                  : null,
+                tab !== "products"
+                  ? {
+                      label: "Cek produk",
+                      onClick: () => startTransition(() => setTab("products")),
+                      ghost: true,
+                      icon: <Box size={14} />,
+                    }
+                  : null,
+                tab !== "testimonials" && testimonialsWithoutCaption
+                  ? {
+                      label: "Rapikan testimoni",
+                      onClick: () => startTransition(() => setTab("testimonials")),
+                      ghost: true,
+                      icon: <Star size={14} />,
+                    }
+                  : null,
+                { label: "Muat ulang", onClick: refreshAll, ghost: true, icon: <Eye size={14} /> },
+              ].filter(Boolean)}
+              className="admin-flowAssist"
+              dense
+            />
 
             <div className="admin-stats">
               {dashboardStats.map((stat) => {
@@ -1283,7 +1375,7 @@ export default function AdminDashboard() {
                   <div className="admin-panel-body">
                     <div className="admin-overviewHeroTop">
                       <div>
-                        <div className="admin-topbar-eyebrow">Business Snapshot</div>
+                        <div className="admin-topbar-eyebrow">Ringkasan hari ini</div>
                         <div className="admin-heroTitle">Satu layar untuk membaca kondisi toko hari ini.</div>
                         <div className="admin-panel-sub">
                           Revenue, order masuk, stok tipis, dan performa promo dibungkus jadi ringkasan yang cepat dipahami.

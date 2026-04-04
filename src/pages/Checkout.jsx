@@ -1,8 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import { ArrowRight, Sparkles, TicketPercent, X } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
+import { ArrowRight, ShoppingBag, Sparkles, TicketPercent, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
@@ -28,7 +28,7 @@ const backdropVariants = {
   },
 };
 
-const drawerVariants = {
+const desktopDrawerVariants = {
   hidden: { x: "100%", opacity: 0 },
   visible: {
     x: 0,
@@ -52,6 +52,30 @@ const drawerVariants = {
   },
 };
 
+const mobileDrawerVariants = {
+  hidden: { y: "100%", opacity: 0 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    transition: {
+      type: "spring",
+      damping: 34,
+      stiffness: 320,
+      mass: 0.86,
+    },
+  },
+  exit: {
+    y: "100%",
+    opacity: 0,
+    transition: {
+      type: "spring",
+      damping: 34,
+      stiffness: 320,
+      mass: 0.86,
+    },
+  },
+};
+
 export default function Checkout() {
   const nav = useNavigate();
   const location = useLocation();
@@ -59,6 +83,7 @@ export default function Checkout() {
   const { promo, apply, clear } = usePromo();
   const toast = useToast();
   const closeButtonRef = useRef(null);
+  const reduceMotion = useReducedMotion();
 
   const promoPercent = Number(promo?.percent || 0);
   const subtotal = cart.subtotal();
@@ -67,10 +92,14 @@ export default function Checkout() {
   const [code, setCode] = useState(() => promo?.code || "");
   const [msg, setMsg] = useState("");
   const [closing, setClosing] = useState(false);
+  const [isMobileSheet, setIsMobileSheet] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia("(max-width: 720px)").matches : false
+  );
+  const [showGestureHint, setShowGestureHint] = useState(true);
 
   usePageMeta({
     title: "Checkout",
-    description: "Review cepat sebelum masuk ke halaman pembayaran.",
+    description: "Review order, promo, dan total sebelum lanjut ke halaman pembayaran.",
   });
 
   useEffect(() => {
@@ -84,8 +113,34 @@ export default function Checkout() {
   }, []);
 
   useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const media = window.matchMedia("(max-width: 720px)");
+    const sync = (event) => setIsMobileSheet(event.matches);
+    setIsMobileSheet(media.matches);
+
+    if (typeof media.addEventListener === "function") {
+      media.addEventListener("change", sync);
+      return () => media.removeEventListener("change", sync);
+    }
+
+    media.addListener(sync);
+    return () => media.removeListener(sync);
+  }, []);
+
+  useEffect(() => {
     closeButtonRef.current?.focus();
   }, []);
+
+  useEffect(() => {
+    setShowGestureHint(true);
+
+    const timer = window.setTimeout(() => {
+      setShowGestureHint(false);
+    }, reduceMotion ? 1800 : 3200);
+
+    return () => window.clearTimeout(timer);
+  }, [isMobileSheet, reduceMotion]);
 
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
   const backgroundLocation = location.state?.backgroundLocation;
@@ -148,8 +203,8 @@ export default function Checkout() {
   function renderSummary(extraClass = "") {
     return (
       <aside className={`card pad checkout-panel checkout-summary ${extraClass}`}>
-        <div className="checkout-summaryBadge">{discount > 0 ? `${promoPercent}% off` : "Summary"}</div>
-        <div className="checkout-summaryLabel">Total bayar</div>
+        <div className="checkout-summaryBadge">{discount > 0 ? `${promoPercent}% off` : "Ringkasan"}</div>
+        <div className="checkout-summaryLabel">Total saat ini</div>
         <div className="checkout-summaryTotal">{formatIDR(total)}</div>
 
         <div className="checkout-summaryRows">
@@ -165,25 +220,35 @@ export default function Checkout() {
           ) : null}
         </div>
 
-        <div className="checkout-summaryRail" aria-label="Benefit checkout">
-          <span>QRIS</span>
-          <span>ID order</span>
-          <span>Status</span>
-        </div>
-
         <button className="btn btn-wide checkout-summaryBtn" type="button" onClick={goPay} disabled={cart.items.length === 0}>
           Lanjut ke bayar
           <ArrowRight size={16} />
         </button>
 
         <Link className="checkout-summaryLink" to="/status">
-          Sudah punya ID? Cek status
+          Sudah pegang ID? Buka status
         </Link>
       </aside>
     );
   }
 
+  function renderMobileBar() {
+    return (
+      <div className="checkout-mobileBar">
+        <div className="checkout-mobileBarCopy">
+          <span>Total checkout</span>
+          <strong>{formatIDR(total)}</strong>
+        </div>
+        <button className="btn checkout-mobileBarBtn" type="button" onClick={goPay} disabled={cart.items.length === 0}>
+          Lanjut bayar
+        </button>
+      </div>
+    );
+  }
+
   if (typeof document === "undefined") return null;
+
+  const drawerVariants = isMobileSheet ? mobileDrawerVariants : desktopDrawerVariants;
 
   return createPortal(
     <div className="checkout-overlay" role="presentation">
@@ -201,18 +266,40 @@ export default function Checkout() {
         variants={drawerVariants}
         initial="hidden"
         animate={closing ? "exit" : "visible"}
-        drag="x"
-        dragConstraints={{ left: 0, right: 0 }}
-        dragElastic={0.18}
+        drag={isMobileSheet ? "y" : true}
+        dragConstraints={isMobileSheet ? { top: 0, bottom: 0 } : { left: 0, right: 0, top: 0, bottom: 0 }}
+        dragElastic={isMobileSheet ? (reduceMotion ? 0.06 : 0.1) : reduceMotion ? 0.1 : 0.16}
+        dragDirectionLock
+        onDragStart={() => setShowGestureHint(false)}
         onDragEnd={(event, info) => {
-          if (info.offset.x > 110 || info.velocity.x > 500) requestClose();
+          if (isMobileSheet) {
+            if (info.offset.y > 120 || info.velocity.y > 520) requestClose();
+            return;
+          }
+
+          if (
+            info.offset.x > 110 ||
+            info.velocity.x > 500 ||
+            info.offset.y > 130 ||
+            info.velocity.y > 560
+          ) {
+            requestClose();
+          }
         }}
         onMouseDown={(event) => event.stopPropagation()}
+        onPointerDown={() => setShowGestureHint(false)}
+        style={{ touchAction: isMobileSheet ? "pan-y" : "none" }}
         role="dialog"
         aria-modal="true"
         aria-label="Checkout"
       >
         <div className="checkout-drawerHandle" aria-hidden="true" />
+        {showGestureHint ? (
+          <div className="checkout-drawerGesture" role="status" aria-live="polite">
+            <span className="checkout-drawerGestureDot" aria-hidden="true" />
+            <span>{isMobileSheet ? "Geser ke bawah untuk tutup" : "Geser panel atau klik X untuk tutup"}</span>
+          </div>
+        ) : null}
 
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
@@ -221,7 +308,7 @@ export default function Checkout() {
               <span>Checkout</span>
             </div>
             <h1 className="h1 checkout-drawerTitle">Checkout.</h1>
-            <p className="checkout-drawerSub">Review cepat lalu lanjut bayar.</p>
+            <p className="checkout-drawerSub">Cek ulang isi order, promo, dan total sebelum masuk ke pembayaran.</p>
           </div>
 
           <button
@@ -247,16 +334,16 @@ export default function Checkout() {
               <div className="checkout-main-head">
                 <div>
                   <div className="checkout-main-kicker">Keranjang</div>
-                  <h2 className="h3 checkout-main-title">{cart.items.length === 0 ? "Belum ada item" : "Semua item"}</h2>
+                  <h2 className="h3 checkout-main-title">{cart.items.length === 0 ? "Belum ada pilihan" : "Isi order"}</h2>
                 </div>
-                {cart.items.length > 0 ? <span className="checkout-main-count">{itemCount} item</span> : null}
+                {cart.items.length > 0 ? <span className="checkout-main-count">x{itemCount}</span> : null}
               </div>
 
               {cart.items.length === 0 ? (
                 <EmptyState
-                  icon="Bag"
+                  icon={<ShoppingBag size={30} strokeWidth={2.2} />}
                   title="Keranjang kosong"
-                  description="Pilih produk dulu."
+                  description="Mulai dari katalog, lalu tambahkan paket yang sudah cocok."
                   primaryAction={{ label: "Produk", to: "/produk" }}
                   secondaryAction={{ label: "Status", to: "/status" }}
                 />
@@ -327,7 +414,7 @@ export default function Checkout() {
                     <div className="checkout-promo-head">
                       <div className="checkout-promo-title">
                         <TicketPercent size={15} />
-                        <span>Promo code</span>
+                        <span>Kode promo</span>
                       </div>
                       {promoPercent ? (
                         <button
@@ -365,6 +452,8 @@ export default function Checkout() {
             {cart.items.length > 0 ? renderSummary("checkout-summary-desktop") : null}
           </div>
         </div>
+
+        {cart.items.length > 0 ? renderMobileBar() : null}
       </motion.aside>
     </div>,
     document.body

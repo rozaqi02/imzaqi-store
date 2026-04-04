@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
@@ -23,6 +23,7 @@ import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
 import { formatIDR } from "../lib/format";
+import { buildStoreInsights } from "../lib/storeInsights";
 
 const CATEGORIES = [
   { key: "streaming", label: "Streaming", icon: Film },
@@ -252,7 +253,7 @@ export default function Products() {
 
   usePageMeta({
     title: "Produk",
-    description: "Katalog produk dengan filter cepat dan paket yang mudah dipilih.",
+    description: "Katalog produk dengan alur pencarian yang ringkas, jelas, dan mudah dilanjutkan ke checkout.",
   });
 
   useEffect(() => {
@@ -355,6 +356,18 @@ export default function Products() {
     setCats((prev) => (prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]));
   }
 
+  function setSoloCategory(key) {
+    setCats((prev) => (prev.length === 1 && prev[0] === key ? [] : [key]));
+  }
+
+  const applyBudgetCap = useCallback((cap) => {
+    if (priceBounds.max <= 0) return;
+    setPrice({
+      min: priceBounds.min,
+      max: Math.max(priceBounds.min, Math.min(priceBounds.max, cap)),
+    });
+  }, [priceBounds.max, priceBounds.min]);
+
   function resetFilters() {
     setQuery("");
     setCats([]);
@@ -416,6 +429,55 @@ export default function Products() {
     (sort !== "reco" ? 1 : 0);
 
   const skeletonCount = view === "list" ? 6 : 8;
+  const insights = useMemo(() => buildStoreInsights({ products }), [products]);
+  const quickFilters = useMemo(
+    () => [
+      {
+        key: "popular",
+        label: insights.topProduct ? `Terlaris: ${insights.topProduct.name}` : "Urutkan terlaris",
+        active: sort === "popular",
+        onClick: () => setSort("popular"),
+      },
+      {
+        key: "ready",
+        label: `Ready ${insights.readyVariantsCount}`,
+        active: inStockOnly,
+        onClick: () => setInStockOnly((prev) => !prev),
+      },
+      {
+        key: "streaming",
+        label: `Streaming ${insights.categoryCounts.streaming || 0}`,
+        active: cats.length === 1 && cats[0] === "streaming",
+        onClick: () => setSoloCategory("streaming"),
+      },
+      {
+        key: "tools",
+        label: `Tools ${insights.categoryCounts.tools || 0}`,
+        active: cats.length === 1 && cats[0] === "tools",
+        onClick: () => setSoloCategory("tools"),
+      },
+      {
+        key: "budget",
+        label: "Di bawah 10rb",
+        active: priceReady && price.min === priceBounds.min && price.max <= 10000,
+        onClick: () => applyBudgetCap(10000),
+      },
+    ],
+    [
+      applyBudgetCap,
+      cats,
+      inStockOnly,
+      insights.categoryCounts.streaming,
+      insights.categoryCounts.tools,
+      insights.readyVariantsCount,
+      insights.topProduct,
+      price.max,
+      price.min,
+      priceBounds.min,
+      priceReady,
+      sort,
+    ]
+  );
 
   return (
     <div className={cartItemCount > 0 ? "page with-sticky-cta" : "page"}>
@@ -424,8 +486,8 @@ export default function Products() {
           <div className="catalog-heroGrid">
             <div>
               <div className="catalog-eyebrow">Katalog produk</div>
-              <h1 className="h1 catalog-title">Cari yang cocok.</h1>
-              <p className="catalog-sub">Filter cepat. Harga jelas. Masuk ke paket dalam satu tap.</p>
+              <h1 className="h1 catalog-title">Cari paket yang pas.</h1>
+              <p className="catalog-sub">Cari, bandingkan, lalu buka detail paket tanpa pindah alur.</p>
             </div>
           </div>
 
@@ -497,6 +559,25 @@ export default function Products() {
           </aside>
 
           <div className="catalog-content">
+            <div className="catalog-quickFilters" aria-label="Pilih cepat">
+              {quickFilters.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={`catalog-quickChip${item.active ? " active" : ""}`}
+                  onClick={item.onClick}
+                >
+                  {item.label}
+                </button>
+              ))}
+
+              {activeFiltersCount ? (
+                <button type="button" className="catalog-quickChip ghost" onClick={resetFilters}>
+                  Reset semua
+                </button>
+              ) : null}
+            </div>
+
             <div className="catalog-contentBar">
               <div className="catalog-contentMeta">
                 <strong>{loading ? "..." : filtered.length}</strong>
@@ -542,14 +623,15 @@ export default function Products() {
                   <EmptyState
                     icon="-"
                     title="Tidak ditemukan"
-                    description={query ? `Tidak ada produk untuk "${query}".` : "Coba ubah filter atau reset."}
-                    primaryAction={{ label: "Reset Filter", onClick: resetFilters }}
+                    description={query ? `Belum ada hasil untuk "${query}".` : "Atur ulang filter lalu coba lagi."}
+                    primaryAction={{ label: "Reset filter", onClick: resetFilters }}
                   />
                 </div>
               ) : (
                 filtered.map((product) => {
                   const stock = Number(product._stock || 0);
                   const sold = Number(product._sold || 0);
+                  const soldOut = stock <= 0;
                   const low = stock > 0 && stock <= 5;
                   const hot = sold >= 10;
                   const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
@@ -576,6 +658,12 @@ export default function Products() {
                             <span className="catalog-status hot">
                               <Flame size={13} />
                               <span>Hot</span>
+                            </span>
+                          ) : null}
+                          {soldOut ? (
+                            <span className="catalog-status soldout">
+                              <CircleAlert size={13} />
+                              <span>Habis</span>
                             </span>
                           ) : null}
                           {low ? (
@@ -611,7 +699,7 @@ export default function Products() {
                         </div>
 
                         <div className="catalog-cardFoot">
-                          <span>Lihat paket</span>
+                          <span>Buka detail</span>
                           <ArrowRight size={15} />
                         </div>
                       </div>
@@ -632,7 +720,7 @@ export default function Products() {
                 <div className="catalog-sheetHead">
                   <div>
                     <div className="catalog-sheetTitle">Filter produk</div>
-                    <div className="catalog-sheetSub">Sapu, pilih, lalu lanjut.</div>
+                    <div className="catalog-sheetSub">Atur yang perlu, lalu lanjut.</div>
                   </div>
                   <button className="catalog-sheetClose" type="button" onClick={() => setFiltersOpen(false)} aria-label="Tutup">
                     <X size={18} />

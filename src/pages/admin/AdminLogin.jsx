@@ -21,7 +21,7 @@ export default function AdminLogin() {
 
   usePageMeta({
     title: "Admin Login",
-    description: "Halaman login admin untuk mengelola produk, promo, dan order.",
+    description: "Masuk ke ruang admin untuk mengelola order, produk, promo, dan operasional toko.",
   });
 
   async function onLogin(e) {
@@ -52,21 +52,21 @@ export default function AdminLogin() {
         <div className="container narrow">
           <div className="admin-loginShell card">
             <div className="admin-loginAside">
-              <h1 className="h2">Masuk cepat.</h1>
-              <p className="admin-loginSub">Satu pintu untuk order, promo, dan produk.</p>
+              <h1 className="h2">Masuk ke ruang operasional.</h1>
+              <p className="admin-loginSub">Satu panel untuk order, produk, promo, dan QRIS.</p>
 
               <div className="admin-loginSignals">
                 <div className="admin-loginSignal">
                   <KeyRound size={15} />
-                  <span>Secure</span>
+                  <span>Aman</span>
                 </div>
                 <div className="admin-loginSignal">
                   <LockKeyhole size={15} />
-                  <span>Private</span>
+                  <span>Privat</span>
                 </div>
                 <div className="admin-loginSignal">
                   <ShieldCheck size={15} />
-                  <span>Verified</span>
+                  <span>Terverifikasi</span>
                 </div>
               </div>
             </div>
@@ -93,7 +93,7 @@ export default function AdminLogin() {
                 />
 
                 <button className="btn btn-wide" type="submit" disabled={submitting}>
-                  {submitting ? "Masuk..." : "Login"}
+                  {submitting ? "Masuk..." : "Masuk admin"}
                 </button>
 
                 {msg ? <div className="hint">{msg}</div> : null}

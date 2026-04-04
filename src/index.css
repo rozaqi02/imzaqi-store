@@ -14,6 +14,8 @@
 @import "./css/pages/AdminLogin.css";
 @import "./css/pages/AdminDashboard.css";
 
-/* Global overrides for final polish */
-@import "./css/overrides-v3.css";
+/* Brand color direction */
 @import "./css/theme-disney.css";
+
+/* Theme modes and compact controls */
+@import "./css/theme-neumorphism.css";

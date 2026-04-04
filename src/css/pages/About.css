@@ -45,9 +45,16 @@
   line-height: 1.5;
 }
 
+.about-liveNote {
+  max-width: 52ch;
+  margin: 10px auto 0;
+  color: var(--brand-muted);
+  line-height: 1.6;
+}
+
 .about-miniStats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   width: min(780px, 100%);
   margin: 24px auto 0;

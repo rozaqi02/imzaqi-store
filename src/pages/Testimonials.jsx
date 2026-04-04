@@ -5,20 +5,25 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ChevronLeft,
   ChevronRight,
+  Clock3,
   Grid2x2,
   LayoutGrid,
+  MessageSquareText,
   Search,
   X,
 } from "lucide-react";
 import { fetchTestimonials } from "../lib/api";
 import EmptyState from "../components/EmptyState";
+import FlowAssist from "../components/FlowAssist";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { buildStoreInsights } from "../lib/storeInsights";
 
 export default function Testimonials() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
   const [error, setError] = useState("");
   const [q, setQ] = useState("");
+  const [captionMode, setCaptionMode] = useState("all");
   const [view, setView] = useState(() => {
     if (typeof window === "undefined" || !window.matchMedia) return "masonry";
     return window.matchMedia("(max-width: 720px)").matches ? "grid" : "masonry";
@@ -51,19 +56,28 @@ export default function Testimonials() {
     };
   }, []);
 
+  const insights = useMemo(() => buildStoreInsights({ testimonials: items }), [items]);
   const filtered = useMemo(() => {
     const s = q.trim().toLowerCase();
-    if (!s) return items;
-    return items.filter((t) => {
+    let list = items;
+
+    if (captionMode === "captioned") {
+      list = list.filter((t) => String(t?.caption || "").trim());
+    } else if (captionMode === "uncaptioned") {
+      list = list.filter((t) => !String(t?.caption || "").trim());
+    }
+
+    if (!s) return list;
+    return list.filter((t) => {
       const cap = (t?.caption || "").toLowerCase();
       const url = (t?.image_url || "").toLowerCase();
       return cap.includes(s) || url.includes(s);
     });
-  }, [items, q]);
+  }, [captionMode, items, q]);
 
   useEffect(() => {
     setLimit(18);
-  }, [q, view]);
+  }, [captionMode, q, view]);
 
   useEffect(() => {
     function onKey(e) {
@@ -77,16 +91,28 @@ export default function Testimonials() {
     return () => window.removeEventListener("keydown", onKey);
   }, [activeIdx, filtered.length]);
 
+  useEffect(() => {
+    if (activeIdx >= 0 && activeIdx >= filtered.length) {
+      setActiveIdx(-1);
+    }
+  }, [activeIdx, filtered.length]);
+
   const shown = useMemo(() => filtered.slice(0, limit), [filtered, limit]);
   const hasMore = shown.length < filtered.length;
   const active = activeIdx >= 0 ? filtered[activeIdx] : null;
+  const latestLabel = useMemo(() => {
+    if (!insights.latestTestimonial?.created_at) return "Belum ada";
+    return new Intl.DateTimeFormat("id-ID", { day: "2-digit", month: "short" }).format(
+      new Date(insights.latestTestimonial.created_at)
+    );
+  }, [insights.latestTestimonial]);
 
   return (
     <div className="page">
       <section className="section reveal testi-minimal-hero">
         <div className="container center">
-          <h1 className="h1 testi-minimal-title">Real screenshots. Quick scan.</h1>
-          <p className="testi-minimal-sub">Tap untuk zoom.</p>
+          <h1 className="h1 testi-minimal-title">Bukti order yang mudah dipindai.</h1>
+          <p className="testi-minimal-sub">Lihat cepat, buka saat butuh detail.</p>
 
           <div className="testi-miniStats">
             <div className="testi-miniStat">
@@ -94,12 +120,12 @@ export default function Testimonials() {
               <span>Total</span>
             </div>
             <div className="testi-miniStat">
-              <strong>Real</strong>
-              <span>Admin upload</span>
+              <strong>{insights.captionedTestimonialsCount.toLocaleString("id-ID")}</strong>
+              <span>Dengan caption</span>
             </div>
             <div className="testi-miniStat">
-              <strong>Live</strong>
-              <span>Update cepat</span>
+              <strong>{latestLabel}</strong>
+              <span>Unggahan terbaru</span>
             </div>
           </div>
 
@@ -116,12 +142,33 @@ export default function Testimonials() {
 
       <section className="section reveal">
         <div className="container">
+          <FlowAssist
+            eyebrow="Biar cepat dipindai"
+            title={
+              insights.uncaptionedTestimonialsCount
+                ? "Masih ada screenshot tanpa caption."
+                : "Semua testimoni sudah berkonteks."
+            }
+            description="Filter caption atau screenshot polos."
+            badges={[
+              `${insights.testimonialsCount} bukti`,
+              { label: `${insights.captionedTestimonialsCount} caption`, icon: <MessageSquareText size={13} /> },
+              { label: `${insights.uncaptionedTestimonialsCount} polos`, icon: <Clock3 size={13} /> },
+            ]}
+            actions={[
+              { label: "Produk", to: "/produk" },
+              { label: "Status", to: "/status", ghost: true },
+            ]}
+            className="testi-flowAssist"
+            dense
+          />
+
           <div className="testi-toolbar">
             <div className="testi-searchShell">
               <Search size={16} className="testi-searchIcon" />
               <input
                 className="input testi-searchInput"
-                placeholder="Cari caption"
+                placeholder={insights.captionedTestimonialsCount ? "Cari caption atau nama file" : "Cari nama file screenshot"}
                 value={q}
                 onChange={(e) => setQ(e.target.value)}
               />
@@ -155,6 +202,30 @@ export default function Testimonials() {
             </div>
           </div>
 
+          <div className="testi-filterRow" aria-label="Filter testimoni">
+            <button
+              type="button"
+              className={`testi-filterChip${captionMode === "all" ? " active" : ""}`}
+              onClick={() => setCaptionMode("all")}
+            >
+              Semua
+            </button>
+            <button
+              type="button"
+              className={`testi-filterChip${captionMode === "captioned" ? " active" : ""}`}
+              onClick={() => setCaptionMode("captioned")}
+            >
+              Ada caption
+            </button>
+            <button
+              type="button"
+              className={`testi-filterChip${captionMode === "uncaptioned" ? " active" : ""}`}
+              onClick={() => setCaptionMode("uncaptioned")}
+            >
+              Tanpa caption
+            </button>
+          </div>
+
           {loading ? (
             <div className="testi-skel-grid">
               <div className="testi-skel" />
@@ -172,12 +243,16 @@ export default function Testimonials() {
             </div>
           ) : filtered.length === 0 ? (
             <div className="card pad" style={{ marginTop: 14 }}>
-              <EmptyState
-                icon="-"
-                title="Belum ada hasil"
-                description="Coba kata kunci lain."
-                primaryAction={{ label: "Reset", onClick: () => setQ("") }}
-              />
+                <EmptyState
+                  icon="-"
+                  title="Belum ada hasil"
+                  description={
+                    captionMode === "all"
+                      ? "Coba kata kunci lain atau kosongkan pencarian."
+                      : "Ganti filter galeri atau kosongkan pencarian."
+                  }
+                  primaryAction={{ label: "Reset", onClick: () => setQ("") }}
+                />
             </div>
           ) : (
             <>
@@ -191,10 +266,12 @@ export default function Testimonials() {
                     aria-label="Buka testimoni"
                   >
                     <div className="testi-imgWrap">
-                      <img src={item.image_url} alt={item.caption || "testimoni"} loading="lazy" />
+                      <img src={item.image_url} alt={item.caption || "testimoni"} loading="lazy" decoding="async" />
                       <div className="testi-overlay">
                         <span className="testi-overlayPill">Zoom</span>
-                        {item.caption ? <span className="testi-captionPill">{item.caption}</span> : null}
+                        <span className={`testi-captionPill${item.caption ? "" : " is-muted"}`}>
+                          {item.caption || "Tanpa caption"}
+                        </span>
                       </div>
                     </div>
                   </button>
@@ -204,7 +281,7 @@ export default function Testimonials() {
               {hasMore ? (
                 <div className="testi-loadmore">
                   <button className="btn btn-ghost" type="button" onClick={() => setLimit((x) => x + 18)}>
-                    Load more
+                    Muat lagi
                   </button>
                 </div>
               ) : null}

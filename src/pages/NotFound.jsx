@@ -16,7 +16,7 @@ export default function NotFound() {
             </div>
             <div className="nf-code">404</div>
             <h1 className="h2">Halaman tidak ada</h1>
-            <p className="nf-sub">Coba kembali ke alur utama.</p>
+            <p className="nf-sub">Lanjut dari katalog atau kembali ke halaman utama.</p>
             <div className="nf-actions">
               <Link className="btn" to="/">
                 <Home size={16} />

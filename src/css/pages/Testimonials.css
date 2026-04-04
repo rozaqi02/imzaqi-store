@@ -83,6 +83,10 @@
   margin-top: 20px;
 }
 
+.testi-flowAssist {
+  margin-bottom: 14px;
+}
+
 .testi-toolbar {
   display: flex;
   align-items: center;
@@ -133,6 +137,35 @@
   display: flex;
   align-items: center;
   gap: 10px;
+}
+
+.testi-filterRow {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.testi-filterChip {
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--brand-line);
+  background: var(--skeu-control-bg);
+  color: var(--brand-text);
+  box-shadow: var(--skeu-control-shadow);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.testi-filterChip.active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  border-color: rgba(79, 255, 200, 0.24);
+  color: #032235;
+  box-shadow: var(--skeu-accent-shadow);
 }
 
 .testi-count {
@@ -203,6 +236,8 @@
   background: transparent;
   cursor: pointer;
   break-inside: avoid;
+  content-visibility: auto;
+  contain-intrinsic-size: 320px;
 }
 
 .testi-imgWrap {
@@ -255,6 +290,10 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.testi-captionPill.is-muted {
+  color: var(--brand-muted);
 }
 
 .testi-tile:hover .testi-overlay {
@@ -343,7 +382,7 @@
 
 @media (max-width: 720px) {
   .testi-miniStats {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
@@ -363,9 +402,19 @@
     letter-spacing: 0.05em;
   }
 
+  .testi-filterRow {
+    gap: 8px;
+  }
+
+  .testi-filterChip {
+    min-height: 34px;
+    padding: 0 12px;
+    font-size: 11px;
+  }
+
   .testi-grid,
   .testi-skel-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
 
@@ -388,6 +437,40 @@
 
   .lightbox-nav {
     display: none;
+  }
+}
+
+@media (max-width: 560px) {
+  .testi-toolbar {
+    align-items: stretch;
+  }
+
+  .testi-searchShell,
+  .testi-toolbarMeta {
+    width: 100%;
+  }
+
+  .testi-toolbarMeta {
+    justify-content: space-between;
+  }
+}
+
+@media (max-width: 430px) {
+  .testi-miniStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .testi-grid,
+  .testi-skel-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  .testi-miniStats,
+  .testi-grid,
+  .testi-skel-grid {
+    grid-template-columns: 1fr;
   }
 }
 

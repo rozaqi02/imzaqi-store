@@ -28,26 +28,67 @@ function addDaysISO(isoDate, days) {
   return d.toISOString().slice(0, 10);
 }
 
+function startOfWeekISO(isoDate) {
+  const d = new Date(`${isoDate}T00:00:00Z`);
+  const dayOfWeek = d.getUTCDay();
+  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
+  d.setUTCDate(d.getUTCDate() + diffToMonday);
+  return d.toISOString().slice(0, 10);
+}
+
+function getLoadProfile(baseIntervalMs) {
+  try {
+    const coarse = typeof window !== "undefined" && window.matchMedia?.("(max-width: 720px), (pointer: coarse)")?.matches;
+    const saveData = Boolean(navigator?.connection?.saveData);
+    const lowMemory = Number(navigator?.deviceMemory || 0) > 0 && Number(navigator.deviceMemory) <= 4;
+
+    if (coarse || saveData || lowMemory) {
+      return { intervalMs: Math.max(baseIntervalMs, 45000), lightMode: true };
+    }
+  } catch {}
+
+  return { intervalMs: baseIntervalMs, lightMode: false };
+}
+
 export function useLiveStats({ intervalMs = 15000 } = {}) {
   const [state, setState] = useState({
     totalViews: null,
     todayViews: null,
     totalOrders: null,
     todayOrders: null,
+    weekOrders: null,
   });
 
   useEffect(() => {
     let alive = true;
-    // WIB (Asia/Jakarta) - reset harian wajib 00:00 WIB
-    const day = todayISO("Asia/Jakarta");
-    const nextDay = addDaysISO(day, 1);
-    const startWIB = `${day}T00:00:00+07:00`;
-    const endWIB = `${nextDay}T00:00:00+07:00`;
+    const { intervalMs: effectiveIntervalMs } = getLoadProfile(intervalMs);
+    let timerId = 0;
 
     async function load() {
+      if (typeof document !== "undefined" && document.visibilityState === "hidden") {
+        return;
+      }
+
+      const day = todayISO("Asia/Jakarta");
+      const nextDay = addDaysISO(day, 1);
+      const weekStart = startOfWeekISO(day);
+      const startWIB = `${day}T00:00:00+07:00`;
+      const endWIB = `${nextDay}T00:00:00+07:00`;
+      const weekStartWIB = `${weekStart}T00:00:00+07:00`;
+
       try {
         // Prefer RPC (lebih aman kalau RLS orders/page_views ketat)
-        const { data: stats, error: rpcErr } = await supabase.rpc("get_public_stats");
+        const [
+          { data: stats, error: rpcErr },
+          { count: oWeek },
+        ] = await Promise.all([
+          supabase.rpc("get_public_stats"),
+          supabase
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", weekStartWIB)
+            .lt("created_at", endWIB),
+        ]);
 
         if (!rpcErr && stats) {
           if (!alive) return;
@@ -56,12 +97,13 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
             todayViews: Number(stats.today_views || 0),
             totalOrders: Number(stats.total_orders || 0),
             todayOrders: Number(stats.today_orders || 0),
+            weekOrders: Number(stats.week_orders ?? oWeek ?? 0),
           });
           return;
         }
 
         // Fallback (kalau RPC belum dibuat)
-        const [{ count: vToday }, { count: vTotal }, { count: oToday }, { count: oTotal }] = await Promise.all([
+        const [{ count: vToday }, { count: vTotal }, { count: oToday }, { count: oTotal }, { count: oWeekFallback }] = await Promise.all([
           supabase.from("page_views").select("id", { count: "exact", head: true }).eq("view_date", day),
           supabase.from("page_views").select("id", { count: "exact", head: true }),
           supabase
@@ -70,6 +112,11 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
             .gte("created_at", startWIB)
             .lt("created_at", endWIB),
           supabase.from("orders").select("id", { count: "exact", head: true }),
+          supabase
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", weekStartWIB)
+            .lt("created_at", endWIB),
         ]);
 
         if (!alive) return;
@@ -78,15 +125,33 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
           todayViews: Number(vToday || 0),
           totalOrders: Number(oTotal || 0),
           todayOrders: Number(oToday || 0),
+          weekOrders: Number(oWeekFallback || 0),
         });
       } catch {}
     }
 
-    load();
-    const t = setInterval(load, intervalMs);
+    function startPolling() {
+      load();
+      timerId = window.setInterval(load, effectiveIntervalMs);
+    }
+
+    function onVisibilityChange() {
+      if (typeof document === "undefined" || document.visibilityState === "visible") {
+        load();
+      }
+    }
+
+    startPolling();
+    if (typeof document !== "undefined") {
+      document.addEventListener("visibilitychange", onVisibilityChange);
+    }
+
     return () => {
       alive = false;
-      clearInterval(t);
+      window.clearInterval(timerId);
+      if (typeof document !== "undefined") {
+        document.removeEventListener("visibilitychange", onVisibilityChange);
+      }
     };
   }, [intervalMs]);
 

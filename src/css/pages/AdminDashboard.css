@@ -1508,3 +1508,598 @@
   }
 }
 
+@media (max-width: 720px) {
+  .admin-shell {
+    gap: 12px;
+  }
+
+  .admin-sidebar,
+  .admin-panel,
+  .admin-overviewHero,
+  .admin-orderCardModern,
+  .modal {
+    max-width: 100%;
+  }
+
+  .admin-sidebar {
+    padding: 12px;
+    border-radius: 22px;
+  }
+
+  .admin-brand {
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .admin-brand-title {
+    font-size: 14px;
+  }
+
+  .admin-brand-sub {
+    font-size: 11px;
+  }
+
+  .admin-sidebarPulseGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .admin-nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    overflow: visible;
+    margin-top: 12px;
+    margin-right: 0;
+    padding-right: 0;
+  }
+
+  .admin-nav-btn {
+    min-width: 0;
+    min-height: 98px;
+    padding: 12px 10px;
+    gap: 10px;
+    border-radius: 20px;
+  }
+
+  .admin-nav-icon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+  }
+
+  .admin-nav-copy strong {
+    font-size: 13px;
+  }
+
+  .admin-nav-copy small {
+    display: none;
+  }
+
+  .admin-nav-badge {
+    max-width: 100%;
+    padding: 5px 8px;
+    font-size: 10px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .admin-sidebar-actions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .admin-sidebar-actions .btn {
+    width: 100%;
+  }
+
+  .admin-topbar {
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+
+  .admin-topbarCopy .h2 {
+    font-size: clamp(24px, 7vw, 32px);
+  }
+
+  .admin-topbarCopy .muted {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+
+  .admin-topbar-current {
+    min-width: 0;
+    width: 100%;
+    padding: 12px 14px;
+    border-radius: 18px;
+  }
+
+  .admin-topbar-currentIcon {
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
+  }
+
+  .admin-stats {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    overflow: visible;
+    gap: 10px;
+    padding-right: 0;
+    padding-bottom: 0;
+    margin-right: 0;
+    scroll-snap-type: none;
+  }
+
+  .admin-statCard {
+    min-height: 0;
+    padding: 12px 14px;
+    border-radius: 18px;
+  }
+
+  .admin-panel-head,
+  .admin-overviewHeroTop,
+  .admin-orderSummary,
+  .admin-orderSummarySide,
+  .admin-chartRow,
+  .admin-head-actions,
+  .admin-form-actions {
+    gap: 10px;
+  }
+
+  .admin-panel-head,
+  .admin-head-actions,
+  .admin-form-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-panel-body {
+    padding: 14px;
+  }
+
+  .admin-products,
+  .admin-ordersLayout,
+  .admin-overviewGrid,
+  .admin-miniGrid,
+  .admin-miniGridHero,
+  .admin-orderMetaGrid,
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-orderSummary {
+    padding: 14px;
+    align-items: flex-start;
+  }
+
+  .admin-orderSummarySide {
+    width: 100%;
+  }
+
+  .admin-orderBodyModern {
+    padding: 0 14px 14px;
+  }
+
+  .admin-orderMetaCard {
+    padding: 12px;
+    border-radius: 16px;
+  }
+
+  .admin-searchRow,
+  .admin-searchInput {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-orderToolbar {
+    position: static;
+    top: auto;
+    background: transparent;
+    padding: 0;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-sidebar-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-nav-btn {
+    min-height: 88px;
+  }
+
+  .admin-topbar-current {
+    padding: 12px;
+  }
+
+  .admin-chipRow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+
+  .admin-chip {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 360px) {
+  .admin-sidebarPulseGrid,
+  .admin-nav,
+  .admin-stats,
+  .admin-chipRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+.admin-mobileControls {
+  display: none;
+}
+
+.admin-mobileBar {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-mobileBrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.025)),
+    radial-gradient(circle at top left, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0) 56%);
+}
+
+.admin-mobileCopy {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.admin-mobileCopy strong {
+  font-size: 14px;
+  font-weight: 1000;
+}
+
+.admin-mobileCopy span {
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.admin-mobileActions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-mobileActions .btn {
+  width: 100%;
+}
+
+.admin-mobileTabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.admin-mobileTab {
+  width: 100%;
+  min-width: 0;
+  min-height: 92px;
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 12px;
+  text-align: left;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
+    radial-gradient(circle at top left, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0) 56%);
+  color: rgba(234, 255, 245, 0.9);
+  cursor: pointer;
+}
+
+.admin-mobileTab.active {
+  border-color: rgba(29, 131, 255, 0.24);
+  background:
+    linear-gradient(180deg, rgba(29, 131, 255, 0.16), rgba(29, 131, 255, 0.08)),
+    rgba(255, 255, 255, 0.04);
+}
+
+.admin-mobileTabIcon {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  color: #9fe0ff;
+}
+
+.admin-mobileTabLabel,
+.admin-mobileTabMeta {
+  display: block;
+  min-width: 0;
+}
+
+.admin-mobileTabLabel {
+  font-size: 13px;
+  font-weight: 900;
+  line-height: 1.3;
+}
+
+.admin-mobileTabMeta {
+  color: rgba(255, 255, 255, 0.58);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+@media (max-width: 720px) {
+  .admin-flowAssist {
+    display: none;
+  }
+
+  .app-main-admin {
+    padding-left: calc(12px + env(safe-area-inset-left)) !important;
+    padding-right: calc(12px + env(safe-area-inset-right)) !important;
+  }
+
+  .admin-page .section {
+    padding-top: 18px;
+    padding-bottom: 24px;
+  }
+
+  .container.admin-shell {
+    width: 100%;
+    max-width: none;
+  }
+
+  .admin-shell {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .admin-sidebar {
+    display: none;
+  }
+
+  .admin-mobileControls {
+    display: grid;
+    gap: 10px;
+    margin-bottom: 2px;
+    position: sticky;
+    top: 72px;
+    z-index: 8;
+  }
+
+  .admin-topbar {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .admin-topbarCopy .muted,
+  .admin-topbar-current {
+    display: none;
+  }
+
+  .admin-topbarCopy .h2 {
+    font-size: clamp(23px, 7vw, 30px);
+    margin-top: 4px;
+  }
+
+  .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-auto-flow: row;
+    grid-auto-columns: auto;
+    overflow: visible;
+    gap: 10px;
+    margin-right: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+    scroll-snap-type: none;
+  }
+
+  .admin-statCard {
+    min-height: 0;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .admin-statValue {
+    font-size: clamp(20px, 6vw, 26px);
+  }
+
+  .admin-products,
+  .admin-ordersLayout,
+  .admin-overviewGrid,
+  .admin-miniGrid,
+  .admin-miniGridHero,
+  .admin-orderMetaGrid,
+  .admin-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-panel,
+  .admin-overviewHero,
+  .admin-orderCardModern,
+  .modal {
+    max-width: 100%;
+    border-radius: 22px;
+  }
+
+  .admin-panel-head,
+  .admin-head-actions,
+  .admin-form-actions,
+  .admin-overviewHeroTop,
+  .admin-orderSummary,
+  .admin-orderSummarySide,
+  .admin-chartRow,
+  .admin-order-top,
+  .admin-order-item,
+  .admin-variant-row {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .admin-panel-body {
+    padding: 14px;
+  }
+
+  .admin-orderSummary {
+    padding: 14px;
+  }
+
+  .admin-orderSummarySide,
+  .admin-order-itemPrice,
+  .admin-order-right {
+    width: 100%;
+  }
+
+  .admin-chartValue {
+    text-align: left;
+  }
+
+  .admin-orderBodyModern {
+    padding: 0 14px 14px;
+  }
+
+  .admin-orderToolbar {
+    position: static;
+    top: auto;
+    padding: 0;
+    background: transparent;
+  }
+
+  .admin-searchRow,
+  .admin-searchInput {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .admin-chipRow {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .admin-chip {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-mobileActions,
+  .admin-mobileTabs,
+  .admin-sidebarPulseGrid,
+  .admin-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-mobileTab {
+    min-height: 84px;
+  }
+
+  .admin-chipRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-mobileActions,
+  .admin-mobileTabs,
+  .admin-sidebarPulseGrid,
+  .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-mobileTab {
+    min-height: 88px;
+  }
+
+  .admin-mobileTabMeta {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .admin-chipRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 360px) {
+  .admin-mobileActions,
+  .admin-mobileTabs,
+  .admin-sidebarPulseGrid,
+  .admin-stats,
+  .admin-chipRow {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-mobileControls {
+    gap: 8px;
+  }
+
+  .admin-mobileBrand {
+    padding: 12px 14px;
+    border-radius: 18px;
+    align-items: center;
+  }
+
+  .admin-mobileActions,
+  .admin-mobileTabs {
+    align-items: stretch;
+  }
+
+  .admin-mobileTab {
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    align-content: stretch;
+    gap: 10px;
+    padding: 12px;
+    border-radius: 18px;
+  }
+
+  .admin-mobileTabIcon {
+    width: 36px;
+    height: 36px;
+    box-sizing: border-box;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .admin-mobileTabLabel {
+    line-height: 1.15;
+  }
+
+  .admin-mobileTabMeta {
+    min-height: 30px;
+    line-height: 1.35;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-mobileTabs,
+  .admin-mobileActions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-mobileTab {
+    min-height: 88px;
+  }
+}
+

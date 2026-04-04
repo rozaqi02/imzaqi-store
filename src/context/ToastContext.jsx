@@ -7,14 +7,7 @@ import React, {
   useState,
 } from "react";
 import { createPortal } from "react-dom";
-
-/**
- * Lightweight toast system (no deps) for global UX feedback.
- *
- * Usage:
- *   const toast = useToast();
- *   toast.success("Ditambahkan ke keranjang");
- */
+import { CircleAlert, CircleCheckBig, LoaderCircle, MessageCircleMore, X } from "lucide-react";
 
 const ToastContext = createContext(null);
 
@@ -23,24 +16,48 @@ function uid() {
 }
 
 function ToastIcon({ type }) {
-  const t = type || "info";
-  const icon =
-    t === "success" ? "✅" : t === "error" ? "⚠️" : t === "loading" ? "⏳" : "💬";
+  if (type === "success") {
+    return (
+      <span className="toast-icon toast-icon-success" aria-hidden="true">
+        <CircleCheckBig size={18} strokeWidth={2.1} />
+      </span>
+    );
+  }
+
+  if (type === "error") {
+    return (
+      <span className="toast-icon toast-icon-error" aria-hidden="true">
+        <CircleAlert size={18} strokeWidth={2.1} />
+      </span>
+    );
+  }
+
+  if (type === "loading") {
+    return (
+      <span className="toast-icon toast-icon-loading" aria-hidden="true">
+        <LoaderCircle size={18} strokeWidth={2.1} />
+      </span>
+    );
+  }
+
   return (
-    <span className="toast-icon" aria-hidden="true">
-      {icon}
+    <span className="toast-icon toast-icon-info" aria-hidden="true">
+      <MessageCircleMore size={18} strokeWidth={2.1} />
     </span>
   );
 }
 
 function ToastItem({ toast, onClose }) {
   const { id, type, title, message, actionLabel, onAction } = toast;
+
   return (
     <div className={`toast toast-${type || "info"}`} role="status" aria-live="polite">
       <ToastIcon type={type} />
+
       <div className="toast-body">
         {title ? <div className="toast-title">{title}</div> : null}
         <div className="toast-msg">{message}</div>
+
         {actionLabel && typeof onAction === "function" ? (
           <button
             className="toast-action"
@@ -58,7 +75,7 @@ function ToastItem({ toast, onClose }) {
       </div>
 
       <button className="toast-close" onClick={() => onClose(id)} aria-label="Tutup">
-        ✕
+        <X size={15} strokeWidth={2.4} />
       </button>
     </div>
   );
@@ -70,30 +87,34 @@ export function ToastProvider({ children }) {
 
   const remove = useCallback((id) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
-    const t = timers.current.get(id);
-    if (t) {
-      clearTimeout(t);
+    const timer = timers.current.get(id);
+
+    if (timer) {
+      clearTimeout(timer);
       timers.current.delete(id);
     }
   }, []);
 
-  const push = useCallback((toast) => {
-    const id = toast.id || uid();
-    const duration = typeof toast.duration === "number" ? toast.duration : 3200;
-    const next = { id, type: "info", ...toast };
+  const push = useCallback(
+    (toast) => {
+      const id = toast.id || uid();
+      const duration = typeof toast.duration === "number" ? toast.duration : 3200;
+      const next = { id, type: "info", ...toast };
 
-    setToasts((prev) => {
-      // keep it tidy: max 3 toasts
-      const trimmed = prev.slice(-2);
-      return [...trimmed, next];
-    });
+      setToasts((prev) => {
+        const trimmed = prev.slice(-2);
+        return [...trimmed, next];
+      });
 
-    if (duration > 0 && next.type !== "loading") {
-      const t = setTimeout(() => remove(id), duration);
-      timers.current.set(id, t);
-    }
-    return id;
-  }, [remove]);
+      if (duration > 0 && next.type !== "loading") {
+        const timer = setTimeout(() => remove(id), duration);
+        timers.current.set(id, timer);
+      }
+
+      return id;
+    },
+    [remove]
+  );
 
   const api = useMemo(
     () => ({
@@ -121,8 +142,8 @@ export function ToastProvider({ children }) {
       {typeof document !== "undefined"
         ? createPortal(
             <div className="toast-viewport" aria-label="Notifikasi">
-              {toasts.map((t) => (
-                <ToastItem key={t.id} toast={t} onClose={remove} />
+              {toasts.map((toast) => (
+                <ToastItem key={toast.id} toast={toast} onClose={remove} />
               ))}
             </div>,
             document.body

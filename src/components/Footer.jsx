@@ -1,6 +1,49 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+const metaLinks = [
+  { label: "QRIS", to: "/tentang" },
+  { label: "ID order", to: "/status" },
+  { label: "WA admin", href: "https://wa.me/6283136049987" },
+];
+
+const footerGroups = [
+  {
+    label: "Menu",
+    to: "/produk",
+    links: [
+      { label: "Home", to: "/" },
+      { label: "Produk", to: "/produk" },
+      { label: "Status", to: "/status" },
+    ],
+  },
+  {
+    label: "Bantuan",
+    to: "/tentang",
+    links: [
+      { label: "Tentang", to: "/tentang" },
+      { label: "Testimoni", to: "/testimoni" },
+      { label: "Hubungi admin", href: "https://wa.me/6283136049987" },
+    ],
+  },
+];
+
+function FooterLink({ item, className = "" }) {
+  if (item.href) {
+    return (
+      <a className={className} href={item.href} target="_blank" rel="noreferrer">
+        {item.label}
+      </a>
+    );
+  }
+
+  return (
+    <Link className={className} to={item.to}>
+      {item.label}
+    </Link>
+  );
+}
+
 export default function Footer() {
   const year = new Date().getFullYear();
 
@@ -10,68 +53,61 @@ export default function Footer() {
         <div className="site-footerPanel">
           <div className="site-footerTop">
             <div className="site-footerIntro">
-              <div className="site-footerBadge">imzaqi.store</div>
+              <Link className="site-footerBadge" to="/">
+                imzaqi.store
+              </Link>
 
               <div className="site-footerBrand">
-                <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
-                <div>
-                  <strong>Checkout yang cepat dan bersih.</strong>
-                  <span>Produk digital, QRIS, dan status order dalam satu alur yang ringkas.</span>
+                <Link to="/produk" aria-label="Buka katalog produk">
+                  <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
+                </Link>
+
+                <div className="site-footerBrandCopy">
+                  <Link className="site-footerHeadline" to="/produk">
+                    Digital goods, tanpa ribet.
+                  </Link>
+                  <Link className="site-footerLead" to="/tentang">
+                    Pilih paket. Bayar. Simpan ID.
+                  </Link>
                 </div>
               </div>
             </div>
 
             <div className="site-footerActions">
               <Link className="btn" to="/produk">
-                Produk
+                Lihat katalog
               </Link>
               <a className="btn btn-ghost" href="https://wa.me/6283136049987" target="_blank" rel="noreferrer">
-                WhatsApp
+                Hubungi admin
               </a>
             </div>
           </div>
 
           <div className="site-footerMeta">
-            <span>QRIS</span>
-            <span>ID order</span>
-            <span>Status</span>
-            <span>Digital goods</span>
+            {metaLinks.map((item) => (
+              <FooterLink key={item.label} item={item} />
+            ))}
           </div>
 
           <div className="site-footerGrid">
-            <div className="site-footerCol">
-              <div className="site-footerLabel">Explore</div>
-              <div className="site-footerList">
-                <Link to="/">Home</Link>
-                <Link to="/produk">Produk</Link>
-                <Link to="/testimoni">Testimoni</Link>
+            {footerGroups.map((group) => (
+              <div key={group.label} className="site-footerCol">
+                <Link className="site-footerLabel" to={group.to}>
+                  {group.label}
+                </Link>
+                <div className="site-footerList">
+                  {group.links.map((item) => (
+                    <FooterLink key={item.label} item={item} />
+                  ))}
+                </div>
               </div>
-            </div>
-
-            <div className="site-footerCol">
-              <div className="site-footerLabel">Support</div>
-              <div className="site-footerList">
-                <Link to="/tentang">Tentang</Link>
-                <Link to="/status">Cek status</Link>
-                <a href="https://wa.me/6283136049987" target="_blank" rel="noreferrer">
-                  Hubungi admin
-                </a>
-              </div>
-            </div>
-
-            <div className="site-footerCol">
-              <div className="site-footerLabel">Kontak</div>
-              <div className="site-footerList">
-                <span>0831-3604-9987</span>
-                <span>Pembayaran QRIS</span>
-                <span>Fast mobile checkout</span>
-              </div>
-            </div>
+            ))}
           </div>
 
           <div className="site-footerBottom">
-            <span>Copyright {year} imzaqi.store</span>
-            <span>Built for fast mobile checkout.</span>
+            <Link to="/">Copyright {year} imzaqi.store</Link>
+            <a href="tel:+6283136049987">0831-3604-9987</a>
+            <Link to="/status">Cek status</Link>
           </div>
         </div>
       </div>
