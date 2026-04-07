@@ -695,6 +695,9 @@
 
 .modal {
   width: min(760px, 100%);
+  max-height: calc(100dvh - 32px);
+  display: flex;
+  flex-direction: column;
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
@@ -727,9 +730,13 @@
 
 .modal-body {
   padding: 18px;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
 }
 
 .modal-foot {
+  flex-shrink: 0;
   padding: 14px 18px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
@@ -1796,6 +1803,7 @@
   min-width: 0;
   min-height: 92px;
   display: grid;
+  box-sizing: border-box;
   align-content: start;
   gap: 8px;
   padding: 12px;
@@ -1845,6 +1853,22 @@
 }
 
 @media (max-width: 720px) {
+  .modal-backdrop {
+    align-items: flex-start;
+    overflow-y: auto;
+    padding:
+      calc(12px + env(safe-area-inset-top))
+      calc(12px + env(safe-area-inset-right))
+      calc(12px + env(safe-area-inset-bottom))
+      calc(12px + env(safe-area-inset-left));
+  }
+
+  .modal {
+    width: min(100%, 760px);
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    margin: 0 auto;
+  }
+
   .admin-flowAssist {
     display: none;
   }
@@ -2068,18 +2092,29 @@
   }
 
   .admin-mobileTab {
+    width: 100%;
+    justify-items: start;
     grid-template-rows: auto minmax(0, 1fr) auto;
     align-content: stretch;
     gap: 10px;
     padding: 12px;
     border-radius: 18px;
+    overflow: hidden;
   }
 
   .admin-mobileTabIcon {
     width: 36px;
     height: 36px;
     box-sizing: border-box;
+    align-self: start;
     border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .admin-mobileTabLabel,
+  .admin-mobileTabMeta {
+    width: 100%;
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 
   .admin-mobileTabLabel {
@@ -2089,6 +2124,10 @@
   .admin-mobileTabMeta {
     min-height: 30px;
     line-height: 1.35;
+  }
+
+  .admin-mobileActions .btn {
+    min-width: 0;
   }
 }
 

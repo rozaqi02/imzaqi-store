@@ -64,7 +64,7 @@ export async function fetchProducts({ includeInactive = false, useCache = !inclu
   let q = supabase
     .from("products")
     .select(
-      "id,slug,name,description,icon_url,category,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count)"
+      "id,slug,name,description,icon_url,category,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
     )
     .order("sort_order", { ascending: true })
     .order("sort_order", { foreignTable: "product_variants", ascending: true });
@@ -77,7 +77,7 @@ export async function fetchProducts({ includeInactive = false, useCache = !inclu
     q = supabase
       .from("products")
       .select(
-        "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count)"
+        "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
       )
       .order("sort_order", { ascending: true })
       .order("sort_order", { foreignTable: "product_variants", ascending: true });
@@ -100,7 +100,7 @@ export async function fetchProductBySlug(slug, { includeInactive = false, useCac
   let q = supabase
     .from("products")
     .select(
-      "id,slug,name,description,icon_url,category,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count)"
+      "id,slug,name,description,icon_url,category,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
     )
     .eq("slug", slug);
 
@@ -114,7 +114,7 @@ export async function fetchProductBySlug(slug, { includeInactive = false, useCac
     q = supabase
       .from("products")
       .select(
-        "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count)"
+        "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
       )
       .eq("slug", slug);
 

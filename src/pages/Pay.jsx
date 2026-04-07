@@ -6,7 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
-import { fetchSettings } from "../lib/api";
+import { fetchProducts, fetchSettings } from "../lib/api";
 import { getVisitorIdAsUUID } from "../lib/visitor";
 import { makeOrderCode } from "../lib/orderCode";
 import { buildDynamicQrisImage } from "../lib/qris";
@@ -15,9 +15,59 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
 
+const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
+const BUYER_EMAIL_REQUIREMENT_REGEX =
+  /(akun\s*buyer|buyer\s*akun|email\s*(buyer|pembeli)|wajib\s*email|butuh\s*email|email\s*aktivasi|aktivasi\s*akun|account\s*activation|send\s*email)/i;
+
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
   return { discount, total: Math.max(0, subtotal - discount) };
+}
+
+function variantNeedsBuyerEmail(item) {
+  if (!item) return false;
+
+  if (
+    item?.requires_note ||
+    item?.require_note ||
+    item?.requires_buyer_email ||
+    item?.require_buyer_email ||
+    item?.needs_buyer_email
+  ) {
+    return true;
+  }
+
+  const blob = [
+    item?.product_name,
+    item?.variant_name,
+    item?.name,
+    item?.description,
+    item?.duration_label,
+    item?.guarantee_text,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  return BUYER_EMAIL_REQUIREMENT_REGEX.test(blob);
+}
+
+function toFriendlyPayError(error, { hasNotes = false } = {}) {
+  const raw = String(error?.message || error || "");
+
+  if (hasNotes && /(notes|p_notes|function)/i.test(raw)) {
+    return "Catatan order belum tersedia sekarang. Coba kirim order tanpa catatan.";
+  }
+
+  if (/(stock|stok|insufficient|habis|out of stock)/i.test(raw)) {
+    return "Stok berubah. Cek ulang keranjang lalu coba lagi.";
+  }
+
+  if (/promo/i.test(raw)) {
+    return "Kode promo tidak bisa dipakai untuk order ini.";
+  }
+
+  return "Order belum bisa diproses. Coba lagi beberapa saat.";
 }
 
 function QRISSkeleton() {
@@ -28,7 +78,7 @@ function QRISSkeleton() {
   );
 }
 
-function OrderSuccessModal({ open, orderCode, statusUrl, onClose, onCopied }) {
+function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, onCopied }) {
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
@@ -84,6 +134,9 @@ function OrderSuccessModal({ open, orderCode, statusUrl, onClose, onCopied }) {
             <button className="btn btn-ghost" type="button" onClick={copyCode}>
               {copied ? "Tersalin" : "Salin ID"}
             </button>
+            <a className="btn btn-ghost" href={adminWaUrl} target="_blank" rel="noreferrer">
+              Hubungi Admin
+            </a>
           </div>
         </div>
       </div>
@@ -135,6 +188,7 @@ export default function Pay() {
   const [qrisNotice, setQrisNotice] = useState("");
   const [qrisFailed, setQrisFailed] = useState(false);
   const [qrisMode, setQrisMode] = useState("idle");
+  const [productIconLookup, setProductIconLookup] = useState({});
 
   useEffect(() => {
     fetchSettings()
@@ -145,6 +199,33 @@ export default function Pay() {
         })
       )
       .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    fetchProducts({ useCache: true })
+      .then((rows) => {
+        if (!active) return;
+
+        const next = {};
+        (rows || []).forEach((product) => {
+          const url = String(product?.icon_url || "").trim();
+          if (!url) return;
+
+          if (product?.id) next[`id:${product.id}`] = url;
+
+          const keyByName = String(product?.name || "").trim().toLowerCase();
+          if (keyByName) next[`name:${keyByName}`] = url;
+        });
+
+        setProductIconLookup(next);
+      })
+      .catch(() => {});
+
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -189,13 +270,40 @@ export default function Pay() {
   }, [items.length, nav, ok, orderCode]);
 
   const noteText = useMemo(() => String(notes || "").trim(), [notes]);
-  const canShowQris = Boolean(customerWhatsApp && isWaValid);
+  const hasValidWhatsApp = Boolean(customerWhatsApp && isWaValid);
+  const requiredBuyerEmailItems = useMemo(() => items.filter((item) => variantNeedsBuyerEmail(item)), [items]);
+  const requiresBuyerEmailNote = requiredBuyerEmailItems.length > 0;
+  const hasEmailInNotes = useMemo(() => EMAIL_IN_TEXT_REGEX.test(noteText), [noteText]);
+  const missingBuyerEmailNote = requiresBuyerEmailNote && !hasEmailInNotes;
+  const requiredEmailProductsText = useMemo(() => {
+    const names = Array.from(
+      new Set(
+        requiredBuyerEmailItems
+          .map((item) => String(item?.product_name || item?.variant_name || item?.name || "").trim())
+          .filter(Boolean)
+      )
+    );
+    if (!names.length) return "item ini";
+
+    const compact = names.map((name) => (name.length > 24 ? `${name.slice(0, 21).trimEnd()}...` : name));
+    if (compact.length === 1) return compact[0];
+    if (compact.length === 2) return `${compact[0]} & ${compact[1]}`;
+    return `${compact[0]} +${compact.length - 1} lainnya`;
+  }, [requiredBuyerEmailItems]);
+
+  const canShowQris = hasValidWhatsApp && !missingBuyerEmailNote;
   const isDynamicQris = qrisMode === "dynamic";
-  const qrisFootText = canShowQris
-    ? isDynamicQris
-      ? "Nominal QR sudah menyesuaikan total."
-      : "QR statis aktif. Bayar sesuai total di ringkasan."
-    : "QR akan terbuka setelah nomor WhatsApp valid.";
+  const qrisFootText = !hasValidWhatsApp
+    ? "QR akan terbuka setelah nomor WhatsApp valid."
+    : missingBuyerEmailNote
+      ? "Lengkapi catatan email buyer agar QRIS terbuka."
+      : isDynamicQris
+        ? "Nominal QR sudah menyesuaikan total."
+        : "QR statis aktif. Bayar sesuai total di ringkasan.";
+  const qrisLockTitle = !hasValidWhatsApp ? "QRIS terkunci" : "Butuh catatan buyer";
+  const qrisLockDescription = !hasValidWhatsApp
+    ? "Isi nomor WhatsApp yang valid agar langkah berikutnya terbuka."
+    : `Item ${requiredEmailProductsText} memerlukan email buyer untuk aktivasi akun. Isi email buyer di catatan.`;
 
   const summaryText = useMemo(() => {
     const rows = items.map(
@@ -210,12 +318,14 @@ export default function Pay() {
     return rows.join("\n");
   }, [customerWhatsApp, discount, items, noteText, subtotal, total]);
 
-  const waUrl = useMemo(() => {
+  const adminWaUrl = useMemo(() => {
     const text = encodeURIComponent(
-      `Halo, saya sudah bayar.\n\nID Order: ${orderCode || "(menunggu)"}\n${summaryText}\n\nMohon diproses.`
+      `Halo Admin Imzaqi Store, saya sudah bayar.\n\nID Order: ${orderCode || "(menunggu)"}\nTotal: ${formatIDR(
+        total
+      )}\nItem: ${itemCount}\n\n${summaryText}\n\nMohon dicek dan diproses. Terima kasih.`
     );
     return `https://wa.me/${waNumber}?text=${text}`;
-  }, [orderCode, summaryText, waNumber]);
+  }, [itemCount, orderCode, summaryText, total, waNumber]);
 
   const statusUrl = orderCode ? `/status?order=${encodeURIComponent(orderCode)}` : "/status";
 
@@ -257,6 +367,12 @@ export default function Pay() {
       toast.error(text);
       return;
     }
+    if (missingBuyerEmailNote) {
+      const text = "Item tertentu perlu email buyer. Isi email buyer di catatan dulu.";
+      setErrorText(text);
+      toast.error(text);
+      return;
+    }
 
     setBusy(true);
     const loadingId = toast.loading("Membuat ID order...");
@@ -284,10 +400,11 @@ export default function Pay() {
       toast.remove(loadingId);
       toast.success("ID order berhasil dibuat.");
     } catch (error) {
-      const message = error?.message || String(error);
+      const message = toFriendlyPayError(error, { hasNotes: Boolean(noteText) });
+      console.warn("Gagal memproses order:", error);
       setErrorText(message);
       toast.remove(loadingId);
-      toast.error(message.includes("catatan") ? message : "Gagal memproses order.");
+      toast.error(message);
     } finally {
       setBusy(false);
     }
@@ -297,17 +414,35 @@ export default function Pay() {
     return (
       <>
         <div className="pay-orderList">
-          {items.map((item) => (
-            <div key={item.variant_id} className="pay-orderItem">
-              <div className="pay-orderItemCopy">
-                <div className="pay-orderItemName">{item.product_name}</div>
-                <div className="pay-orderItemMeta">
-                  {item.variant_name} / {item.duration_label} / x{item.qty}
+          {items.map((item) => {
+            const iconUrl = resolveItemIconUrl(item);
+
+            return (
+              <div key={item.variant_id} className="pay-orderItem">
+                <div className="pay-orderItemMain">
+                  <div className="pay-orderItemIcon app-productIcon">
+                    {iconUrl ? (
+                      <img src={iconUrl} alt={`${item.product_name} icon`} loading="lazy" decoding="async" />
+                    ) : (
+                      <span className="app-productIconFallback">
+                        {String(item.product_name || "P")
+                          .slice(0, 1)
+                          .toUpperCase()}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="pay-orderItemCopy">
+                    <div className="pay-orderItemName">{item.product_name}</div>
+                    <div className="pay-orderItemMeta">
+                      {item.variant_name} / {item.duration_label} / x{item.qty}
+                    </div>
+                  </div>
                 </div>
+                <b>{formatIDR(item.price_idr * item.qty)}</b>
               </div>
-              <b>{formatIDR(item.price_idr * item.qty)}</b>
-            </div>
-          ))}
+            );
+          })}
         </div>
 
         <div className="pay-orderRows">
@@ -332,15 +467,30 @@ export default function Pay() {
 
   const canSubmit = !busy && canShowQris;
 
-  function renderMobileBar() {
-    return (
-      <div className="pay-mobileBar">
-        <div className="pay-mobileBarCopy">
-          <span>Total bayar</span>
-          <strong>{formatIDR(total)}</strong>
-        </div>
+  function resolveItemIconUrl(item) {
+    const direct = String(item?.product_icon_url || "").trim();
+    if (direct) return direct;
 
-        <button className="btn pay-mobileBarBtn" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
+    if (item?.product_id) {
+      const byId = String(productIconLookup[`id:${item.product_id}`] || "").trim();
+      if (byId) return byId;
+    }
+
+    const keyByName = String(item?.product_name || "").trim().toLowerCase();
+    if (keyByName) {
+      const byName = String(productIconLookup[`name:${keyByName}`] || "").trim();
+      if (byName) return byName;
+    }
+
+    return "";
+  }
+
+  function renderStageActions(extraClass = "") {
+    const klass = `pay-stageActions ${extraClass}`.trim();
+
+    return (
+      <div className={klass}>
+        <button className="btn btn-wide" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
           {busy ? (
             <>
               <Loader className="spinner" size={16} /> Menyimpan
@@ -351,6 +501,12 @@ export default function Pay() {
             </>
           )}
         </button>
+
+        <div className="pay-stageLinks">
+          <Link className="btn btn-ghost btn-sm" to="/checkout" state={{ backgroundLocation: location }}>
+            Edit order
+          </Link>
+        </div>
       </div>
     );
   }
@@ -375,14 +531,16 @@ export default function Pay() {
 
         {items.length > 0 ? (
           <div className="container pay-order-mobileWrap">
-            <details className="pay-orderMobile">
-              <summary>
-                <span>Order</span>
-                <b>{itemCount} item</b>
-                <strong>{formatIDR(total)}</strong>
-              </summary>
+            <aside className="card pad pay-card pay-orderMobileCard">
+              <div className="pay-orderHead">
+                <div>
+                  <div className="pay-orderKicker">Order</div>
+                  <div className="pay-orderTitle">{itemCount} item</div>
+                </div>
+                {promoPercent ? <span className="pay-orderPromo">{promo?.code}</span> : null}
+              </div>
               {renderOrderSummaryContent()}
-            </details>
+            </aside>
           </div>
         ) : null}
 
@@ -411,23 +569,41 @@ export default function Pay() {
                 className="pay-waField"
               />
 
-              <details className="pay-noteToggle">
-                <summary>
-                  <FileText size={14} />
-                  <span>Tambah catatan opsional</span>
-                </summary>
-                <div className="pay-noteBody">
-                  <textarea
-                    className="input pay-noteInput"
-                    rows={3}
-                    maxLength={400}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Opsional"
-                  />
+              <div className={`pay-notePanel ${requiresBuyerEmailNote ? "required" : ""}`}>
+                <div className="pay-noteHead">
+                  <div className="pay-noteLabelWrap">
+                    <FileText size={14} />
+                    <span className="pay-noteLabel">Catatan pembeli</span>
+                  </div>
+                  <span className={`pay-noteState ${requiresBuyerEmailNote ? (missingBuyerEmailNote ? "warn" : "ok") : ""}`}>
+                    {requiresBuyerEmailNote ? (missingBuyerEmailNote ? "Wajib email" : "Email terdeteksi") : "Opsional"}
+                  </span>
+                </div>
+
+                <textarea
+                  className="input pay-noteInput"
+                  rows={3}
+                  maxLength={400}
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  placeholder={
+                    requiresBuyerEmailNote
+                      ? "Wajib isi email buyer. Contoh: buyer@mail.com"
+                      : "Opsional, contoh: minta diproses malam ini."
+                  }
+                />
+
+                <div className="pay-noteMetaRow">
+                  <div className={`pay-noteHintText ${requiresBuyerEmailNote ? (missingBuyerEmailNote ? "warn" : "ok") : ""}`}>
+                    {requiresBuyerEmailNote
+                      ? missingBuyerEmailNote
+                        ? `Item ${requiredEmailProductsText} memerlukan email buyer untuk aktivasi akun.`
+                        : "Email buyer sudah terdeteksi di catatan."
+                      : "Tambahkan catatan jika ada request khusus untuk admin."}
+                  </div>
                   <div className="pay-noteMeta">{notes.length}/400</div>
                 </div>
-              </details>
+              </div>
             </section>
 
             <section className="card pad pay-card pay-stageCard">
@@ -435,7 +611,13 @@ export default function Pay() {
                 <div className="pay-stageMeta">
                   <div className="pay-stageLabel">Total bayar</div>
                   <div className="pay-stageTotal">{formatIDR(total)}</div>
-                  <div className="pay-stageHint">{canShowQris ? "Scan QR, selesaikan pembayaran, lalu simpan ID order." : "Isi WhatsApp dulu untuk membuka QR."}</div>
+                  <div className="pay-stageHint">
+                    {canShowQris
+                      ? "Scan QR, selesaikan pembayaran, lalu simpan ID order."
+                      : missingBuyerEmailNote
+                        ? "Lengkapi email buyer di catatan agar QRIS terbuka."
+                        : "Isi WhatsApp dulu untuk membuka QR."}
+                  </div>
 
                   <div className="pay-stageRows">
                     <div className="pay-stageRow">
@@ -456,33 +638,7 @@ export default function Pay() {
                     </div>
                   ) : null}
 
-                  <div className="pay-stageActions">
-                    <button className="btn btn-wide" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
-                      {busy ? (
-                        <>
-                          <Loader className="spinner" size={16} /> Menyimpan
-                        </>
-                      ) : (
-                        <>
-                          <Check size={16} /> Saya sudah bayar
-                        </>
-                      )}
-                    </button>
-
-                    <div className="pay-stageLinks">
-                      {canShowQris ? (
-                        <a className="btn btn-ghost btn-sm" href={qrisUrl || fallbackQrisUrl} target="_blank" rel="noreferrer">
-                          QR
-                        </a>
-                      ) : null}
-                      <a className="btn btn-ghost btn-sm" href={waUrl} target="_blank" rel="noreferrer">
-                        Admin
-                      </a>
-                      <Link className="btn btn-ghost btn-sm" to="/checkout" state={{ backgroundLocation: location }}>
-                        Edit order
-                      </Link>
-                    </div>
-                  </div>
+                  {renderStageActions("pay-stageActionsDesktop")}
                 </div>
 
                 <div className="pay-stageVisual">
@@ -509,8 +665,8 @@ export default function Pay() {
                     ) : (
                       <div className="pay-qrisLocked">
                         <Phone size={24} />
-                        <strong>QRIS terkunci</strong>
-                        <p>Isi nomor WhatsApp yang valid agar langkah berikutnya terbuka.</p>
+                        <strong>{qrisLockTitle}</strong>
+                        <p>{qrisLockDescription}</p>
                       </div>
                     )}
                   </div>
@@ -520,6 +676,8 @@ export default function Pay() {
                     <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qrisNotice}</div>
                   ) : null}
                 </div>
+
+                {renderStageActions("pay-stageActionsMobile")}
               </div>
             </section>
           </div>
@@ -539,12 +697,11 @@ export default function Pay() {
         </div>
       </section>
 
-      {items.length > 0 ? renderMobileBar() : null}
-
       <OrderSuccessModal
         open={ok}
         orderCode={orderCode}
         statusUrl={statusUrl}
+        adminWaUrl={adminWaUrl}
         onClose={() => nav(statusUrl)}
         onCopied={() => toast.success("ID order disalin")}
       />

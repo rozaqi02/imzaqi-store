@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { MessageCircle, Phone, ReceiptText, ScanLine } from "lucide-react";
 
 const metaLinks = [
   { label: "QRIS", to: "/tentang" },
@@ -28,6 +29,13 @@ const footerGroups = [
   },
 ];
 
+const mobileQuickLinks = [
+  { label: "QRIS", helper: "cara bayar", to: "/tentang", icon: ScanLine },
+  { label: "Status", helper: "cek order", to: "/status", icon: ReceiptText },
+  { label: "WhatsApp", helper: "hubungi admin", href: "https://wa.me/6283136049987", icon: MessageCircle },
+  { label: "Telepon", helper: "0831-3604-9987", href: "tel:+6283136049987", icon: Phone },
+];
+
 function FooterLink({ item, className = "" }) {
   if (item.href) {
     return (
@@ -40,6 +48,35 @@ function FooterLink({ item, className = "" }) {
   return (
     <Link className={className} to={item.to}>
       {item.label}
+    </Link>
+  );
+}
+
+function FooterQuickLink({ item }) {
+  const Icon = item.icon;
+  const content = (
+    <>
+      <span className="site-footerQuickIcon">
+        <Icon size={18} />
+      </span>
+      <span className="site-footerQuickCopy">
+        <strong>{item.label}</strong>
+        <span>{item.helper}</span>
+      </span>
+    </>
+  );
+
+  if (item.href) {
+    return (
+      <a className="site-footerQuickLink" href={item.href} target="_blank" rel="noreferrer">
+        {content}
+      </a>
+    );
+  }
+
+  return (
+    <Link className="site-footerQuickLink" to={item.to}>
+      {content}
     </Link>
   );
 }
@@ -89,6 +126,12 @@ export default function Footer() {
             ))}
           </div>
 
+          <div className="site-footerQuickGrid">
+            {mobileQuickLinks.map((item) => (
+              <FooterQuickLink key={item.label} item={item} />
+            ))}
+          </div>
+
           <div className="site-footerGrid">
             {footerGroups.map((group) => (
               <div key={group.label} className="site-footerCol">
@@ -105,9 +148,15 @@ export default function Footer() {
           </div>
 
           <div className="site-footerBottom">
-            <Link to="/">Copyright {year} imzaqi.store</Link>
-            <a href="tel:+6283136049987">0831-3604-9987</a>
-            <Link to="/status">Cek status</Link>
+            <Link className="site-footerBottomMain" to="/">
+              Copyright {year} imzaqi.store
+            </Link>
+            <a className="site-footerBottomItem" href="tel:+6283136049987">
+              0831-3604-9987
+            </a>
+            <Link className="site-footerBottomItem" to="/status">
+              Cek status
+            </Link>
           </div>
         </div>
       </div>

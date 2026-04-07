@@ -35,7 +35,17 @@ export default function QuickBuyDrawer({ open, onClose, product }) {
               key={variant.id}
               className="drawer-item"
               type="button"
-              onClick={() => cart.add({ ...variant, product_id: product.id, product_name: product.name }, 1)}
+              onClick={() =>
+                cart.add(
+                  {
+                    ...variant,
+                    product_id: product.id,
+                    product_name: product.name,
+                    product_icon_url: product?.icon_url || "",
+                  },
+                  1
+                )
+              }
             >
               <div className="drawer-item-left">
                 <div className="drawer-item-name">{variant.name}</div>

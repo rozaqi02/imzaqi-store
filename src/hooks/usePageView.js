@@ -2,13 +2,15 @@ import { useEffect, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
 
 export function usePageView(path) {
-  // Gunakan ref untuk mencegah double-count di React.StrictMode (development mode)
-  const initialized = useRef(false);
+  // Simpan path terakhir agar route baru tetap tercatat,
+  // tapi render ulang / StrictMode tidak memicu double-hit untuk path yang sama.
+  const lastTrackedPath = useRef("");
 
   useEffect(() => {
-    if (initialized.current) return;
+    const nextPath = String(path || "/");
+    if (lastTrackedPath.current === nextPath) return;
+    lastTrackedPath.current = nextPath;
     
-    // Fungsi untuk menambah counter via RPC
     async function hit() {
       try {
         await supabase.rpc("increment_view");
@@ -18,10 +20,5 @@ export function usePageView(path) {
     }
 
     hit();
-    initialized.current = true;
-    
-    // Reset ref jika path berubah (opsional, tergantung mau hitung per halaman atau per sesi)
-    // Kalau mau hitung setiap ganti halaman, hapus baris "if (initialized...)" di atas 
-    // dan biarkan useEffect jalan tiap [path] berubah.
   }, [path]);
 }

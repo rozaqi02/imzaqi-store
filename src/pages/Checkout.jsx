@@ -232,20 +232,6 @@ export default function Checkout() {
     );
   }
 
-  function renderMobileBar() {
-    return (
-      <div className="checkout-mobileBar">
-        <div className="checkout-mobileBarCopy">
-          <span>Total checkout</span>
-          <strong>{formatIDR(total)}</strong>
-        </div>
-        <button className="btn checkout-mobileBarBtn" type="button" onClick={goPay} disabled={cart.items.length === 0}>
-          Lanjut bayar
-        </button>
-      </div>
-    );
-  }
-
   if (typeof document === "undefined") return null;
 
   const drawerVariants = isMobileSheet ? mobileDrawerVariants : desktopDrawerVariants;
@@ -394,9 +380,13 @@ export default function Checkout() {
                                       id: item.variant_id,
                                       product_id: item.product_id,
                                       product_name: item.product_name,
+                                      product_icon_url: item.product_icon_url || "",
                                       name: item.variant_name,
                                       duration_label: item.duration_label,
                                       price_idr: item.price_idr,
+                                      description: item.description || "",
+                                      guarantee_text: item.guarantee_text || "",
+                                      requires_buyer_email: !!item.requires_buyer_email,
                                     },
                                     item.qty
                                   ),
@@ -452,8 +442,6 @@ export default function Checkout() {
             {cart.items.length > 0 ? renderSummary("checkout-summary-desktop") : null}
           </div>
         </div>
-
-        {cart.items.length > 0 ? renderMobileBar() : null}
       </motion.aside>
     </div>,
     document.body

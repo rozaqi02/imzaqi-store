@@ -62,6 +62,10 @@ function normalizeOrderCode(value) {
   return code.replace(/^IMZ-+/, "IMZ-");
 }
 
+function toFriendlyStatusError() {
+  return "Status belum bisa diambil. Coba lagi beberapa saat.";
+}
+
 function TimelineStep({ active, done, label }) {
   const meta = done ? "Selesai" : active ? "Aktif" : "Menunggu";
 
@@ -179,8 +183,9 @@ export default function Status() {
       setSearchParams({ order: code }, { replace: true });
       toast.success("Order ditemukan", { title: row.order_code || code, duration: 2200 });
     } catch (error) {
-      const text = "Status belum bisa diambil.";
-      setMessage(`${text} ${error?.message || error}`);
+      const text = toFriendlyStatusError();
+      console.warn("Gagal mengambil status order:", error);
+      setMessage(text);
       toast.error(text);
     } finally {
       setLoading(false);

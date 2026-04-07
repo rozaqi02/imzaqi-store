@@ -8,7 +8,7 @@ import { useToast } from "../../context/ToastContext";
 export default function AdminLogin() {
   const nav = useNavigate();
   const toast = useToast();
-  const [email, setEmail] = useState("rojaki1419@gmail.com");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -32,7 +32,11 @@ export default function AdminLogin() {
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     if (error) {
-      setMsg(error.message);
+      const nextMessage = /invalid login credentials/i.test(String(error?.message || ""))
+        ? "Email atau password salah."
+        : "Login belum bisa diproses.";
+      setMsg(nextMessage);
+      console.warn("Admin login gagal:", error);
       toast.error("Login gagal");
       setSubmitting(false);
       return;

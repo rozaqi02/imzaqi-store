@@ -166,6 +166,7 @@ export default function ProductCard({ product }) {
         ...variant,
         product_id: product.id,
         product_name: product.name,
+        product_icon_url: product.icon_url || logoSrc || "",
       },
       1
     );

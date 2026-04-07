@@ -17,6 +17,7 @@ import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
 
 const MOBILE_BREAKPOINT = "(max-width: 720px)";
+const MOBILE_MENU_ANIMATION_MS = 260;
 
 function CartIcon() {
   return (
@@ -100,7 +101,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
     closeTimerRef.current = window.setTimeout(() => {
       onClose();
       setPhase("closed");
-    }, 180);
+    }, MOBILE_MENU_ANIMATION_MS);
   }, [onClose, open, phase]);
 
   useEffect(() => {
@@ -197,7 +198,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 
         <div className="mobile-menu-footer">
           <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-          <p className="menu-footer-text">Imzaqi Store Web V.3.9</p>
+          <p className="menu-footer-text">Imzaqi Store Web V.3.9.2</p>
         </div>
       </aside>
     </>,
@@ -296,14 +297,16 @@ export default function Header() {
               <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
             </div>
 
-            <NavLink
-              to="/admin"
-              className={`header-iconAction desktop-only${location.pathname.startsWith("/admin") ? " active" : ""}`}
-              aria-label="Admin"
-              title="Admin"
-            >
-              <Shield size={18} strokeWidth={2.1} />
-            </NavLink>
+            {!isMobileViewport ? (
+              <NavLink
+                to="/admin"
+                className={`header-iconAction${location.pathname.startsWith("/admin") ? " active" : ""}`}
+                aria-label="Admin"
+                title="Admin"
+              >
+                <Shield size={18} strokeWidth={2.1} />
+              </NavLink>
+            ) : null}
 
             {isMobileViewport ? (
               <button

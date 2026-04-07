@@ -9,10 +9,12 @@ import {
   Flame,
   GraduationCap,
   Grid2x2,
+  Layers3,
   List,
   Music4,
-  Package2,
+  PackageCheck,
   Search,
+  ShoppingBag,
   SlidersHorizontal,
   Sparkles,
   X,
@@ -56,6 +58,16 @@ function formatCompactIDR(n) {
   if (value >= 1000000) return `${Math.round(value / 100000) / 10}jt`;
   if (value >= 1000) return `${Math.round(value / 100) / 10}k`;
   return String(value);
+}
+
+function summarizeCatalogCopy(text) {
+  const firstLine = String(text || "")
+    .split(/\r?\n+/)
+    .map((line) => line.trim())
+    .find(Boolean);
+
+  if (!firstLine) return "Pilih paket lalu lanjut ke checkout.";
+  return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
 }
 
 function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
@@ -635,73 +647,88 @@ export default function Products() {
                   const low = stock > 0 && stock <= 5;
                   const hot = sold >= 10;
                   const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
+                  const category = CATEGORIES.find((item) => item.key === product._category);
+                  const categoryLabel = category?.label || "Digital";
+                  const CategoryIcon = category?.icon || Sparkles;
+                  const summaryCopy = summarizeCatalogCopy(product.description);
 
                   return (
                     <Link
                       key={product.id}
                       to={`/produk/${product.slug}`}
-                      className={`catalog-card ${view === "list" ? "list" : "grid"}`}
+                      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}`}
                       role="listitem"
                       aria-label={`Buka detail ${product.name}`}
                     >
-                      <div className="catalog-cardCover">
-                        <div className="catalog-cardIcon">
-                          {product.icon_url ? (
-                            <img src={product.icon_url} alt="" loading="lazy" />
-                          ) : (
-                            <span>{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>
-                          )}
+                      <div className="catalog-cardTop">
+                        <div className="catalog-cardBrand">
+                          <div className="catalog-cardIcon">
+                            {product.icon_url ? (
+                              <img src={product.icon_url} alt="" loading="lazy" />
+                            ) : (
+                              <span>{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>
+                            )}
+                          </div>
+
+                          <div className="catalog-cardCopy">
+                            <div className="catalog-cardKicker">
+                              <CategoryIcon size={13} />
+                              <span>{categoryLabel}</span>
+                            </div>
+                            <div className="catalog-cardTitle">{product.name}</div>
+                            <div className="catalog-cardSummary">{summaryCopy}</div>
+                          </div>
                         </div>
 
-                        <div className="catalog-cardStatus">
-                          {hot ? (
-                            <span className="catalog-status hot">
-                              <Flame size={13} />
-                              <span>Hot</span>
-                            </span>
-                          ) : null}
-                          {soldOut ? (
-                            <span className="catalog-status soldout">
-                              <CircleAlert size={13} />
-                              <span>Habis</span>
-                            </span>
-                          ) : null}
-                          {low ? (
-                            <span className="catalog-status warn">
-                              <CircleAlert size={13} />
-                              <span>{stock}</span>
-                            </span>
-                          ) : null}
+                        <div className="catalog-cardPriceWrap">
+                          <span className="catalog-cardPriceLabel">Mulai</span>
+                          <div className="catalog-cardPrice">{displayPrice}</div>
                         </div>
                       </div>
 
-                      <div className="catalog-cardBody">
-                        <div className="catalog-cardHead">
-                          <div>
-                            <div className="catalog-cardTitle">{product.name}</div>
-                          </div>
-                          <div className="catalog-cardPrice">{displayPrice}</div>
-                        </div>
+                      <div className="catalog-cardSignals">
+                        {hot ? (
+                          <span className="catalog-status hot">
+                            <Flame size={13} />
+                            <span>Hot</span>
+                          </span>
+                        ) : null}
+                        {soldOut ? (
+                          <span className="catalog-status soldout">
+                            <CircleAlert size={13} />
+                            <span>Habis</span>
+                          </span>
+                        ) : low ? (
+                          <span className="catalog-status warn">
+                            <CircleAlert size={13} />
+                            <span>Stok: {stock}</span>
+                          </span>
+                        ) : (
+                          <span className="catalog-status ok">
+                            <PackageCheck size={13} />
+                            <span>Ready</span>
+                          </span>
+                        )}
+                      </div>
 
-                        <div className="catalog-cardMeta">
-                          <span>
-                            <Package2 size={13} />
-                            <span>{product._vars?.length || 0} varian</span>
-                          </span>
-                          <span>
-                            <span>{stock}</span>
-                            <span>stok</span>
-                          </span>
-                          <span>
-                            <span>{sold}</span>
-                            <span>terjual</span>
-                          </span>
-                        </div>
+                      <div className="catalog-cardMeta">
+                        <span>
+                          <Layers3 size={13} />
+                          <span>{product._vars?.length || 0} varian</span>
+                        </span>
+                        <span>
+                          <PackageCheck size={13} />
+                          <span>Stok: {stock}</span>
+                        </span>
+                        <span>
+                          <ShoppingBag size={13} />
+                          <span>{sold} terjual</span>
+                        </span>
+                      </div>
 
-                        <div className="catalog-cardFoot">
-                          <span>Buka detail</span>
-                          <ArrowRight size={15} />
-                        </div>
+                      <div className="catalog-cardFoot">
+                        <span>Lihat paket</span>
+                        <ArrowRight size={15} />
                       </div>
                     </Link>
                   );

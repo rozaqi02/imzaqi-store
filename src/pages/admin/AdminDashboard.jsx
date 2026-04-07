@@ -244,6 +244,7 @@ export default function AdminDashboard() {
     guarantee_text: "",
     stock: 0,
     is_active: true,
+    requires_buyer_email: false,
     sort_order: 100,
   });
 
@@ -446,6 +447,22 @@ export default function AdminDashboard() {
       .slice()
       .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0));
   }, [selectedProduct]);
+
+  const nextProductSortOrder = useMemo(() => {
+    const highest = (products || []).reduce((max, item) => {
+      const value = Number(item?.sort_order);
+      return Number.isFinite(value) ? Math.max(max, value) : max;
+    }, 0);
+    return highest + 10;
+  }, [products]);
+
+  const nextVariantSortOrder = useMemo(() => {
+    const highest = (selectedVariants || []).reduce((max, item) => {
+      const value = Number(item?.sort_order);
+      return Number.isFinite(value) ? Math.max(max, value) : max;
+    }, 0);
+    return highest + 10;
+  }, [selectedVariants]);
 
   const allVariants = useMemo(() => {
     return (products || []).flatMap((product) => product.product_variants || []);
@@ -708,7 +725,7 @@ export default function AdminDashboard() {
       slug: "",
       category: "other",
       description: "",
-      sort_order: 100,
+      sort_order: nextProductSortOrder,
       is_active: true,
     });
     setProductModalOpen(true);
@@ -736,7 +753,7 @@ export default function AdminDashboard() {
           description: String(newProduct.description || ""),
           icon_url: null,
           is_active: !!newProduct.is_active,
-          sort_order: Number(newProduct.sort_order || 100),
+          sort_order: Number.isFinite(Number(newProduct.sort_order)) ? Number(newProduct.sort_order) : nextProductSortOrder,
         })
         .select("id")
         .single();
@@ -765,7 +782,9 @@ export default function AdminDashboard() {
       description: String(productForm.description || ""),
       icon_url: productForm.icon_url ? String(productForm.icon_url) : null,
       is_active: !!productForm.is_active,
-      sort_order: Number(productForm.sort_order || 100),
+      sort_order: Number.isFinite(Number(productForm.sort_order))
+        ? Number(productForm.sort_order)
+        : Number(selectedProduct?.sort_order || 100),
       updated_at: new Date().toISOString(),
     };
 
@@ -858,7 +877,8 @@ export default function AdminDashboard() {
       guarantee_text: "",
       stock: 0,
       is_active: true,
-      sort_order: 100,
+      requires_buyer_email: false,
+      sort_order: nextVariantSortOrder,
     });
     setVariantModalOpen(true);
   }
@@ -875,6 +895,7 @@ export default function AdminDashboard() {
       guarantee_text: v.guarantee_text || "",
       stock: Number(v.stock || 0),
       is_active: !!v.is_active,
+      requires_buyer_email: !!v.requires_buyer_email,
       sort_order: Number(v.sort_order || 100),
     });
     setVariantModalOpen(true);
@@ -882,6 +903,9 @@ export default function AdminDashboard() {
 
   async function saveVariant() {
     if (!variantForm?.product_id) return;
+
+    const activeVariantSort = Number(variantForm.sort_order);
+    const fallbackSortOrder = variantMode === "create" ? nextVariantSortOrder : 100;
 
     const payload = {
       product_id: variantForm.product_id,
@@ -892,7 +916,8 @@ export default function AdminDashboard() {
       guarantee_text: String(variantForm.guarantee_text || ""),
       stock: Number(variantForm.stock || 0),
       is_active: !!variantForm.is_active,
-      sort_order: Number(variantForm.sort_order || 100),
+      requires_buyer_email: !!variantForm.requires_buyer_email,
+      sort_order: Number.isFinite(activeVariantSort) ? activeVariantSort : fallbackSortOrder,
       updated_at: new Date().toISOString(),
     };
 
@@ -901,19 +926,30 @@ export default function AdminDashboard() {
       return;
     }
 
-    const tid = toast.loading(variantMode === "edit" ? "Menyimpan varian…" : "Menambah varian…");
+    const tid = toast.loading(variantMode === "edit" ? "Menyimpan varian..." : "Menambah varian...");
     setMsg("");
 
     try {
       if (variantMode === "edit") {
-        const { error } = await supabase.from("product_variants").update(payload).eq("id", variantForm.id);
+        const { data, error } = await supabase
+          .from("product_variants")
+          .update(payload)
+          .eq("id", variantForm.id)
+          .select("id")
+          .maybeSingle();
         if (error) throw error;
+        if (!data?.id) throw new Error("Varian tidak ditemukan atau akses ditolak.");
       } else {
-        const { error } = await supabase.from("product_variants").insert({
-          ...payload,
-          created_at: new Date().toISOString(),
-        });
+        const { data, error } = await supabase
+          .from("product_variants")
+          .insert({
+            ...payload,
+            created_at: new Date().toISOString(),
+          })
+          .select("id")
+          .maybeSingle();
         if (error) throw error;
+        if (!data?.id) throw new Error("Varian gagal ditambahkan.");
       }
 
       await refreshProducts();
@@ -922,8 +958,16 @@ export default function AdminDashboard() {
       toast.success("Varian tersimpan", { duration: 1400 });
     } catch (e) {
       toast.remove(tid);
-      toast.error("Gagal menyimpan varian");
-      setMsg(e?.message || String(e));
+      const rawMessage = String(e?.message || e || "");
+      const msgLower = rawMessage.toLowerCase();
+      if (e?.code === "23505" || msgLower.includes("product_variants_unique") || msgLower.includes("duplicate key value")) {
+        toast.error("Database masih memblokir duplikat nama+durasi. Jalankan query SQL update constraint dulu.");
+      } else if (e?.code === "42501" || msgLower.includes("row-level security") || msgLower.includes("permission denied")) {
+        toast.error("Akses ditolak. Coba login ulang admin.");
+      } else {
+        toast.error("Gagal menyimpan varian");
+      }
+      setMsg(rawMessage || "Terjadi error saat menyimpan varian.");
     }
   }
 
@@ -1191,6 +1235,12 @@ export default function AdminDashboard() {
     : lastSyncedAt
       ? `Terakhir sinkron ${formatAdminDate(lastSyncedAt)}`
       : activeTab.hint;
+  const isOverviewTab = activeTab.id === "overview";
+  const topbarEyebrow = isOverviewTab ? activeTab.label : "Area kerja";
+  const topbarTitle = isOverviewTab ? "Operasional toko" : activeTab.label;
+  const topbarLead = isOverviewTab
+    ? "Pilih area kerja di kiri. Setiap panel diringkas supaya cepat dipindai saat toko lagi ramai."
+    : activeTab.hint;
 
   return (
     <div className="page admin-page">
@@ -1291,9 +1341,9 @@ export default function AdminDashboard() {
 
             <div className="admin-topbar">
               <div className="admin-topbarCopy">
-                <div className="admin-topbar-eyebrow">{activeTab.label}</div>
-                <h1 className="h2">Operasional toko</h1>
-                <div className="muted">Pilih area kerja di kiri. Setiap panel diringkas supaya cepat dipindai saat toko lagi ramai.</div>
+                <div className="admin-topbar-eyebrow">{topbarEyebrow}</div>
+                <h1 className="h2">{topbarTitle}</h1>
+                <div className="muted">{topbarLead}</div>
               </div>
 
               <div className="admin-topbar-current">
@@ -1749,16 +1799,6 @@ export default function AdminDashboard() {
                             />
                           </label>
 
-                          <label className="admin-field">
-                            <span>Urutan (sort_order)</span>
-                            <input
-                              className="input"
-                              type="number"
-                              value={productForm.sort_order}
-                              onChange={(e) => setProductForm((p) => ({ ...p, sort_order: Number(e.target.value) }))}
-                            />
-                          </label>
-
                           <label className="admin-field admin-field-switch">
                             <span>Aktif</span>
                             <input
@@ -1819,7 +1859,7 @@ export default function AdminDashboard() {
                           <div>
                             <div className="admin-panel-title">Varian / Paket</div>
                             <div className="admin-panel-sub">
-                              Atur harga, deskripsi varian, garansi, dan stok.
+                              Atur harga, deskripsi varian, garansi, stok, dan kebutuhan email buyer.
                             </div>
                           </div>
 
@@ -1841,6 +1881,7 @@ export default function AdminDashboard() {
                                   <div className="admin-variant-sub">
                                     {v.duration_label} • <b>{formatIDR(v.price_idr)}</b> • stok <b>{v.stock}</b>
                                     {!v.is_active ? " • (off)" : ""}
+                                    {v.requires_buyer_email ? " • wajib email buyer" : ""}
                                   </div>
                                   {v.description ? <div className="admin-variant-desc">{v.description}</div> : null}
                                 </div>
@@ -2510,16 +2551,6 @@ export default function AdminDashboard() {
             />
           </label>
 
-          <label className="admin-field">
-            <span>sort_order</span>
-            <input
-              className="input"
-              type="number"
-              value={newProduct.sort_order}
-              onChange={(e) => setNewProduct((p) => ({ ...p, sort_order: Number(e.target.value) }))}
-            />
-          </label>
-
           <label className="admin-field admin-field-switch">
             <span>Aktif</span>
             <input
@@ -2604,13 +2635,12 @@ export default function AdminDashboard() {
             />
           </label>
 
-          <label className="admin-field">
-            <span>sort_order</span>
+          <label className="admin-field admin-field-switch admin-field-full">
+            <span>Wajib Email Buyer (untuk buka QRIS)</span>
             <input
-              className="input"
-              type="number"
-              value={variantForm.sort_order}
-              onChange={(e) => setVariantForm((p) => ({ ...p, sort_order: Number(e.target.value) }))}
+              type="checkbox"
+              checked={!!variantForm.requires_buyer_email}
+              onChange={(e) => setVariantForm((p) => ({ ...p, requires_buyer_email: e.target.checked }))}
             />
           </label>
 

@@ -21,27 +21,52 @@ export function CartProvider({ children }) {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
   }, [items]);
 
-const api = useMemo(() => ({
+  const api = useMemo(() => ({
     items,
 
     add(variant, qty = 1) {
-      // ... kode add tetap sama ...
       setItems(prev => {
         const i = prev.findIndex(x => x.variant_id === variant.id);
         if (i >= 0) {
           const next = [...prev];
-          next[i] = { ...next[i], qty: clamp(next[i].qty + qty, 1, 99) };
+          next[i] = {
+            ...next[i],
+            product_id: variant.product_id ?? next[i].product_id,
+            product_name: variant.product_name ?? next[i].product_name,
+            variant_name: variant.name ?? next[i].variant_name,
+            duration_label: variant.duration_label ?? next[i].duration_label,
+            price_idr: variant.price_idr ?? next[i].price_idr,
+            product_icon_url:
+              variant.product_icon_url ??
+              variant.icon_url ??
+              next[i].product_icon_url ??
+              "",
+            description: variant.description ?? next[i].description,
+            guarantee_text: variant.guarantee_text ?? next[i].guarantee_text,
+            requires_buyer_email:
+              typeof variant.requires_buyer_email === "boolean"
+                ? variant.requires_buyer_email
+                : !!next[i].requires_buyer_email,
+            qty: clamp(next[i].qty + qty, 1, 99),
+          };
           return next;
         }
-        return [...prev, {
-          variant_id: variant.id,
-          product_id: variant.product_id,
-          product_name: variant.product_name,
-          variant_name: variant.name,
-          duration_label: variant.duration_label,
-          price_idr: variant.price_idr,
-          qty: clamp(qty, 1, 99),
-        }];
+        return [
+          ...prev,
+          {
+            variant_id: variant.id,
+            product_id: variant.product_id,
+            product_name: variant.product_name,
+            variant_name: variant.name,
+            duration_label: variant.duration_label,
+            price_idr: variant.price_idr,
+            product_icon_url: variant.product_icon_url || variant.icon_url || "",
+            description: variant.description || "",
+            guarantee_text: variant.guarantee_text || "",
+            requires_buyer_email: !!variant.requires_buyer_email,
+            qty: clamp(qty, 1, 99),
+          },
+        ];
       });
     },
 
