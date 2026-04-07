@@ -2631,10 +2631,12 @@ select.input {
   color: rgba(56, 84, 94, 0.88) !important;
 }
 
-/* Unified search boxes (Products, Status, Home/Hero, Testimonials) */
+/* Unified search boxes (Products, Status, FAQ, Home/Hero, Testimonials) */
 .catalog-commandSearch,
 .catalog-filterSearch,
 .status-searchField,
+.st-inputWrap,
+.faq-searchWrap,
 .hero-search-shell,
 .testi-searchShell {
   border: 1px solid var(--brand-line) !important;
@@ -2650,6 +2652,8 @@ select.input {
 
 .catalog-commandSearch,
 .status-searchField,
+.st-inputWrap,
+.faq-searchWrap,
 .hero-search-shell {
   min-height: 56px;
   border-radius: 20px !important;
@@ -2664,6 +2668,8 @@ select.input {
 .catalog-commandSearch:focus-within,
 .catalog-filterSearch:focus-within,
 .status-searchField:focus-within,
+.st-inputWrap:focus-within,
+.faq-searchWrap:focus-within,
 .hero-search-shell:focus-within,
 .testi-searchShell:focus-within {
   border-color: rgba(79, 255, 200, 0.4) !important;
@@ -2675,6 +2681,8 @@ select.input {
 .catalog-commandSearch .catalog-commandInput,
 .catalog-filterSearch .catalog-filterInput,
 .status-searchField .status-searchInput,
+.st-inputWrap .st-input,
+.faq-searchWrap .faq-searchInput,
 .hero-search-shell .hero-search-input,
 .testi-searchShell .testi-searchInput {
   border: 0 !important;
@@ -2688,6 +2696,8 @@ select.input {
 .catalog-commandSearch .catalog-commandInput,
 .catalog-filterSearch .catalog-filterInput,
 .status-searchField .status-searchInput,
+.st-inputWrap .st-input,
+.faq-searchWrap .faq-searchInput,
 .hero-search-shell .hero-search-input,
 .testi-searchShell .testi-searchInput {
   padding-top: 0 !important;
@@ -2701,6 +2711,8 @@ select.input {
 .catalog-commandSearch .catalog-commandInput::placeholder,
 .catalog-filterSearch .catalog-filterInput::placeholder,
 .status-searchField .status-searchInput::placeholder,
+.st-inputWrap .st-input::placeholder,
+.faq-searchWrap .faq-searchInput::placeholder,
 .hero-search-shell .hero-search-input::placeholder,
 .testi-searchShell .testi-searchInput::placeholder {
   color: var(--brand-muted) !important;
@@ -2709,6 +2721,8 @@ select.input {
 .catalog-commandIcon,
 .catalog-filterSearch > svg,
 .status-searchField > svg,
+.st-inputWrap > svg,
+.faq-searchWrap > svg,
 .hero-search-icon,
 .testi-searchIcon {
   color: var(--brand-icon) !important;
@@ -2729,6 +2743,8 @@ select.input {
 :root[data-theme="light"] .catalog-commandSearch,
 :root[data-theme="light"] .catalog-filterSearch,
 :root[data-theme="light"] .status-searchField,
+:root[data-theme="light"] .st-inputWrap,
+:root[data-theme="light"] .faq-searchWrap,
 :root[data-theme="light"] .hero-search-shell,
 :root[data-theme="light"] .testi-searchShell {
   border-color: rgba(0, 138, 148, 0.16) !important;
@@ -2745,6 +2761,8 @@ select.input {
 :root[data-theme="light"] .catalog-commandSearch .catalog-commandInput,
 :root[data-theme="light"] .catalog-filterSearch .catalog-filterInput,
 :root[data-theme="light"] .status-searchField .status-searchInput,
+:root[data-theme="light"] .st-inputWrap .st-input,
+:root[data-theme="light"] .faq-searchWrap .faq-searchInput,
 :root[data-theme="light"] .hero-search-shell .hero-search-input,
 :root[data-theme="light"] .testi-searchShell .testi-searchInput {
   color: #123744 !important;
@@ -2754,4 +2772,643 @@ select.input {
 :root[data-theme="light"] .catalog-filterClear,
 :root[data-theme="light"] .hero-search-clear {
   border-color: rgba(0, 138, 148, 0.16) !important;
+}
+
+/* Cross-page alignment: Home, Produk, Testimoni, Admin */
+.hero-commandCard,
+.stat-minimal,
+.product-tile,
+.catalog-command,
+.catalog-filter,
+.catalog-card.catalog-cardV2,
+.catalog-sheet,
+.testi-toolbar,
+.testi-miniStat,
+.testi-imgWrap,
+.admin-sidebar,
+.admin-panel,
+.admin-statCard,
+.admin-miniCard,
+.admin-orderCardModern,
+.admin-mobileBrand,
+.admin-mobileTab {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 24%),
+    radial-gradient(circle at 14% -2%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 32%),
+    radial-gradient(circle at top right, var(--brand-card-spot), rgba(0, 214, 180, 0) 52%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.layout-toggles,
+.catalog-quickChip,
+.catalog-viewBtn,
+.testi-filterChip,
+.testi-count,
+.admin-chip,
+.admin-searchRow {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-quickChip.active,
+.testi-filterChip.active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
+  border-color: rgba(79, 255, 200, 0.24) !important;
+  color: #032235 !important;
+  box-shadow: var(--skeu-accent-shadow) !important;
+}
+
+.product-tile-icon,
+.catalog-card.catalog-cardV2 .catalog-cardIcon,
+.admin-product-icon,
+.admin-icon-preview,
+.admin-nav-icon,
+.admin-mobileTabIcon {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.product-tile-icon img,
+.catalog-card.catalog-cardV2 .catalog-cardIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover !important;
+  padding: 0 !important;
+}
+
+:root[data-theme="light"] .catalog-title,
+:root[data-theme="light"] .catalog-cardTitle,
+:root[data-theme="light"] .product-tile-name,
+:root[data-theme="light"] .testi-minimal-title,
+:root[data-theme="light"] .admin-panel-title,
+:root[data-theme="light"] .admin-heroTitle,
+:root[data-theme="light"] .admin-brand-title {
+  color: #123744 !important;
+}
+
+:root[data-theme="light"] .catalog-eyebrow,
+:root[data-theme="light"] .catalog-sub,
+:root[data-theme="light"] .catalog-cardKicker,
+:root[data-theme="light"] .catalog-cardSummary,
+:root[data-theme="light"] .home-summaryText,
+:root[data-theme="light"] .product-tile-desc,
+:root[data-theme="light"] .testi-minimal-sub,
+:root[data-theme="light"] .testi-miniStat span,
+:root[data-theme="light"] .admin-panel-sub,
+:root[data-theme="light"] .admin-brand-sub,
+:root[data-theme="light"] .admin-topbar-eyebrow,
+:root[data-theme="light"] .admin-nav-copy small,
+:root[data-theme="light"] .admin-statLabel,
+:root[data-theme="light"] .admin-miniCard span,
+:root[data-theme="light"] .admin-miniCard small {
+  color: rgba(46, 76, 88, 0.9) !important;
+}
+
+@media (max-width: 900px) and (min-width: 721px) {
+  .hero-commandCard,
+  .catalog-command,
+  .catalog-filter,
+  .catalog-card.catalog-cardV2,
+  .testi-toolbar,
+  .admin-sidebar,
+  .admin-panel {
+    border-radius: 24px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-commandCard,
+  .catalog-command,
+  .catalog-filter,
+  .catalog-card.catalog-cardV2,
+  .testi-toolbar,
+  .admin-panel,
+  .admin-sidebar,
+  .admin-mobileBrand,
+  .admin-mobileTab {
+    border-radius: 20px !important;
+  }
+
+  .product-grid-container.grid-mode,
+  .catalog-grid.grid,
+  .testi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  .product-grid-container.grid-mode,
+  .catalog-grid.grid,
+  .testi-grid,
+  .testi-skel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Mobile footer refresh inspired by Gopay */
+.site-footer--gopay .site-footerMobile {
+  display: none;
+}
+
+.site-footer--gopay .site-footerDesktop {
+  display: block;
+}
+
+@media (max-width: 680px) {
+  .site-footer--gopay {
+    padding: 18px 0 28px !important;
+  }
+
+  .site-footer--gopay .container {
+    width: min(1100px, calc(100% - 18px)) !important;
+  }
+
+  .site-footer--gopay .site-footerDesktop {
+    display: none !important;
+  }
+
+  .site-footer--gopay .site-footerMobile {
+    display: grid;
+    gap: 16px;
+  }
+
+  .site-footer--gopay .site-footerPanel {
+    padding: 16px 16px 18px !important;
+    border-radius: 24px !important;
+    border: 1px solid rgba(172, 206, 255, 0.2) !important;
+    background:
+      radial-gradient(120% 120% at 0% 0%, rgba(47, 92, 158, 0.28), rgba(0, 0, 0, 0) 58%),
+      linear-gradient(160deg, #0c1a2e 0%, #10233f 52%, #0f213d 100%) !important;
+    box-shadow:
+      0 24px 52px rgba(2, 8, 20, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  }
+
+  :root[data-theme="light"] .site-footer--gopay .site-footerPanel {
+    border-color: rgba(172, 206, 255, 0.22) !important;
+    background:
+      radial-gradient(120% 120% at 0% 0%, rgba(47, 92, 158, 0.26), rgba(0, 0, 0, 0) 58%),
+      linear-gradient(160deg, #0c1a2e 0%, #10233f 52%, #0f213d 100%) !important;
+    box-shadow:
+      0 24px 52px rgba(2, 8, 20, 0.58),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  }
+
+  .site-footer--gopay .site-footerMobileBrandRow {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+  }
+
+  .site-footer--gopay .site-footerMobileBrand {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    color: #f3f8ff;
+  }
+
+  .site-footer--gopay .site-footerMobileBrand img {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    border: 1px solid rgba(201, 222, 255, 0.24);
+    background: rgba(255, 255, 255, 0.06);
+    object-fit: cover;
+  }
+
+  .site-footer--gopay .site-footerMobileBrand span {
+    font-size: 20px;
+    font-weight: 1000;
+    letter-spacing: -0.04em;
+    color: #f6fbff;
+  }
+
+  .site-footer--gopay .site-footerMobileContactIntro {
+    display: grid;
+    gap: 6px;
+  }
+
+  .site-footer--gopay .site-footerMobileContactIntro a {
+    font-size: 13px;
+    font-weight: 800;
+    color: rgba(233, 244, 255, 0.94);
+    line-height: 1.45;
+  }
+
+  .site-footer--gopay .site-footerMobileSocial {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .site-footer--gopay .site-footerMobileSocialBtn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(220, 235, 255, 0.2);
+    background: rgba(255, 255, 255, 0.04);
+    color: #eef6ff;
+  }
+
+  .site-footer--gopay .site-footerMobileGrid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 14px;
+    margin-top: 2px;
+  }
+
+  .site-footer--gopay .site-footerMobileCol {
+    display: grid;
+    gap: 8px;
+  }
+
+  .site-footer--gopay .site-footerMobileColTitle {
+    font-family: "Times New Roman", Georgia, serif;
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #f7fbff;
+  }
+
+  .site-footer--gopay .site-footerMobileList {
+    display: grid;
+    gap: 6px;
+  }
+
+  .site-footer--gopay .site-footerMobileLink {
+    display: block;
+    color: rgba(236, 245, 255, 0.95);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .site-footer--gopay .site-footerMobileReach {
+    display: grid;
+    gap: 8px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(209, 228, 255, 0.14);
+  }
+
+  .site-footer--gopay .site-footerMobileReach p {
+    margin: 0;
+    color: rgba(232, 243, 255, 0.9);
+    font-size: 13px;
+    line-height: 1.55;
+    font-weight: 700;
+  }
+
+  .site-footer--gopay .site-footerMobileReach a {
+    color: #f8fcff;
+    font-size: 15px;
+    font-weight: 900;
+  }
+
+  .site-footer--gopay .site-footerMobileLegal {
+    display: grid;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(209, 228, 255, 0.14);
+    text-align: center;
+  }
+
+  .site-footer--gopay .site-footerMobileLegal p {
+    margin: 0;
+    color: rgba(220, 236, 255, 0.82);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .site-footer--gopay .site-footerMobileLegal a {
+    color: #f4fbff;
+    font-size: 12px;
+    font-weight: 800;
+  }
+}
+
+/* Light mode polish for footer variant */
+:root[data-theme="light"] .site-footer--gopay .site-footerPanel {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(238, 249, 252, 0.96)),
+    rgba(246, 251, 253, 0.98) !important;
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  box-shadow:
+    0 24px 44px rgba(82, 127, 144, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerTop,
+:root[data-theme="light"] .site-footer--gopay .site-footerBottom {
+  border-color: rgba(8, 108, 122, 0.14) !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerHeadline,
+:root[data-theme="light"] .site-footer--gopay .site-footerList a,
+:root[data-theme="light"] .site-footer--gopay .site-footerBottom a {
+  color: rgba(13, 45, 57, 0.98) !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerLead,
+:root[data-theme="light"] .site-footer--gopay .site-footerLabel,
+:root[data-theme="light"] .site-footer--gopay .site-footerMeta a,
+:root[data-theme="light"] .site-footer--gopay .site-footerBottom {
+  color: rgba(56, 84, 94, 0.9) !important;
+}
+
+@media (max-width: 680px) {
+  :root[data-theme="light"] .site-footer--gopay .site-footerPanel {
+    border-color: rgba(0, 138, 148, 0.18) !important;
+    background:
+      radial-gradient(130% 120% at 0% 0%, rgba(94, 188, 204, 0.26), rgba(0, 0, 0, 0) 58%),
+      linear-gradient(160deg, #f6fdff 0%, #e8f6fb 56%, #e3f1f8 100%) !important;
+    box-shadow:
+      0 22px 46px rgba(76, 118, 132, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  }
+
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileBrand,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileBrand span,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileColTitle,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileReach a,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLegal a {
+    color: #123744 !important;
+  }
+
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileContactIntro a,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLink,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileReach p,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLegal p {
+    color: rgba(36, 72, 84, 0.92) !important;
+  }
+
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileBrand img {
+    border-color: rgba(0, 138, 148, 0.2) !important;
+    background: rgba(255, 255, 255, 0.88) !important;
+  }
+
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileSocialBtn {
+    border-color: rgba(0, 138, 148, 0.18) !important;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0) 26%),
+      rgba(246, 252, 255, 0.92) !important;
+    color: rgba(17, 59, 73, 0.92) !important;
+    box-shadow: var(--skeu-control-shadow) !important;
+  }
+
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileReach,
+  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLegal {
+    border-top-color: rgba(0, 138, 148, 0.16) !important;
+  }
+}
+
+/* Gopay footer v2: unified desktop + mobile, no boxed links */
+.site-footer--gopay .site-footerPanel.site-footerGo {
+  border-radius: 34px !important;
+  border: 1px solid rgba(167, 205, 255, 0.2) !important;
+  background:
+    radial-gradient(130% 130% at 0% 0%, rgba(48, 91, 154, 0.26), rgba(0, 0, 0, 0) 58%),
+    linear-gradient(160deg, #0c1b31 0%, #0f223f 52%, #102342 100%) !important;
+  box-shadow:
+    0 26px 58px rgba(2, 8, 20, 0.56),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+  padding: 34px 38px !important;
+}
+
+.site-footer--gopay .site-footerGoIntro {
+  display: grid;
+  gap: 12px;
+}
+
+.site-footer--gopay .site-footerGoBrand {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  width: max-content;
+  color: #f3f8ff;
+}
+
+.site-footer--gopay .site-footerGoBrand img {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  border: 1px solid rgba(209, 228, 255, 0.22);
+  background: rgba(255, 255, 255, 0.06);
+  object-fit: cover;
+}
+
+.site-footer--gopay .site-footerGoBrand span {
+  font-size: 48px;
+  font-weight: 1000;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.site-footer--gopay .site-footerGoContact {
+  display: grid;
+  gap: 6px;
+}
+
+.site-footer--gopay .site-footerGoContact a {
+  color: rgba(230, 242, 255, 0.94);
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.site-footer--gopay .site-footerGoSocial {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.site-footer--gopay .site-footerGoSocialBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #edf6ff;
+  border: 1px solid rgba(220, 235, 255, 0.22);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.site-footer--gopay .site-footerGoColumns {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr 1fr 1fr 1.2fr;
+  gap: 22px;
+  padding-top: 24px;
+}
+
+.site-footer--gopay .site-footerGoCol {
+  display: grid;
+  gap: 10px;
+}
+
+.site-footer--gopay .site-footerGoTitle {
+  margin: 0;
+  color: #f6fbff;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+}
+
+.site-footer--gopay .site-footerGoList {
+  display: grid;
+  gap: 8px;
+}
+
+.site-footer--gopay .site-footerGoLink {
+  color: rgba(234, 245, 255, 0.92);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.45;
+}
+
+.site-footer--gopay .site-footerGoReach p {
+  margin: 0;
+  color: rgba(232, 243, 255, 0.9);
+  font-size: 14px;
+  line-height: 1.6;
+  font-weight: 700;
+}
+
+.site-footer--gopay .site-footerGoReach a {
+  color: #f8fdff;
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.site-footer--gopay .site-footerGoLegal {
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(209, 228, 255, 0.15);
+  display: grid;
+  gap: 10px;
+  text-align: center;
+}
+
+.site-footer--gopay .site-footerGoLegal p {
+  margin: 0;
+  color: rgba(220, 236, 255, 0.84);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.55;
+}
+
+@media (max-width: 980px) {
+  .site-footer--gopay .site-footerPanel.site-footerGo {
+    padding: 26px 24px !important;
+  }
+
+  .site-footer--gopay .site-footerGoColumns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 16px;
+  }
+}
+
+@media (max-width: 680px) {
+  .site-footer--gopay .site-footerPanel.site-footerGo {
+    padding: 18px 16px 20px !important;
+    border-radius: 24px !important;
+  }
+
+  .site-footer--gopay .site-footerGoBrand span {
+    font-size: 30px;
+  }
+
+  .site-footer--gopay .site-footerGoBrand img {
+    width: 44px;
+    height: 44px;
+  }
+
+  .site-footer--gopay .site-footerGoColumns {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px 14px;
+    padding-top: 16px;
+  }
+
+  .site-footer--gopay .site-footerGoTitle {
+    font-size: 15px;
+  }
+
+  .site-footer--gopay .site-footerGoLink,
+  .site-footer--gopay .site-footerGoReach p {
+    font-size: 13px;
+  }
+
+  .site-footer--gopay .site-footerGoReach a {
+    font-size: 15px;
+  }
+
+  .site-footer--gopay .site-footerGoLegal {
+    margin-top: 16px;
+    padding-top: 14px;
+  }
+
+  .site-footer--gopay .site-footerGoLegal p {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 420px) {
+  .site-footer--gopay .site-footerGoColumns {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Light mode: keep gopay structure, remove boxy card look */
+:root[data-theme="light"] .site-footer--gopay .site-footerPanel.site-footerGo {
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  background:
+    radial-gradient(130% 120% at 0% 0%, rgba(95, 189, 205, 0.22), rgba(0, 0, 0, 0) 58%),
+    linear-gradient(160deg, #f6fdff 0%, #e8f6fb 56%, #e2f1f8 100%) !important;
+  box-shadow:
+    0 24px 46px rgba(76, 118, 132, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerGoBrand,
+:root[data-theme="light"] .site-footer--gopay .site-footerGoBrand span,
+:root[data-theme="light"] .site-footer--gopay .site-footerGoTitle,
+:root[data-theme="light"] .site-footer--gopay .site-footerGoReach a {
+  color: #123744 !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerGoContact a,
+:root[data-theme="light"] .site-footer--gopay .site-footerGoLink,
+:root[data-theme="light"] .site-footer--gopay .site-footerGoReach p,
+:root[data-theme="light"] .site-footer--gopay .site-footerGoLegal p {
+  color: rgba(36, 72, 84, 0.92) !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerGoSocialBtn {
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0) 26%),
+    rgba(246, 252, 255, 0.92) !important;
+  color: rgba(17, 59, 73, 0.92) !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerGoBrand img {
+  border-color: rgba(0, 138, 148, 0.2) !important;
+  background: rgba(255, 255, 255, 0.88) !important;
+}
+
+:root[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
+  border-top-color: rgba(0, 138, 148, 0.16) !important;
 }

@@ -3,9 +3,9 @@ import { Link, NavLink, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
 import {
   Activity,
+  CircleHelp,
   Grid2x2,
   House,
-  Info,
   Menu,
   MessageSquareQuote,
   Moon,
@@ -40,7 +40,7 @@ function CartIcon() {
 const primaryItems = [
   { to: "/", label: "Home", icon: House },
   { to: "/produk", label: "Produk", icon: Grid2x2 },
-  { to: "/tentang", label: "Tentang", icon: Info },
+  { to: "/tentang", label: "FAQ", icon: CircleHelp },
   { to: "/testimoni", label: "Testimoni", icon: MessageSquareQuote },
 ];
 
@@ -282,7 +282,7 @@ export default function Header() {
           <nav className="nav desktop-only">
             <NavLink to="/">Home</NavLink>
             <NavLink to="/produk">Produk</NavLink>
-            <NavLink to="/tentang">Tentang</NavLink>
+            <NavLink to="/tentang">FAQ</NavLink>
             <NavLink to="/testimoni">Testimoni</NavLink>
             <NavLink to="/status">Status</NavLink>
           </nav>

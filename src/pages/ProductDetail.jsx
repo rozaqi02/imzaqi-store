@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, Clock3, Minus, Plus, ShieldCheck, ShoppingCart, Sparkles } from "lucide-react";
+import { ArrowLeft, Clock3, Minus, Plus, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles } from "lucide-react";
 
 import { fetchProductBySlug } from "../lib/api";
 import { useCart } from "../context/CartContext";
@@ -215,7 +215,7 @@ export default function ProductDetail() {
 
   if (loading) {
     return (
-      <div className="page">
+      <div className="page detail-page">
         <section className="section">
           <div className="container">
             <div className="product-detail-loading">
@@ -234,7 +234,7 @@ export default function ProductDetail() {
 
   if (error || !product) {
     return (
-      <div className="page">
+      <div className="page detail-page">
         <section className="section">
           <div className="container">
             <div className="card pad">
@@ -252,7 +252,7 @@ export default function ProductDetail() {
   }
 
   return (
-    <div className="page">
+    <div className="page detail-page">
       <section className="section">
         <div className="container">
           <Link to="/produk" className="back-link">
@@ -328,6 +328,7 @@ export default function ProductDetail() {
                 const canDec = qty > 1;
                 const canInc = qty < maxQty;
                 const isRecommended = variant.id === recommendedVariantId;
+                const soldCount = Math.max(0, Number(variant?.sold_count || 0));
                 const descriptionBody = String(
                   variant.description ||
                     (out
@@ -339,6 +340,7 @@ export default function ProductDetail() {
                 const factChips = [
                   { key: `duration-${variant.id}`, icon: Clock3, text: variant.duration_label || "-" },
                   { key: `guarantee-${variant.id}`, icon: ShieldCheck, text: variant.guarantee_text || "Garansi admin" },
+                  { key: `sold-${variant.id}`, icon: ShoppingBag, text: `${soldCount} terjual` },
                 ];
 
                 return (

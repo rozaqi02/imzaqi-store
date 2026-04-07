@@ -1,39 +1,51 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { MessageCircle, Phone, ReceiptText, ScanLine } from "lucide-react";
+import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
-const metaLinks = [
-  { label: "QRIS", to: "/tentang" },
-  { label: "ID order", to: "/status" },
-  { label: "WA admin", href: "https://wa.me/6283136049987" },
-];
-
-const footerGroups = [
+const footerColumns = [
   {
-    label: "Menu",
-    to: "/produk",
+    label: "Produk",
     links: [
       { label: "Home", to: "/" },
       { label: "Produk", to: "/produk" },
+      { label: "Checkout", to: "/checkout" },
       { label: "Status", to: "/status" },
     ],
   },
   {
-    label: "Bantuan",
-    to: "/tentang",
+    label: "Merchant",
     links: [
-      { label: "Tentang", to: "/tentang" },
+      { label: "Hubungi Admin", href: "https://wa.me/6283136049987" },
+      { label: "Cara Bayar QRIS", to: "/tentang" },
       { label: "Testimoni", to: "/testimoni" },
-      { label: "Hubungi admin", href: "https://wa.me/6283136049987" },
+      { label: "Promo", to: "/produk" },
+    ],
+  },
+  {
+    label: "Perusahaan",
+    links: [
+      { label: "FAQ", to: "/tentang" },
+      { label: "Panduan", to: "/tentang" },
+      { label: "Media Kit", to: "/tentang" },
+      { label: "Karier", to: "/tentang" },
+    ],
+  },
+  {
+    label: "Lainnya",
+    links: [
+      { label: "Bantuan", to: "/tentang" },
+      { label: "Blog", to: "/tentang" },
+      { label: "Hubungi Kami", href: "https://wa.me/6283136049987" },
+      { label: "Kebijakan Privasi", to: "/tentang" },
     ],
   },
 ];
 
-const mobileQuickLinks = [
-  { label: "QRIS", helper: "cara bayar", to: "/tentang", icon: ScanLine },
-  { label: "Status", helper: "cek order", to: "/status", icon: ReceiptText },
-  { label: "WhatsApp", helper: "hubungi admin", href: "https://wa.me/6283136049987", icon: MessageCircle },
-  { label: "Telepon", helper: "0831-3604-9987", href: "tel:+6283136049987", icon: Phone },
+const socialLinks = [
+  { label: "Facebook", href: "https://facebook.com", icon: Facebook },
+  { label: "Instagram", href: "https://instagram.com", icon: Instagram },
+  { label: "Twitter", href: "https://x.com", icon: Twitter },
+  { label: "Youtube", href: "https://youtube.com", icon: Youtube },
 ];
 
 function FooterLink({ item, className = "" }) {
@@ -52,111 +64,65 @@ function FooterLink({ item, className = "" }) {
   );
 }
 
-function FooterQuickLink({ item }) {
-  const Icon = item.icon;
-  const content = (
-    <>
-      <span className="site-footerQuickIcon">
-        <Icon size={18} />
-      </span>
-      <span className="site-footerQuickCopy">
-        <strong>{item.label}</strong>
-        <span>{item.helper}</span>
-      </span>
-    </>
-  );
-
-  if (item.href) {
-    return (
-      <a className="site-footerQuickLink" href={item.href} target="_blank" rel="noreferrer">
-        {content}
-      </a>
-    );
-  }
-
-  return (
-    <Link className="site-footerQuickLink" to={item.to}>
-      {content}
-    </Link>
-  );
-}
-
 export default function Footer() {
   const year = new Date().getFullYear();
 
   return (
-    <footer className="site-footer">
+    <footer className="site-footer site-footer--gopay">
       <div className="container">
-        <div className="site-footerPanel">
-          <div className="site-footerTop">
-            <div className="site-footerIntro">
-              <Link className="site-footerBadge" to="/">
-                imzaqi.store
-              </Link>
+        <div className="site-footerPanel site-footerGo">
+          <div className="site-footerGoIntro">
+            <Link className="site-footerGoBrand" to="/produk" aria-label="Buka katalog produk">
+              <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
+              <span>imzaqi.store</span>
+            </Link>
 
-              <div className="site-footerBrand">
-                <Link to="/produk" aria-label="Buka katalog produk">
-                  <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
-                </Link>
-
-                <div className="site-footerBrandCopy">
-                  <Link className="site-footerHeadline" to="/produk">
-                    Digital goods, tanpa ribet.
-                  </Link>
-                  <Link className="site-footerLead" to="/tentang">
-                    Pilih paket. Bayar. Simpan ID.
-                  </Link>
-                </div>
-              </div>
+            <div className="site-footerGoContact">
+              <a href="tel:+6283136049987">Call Center: 0831-3604-9987</a>
+              <a href="mailto:admin@imzaqi.store">admin@imzaqi.store</a>
             </div>
 
-            <div className="site-footerActions">
-              <Link className="btn" to="/produk">
-                Lihat katalog
-              </Link>
-              <a className="btn btn-ghost" href="https://wa.me/6283136049987" target="_blank" rel="noreferrer">
-                Hubungi admin
-              </a>
+            <div className="site-footerGoSocial" aria-label="Social links">
+              {socialLinks.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <a
+                    key={item.label}
+                    className="site-footerGoSocialBtn"
+                    href={item.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={item.label}
+                  >
+                    <Icon size={16} />
+                  </a>
+                );
+              })}
             </div>
           </div>
 
-          <div className="site-footerMeta">
-            {metaLinks.map((item) => (
-              <FooterLink key={item.label} item={item} />
-            ))}
-          </div>
-
-          <div className="site-footerQuickGrid">
-            {mobileQuickLinks.map((item) => (
-              <FooterQuickLink key={item.label} item={item} />
-            ))}
-          </div>
-
-          <div className="site-footerGrid">
-            {footerGroups.map((group) => (
-              <div key={group.label} className="site-footerCol">
-                <Link className="site-footerLabel" to={group.to}>
-                  {group.label}
-                </Link>
-                <div className="site-footerList">
+          <div className="site-footerGoColumns">
+            {footerColumns.map((group) => (
+              <div key={group.label} className="site-footerGoCol">
+                <h3 className="site-footerGoTitle">{group.label}</h3>
+                <div className="site-footerGoList">
                   {group.links.map((item) => (
-                    <FooterLink key={item.label} item={item} />
+                    <FooterLink key={`${group.label}-${item.label}`} item={item} className="site-footerGoLink" />
                   ))}
                 </div>
               </div>
             ))}
+
+            <div className="site-footerGoCol site-footerGoReach">
+              <h3 className="site-footerGoTitle">Hubungi Kami</h3>
+              <p>Jl. Iskandarsyah II No.2, Melawai, Kebayoran Baru, Jakarta Selatan</p>
+              <a href="tel:+6283136049987">0831-3604-9987</a>
+            </div>
           </div>
 
-          <div className="site-footerBottom">
-            <Link className="site-footerBottomMain" to="/">
-              Copyright {year} imzaqi.store
-            </Link>
-            <a className="site-footerBottomItem" href="tel:+6283136049987">
-              0831-3604-9987
-            </a>
-            <Link className="site-footerBottomItem" to="/status">
-              Cek status
-            </Link>
+          <div className="site-footerGoLegal">
+            <p>Imzaqi Store berfokus pada alur simpel: pilih produk, bayar, simpan ID, lalu pantau status order.</p>
+            <p>(c) {year} imzaqi.store. All Rights Reserved.</p>
           </div>
         </div>
       </div>

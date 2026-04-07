@@ -929,13 +929,28 @@
   }
 
   .hero-rail {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
     gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    width: 100%;
+    max-width: 100%;
+    padding: 0 2px 2px;
+    scroll-padding-inline: 2px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .hero-rail::-webkit-scrollbar {
+    display: none;
   }
 
   .hero-railItem {
+    flex: 0 0 auto;
     justify-content: center;
+    white-space: nowrap;
   }
 
   .grid-mode {

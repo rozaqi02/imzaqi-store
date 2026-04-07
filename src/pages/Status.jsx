@@ -23,7 +23,7 @@ function prettyStatus(status) {
   const map = {
     pending: "Pending",
     processing: "Diproses",
-    done: "Sukses",
+    done: "Selesai",
     paid_reported: "Pending",
     cancelled: "Dibatalkan",
   };
@@ -42,14 +42,19 @@ function getTimeline(status) {
   const value = String(status || "pending");
   if (value === "cancelled") {
     return [
-      { key: "pending", label: "Masuk", active: true, done: true },
-      { key: "cancelled", label: "Batal", active: true, done: false },
+      { key: "pending", label: "Order masuk", active: true, done: true },
+      { key: "cancelled", label: "Dibatalkan", active: true, done: false },
     ];
   }
 
   return [
-    { key: "pending", label: "Masuk", active: true, done: value !== "pending" },
-    { key: "processing", label: "Proses", active: value === "processing" || value === "done", done: value === "done" },
+    { key: "pending", label: "Order masuk", active: true, done: value !== "pending" },
+    {
+      key: "processing",
+      label: "Diproses",
+      active: value === "processing" || value === "done",
+      done: value === "done",
+    },
     { key: "done", label: "Selesai", active: value === "done", done: value === "done" },
   ];
 }
@@ -66,17 +71,26 @@ function toFriendlyStatusError() {
   return "Status belum bisa diambil. Coba lagi beberapa saat.";
 }
 
-function TimelineStep({ active, done, label }) {
-  const meta = done ? "Selesai" : active ? "Aktif" : "Menunggu";
-
+function FlowStep({ step }) {
+  const stateText = step.done ? "Selesai" : step.active ? "Aktif" : "Menunggu";
   return (
-    <div className={"status-stepCard" + (active ? " active" : "") + (done ? " done" : "")}>
-      <div className="status-stepDot">{done ? <CheckCircle2 size={14} /> : <span />}</div>
-      <div className="status-stepCopy">
-        <strong>{label}</strong>
-        <small>{meta}</small>
+    <div className={`st-flowStep${step.active ? " is-active" : ""}${step.done ? " is-done" : ""}`}>
+      <div className="st-flowDot">{step.done ? <CheckCircle2 size={14} /> : <span />}</div>
+      <div className="st-flowCopy">
+        <strong>{step.label}</strong>
+        <small>{stateText}</small>
       </div>
     </div>
+  );
+}
+
+function InfoCard({ label, value, hint, tone = "" }) {
+  return (
+    <article className={`st-infoCard${tone ? ` is-${tone}` : ""}`}>
+      <span>{label}</span>
+      <strong>{value}</strong>
+      <small>{hint}</small>
+    </article>
   );
 }
 
@@ -106,6 +120,7 @@ export default function Status() {
         setSettings({ whatsapp: result.whatsapp || { number: "6283136049987" } });
       })
       .catch(() => {});
+
     return () => {
       active = false;
     };
@@ -120,24 +135,24 @@ export default function Status() {
   }, [initialParam]);
 
   const statusMeta = useMemo(() => getStatusMeta(order?.status), [order?.status]);
+  const StatusIcon = statusMeta.icon;
   const timeline = useMemo(() => getTimeline(order?.status), [order?.status]);
 
-  const discountValue = useMemo(() => {
-    const subtotal = Number(order?.subtotal_idr || 0);
-    const total = Number(order?.total_idr || 0);
-    return Math.max(0, subtotal - total);
-  }, [order?.subtotal_idr, order?.total_idr]);
+  const subtotalValue = Number(order?.subtotal_idr || 0);
+  const totalValue = Number(order?.total_idr || 0);
 
+  const discountValue = useMemo(() => Math.max(0, subtotalValue - totalValue), [subtotalValue, totalValue]);
   const itemCount = useMemo(
     () => (order?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0),
     [order?.items]
   );
 
-  const subtotalValue = Number(order?.subtotal_idr || 0);
-  const totalValue = Number(order?.total_idr || 0);
-  const paidRatio = subtotalValue ? Math.max(18, Math.min(100, (totalValue / subtotalValue) * 100)) : 100;
+  const paidRatio = subtotalValue
+    ? Math.max(16, Math.min(100, Math.round((totalValue / Math.max(subtotalValue, 1)) * 100)))
+    : 100;
+
   const createdDateLabel = useMemo(() => {
-    if (!order?.created_at) return "";
+    if (!order?.created_at) return "-";
     return new Date(order.created_at).toLocaleDateString("id-ID", {
       day: "numeric",
       month: "short",
@@ -147,7 +162,7 @@ export default function Status() {
 
   const waUrl = useMemo(() => {
     const code = order?.order_code || input || "";
-    const text = encodeURIComponent(`Halo, saya ingin cek order.\n\nID Order: ${code}`);
+    const text = encodeURIComponent(`Halo admin, saya ingin cek order.\n\nID Order: ${code}`);
     return `https://wa.me/${waNumber}?text=${text}`;
   }, [input, order?.order_code, waNumber]);
 
@@ -156,7 +171,7 @@ export default function Status() {
     setInput(code);
 
     if (!code) {
-      const text = "Masukkan ID order.";
+      const text = "Masukkan ID order dulu.";
       setMessage(text);
       setOrder(null);
       toast.error(text);
@@ -197,7 +212,7 @@ export default function Status() {
       await navigator.clipboard.writeText(order?.order_code || "");
       toast.success("ID disalin");
     } catch {
-      toast.error("Gagal menyalin.");
+      toast.error("Gagal menyalin ID.");
     }
   }
 
@@ -212,46 +227,44 @@ export default function Status() {
     }
   }
 
-  const StatusIcon = statusMeta.icon;
-
   return (
     <div className="page status-page">
       <section className="section reveal status-shell">
-        <div className="container status-container">
-          <div className="status-head">
-            <div className="status-headCopy">
-              <div className="status-eyebrow">Order tracker</div>
-              <h1 className="h1 status-headline">{order ? "Order sudah kebaca." : "Cek order."}</h1>
-              <p className="status-lead">{order ? "Ringkas. Jelas. Siap dipantau." : "Masukkan ID order. Hasil langsung tampil."}</p>
+        <div className="container st-wrap">
+          <header className="st-hero">
+            <div className="st-heroCopy">
+              <div className="st-kicker">Order tracker</div>
+              <h1 className="h1 st-title">{order ? "Order kebaca." : "Cek status order."}</h1>
+              <p className="st-sub">{order ? "Progress rapi dalam satu layar." : "Masukkan ID order untuk lihat progres terbaru."}</p>
             </div>
 
             {order ? (
-              <div className={"status-headState " + statusMeta.tone}>
-                <StatusIcon size={18} />
+              <div className={`st-statePill is-${statusMeta.tone}`}>
+                <StatusIcon size={16} />
                 <span>{prettyStatus(order.status)}</span>
               </div>
             ) : null}
-          </div>
+          </header>
 
-          <section className="status-searchCard">
-            <div className="status-searchHead">
+          <section className="st-search">
+            <div className="st-searchHead">
               <div>
-                <div className="status-searchEyebrow">ID order</div>
-                <div className="status-searchTitle">{order ? "Cari order lain" : "Masukkan ID"}</div>
+                <div className="st-kicker">ID order</div>
+                <h2 className="st-searchTitle">{order ? "Cari order lain" : "Masukkan ID"}</h2>
               </div>
-              <button className="status-searchPaste" type="button" onClick={pasteOrderCode}>
+              <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
                 Paste
               </button>
             </div>
 
-            <div className="status-searchRow">
-              <label className="status-searchField">
+            <div className="st-searchRow">
+              <label className="st-inputWrap">
                 <Search size={16} />
                 <input
-                  className="input status-searchInput"
+                  className="input st-input"
                   inputMode="text"
                   autoCapitalize="characters"
-                  placeholder="Masukkan ID order (contoh: IMZ-ABCD)"
+                  placeholder="Contoh: IMZ-ABCD"
                   value={input}
                   onChange={(e) => setInput(normalizeOrderCode(e.target.value))}
                   onKeyDown={(e) => {
@@ -260,24 +273,22 @@ export default function Status() {
                 />
               </label>
 
-              <button className="btn status-searchBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
-                {loading ? "Mencari..." : "Cek"}
+              <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
+                {loading ? "Mencari..." : "Cek status"}
               </button>
             </div>
 
-            {message ? (
-              <div className="status-inlineAlert">{message}</div>
-            ) : (
-              <div className="status-inlineHint">{order ? "Tap ID untuk menyalin cepat." : "Format cepat: IMZ-ABCD"}</div>
-            )}
+            <div className={`st-searchHint${message ? " is-error" : ""}`}>
+              {message || (order ? "Klik kartu ID order untuk salin cepat." : "Format singkat juga bisa: ABCD")}
+            </div>
           </section>
 
           {!order ? (
-            <section className="status-emptyPanel">
-              <div className="status-emptyBadge">{message ? "!" : "IMZ"}</div>
-              <div className="status-emptyTitle">{message ? "Order belum ketemu." : "Status siap dicek."}</div>
-              <div className="status-emptyText">{message || "Tempel ID. Detail order akan muncul di sini."}</div>
-              <div className="status-emptyActions">
+            <section className="st-empty">
+              <div className="st-emptyBadge">IMZ</div>
+              <h2 className="st-emptyTitle">Status siap dipantau</h2>
+              <p className="st-emptyText">Tempel ID order, lalu semua ringkasan akan muncul otomatis di sini.</p>
+              <div className="st-emptyActions">
                 <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>
                   Tempel ID
                 </button>
@@ -287,180 +298,169 @@ export default function Status() {
               </div>
             </section>
           ) : (
-            <div className="status-dashboard">
-              <section className="status-board">
-                <div className="status-overviewGrid">
-                  <article className={"status-overviewCard is-status " + statusMeta.tone}>
-                    <span>Status</span>
-                    <strong>{prettyStatus(order.status)}</strong>
-                    <small>Progres order aktif</small>
-                  </article>
+            <div className="st-layout">
+              <main className="st-main">
+                <section className="st-metrics">
+                  <InfoCard label="Status" value={prettyStatus(order.status)} hint="Status aktif" tone={statusMeta.tone} />
 
-                  <button className="status-overviewCard status-overviewAction" type="button" onClick={copyOrderCode}>
+                  <button className="st-infoCard st-infoAction" type="button" onClick={copyOrderCode}>
                     <span>ID order</span>
                     <strong>{order.order_code}</strong>
                     <small>Tap untuk salin</small>
                   </button>
 
-                  <article className="status-overviewCard">
-                    <span>Total</span>
-                    <strong>{formatIDR(totalValue)}</strong>
-                    <small>{itemCount} item</small>
-                  </article>
+                  <InfoCard label="Total bayar" value={formatIDR(totalValue)} hint={`${itemCount} item`} />
+                  <InfoCard
+                    label="Tanggal"
+                    value={createdDateLabel}
+                    hint={discountValue > 0 ? `${formatIDR(discountValue)} hemat` : "Tanpa promo"}
+                  />
+                </section>
 
-                  <article className="status-overviewCard">
-                    <span>Tanggal</span>
-                    <strong>{createdDateLabel}</strong>
-                    <small>{discountValue > 0 ? `${formatIDR(discountValue)} hemat` : "Tanpa promo"}</small>
-                  </article>
-                </div>
-
-                <div className="status-boardGrid">
-                  <article className="status-card status-progressCard">
-                    <div className="status-cardHead">
-                      <div>
-                        <div className="status-cardEyebrow">Progress</div>
-                        <h2 className="status-cardTitle">Tahap order</h2>
-                      </div>
-                      <div className={"status-cardPill " + statusMeta.tone}>
-                        <StatusIcon size={14} />
-                        <span>{prettyStatus(order.status)}</span>
-                      </div>
-                    </div>
-
-                    <div className="status-stepRail">
-                      {timeline.map((step, index) => (
-                        <React.Fragment key={step.key}>
-                          <TimelineStep label={step.label} active={step.active} done={step.done} />
-                          {index < timeline.length - 1 ? <div className="status-stepLine" /> : null}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </article>
-
-                  <article className="status-card status-paymentCard">
-                    <div className="status-cardHead">
-                      <div>
-                        <div className="status-cardEyebrow">Pembayaran</div>
-                        <h2 className="status-cardTitle">Ringkasan total</h2>
-                      </div>
-                      <div className="status-cardIcon">
-                        <WalletCards size={16} />
-                      </div>
-                    </div>
-
-                    <div className="status-paymentRows">
-                      <div className="status-paymentRow">
-                        <span>Subtotal</span>
-                        <b>{formatIDR(subtotalValue)}</b>
-                      </div>
-                      <div className="status-paymentRow">
-                        <span>Potong</span>
-                        <b>{formatIDR(discountValue)}</b>
-                      </div>
-                      <div className="status-paymentRow total">
-                        <span>Bayar</span>
-                        <b>{formatIDR(totalValue)}</b>
-                      </div>
-                    </div>
-
-                    <div className="status-paymentBar">
-                      <div className="status-paymentTrack">
-                        <i style={{ width: `${paidRatio}%` }} />
-                      </div>
-                      <small>Rasio bayar {Math.round(paidRatio)}%</small>
-                    </div>
-                  </article>
-                </div>
-
-                <article className="status-card status-itemsCard">
-                  <div className="status-cardHead">
+                <article className="st-card st-flow">
+                  <div className="st-cardHead">
                     <div>
-                      <div className="status-cardEyebrow">Item</div>
-                      <h2 className="status-cardTitle">Isi order</h2>
+                      <div className="st-kicker">Progress</div>
+                      <h2 className="st-cardTitle">Tahap order</h2>
                     </div>
-                    <div className="status-cardPill neutral">
-                      <Package size={14} />
-                      <span>{itemCount} item</span>
+                    <div className={`st-statePill is-${statusMeta.tone}`}>
+                      <StatusIcon size={14} />
+                      <span>{prettyStatus(order.status)}</span>
                     </div>
                   </div>
 
-                  <div className="status-itemList">
+                  <div className="st-flowRail">
+                    {timeline.map((step, index) => (
+                      <React.Fragment key={step.key}>
+                        <FlowStep step={step} />
+                        {index < timeline.length - 1 ? <div className="st-flowLine" /> : null}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                </article>
+
+                <article className="st-card st-items">
+                  <div className="st-cardHead">
+                    <div>
+                      <div className="st-kicker">Item order</div>
+                      <h2 className="st-cardTitle">Daftar paket</h2>
+                    </div>
+                    <div className="st-cardIcon">
+                      <Package size={16} />
+                    </div>
+                  </div>
+
+                  <div className="st-itemList">
                     {(order.items || []).map((item, index) => (
-                      <div key={index} className="status-itemRow">
-                        <div className="status-itemRowMain">
-                          <div className="status-itemTitle">{item.product_name}</div>
-                          <div className="status-itemMeta">
+                      <div key={index} className="st-itemRow">
+                        <div className="st-itemMain">
+                          <div className="st-itemName">{item.product_name}</div>
+                          <div className="st-itemMeta">
                             <span>{item.variant_name}</span>
                             <span>{item.duration_label}</span>
                             <span>x{item.qty}</span>
                           </div>
                         </div>
-
                         <b>{formatIDR(Number(item.price_idr || 0) * Number(item.qty || 0))}</b>
                       </div>
                     ))}
                   </div>
                 </article>
-              </section>
+              </main>
 
-              <aside className="status-sidebar">
-                <article className="status-card status-notePanel accent">
-                  <div className="status-cardHead">
+              <aside className="st-aside">
+                <article className="st-card st-payCard">
+                  <div className="st-cardHead">
                     <div>
-                      <div className="status-cardEyebrow">Admin</div>
-                      <h2 className="status-cardTitle">Catatan admin</h2>
+                      <div className="st-kicker">Pembayaran</div>
+                      <h2 className="st-cardTitle">Ringkasan total</h2>
                     </div>
-                    <div className="status-cardIcon">
+                    <div className="st-cardIcon">
+                      <WalletCards size={16} />
+                    </div>
+                  </div>
+
+                  <div className="st-payRows">
+                    <div className="st-payRow">
+                      <span>Subtotal</span>
+                      <b>{formatIDR(subtotalValue)}</b>
+                    </div>
+                    <div className="st-payRow">
+                      <span>Potong</span>
+                      <b>{formatIDR(discountValue)}</b>
+                    </div>
+                    <div className="st-payRow is-total">
+                      <span>Total</span>
+                      <b>{formatIDR(totalValue)}</b>
+                    </div>
+                  </div>
+
+                  <div className="st-payProgress">
+                    <div className="st-payTrack">
+                      <i style={{ width: `${paidRatio}%` }} />
+                    </div>
+                    <small>Rasio bayar {paidRatio}%</small>
+                  </div>
+                </article>
+
+                <article className="st-card st-noteCard is-accent">
+                  <div className="st-cardHead">
+                    <div>
+                      <div className="st-kicker">Admin</div>
+                      <h2 className="st-cardTitle">Catatan admin</h2>
+                    </div>
+                    <div className="st-cardIcon">
                       <MessageSquareText size={16} />
                     </div>
                   </div>
-                  <div className={"status-noteBody" + (order.admin_note ? "" : " empty")}>{order.admin_note || "Belum ada catatan admin."}</div>
+                  <div className={`st-noteBody${order.admin_note ? "" : " is-empty"}`}>{order.admin_note || "Belum ada catatan admin."}</div>
                 </article>
 
-                <article className="status-card status-notePanel">
-                  <div className="status-cardHead">
+                <article className="st-card st-noteCard">
+                  <div className="st-cardHead">
                     <div>
-                      <div className="status-cardEyebrow">Catatanmu</div>
-                      <h2 className="status-cardTitle">Info tambahan</h2>
+                      <div className="st-kicker">Catatan buyer</div>
+                      <h2 className="st-cardTitle">Info tambahan</h2>
                     </div>
-                    <div className="status-cardIcon">
-                      <Package size={16} />
+                    <div className="st-cardIcon">
+                      <MessageSquareText size={16} />
                     </div>
                   </div>
-                  <div className={"status-noteBody" + (order.notes ? "" : " empty")}>{order.notes || "Tidak ada catatan customer."}</div>
+                  <div className={`st-noteBody${order.notes ? "" : " is-empty"}`}>{order.notes || "Tidak ada catatan customer."}</div>
                 </article>
 
                 {order.promo_code ? (
-                  <article className="status-card status-promoPanel">
-                    <div className="status-cardHead">
+                  <article className="st-card st-promoCard">
+                    <div className="st-cardHead">
                       <div>
-                        <div className="status-cardEyebrow">Promo</div>
-                        <h2 className="status-cardTitle">Kode aktif</h2>
+                        <div className="st-kicker">Promo</div>
+                        <h2 className="st-cardTitle">Kode aktif</h2>
                       </div>
-                      <div className="status-cardIcon">
+                      <div className="st-cardIcon">
                         <BadgePercent size={16} />
                       </div>
                     </div>
-                    <div className="status-promoRow">
+                    <div className="st-promoRow">
                       <b>{order.promo_code}</b>
                       <span>{order.discount_percent || 0}%</span>
                     </div>
                   </article>
                 ) : null}
 
-                <article className="status-card status-helpPanel">
-                  <div className="status-cardHead">
+                <article className="st-card st-helpCard">
+                  <div className="st-cardHead">
                     <div>
-                      <div className="status-cardEyebrow">Bantuan</div>
-                      <h2 className="status-cardTitle">Butuh follow up?</h2>
+                      <div className="st-kicker">Bantuan</div>
+                      <h2 className="st-cardTitle">Perlu follow up?</h2>
                     </div>
-                    <div className="status-cardIcon">
-                      <MessageSquareText size={16} />
+                    <div className="st-cardIcon">
+                      <Sparkles size={16} />
                     </div>
                   </div>
-                  <div className="status-helpText">Kalau order perlu follow up, kirim ID order ini ke admin.</div>
-                  <div className="status-helpActions">
+
+                  <p className="st-helpText">Jika ada kendala, kirim ID order ini ke admin agar diproses lebih cepat.</p>
+
+                  <div className="st-helpActions">
                     <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
                       Hubungi admin
                       <ArrowUpRight size={15} />

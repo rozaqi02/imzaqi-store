@@ -19,3 +19,6 @@
 
 /* Theme modes and compact controls */
 @import "./css/theme-neumorphism.css";
+
+/* Final unification layer inspired by Status/FAQ */
+@import "./css/theme-unified-v4.css";

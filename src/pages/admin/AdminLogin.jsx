@@ -51,7 +51,7 @@ export default function AdminLogin() {
   }
 
   return (
-    <div className="page">
+    <div className="page admin-login-page">
       <section className="section">
         <div className="container narrow">
           <div className="admin-loginShell card">

@@ -492,7 +492,7 @@ export default function Products() {
   );
 
   return (
-    <div className={cartItemCount > 0 ? "page with-sticky-cta" : "page"}>
+    <div className={cartItemCount > 0 ? "page with-sticky-cta catalog-page" : "page catalog-page"}>
       <section className="section catalog-hero reveal">
         <div className="container">
           <div className="catalog-heroGrid">

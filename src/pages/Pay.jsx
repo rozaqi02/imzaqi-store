@@ -512,7 +512,7 @@ export default function Pay() {
   }
 
   return (
-    <div className="page pay-shell">
+    <div className="page pay-shell pay-page">
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
           <div className="pay-shell-copy">

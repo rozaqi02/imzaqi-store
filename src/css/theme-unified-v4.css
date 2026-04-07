@@ -1,0 +1,568 @@
+/*
+  Unified UI v4
+  Goal: make non-Status/FAQ pages use the same visual language as Status/FAQ.
+*/
+
+:root,
+:root[data-theme="dark"] {
+  --uni-panel:
+    linear-gradient(172deg, rgba(12, 24, 44, 0.96) 0%, rgba(10, 20, 38, 0.95) 52%, rgba(9, 18, 34, 0.97) 100%);
+  --uni-panel-soft: linear-gradient(180deg, rgba(16, 33, 60, 0.9), rgba(11, 22, 42, 0.92));
+  --uni-inset: linear-gradient(180deg, rgba(8, 15, 31, 0.95), rgba(13, 25, 46, 0.92));
+  --uni-line: rgba(123, 184, 255, 0.22);
+  --uni-line-strong: rgba(90, 170, 255, 0.36);
+  --uni-text: #ebf8ff;
+  --uni-muted: rgba(214, 235, 255, 0.72);
+  --uni-shadow:
+    0 26px 64px rgba(1, 8, 20, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(78, 149, 255, 0.08);
+  --uni-soft-shadow:
+    0 16px 36px rgba(1, 8, 20, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --uni-inset-shadow:
+    inset 0 4px 12px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+:root[data-theme="light"] {
+  --uni-panel:
+    linear-gradient(176deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 249, 253, 0.96) 52%, rgba(228, 244, 250, 0.98) 100%);
+  --uni-panel-soft: linear-gradient(180deg, rgba(250, 254, 255, 0.96), rgba(236, 248, 252, 0.96));
+  --uni-inset: linear-gradient(180deg, rgba(233, 246, 251, 0.98), rgba(248, 253, 255, 0.93));
+  --uni-line: rgba(13, 124, 144, 0.2);
+  --uni-line-strong: rgba(13, 124, 144, 0.3);
+  --uni-text: #123744;
+  --uni-muted: rgba(50, 79, 89, 0.84);
+  --uni-shadow:
+    0 18px 42px rgba(60, 105, 120, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(13, 124, 144, 0.08);
+  --uni-soft-shadow:
+    0 12px 26px rgba(60, 105, 120, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  --uni-inset-shadow:
+    inset 0 2px 6px rgba(124, 158, 171, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* Search field parity (Status + FAQ + others) */
+.catalog-commandSearch,
+.catalog-filterSearch,
+.status-searchField,
+.st-inputWrap,
+.faq-searchWrap,
+.hero-search-shell,
+.testi-searchShell,
+.admin-searchRow {
+  border: 1px solid var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
+    var(--uni-inset) !important;
+  box-shadow: var(--uni-inset-shadow) !important;
+}
+
+.catalog-commandSearch,
+.status-searchField,
+.st-inputWrap,
+.faq-searchWrap,
+.hero-search-shell,
+.admin-searchRow {
+  min-height: 56px;
+  border-radius: 20px !important;
+}
+
+.catalog-filterSearch,
+.testi-searchShell {
+  min-height: 44px;
+  border-radius: 16px !important;
+}
+
+.catalog-commandSearch:focus-within,
+.catalog-filterSearch:focus-within,
+.status-searchField:focus-within,
+.st-inputWrap:focus-within,
+.faq-searchWrap:focus-within,
+.hero-search-shell:focus-within,
+.testi-searchShell:focus-within,
+.admin-searchRow:focus-within {
+  border-color: var(--uni-line-strong) !important;
+  box-shadow:
+    0 0 0 3px rgba(16, 188, 198, 0.14),
+    var(--uni-inset-shadow) !important;
+}
+
+.catalog-commandSearch .catalog-commandInput,
+.catalog-filterSearch .catalog-filterInput,
+.status-searchField .status-searchInput,
+.st-inputWrap .st-input,
+.faq-searchWrap .faq-searchInput,
+.hero-search-shell .hero-search-input,
+.testi-searchShell .testi-searchInput,
+.admin-searchInput {
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--uni-text) !important;
+}
+
+.catalog-commandIcon,
+.catalog-filterSearch > svg,
+.status-searchField > svg,
+.st-inputWrap > svg,
+.faq-searchWrap > svg,
+.hero-search-icon,
+.testi-searchIcon,
+.admin-searchRow > svg {
+  color: #1d95aa !important;
+}
+
+/* FAQ active chips: make them consistent with other active chips */
+.faq-chip,
+.catalog-quickChip,
+.testi-filterChip,
+.catalog-viewBtn,
+.admin-chip,
+.layout-toggles {
+  border: 1px solid var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
+    var(--uni-panel-soft) !important;
+  box-shadow: var(--uni-soft-shadow) !important;
+}
+
+.faq-chip.active,
+.catalog-quickChip.active,
+.testi-filterChip.active,
+.catalog-viewBtn.active,
+.admin-chip.active {
+  border-color: rgba(79, 255, 200, 0.26) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
+  color: #032235 !important;
+  box-shadow:
+    0 16px 30px rgba(0, 214, 180, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.44) !important;
+}
+
+/* Rebuild non-Status/FAQ pages to shared shell */
+.hero-commandCard,
+.stat-minimal,
+.flow-assist,
+.product-tile,
+.catalog-command,
+.catalog-filter,
+.catalog-card.catalog-cardV2,
+.catalog-sheet,
+.testi-toolbar,
+.testi-miniStat,
+.testi-imgWrap,
+.checkout-drawer,
+.checkout-panel,
+.checkout-summary,
+.checkout-item-card,
+.checkout-promo-card,
+.pay-card,
+.pay-orderDesktop,
+.pay-orderMobileCard,
+.qris-wrap,
+.pay-successModal,
+.product-detail,
+.product-detail-priceCard,
+.variant-tile,
+.variant-notes,
+.admin-loginShell,
+.admin-loginAside,
+.admin-loginSignal,
+.admin-sidebar,
+.admin-panel,
+.admin-statCard,
+.admin-miniCard,
+.admin-orderCardModern,
+.admin-mobileBrand,
+.admin-mobileTab {
+  border: 1px solid var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at top right, rgba(83, 204, 255, 0.16), rgba(83, 204, 255, 0) 52%),
+    var(--uni-panel) !important;
+  box-shadow: var(--uni-shadow) !important;
+}
+
+.hero-eyebrow,
+.home-kicker,
+.catalog-eyebrow,
+.catalog-sub,
+.home-summaryText,
+.testi-minimal-sub,
+.testi-miniStat span,
+.product-tile-desc,
+.catalog-cardSummary,
+.catalog-cardKicker,
+.admin-panel-sub,
+.admin-brand-sub,
+.admin-topbar-eyebrow,
+.admin-nav-copy small,
+.admin-statLabel,
+.admin-miniCard span,
+.admin-miniCard small,
+.pay-shell-sub,
+.checkout-drawerSub,
+.checkout-main-kicker,
+.checkout-summaryLabel {
+  color: var(--uni-muted) !important;
+}
+
+.hero-title-minimal,
+.catalog-title,
+.catalog-cardTitle,
+.product-tile-name,
+.testi-minimal-title,
+.admin-panel-title,
+.admin-heroTitle,
+.admin-brand-title,
+.pay-shell-title,
+.pay-cardTitle,
+.checkout-drawerTitle {
+  color: var(--uni-text) !important;
+}
+
+/* Icon and border fit language from Product Detail */
+.product-tile-icon,
+.catalog-card.catalog-cardV2 .catalog-cardIcon,
+.pay-orderItemIcon,
+.admin-product-icon,
+.admin-icon-preview,
+.admin-nav-icon,
+.admin-mobileTabIcon {
+  border: 1px solid var(--uni-line) !important;
+  border-radius: 18px !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 24%),
+    var(--uni-panel-soft) !important;
+  box-shadow: var(--uni-soft-shadow) !important;
+}
+
+.product-tile-icon img,
+.catalog-card.catalog-cardV2 .catalog-cardIcon img,
+.pay-orderItemIcon img,
+.admin-product-icon {
+  width: 100%;
+  height: 100%;
+  object-fit: cover !important;
+  padding: 0 !important;
+}
+
+/* Responsive consistency desktop / tablet / mobile / flip */
+@media (max-width: 900px) and (min-width: 721px) {
+  .hero-commandCard,
+  .catalog-command,
+  .catalog-filter,
+  .catalog-card.catalog-cardV2,
+  .testi-toolbar,
+  .admin-panel,
+  .pay-card,
+  .checkout-panel {
+    border-radius: 24px !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .hero-commandCard,
+  .catalog-command,
+  .catalog-filter,
+  .catalog-card.catalog-cardV2,
+  .testi-toolbar,
+  .admin-panel,
+  .pay-card,
+  .checkout-panel {
+    border-radius: 20px !important;
+  }
+
+  .product-grid-container.grid-mode,
+  .catalog-grid.grid,
+  .testi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 360px) {
+  .product-grid-container.grid-mode,
+  .catalog-grid.grid,
+  .testi-grid,
+  .testi-skel-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* FAQ chip override (force parity) */
+.faq-command .faq-chip.active {
+  border-color: rgba(79, 255, 200, 0.26) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
+  color: #032235 !important;
+}
+
+/* Rebuild pass v5: Home */
+.home-page .hero-minimal::before {
+  inset: -14% -8% auto !important;
+  height: 640px !important;
+  background:
+    radial-gradient(640px 320px at 12% 12%, rgba(79, 160, 255, 0.2), rgba(79, 160, 255, 0) 70%),
+    radial-gradient(640px 320px at 88% 14%, rgba(71, 233, 225, 0.18), rgba(71, 233, 225, 0) 72%) !important;
+}
+
+.home-page .hero-commandCard {
+  border-radius: 30px !important;
+  padding: 14px !important;
+}
+
+.home-page .hero-railItem,
+.home-page .stat-minimal,
+.home-page .product-tile-pill,
+.home-page .layout-toggles {
+  border: 1px solid var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
+    var(--uni-panel-soft) !important;
+  box-shadow: var(--uni-soft-shadow) !important;
+}
+
+.home-page .product-tile {
+  border-radius: 28px !important;
+  border-color: var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 20%),
+    radial-gradient(circle at top right, rgba(83, 204, 255, 0.16), rgba(83, 204, 255, 0) 50%),
+    var(--uni-panel) !important;
+  box-shadow: var(--uni-shadow) !important;
+}
+
+.home-page .product-tile--list::before {
+  background: linear-gradient(180deg, #50ffd0, #1ec8d6) !important;
+}
+
+/* Rebuild pass v5: Produk */
+.catalog-page .catalog-hero::before {
+  inset: -10% -8% auto !important;
+  height: 580px !important;
+  background:
+    radial-gradient(620px 300px at 16% 12%, rgba(79, 160, 255, 0.2), rgba(79, 160, 255, 0) 70%),
+    radial-gradient(620px 300px at 84% 12%, rgba(71, 233, 225, 0.17), rgba(71, 233, 225, 0) 72%) !important;
+}
+
+.catalog-page .catalog-layout {
+  gap: 18px !important;
+}
+
+.catalog-page .catalog-sidebar {
+  top: 96px !important;
+}
+
+.catalog-page .catalog-filter {
+  border-radius: 28px !important;
+  padding: 18px !important;
+}
+
+.catalog-page .catalog-command {
+  border-radius: 28px !important;
+  padding: 12px !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 {
+  border-radius: 26px !important;
+  padding: 14px !important;
+  gap: 10px !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardTop {
+  gap: 8px !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardBrand {
+  gap: 10px !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardTitle {
+  font-size: clamp(20px, 2.2vw, 24px) !important;
+  line-height: 1.08 !important;
+  -webkit-line-clamp: 2 !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  overflow: hidden !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardSummary {
+  color: var(--uni-muted) !important;
+  -webkit-line-clamp: 2 !important;
+  line-height: 1.55 !important;
+  overflow-wrap: anywhere !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
+  grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta > span {
+  min-width: 0 !important;
+  min-height: 30px !important;
+  padding: 0 8px !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta > span > span {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+}
+
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardFoot {
+  min-height: 42px !important;
+}
+
+/* Rebuild pass v5: Testimoni */
+.testimonials-page .testi-minimal-hero::before {
+  inset: -12% -8% auto !important;
+  height: 560px !important;
+  background:
+    radial-gradient(580px 300px at 18% 14%, rgba(79, 160, 255, 0.2), rgba(79, 160, 255, 0) 70%),
+    radial-gradient(580px 300px at 82% 14%, rgba(71, 233, 225, 0.17), rgba(71, 233, 225, 0) 72%) !important;
+}
+
+.testimonials-page .testi-toolbar {
+  border-radius: 26px !important;
+  padding: 12px !important;
+}
+
+.testimonials-page .testi-miniStat,
+.testimonials-page .testi-imgWrap,
+.testimonials-page .lightbox {
+  border-radius: 24px !important;
+}
+
+.testimonials-page .testi-captionPill {
+  max-width: 100% !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Rebuild pass v5: Pay + Checkout + Product Detail */
+.pay-page .pay-shell-hero::before {
+  inset: -16% -8% !important;
+  background:
+    radial-gradient(700px 340px at 12% 10%, rgba(79, 160, 255, 0.18), rgba(79, 160, 255, 0) 66%),
+    radial-gradient(700px 340px at 86% 14%, rgba(71, 233, 225, 0.16), rgba(71, 233, 225, 0) 68%) !important;
+  filter: none !important;
+}
+
+.pay-page .pay-card,
+.pay-page .pay-orderDesktop,
+.pay-page .pay-orderMobileCard,
+.pay-page .qris-wrap,
+.pay-page .pay-successModal {
+  border-radius: 28px !important;
+}
+
+.checkout-drawer {
+  border-left-color: var(--uni-line) !important;
+}
+
+.checkout-panel,
+.checkout-summary,
+.checkout-item-card,
+.checkout-promo-card {
+  border-radius: 24px !important;
+}
+
+.detail-page .product-detail,
+.detail-page .variant-tile,
+.detail-page .product-detail-priceCard,
+.detail-page .variant-notes {
+  border-radius: 28px !important;
+}
+
+.detail-page .product-detail-descBubble {
+  border-color: var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 20%),
+    var(--uni-panel-soft) !important;
+  box-shadow: var(--uni-soft-shadow) !important;
+}
+
+/* Rebuild pass v5: Admin */
+.admin-login-page .admin-loginShell,
+.admin-login-page .admin-loginAside,
+.admin-login-page .admin-loginSignal {
+  border-color: var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at top right, rgba(83, 204, 255, 0.14), rgba(83, 204, 255, 0) 52%),
+    var(--uni-panel) !important;
+  box-shadow: var(--uni-shadow) !important;
+}
+
+.admin-page .admin-sidebar,
+.admin-page .admin-panel,
+.admin-page .admin-statCard,
+.admin-page .admin-miniCard,
+.admin-page .admin-orderCardModern,
+.admin-page .admin-mobileBrand,
+.admin-page .admin-mobileTab {
+  border-radius: 26px !important;
+}
+
+.admin-page .admin-searchRow {
+  border-radius: 18px !important;
+}
+
+/* Layout safety for desktop / mobile / ipad / flip */
+@media (max-width: 1024px) {
+  .catalog-page .catalog-layout {
+    grid-template-columns: 290px minmax(0, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .home-page .hero-commandCard,
+  .catalog-page .catalog-command,
+  .testimonials-page .testi-toolbar,
+  .pay-page .pay-card,
+  .checkout-panel,
+  .detail-page .product-detail,
+  .admin-page .admin-panel {
+    border-radius: 20px !important;
+  }
+
+  .catalog-page .catalog-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .home-page .product-grid-container.grid-mode,
+  .catalog-page .catalog-grid.grid,
+  .testimonials-page .testi-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .home-page .product-grid-container.grid-mode,
+  .catalog-page .catalog-grid.grid,
+  .testimonials-page .testi-grid,
+  .testimonials-page .testi-skel-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
+    grid-template-columns: 1fr !important;
+  }
+}

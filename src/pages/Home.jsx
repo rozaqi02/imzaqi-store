@@ -71,7 +71,7 @@ export default function Home() {
   );
 
   return (
-    <div className="page">
+    <div className="page home-page">
       <Hero />
 
       <section className="section">
