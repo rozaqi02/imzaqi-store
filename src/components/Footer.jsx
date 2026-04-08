@@ -70,7 +70,9 @@ export default function Footer() {
             </Link>
 
             <div className="site-footerGoContact">
-              <a href="tel:+6283136049987">Call Center: 0831-3604-9987</a>
+              <a href="https://wa.me/6283136049987" target="_blank" rel="noreferrer">
+                Call Center: 0831-3604-9987
+              </a>
             </div>
           </div>
 

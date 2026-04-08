@@ -3249,7 +3249,8 @@ select.input {
 
 .site-footer--gopay .site-footerGoColumns {
   display: grid;
-  grid-template-columns: 1.2fr 1fr 1fr 1fr 1.2fr;
+  /* Footer Reach column removed from JSX; keep desktop grid balanced (4 cols). */
+  grid-template-columns: 1.2fr 1fr 1fr 1fr;
   gap: 22px;
   padding-top: 24px;
 }

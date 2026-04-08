@@ -198,7 +198,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 
         <div className="mobile-menu-footer">
           <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-          <p className="menu-footer-text">Imzaqi Store Web V.3.9.2</p>
+          <p className="menu-footer-text">Imzaqi Store App V.4.0</p>
         </div>
       </aside>
     </>,
