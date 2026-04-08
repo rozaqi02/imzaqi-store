@@ -20,9 +20,10 @@
   align-content: start;
   gap: 16px;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.03)),
     radial-gradient(circle at top left, rgba(29, 131, 255, 0.14), rgba(29, 131, 255, 0) 45%);
-  border-right: 1px solid rgba(255, 255, 255, 0.08);
+  border-right: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  color: var(--brand-text, #eef4ff);
 }
 
 .admin-loginBadge {
@@ -43,8 +44,12 @@
 
 .admin-loginSub {
   margin: 0;
-  color: rgba(234, 255, 245, 0.68);
+  color: var(--brand-muted, rgba(234, 255, 245, 0.68));
   line-height: 1.6;
+}
+
+.admin-loginAside .h2 {
+  color: var(--brand-text, #eef4ff);
 }
 
 .admin-loginSignals {
@@ -59,9 +64,11 @@
   min-height: 42px;
   padding: 0 12px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(234, 255, 245, 0.84);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  color: var(--brand-text, rgba(234, 255, 245, 0.84));
   font-size: 13px;
   font-weight: 800;
 }
@@ -69,10 +76,45 @@
 .admin-loginFormWrap {
   display: grid;
   align-content: center;
+  color: var(--brand-text, #eef4ff);
 }
 
 .admin-loginForm {
   gap: 8px;
+}
+
+.admin-loginForm .label {
+  color: var(--brand-text, #eef4ff);
+}
+
+.admin-loginForm .input {
+  color: var(--brand-text, #eef4ff);
+}
+
+.admin-loginForm .input::placeholder {
+  color: var(--brand-muted, rgba(234, 255, 245, 0.68));
+}
+
+.admin-loginForm .hint {
+  color: var(--brand-muted, rgba(234, 255, 245, 0.72));
+}
+
+:root[data-theme="light"] .admin-loginAside {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(239, 249, 253, 0.78)),
+    radial-gradient(circle at top left, rgba(24, 152, 173, 0.16), rgba(24, 152, 173, 0) 52%);
+}
+
+:root[data-theme="light"] .admin-loginSub {
+  color: rgba(23, 66, 80, 0.86);
+}
+
+:root[data-theme="light"] .admin-loginSignal {
+  color: rgba(18, 54, 67, 0.94);
+}
+
+:root[data-theme="light"] .admin-loginForm .hint {
+  color: rgba(26, 72, 86, 0.84);
 }
 
 @media (max-width: 760px) {

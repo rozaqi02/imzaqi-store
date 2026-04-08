@@ -55,17 +55,17 @@ export function normalizePhoneNumber(phone) {
 
   let cleaned = phone.replace(/[^\d+]/g, '');
 
-  // 08xxx → +628xxx
+  // 08xxx  +628xxx
   if (cleaned.startsWith('0')) {
     cleaned = '+62' + cleaned.slice(1);
   }
 
-  // 62xxx → +62xxx
+  // 62xxx  +62xxx
   if (cleaned.startsWith('62') && !cleaned.startsWith('+62')) {
     cleaned = '+' + cleaned;
   }
 
-  // xxx → +62xxx (assume Indonesian)
+  // xxx  +62xxx (assume Indonesian)
   if (!cleaned.startsWith('+62') && !cleaned.startsWith('08')) {
     cleaned = '+62' + cleaned;
   }
@@ -276,7 +276,7 @@ export function validateForm(fields) {
 // EXPORT ALL VALIDATORS
 // ================================================================
 
-export default {
+const validators = {
   phoneNumber: validatePhoneNumber,
   normalizePhone: normalizePhoneNumber,
   email: validateEmail,
@@ -287,3 +287,5 @@ export default {
   promoCode: validatePromoCode,
   form: validateForm,
 };
+
+export default validators;

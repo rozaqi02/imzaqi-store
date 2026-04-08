@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Facebook, Instagram, Twitter, Youtube } from "lucide-react";
 
 const footerColumns = [
   {
@@ -41,13 +40,6 @@ const footerColumns = [
   },
 ];
 
-const socialLinks = [
-  { label: "Facebook", href: "https://facebook.com", icon: Facebook },
-  { label: "Instagram", href: "https://instagram.com", icon: Instagram },
-  { label: "Twitter", href: "https://x.com", icon: Twitter },
-  { label: "Youtube", href: "https://youtube.com", icon: Youtube },
-];
-
 function FooterLink({ item, className = "" }) {
   if (item.href) {
     return (
@@ -79,25 +71,6 @@ export default function Footer() {
 
             <div className="site-footerGoContact">
               <a href="tel:+6283136049987">Call Center: 0831-3604-9987</a>
-              <a href="mailto:admin@imzaqi.store">admin@imzaqi.store</a>
-            </div>
-
-            <div className="site-footerGoSocial" aria-label="Social links">
-              {socialLinks.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <a
-                    key={item.label}
-                    className="site-footerGoSocialBtn"
-                    href={item.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    aria-label={item.label}
-                  >
-                    <Icon size={16} />
-                  </a>
-                );
-              })}
             </div>
           </div>
 
@@ -113,11 +86,6 @@ export default function Footer() {
               </div>
             ))}
 
-            <div className="site-footerGoCol site-footerGoReach">
-              <h3 className="site-footerGoTitle">Hubungi Kami</h3>
-              <p>Jl. Iskandarsyah II No.2, Melawai, Kebayoran Baru, Jakarta Selatan</p>
-              <a href="tel:+6283136049987">0831-3604-9987</a>
-            </div>
           </div>
 
           <div className="site-footerGoLegal">

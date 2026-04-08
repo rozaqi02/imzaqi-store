@@ -5,6 +5,15 @@ const CartContext = createContext(null);
 
 const STORAGE_KEY = "imzaqi_store_cart_v1";
 
+function safeStorage() {
+  try {
+    if (typeof window === "undefined") return null;
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
 function safeParse(json, fallback) {
   try {
     const v = JSON.parse(json);
@@ -15,10 +24,18 @@ function safeParse(json, fallback) {
 }
 
 export function CartProvider({ children }) {
-  const [items, setItems] = useState(() => safeParse(localStorage.getItem(STORAGE_KEY), []));
+  const [items, setItems] = useState(() => {
+    const storage = safeStorage();
+    if (!storage) return [];
+    return safeParse(storage.getItem(STORAGE_KEY), []);
+  });
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    const storage = safeStorage();
+    if (!storage) return;
+    try {
+      storage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {}
   }, [items]);
 
   const api = useMemo(() => ({

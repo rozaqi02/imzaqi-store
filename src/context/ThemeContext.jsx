@@ -9,7 +9,12 @@ function getInitialTheme() {
     if (preset === "light" || preset === "dark") return preset;
   }
   if (typeof window === "undefined") return "light";
-  const saved = window.localStorage.getItem(STORAGE_KEY);
+  let saved = "";
+  try {
+    saved = window.localStorage.getItem(STORAGE_KEY);
+  } catch {
+    saved = "";
+  }
   return saved === "light" || saved === "dark" ? saved : "light";
 }
 
@@ -20,7 +25,9 @@ export function ThemeProvider({ children }) {
     const root = document.documentElement;
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
-    window.localStorage.setItem(STORAGE_KEY, theme);
+    try {
+      window.localStorage.setItem(STORAGE_KEY, theme);
+    } catch {}
   }, [theme]);
 
   const value = useMemo(

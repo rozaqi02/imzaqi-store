@@ -56,8 +56,8 @@ export default function AdminLogin() {
         <div className="container narrow">
           <div className="admin-loginShell card">
             <div className="admin-loginAside">
-              <h1 className="h2">Masuk ke ruang operasional.</h1>
-              <p className="admin-loginSub">Satu panel untuk order, produk, promo, dan QRIS.</p>
+              <h1 className="h2">Masuk ke Admin Dashboard.</h1>
+              <p className="admin-loginSub">Kelola orderan, produk, promo, dan QRIS.</p>
 
               <div className="admin-loginSignals">
                 <div className="admin-loginSignal">

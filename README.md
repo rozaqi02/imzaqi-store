@@ -1,3 +1,18 @@
+# Imzaqi Store
+
+Dokumen implementasi terbaru:
+
+- Backend hardening order RPC: [docs/backend-order-hardening.md](docs/backend-order-hardening.md)
+- Rencana migrasi CRA ke Vite: [docs/cra-to-vite-migration-plan.md](docs/cra-to-vite-migration-plan.md)
+
+Apply hardening SQL ke Supabase:
+
+1. Buka Supabase Dashboard -> SQL Editor.
+2. Copy isi file [supabase/migrations/20260408122000_harden_create_order_with_stock_check.sql](supabase/migrations/20260408122000_harden_create_order_with_stock_check.sql).
+3. Jalankan query, lalu test flow checkout/pay.
+
+---
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).

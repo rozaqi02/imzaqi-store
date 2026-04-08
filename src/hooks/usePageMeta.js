@@ -23,7 +23,7 @@ export function usePageMeta({ title, description } = {}) {
     if (typeof document === "undefined") return;
 
     const base = "Imzaqi Store";
-    const nextTitle = title ? `${title} — ${base}` : `${base} — Digital Subscription Store`;
+    const nextTitle = title ? `${title} - ${base}` : `${base} - Digital Subscription Store`;
     document.title = nextTitle;
 
     if (description) {
@@ -38,3 +38,4 @@ export function usePageMeta({ title, description } = {}) {
 }
 
 export default usePageMeta;
+

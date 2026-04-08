@@ -41,7 +41,7 @@ export default function ProtectedRoute({ children, fallback = null }) {
           <section className="section">
             <div className="container narrow">
               <div className="card pad">
-                <div className="hint subtle">Memeriksa akses admin…</div>
+                <div className="hint subtle">Memeriksa akses admin...</div>
                 <div className="skeleton" style={{ height: 14, marginTop: 12 }} />
               </div>
             </div>
@@ -55,3 +55,4 @@ export default function ProtectedRoute({ children, fallback = null }) {
 
   return children;
 }
+

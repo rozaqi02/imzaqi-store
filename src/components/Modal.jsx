@@ -21,7 +21,7 @@ export default function Modal({ open, title, children, footer, onClose }) {
         <div className="modal-head">
           <div className="modal-title">{title}</div>
           <button className="modal-close" type="button" onClick={() => onClose?.()} aria-label="Tutup">
-            ×
+            x
           </button>
         </div>
 
@@ -33,3 +33,4 @@ export default function Modal({ open, title, children, footer, onClose }) {
     document.body
   );
 }
+

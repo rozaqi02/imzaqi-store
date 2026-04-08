@@ -24,6 +24,12 @@ function calcTotal(subtotal, percent) {
   return { discount, total: Math.max(0, subtotal - discount) };
 }
 
+function sanitizeQty(value) {
+  const qty = Math.floor(Number(value || 0));
+  if (!Number.isFinite(qty)) return 1;
+  return Math.max(1, Math.min(99, qty));
+}
+
 function variantNeedsBuyerEmail(item) {
   if (!item) return false;
 
@@ -65,6 +71,10 @@ function toFriendlyPayError(error, { hasNotes = false } = {}) {
 
   if (/promo/i.test(raw)) {
     return "Kode promo tidak bisa dipakai untuk order ini.";
+  }
+
+  if (/(subtotal mismatch|total mismatch|promo mismatch|harga terbaru berubah|mismatch)/i.test(raw)) {
+    return "Harga atau promo berubah. Cek ulang keranjang, lalu konfirmasi lagi.";
   }
 
   return "Order belum bisa diproses. Coba lagi beberapa saat.";
@@ -149,7 +159,7 @@ export default function Pay() {
   const nav = useNavigate();
   const location = useLocation();
   const cart = useCart();
-  const { promo } = usePromo();
+  const { promo, clear: clearPromo } = usePromo();
   const toast = useToast();
 
   usePageMeta({
@@ -329,16 +339,100 @@ export default function Pay() {
 
   const statusUrl = orderCode ? `/status?order=${encodeURIComponent(orderCode)}` : "/status";
 
-  async function createOrderWithStock(nextCode) {
+  async function buildCanonicalOrderPayload() {
+    const latestProducts = await fetchProducts({ includeInactive: true, useCache: false });
+    const variantMap = new Map();
+
+    (latestProducts || []).forEach((product) => {
+      (product?.product_variants || []).forEach((variant) => {
+        variantMap.set(String(variant?.id || ""), {
+          product,
+          variant,
+        });
+      });
+    });
+
+    const canonicalItems = (items || []).map((item) => {
+      const variantId = String(item?.variant_id || "");
+      if (!variantId) {
+        throw new Error("Item keranjang tidak valid.");
+      }
+
+      const entry = variantMap.get(variantId);
+      if (!entry) {
+        throw new Error("Ada item yang sudah tidak tersedia.");
+      }
+
+      const productActive = entry.product?.is_active !== false;
+      const variantActive = entry.variant?.is_active !== false;
+      if (!productActive || !variantActive) {
+        throw new Error("Ada item nonaktif di keranjang.");
+      }
+
+      const safeQty = sanitizeQty(item?.qty);
+      const safePrice = Math.max(0, Number(entry.variant?.price_idr || 0));
+
+      return {
+        variant_id: entry.variant.id,
+        product_id: entry.product.id,
+        product_name: String(entry.product?.name || item?.product_name || ""),
+        variant_name: String(entry.variant?.name || item?.variant_name || ""),
+        duration_label: String(entry.variant?.duration_label || item?.duration_label || ""),
+        price_idr: safePrice,
+        product_icon_url: String(entry.product?.icon_url || item?.product_icon_url || ""),
+        description: String(entry.variant?.description || item?.description || ""),
+        guarantee_text: String(entry.variant?.guarantee_text || item?.guarantee_text || ""),
+        requires_buyer_email: !!entry.variant?.requires_buyer_email,
+        qty: safeQty,
+      };
+    });
+
+    if (!canonicalItems.length) {
+      throw new Error("Keranjang kosong.");
+    }
+
+    const canonicalSubtotal = canonicalItems.reduce(
+      (sum, item) => sum + Number(item.price_idr || 0) * Number(item.qty || 0),
+      0
+    );
+
+    let canonicalPromoCode = null;
+    let canonicalDiscountPercent = 0;
+    const requestedPromo = String(promo?.code || "").trim().toUpperCase();
+
+    if (requestedPromo) {
+      const { data, error } = await supabase.rpc("validate_promo", { p_code: requestedPromo });
+      if (!error) {
+        const nextPercent = Number(data || 0);
+        if (nextPercent > 0) {
+          canonicalPromoCode = requestedPromo;
+          canonicalDiscountPercent = nextPercent;
+        }
+      }
+    }
+
+    const canonicalDiscount = Math.round((canonicalSubtotal * canonicalDiscountPercent) / 100);
+    const canonicalTotal = Math.max(0, canonicalSubtotal - canonicalDiscount);
+
+    return {
+      items: canonicalItems,
+      subtotal: canonicalSubtotal,
+      discountPercent: canonicalDiscountPercent,
+      total: canonicalTotal,
+      promoCode: canonicalPromoCode,
+    };
+  }
+
+  async function createOrderWithStock(nextCode, orderDraft) {
     const visitorId = getVisitorIdAsUUID();
     const payload = {
       p_visitor_id: visitorId,
       p_order_code: nextCode,
-      p_items: items,
-      p_promo_code: promo?.code || null,
-      p_subtotal_idr: subtotal,
-      p_discount_percent: promoPercent,
-      p_total_idr: total,
+      p_items: orderDraft.items,
+      p_promo_code: orderDraft.promoCode,
+      p_subtotal_idr: orderDraft.subtotal,
+      p_discount_percent: orderDraft.discountPercent,
+      p_total_idr: orderDraft.total,
       p_payment_proof_url: null,
       p_customer_whatsapp: customerWhatsApp,
     };
@@ -375,16 +469,35 @@ export default function Pay() {
     }
 
     setBusy(true);
-    const loadingId = toast.loading("Membuat ID order...");
+    let loadingId = "";
 
     try {
+      const canonicalOrder = await buildCanonicalOrderPayload();
+      const hasPricingMismatch =
+        Number(canonicalOrder.subtotal) !== Number(subtotal) ||
+        Number(canonicalOrder.discountPercent) !== Number(promoPercent) ||
+        Number(canonicalOrder.total) !== Number(total);
+
+      if (hasPricingMismatch) {
+        setSnapshot(canonicalOrder.items);
+        if (!canonicalOrder.promoCode && promo?.code) {
+          clearPromo();
+        }
+
+        const syncMessage = "Harga atau promo berubah. Data terbaru sudah disinkronkan, cek ulang lalu konfirmasi lagi.";
+        setErrorText(syncMessage);
+        toast.info(syncMessage, { duration: 4200 });
+        return;
+      }
+
+      loadingId = toast.loading("Membuat ID order...");
       let createdOrder = null;
       let generatedCode = "";
 
       for (let index = 0; index < 5; index += 1) {
         generatedCode = makeOrderCode(4);
         try {
-          createdOrder = await createOrderWithStock(generatedCode);
+          createdOrder = await createOrderWithStock(generatedCode, canonicalOrder);
           break;
         } catch (error) {
           if (error?.code === "23505") continue;
@@ -396,14 +509,15 @@ export default function Pay() {
 
       setOrderCode(generatedCode);
       setOk(true);
+      setSnapshot(canonicalOrder.items);
       cart.clear();
-      toast.remove(loadingId);
+      if (loadingId) toast.remove(loadingId);
       toast.success("ID order berhasil dibuat.");
     } catch (error) {
       const message = toFriendlyPayError(error, { hasNotes: Boolean(noteText) });
       console.warn("Gagal memproses order:", error);
       setErrorText(message);
-      toast.remove(loadingId);
+      if (loadingId) toast.remove(loadingId);
       toast.error(message);
     } finally {
       setBusy(false);

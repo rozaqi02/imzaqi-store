@@ -1784,7 +1784,7 @@ body{
   }
 }
 
-/* Overlay gelap – TANPA blur (ringan) */
+/* Overlay gelap  TANPA blur (ringan) */
 .mobile-backdrop{
   position:fixed;
   inset:0;
@@ -4000,4 +4000,5 @@ body {
 /* Ensure hero art sits behind text */
 .hero-center-inner{ position: relative; z-index: 2; }
 .hero-art-premium{ z-index: 1; }
+
 

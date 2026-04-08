@@ -12,7 +12,7 @@ export default function NetworkBridge() {
       toast.error("Koneksi terputus. Cek internet kamu ya.", { duration: 5000 });
     }
     function onOnline() {
-      toast.success("Koneksi balik normal ✅", { duration: 2200 });
+      toast.success("Koneksi balik normal.", { duration: 2200 });
     }
 
     window.addEventListener("offline", onOffline);
@@ -31,3 +31,4 @@ export default function NetworkBridge() {
 
   return null;
 }
+

@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 export default function EmptyState({
   title,
   description,
-  icon = "🫙",
+  icon = "[]",
   primaryAction,
   secondaryAction,
 }) {
@@ -46,3 +46,4 @@ function renderAction(action, className) {
     </button>
   );
 }
+

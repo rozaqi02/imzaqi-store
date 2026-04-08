@@ -1,4 +1,4 @@
-/* Overrides v3 — requested polish (mobile blur, footer redesign, gen‑Z accents) */
+/* Overrides v3  requested polish (mobile blur, footer redesign, genZ accents) */
 
 /* 1) Mobile header: glass blur */
 .header{position:sticky;top:0;z-index:400;}
@@ -71,4 +71,5 @@ pointer-events:none;}
 @media (max-width: 680px){
   .footer .footer-topbar{margin-bottom:14px;}
 }
+
 

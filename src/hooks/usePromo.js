@@ -4,6 +4,15 @@ import { getVisitorIdAsUUID } from "../lib/visitor";
 
 const KEY = "imzaqi_store_promo_v1";
 
+function safeStorage() {
+  try {
+    if (typeof window === "undefined") return null;
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
 function safeParse(json, fallback) {
   try {
     const v = JSON.parse(json);
@@ -17,10 +26,18 @@ function safeParse(json, fallback) {
 }
 
 export function usePromo() {
-  const [promo, setPromo] = useState(() => safeParse(localStorage.getItem(KEY), { code: "", percent: 0 }));
+  const [promo, setPromo] = useState(() => {
+    const storage = safeStorage();
+    if (!storage) return { code: "", percent: 0 };
+    return safeParse(storage.getItem(KEY), { code: "", percent: 0 });
+  });
 
   useEffect(() => {
-    localStorage.setItem(KEY, JSON.stringify(promo));
+    const storage = safeStorage();
+    if (!storage) return;
+    try {
+      storage.setItem(KEY, JSON.stringify(promo));
+    } catch {}
   }, [promo]);
 
   const api = useMemo(() => ({

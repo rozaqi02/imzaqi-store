@@ -2674,7 +2674,7 @@ select.input {
 .testi-searchShell:focus-within {
   border-color: rgba(79, 255, 200, 0.4) !important;
   box-shadow:
-    0 0 0 3px rgba(0, 214, 180, 0.14) !important,
+    0 0 0 3px rgba(0, 214, 180, 0.14),
     var(--skeu-control-shadow) !important;
 }
 

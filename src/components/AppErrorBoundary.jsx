@@ -22,7 +22,7 @@ export default class AppErrorBoundary extends React.Component {
           <section className="section">
             <div className="container narrow">
               <div className="card pad">
-                <h1 className="h2">Oops… ada yang error</h1>
+                <h1 className="h2">Oops ada yang error</h1>
                 <p className="muted">
                   Coba refresh halaman. Kalau masih error, kabari admin ya.
                 </p>
@@ -49,3 +49,4 @@ export default class AppErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
+

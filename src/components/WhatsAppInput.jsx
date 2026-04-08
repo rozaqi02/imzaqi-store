@@ -111,8 +111,8 @@ export default function WhatsAppInput({
           autoFocus={autoFocus}
           required={required}
         />
-        {showSuccess && <span className="input-icon">✓</span>}
-        {showError && <span className="input-icon">✗</span>}
+        {showSuccess && <span className="input-icon">OK</span>}
+        {showError && <span className="input-icon">X</span>}
       </div>
 
       {showError && (
@@ -138,3 +138,4 @@ export default function WhatsAppInput({
     </div>
   );
 }
+

@@ -379,7 +379,7 @@ export default function AdminDashboard() {
 
   async function refreshAll() {
     setMsg("");
-    const tid = toast.loading("Memuat dashboard…");
+    const tid = toast.loading("Memuat dashboard");
 
     try {
       setLoading(true);
@@ -740,7 +740,7 @@ export default function AdminDashboard() {
 
     const slug = String(newProduct.slug || "").trim() || slugify(name);
 
-    const tid = toast.loading("Membuat produk…");
+    const tid = toast.loading("Membuat produk");
     setMsg("");
 
     try {
@@ -793,7 +793,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    const tid = toast.loading("Menyimpan produk…");
+    const tid = toast.loading("Menyimpan produk");
     setMsg("");
 
     try {
@@ -814,7 +814,7 @@ export default function AdminDashboard() {
     if (!id) return;
     if (!window.confirm("Hapus produk ini beserta variannya?")) return;
 
-    const tid = toast.loading("Menghapus produk…");
+    const tid = toast.loading("Menghapus produk");
     setMsg("");
 
     try {
@@ -839,7 +839,7 @@ export default function AdminDashboard() {
     if (!selectedProduct) return;
     if (!file) return;
 
-    const tid = toast.loading("Upload ikon…");
+    const tid = toast.loading("Upload ikon");
     setMsg("");
 
     try {
@@ -975,7 +975,7 @@ export default function AdminDashboard() {
     if (!id) return;
     if (!window.confirm("Hapus varian ini?")) return;
 
-    const tid = toast.loading("Menghapus varian…");
+    const tid = toast.loading("Menghapus varian");
     setMsg("");
 
     try {
@@ -994,7 +994,7 @@ export default function AdminDashboard() {
 
   // ===== Orders actions =====
   async function updateOrderStatus(orderId, status) {
-    const tid = toast.loading("Update status…");
+    const tid = toast.loading("Update status");
     setMsg("");
 
     try {
@@ -1058,7 +1058,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    const tid = toast.loading("Menyimpan promo…");
+    const tid = toast.loading("Menyimpan promo");
     setMsg("");
 
     try {
@@ -1077,7 +1077,7 @@ export default function AdminDashboard() {
   }
 
   async function togglePromo(code, is_active) {
-    const tid = toast.loading("Update promo…");
+    const tid = toast.loading("Update promo");
     try {
       const { error } = await supabase
         .from("promo_codes")
@@ -1106,7 +1106,7 @@ export default function AdminDashboard() {
       return;
     }
 
-    const tid = toast.loading("Upload testimoni…");
+    const tid = toast.loading("Upload testimoni");
 
     try {
       const urls = [];
@@ -1141,7 +1141,7 @@ export default function AdminDashboard() {
   }
 
   async function updateTestimonial(id, patch) {
-    const tid = toast.loading("Update testimoni…");
+    const tid = toast.loading("Update testimoni");
     try {
       const { error } = await supabase.from("testimonials").update(patch).eq("id", id);
       if (error) throw error;
@@ -1157,7 +1157,7 @@ export default function AdminDashboard() {
   async function deleteTestimonial(id) {
     if (!window.confirm("Hapus testimoni ini?")) return;
 
-    const tid = toast.loading("Menghapus…");
+    const tid = toast.loading("Menghapus");
     try {
       const { error } = await supabase.from("testimonials").delete().eq("id", id);
       if (error) throw error;
@@ -1174,7 +1174,7 @@ export default function AdminDashboard() {
   // ===== Settings =====
   async function saveWhatsApp(number) {
     const n = String(number || "").trim();
-    const tid = toast.loading("Simpan WA…");
+    const tid = toast.loading("Simpan WA");
 
     try {
       await upsertSetting("whatsapp", { number: n });
@@ -1195,7 +1195,7 @@ export default function AdminDashboard() {
       base_payload: String(basePayload || "").trim(),
       image_url: String(imageUrl || "").trim(),
     };
-    const tid = toast.loading("Simpan QRIS…");
+    const tid = toast.loading("Simpan QRIS");
 
     try {
       await upsertSetting("qris", nextQris);
@@ -1668,7 +1668,7 @@ export default function AdminDashboard() {
                   <div className="admin-panel-body">
                     <input
                       className="input"
-                      placeholder="Cari produk…"
+                      placeholder="Cari produk"
                       value={productQuery}
                       onChange={(e) => setProductQuery(e.target.value)}
                     />
@@ -1719,7 +1719,7 @@ export default function AdminDashboard() {
 
                       {filteredProducts.length === 0 ? (
                         <div className="card pad" style={{ marginTop: 10 }}>
-                          <EmptyState icon="🔎" title="Tidak ada" description="Produk tidak ditemukan." />
+                          <EmptyState icon="?" title="Tidak ada" description="Produk tidak ditemukan." />
                         </div>
                       ) : null}
                     </div>
@@ -1730,7 +1730,7 @@ export default function AdminDashboard() {
                   {!selectedProduct || !productForm ? (
                     <div className="admin-panel-body">
                       <EmptyState
-                        icon="🧩"
+                        icon="?"
                         title="Pilih produk"
                         description="Klik salah satu produk di kiri untuk mulai mengedit."
                       />
@@ -1795,7 +1795,7 @@ export default function AdminDashboard() {
                               value={productForm.description}
                               onChange={(e) => setProductForm((p) => ({ ...p, description: e.target.value }))}
                               rows={4}
-                              placeholder="Deskripsi singkat untuk halaman detail…"
+                              placeholder="Deskripsi singkat untuk halaman detail"
                             />
                           </label>
 
@@ -1871,7 +1871,7 @@ export default function AdminDashboard() {
                         <div className="admin-variants">
                           {selectedVariants.length === 0 ? (
                             <div className="card pad">
-                              <EmptyState icon="📦" title="Belum ada varian" description="Klik +Varian untuk menambahkan paket." />
+                              <EmptyState icon="?" title="Belum ada varian" description="Klik +Varian untuk menambahkan paket." />
                             </div>
                           ) : (
                             selectedVariants.map((v) => (
@@ -1879,9 +1879,9 @@ export default function AdminDashboard() {
                                 <div className="admin-variant-main">
                                   <div className="admin-variant-title">{v.name}</div>
                                   <div className="admin-variant-sub">
-                                    {v.duration_label} • <b>{formatIDR(v.price_idr)}</b> • stok <b>{v.stock}</b>
-                                    {!v.is_active ? " • (off)" : ""}
-                                    {v.requires_buyer_email ? " • wajib email buyer" : ""}
+                                    {v.duration_label} | <b>{formatIDR(v.price_idr)}</b> | stok <b>{v.stock}</b>
+                                    {!v.is_active ? " | (off)" : ""}
+                                    {v.requires_buyer_email ? " | wajib email buyer" : ""}
                                   </div>
                                   {v.description ? <div className="admin-variant-desc">{v.description}</div> : null}
                                 </div>
@@ -1999,7 +1999,7 @@ export default function AdminDashboard() {
                                 <div className="admin-orderSummaryMain">
                                   <div className="admin-order-code">{o.order_code || o.id}</div>
                                   <div className="admin-order-sub">
-                                    {formatAdminDate(o.created_at)} • {itemCount} item • {o.customer_whatsapp || "Tanpa WA"}
+                                    {formatAdminDate(o.created_at)} | {itemCount} item | {o.customer_whatsapp || "Tanpa WA"}
                                   </div>
                                 </div>
 
@@ -2051,7 +2051,7 @@ export default function AdminDashboard() {
                                         <div>
                                           <b>{it.product_name}</b>
                                           <div className="muted" style={{ fontSize: 12 }}>
-                                            {it.variant_name} • {it.duration_label}
+                                            {it.variant_name} | {it.duration_label}
                                           </div>
                                         </div>
                                         <div className="admin-order-itemPrice">
@@ -2190,7 +2190,7 @@ export default function AdminDashboard() {
                 <div className="admin-panel-body">
                   {orders.length === 0 ? (
                     <div className="card pad">
-                      <EmptyState icon="🧾" title="Belum ada order" description="Order akan muncul di sini setelah ada checkout." />
+                      <EmptyState icon="?" title="Belum ada order" description="Order akan muncul di sini setelah ada checkout." />
                     </div>
                   ) : (
                     <div className="admin-orders">
@@ -2204,8 +2204,8 @@ export default function AdminDashboard() {
                             <div>
                               <div className="admin-order-code">{o.order_code || o.id}</div>
                               <div className="admin-order-sub">
-                                {new Date(o.created_at).toLocaleString("id-ID")} • Total <b>{formatIDR(o.total_idr)}</b>
-                                {o.customer_whatsapp ? ` • WA: ${o.customer_whatsapp}` : ""}
+                                {new Date(o.created_at).toLocaleString("id-ID")} | Total <b>{formatIDR(o.total_idr)}</b>
+                                {o.customer_whatsapp ? ` | WA: ${o.customer_whatsapp}` : ""}
                               </div>
                             </div>
 
@@ -2231,11 +2231,11 @@ export default function AdminDashboard() {
                                   <div>
                                     <b>{it.product_name}</b>
                                     <div className="muted" style={{ fontSize: 12 }}>
-                                      {it.variant_name} • {it.duration_label}
+                                      {it.variant_name} | {it.duration_label}
                                     </div>
                                   </div>
                                   <div>
-                                    {it.qty} × {formatIDR(it.price_idr)}
+                                    {it.qty} x {formatIDR(it.price_idr)}
                                   </div>
                                 </div>
                               ))}
@@ -2547,7 +2547,7 @@ export default function AdminDashboard() {
               value={newProduct.description}
               onChange={(e) => setNewProduct((p) => ({ ...p, description: e.target.value }))}
               rows={4}
-              placeholder="Deskripsi singkat…"
+              placeholder="Deskripsi singkat"
             />
           </label>
 
@@ -2601,7 +2601,7 @@ export default function AdminDashboard() {
               value={variantForm.description}
               onChange={(e) => setVariantForm((p) => ({ ...p, description: e.target.value }))}
               rows={4}
-              placeholder="Jelaskan detail paket/aturan…"
+              placeholder="Jelaskan detail paket/aturan"
             />
           </label>
 
@@ -2657,3 +2657,4 @@ export default function AdminDashboard() {
     </div>
   );
 }
+

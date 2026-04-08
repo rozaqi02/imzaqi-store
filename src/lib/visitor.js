@@ -1,7 +1,27 @@
 // src/lib/visitor.js
+function safeStorage() {
+  try {
+    if (typeof window === "undefined") return null;
+    return window.localStorage;
+  } catch {
+    return null;
+  }
+}
+
+function safeCrypto() {
+  try {
+    if (typeof window === "undefined") return null;
+    return window.crypto || null;
+  } catch {
+    return null;
+  }
+}
+
 export function getVisitorId() {
   const key = "imzaqi_visitor_id";
-  let v = localStorage.getItem(key);
+  const storage = safeStorage();
+  let v = storage ? storage.getItem(key) : "";
+  const crypto = safeCrypto();
 
   const isUUID = (s) =>
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
@@ -11,9 +31,9 @@ export function getVisitorId() {
   // UUID v4 fallback (valid)
   const uuidv4 = () => {
     // prefer crypto.getRandomValues if available
-    if (window.crypto?.getRandomValues) {
+    if (crypto?.getRandomValues) {
       const bytes = new Uint8Array(16);
-      window.crypto.getRandomValues(bytes);
+      crypto.getRandomValues(bytes);
 
       // per RFC4122 v4
       bytes[6] = (bytes[6] & 0x0f) | 0x40;
@@ -36,8 +56,10 @@ export function getVisitorId() {
 
   if (!isUUID(v)) {
     // if randomUUID exists, use it; else fallback uuidv4
-    v = window.crypto?.randomUUID ? window.crypto.randomUUID() : uuidv4();
-    localStorage.setItem(key, v);
+    v = crypto?.randomUUID ? crypto.randomUUID() : uuidv4();
+    try {
+      storage?.setItem(key, v);
+    } catch {}
   }
 
   return v;
