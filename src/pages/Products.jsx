@@ -35,6 +35,12 @@ const CATEGORIES = [
   { key: "other", label: "Lainnya", icon: Sparkles },
 ];
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+// "Produk baru" = ditambahkan dalam N hari terakhir.
+const NEW_PRODUCT_DAYS = 30;
+// "Baru di stok" = varian in-stock yang terakhir di-update dalam N hari terakhir.
+const RESTOCK_DAYS = 7;
+
 function inferCategory(product) {
   const explicit = String(product?.category || "").trim().toLowerCase();
   if (explicit) return explicit;
@@ -50,6 +56,11 @@ function clamp(n, min, max) {
   const value = Number(n);
   if (!Number.isFinite(value)) return min;
   return Math.max(min, Math.min(max, value));
+}
+
+function toTime(value) {
+  const time = new Date(value || 0).getTime();
+  return Number.isFinite(time) ? time : 0;
 }
 
 function formatCompactIDR(n) {
@@ -123,6 +134,10 @@ function FilterPanel({
   toggleCat,
   inStockOnly,
   setInStockOnly,
+  newOnly,
+  setNewOnly,
+  restockOnly,
+  setRestockOnly,
   priceBounds,
   price,
   setPrice,
@@ -180,6 +195,30 @@ function FilterPanel({
           <span className="catalog-filterLabel">Ready</span>
           <label className="catalog-toggle">
             <input type="checkbox" checked={inStockOnly} onChange={(e) => setInStockOnly(e.target.checked)} />
+            <span className="catalog-toggleUi" aria-hidden="true" />
+          </label>
+        </div>
+      </div>
+
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterRow">
+          <span className="catalog-filterLabel" title={`Produk yang ditambahkan dalam ${NEW_PRODUCT_DAYS} hari terakhir`}>
+            Produk baru
+          </span>
+          <label className="catalog-toggle">
+            <input type="checkbox" checked={newOnly} onChange={(e) => setNewOnly(e.target.checked)} />
+            <span className="catalog-toggleUi" aria-hidden="true" />
+          </label>
+        </div>
+      </div>
+
+      <div className="catalog-filterBlock">
+        <div className="catalog-filterRow">
+          <span className="catalog-filterLabel" title={`Varian in-stock yang di-update dalam ${RESTOCK_DAYS} hari terakhir`}>
+            Baru di stok
+          </span>
+          <label className="catalog-toggle">
+            <input type="checkbox" checked={restockOnly} onChange={(e) => setRestockOnly(e.target.checked)} />
             <span className="catalog-toggleUi" aria-hidden="true" />
           </label>
         </div>
@@ -250,6 +289,8 @@ export default function Products() {
   const [error, setError] = useState("");
   const [cats, setCats] = useState([]);
   const [inStockOnly, setInStockOnly] = useState(false);
+  const [newOnly, setNewOnly] = useState(false);
+  const [restockOnly, setRestockOnly] = useState(false);
   const [sort, setSort] = useState("reco");
   const [view, setView] = useState("grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
@@ -331,6 +372,13 @@ export default function Products() {
         .map((variant) => Number(variant?.price_idr || 0))
         .filter((value) => Number.isFinite(value) && value > 0);
 
+      const latestInStockUpdateTs = vars
+        .filter((variant) => Number(variant?.stock || 0) > 0)
+        .reduce((maxTs, variant) => {
+          const next = Math.max(toTime(variant?.updated_at), toTime(variant?.created_at));
+          return next > maxTs ? next : maxTs;
+        }, 0);
+
       return {
         ...product,
         _vars: vars,
@@ -339,6 +387,8 @@ export default function Products() {
         _stock: vars.reduce((sum, variant) => sum + Number(variant?.stock || 0), 0),
         _sold: vars.reduce((sum, variant) => sum + Number(variant?.sold_count || 0), 0),
         _category: inferCategory(product),
+        _createdAtTs: toTime(product?.created_at),
+        _latestInStockUpdateTs: latestInStockUpdateTs,
       };
     });
   }, [products]);
@@ -384,6 +434,8 @@ export default function Products() {
     setQuery("");
     setCats([]);
     setInStockOnly(false);
+    setNewOnly(false);
+    setRestockOnly(false);
     setSort("reco");
     setView("grid");
     if (priceBounds.max > 0) setPrice({ min: priceBounds.min, max: priceBounds.max });
@@ -391,10 +443,15 @@ export default function Products() {
 
   const filtered = useMemo(() => {
     const s = String(query || "").trim().toLowerCase();
+    const now = Date.now();
+    const newCutoff = now - NEW_PRODUCT_DAYS * DAY_MS;
+    const restockCutoff = now - RESTOCK_DAYS * DAY_MS;
     let list = (enriched || []).filter((item) => item?.is_active);
 
     if (cats.length) list = list.filter((item) => cats.includes(item._category));
     if (inStockOnly) list = list.filter((item) => Number(item._stock || 0) > 0);
+    if (newOnly) list = list.filter((item) => Number(item._createdAtTs || 0) >= newCutoff);
+    if (restockOnly) list = list.filter((item) => Number(item._latestInStockUpdateTs || 0) >= restockCutoff);
 
     if (priceBounds.max > 0) {
       list = list.filter((item) => {
@@ -431,17 +488,29 @@ export default function Products() {
     else if (sort === "name") sorted.sort(byName);
     else sorted.sort(byReco);
     return sorted;
-  }, [cats, enriched, inStockOnly, price.max, price.min, priceBounds.max, query, sort]);
+  }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, query, restockOnly, sort]);
 
   const activeFiltersCount =
     (query ? 1 : 0) +
     (cats.length ? 1 : 0) +
     (inStockOnly ? 1 : 0) +
+    (newOnly ? 1 : 0) +
+    (restockOnly ? 1 : 0) +
     (priceReady && (price.min !== priceBounds.min || price.max !== priceBounds.max) ? 1 : 0) +
     (sort !== "reco" ? 1 : 0);
 
   const skeletonCount = view === "list" ? 6 : 8;
   const insights = useMemo(() => buildStoreInsights({ products }), [products]);
+  const freshnessCounts = useMemo(() => {
+    const now = Date.now();
+    const newCutoff = now - NEW_PRODUCT_DAYS * DAY_MS;
+    const restockCutoff = now - RESTOCK_DAYS * DAY_MS;
+    const active = (enriched || []).filter((item) => item?.is_active);
+    return {
+      newProducts: active.filter((item) => Number(item?._createdAtTs || 0) >= newCutoff).length,
+      restocked: active.filter((item) => Number(item?._latestInStockUpdateTs || 0) >= restockCutoff).length,
+    };
+  }, [enriched]);
   const quickFilters = useMemo(
     () => [
       {
@@ -455,6 +524,18 @@ export default function Products() {
         label: `Ready ${insights.readyVariantsCount}`,
         active: inStockOnly,
         onClick: () => setInStockOnly((prev) => !prev),
+      },
+      {
+        key: "new",
+        label: freshnessCounts.newProducts ? `Produk baru ${freshnessCounts.newProducts}` : "Produk baru",
+        active: newOnly,
+        onClick: () => setNewOnly((prev) => !prev),
+      },
+      {
+        key: "restock",
+        label: freshnessCounts.restocked ? `Baru di stok ${freshnessCounts.restocked}` : "Baru di stok",
+        active: restockOnly,
+        onClick: () => setRestockOnly((prev) => !prev),
       },
       {
         key: "streaming",
@@ -483,11 +564,15 @@ export default function Products() {
       insights.categoryCounts.tools,
       insights.readyVariantsCount,
       insights.topProduct,
+      freshnessCounts.newProducts,
+      freshnessCounts.restocked,
       price.max,
       price.min,
       priceBounds.min,
       priceReady,
       sort,
+      newOnly,
+      restockOnly,
     ]
   );
 
@@ -559,6 +644,10 @@ export default function Products() {
               toggleCat={toggleCat}
               inStockOnly={inStockOnly}
               setInStockOnly={setInStockOnly}
+              newOnly={newOnly}
+              setNewOnly={setNewOnly}
+              restockOnly={restockOnly}
+              setRestockOnly={setRestockOnly}
               priceBounds={priceBounds}
               price={price}
               setPrice={setPrice}
@@ -763,6 +852,10 @@ export default function Products() {
                     toggleCat={toggleCat}
                     inStockOnly={inStockOnly}
                     setInStockOnly={setInStockOnly}
+                    newOnly={newOnly}
+                    setNewOnly={setNewOnly}
+                    restockOnly={restockOnly}
+                    setRestockOnly={setRestockOnly}
                     priceBounds={priceBounds}
                     price={price}
                     setPrice={setPrice}

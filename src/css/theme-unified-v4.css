@@ -344,6 +344,29 @@
   background: linear-gradient(180deg, #50ffd0, #1ec8d6) !important;
 }
 
+/* Home popular list: keep parity with Produk page cards */
+.home-page .home-popularList .home-popularSold {
+  border-color: rgba(79, 255, 200, 0.24) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
+  color: #032235 !important;
+  box-shadow:
+    0 16px 34px rgba(0, 214, 180, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+}
+
+@media (max-width: 460px) {
+  /* Keep the same list look as desktop (don't hide kicker/summary). */
+  .home-page .home-popularList .catalog-card.catalog-cardV2 .catalog-cardKicker {
+    display: inline-flex !important;
+  }
+
+  .home-page .home-popularList .catalog-card.catalog-cardV2 .catalog-cardSummary {
+    display: block !important;
+  }
+}
+
 /* Rebuild pass v5: Produk */
 .catalog-page .catalog-hero::before {
   inset: -10% -8% auto !important;

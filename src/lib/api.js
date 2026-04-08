@@ -56,34 +56,84 @@ function clearPublicCache(key) {
   } catch {}
 }
 
+function buildProductsSelect({ includeCategory = true, includeTimestamps = true } = {}) {
+  const productFields = [
+    "id",
+    "slug",
+    "name",
+    "description",
+    "icon_url",
+    includeCategory ? "category" : null,
+    "is_active",
+    "sort_order",
+    includeTimestamps ? "created_at" : null,
+    includeTimestamps ? "updated_at" : null,
+  ]
+    .filter(Boolean)
+    .join(",");
+
+  const variantFields = [
+    "id",
+    "product_id",
+    "name",
+    "duration_label",
+    "description",
+    "price_idr",
+    "guarantee_text",
+    "is_active",
+    "sort_order",
+    "stock",
+    "sold_count",
+    "requires_buyer_email",
+    includeTimestamps ? "created_at" : null,
+    includeTimestamps ? "updated_at" : null,
+  ]
+    .filter(Boolean)
+    .join(",");
+
+  return `${productFields},product_variants(${variantFields})`;
+}
+
 export async function fetchProducts({ includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
-  const cacheKey = `products:${includeInactive ? "all" : "active"}`;
+  const cacheKey = `products:v2:${includeInactive ? "all" : "active"}`;
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
   if (cached) return cached;
 
-  let q = supabase
-    .from("products")
-    .select(
-      "id,slug,name,description,icon_url,category,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
-    )
-    .order("sort_order", { ascending: true })
-    .order("sort_order", { foreignTable: "product_variants", ascending: true });
+  const attempts = [
+    { includeCategory: true, includeTimestamps: true },
+    { includeCategory: false, includeTimestamps: true },
+    { includeCategory: true, includeTimestamps: false },
+    { includeCategory: false, includeTimestamps: false },
+  ];
 
-  if (!includeInactive) q.eq("is_active", true);
-
-  let { data, error } = await q;
-
-  if (error && /category/i.test(String(error?.message || ""))) {
-    q = supabase
+  let data;
+  let error;
+  for (const attempt of attempts) {
+    let q = supabase
       .from("products")
-      .select(
-        "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
-      )
+      .select(buildProductsSelect(attempt))
       .order("sort_order", { ascending: true })
       .order("sort_order", { foreignTable: "product_variants", ascending: true });
 
-    if (!includeInactive) q.eq("is_active", true);
-    ({ data, error } = await q);
+    if (!includeInactive) q = q.eq("is_active", true);
+
+    // eslint-disable-next-line no-await-in-loop
+    const res = await q;
+    data = res.data;
+    error = res.error;
+
+    if (!error) break;
+
+    const message = String(error?.message || "").toLowerCase();
+    const schemaMismatch =
+      message.includes("does not exist") ||
+      message.includes("could not find") ||
+      message.includes("unknown column") ||
+      message.includes("category") ||
+      message.includes("created_at") ||
+      message.includes("updated_at");
+
+    if (!schemaMismatch) break;
   }
 
   if (error) throw error;
@@ -93,34 +143,46 @@ export async function fetchProducts({ includeInactive = false, useCache = !inclu
 }
 
 export async function fetchProductBySlug(slug, { includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
-  const cacheKey = `product:${includeInactive ? "all" : "active"}:${slug}`;
+  const cacheKey = `product:v2:${includeInactive ? "all" : "active"}:${slug}`;
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
   if (cached) return cached;
 
-  let q = supabase
-    .from("products")
-    .select(
-      "id,slug,name,description,icon_url,category,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
-    )
-    .eq("slug", slug);
+  const attempts = [
+    { includeCategory: true, includeTimestamps: true },
+    { includeCategory: false, includeTimestamps: true },
+    { includeCategory: true, includeTimestamps: false },
+    { includeCategory: false, includeTimestamps: false },
+  ];
 
-  if (!includeInactive) q = q.eq("is_active", true);
-
-  q = q.order("sort_order", { foreignTable: "product_variants", ascending: true }).single();
-
-  let { data, error } = await q;
-
-  if (error && /category/i.test(String(error?.message || ""))) {
-    q = supabase
+  let data;
+  let error;
+  for (const attempt of attempts) {
+    let q = supabase
       .from("products")
-      .select(
-        "id,slug,name,description,icon_url,is_active,sort_order,product_variants(id,product_id,name,duration_label,description,price_idr,guarantee_text,is_active,sort_order,stock,sold_count,requires_buyer_email)"
-      )
+      .select(buildProductsSelect(attempt))
       .eq("slug", slug);
 
     if (!includeInactive) q = q.eq("is_active", true);
+
     q = q.order("sort_order", { foreignTable: "product_variants", ascending: true }).single();
-    ({ data, error } = await q);
+
+    // eslint-disable-next-line no-await-in-loop
+    const res = await q;
+    data = res.data;
+    error = res.error;
+
+    if (!error) break;
+
+    const message = String(error?.message || "").toLowerCase();
+    const schemaMismatch =
+      message.includes("does not exist") ||
+      message.includes("could not find") ||
+      message.includes("unknown column") ||
+      message.includes("category") ||
+      message.includes("created_at") ||
+      message.includes("updated_at");
+
+    if (!schemaMismatch) break;
   }
 
   if (error) throw error;

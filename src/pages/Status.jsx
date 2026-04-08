@@ -286,7 +286,7 @@ export default function Status() {
           {!order ? (
             <section className="st-empty">
               <div className="st-emptyBadge">IMZ</div>
-              <h2 className="st-emptyTitle">Status siap dipantau</h2>
+              <h2 className="st-emptyTitle">Status Ordermu siap dipantau</h2>
               <p className="st-emptyText">Tempel ID order, lalu semua ringkasan akan muncul otomatis di sini.</p>
               <div className="st-emptyActions">
                 <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>

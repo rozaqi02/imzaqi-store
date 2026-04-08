@@ -208,7 +208,8 @@ export default function ProductDetail() {
     () => {
       const lines = normalizeLines(product?.description);
       if (!lines.length) return "Pilih paket yang cocok lalu lanjut checkout.";
-      return lines.slice(0, 2).join("\n");
+      // Show full description on detail page; the list/catalog view already uses a short summary.
+      return lines.join("\n");
     },
     [product?.description]
   );

@@ -1,12 +1,11 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CreditCard, LayoutGrid, Rows3, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, CreditCard, ShieldCheck, Sparkles } from "lucide-react";
 
 import FlowAssist from "../components/FlowAssist";
 import Hero from "../components/Hero";
 import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingIds } from "../lib/api";
-import { formatIDR } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -18,7 +17,6 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [topIds, setTopIds] = useState([]);
   const [error, setError] = useState("");
-  const [layout, setLayout] = useState("grid");
 
   usePageMeta({
     title: "Home",
@@ -103,42 +101,15 @@ export default function Home() {
               <div className="home-kicker">Mulai dari sini</div>
               <h2 className="h2">Paket yang paling sering dipilih</h2>
             </div>
-
-            <div className="layout-toggles" aria-label="Ubah tampilan">
-              <button
-                className={`toggle-btn ${layout === "grid" ? "active" : ""}`}
-                onClick={() => setLayout("grid")}
-                title="Grid"
-                aria-label="Grid"
-              >
-                <LayoutGrid size={18} />
-              </button>
-              <button
-                className={`toggle-btn ${layout === "list" ? "active" : ""}`}
-                onClick={() => setLayout("list")}
-                title="List"
-                aria-label="List"
-              >
-                <Rows3 size={18} />
-              </button>
-            </div>
           </div>
 
-          <p className="home-summaryText">
-            {insights.productCount
-              ? `${insights.productCount} produk aktif, harga mulai ${formatIDR(insights.minPrice)}, dan ${
-                  insights.lowStockCount ? `${insights.lowStockCount} varian stok tipis` : "stok aman untuk banyak pilihan"
-                }.`
-              : "Empat pilihan ini biasanya jadi titik mulai paling aman kalau kamu masih membandingkan paket."}
-          </p>
-
-          <div className={`product-grid-container ${layout === "grid" ? "grid-mode" : "list-mode"}`}>
+          <div className="product-grid-container list-mode home-popularList" role="list" aria-label="Produk populer">
             {loading ? (
               <>
-                <div className="skeleton card" />
-                <div className="skeleton card" />
-                <div className="skeleton card" />
-                <div className="skeleton card" />
+                <div className="catalog-cardSkeleton list" role="listitem" />
+                <div className="catalog-cardSkeleton list" role="listitem" />
+                <div className="catalog-cardSkeleton list" role="listitem" />
+                <div className="catalog-cardSkeleton list" role="listitem" />
               </>
             ) : error ? (
               <div className="card pad" style={{ gridColumn: "1 / -1" }}>
@@ -149,7 +120,7 @@ export default function Home() {
                 <EmptyState icon="-" title="Belum ada produk aktif" />
               </div>
             ) : (
-              popularProducts.map((p) => <ProductTile key={p.id} product={p} layout={layout} />)
+              popularProducts.map((p) => <ProductTile key={p.id} product={p} />)
             )}
           </div>
 
