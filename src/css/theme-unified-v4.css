@@ -1338,3 +1338,260 @@
     margin: 0 !important;
   }
 }
+
+/* Legacy polish v7: closer to old imzaqi.store color language + cleaner typography */
+:root,
+:root[data-theme="dark"] {
+  --uni-line: rgba(117, 178, 214, 0.26);
+  --uni-line-strong: rgba(111, 220, 255, 0.48);
+  --uni-text: #e9f6ff;
+  --uni-muted: rgba(199, 223, 240, 0.78);
+  --uni-neo-panel:
+    linear-gradient(166deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 24%, rgba(255, 255, 255, 0) 52%),
+    radial-gradient(120% 90% at -10% -14%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 54%),
+    radial-gradient(86% 90% at 106% -12%, rgba(95, 180, 255, 0.18), rgba(95, 180, 255, 0) 58%),
+    var(--skeu-panel-bg);
+  --uni-neo-panel-soft:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 34%),
+    var(--skeu-control-bg);
+  --uni-neo-panel-shadow:
+    12px 14px 28px rgba(2, 12, 26, 0.34),
+    -6px -6px 14px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -1px 0 rgba(4, 26, 42, 0.34),
+    0 0 0 1px rgba(117, 178, 214, 0.1);
+  --uni-neo-control:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.03) 34%),
+    var(--skeu-control-bg);
+  --uni-neo-control-shadow:
+    6px 8px 16px rgba(0, 10, 22, 0.24),
+    -3px -3px 8px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(3, 32, 52, 0.28);
+  --uni-neo-inset:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-inset-bg);
+  --uni-neo-inset-shadow:
+    inset 7px 9px 16px rgba(0, 0, 0, 0.34),
+    inset -4px -4px 9px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.04);
+  --uni-neo-focus:
+    0 0 0 4px rgba(111, 220, 255, 0.22),
+    0 12px 24px rgba(0, 10, 20, 0.26);
+  --uni-neo-icon: #76dbff;
+}
+
+:root[data-theme="light"] {
+  --uni-line: rgba(119, 175, 194, 0.34);
+  --uni-line-strong: rgba(28, 135, 160, 0.52);
+  --uni-text: #173849;
+  --uni-muted: rgba(62, 91, 103, 0.82);
+  --uni-neo-panel:
+    linear-gradient(166deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 253, 255, 0.86) 28%, rgba(236, 246, 251, 0.82) 56%, rgba(227, 241, 248, 0.94) 100%),
+    radial-gradient(120% 90% at -10% -14%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0) 54%),
+    radial-gradient(86% 90% at 106% -12%, rgba(126, 194, 224, 0.26), rgba(126, 194, 224, 0) 58%);
+  --uni-neo-panel-soft:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 250, 253, 0.72) 42%, rgba(232, 244, 249, 0.86) 100%);
+  --uni-neo-panel-shadow:
+    10px 12px 24px rgba(102, 140, 156, 0.18),
+    -7px -7px 14px rgba(255, 255, 255, 0.88),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(166, 200, 211, 0.34),
+    0 0 0 1px rgba(119, 175, 194, 0.12);
+  --uni-neo-control:
+    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(242, 250, 253, 0.7) 46%, rgba(232, 244, 249, 0.84) 100%);
+  --uni-neo-control-shadow:
+    5px 7px 14px rgba(98, 136, 151, 0.14),
+    -3px -3px 8px rgba(255, 255, 255, 0.95),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(164, 197, 209, 0.25);
+  --uni-neo-inset:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(245, 252, 255, 0.22) 24%),
+    var(--skeu-inset-bg);
+  --uni-neo-inset-shadow:
+    inset 6px 8px 14px rgba(156, 184, 195, 0.28),
+    inset -4px -4px 10px rgba(255, 255, 255, 0.74),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 0 rgba(255, 255, 255, 0.58);
+  --uni-neo-focus:
+    0 0 0 4px rgba(28, 135, 160, 0.18),
+    0 12px 24px rgba(95, 128, 141, 0.22);
+  --uni-neo-icon: #0b8292;
+}
+
+.nav a,
+.site-nav a,
+.site-navLink,
+.mobile-menu a {
+  font-weight: 600 !important;
+}
+
+.catalog-quickChip,
+.catalog-chip,
+.catalog-viewBtn,
+.product-detail-metaPill,
+.variants-count {
+  font-weight: 800 !important;
+}
+
+.catalog-cardTitle,
+.product-tile-name,
+.product-detail-title,
+.variant-title,
+.hero-title-minimal,
+.catalog-title {
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.catalog-cardSummary,
+.product-tile-desc,
+.product-detail-descBubble,
+.variant-noteBody {
+  overflow-wrap: anywhere;
+  text-wrap: pretty;
+}
+
+.catalog-cardHead,
+.variant-head {
+  align-items: flex-start !important;
+}
+
+.catalog-cardSummary {
+  line-height: 1.62 !important;
+}
+
+.catalog-cardPrice,
+.product-tile-price {
+  line-height: 1.08;
+}
+
+.home-page .home-popularList .product-tile--list {
+  padding: 20px 20px 20px 22px !important;
+  gap: 16px !important;
+}
+
+.home-page .home-popularList .product-tile-main {
+  display: grid;
+  gap: 4px;
+}
+
+.home-page .home-popularList .product-tile-bottom {
+  gap: 10px !important;
+}
+
+@media (max-width: 720px) {
+  .home-page .home-popularList .product-tile--list {
+    padding: 16px 15px 16px 16px !important;
+    gap: 12px !important;
+  }
+}
+
+/* Products chips polish v8: fix placement, depth, and lighting */
+.catalog-page .catalog-quickFilters {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 9px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+  margin: 0 0 12px !important;
+  padding: 2px 4px 4px 2px !important;
+}
+
+.catalog-page .catalog-quickChip {
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--uni-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.02) 42%),
+    var(--uni-neo-control) !important;
+  box-shadow:
+    0 7px 14px rgba(24, 75, 94, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 0 -1px 0 rgba(117, 168, 184, 0.18) !important;
+  color: var(--uni-text) !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  letter-spacing: 0.008em !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  text-wrap: nowrap !important;
+}
+
+.catalog-page .catalog-quickChip:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 10px 18px rgba(24, 75, 94, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(117, 168, 184, 0.2) !important;
+}
+
+.catalog-page .catalog-quickChip.active {
+  border-color: rgba(43, 223, 198, 0.44) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #71ffe8 0%, #35e7d8 36%, #00cdbd 62%, #0c8a9c 100%) !important;
+  color: #042534 !important;
+  box-shadow:
+    0 12px 22px rgba(0, 170, 160, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -2px 0 rgba(4, 86, 96, 0.28) !important;
+}
+
+.catalog-page .catalog-contentBar {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 10px !important;
+  margin-bottom: 12px !important;
+}
+
+.catalog-page .catalog-contentActions {
+  justify-content: flex-end !important;
+  gap: 8px !important;
+}
+
+.catalog-page .catalog-viewBtn {
+  min-width: 42px !important;
+  min-height: 38px !important;
+  border-radius: 14px !important;
+  box-shadow:
+    0 7px 14px rgba(24, 75, 94, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.86),
+    inset 0 -1px 0 rgba(117, 168, 184, 0.16) !important;
+}
+
+@media (max-width: 720px) {
+  .catalog-page .catalog-quickFilters {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .catalog-page .catalog-quickChip {
+    width: 100% !important;
+    min-height: 42px !important;
+    padding: 0 10px !important;
+    justify-content: center !important;
+    white-space: normal !important;
+    text-wrap: balance !important;
+    line-height: 1.2 !important;
+    text-align: center !important;
+  }
+
+  .catalog-page .catalog-contentBar {
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+  }
+
+  .catalog-page .catalog-contentActions {
+    justify-content: flex-start !important;
+  }
+}
