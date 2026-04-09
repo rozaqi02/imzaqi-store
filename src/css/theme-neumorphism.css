@@ -403,13 +403,18 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-.mobile-backdrop,
 .checkout-backdrop,
 .catalog-sheetBackdrop,
 .lightbox-backdrop {
   background: var(--brand-overlay) !important;
   backdrop-filter: blur(18px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+}
+
+.mobile-backdrop {
+  background: var(--brand-overlay) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 .mobile-menu {
@@ -1048,8 +1053,10 @@ select.input {
 @media (max-width: 720px) {
   :root[data-theme="light"] .mobile-menu,
   :root[data-theme="light"] .mobile-backdrop {
-    backdrop-filter: blur(18px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
   }
 }
 
@@ -2046,8 +2053,10 @@ select.input {
 }
 
 .mobile-backdrop-lite {
-  backdrop-filter: blur(16px) saturate(135%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(135%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  filter: none !important;
+  -webkit-filter: none !important;
 }
 
 :root[data-theme="dark"] .mobile-backdrop-lite {
@@ -2057,15 +2066,19 @@ select.input {
 :root[data-theme="dark"] .mobile-menu-lite {
   background:
     linear-gradient(180deg, rgba(22, 34, 61, 0.84), rgba(8, 14, 31, 0.92) 58%, rgba(5, 9, 22, 0.94) 100%) !important;
-  backdrop-filter: blur(24px) saturate(155%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(155%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
 }
 
 :root[data-theme="light"] .mobile-menu-lite {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(237, 247, 251, 0.9) 58%, rgba(226, 241, 247, 0.94) 100%) !important;
-  backdrop-filter: blur(20px) saturate(145%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+:root[data-theme="light"] .mobile-backdrop-lite {
+  background: rgba(8, 22, 34, 0.52) !important;
 }
 
 .menu-footer-text {
@@ -3412,4 +3425,30 @@ select.input {
 
 :root[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
   border-top-color: rgba(0, 138, 148, 0.16) !important;
+}
+
+/* Mobile sidebar backdrop: replace blur with subtle dim overlay (light + dark) */
+@media (max-width: 720px) {
+  .mobile-backdrop,
+  .mobile-backdrop-lite {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(2, 9, 18, 0.44) !important;
+  }
+
+  :root[data-theme="light"] .mobile-backdrop,
+  :root[data-theme="light"] .mobile-backdrop-lite {
+    background: rgba(8, 22, 34, 0.52) !important;
+  }
+
+  :root[data-theme="dark"] .mobile-backdrop,
+  :root[data-theme="dark"] .mobile-backdrop-lite {
+    background: rgba(2, 9, 18, 0.48) !important;
+  }
+
+  .mobile-menu,
+  .mobile-menu-lite {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }

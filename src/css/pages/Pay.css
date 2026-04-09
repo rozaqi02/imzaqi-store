@@ -119,6 +119,28 @@ padding:24px 18px 20px;text-align:center;}
 .pay-successCode{margin-top:12px;font-size:clamp(38px, 8vw, 58px);line-height:1;font-weight:900;letter-spacing:.14em;color:#fff;text-shadow:none;}
 .pay-successLead{margin:14px auto 0;max-width:24ch;line-height:1.6;color:rgba(255,255,255,.56);font-size:14px;}
 .pay-successActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px;}
+.icon-btn{
+  width:40px;
+  height:40px;
+  display:grid;
+  place-items:center;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,.14);
+  background:linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,0) 26%), rgba(255,255,255,.04);
+  color:rgba(255,255,255,.9);
+  cursor:pointer;
+  transition:background .18s ease,border-color .18s ease,color .18s ease,transform .18s ease;
+}
+.icon-btn:hover{
+  transform:translateY(-1px);
+  border-color:rgba(255,255,255,.24);
+  background:rgba(255,255,255,.08);
+}
+.icon-btn:focus-visible{
+  outline:none;
+  border-color:rgba(79,255,200,.32);
+  box-shadow:0 0 0 4px rgba(79,255,200,.14), 0 12px 24px rgba(0,0,0,.22);
+}
 .pay-shell .btn{border-radius:18px;}
 .pay-shell .btn:not(.btn-ghost){background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.84));color:#071018;border:1px solid rgba(255,255,255,.72);box-shadow:0 20px 40px rgba(255,255,255,.06);}
 .pay-shell .btn:not(.btn-ghost):hover{transform:translateY(-1px);filter:brightness(1.02);}

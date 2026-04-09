@@ -22,3 +22,6 @@
 
 /* Final unification layer inspired by Status/FAQ */
 @import "./css/theme-unified-v4.css";
+
+/* Adaptive motion performance layer (must stay last) */
+@import "./css/motion-adaptive.css";

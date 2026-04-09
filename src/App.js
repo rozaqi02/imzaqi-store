@@ -33,8 +33,11 @@ function ScrollToTop() {
     const reduce = typeof window !== "undefined" &&
       window.matchMedia &&
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const coarse = typeof window !== "undefined" &&
+      window.matchMedia &&
+      window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
     requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      window.scrollTo({ top: 0, behavior: reduce || coarse ? "auto" : "smooth" });
     });
   }, [pathname]);
 

@@ -70,7 +70,7 @@ export default function Home() {
 
   return (
     <div className="page home-page">
-      <Hero />
+      <Hero products={products} />
 
       <section className="section">
         <div className="container">

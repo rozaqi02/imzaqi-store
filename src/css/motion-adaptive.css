@@ -1,0 +1,273 @@
+/*
+  Adaptive motion layer
+  - full: desktop/default
+  - lite: mobile/coarse pointer (keep animation, reduce render cost)
+  - off: prefers-reduced-motion
+*/
+
+@keyframes routeInLite {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 6px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+[data-motion="lite"] .route-transition {
+  animation: routeInLite 180ms cubic-bezier(0.22, 1, 0.36, 1) both !important;
+}
+
+[data-motion="lite"] .header,
+[data-motion="lite"] .site-header,
+[data-motion="lite"] .mobile-backdrop,
+[data-motion="lite"] .mobile-menu,
+[data-motion="lite"] .checkout-backdrop,
+[data-motion="lite"] .checkout-drawer,
+[data-motion="lite"] .checkout-panel,
+[data-motion="lite"] .checkout-summary,
+[data-motion="lite"] .pay-card,
+[data-motion="lite"] .pay-orderDesktop,
+[data-motion="lite"] .pay-orderMobileCard,
+[data-motion="lite"] .qris-wrap,
+[data-motion="lite"] .pay-successModal,
+[data-motion="lite"] .toast {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-motion="lite"] .card,
+[data-motion="lite"] .btn,
+[data-motion="lite"] .checkout-drawer,
+[data-motion="lite"] .checkout-panel,
+[data-motion="lite"] .checkout-summary,
+[data-motion="lite"] .status-mainCard,
+[data-motion="lite"] .status-sideCard,
+[data-motion="lite"] .status-emptyCard,
+[data-motion="lite"] .admin-panel,
+[data-motion="lite"] .admin-card {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
+}
+
+[data-motion="lite"] .btn,
+[data-motion="lite"] .card,
+[data-motion="lite"] .checkout-drawer,
+[data-motion="lite"] .checkout-panel,
+[data-motion="lite"] .checkout-summary,
+[data-motion="lite"] .product-card-modern,
+[data-motion="lite"] .catalog-card,
+[data-motion="lite"] .admin-panel,
+[data-motion="lite"] .admin-orderCardModern {
+  transition-property: transform, opacity, border-color, background-color !important;
+  transition-duration: 160ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+  will-change: auto !important;
+}
+
+[data-motion="lite"] .btn::before,
+[data-motion="lite"] .mobile-menu a::before,
+[data-motion="lite"] .skeleton::after,
+[data-motion="lite"] .catalog-cardSkeleton::after,
+[data-motion="lite"] .testi-skel::after,
+[data-motion="lite"] .stock-progress-fill::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+[data-motion="lite"] .trending-badge,
+[data-motion="lite"] .stock-badge-modern.low-stock,
+[data-motion="lite"] .route-progress-bar,
+[data-motion="lite"] .cursor {
+  animation: none !important;
+}
+
+/* Checkout specifically: keep smooth open/close with lower paint cost */
+[data-motion="lite"] .checkout-overlay {
+  contain: layout paint;
+}
+
+[data-motion="lite"] .checkout-backdrop {
+  background: rgba(3, 8, 18, 0.56) !important;
+}
+
+[data-motion="lite"] .checkout-drawer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout paint style;
+  will-change: transform !important;
+}
+
+[data-motion="lite"] .checkout-drawerBody {
+  contain: content;
+}
+
+[data-motion="lite"] .checkout-drawerGesture {
+  animation: checkoutGestureIn 220ms cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+/* Product page + detail page: reduce paint complexity while keeping style direction */
+[data-motion="lite"] .catalog-page .catalog-hero::before,
+[data-motion="lite"] .catalog-page .catalog-card::before,
+[data-motion="lite"] .catalog-page .catalog-cardSkeleton::after {
+  display: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-command,
+[data-motion="lite"] .catalog-page .catalog-filter,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2,
+[data-motion="lite"] .catalog-page .catalog-quickChip,
+[data-motion="lite"] .catalog-page .catalog-sheet,
+[data-motion="lite"] .detail-page .product-detail,
+[data-motion="lite"] .detail-page .product-detail-priceCard,
+[data-motion="lite"] .detail-page .variant-tile,
+[data-motion="lite"] .detail-page .variant-notes {
+  background: var(--skeu-panel-bg) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-sheetBackdrop {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card,
+[data-motion="lite"] .detail-page .variant-tile {
+  content-visibility: visible !important;
+  contain-intrinsic-size: auto !important;
+  contain: layout paint style;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition-property: transform, border-color, opacity !important;
+  transition-duration: 140ms !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card:hover,
+[data-motion="lite"] .detail-page .variant-tile:hover {
+  transform: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardSummary {
+  display: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Home page mobile hotspots: popular list + side stats */
+[data-motion="lite"] .home-page .hero-minimal::before,
+[data-motion="lite"] .home-page .hero-minimal::after,
+[data-motion="lite"] .home-page .product-tile::before,
+[data-motion="lite"] .home-page .product-tile::after,
+[data-motion="lite"] .home-page .stat-minimal::before {
+  display: none !important;
+}
+
+[data-motion="lite"] .home-page .hero-search-shell,
+[data-motion="lite"] .home-page .suggestions,
+[data-motion="lite"] .home-page .stat-minimal {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+[data-motion="lite"] .home-page .hero-commandCard,
+[data-motion="lite"] .home-page .flow-assist,
+[data-motion="lite"] .home-page .stat-minimal,
+[data-motion="lite"] .home-page .home-popularList .product-tile,
+[data-motion="lite"] .home-page .home-popularList .product-tile-pill {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+}
+
+[data-motion="lite"] .home-page .hero-stats-minimal,
+[data-motion="lite"] .home-page .home-popularList {
+  contain: layout paint style;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+[data-motion="lite"] .home-page .home-popularList .product-tile {
+  content-visibility: visible !important;
+  contain-intrinsic-size: auto !important;
+  contain: layout paint style;
+  transition-duration: 120ms !important;
+}
+
+[data-motion="lite"] .home-page .home-popularList .product-tile:hover {
+  transform: none !important;
+}
+
+/* Hard override: mobile sidebar backdrop must dim only (no blur) in all themes */
+@media (max-width: 720px) {
+  .mobile-backdrop,
+  .mobile-backdrop-lite,
+  .mobile-backdrop.mobile-backdrop-lite,
+  .mobile-backdrop.is-open,
+  .mobile-backdrop-lite.is-open,
+  .mobile-backdrop.is-closing,
+  .mobile-backdrop-lite.is-closing,
+  .mobile-sheetBackdrop,
+  body.nav-open .mobile-backdrop,
+  body.nav-open .mobile-backdrop-lite,
+  body.nav-open .mobile-backdrop.mobile-backdrop-lite {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+    background-image: none !important;
+  }
+
+  .mobile-menu,
+  .mobile-menu-lite,
+  .mobile-menu.mobile-menu-lite,
+  .mobile-sheet,
+  body.nav-open .mobile-menu,
+  body.nav-open .mobile-menu-lite,
+  body.nav-open .mobile-menu.mobile-menu-lite {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    filter: none !important;
+    -webkit-filter: none !important;
+  }
+
+  :root[data-theme="light"] .mobile-backdrop,
+  :root[data-theme="light"] .mobile-backdrop-lite,
+  :root[data-theme="light"] .mobile-backdrop.mobile-backdrop-lite,
+  :root[data-theme="light"] .mobile-sheetBackdrop,
+  :root[data-theme="light"] body.nav-open .mobile-backdrop,
+  :root[data-theme="light"] body.nav-open .mobile-backdrop-lite,
+  :root[data-theme="light"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
+    background: rgba(6, 17, 28, 0.68) !important;
+  }
+
+  :root[data-theme="dark"] .mobile-backdrop,
+  :root[data-theme="dark"] .mobile-backdrop-lite,
+  :root[data-theme="dark"] .mobile-backdrop.mobile-backdrop-lite,
+  :root[data-theme="dark"] .mobile-sheetBackdrop,
+  :root[data-theme="dark"] body.nav-open .mobile-backdrop,
+  :root[data-theme="dark"] body.nav-open .mobile-backdrop-lite,
+  :root[data-theme="dark"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
+    background: rgba(2, 9, 18, 0.56) !important;
+  }
+
+  :root[data-theme="light"] .mobile-menu,
+  :root[data-theme="light"] .mobile-menu-lite,
+  :root[data-theme="light"] .mobile-menu.mobile-menu-lite {
+    background:
+      linear-gradient(180deg, rgba(251, 254, 255, 0.99), rgba(238, 247, 251, 0.99) 58%, rgba(228, 241, 247, 0.99) 100%) !important;
+    border-left: 1px solid rgba(0, 138, 148, 0.2) !important;
+    box-shadow:
+      -10px 0 18px rgba(9, 26, 40, 0.12),
+      inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
+  }
+}
+
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}

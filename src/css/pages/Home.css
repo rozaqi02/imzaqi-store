@@ -226,6 +226,10 @@
   background: rgba(255, 255, 255, 0.06);
 }
 
+.suggestion-item.is-active {
+  background: rgba(29, 131, 255, 0.2);
+}
+
 .hero-ctas-minimal {
   display: flex;
   justify-content: center;
@@ -353,8 +357,8 @@
     transform 0.3s var(--ease-out),
     border-color 0.3s var(--ease-out),
     box-shadow 0.3s var(--ease-out);
-  content-visibility: auto;
-  contain-intrinsic-size: 230px;
+  content-visibility: visible;
+  contain: layout paint style;
 }
 
 .product-tile--grid {
@@ -374,15 +378,8 @@
 }
 
 .product-tile--list::before {
-  content: "";
-  position: absolute;
-  left: 14px;
-  top: 16px;
-  bottom: 16px;
-  width: 4px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, rgba(79, 255, 200, 0.95), rgba(0, 194, 208, 0.86));
-  box-shadow: 0 0 16px rgba(79, 255, 200, 0.2);
+  content: none;
+  display: none;
 }
 
 .product-tile:hover {
@@ -796,6 +793,83 @@
   }
 }
 
+@media (max-width: 460px) {
+  .home-page .home-popularList {
+    padding-inline: 2px;
+  }
+
+  .home-page .home-popularList .product-tile--list {
+    grid-template-columns: minmax(0, 1fr) 96px;
+    gap: 10px;
+    padding: 13px 16px 13px 14px;
+    align-items: stretch;
+  }
+
+  .home-page .home-popularList .product-tile--list::before {
+    display: none;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-top {
+    gap: 8px;
+    align-items: start;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-arrow {
+    display: none;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-name {
+    font-size: 16px;
+    line-height: 1.08;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-desc {
+    margin-top: 4px;
+    font-size: 11px;
+    line-height: 1.35;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-bottom {
+    min-width: 96px;
+    gap: 6px;
+    align-items: stretch;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-pills {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px;
+    width: 100%;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-pill {
+    height: 23px;
+    padding: 0 6px;
+    font-size: 8px;
+    gap: 4px;
+    width: 100%;
+    min-width: 0;
+    justify-content: flex-start;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-pill > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-pill svg {
+    width: 10px;
+    height: 10px;
+  }
+
+  .home-page .home-popularList .product-tile--list .product-tile-price {
+    font-size: 14px;
+    text-align: right;
+  }
+}
+
 @media (max-width: 720px) {
   .hero {
     padding-bottom: 12px;
@@ -1006,6 +1080,53 @@
 
   .grid-mode {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .home-page .hero-minimal::before {
+    display: none;
+  }
+
+  .home-page .hero-commandCard {
+    box-shadow: 0 14px 26px rgba(0, 0, 0, 0.16);
+  }
+
+  .home-page .hero-stats-minimal,
+  .home-page .home-popularList {
+    contain: layout paint style;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .home-page .hero-search-shell,
+  .home-page .suggestions,
+  .home-page .stat-minimal {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .home-page .stat-minimal,
+  .home-page .home-popularList .product-tile,
+  .home-page .home-popularList .product-tile-pill {
+    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  .home-page .home-popularList .product-tile {
+    padding: 14px 15px 14px 15px;
+    contain: layout paint style;
+    transition-duration: 120ms !important;
+    will-change: auto !important;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
+  .home-page .home-popularList .product-tile-pill {
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  .home-page .home-popularList .product-tile:hover {
+    transform: none !important;
   }
 }
 

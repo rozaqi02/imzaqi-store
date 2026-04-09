@@ -164,6 +164,15 @@
   grid-template-columns: 320px 1fr;
   gap: 16px;
   align-items: start;
+  min-width: 0;
+  overflow-x: hidden;
+}
+
+.catalog-content {
+  min-width: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-x: clip;
 }
 
 .catalog-sidebar {
@@ -272,6 +281,15 @@
   align-items: center;
   justify-content: space-between;
   gap: 10px;
+}
+
+.catalog-filterRow--toggle {
+  cursor: pointer;
+  user-select: none;
+}
+
+.catalog-filterRow--toggle .catalog-filterLabel {
+  margin: 0;
 }
 
 .catalog-toggle {
@@ -427,7 +445,11 @@
   gap: 10px;
   overflow-x: auto;
   padding-bottom: 4px;
+  padding-right: 0;
   margin: 0 0 14px;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   scrollbar-width: none;
 }
 
@@ -449,6 +471,7 @@
   letter-spacing: 0.01em;
   cursor: pointer;
   white-space: nowrap;
+  max-width: 100%;
 }
 
 .catalog-quickChip.active {
@@ -513,8 +536,6 @@
     transform 0.3s var(--ease-out),
     border-color 0.3s var(--ease-out),
     box-shadow 0.3s var(--ease-out);
-  content-visibility: auto;
-  contain-intrinsic-size: 240px;
   overflow: hidden;
 }
 
@@ -874,6 +895,18 @@
 @media (min-width: 721px) {
   .catalog-filterBtn {
     display: none;
+  }
+
+  .catalog-content {
+    overflow-x: hidden;
+    overflow-x: clip;
+  }
+
+  .catalog-quickFilters {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding-right: 0;
   }
 }
 

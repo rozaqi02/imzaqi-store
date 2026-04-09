@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
+import { useDialogA11y } from "../hooks/useDialogA11y";
 
 const MOBILE_BREAKPOINT = "(max-width: 720px)";
 const MOBILE_MENU_ANIMATION_MS = 260;
@@ -155,12 +156,12 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
     return undefined;
   }, [location.pathname, open, requestClose]);
 
-  useEffect(() => {
-    if (!open || phase !== "open" || !menuRef.current) return undefined;
-    const firstInteractive = menuRef.current.querySelector("button, a");
-    firstInteractive?.focus();
-    return undefined;
-  }, [open, phase]);
+  useDialogA11y({
+    open: open && phase !== "closed",
+    containerRef: menuRef,
+    onClose: requestClose,
+    initialFocusSelector: ".mobile-menu-close",
+  });
 
   if (typeof document === "undefined" || (!open && phase === "closed")) return null;
 
@@ -173,7 +174,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
       <div className={backdropClass} onClick={requestClose} aria-hidden="true" />
 
       <aside ref={menuRef} className={menuClass} role="dialog" aria-modal="true" aria-label="Navigasi mobile">
-        <button className="mobile-menu-close" onClick={requestClose} aria-label="Tutup menu">
+        <button className="mobile-menu-close" type="button" onClick={requestClose} aria-label="Tutup menu">
           <X size={18} strokeWidth={2.2} />
         </button>
 

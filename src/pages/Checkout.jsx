@@ -10,6 +10,8 @@ import CheckoutSteps from "../components/CheckoutSteps";
 import EmptyState from "../components/EmptyState";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
+import { useDialogA11y } from "../hooks/useDialogA11y";
 
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
@@ -26,6 +28,12 @@ const backdropVariants = {
     opacity: 0,
     transition: { duration: 0.26, ease: [0.22, 1, 0.36, 1] },
   },
+};
+
+const backdropVariantsLite = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] } },
+  exit: { opacity: 0, transition: { duration: 0.14, ease: [0.22, 1, 0.36, 1] } },
 };
 
 const desktopDrawerVariants = {
@@ -49,6 +57,18 @@ const desktopDrawerVariants = {
       stiffness: 300,
       mass: 0.82,
     },
+  },
+};
+
+const desktopDrawerVariantsLite = {
+  hidden: { x: "100%" },
+  visible: {
+    x: 0,
+    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+  },
+  exit: {
+    x: "100%",
+    transition: { duration: 0.16, ease: [0.22, 1, 0.36, 1] },
   },
 };
 
@@ -76,6 +96,18 @@ const mobileDrawerVariants = {
   },
 };
 
+const mobileDrawerVariantsLite = {
+  hidden: { y: "100%" },
+  visible: {
+    y: 0,
+    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+  },
+  exit: {
+    y: "100%",
+    transition: { duration: 0.16, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export default function Checkout() {
   const nav = useNavigate();
   const location = useLocation();
@@ -83,7 +115,11 @@ export default function Checkout() {
   const { promo, apply, clear } = usePromo();
   const toast = useToast();
   const closeButtonRef = useRef(null);
+  const drawerRef = useRef(null);
   const reduceMotion = useReducedMotion();
+  const motionMode = useAdaptiveMotion();
+  const isMotionOff = motionMode === "off" || reduceMotion;
+  const isLiteMotion = motionMode === "lite" && !isMotionOff;
 
   const promoPercent = Number(promo?.percent || 0);
   const subtotal = cart.subtotal();
@@ -137,10 +173,10 @@ export default function Checkout() {
 
     const timer = window.setTimeout(() => {
       setShowGestureHint(false);
-    }, reduceMotion ? 1800 : 3200);
+    }, isMotionOff ? 1200 : isLiteMotion ? 1500 : 3200);
 
     return () => window.clearTimeout(timer);
-  }, [isMobileSheet, reduceMotion]);
+  }, [isMobileSheet, isLiteMotion, isMotionOff]);
 
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
   const backgroundLocation = location.state?.backgroundLocation;
@@ -148,6 +184,13 @@ export default function Checkout() {
   const requestClose = useCallback(() => {
     setClosing((prev) => (prev ? prev : true));
   }, []);
+
+  useDialogA11y({
+    open: true,
+    containerRef: drawerRef,
+    onClose: requestClose,
+    initialFocusSelector: ".checkout-drawerClose",
+  });
 
   useEffect(() => {
     function onKeyDown(event) {
@@ -168,10 +211,10 @@ export default function Checkout() {
       }
 
       nav("/", { replace: true });
-    }, 280);
+    }, isMotionOff || isLiteMotion ? 190 : 280);
 
     return () => window.clearTimeout(timer);
-  }, [backgroundLocation, closing, nav]);
+  }, [backgroundLocation, closing, isLiteMotion, isMotionOff, nav]);
 
   async function onApplyPromo() {
     const raw = String(code || "").trim();
@@ -234,13 +277,21 @@ export default function Checkout() {
 
   if (typeof document === "undefined") return null;
 
-  const drawerVariants = isMobileSheet ? mobileDrawerVariants : desktopDrawerVariants;
+  const drawerVariants = isMobileSheet
+    ? isLiteMotion
+      ? mobileDrawerVariantsLite
+      : mobileDrawerVariants
+    : isLiteMotion
+      ? desktopDrawerVariantsLite
+      : desktopDrawerVariants;
+  const overlayVariants = isLiteMotion ? backdropVariantsLite : backdropVariants;
+  const enableDrag = isMotionOff ? false : isMobileSheet ? true : !isLiteMotion;
 
   return createPortal(
     <div className="checkout-overlay" role="presentation">
       <motion.div
         className="checkout-backdrop"
-        variants={backdropVariants}
+        variants={overlayVariants}
         initial="hidden"
         animate={closing ? "exit" : "visible"}
         onMouseDown={requestClose}
@@ -248,18 +299,20 @@ export default function Checkout() {
       />
 
       <motion.aside
+        ref={drawerRef}
         className="checkout-drawer"
         variants={drawerVariants}
         initial="hidden"
         animate={closing ? "exit" : "visible"}
-        drag={isMobileSheet ? "y" : true}
+        drag={enableDrag ? (isMobileSheet ? "y" : true) : false}
         dragConstraints={isMobileSheet ? { top: 0, bottom: 0 } : { left: 0, right: 0, top: 0, bottom: 0 }}
-        dragElastic={isMobileSheet ? (reduceMotion ? 0.06 : 0.1) : reduceMotion ? 0.1 : 0.16}
+        dragElastic={isLiteMotion ? 0.04 : isMobileSheet ? (reduceMotion ? 0.06 : 0.1) : reduceMotion ? 0.1 : 0.16}
+        dragMomentum={false}
         dragDirectionLock
         onDragStart={() => setShowGestureHint(false)}
         onDragEnd={(event, info) => {
           if (isMobileSheet) {
-            if (info.offset.y > 120 || info.velocity.y > 520) requestClose();
+            if (info.offset.y > (isLiteMotion ? 96 : 120) || info.velocity.y > (isLiteMotion ? 440 : 520)) requestClose();
             return;
           }
 
@@ -274,7 +327,7 @@ export default function Checkout() {
         }}
         onMouseDown={(event) => event.stopPropagation()}
         onPointerDown={() => setShowGestureHint(false)}
-        style={{ touchAction: isMobileSheet ? "pan-y" : "none" }}
+        style={{ touchAction: isMobileSheet ? "pan-y" : "none", willChange: "transform" }}
         role="dialog"
         aria-modal="true"
         aria-label="Checkout"

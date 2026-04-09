@@ -261,8 +261,6 @@
     transform 0.26s var(--ease-out),
     border-color 0.26s var(--ease-out),
     box-shadow 0.26s var(--ease-out);
-  content-visibility: auto;
-  contain-intrinsic-size: 260px;
 }
 
 .variant-tile:hover {

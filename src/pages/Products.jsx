@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
@@ -26,6 +26,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
 import { formatIDR } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
+import { useDialogA11y } from "../hooks/useDialogA11y";
 
 const CATEGORIES = [
   { key: "streaming", label: "Streaming", icon: Film },
@@ -147,7 +148,14 @@ function FilterPanel({
   setView,
   onReset,
   compact = false,
+  idPrefix = "",
 }) {
+  const generatedPrefix = useId().replace(/:/g, "");
+  const prefix = idPrefix || `catalog-${generatedPrefix}`;
+  const readyToggleId = `${prefix}-ready`;
+  const newToggleId = `${prefix}-new`;
+  const restockToggleId = `${prefix}-restock`;
+
   return (
     <div className={`catalog-filter ${compact ? "compact" : ""}`}>
       <div className="catalog-filterBlock">
@@ -191,37 +199,47 @@ function FilterPanel({
       </div>
 
       <div className="catalog-filterBlock">
-        <div className="catalog-filterRow">
+        <label className="catalog-filterRow catalog-filterRow--toggle" htmlFor={readyToggleId}>
           <span className="catalog-filterLabel">Ready</span>
-          <label className="catalog-toggle">
-            <input type="checkbox" checked={inStockOnly} onChange={(e) => setInStockOnly(e.target.checked)} />
+          <span className="catalog-toggle">
+            <input
+              id={readyToggleId}
+              type="checkbox"
+              checked={inStockOnly}
+              onChange={(e) => setInStockOnly(e.target.checked)}
+            />
             <span className="catalog-toggleUi" aria-hidden="true" />
-          </label>
-        </div>
+          </span>
+        </label>
       </div>
 
       <div className="catalog-filterBlock">
-        <div className="catalog-filterRow">
+        <label className="catalog-filterRow catalog-filterRow--toggle" htmlFor={newToggleId}>
           <span className="catalog-filterLabel" title={`Produk yang ditambahkan dalam ${NEW_PRODUCT_DAYS} hari terakhir`}>
             Produk baru
           </span>
-          <label className="catalog-toggle">
-            <input type="checkbox" checked={newOnly} onChange={(e) => setNewOnly(e.target.checked)} />
+          <span className="catalog-toggle">
+            <input id={newToggleId} type="checkbox" checked={newOnly} onChange={(e) => setNewOnly(e.target.checked)} />
             <span className="catalog-toggleUi" aria-hidden="true" />
-          </label>
-        </div>
+          </span>
+        </label>
       </div>
 
       <div className="catalog-filterBlock">
-        <div className="catalog-filterRow">
+        <label className="catalog-filterRow catalog-filterRow--toggle" htmlFor={restockToggleId}>
           <span className="catalog-filterLabel" title={`Varian in-stock yang di-update dalam ${RESTOCK_DAYS} hari terakhir`}>
             Baru di stok
           </span>
-          <label className="catalog-toggle">
-            <input type="checkbox" checked={restockOnly} onChange={(e) => setRestockOnly(e.target.checked)} />
+          <span className="catalog-toggle">
+            <input
+              id={restockToggleId}
+              type="checkbox"
+              checked={restockOnly}
+              onChange={(e) => setRestockOnly(e.target.checked)}
+            />
             <span className="catalog-toggleUi" aria-hidden="true" />
-          </label>
-        </div>
+          </span>
+        </label>
       </div>
 
       <div className="catalog-filterBlock">
@@ -300,9 +318,18 @@ export default function Products() {
   const qParam = params.get("q") || "";
   const [query, setQuery] = useState(qParam);
   const searchRef = useRef(null);
+  const sheetRef = useRef(null);
 
   const { items, subtotal } = useCart();
   const cartItemCount = items?.reduce((sum, item) => sum + (item.qty || 0), 0) || 0;
+  const closeFilters = useCallback(() => setFiltersOpen(false), []);
+
+  useDialogA11y({
+    open: filtersOpen,
+    containerRef: sheetRef,
+    onClose: closeFilters,
+    initialFocusSelector: ".catalog-sheetClose",
+  });
 
   usePageMeta({
     title: "Produk",
@@ -638,6 +665,7 @@ export default function Products() {
         <div className="container catalog-layout">
           <aside className="catalog-sidebar" aria-label="Filter produk">
             <FilterPanel
+              idPrefix="catalog-side"
               query={query}
               setQuery={setQuery}
               cats={cats}
@@ -667,6 +695,7 @@ export default function Products() {
                   type="button"
                   className={`catalog-quickChip${item.active ? " active" : ""}`}
                   onClick={item.onClick}
+                  aria-pressed={item.active}
                 >
                   {item.label}
                 </button>
@@ -691,6 +720,7 @@ export default function Products() {
                   className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
                   onClick={() => setView("grid")}
                   aria-label="Grid"
+                  aria-pressed={view === "grid"}
                 >
                   <Grid2x2 size={15} />
                 </button>
@@ -699,6 +729,7 @@ export default function Products() {
                   className={`catalog-viewBtn ${view === "list" ? "active" : ""}`}
                   onClick={() => setView("list")}
                   aria-label="List"
+                  aria-pressed={view === "list"}
                 >
                   <List size={15} />
                 </button>
@@ -830,15 +861,22 @@ export default function Products() {
 
       {filtersOpen && typeof document !== "undefined"
         ? createPortal(
-            <div className="catalog-sheetBackdrop" onMouseDown={() => setFiltersOpen(false)} role="presentation">
-              <div className="catalog-sheet" onMouseDown={(e) => e.stopPropagation()} role="dialog" aria-modal="true" aria-label="Filter produk">
+            <div className="catalog-sheetBackdrop" onMouseDown={closeFilters} role="presentation">
+              <div
+                ref={sheetRef}
+                className="catalog-sheet"
+                onMouseDown={(e) => e.stopPropagation()}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Filter produk"
+              >
                 <div className="catalog-sheetHandle" aria-hidden="true" />
                 <div className="catalog-sheetHead">
                   <div>
                     <div className="catalog-sheetTitle">Filter produk</div>
                     <div className="catalog-sheetSub">Atur yang perlu, lalu lanjut.</div>
                   </div>
-                  <button className="catalog-sheetClose" type="button" onClick={() => setFiltersOpen(false)} aria-label="Tutup">
+                  <button className="catalog-sheetClose" type="button" onClick={closeFilters} aria-label="Tutup">
                     <X size={18} />
                   </button>
                 </div>
@@ -846,6 +884,7 @@ export default function Products() {
                 <div className="catalog-sheetBody">
                   <FilterPanel
                     compact
+                    idPrefix="catalog-sheet"
                     query={query}
                     setQuery={setQuery}
                     cats={cats}
@@ -868,7 +907,7 @@ export default function Products() {
                 </div>
 
                 <div className="catalog-sheetFoot">
-                  <button type="button" className="btn btn-wide" onClick={() => setFiltersOpen(false)}>
+                  <button type="button" className="btn btn-wide" onClick={closeFilters}>
                     Terapkan
                   </button>
                 </div>

@@ -14,6 +14,7 @@ import CheckoutSteps from "../components/CheckoutSteps";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
+import { useDialogA11y } from "../hooks/useDialogA11y";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
 const BUYER_EMAIL_REQUIREMENT_REGEX =
@@ -90,6 +91,14 @@ function QRISSkeleton() {
 
 function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, onCopied }) {
   const [copied, setCopied] = useState(false);
+  const modalRef = React.useRef(null);
+
+  useDialogA11y({
+    open,
+    containerRef: modalRef,
+    onClose,
+    initialFocusSelector: ".icon-btn",
+  });
 
   useEffect(() => {
     if (open && typeof window !== "undefined" && window.confetti) {
@@ -116,7 +125,14 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
 
   return createPortal(
     <div className="modal-backdrop pay-overlay" onMouseDown={onClose} role="presentation">
-      <div className="modal pay-successModal" role="dialog" aria-modal="true" aria-label="Order berhasil" onMouseDown={(e) => e.stopPropagation()}>
+      <div
+        ref={modalRef}
+        className="modal pay-successModal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Order berhasil"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
         <div className="modal-head pay-successHead">
           <div>
             <div className="modal-title">Order dibuat</div>

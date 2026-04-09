@@ -10,7 +10,6 @@ import {
   ShieldCheck,
   Zap,
 } from "lucide-react";
-import { fetchProducts } from "../lib/api";
 import { useLiveStats } from "../hooks/useLiveStats";
 
 const HERO_TEXT = "Pilih paket. Bayar rapi.";
@@ -52,7 +51,7 @@ function renderTypedWithHighlight(typedText) {
   );
 }
 
-export default function Hero() {
+export default function Hero({ products = [] }) {
   const nav = useNavigate();
   const location = useLocation();
   const { totalViews, todayViews, totalOrders, weekOrders } = useLiveStats();
@@ -62,9 +61,9 @@ export default function Hero() {
     const coarse = window.matchMedia("(max-width: 920px), (pointer: coarse)")?.matches;
     return reduce || coarse ? HERO_TEXT : "";
   });
-  const [index, setIndex] = useState([]);
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [lightMotion, setLightMotion] = useState(() => {
     if (typeof window === "undefined" || !window.matchMedia) return false;
     return window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
@@ -104,38 +103,35 @@ export default function Hero() {
     return () => window.clearInterval(timer);
   }, [lightMotion]);
 
-  useEffect(() => {
-    let alive = true;
-    (async () => {
-      try {
-        const data = await fetchProducts();
-        if (!alive) return;
-        const words = [];
-        (data || []).forEach((p) => {
-          if (p?.name) words.push(p.name);
-          if (p?.slug) words.push(p.slug.replace(/-/g, " "));
-          (p?.product_variants || []).forEach((v) => {
-            if (v?.name) words.push(`${p.name} ${v.name}`);
-          });
-        });
-        setIndex(Array.from(new Set(words.map((x) => String(x).trim()).filter(Boolean))));
-      } catch {}
-    })();
-
-    return () => {
-      alive = false;
-    };
-  }, []);
+  const searchIndex = useMemo(() => {
+    const words = [];
+    (products || []).forEach((product) => {
+      if (product?.name) words.push(product.name);
+      if (product?.slug) words.push(product.slug.replace(/-/g, " "));
+      (product?.product_variants || []).forEach((variant) => {
+        if (variant?.name) words.push(`${product.name} ${variant.name}`);
+      });
+    });
+    return Array.from(new Set(words.map((text) => String(text).trim()).filter(Boolean)));
+  }, [products]);
 
   const suggestions = useMemo(() => {
     const s = q.trim().toLowerCase();
     if (!s) return [];
-    return index.filter((x) => x.toLowerCase().includes(s)).slice(0, 6);
-  }, [index, q]);
+    return searchIndex.filter((x) => x.toLowerCase().includes(s)).slice(0, 6);
+  }, [q, searchIndex]);
+
+  useEffect(() => {
+    if (activeSuggestionIndex < suggestions.length) return;
+    setActiveSuggestionIndex(-1);
+  }, [activeSuggestionIndex, suggestions.length]);
 
   useEffect(() => {
     function onDoc(e) {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) setOpen(false);
+      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
+        setOpen(false);
+        setActiveSuggestionIndex(-1);
+      }
     }
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
@@ -145,6 +141,7 @@ export default function Hero() {
     const term = String(value || q || "").trim();
     if (!term) return;
     setOpen(false);
+    setActiveSuggestionIndex(-1);
     nav(`/produk?q=${encodeURIComponent(term)}`);
   }
 
@@ -163,6 +160,8 @@ export default function Hero() {
   ];
 
   const fadeProps = lightMotion ? {} : { initial: "hidden", animate: "visible", variants: fadeUp };
+
+  const listboxId = "hero-search-listbox";
 
   return (
     <section className="hero hero-minimal full-bleed">
@@ -209,14 +208,48 @@ export default function Hero() {
                   placeholder="Cari produk favoritmu"
                   value={q}
                   aria-label="Cari produk"
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-expanded={open && suggestions.length > 0}
+                  aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
+                  aria-activedescendant={
+                    activeSuggestionIndex >= 0 ? `${listboxId}-option-${activeSuggestionIndex}` : undefined
+                  }
                   onFocus={() => setOpen(true)}
                   onChange={(e) => {
                     setQ(e.target.value);
                     setOpen(true);
+                    setActiveSuggestionIndex(-1);
                   }}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") goSearch();
-                    if (e.key === "Escape") setOpen(false);
+                    if (e.key === "ArrowDown" && suggestions.length > 0) {
+                      e.preventDefault();
+                      setOpen(true);
+                      setActiveSuggestionIndex((prev) => (prev >= suggestions.length - 1 ? 0 : prev + 1));
+                      return;
+                    }
+
+                    if (e.key === "ArrowUp" && suggestions.length > 0) {
+                      e.preventDefault();
+                      setOpen(true);
+                      setActiveSuggestionIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
+                      return;
+                    }
+
+                    if (e.key === "Enter") {
+                      if (open && activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
+                        e.preventDefault();
+                        goSearch(suggestions[activeSuggestionIndex]);
+                        return;
+                      }
+                      e.preventDefault();
+                      goSearch();
+                    }
+
+                    if (e.key === "Escape") {
+                      setOpen(false);
+                      setActiveSuggestionIndex(-1);
+                    }
                   }}
                 />
 
@@ -227,6 +260,7 @@ export default function Hero() {
                     onClick={() => {
                       setQ("");
                       setOpen(false);
+                      setActiveSuggestionIndex(-1);
                     }}
                     aria-label="Hapus pencarian"
                   >
@@ -245,15 +279,18 @@ export default function Hero() {
                     exit={lightMotion ? undefined : { opacity: 0, y: 10 }}
                     className="suggestions suggestions-minimal"
                     role="listbox"
+                    id={listboxId}
                   >
-                    {suggestions.map((sug) => (
+                    {suggestions.map((sug, idx) => (
                       <button
                         key={sug}
-                        className="suggestion-item"
+                        id={`${listboxId}-option-${idx}`}
+                        className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
                         onClick={() => goSearch(sug)}
+                        onMouseEnter={() => setActiveSuggestionIndex(idx)}
                         type="button"
                         role="option"
-                        aria-selected={false}
+                        aria-selected={idx === activeSuggestionIndex}
                       >
                         <Search size={14} />
                         <span>{sug}</span>

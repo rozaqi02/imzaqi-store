@@ -9,6 +9,7 @@ import { useToast } from "../context/ToastContext";
 import { formatIDR } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
+import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 
 function normalizeLines(text) {
   return String(text || "")
@@ -88,6 +89,9 @@ export default function ProductDetail() {
   const cart = useCart();
   const { add } = cart;
   const reduceMotion = useReducedMotion();
+  const motionMode = useAdaptiveMotion();
+  const isMotionOff = motionMode === "off" || reduceMotion;
+  const isLiteMotion = motionMode === "lite" && !isMotionOff;
 
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
@@ -263,10 +267,10 @@ export default function ProductDetail() {
 
           <motion.div
             className="product-detail"
-            initial={reduceMotion ? false : { opacity: 0, y: 18 }}
+            initial={isMotionOff || isLiteMotion ? false : { opacity: 0, y: 18 }}
             animate={{ opacity: 1, y: 0 }}
             transition={
-              reduceMotion
+              isMotionOff || isLiteMotion
                 ? { duration: 0 }
                 : { duration: 0.34, ease: [0.22, 1, 0.36, 1] }
             }
