@@ -246,8 +246,7 @@
 
 .product-tile-icon img,
 .catalog-card.catalog-cardV2 .catalog-cardIcon img,
-.pay-orderItemIcon img,
-.admin-product-icon {
+.pay-orderItemIcon img {
   width: 100%;
   height: 100%;
   object-fit: cover !important;
