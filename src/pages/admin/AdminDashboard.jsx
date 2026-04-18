@@ -3,8 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
   Box,
-  ChevronDown,
-  ChevronUp,
   ClipboardList,
   Eye,
   LayoutDashboard,
@@ -218,7 +216,7 @@ export default function AdminDashboard() {
   const [productForm, setProductForm] = useState(null);
   const [orderQuery, setOrderQuery] = useState("");
   const [orderBucket, setOrderBucket] = useState("all");
-  const [expandedOrderId, setExpandedOrderId] = useState("");
+  const [activeOrderId, setActiveOrderId] = useState("");
 
   // Product modal
   const [productModalOpen, setProductModalOpen] = useState(false);
@@ -679,9 +677,16 @@ export default function AdminDashboard() {
     });
   }, [deferredOrderQuery, orderBucket, orders]);
 
-  const expandedOrder = useMemo(() => {
-    return filteredOrders.find((order) => order.id === expandedOrderId) || null;
-  }, [expandedOrderId, filteredOrders]);
+  const activeOrder = useMemo(() => {
+    return (orders || []).find((order) => order.id === activeOrderId) || null;
+  }, [activeOrderId, orders]);
+
+  useEffect(() => {
+    if (!activeOrderId) return;
+    if (!(orders || []).some((order) => order.id === activeOrderId)) {
+      setActiveOrderId("");
+    }
+  }, [activeOrderId, orders]);
 
   // Keep an editable form in sync with the selected product
   useEffect(() => {
@@ -1241,6 +1246,7 @@ export default function AdminDashboard() {
   const topbarLead = isOverviewTab
     ? "Pilih area kerja di kiri. Setiap panel diringkas supaya cepat dipindai saat toko lagi ramai."
     : activeTab.hint;
+  const activeOrderWhatsApp = activeOrder ? buildWhatsAppLink(activeOrder.customer_whatsapp) : "";
 
   return (
     <div className="page admin-page">
@@ -1357,61 +1363,75 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <FlowAssist
-              eyebrow="Konteks kerja"
-              title={`Fokus: ${activeTab.label}.`}
-              description="Ringkasan inti tetap dekat."
-              badges={[
-                { label: tabMeta[activeTab.id], tone: "emphasis", icon: <ActiveTabIcon size={13} /> },
-                `${orderStats.live} order aktif`,
-                `${analyticsSummary.stockAlerts.length} stok menipis`,
-                testimonialsWithoutCaption ? `${testimonialsWithoutCaption} testimoni polos` : "Testimoni rapi",
-              ]}
-              actions={[
-                tab !== "orders"
-                  ? {
-                      label: "Buka pesanan",
-                      onClick: () => startTransition(() => setTab("orders")),
-                      icon: <ClipboardList size={14} />,
-                    }
-                  : null,
-                tab !== "products"
-                  ? {
-                      label: "Cek produk",
-                      onClick: () => startTransition(() => setTab("products")),
-                      ghost: true,
-                      icon: <Box size={14} />,
-                    }
-                  : null,
-                tab !== "testimonials" && testimonialsWithoutCaption
-                  ? {
-                      label: "Rapikan testimoni",
-                      onClick: () => startTransition(() => setTab("testimonials")),
-                      ghost: true,
-                      icon: <Star size={14} />,
-                    }
-                  : null,
-                { label: "Muat ulang", onClick: refreshAll, ghost: true, icon: <Eye size={14} /> },
-              ].filter(Boolean)}
-              className="admin-flowAssist"
-              dense
-            />
+            {isOverviewTab ? (
+              <FlowAssist
+                eyebrow="Konteks kerja"
+                title={`Fokus: ${activeTab.label}.`}
+                description="Ringkasan inti tetap dekat."
+                badges={[
+                  { label: tabMeta[activeTab.id], tone: "emphasis", icon: <ActiveTabIcon size={13} /> },
+                  `${orderStats.live} order aktif`,
+                  `${analyticsSummary.stockAlerts.length} stok menipis`,
+                  testimonialsWithoutCaption ? `${testimonialsWithoutCaption} testimoni polos` : "Testimoni rapi",
+                ]}
+                actions={[
+                  tab !== "orders"
+                    ? {
+                        label: "Buka pesanan",
+                        onClick: () => startTransition(() => setTab("orders")),
+                        icon: <ClipboardList size={14} />,
+                      }
+                    : null,
+                  tab !== "products"
+                    ? {
+                        label: "Cek produk",
+                        onClick: () => startTransition(() => setTab("products")),
+                        ghost: true,
+                        icon: <Box size={14} />,
+                      }
+                    : null,
+                  tab !== "testimonials" && testimonialsWithoutCaption
+                    ? {
+                        label: "Rapikan testimoni",
+                        onClick: () => startTransition(() => setTab("testimonials")),
+                        ghost: true,
+                        icon: <Star size={14} />,
+                      }
+                    : null,
+                  { label: "Muat ulang", onClick: refreshAll, ghost: true, icon: <Eye size={14} /> },
+                ].filter(Boolean)}
+                className="admin-flowAssist"
+                dense
+              />
+            ) : null}
 
-            <div className="admin-stats">
-              {dashboardStats.map((stat) => {
-                const StatIcon = stat.icon || TAB_ICONS[stat.key] || Box;
-                return (
-                  <div key={stat.key} className="admin-statCard">
-                    <span className="admin-statIcon">
-                      <StatIcon size={16} />
-                    </span>
-                    <span className="admin-statLabel">{stat.label}</span>
-                    <strong className="admin-statValue">{stat.value}</strong>
-                    <span className="admin-statHelper">{stat.helper}</span>
-                  </div>
-                );
-              })}
-            </div>
+            {isOverviewTab ? (
+              <div className="admin-stats">
+                {dashboardStats.map((stat) => {
+                  const StatIcon = stat.icon || TAB_ICONS[stat.key] || Box;
+                  return (
+                    <div key={stat.key} className="admin-statCard">
+                      <span className="admin-statIcon">
+                        <StatIcon size={16} />
+                      </span>
+                      <span className="admin-statLabel">{stat.label}</span>
+                      <strong className="admin-statValue">{stat.value}</strong>
+                      <span className="admin-statHelper">{stat.helper}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="admin-kpiStrip" aria-label="Ringkasan cepat operasional">
+                {dashboardStats.map((stat) => (
+                  <article key={stat.key} className="admin-kpiChip">
+                    <span>{stat.label}</span>
+                    <strong>{stat.value}</strong>
+                    <small>{stat.helper}</small>
+                  </article>
+                ))}
+              </div>
+            )}
 
             {msg ? (
               <div className="admin-alert">
@@ -1906,271 +1926,128 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "orders" ? (
-              <div className="admin-ordersLayout">
-                <div className="admin-panel">
-                  <div className="admin-panel-head">
-                    <div>
-                      <div className="admin-panel-title">Queue order</div>
-                      <div className="admin-panel-sub">Antrean order dibuat lebih cepat dibaca, dicari, dan di-follow-up dari layar kecil maupun besar.</div>
-                    </div>
-                    <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>
-                      Refresh orders
-                    </button>
+              <div className="admin-panel">
+                <div className="admin-panel-head">
+                  <div>
+                    <div className="admin-panel-title">Queue order</div>
+                    <div className="admin-panel-sub">Daftar dibuat lebih ringkas: scan cepat di list, buka detail lewat popup saat perlu aksi.</div>
                   </div>
-
-                  <div className="admin-panel-body">
-                    <div className="admin-orderToolbar">
-                      <div className="admin-searchRow">
-                        <Search size={16} />
-                        <input
-                          className="input admin-searchInput"
-                          value={orderQuery}
-                          onChange={(e) => setOrderQuery(e.target.value)}
-                          placeholder="Cari kode, WA, promo, atau nama produk..."
-                        />
-                      </div>
-
-                      <div className="admin-chipRow">
-                        <button type="button" className={`admin-chip ${orderBucket === "all" ? "active" : ""}`} onClick={() => setOrderBucket("all")}>
-                          Semua
-                        </button>
-                        <button
-                          type="button"
-                          className={`admin-chip ${orderBucket === "attention" ? "active" : ""}`}
-                          onClick={() => setOrderBucket("attention")}
-                        >
-                          Butuh aksi
-                        </button>
-                        <button type="button" className={`admin-chip ${orderBucket === "done" ? "active" : ""}`} onClick={() => setOrderBucket("done")}>
-                          Selesai
-                        </button>
-                        <button
-                          type="button"
-                          className={`admin-chip ${orderBucket === "cancelled" ? "active" : ""}`}
-                          onClick={() => setOrderBucket("cancelled")}
-                        >
-                          Batal
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="admin-miniGrid" style={{ marginTop: 14 }}>
-                      <div className="admin-miniCard">
-                        <span>Total order</span>
-                        <strong>{orderStats.total}</strong>
-                        <small>Semua status</small>
-                      </div>
-                      <div className="admin-miniCard">
-                        <span>Perlu aksi</span>
-                        <strong>{orderStats.live}</strong>
-                        <small>{formatCompactIDR(analyticsSummary.pipelineValue)}</small>
-                      </div>
-                      <div className="admin-miniCard">
-                        <span>Selesai</span>
-                        <strong>{orderStats.done}</strong>
-                        <small>{formatCompactIDR(analyticsSummary.revenueTotal)}</small>
-                      </div>
-                      <div className="admin-miniCard">
-                        <span>Dibatalkan</span>
-                        <strong>{orderStats.cancelled}</strong>
-                        <small>Perlu review bila naik</small>
-                      </div>
-                    </div>
-
-                    {filteredOrders.length === 0 ? (
-                      <div className="card pad" style={{ marginTop: 16 }}>
-                        <EmptyState icon="ORD" title="Order tidak ditemukan" description="Coba ubah filter atau kata kunci pencarian." />
-                      </div>
-                    ) : (
-                      <div className="admin-ordersFeed" style={{ marginTop: 16 }}>
-                        {filteredOrders.map((o) => {
-                          const itemCount = getOrderItemCount(o);
-                          const discountAmount = getOrderDiscountAmount(o);
-                          const isOpen = expandedOrderId === o.id;
-                          const whatsappLink = buildWhatsAppLink(o.customer_whatsapp);
-
-                          return (
-                            <article key={o.id} className={`admin-orderCardModern ${isOpen ? "open" : ""}`}>
-                              <button
-                                type="button"
-                                className="admin-orderSummary"
-                                onClick={() => setExpandedOrderId((prev) => (prev === o.id ? "" : o.id))}
-                              >
-                                <div className="admin-orderSummaryMain">
-                                  <div className="admin-order-code">{o.order_code || o.id}</div>
-                                  <div className="admin-order-sub">
-                                    {formatAdminDate(o.created_at)} | {itemCount} item | {o.customer_whatsapp || "Tanpa WA"}
-                                  </div>
-                                </div>
-
-                                <div className="admin-orderSummarySide">
-                                  <StatusBadge status={o.status} />
-                                  <strong>{formatIDR(o.total_idr)}</strong>
-                                  <span className="admin-chevron">{isOpen ? <ChevronUp size={16} /> : <ChevronDown size={16} />}</span>
-                                </div>
-                              </button>
-
-                              {isOpen ? (
-                                <div className="admin-orderBodyModern">
-                                  <div className="admin-orderMetaGrid">
-                                    <div className="admin-orderMetaCard">
-                                      <span>Kontak customer</span>
-                                      <strong>{o.customer_whatsapp || "-"}</strong>
-                                      {whatsappLink ? (
-                                        <a href={whatsappLink} target="_blank" rel="noreferrer">
-                                          Chat WhatsApp
-                                        </a>
-                                      ) : (
-                                        <small>Tidak ada nomor WA</small>
-                                      )}
-                                    </div>
-                                    <div className="admin-orderMetaCard">
-                                      <span>Status sekarang</span>
-                                      <strong>{prettyStatus(o.status)}</strong>
-                                      <small>{o.promo_code ? `Promo ${o.promo_code}` : "Tanpa promo"}</small>
-                                    </div>
-                                    <div className="admin-orderMetaCard">
-                                      <span>Update status</span>
-                                      <select
-                                        className="input admin-select"
-                                        value={String(o.status || "pending")}
-                                        onChange={(e) => updateOrderStatus(o.id, e.target.value)}
-                                      >
-                                        {ORDER_STATUS_OPTIONS.map((option) => (
-                                          <option key={option.value} value={option.value}>
-                                            {option.label}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-                                  </div>
-
-                                  <div className="admin-order-items">
-                                    {getSafeOrderItems(o).map((it, idx) => (
-                                      <div key={`${o.id}-${idx}`} className="admin-order-item">
-                                        <div>
-                                          <b>{it.product_name}</b>
-                                          <div className="muted" style={{ fontSize: 12 }}>
-                                            {it.variant_name} | {it.duration_label}
-                                          </div>
-                                        </div>
-                                        <div className="admin-order-itemPrice">
-                                          <strong>{it.qty}x</strong>
-                                          <span>{formatIDR(it.price_idr)}</span>
-                                        </div>
-                                      </div>
-                                    ))}
-                                  </div>
-
-                                  <div className="admin-order-pricing">
-                                    <div className="admin-order-priceRow">
-                                      <span>Subtotal</span>
-                                      <b>{formatIDR(o.subtotal_idr)}</b>
-                                    </div>
-                                    <div className="admin-order-priceRow">
-                                      <span>Diskon {o.discount_percent ? `(${o.discount_percent}%)` : ""}</span>
-                                      <b>- {formatIDR(discountAmount)}</b>
-                                    </div>
-                                    <div className="admin-order-priceRow total">
-                                      <span>Total bayar</span>
-                                      <b>{formatIDR(o.total_idr)}</b>
-                                    </div>
-                                  </div>
-
-                                  <div className={"admin-order-notes" + (o.notes ? "" : " empty")}>
-                                    <div className="admin-order-notesTitle">Catatan customer</div>
-                                    <div>{o.notes || "Tidak ada catatan tambahan."}</div>
-                                  </div>
-
-                                  <div className="admin-order-adminNote">
-                                    <div className="admin-order-notesTitle">Catatan admin</div>
-                                    <textarea
-                                      className="input admin-textarea"
-                                      rows={3}
-                                      value={adminNoteDrafts[o.id] || ""}
-                                      onChange={(e) => setAdminNoteDrafts((prev) => ({ ...prev, [o.id]: e.target.value }))}
-                                      placeholder="Tulis instruksi internal atau bahan follow-up."
-                                    />
-                                    <div className="admin-order-adminActions">
-                                      <button className="btn btn-sm" type="button" onClick={() => saveOrderAdminNote(o.id)}>
-                                        Simpan catatan
-                                      </button>
-                                      {o.payment_proof_url ? (
-                                        <a className="admin-proof" href={o.payment_proof_url} target="_blank" rel="noreferrer">
-                                          Lihat bukti bayar
-                                        </a>
-                                      ) : (
-                                        <span className="muted" style={{ fontSize: 13 }}>
-                                          Tanpa bukti bayar
-                                        </span>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                              ) : null}
-                            </article>
-                          );
-                        })}
-                      </div>
-                    )}
-                  </div>
+                  <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>
+                    Refresh orders
+                  </button>
                 </div>
 
-                <div className="admin-panel admin-sidePanel">
-                  <div className="admin-panel-head">
-                    <div>
-                      <div className="admin-panel-title">Focus panel</div>
-                      <div className="admin-panel-sub">Ringkasan cepat order yang sedang dibuka dan antrean aktif hari ini.</div>
+                <div className="admin-panel-body">
+                  <div className="admin-orderToolbar">
+                    <div className="admin-searchRow">
+                      <Search size={16} />
+                      <input
+                        className="input admin-searchInput"
+                        value={orderQuery}
+                        onChange={(e) => setOrderQuery(e.target.value)}
+                        placeholder="Cari kode, WA, promo, atau nama produk..."
+                      />
+                    </div>
+
+                    <div className="admin-chipRow">
+                      <button type="button" className={`admin-chip ${orderBucket === "all" ? "active" : ""}`} onClick={() => setOrderBucket("all")}>
+                        Semua
+                      </button>
+                      <button
+                        type="button"
+                        className={`admin-chip ${orderBucket === "attention" ? "active" : ""}`}
+                        onClick={() => setOrderBucket("attention")}
+                      >
+                        Butuh aksi
+                      </button>
+                      <button type="button" className={`admin-chip ${orderBucket === "done" ? "active" : ""}`} onClick={() => setOrderBucket("done")}>
+                        Selesai
+                      </button>
+                      <button
+                        type="button"
+                        className={`admin-chip ${orderBucket === "cancelled" ? "active" : ""}`}
+                        onClick={() => setOrderBucket("cancelled")}
+                      >
+                        Batal
+                      </button>
                     </div>
                   </div>
-                  <div className="admin-panel-body admin-stack">
-                    {expandedOrder ? (
-                      <>
-                        <div className="admin-miniGrid">
-                          <div className="admin-miniCard">
-                            <span>Order aktif</span>
-                            <strong>{expandedOrder.order_code || expandedOrder.id}</strong>
-                            <small>{prettyStatus(expandedOrder.status)}</small>
-                          </div>
-                          <div className="admin-miniCard">
-                            <span>Total</span>
-                            <strong>{formatCompactIDR(expandedOrder.total_idr)}</strong>
-                            <small>{getOrderItemCount(expandedOrder)} item</small>
-                          </div>
-                        </div>
 
-                        <div className="admin-focusList">
-                          <div className="admin-focusRow">
-                            <span>Masuk</span>
-                            <strong>{formatAdminDate(expandedOrder.created_at)}</strong>
-                          </div>
-                          <div className="admin-focusRow">
-                            <span>Promo</span>
-                            <strong>{expandedOrder.promo_code || "-"}</strong>
-                          </div>
-                          <div className="admin-focusRow">
-                            <span>WhatsApp</span>
-                            <strong>{expandedOrder.customer_whatsapp || "-"}</strong>
-                          </div>
-                        </div>
-                      </>
-                    ) : (
-                      <div className="admin-emptyInline">Buka salah satu order untuk melihat detail cepat di panel ini.</div>
-                    )}
-
-                    <div className="admin-miniGrid">
-                      <div className="admin-miniCard">
-                        <span>Order hari ini</span>
-                        <strong>{analyticsSummary.todayOrders}</strong>
-                        <small>{formatCompactIDR(analyticsSummary.todayRevenue)}</small>
-                      </div>
-                      <div className="admin-miniCard">
-                        <span>Pending + proses</span>
-                        <strong>{orderStats.live}</strong>
-                        <small>Antrian aktif sekarang</small>
-                      </div>
-                    </div>
+                  <div className="admin-orderStatsStrip">
+                    <article className="admin-orderStat">
+                      <span>Total order</span>
+                      <strong>{orderStats.total}</strong>
+                      <small>Semua status</small>
+                    </article>
+                    <article className="admin-orderStat">
+                      <span>Perlu aksi</span>
+                      <strong>{orderStats.live}</strong>
+                      <small>{formatCompactIDR(analyticsSummary.pipelineValue)}</small>
+                    </article>
+                    <article className="admin-orderStat">
+                      <span>Selesai</span>
+                      <strong>{orderStats.done}</strong>
+                      <small>{formatCompactIDR(analyticsSummary.revenueTotal)}</small>
+                    </article>
+                    <article className="admin-orderStat">
+                      <span>Dibatalkan</span>
+                      <strong>{orderStats.cancelled}</strong>
+                      <small>Perlu review bila naik</small>
+                    </article>
                   </div>
+
+                  {filteredOrders.length === 0 ? (
+                    <div className="card pad" style={{ marginTop: 16 }}>
+                      <EmptyState icon="ORD" title="Order tidak ditemukan" description="Coba ubah filter atau kata kunci pencarian." />
+                    </div>
+                  ) : (
+                    <div className="admin-ordersList">
+                      {filteredOrders.map((o) => {
+                        const itemCount = getOrderItemCount(o);
+                        const whatsappLink = buildWhatsAppLink(o.customer_whatsapp);
+
+                        return (
+                          <article key={o.id} className="admin-orderListItem">
+                            <div className="admin-orderListMain">
+                              <div className="admin-order-code">{o.order_code || o.id}</div>
+                              <div className="admin-order-sub">
+                                {formatAdminDate(o.created_at)} | {itemCount} item | {o.customer_whatsapp || "Tanpa WA"}
+                              </div>
+                              <div className="admin-orderListMeta">
+                                {o.promo_code ? <span className="admin-orderTag">Promo {o.promo_code}</span> : null}
+                                {whatsappLink ? (
+                                  <a className="admin-orderLink" href={whatsappLink} target="_blank" rel="noreferrer">
+                                    Chat WhatsApp
+                                  </a>
+                                ) : null}
+                              </div>
+                            </div>
+
+                            <div className="admin-orderListRight">
+                              <StatusBadge status={o.status} />
+                              <strong className="admin-orderTotal">{formatIDR(o.total_idr)}</strong>
+                              <div className="admin-orderRowActions">
+                                <select
+                                  className="input admin-select admin-orderInlineSelect"
+                                  value={String(o.status || "pending")}
+                                  onChange={(e) => updateOrderStatus(o.id, e.target.value)}
+                                >
+                                  {ORDER_STATUS_OPTIONS.map((option) => (
+                                    <option key={option.value} value={option.value}>
+                                      {option.label}
+                                    </option>
+                                  ))}
+                                </select>
+                                <button className="btn btn-sm" type="button" onClick={() => setActiveOrderId(o.id)}>
+                                  Detail
+                                </button>
+                              </div>
+                            </div>
+                          </article>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             ) : null}
@@ -2653,6 +2530,120 @@ export default function AdminDashboard() {
             />
           </label>
         </div>
+      </Modal>
+
+      <Modal
+        open={!!activeOrder}
+        title={activeOrder ? `Detail Order ${activeOrder.order_code || activeOrder.id}` : "Detail Order"}
+        onClose={() => setActiveOrderId("")}
+        footer={
+          <div className="modal-actions">
+            <button className="btn btn-ghost" type="button" onClick={() => setActiveOrderId("")}>
+              Tutup
+            </button>
+            {activeOrder ? (
+              <button className="btn" type="button" onClick={() => saveOrderAdminNote(activeOrder.id)}>
+                Simpan catatan
+              </button>
+            ) : null}
+          </div>
+        }
+      >
+        {activeOrder ? (
+          <div className="admin-orderBodyModern admin-orderBodyModal">
+            <div className="admin-orderMetaGrid">
+              <div className="admin-orderMetaCard">
+                <span>Kontak customer</span>
+                <strong>{activeOrder.customer_whatsapp || "-"}</strong>
+                {activeOrderWhatsApp ? (
+                  <a href={activeOrderWhatsApp} target="_blank" rel="noreferrer">
+                    Chat WhatsApp
+                  </a>
+                ) : (
+                  <small>Tidak ada nomor WA</small>
+                )}
+              </div>
+              <div className="admin-orderMetaCard">
+                <span>Status sekarang</span>
+                <strong>{prettyStatus(activeOrder.status)}</strong>
+                <small>{activeOrder.promo_code ? `Promo ${activeOrder.promo_code}` : "Tanpa promo"}</small>
+              </div>
+              <div className="admin-orderMetaCard">
+                <span>Update status</span>
+                <select
+                  className="input admin-select"
+                  value={String(activeOrder.status || "pending")}
+                  onChange={(e) => updateOrderStatus(activeOrder.id, e.target.value)}
+                >
+                  {ORDER_STATUS_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <div className="admin-order-items">
+              {getSafeOrderItems(activeOrder).map((it, idx) => (
+                <div key={`${activeOrder.id}-${idx}`} className="admin-order-item">
+                  <div>
+                    <b>{it.product_name}</b>
+                    <div className="muted" style={{ fontSize: 12 }}>
+                      {it.variant_name} | {it.duration_label}
+                    </div>
+                  </div>
+                  <div className="admin-order-itemPrice">
+                    <strong>{it.qty}x</strong>
+                    <span>{formatIDR(it.price_idr)}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="admin-order-pricing">
+              <div className="admin-order-priceRow">
+                <span>Subtotal</span>
+                <b>{formatIDR(activeOrder.subtotal_idr)}</b>
+              </div>
+              <div className="admin-order-priceRow">
+                <span>Diskon {activeOrder.discount_percent ? `(${activeOrder.discount_percent}%)` : ""}</span>
+                <b>- {formatIDR(getOrderDiscountAmount(activeOrder))}</b>
+              </div>
+              <div className="admin-order-priceRow total">
+                <span>Total bayar</span>
+                <b>{formatIDR(activeOrder.total_idr)}</b>
+              </div>
+            </div>
+
+            <div className={"admin-order-notes" + (activeOrder.notes ? "" : " empty")}>
+              <div className="admin-order-notesTitle">Catatan customer</div>
+              <div>{activeOrder.notes || "Tidak ada catatan tambahan."}</div>
+            </div>
+
+            <div className="admin-order-adminNote">
+              <div className="admin-order-notesTitle">Catatan admin</div>
+              <textarea
+                className="input admin-textarea"
+                rows={3}
+                value={adminNoteDrafts[activeOrder.id] || ""}
+                onChange={(e) => setAdminNoteDrafts((prev) => ({ ...prev, [activeOrder.id]: e.target.value }))}
+                placeholder="Tulis instruksi internal atau bahan follow-up."
+              />
+              <div className="admin-order-adminActions">
+                {activeOrder.payment_proof_url ? (
+                  <a className="admin-proof" href={activeOrder.payment_proof_url} target="_blank" rel="noreferrer">
+                    Lihat bukti bayar
+                  </a>
+                ) : (
+                  <span className="muted" style={{ fontSize: 13 }}>
+                    Tanpa bukti bayar
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        ) : null}
       </Modal>
     </div>
   );

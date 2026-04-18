@@ -2142,3 +2142,274 @@
   }
 }
 
+/* ===== Admin UX refresh: wider workspace + compact operational layout ===== */
+.container.admin-shell {
+  width: min(1480px, 100%);
+}
+
+.admin-shell {
+  grid-template-columns: 280px minmax(0, 1fr);
+  gap: 20px;
+}
+
+.admin-kpiStrip {
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-kpiChip {
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-kpiChip span,
+.admin-kpiChip strong,
+.admin-kpiChip small {
+  display: block;
+}
+
+.admin-kpiChip span {
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-kpiChip strong {
+  margin-top: 6px;
+  font-size: 18px;
+  line-height: 1.2;
+}
+
+.admin-kpiChip small {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.admin-orderStatsStrip {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.admin-orderStat {
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-orderStat span,
+.admin-orderStat strong,
+.admin-orderStat small {
+  display: block;
+}
+
+.admin-orderStat span {
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-orderStat strong {
+  margin-top: 6px;
+  font-size: 20px;
+  line-height: 1.2;
+}
+
+.admin-orderStat small {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 11px;
+}
+
+.admin-ordersList {
+  margin-top: 16px;
+  display: grid;
+  gap: 10px;
+}
+
+.admin-orderListItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.018)),
+    radial-gradient(circle at top left, rgba(29, 131, 255, 0.08), rgba(29, 131, 255, 0) 56%);
+  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
+}
+
+.admin-orderListMain {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+  flex: 1;
+}
+
+.admin-orderListMeta {
+  margin-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-orderTag {
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(80, 220, 146, 0.26);
+  background: rgba(80, 220, 146, 0.12);
+  color: rgba(208, 255, 224, 0.92);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.admin-orderLink {
+  min-height: 24px;
+  padding: 0 9px;
+  border-radius: 999px;
+  border: 1px solid rgba(29, 131, 255, 0.26);
+  background: rgba(29, 131, 255, 0.12);
+  color: rgba(190, 232, 255, 0.96);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  display: inline-flex;
+  align-items: center;
+}
+
+.admin-orderListRight {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.admin-orderTotal {
+  font-size: 28px;
+  line-height: 1;
+  letter-spacing: -0.04em;
+}
+
+.admin-orderRowActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-orderInlineSelect {
+  width: 176px;
+  min-height: 38px;
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.admin-orderBodyModal {
+  padding: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.admin-orderBodyModal .admin-orderMetaGrid {
+  margin-bottom: 0;
+}
+
+.admin-orderBodyModal .admin-order-adminActions {
+  justify-content: flex-start;
+}
+
+@media (max-width: 1400px) {
+  .container.admin-shell {
+    width: min(1320px, 100%);
+  }
+
+  .admin-orderTotal {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 1100px) {
+  .container.admin-shell {
+    width: 100%;
+    max-width: none;
+  }
+
+  .admin-kpiStrip,
+  .admin-orderStatsStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 720px) {
+  .admin-kpiStrip {
+    margin-bottom: 12px;
+    gap: 8px;
+  }
+
+  .admin-orderStatsStrip {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .admin-ordersList {
+    margin-top: 12px;
+    gap: 8px;
+  }
+
+  .admin-orderListItem {
+    padding: 12px;
+    border-radius: 18px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .admin-orderListRight {
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .admin-orderTotal {
+    font-size: 22px;
+  }
+
+  .admin-orderRowActions {
+    width: 100%;
+  }
+
+  .admin-orderInlineSelect {
+    width: auto;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .admin-orderBodyModal .admin-orderMetaGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-kpiStrip,
+  .admin-orderStatsStrip {
+    grid-template-columns: 1fr;
+  }
+}
+
