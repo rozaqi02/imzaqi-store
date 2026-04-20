@@ -18,8 +18,7 @@ import NotFound from "./pages/NotFound";
 import { usePageView } from "./hooks/usePageView";
 
 function AnalyticsBridge() {
-  const location = useLocation();
-  usePageView(location.pathname);
+  usePageView();
   return null;
 }
 

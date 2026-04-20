@@ -41,6 +41,14 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const NEW_PRODUCT_DAYS = 30;
 // "Baru di stok" = varian in-stock yang terakhir di-update dalam N hari terakhir.
 const RESTOCK_DAYS = 7;
+const SORT_LABELS = {
+  reco: "Rekomendasi",
+  popular: "Terlaris",
+  price_asc: "Harga termurah",
+  price_desc: "Harga termahal",
+  stock_desc: "Stok terbanyak",
+  name: "Nama A-Z",
+};
 
 function inferCategory(product) {
   const explicit = String(product?.category || "").trim().toLowerCase();
@@ -603,6 +611,58 @@ export default function Products() {
     ]
   );
 
+  const activeSummaryTags = useMemo(() => {
+    const tags = [];
+    const trimmedQuery = String(query || "").trim();
+
+    if (trimmedQuery) {
+      const queryPreview = trimmedQuery.length > 20 ? `${trimmedQuery.slice(0, 20).trimEnd()}...` : trimmedQuery;
+      tags.push(`Cari: "${queryPreview}"`);
+    }
+
+    if (cats.length) {
+      const categoryLabels = cats
+        .map((key) => CATEGORIES.find((item) => item.key === key)?.label || key)
+        .filter(Boolean);
+      if (categoryLabels.length <= 2) {
+        tags.push(`Kategori: ${categoryLabels.join(", ")}`);
+      } else {
+        tags.push(`Kategori: ${categoryLabels.slice(0, 2).join(", ")} +${categoryLabels.length - 2}`);
+      }
+    }
+
+    if (inStockOnly) tags.push("Hanya ready");
+    if (newOnly) tags.push(`Produk baru <= ${NEW_PRODUCT_DAYS} hari`);
+    if (restockOnly) tags.push(`Restock <= ${RESTOCK_DAYS} hari`);
+
+    if (priceReady && priceBounds.max > 0 && (price.min !== priceBounds.min || price.max !== priceBounds.max)) {
+      tags.push(`Harga: ${formatCompactIDR(price.min)}-${formatCompactIDR(price.max)}`);
+    }
+
+    if (sort !== "reco") {
+      tags.push(`Urut: ${SORT_LABELS[sort] || sort}`);
+    }
+
+    if (view !== "grid") {
+      tags.push("Tampilan: List");
+    }
+
+    return tags;
+  }, [
+    cats,
+    inStockOnly,
+    newOnly,
+    restockOnly,
+    price.max,
+    price.min,
+    priceBounds.max,
+    priceBounds.min,
+    priceReady,
+    query,
+    sort,
+    view,
+  ]);
+
   return (
     <div className={cartItemCount > 0 ? "page with-sticky-cta catalog-page" : "page catalog-page"}>
       <section className="section catalog-hero reveal">
@@ -712,6 +772,7 @@ export default function Products() {
               <div className="catalog-contentMeta">
                 <strong>{loading ? "..." : filtered.length}</strong>
                 <span>produk</span>
+                <em>{activeFiltersCount ? `${activeFiltersCount} filter aktif` : "Semua produk"}</em>
               </div>
 
               <div className="catalog-contentActions">
@@ -735,6 +796,21 @@ export default function Products() {
                 </button>
               </div>
             </div>
+
+            {activeSummaryTags.length ? (
+              <div className="catalog-activeState" aria-label="Ringkasan filter aktif">
+                {activeSummaryTags.map((tag, idx) => (
+                  <span key={`${tag}-${idx}`} className="catalog-activeTag">
+                    {tag}
+                  </span>
+                ))}
+                {activeFiltersCount ? (
+                  <button type="button" className="catalog-activeReset" onClick={resetFilters}>
+                    Reset
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
 
             <div className={`catalog-grid ${view === "list" ? "list" : "grid"}`} role="list">
               {loading ? (

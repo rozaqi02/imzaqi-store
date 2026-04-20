@@ -4,6 +4,7 @@ Dokumen implementasi terbaru:
 
 - Backend hardening order RPC: [docs/backend-order-hardening.md](docs/backend-order-hardening.md)
 - Rencana migrasi CRA ke Vite: [docs/cra-to-vite-migration-plan.md](docs/cra-to-vite-migration-plan.md)
+- Unique daily visits (visitor dedupe): [supabase/migrations/20260420164500_add_increment_unique_visit.sql](supabase/migrations/20260420164500_add_increment_unique_visit.sql)
 
 Apply hardening SQL ke Supabase:
 

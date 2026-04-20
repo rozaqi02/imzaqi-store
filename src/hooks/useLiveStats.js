@@ -102,10 +102,9 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
           return;
         }
 
-        // Fallback (kalau RPC belum dibuat)
-        const [{ count: vToday }, { count: vTotal }, { count: oToday }, { count: oTotal }, { count: oWeekFallback }] = await Promise.all([
-          supabase.from("page_views").select("id", { count: "exact", head: true }).eq("view_date", day),
-          supabase.from("page_views").select("id", { count: "exact", head: true }),
+        // Fallback (kalau RPC belum tersedia): ambil view dari site_stats.
+        const [{ data: siteStats }, { count: oToday }, { count: oTotal }, { count: oWeekFallback }] = await Promise.all([
+          supabase.from("site_stats").select("total_views,today_views,last_date").maybeSingle(),
           supabase
             .from("orders")
             .select("id", { count: "exact", head: true })
@@ -121,8 +120,8 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
 
         if (!alive) return;
         setState({
-          totalViews: Number(vTotal || 0),
-          todayViews: Number(vToday || 0),
+          totalViews: Number(siteStats?.total_views || 0),
+          todayViews: Number(siteStats?.today_views || 0),
           totalOrders: Number(oTotal || 0),
           todayOrders: Number(oToday || 0),
           weekOrders: Number(oWeekFallback || 0),

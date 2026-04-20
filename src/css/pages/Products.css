@@ -286,15 +286,19 @@
 .catalog-filterRow--toggle {
   cursor: pointer;
   user-select: none;
+  min-height: 34px;
+  padding: 2px 0;
 }
 
 .catalog-filterRow--toggle .catalog-filterLabel {
   margin: 0;
+  line-height: 1.2;
 }
 
 .catalog-toggle {
   position: relative;
   display: inline-flex;
+  flex: 0 0 auto;
 }
 
 .catalog-toggle input {
@@ -304,8 +308,8 @@
 }
 
 .catalog-toggleUi {
-  width: 46px;
-  height: 28px;
+  width: 48px;
+  height: 27px;
   display: block;
   position: relative;
   border-radius: 999px;
@@ -317,10 +321,10 @@
 .catalog-toggleUi::after {
   content: "";
   position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
+  top: 2px;
+  left: 2px;
+  width: 21px;
+  height: 21px;
   border-radius: 999px;
   background: rgba(255, 255, 255, 0.9);
   transition: transform 0.2s ease;
@@ -332,7 +336,12 @@
 }
 
 .catalog-toggle input:checked + .catalog-toggleUi::after {
-  transform: translateX(18px);
+  transform: translateX(21px);
+}
+
+.catalog-toggle input:focus-visible + .catalog-toggleUi {
+  outline: 2px solid rgba(87, 189, 255, 0.82);
+  outline-offset: 2px;
 }
 
 .catalog-range {
@@ -437,6 +446,12 @@
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 12px;
+  padding: 10px 12px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    rgba(255, 255, 255, 0.03);
   min-width: 0;
 }
 
@@ -507,6 +522,51 @@
   text-transform: uppercase;
 }
 
+.catalog-contentMeta em {
+  font-style: normal;
+  color: rgba(234, 255, 245, 0.72);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.catalog-activeState {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.catalog-activeTag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(29, 131, 255, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 30%),
+    rgba(29, 131, 255, 0.12);
+  color: rgba(234, 255, 245, 0.94);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  max-width: 100%;
+}
+
+.catalog-activeReset {
+  min-height: 30px;
+  padding: 0 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 91, 122, 0.34);
+  background: rgba(255, 91, 122, 0.12);
+  color: #ffd7df;
+  font-size: 11px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
 .catalog-grid {
   display: grid;
   gap: 14px;
@@ -559,6 +619,12 @@
   transform: translateY(-5px);
   border-color: rgba(29, 131, 255, 0.22);
   box-shadow: 0 34px 80px rgba(0, 0, 0, 0.26);
+}
+
+.catalog-card:focus-visible {
+  outline: 2px solid rgba(85, 188, 255, 0.82);
+  outline-offset: 2px;
+  border-color: rgba(85, 188, 255, 0.44);
 }
 
 .catalog-card.grid {
@@ -1646,5 +1712,156 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.62)),
     rgba(236, 248, 252, 0.9);
   color: #2a4e5c;
+}
+
+/* Visual audit refinements */
+.catalog-card.catalog-cardV2 .catalog-cardPriceWrap {
+  justify-content: space-between;
+}
+
+.catalog-card.catalog-cardV2 .catalog-cardSummary {
+  color: rgba(234, 255, 245, 0.74);
+}
+
+.catalog-card.catalog-cardV2 .catalog-cardMeta > span {
+  min-height: 30px;
+}
+
+@media (max-width: 720px) {
+  .catalog-contentBar {
+    margin-bottom: 10px;
+    padding: 9px 10px;
+    border-radius: 16px;
+  }
+
+  .catalog-contentMeta strong {
+    font-size: 22px;
+  }
+
+  .catalog-contentMeta em {
+    width: 100%;
+    font-size: 11px;
+  }
+
+  .catalog-activeState {
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .catalog-activeTag,
+  .catalog-activeReset {
+    min-height: 28px;
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 560px) {
+  .catalog-contentBar {
+    gap: 10px;
+  }
+
+  .catalog-activeTag {
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-cardMeta > span {
+    min-height: 26px;
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-cardPrice {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 460px) {
+  .catalog-card.catalog-cardV2 .catalog-cardKicker {
+    display: inline-flex;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-cardSummary {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-cardMeta > span {
+    min-height: 25px;
+    font-size: 10px;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-cardFoot {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 430px) {
+  .catalog-grid.grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .catalog-card.catalog-cardV2 {
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-cardIcon {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-cardTitle {
+    font-size: 16px;
+  }
+}
+
+:root[data-theme="light"] .catalog-contentMeta em {
+  color: #4a6671;
+}
+
+:root[data-theme="light"] .catalog-activeTag {
+  border-color: rgba(24, 122, 157, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72)),
+    rgba(220, 244, 252, 0.96);
+  color: #1f4a5a;
+}
+
+:root[data-theme="light"] .catalog-activeReset {
+  border-color: rgba(202, 74, 97, 0.3);
+  background: rgba(255, 237, 242, 0.9);
+  color: #8f2c42;
+}
+
+:root[data-theme="light"] .catalog-toggleUi {
+  border-color: rgba(41, 98, 121, 0.34);
+  background: linear-gradient(180deg, rgba(232, 241, 246, 0.98), rgba(221, 234, 241, 0.96));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+}
+
+:root[data-theme="light"] .catalog-toggleUi::after {
+  background: linear-gradient(180deg, #ffffff, #f4f9fc);
+  border: 1px solid rgba(54, 103, 124, 0.28);
+  box-shadow: 0 1px 3px rgba(29, 76, 95, 0.2);
+}
+
+:root[data-theme="light"] .catalog-toggle input:checked + .catalog-toggleUi {
+  border-color: rgba(15, 133, 140, 0.56);
+  background: linear-gradient(180deg, rgba(191, 246, 232, 0.98), rgba(144, 226, 205, 0.95));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+}
+
+:root[data-theme="light"] .catalog-toggle input:checked + .catalog-toggleUi::after {
+  border-color: rgba(7, 125, 133, 0.45);
+}
+
+:root[data-theme="light"] .catalog-filterRow--toggle .catalog-filterLabel {
+  color: #3f5f6c;
 }
 
