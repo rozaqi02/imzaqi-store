@@ -582,6 +582,7 @@ select.input {
 :root[data-theme="light"] .pay-orderMobile,
 :root[data-theme="light"] .qris-wrap,
 :root[data-theme="light"] .pay-successModal,
+:root[data-theme="light"] .pay-confirmModal,
 :root[data-theme="light"] .product-detail-summaryCard,
 :root[data-theme="light"] .detail-flow,
 :root[data-theme="light"] .testi-toolbar,

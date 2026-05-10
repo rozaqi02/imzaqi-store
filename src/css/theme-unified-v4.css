@@ -107,13 +107,13 @@
 }
 
 .catalog-commandIcon,
-.catalog-filterSearch > svg,
-.status-searchField > svg,
-.st-inputWrap > svg,
-.faq-searchWrap > svg,
+.catalog-filterSearch>svg,
+.status-searchField>svg,
+.st-inputWrap>svg,
+.faq-searchWrap>svg,
 .hero-search-icon,
 .testi-searchIcon,
-.admin-searchRow > svg {
+.admin-searchRow>svg {
   color: #1d95aa !important;
 }
 
@@ -255,6 +255,7 @@
 
 /* Responsive consistency desktop / tablet / mobile / flip */
 @media (max-width: 900px) and (min-width: 721px) {
+
   .hero-commandCard,
   .catalog-command,
   .catalog-filter,
@@ -268,6 +269,7 @@
 }
 
 @media (max-width: 720px) {
+
   .hero-commandCard,
   .catalog-command,
   .catalog-filter,
@@ -287,6 +289,7 @@
 }
 
 @media (max-width: 360px) {
+
   .product-grid-container.grid-mode,
   .catalog-grid.grid,
   .testi-grid,
@@ -503,6 +506,7 @@
 }
 
 @media (max-width: 460px) {
+
   /* Keep the same list look as desktop (don't hide kicker/summary). */
   .home-page .home-popularList .catalog-card.catalog-cardV2 .catalog-cardKicker {
     display: inline-flex !important;
@@ -576,13 +580,13 @@
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
 }
 
-.catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta > span {
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta>span {
   min-width: 0 !important;
   min-height: 30px !important;
   padding: 0 8px !important;
 }
 
-.catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta > span > span {
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta>span>span {
   overflow: hidden !important;
   text-overflow: ellipsis !important;
   white-space: nowrap !important;
@@ -662,16 +666,7 @@
 }
 
 /* Rebuild pass v5: Admin */
-.admin-login-page .admin-loginShell,
-.admin-login-page .admin-loginAside,
-.admin-login-page .admin-loginSignal {
-  border-color: var(--uni-line) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
-    radial-gradient(circle at top right, rgba(83, 204, 255, 0.14), rgba(83, 204, 255, 0) 52%),
-    var(--uni-panel) !important;
-  box-shadow: var(--uni-shadow) !important;
-}
+
 
 .admin-page .admin-sidebar,
 .admin-page .admin-panel,
@@ -687,6 +682,70 @@
   border-radius: 18px !important;
 }
 
+/* Neumorphism Header Navigation Tabs (Animated Liquid Glass) */
+.nav a::after {
+  display: none !important;
+}
+
+.nav a.active {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
+  color: var(--uni-text) !important;
+  border-radius: var(--uni-neo-radius-sm, 14px) !important;
+}
+
+.nav-active-pill {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: var(--uni-neo-radius-sm, 14px) !important;
+  
+  /* Liquid Glass (Kaca Cair) */
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.22) 0%,
+    rgba(255, 255, 255, 0.08) 30%,
+    rgba(0, 214, 180, 0.04) 100%
+  ) !important;
+  
+  backdrop-filter: blur(32px) saturate(220%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(220%) !important;
+  
+  /* Sangat Timbul (3D) + Warna Di Tepi (Cyan Gloss) */
+  box-shadow:
+    0 18px 44px rgba(0, 10, 24, 0.65),
+    0 6px 16px rgba(0, 10, 24, 0.4),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.6),
+    inset 0 0 0 1px rgba(0, 214, 180, 0.35),
+    inset 0 -2px 8px rgba(0, 214, 180, 0.15) !important;
+    
+  border: none !important;
+}
+
+:root[data-theme="light"] .nav-active-pill {
+  background: linear-gradient(
+    160deg,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(255, 255, 255, 0.4) 40%,
+    rgba(0, 194, 208, 0.06) 100%
+  ) !important;
+  
+  box-shadow:
+    0 18px 44px rgba(40, 80, 95, 0.25),
+    0 6px 16px rgba(40, 80, 95, 0.15),
+    inset 0 1px 1.5px rgba(255, 255, 255, 1),
+    inset 0 0 0 1px rgba(0, 194, 208, 0.35),
+    inset 0 -2px 8px rgba(0, 194, 208, 0.15) !important;
+}
+
+.nav a:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.04) !important;
+  border-color: transparent !important;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05) !important;
+  transform: translateY(-1px) !important;
+}
+
 /* Layout safety for desktop / mobile / ipad / flip */
 @media (max-width: 1024px) {
   .catalog-page .catalog-layout {
@@ -700,6 +759,7 @@
 }
 
 @media (max-width: 720px) {
+
   .home-page .hero-commandCard,
   .catalog-page .catalog-command,
   .testimonials-page .testi-toolbar,
@@ -726,6 +786,7 @@
 }
 
 @media (max-width: 380px) {
+
   .home-page .product-grid-container.grid-mode,
   .catalog-page .catalog-grid.grid,
   .testimonials-page .testi-grid,
@@ -913,7 +974,9 @@
 .admin-mobileBrand,
 .admin-mobileTab,
 .admin-sidePanel,
-.admin-overviewHero {
+.admin-overviewHero,
+.nf-shell,
+.site-footer--gopay .site-footerPanel.site-footerGo {
   border-color: var(--uni-line) !important;
   background: var(--uni-neo-panel) !important;
   box-shadow: var(--uni-neo-panel-shadow) !important;
@@ -935,7 +998,8 @@
 .tab-btn,
 .st-statePill,
 .st-pasteBtn,
-.home-bottomCta .btn-ghost {
+.home-bottomCta .btn-ghost,
+.nf-radar {
   border-color: var(--uni-line) !important;
   background: var(--uni-neo-control) !important;
   box-shadow: var(--uni-neo-control-shadow) !important;
@@ -1060,13 +1124,13 @@
 }
 
 .catalog-commandIcon,
-.catalog-filterSearch > svg,
-.status-searchField > svg,
-.st-inputWrap > svg,
-.faq-searchWrap > svg,
+.catalog-filterSearch>svg,
+.status-searchField>svg,
+.st-inputWrap>svg,
+.faq-searchWrap>svg,
 .hero-search-icon,
 .testi-searchIcon,
-.admin-searchRow > svg {
+.admin-searchRow>svg {
   color: var(--uni-neo-icon) !important;
 }
 
@@ -1098,8 +1162,7 @@
 }
 
 /* Keyboard visibility: keep focus states explicit across critical flows */
-:where(
-  .mobile-menu a,
+:where(.mobile-menu a,
   .mobile-menu-close,
   .nav-toggle,
   .header-cart,
@@ -1115,26 +1178,23 @@
   .checkout-drawerClose,
   .checkout-item-remove,
   .qty-btn,
-  .icon-btn
-):focus-visible {
+  .icon-btn):focus-visible {
   outline: none !important;
   border-color: var(--uni-line-strong) !important;
   box-shadow: var(--uni-neo-focus), var(--uni-neo-control-shadow) !important;
 }
 
-:where(
-  .mobile-menu a,
+:where(.mobile-menu a,
   .catalog-quickChip,
   .catalog-viewBtn,
   .catalog-filterBtn,
   .suggestion-item,
-  .checkout-item-remove
-):focus-visible {
+  .checkout-item-remove):focus-visible {
   color: var(--uni-text) !important;
   background: var(--uni-neo-control) !important;
 }
 
-.catalog-toggle input:focus-visible + .catalog-toggleUi {
+.catalog-toggle input:focus-visible+.catalog-toggleUi {
   outline: none !important;
   border-color: var(--uni-line-strong) !important;
   box-shadow: var(--uni-neo-focus), var(--uni-neo-control-shadow) !important;
@@ -1142,6 +1202,7 @@
 
 /* Keep page geometry consistent across desktop, ipad, tablet, mobile, flip */
 @media (max-width: 1280px) {
+
   .hero-commandCard,
   .catalog-command,
   .catalog-filter,
@@ -1154,6 +1215,7 @@
 }
 
 @media (max-width: 1024px) {
+
   .hero-commandCard,
   .catalog-command,
   .catalog-filter,
@@ -1168,6 +1230,7 @@
 }
 
 @media (max-width: 820px) {
+
   .hero-search-shell,
   .catalog-commandSearch,
   .status-searchField,
@@ -1196,6 +1259,7 @@
 }
 
 @media (max-width: 720px) {
+
   .hero-commandCard,
   .catalog-command,
   .catalog-filter,
@@ -1239,6 +1303,7 @@
 
 /* Flip/fold and short-height viewport protection */
 @media (max-width: 920px) and (max-height: 560px) {
+
   .hero-commandCard,
   .catalog-command,
   .catalog-filter,
@@ -1325,6 +1390,7 @@
 }
 
 @media (max-width: 720px) {
+
   .home-page .home-popularList,
   .detail-page .variants-grid,
   .testimonials-page .testi-grid {
@@ -1652,4 +1718,512 @@
 
 :root[data-theme="light"] .status-page .st-noteBody.is-empty {
   color: rgba(62, 98, 112, 0.82) !important;
+}
+
+/* =====================================================================
+   PRODUCT DETAIL (Liquid Glass & Advanced Neumorphism)
+   ===================================================================== */
+
+/* 1. Floating App Icon Layering */
+.detail-page .pdx-productIcon {
+  position: relative;
+  border-radius: 28px !important;
+  box-shadow: 
+    0 24px 48px rgba(0, 10, 24, 0.5), 
+    inset 0 2px 3px rgba(255, 255, 255, 0.45), 
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15) !important;
+  transform: translateY(-4px);
+  background: var(--uni-neo-control) !important;
+}
+
+.detail-page .pdx-productIcon::after {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  background: radial-gradient(circle at center, rgba(0, 214, 180, 0.25), transparent 60%);
+  filter: blur(20px);
+  z-index: -1;
+  animation: pdx-aura-pulse 4s infinite alternate ease-in-out;
+  border-radius: inherit;
+}
+
+@keyframes pdx-aura-pulse {
+  0% { transform: scale(0.95); opacity: 0.6; }
+  100% { transform: scale(1.1); opacity: 1; }
+}
+
+/* 2. VisionOS Sticky Glass Panel (Summary/Checkout) */
+.detail-page .pdx-summaryPanel {
+  position: sticky !important;
+  top: 90px !important;
+  background: linear-gradient(
+    160deg, 
+    rgba(255, 255, 255, 0.12), 
+    rgba(255, 255, 255, 0.02)
+  ) !important;
+  backdrop-filter: blur(32px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(32px) saturate(180%) !important;
+  border: none !important;
+  border-radius: var(--uni-neo-radius-lg, 28px) !important;
+  box-shadow: 
+    0 24px 60px rgba(0, 8, 20, 0.45),
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.4),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.15),
+    inset 0 -2px 8px rgba(0, 214, 180, 0.08) !important;
+}
+
+:root[data-theme="light"] .detail-page .pdx-summaryPanel {
+  background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.5)) !important;
+  box-shadow: 
+    0 24px 60px rgba(50, 90, 105, 0.2),
+    inset 0 1.5px 1px rgba(255, 255, 255, 1),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 3. Neumorphism Variant Cards */
+.detail-page .pdx-variantCard {
+  background: var(--uni-neo-panel) !important;
+  border-color: var(--uni-line) !important;
+  box-shadow: var(--uni-neo-panel-shadow) !important;
+  border-radius: var(--uni-neo-radius-lg, 24px) !important;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease !important;
+}
+
+.detail-page .pdx-variantCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 
+    var(--uni-neo-panel-shadow),
+    0 16px 32px rgba(0, 214, 180, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.25) !important;
+  border-color: rgba(0, 214, 180, 0.3) !important;
+}
+
+.detail-page .pdx-variantCard.is-recommended {
+  background: 
+    radial-gradient(circle at top right, rgba(0, 214, 180, 0.12), transparent 40%),
+    var(--uni-neo-panel) !important;
+  border-color: rgba(0, 214, 180, 0.4) !important;
+  box-shadow: 
+    var(--uni-neo-panel-shadow),
+    inset 0 1px 1.5px rgba(255, 255, 255, 0.3),
+    inset 0 0 0 1px rgba(0, 214, 180, 0.2) !important;
+}
+
+/* 4. VisionOS Segmented Control (Menu Tab Varian) */
+.detail-page .pdx-segmentControl {
+  display: flex;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.04) !important;
+  padding: 6px;
+  border-radius: var(--uni-neo-radius-lg, 20px) !important;
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 10, 24, 0.15),
+    0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  margin-bottom: 28px;
+  overflow-x: auto;
+  border: 1px solid var(--uni-line) !important;
+}
+
+:root[data-theme="light"] .detail-page .pdx-segmentControl {
+  background: rgba(0, 0, 0, 0.03) !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.detail-page .pdx-segmentBtn {
+  position: relative;
+  flex: 1;
+  min-width: max-content;
+  padding: 10px 24px;
+  border: none !important;
+  background: transparent !important;
+  color: var(--uni-text-light) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  cursor: pointer;
+  border-radius: 14px !important;
+  transition: color 0.3s ease !important;
+  z-index: 1;
+}
+
+.detail-page .pdx-segmentBtn.active {
+  color: var(--uni-text) !important;
+}
+
+.detail-page .pdx-segmentPill {
+  position: absolute;
+  inset: 0;
+  background: var(--uni-neo-control) !important;
+  border: 1px solid var(--uni-line) !important;
+  box-shadow: 
+    0 4px 12px rgba(0, 10, 24, 0.2),
+    inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  border-radius: 14px !important;
+  z-index: -1;
+}
+
+:root[data-theme="light"] .detail-page .pdx-segmentPill {
+  box-shadow: 
+    0 4px 12px rgba(60, 100, 115, 0.1),
+    inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+}
+
+/* 5. Toolbar & View Toggle (Grid / List) */
+.detail-page .pdx-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.detail-page .pdx-toolbar .pdx-segmentControl {
+  margin-bottom: 0 !important;
+  flex: 1;
+}
+
+.detail-page .pdx-viewToggle {
+  display: flex;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.04) !important;
+  padding: 6px;
+  border-radius: 16px !important;
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 10, 24, 0.15),
+    0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  border: 1px solid var(--uni-line) !important;
+  flex-shrink: 0;
+}
+
+:root[data-theme="light"] .detail-page .pdx-viewToggle {
+  background: rgba(0, 0, 0, 0.03) !important;
+  box-shadow: 
+    inset 0 2px 4px rgba(0, 0, 0, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+.detail-page .pdx-viewBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none !important;
+  background: transparent !important;
+  color: var(--uni-muted) !important;
+  border-radius: 12px !important;
+  cursor: pointer;
+  transition: all 0.2s ease !important;
+}
+
+.detail-page .pdx-viewBtn:hover {
+  color: var(--uni-text) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+:root[data-theme="light"] .detail-page .pdx-viewBtn:hover {
+  background: rgba(0, 0, 0, 0.04) !important;
+}
+
+.detail-page .pdx-viewBtn.active {
+  color: #fff !important;
+  background: var(--uni-neo-control) !important;
+  box-shadow: 0 4px 12px rgba(0, 10, 24, 0.3), inset 0 1px 1px rgba(255, 255, 255, 0.2) !important;
+  border: 1px solid rgba(255,255,255,0.1) !important;
+}
+
+/* 6. Compact List Mode */
+.detail-page .pdx-variantsGrid.is-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantCard {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px !important;
+  gap: 20px;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantTop,
+.detail-page .pdx-variantsGrid.is-list .pdx-variantNotes,
+.detail-page .pdx-variantsGrid.is-list .pdx-variantPriceLabel,
+.detail-page .pdx-variantsGrid.is-list .pdx-variantSubPrice {
+  display: none !important;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantHead {
+  border: none !important;
+  padding: 0 !important;
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantFoot {
+  border: none !important;
+  padding: 0 !important;
+  width: auto;
+  flex-shrink: 0;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantPriceWrap {
+  align-items: flex-end;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantPrice {
+  font-size: 18px !important;
+}
+
+@media (max-width: 720px) {
+  .detail-page .pdx-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .detail-page .pdx-viewToggle {
+    align-self: flex-end;
+  }
+  .detail-page .pdx-variantsGrid.is-list .pdx-variantCard {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .detail-page .pdx-variantsGrid.is-list .pdx-variantHead {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+  .detail-page .pdx-variantsGrid.is-list .pdx-variantPriceWrap {
+    align-items: flex-start;
+  }
+  .detail-page .pdx-variantsGrid.is-list .pdx-variantFoot {
+    justify-content: space-between;
+  }
+}
+
+/* 7. Toggle Light Mode Fix & Info Button */
+:root[data-theme="light"] .detail-page .pdx-viewBtn.active {
+  background: var(--uni-neo-control) !important;
+  color: var(--uni-text) !important;
+  box-shadow: 
+    0 4px 12px rgba(60, 100, 115, 0.15),
+    inset 0 1px 1px rgba(255, 255, 255, 1) !important;
+  border: 1px solid var(--uni-line) !important;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantCard {
+  flex-wrap: wrap;
+}
+
+.detail-page .pdx-variantsGrid.is-list .pdx-variantNotes.force-show {
+  display: block !important;
+  width: 100%;
+  order: 99; 
+  margin-top: 12px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  padding-top: 16px;
+}
+
+:root[data-theme="light"] .detail-page .pdx-variantsGrid.is-list .pdx-variantNotes.force-show {
+  border-top-color: rgba(0, 0, 0, 0.1);
+}
+
+.detail-page .pdx-infoBtn {
+  margin-right: 12px;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-radius: 50% !important;
+  width: 34px;
+  height: 34px;
+  padding: 0 !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+:root[data-theme="light"] .detail-page .pdx-infoBtn {
+  background: rgba(0, 0, 0, 0.04) !important;
+  color: var(--uni-text) !important;
+}
+
+.detail-page .pdx-infoBtn.active {
+  background: linear-gradient(135deg, #00c2d0 0%, #008a94 100%) !important;
+  color: #fff !important;
+  transform: rotate(180deg);
+}
+
+/* --- New CSS for Product Detail (Priority 1 & 2) --- */
+.detail-page .pdx-summaryActionsMain {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+.detail-page .pdx-shareBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 12px;
+  background: var(--uni-neo-control) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  color: var(--uni-text);
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.detail-page .pdx-shareBtn:hover {
+  transform: translateY(-2px);
+  background: var(--uni-neo-hover) !important;
+}
+:root[data-theme="light"] .detail-page .pdx-shareBtn {
+  border-color: rgba(0, 0, 0, 0.05) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 1), 0 2px 8px rgba(60, 100, 115, 0.1) !important;
+}
+
+.detail-page .pdx-scrollBtn {
+  flex: 1;
+}
+
+.detail-page .pdx-actionBtns {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+}
+.detail-page .pdx-buyNowBtn {
+  flex: 1;
+  height: 38px;
+  background: linear-gradient(135deg, #00c2d0 0%, #008a94 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(0, 194, 208, 0.3) !important;
+  border-radius: 8px !important;
+  font-weight: 700;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 194, 208, 0.3) !important;
+  transition: all 0.3s ease;
+}
+.detail-page .pdx-buyNowBtn:hover {
+  background: linear-gradient(135deg, #00d4e2 0%, #009aa4 100%) !important;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.3), 0 6px 16px rgba(0, 194, 208, 0.4) !important;
+  transform: translateY(-1px);
+}
+.detail-page .pdx-addBtn {
+  flex-shrink: 0;
+  width: 44px;
+  height: 38px;
+  padding: 0 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px !important;
+  background: var(--uni-neo-control) !important;
+  color: var(--uni-text) !important;
+  border: 1px solid var(--uni-line) !important;
+  transition: all 0.3s ease;
+}
+.detail-page .pdx-addBtn:hover {
+  background: var(--uni-neo-hover) !important;
+}
+
+.detail-page .chip-email {
+  background: rgba(234, 179, 8, 0.1) !important;
+  color: #eab308 !important;
+  border: 1px solid rgba(234, 179, 8, 0.2) !important;
+}
+
+/* Sticky Bottom Cart Mobile */
+.detail-page .pdx-mobileStickyCart {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .detail-page {
+    padding-bottom: 90px; /* Safe area */
+  }
+  .detail-page .pdx-mobileStickyCart {
+    display: block;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(18, 18, 20, 0.75);
+    -webkit-backdrop-filter: blur(24px);
+    backdrop-filter: blur(24px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 14px 16px calc(14px + env(safe-area-inset-bottom));
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.4);
+    animation: slideUpCart 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+  :root[data-theme="light"] .detail-page .pdx-mobileStickyCart {
+    background: rgba(255, 255, 255, 0.65);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    backdrop-filter: blur(24px) saturate(150%);
+    border-top: 1px solid rgba(255, 255, 255, 1);
+    box-shadow: 0 -10px 40px rgba(13, 124, 144, 0.1);
+  }
+  .detail-page .pdx-stickyCartInner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+  .detail-page .pdx-stickyCartInfo {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    color: #00a4b4;
+  }
+  .detail-page .pdx-stickyCartText {
+    display: flex;
+    flex-direction: column;
+  }
+  .detail-page .pdx-stickyQty {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--uni-text);
+  }
+  .detail-page .pdx-stickyLabel {
+    font-size: 12px;
+    color: var(--uni-text-dim);
+  }
+  .detail-page .pdx-stickyCheckoutBtn {
+    background: linear-gradient(135deg, #00c2d0 0%, #008a94 100%) !important;
+    color: white !important;
+    border: 1px solid rgba(0, 194, 208, 0.3) !important;
+    padding: 10px 24px !important;
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: 12px !important;
+    box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.2), 0 4px 12px rgba(0, 194, 208, 0.3) !important;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .detail-page .pdx-stickyCheckoutBtn:active {
+    transform: scale(0.96);
+    background: linear-gradient(135deg, #008a94 0%, #006f78 100%) !important;
+  }
+}
+
+/* --- Cart Notification Badge --- */
+.header-cart .pill {
+  background: linear-gradient(135deg, #ff4d6d 0%, #ff204e 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 77, 109, 0.5) !important;
+  box-shadow: 0 4px 12px rgba(255, 77, 109, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+:root[data-theme="light"] .header-cart .pill {
+  box-shadow: 0 4px 12px rgba(255, 77, 109, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+}
+
+@keyframes slideUpCart {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
 }

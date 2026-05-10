@@ -389,12 +389,25 @@ export default function Checkout() {
               ) : (
                 <>
                   <div className="checkout-item-list">
-                    {cart.items.map((item) => (
+                    {cart.items.map((item) => {
+                      const iconUrl = String(item?.product_icon_url || "").trim();
+                      return (
                       <div key={item.variant_id} className="checkout-item-card">
-                        <div className="checkout-item-copy">
-                          <div className="checkout-item-name">{item.product_name}</div>
-                          <div className="checkout-item-meta">
-                            {item.variant_name} / {item.duration_label}
+                        <div className="checkout-item-left">
+                          <div className="checkout-item-icon app-productIcon">
+                            {iconUrl ? (
+                              <img src={iconUrl} alt={`${item.product_name} icon`} loading="lazy" decoding="async" />
+                            ) : (
+                              <span className="app-productIconFallback">
+                                {String(item.product_name || "P").slice(0, 1).toUpperCase()}
+                              </span>
+                            )}
+                          </div>
+                          <div className="checkout-item-copy">
+                            <div className="checkout-item-name">{item.product_name}</div>
+                            <div className="checkout-item-meta">
+                              {item.variant_name} / {item.duration_label}
+                            </div>
                           </div>
                         </div>
 
@@ -449,8 +462,9 @@ export default function Checkout() {
                             Hapus
                           </button>
                         </div>
-                      </div>
-                    ))}
+                       </div>
+                      );
+                    })}
                   </div>
 
                   <div className="checkout-promo-card">

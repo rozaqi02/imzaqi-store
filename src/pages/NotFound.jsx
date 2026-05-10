@@ -10,7 +10,7 @@ export default function NotFound() {
     <div className="page">
       <section className="section">
         <div className="container">
-          <div className="nf-shell card pad center">
+          <div className="nf-shell pad center">
             <div className="nf-radar">
               <Compass size={26} />
             </div>

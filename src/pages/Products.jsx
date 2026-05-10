@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useRef, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
@@ -15,6 +15,7 @@ import {
   PackageCheck,
   Search,
   ShoppingBag,
+  ShoppingCart,
   SlidersHorizontal,
   Sparkles,
   X,
@@ -24,9 +25,11 @@ import { fetchProducts } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
+import { useToast } from "../context/ToastContext";
 import { formatIDR } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import { useDebounce } from "../hooks/useDebounce";
 
 const CATEGORIES = [
   { key: "streaming", label: "Streaming", icon: Film },
@@ -52,13 +55,7 @@ const SORT_LABELS = {
 
 function inferCategory(product) {
   const explicit = String(product?.category || "").trim().toLowerCase();
-  if (explicit) return explicit;
-  const blob = `${product?.slug || ""} ${product?.name || ""}`.toLowerCase();
-  if (/(netflix|disney|hotstar|prime|viu|vidio|iqiyi|bstation)/.test(blob)) return "streaming";
-  if (/(spotify|youtube)/.test(blob)) return "music";
-  if (/(canva|capcut|chatgpt|zoom|getcontact)/.test(blob)) return "tools";
-  if (/(duolingo)/.test(blob)) return "learning";
-  return "other";
+  return explicit || "other";
 }
 
 function clamp(n, min, max) {
@@ -313,18 +310,23 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
-  const [cats, setCats] = useState([]);
-  const [inStockOnly, setInStockOnly] = useState(false);
-  const [newOnly, setNewOnly] = useState(false);
-  const [restockOnly, setRestockOnly] = useState(false);
-  const [sort, setSort] = useState("reco");
-  const [view, setView] = useState("grid");
+  const [cats, setCats] = useState(() => (params.get("cats") ? params.get("cats").split(",") : []));
+  const [inStockOnly, setInStockOnly] = useState(() => params.get("ready") === "1");
+  const [newOnly, setNewOnly] = useState(() => params.get("new") === "1");
+  const [restockOnly, setRestockOnly] = useState(() => params.get("restock") === "1");
+  const [sort, setSort] = useState(() => params.get("sort") || "reco");
+  const [view, setView] = useState(() => params.get("view") || "grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
-  const [price, setPrice] = useState({ min: 0, max: 0 });
+  const [price, setPrice] = useState({
+    min: Number(params.get("pmin")) || 0,
+    max: Number(params.get("pmax")) || 0,
+  });
   const [priceReady, setPriceReady] = useState(false);
+  const [visibleCount, setVisibleCount] = useState(16);
 
   const qParam = params.get("q") || "";
   const [query, setQuery] = useState(qParam);
+  const debouncedQuery = useDebounce(query, 300);
   const searchRef = useRef(null);
   const sheetRef = useRef(null);
 
@@ -366,21 +368,7 @@ export default function Products() {
     };
   }, []);
 
-  useEffect(() => {
-    const next = String(query || "").trim();
-    const current = params.get("q") || "";
-    if (next === current) return;
-
-    if (!next) {
-      params.delete("q");
-      setParams(params, { replace: true });
-      return;
-    }
-
-    params.set("q", next);
-    setParams(params, { replace: true });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query]);
+  // URL Sync Effect moved below priceBounds
 
   useEffect(() => {
     function onKey(e) {
@@ -449,6 +437,42 @@ export default function Products() {
     }));
   }, [priceBounds.min, priceBounds.max, priceReady]);
 
+  useEffect(() => {
+    const nextParams = new URLSearchParams(params);
+
+    const qNext = String(query || "").trim();
+    if (qNext) nextParams.set("q", qNext);
+    else nextParams.delete("q");
+
+    if (cats.length) nextParams.set("cats", cats.join(","));
+    else nextParams.delete("cats");
+
+    if (inStockOnly) nextParams.set("ready", "1");
+    else nextParams.delete("ready");
+
+    if (newOnly) nextParams.set("new", "1");
+    else nextParams.delete("new");
+
+    if (restockOnly) nextParams.set("restock", "1");
+    else nextParams.delete("restock");
+
+    if (sort !== "reco") nextParams.set("sort", sort);
+    else nextParams.delete("sort");
+
+    if (view !== "grid") nextParams.set("view", view);
+    else nextParams.delete("view");
+
+    if (priceReady && priceBounds.max > 0) {
+      if (price.min > priceBounds.min) nextParams.set("pmin", price.min);
+      else nextParams.delete("pmin");
+      if (price.max < priceBounds.max) nextParams.set("pmax", price.max);
+      else nextParams.delete("pmax");
+    }
+
+    setParams(nextParams, { replace: true });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query, cats, inStockOnly, newOnly, restockOnly, sort, view, price, priceReady, priceBounds]);
+
   function toggleCat(key) {
     setCats((prev) => (prev.includes(key) ? prev.filter((item) => item !== key) : [...prev, key]));
   }
@@ -477,7 +501,7 @@ export default function Products() {
   }
 
   const filtered = useMemo(() => {
-    const s = String(query || "").trim().toLowerCase();
+    const s = String(debouncedQuery || "").trim().toLowerCase();
     const now = Date.now();
     const newCutoff = now - NEW_PRODUCT_DAYS * DAY_MS;
     const restockCutoff = now - RESTOCK_DAYS * DAY_MS;
@@ -836,99 +860,26 @@ export default function Products() {
                   />
                 </div>
               ) : (
-                filtered.map((product) => {
-                  const stock = Number(product._stock || 0);
-                  const sold = Number(product._sold || 0);
-                  const soldOut = stock <= 0;
-                  const low = stock > 0 && stock <= 5;
-                  const hot = sold >= 10;
-                  const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
-                  const category = CATEGORIES.find((item) => item.key === product._category);
-                  const categoryLabel = category?.label || "Digital";
-                  const CategoryIcon = category?.icon || Sparkles;
-                  const summaryCopy = summarizeCatalogCopy(product.description);
-
-                  return (
-                    <Link
-                      key={product.id}
-                      to={`/produk/${product.slug}`}
-                      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}`}
-                      role="listitem"
-                      aria-label={`Buka detail ${product.name}`}
-                    >
-                      <div className="catalog-cardTop">
-                        <div className="catalog-cardBrand">
-                          <div className="catalog-cardIcon">
-                            {product.icon_url ? (
-                              <img src={product.icon_url} alt="" loading="lazy" />
-                            ) : (
-                              <span>{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>
-                            )}
-                          </div>
-
-                          <div className="catalog-cardCopy">
-                            <div className="catalog-cardKicker">
-                              <CategoryIcon size={13} />
-                              <span>{categoryLabel}</span>
-                            </div>
-                            <div className="catalog-cardTitle">{product.name}</div>
-                            <div className="catalog-cardSummary">{summaryCopy}</div>
-                          </div>
-                        </div>
-
-                        <div className="catalog-cardPriceWrap">
-                          <span className="catalog-cardPriceLabel">Mulai</span>
-                          <div className="catalog-cardPrice">{displayPrice}</div>
-                        </div>
-                      </div>
-
-                      <div className="catalog-cardSignals">
-                        {hot ? (
-                          <span className="catalog-status hot">
-                            <Flame size={13} />
-                            <span>Hot</span>
-                          </span>
-                        ) : null}
-                        {soldOut ? (
-                          <span className="catalog-status soldout">
-                            <CircleAlert size={13} />
-                            <span>Habis</span>
-                          </span>
-                        ) : low ? (
-                          <span className="catalog-status warn">
-                            <CircleAlert size={13} />
-                            <span>Stok: {stock}</span>
-                          </span>
-                        ) : (
-                          <span className="catalog-status ok">
-                            <PackageCheck size={13} />
-                            <span>Ready</span>
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="catalog-cardMeta">
-                        <span>
-                          <Layers3 size={13} />
-                          <span>{product._vars?.length || 0} varian</span>
-                        </span>
-                        <span>
-                          <PackageCheck size={13} />
-                          <span>Stok: {stock}</span>
-                        </span>
-                        <span>
-                          <ShoppingBag size={13} />
-                          <span>{sold} terjual</span>
-                        </span>
-                      </div>
-
-                      <div className="catalog-cardFoot">
-                        <span>Lihat paket</span>
-                        <ArrowRight size={15} />
-                      </div>
-                    </Link>
-                  );
-                })
+                <>
+                  {filtered.slice(0, visibleCount).map((product) => (
+                    <ProductCardMemo 
+                      key={product.id} 
+                      product={product} 
+                      view={view} 
+                      location={location}
+                    />
+                  ))}
+                  {visibleCount < filtered.length && (
+                    <div className="catalog-loadMore" style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "20px" }}>
+                      <button 
+                        className="btn btn-ghost" 
+                        onClick={() => setVisibleCount(prev => prev + 16)}
+                      >
+                        Muat Lebih Banyak
+                      </button>
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -1009,3 +960,96 @@ export default function Products() {
     </div>
   );
 }
+
+const ProductCardMemo = memo(function ProductCard({ product, view, location }) {
+  const stock = Number(product._stock || 0);
+  const sold = Number(product._sold || 0);
+  const soldOut = stock <= 0;
+  const low = stock > 0 && stock <= 5;
+  const hot = sold >= 10;
+  const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
+  const category = CATEGORIES.find((item) => item.key === product._category);
+  const categoryLabel = category?.label || "Digital";
+  const CategoryIcon = category?.icon || Sparkles;
+  const summaryCopy = summarizeCatalogCopy(product.description);
+
+  return (
+    <Link
+      to={`/produk/${product.slug}`}
+      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}`}
+      role="listitem"
+      aria-label={`Buka detail ${product.name}`}
+    >
+      <div className="catalog-cardTop">
+        <div className="catalog-cardBrand">
+          <div className="catalog-cardIcon">
+            {product.icon_url ? (
+              <img src={product.icon_url} alt="" loading="lazy" />
+            ) : (
+              <span>{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>
+            )}
+          </div>
+
+          <div className="catalog-cardCopy">
+            <div className="catalog-cardKicker">
+              <CategoryIcon size={13} />
+              <span>{categoryLabel}</span>
+            </div>
+            <div className="catalog-cardTitle">{product.name}</div>
+            <div className="catalog-cardSummary">{summaryCopy}</div>
+          </div>
+        </div>
+
+        <div className="catalog-cardPriceWrap">
+          <span className="catalog-cardPriceLabel">Mulai</span>
+          <div className="catalog-cardPrice">{displayPrice}</div>
+        </div>
+      </div>
+
+      <div className="catalog-cardSignals">
+        {hot ? (
+          <span className="catalog-status hot">
+            <Flame size={13} />
+            <span>Hot</span>
+          </span>
+        ) : null}
+        {soldOut ? (
+          <span className="catalog-status soldout">
+            <CircleAlert size={13} />
+            <span>Habis</span>
+          </span>
+        ) : low ? (
+          <span className="catalog-status warn">
+            <CircleAlert size={13} />
+            <span>Stok: {stock}</span>
+          </span>
+        ) : (
+          <span className="catalog-status ok">
+            <PackageCheck size={13} />
+            <span>Ready</span>
+          </span>
+        )}
+      </div>
+
+      <div className="catalog-cardMeta">
+        <span>
+          <Layers3 size={13} />
+          <span>{product._vars?.length || 0} varian</span>
+        </span>
+        <span>
+          <PackageCheck size={13} />
+          <span>Stok: {stock}</span>
+        </span>
+        <span>
+          <ShoppingBag size={13} />
+          <span>{sold} terjual</span>
+        </span>
+      </div>
+
+      <div className="catalog-cardFoot">
+        <span>Lihat paket</span>
+        <ArrowRight size={15} />
+      </div>
+    </Link>
+  );
+});

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
 import {
   Activity,
   CircleHelp,
@@ -212,6 +213,8 @@ export default function Header() {
   const { isDark, toggleTheme } = useTheme();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
   const [open, setOpen] = useState(false);
+  const [pillStyle, setPillStyle] = useState({ width: 0, x: 0, opacity: 0 });
+  const navRefs = useRef([]);
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia(MOBILE_BREAKPOINT).matches : false
   );
@@ -272,6 +275,41 @@ export default function Header() {
     };
   }, [location.pathname]);
 
+  useEffect(() => {
+    const syncPill = () => {
+      const links = [
+        { to: "/" },
+        { to: "/produk" },
+        { to: "/tentang" },
+        { to: "/testimoni" },
+        { to: "/status" },
+      ];
+      const activeIdx = links.findIndex(
+        (link) => location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to))
+      );
+
+      if (activeIdx >= 0 && navRefs.current[activeIdx]) {
+        const el = navRefs.current[activeIdx];
+        setPillStyle({
+          width: el.offsetWidth,
+          x: el.offsetLeft,
+          opacity: 1,
+        });
+      } else {
+        setPillStyle((prev) => ({ ...prev, opacity: 0 }));
+      }
+    };
+
+    syncPill();
+    // Use a small timeout to allow layout to settle on initial render
+    const t = window.setTimeout(syncPill, 10);
+    window.addEventListener("resize", syncPill);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("resize", syncPill);
+    };
+  }, [location.pathname, isMobileViewport]);
+
   return (
     <>
       <header ref={headerRef} className="header">
@@ -280,12 +318,34 @@ export default function Header() {
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
           </Link>
 
-          <nav className="nav desktop-only">
-            <NavLink to="/">Home</NavLink>
-            <NavLink to="/produk">Produk</NavLink>
-            <NavLink to="/tentang">FAQ</NavLink>
-            <NavLink to="/testimoni">Testimoni</NavLink>
-            <NavLink to="/status">Status</NavLink>
+          <nav className="nav desktop-only" style={{ position: "relative" }}>
+            <motion.div
+              className="nav-active-pill"
+              initial={false}
+              animate={{ width: pillStyle.width, x: pillStyle.x, opacity: pillStyle.opacity }}
+              transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              style={{ left: 0 }}
+            />
+            {[
+              { to: "/", label: "Home" },
+              { to: "/produk", label: "Produk" },
+              { to: "/tentang", label: "FAQ" },
+              { to: "/testimoni", label: "Testimoni" },
+              { to: "/status", label: "Status" },
+            ].map((link, idx) => {
+              const isActive = location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to));
+              return (
+                <Link 
+                  key={link.to} 
+                  to={link.to} 
+                  className={isActive ? "active" : ""} 
+                  ref={(el) => (navRefs.current[idx] = el)}
+                  style={{ position: "relative", zIndex: 1 }}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
           </nav>
 
           <div className="header-actions">

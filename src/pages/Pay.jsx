@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, FileText, Info, Loader, Phone, Sparkles, X } from "lucide-react";
+import { Check, CheckCircle2, FileText, Info, Loader, Phone, ShieldCheck, Sparkles, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -171,6 +171,91 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
   );
 }
 
+function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items }) {
+  const modalRef = React.useRef(null);
+
+  useDialogA11y({
+    open,
+    containerRef: modalRef,
+    onClose: onCancel,
+    initialFocusSelector: ".pay-confirmPrimaryBtn",
+  });
+
+  if (!open || typeof document === "undefined") return null;
+
+  const itemCount = (items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
+
+  const checklist = [
+    "Sudah scan QRIS dengan aplikasi m-banking / e-wallet",
+    "Nominal transfer sesuai dengan total tagihan di atas",
+    "Pembayaran sudah berhasil (bukan pending atau gagal)",
+  ];
+
+  return createPortal(
+    <div className="modal-backdrop pay-overlay" onMouseDown={onCancel} role="presentation">
+      <div
+        ref={modalRef}
+        className="pay-confirmModal"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Konfirmasi Pembayaran"
+        onMouseDown={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="pay-confirmModalHeader">
+          <div className="pay-confirmModalHeaderIcon">
+            <ShieldCheck size={20} />
+          </div>
+          <div className="pay-confirmModalHeaderCopy">
+            <div className="pay-confirmModalTitle">Konfirmasi Pembayaran</div>
+            <div className="pay-confirmModalSub">Pastikan semua syarat di bawah terpenuhi</div>
+          </div>
+          <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
+            <X size={16} />
+          </button>
+        </div>
+
+        {/* Total Card */}
+        <div className="pay-confirmTotalCard">
+          <div className="pay-confirmTotalLabel">Total yang harus dibayar</div>
+          <div className="pay-confirmTotalAmount">{formatIDR(total)}</div>
+          <div className="pay-confirmTotalMeta">{itemCount} item &bull; via QRIS</div>
+        </div>
+
+        {/* Checklist */}
+        <ul className="pay-confirmChecklist" role="list">
+          {checklist.map((text, i) => (
+            <li key={i} className="pay-confirmCheckItem">
+              <span className="pay-confirmCheckDot" aria-hidden="true">
+                <Check size={11} strokeWidth={3} />
+              </span>
+              <span>{text}</span>
+            </li>
+          ))}
+        </ul>
+
+        {/* Warning */}
+        <div className="pay-confirmWarning">
+          <Info size={14} />
+          <span>Konfirmasi palsu akan memperlambat proses order kamu.</span>
+        </div>
+
+        {/* Actions */}
+        <div className="pay-confirmActionsNew">
+          <button className="pay-confirmPrimaryBtn" type="button" onClick={onConfirm}>
+            <Check size={16} strokeWidth={2.5} />
+            Ya, Saya Sudah Bayar
+          </button>
+          <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
+            Cek Ulang Dulu
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 export default function Pay() {
   const nav = useNavigate();
   const location = useLocation();
@@ -215,6 +300,7 @@ export default function Pay() {
   const [qrisFailed, setQrisFailed] = useState(false);
   const [qrisMode, setQrisMode] = useState("idle");
   const [productIconLookup, setProductIconLookup] = useState({});
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
 
   useEffect(() => {
     fetchSettings()
@@ -620,7 +706,7 @@ export default function Pay() {
 
     return (
       <div className={klass}>
-        <button className="btn btn-wide" disabled={!canSubmit} onClick={onConfirmPaid} type="button">
+        <button className="btn btn-wide" disabled={!canSubmit} onClick={() => setShowConfirmModal(true)} type="button">
           {busy ? (
             <>
               <Loader className="spinner" size={16} /> Menyimpan
@@ -826,6 +912,17 @@ export default function Pay() {
           ) : null}
         </div>
       </section>
+
+      <ConfirmPaymentModal
+        open={showConfirmModal}
+        total={total}
+        items={items}
+        onConfirm={() => {
+          setShowConfirmModal(false);
+          onConfirmPaid();
+        }}
+        onCancel={() => setShowConfirmModal(false)}
+      />
 
       <OrderSuccessModal
         open={ok}

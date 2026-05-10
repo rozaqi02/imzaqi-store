@@ -211,6 +211,7 @@ export default function AdminDashboard() {
   const [analyticsWindow, setAnalyticsWindow] = useState("7d");
 
   // Products UI state
+  const [visibleProductsCount, setVisibleProductsCount] = useState(20);
   const [productQuery, setProductQuery] = useState("");
   const [selectedProductId, setSelectedProductId] = useState("");
   const [productForm, setProductForm] = useState(null);
@@ -1707,7 +1708,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="admin-list" style={{ marginTop: 10 }}>
-                      {(filteredProducts || []).map((p) => (
+                      {(filteredProducts || []).slice(0, visibleProductsCount).map((p) => (
                         <button
                           key={p.id}
                           className={"admin-product-row " + (p.id === selectedProductId ? "active" : "")}
@@ -1736,6 +1737,18 @@ export default function AdminDashboard() {
                           </div>
                         </button>
                       ))}
+
+                      {visibleProductsCount < filteredProducts.length && (
+                        <div className="admin-loadMore" style={{ textAlign: "center", marginTop: 14 }}>
+                          <button
+                            type="button"
+                            className="btn btn-ghost"
+                            onClick={() => setVisibleProductsCount((prev) => prev + 20)}
+                          >
+                            Muat Lebih Banyak
+                          </button>
+                        </div>
+                      )}
 
                       {filteredProducts.length === 0 ? (
                         <div className="card pad" style={{ marginTop: 10 }}>

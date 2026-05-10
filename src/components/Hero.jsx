@@ -12,8 +12,8 @@ import {
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
 
-const HERO_TEXT = "Pilih paket. Bayar rapi.";
-const HIGHLIGHT = "Bayar rapi";
+const HERO_TEXT = "Pilih paket. Bayar mudah.";
+const HIGHLIGHT = "Bayar mudah";
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
