@@ -71,7 +71,7 @@ export default function Footer() {
 
             <div className="site-footerGoContact">
               <a href="https://wa.me/6283136049987" target="_blank" rel="noreferrer">
-                Customer Support: 0831-3604-9987
+                Contact Admin: 0831-3604-9987
               </a>
             </div>
           </div>

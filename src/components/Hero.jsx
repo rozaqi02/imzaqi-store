@@ -1,66 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
-import {
-  ArrowRight,
-  CheckCircle2,
-  CreditCard,
-  ScanSearch,
-  Search,
-  ShieldCheck,
-  Zap,
-} from "lucide-react";
+import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { ArrowRight, ScanSearch, Search, Zap } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
-
-const HERO_TEXT = "Pilih paket. Bayar mudah.";
-const HIGHLIGHT = "Bayar mudah";
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { delay: i * 0.08, duration: 0.58, ease: [0.22, 1, 0.36, 1] },
-  }),
-};
-
-function renderTypedWithHighlight(typedText) {
-  const start = HERO_TEXT.indexOf(HIGHLIGHT);
-  if (start < 0) return typedText;
-
-  const end = start + HIGHLIGHT.length;
-  const n = typedText.length;
-
-  if (n <= start) return typedText;
-
-  if (n >= end) {
-    return (
-      <>
-        {typedText.slice(0, start)}
-        <span className="hero-highlight">{typedText.slice(start, end)}</span>
-        {typedText.slice(end)}
-      </>
-    );
-  }
-
-  return (
-    <>
-      {typedText.slice(0, start)}
-      <span className="hero-highlight">{typedText.slice(start)}</span>
-    </>
-  );
-}
+import NumberCounter from "./NumberCounter";
 
 export default function Hero({ products = [] }) {
   const nav = useNavigate();
   const location = useLocation();
   const { totalViews, todayViews, totalOrders, weekOrders } = useLiveStats();
-  const [typed, setTyped] = useState(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return "";
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)")?.matches;
-    const coarse = window.matchMedia("(max-width: 920px), (pointer: coarse)")?.matches;
-    return reduce || coarse ? HERO_TEXT : "";
-  });
+
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
@@ -69,39 +18,55 @@ export default function Hero({ products = [] }) {
     return window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
   });
   const wrapRef = useRef(null);
+  const stageRef = useRef(null);
+
+  // Pointer tracking for parallax effect (desktop only)
+  const mouseX = useMotionValue(0.5);
+  const mouseY = useMotionValue(0.5);
+  const smoothX = useSpring(mouseX, { stiffness: 80, damping: 20, mass: 0.6 });
+  const smoothY = useSpring(mouseY, { stiffness: 80, damping: 20, mass: 0.6 });
+
+  const orbAX = useTransform(smoothX, [0, 1], [-30, 30]);
+  const orbAY = useTransform(smoothY, [0, 1], [-20, 20]);
+  const orbBX = useTransform(smoothX, [0, 1], [25, -25]);
+  const orbBY = useTransform(smoothY, [0, 1], [15, -15]);
+  const orbCX = useTransform(smoothX, [0, 1], [-15, 15]);
+  const orbCY = useTransform(smoothY, [0, 1], [-25, 25]);
+  const meshRotate = useTransform(smoothX, [0, 1], [-3, 3]);
 
   useEffect(() => {
     if (!window.matchMedia) return undefined;
-
     const query = window.matchMedia("(max-width: 920px), (pointer: coarse)");
     const update = () => setLightMotion(query.matches);
     update();
-
     if (query.addEventListener) {
       query.addEventListener("change", update);
       return () => query.removeEventListener("change", update);
     }
-
     query.addListener(update);
     return () => query.removeListener(update);
   }, []);
 
   useEffect(() => {
-    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    if (reduce || lightMotion) {
-      setTyped(HERO_TEXT);
-      return undefined;
-    }
-
-    let i = 0;
-    const timer = window.setInterval(() => {
-      i += 1;
-      setTyped(HERO_TEXT.slice(0, i));
-      if (i >= HERO_TEXT.length) window.clearInterval(timer);
-    }, 34);
-
-    return () => window.clearInterval(timer);
-  }, [lightMotion]);
+    if (lightMotion || !stageRef.current) return undefined;
+    const stage = stageRef.current;
+    let frame = 0;
+    const onMove = (e) => {
+      const rect = stage.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => {
+        mouseX.set(Math.max(0, Math.min(1, x)));
+        mouseY.set(Math.max(0, Math.min(1, y)));
+      });
+    };
+    stage.addEventListener("mousemove", onMove);
+    return () => {
+      stage.removeEventListener("mousemove", onMove);
+      cancelAnimationFrame(frame);
+    };
+  }, [lightMotion, mouseX, mouseY]);
 
   const searchIndex = useMemo(() => {
     const words = [];
@@ -147,202 +112,254 @@ export default function Hero({ products = [] }) {
 
   const stats = [
     { label: "Total Kunjungan", value: totalViews },
-    { label: "Kunjungan Hari Ini", value: todayViews },
+    { label: "Hari Ini", value: todayViews },
     { label: "Total Order", value: totalOrders },
-    { label: "Order Minggu Ini", value: weekOrders },
+    { label: "Minggu Ini", value: weekOrders },
   ];
-
-  const flow = [
-    { icon: ScanSearch, label: "Pilih" },
-    { icon: CreditCard, label: "Bayar" },
-    { icon: CheckCircle2, label: "ID Order" },
-    { icon: ShieldCheck, label: "Pantau" },
-  ];
-
-  const fadeProps = lightMotion ? {} : { initial: "hidden", animate: "visible", variants: fadeUp };
 
   const listboxId = "hero-search-listbox";
 
+  // Pick up to 4 product icons for floating orbs
+  const orbProducts = useMemo(() => {
+    return (products || []).filter((p) => p?.icon_url).slice(0, 4);
+  }, [products]);
+
   return (
-    <section className="hero hero-minimal full-bleed">
-      <div className="container hero-minimal-grid">
-        <div className="hero-copy hero-copy-centered">
-          <motion.div custom={0} {...fadeProps} className="hero-eyebrow">
-            Imzaqi Store
-          </motion.div>
+    <section className="hero hero-v2 full-bleed" ref={stageRef}>
+      {/* Animated background mesh */}
+      <div className="hero-v2-bg" aria-hidden="true">
+        <motion.div
+          className="hero-v2-mesh"
+          style={lightMotion ? undefined : { rotate: meshRotate }}
+        />
+        {!lightMotion && (
+          <>
+            <motion.div className="hero-v2-orb hero-v2-orb-a" style={{ x: orbAX, y: orbAY }} />
+            <motion.div className="hero-v2-orb hero-v2-orb-b" style={{ x: orbBX, y: orbBY }} />
+            <motion.div className="hero-v2-orb hero-v2-orb-c" style={{ x: orbCX, y: orbCY }} />
+          </>
+        )}
+        <div className="hero-v2-grid" />
+      </div>
 
-          <motion.h1 custom={1} {...fadeProps} className="hero-title hero-title-minimal">
-            <span className="typewriter">
-              {renderTypedWithHighlight(typed)}
-              <span className="cursor" aria-hidden="true" />
-            </span>
-          </motion.h1>
-
-          <motion.p custom={2} {...fadeProps} className="hero-sub hero-sub-minimal">
-            Dari katalog sampai status order, langkah berikutnya selalu jelas.
-          </motion.p>
-
-          <motion.div custom={3} {...fadeProps} className="hero-rail">
-            {flow.map((item) => {
-              const Icon = item.icon;
+      <div className="container hero-v2-inner">
+        {/* Floating product orbs (desktop only) */}
+        {!lightMotion && orbProducts.length > 0 && (
+          <div className="hero-v2-floaters" aria-hidden="true">
+            {orbProducts.map((p, i) => {
+              const offsets = [
+                { top: "12%", left: "8%", delay: 0 },
+                { top: "18%", right: "10%", delay: 0.4 },
+                { bottom: "20%", left: "12%", delay: 0.8 },
+                { bottom: "14%", right: "8%", delay: 1.2 },
+              ];
+              const pos = offsets[i] || offsets[0];
               return (
-                <div key={item.label} className="hero-railItem">
-                  <span className="hero-railIcon">
-                    <Icon size={15} />
-                  </span>
-                  <span>{item.label}</span>
-                </div>
+                <motion.div
+                  key={p.id}
+                  className="hero-v2-floater"
+                  style={pos}
+                  initial={{ opacity: 0, scale: 0.6, y: 20 }}
+                  animate={{
+                    opacity: 1,
+                    scale: 1,
+                    y: 0,
+                  }}
+                  transition={{
+                    delay: 0.3 + (pos.delay || 0),
+                    duration: 0.8,
+                    ease: [0.22, 1, 0.36, 1],
+                  }}
+                >
+                  <motion.div
+                    className="hero-v2-floaterInner"
+                    animate={{
+                      y: [0, -8, 0],
+                    }}
+                    transition={{
+                      delay: pos.delay || 0,
+                      duration: 4 + i * 0.5,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
+                  >
+                    <img src={p.icon_url} alt="" loading="lazy" decoding="async" />
+                  </motion.div>
+                </motion.div>
               );
             })}
-          </motion.div>
+          </div>
+        )}
 
-          <motion.div custom={4} {...fadeProps} className="hero-commandCard">
-            <div className="hero-search hero-search-minimal" ref={wrapRef}>
-              <div className="hero-search-shell">
-                <span className="hero-search-icon" aria-hidden="true">
-                  <Search size={16} />
-                </span>
+        <motion.div
+          className="hero-v2-eyebrow"
+          initial={lightMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <span>Imzaqi Store</span>
+        </motion.div>
 
-                <input
-                  className="input hero-search-input"
-                  placeholder="Cari produk favoritmu"
-                  value={q}
-                  aria-label="Cari produk"
-                  role="combobox"
-                  aria-autocomplete="list"
-                  aria-expanded={open && suggestions.length > 0}
-                  aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
-                  aria-activedescendant={
-                    activeSuggestionIndex >= 0 ? `${listboxId}-option-${activeSuggestionIndex}` : undefined
-                  }
-                  onFocus={() => setOpen(true)}
-                  onChange={(e) => {
-                    setQ(e.target.value);
-                    setOpen(true);
-                    setActiveSuggestionIndex(-1);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "ArrowDown" && suggestions.length > 0) {
-                      e.preventDefault();
-                      setOpen(true);
-                      setActiveSuggestionIndex((prev) => (prev >= suggestions.length - 1 ? 0 : prev + 1));
-                      return;
-                    }
+        <motion.h1
+          className="hero-v2-title"
+          initial={lightMotion ? false : { opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+        >
+          Pilih paket. <span className="hero-v2-titleLine hero-v2-titleLine--accent">Bergaransi.</span>
+        </motion.h1>
 
-                    if (e.key === "ArrowUp" && suggestions.length > 0) {
-                      e.preventDefault();
-                      setOpen(true);
-                      setActiveSuggestionIndex((prev) => (prev <= 0 ? suggestions.length - 1 : prev - 1));
-                      return;
-                    }
+        <motion.p
+          className="hero-v2-sub"
+          initial={lightMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
+        >
+          Dari katalog sampai status order, langkah berikutnya selalu jelas.
+        </motion.p>
 
-                    if (e.key === "Enter") {
-                      if (open && activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
-                        e.preventDefault();
-                        goSearch(suggestions[activeSuggestionIndex]);
-                        return;
-                      }
-                      e.preventDefault();
-                      goSearch();
-                    }
-
-                    if (e.key === "Escape") {
-                      setOpen(false);
-                      setActiveSuggestionIndex(-1);
-                    }
-                  }}
-                />
-
-                {q ? (
-                  <button
-                    type="button"
-                    className="hero-search-clear"
-                    onClick={() => {
-                      setQ("");
-                      setOpen(false);
-                      setActiveSuggestionIndex(-1);
-                    }}
-                    aria-label="Hapus pencarian"
-                  >
-                    x
-                  </button>
-                ) : null}
-
-                <button className="btn hero-search-btn" onClick={() => goSearch()} type="button">
-                  <ArrowRight size={16} />
-                </button>
-
-                {open && suggestions.length > 0 ? (
-                  <motion.div
-                    initial={lightMotion ? false : { opacity: 0, y: 10 }}
-                    animate={lightMotion ? undefined : { opacity: 1, y: 0 }}
-                    exit={lightMotion ? undefined : { opacity: 0, y: 10 }}
-                    className="suggestions suggestions-minimal"
-                    role="listbox"
-                    id={listboxId}
-                  >
-                    {suggestions.map((sug, idx) => (
-                      <button
-                        key={sug}
-                        id={`${listboxId}-option-${idx}`}
-                        className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
-                        onClick={() => goSearch(sug)}
-                        onMouseEnter={() => setActiveSuggestionIndex(idx)}
-                        type="button"
-                        role="option"
-                        aria-selected={idx === activeSuggestionIndex}
-                      >
-                        <Search size={14} />
-                        <span>{sug}</span>
-                      </button>
-                    ))}
-                  </motion.div>
-                ) : null}
-              </div>
-            </div>
-
-            <motion.div custom={5} {...fadeProps} className="hero-ctas hero-ctas-minimal">
-              <Link className="btn" to="/produk">
-                <ScanSearch size={16} />
-                <span>Lihat katalog</span>
-              </Link>
-              <Link className="btn btn-ghost" to="/checkout" state={{ backgroundLocation: location }}>
-                <Zap size={16} />
-                <span>Buka checkout</span>
-              </Link>
-            </motion.div>
-          </motion.div>
-
-          <motion.div
-            className="hero-stats hero-stats-minimal"
-            initial={lightMotion ? undefined : "hidden"}
-            animate={lightMotion ? undefined : "visible"}
-            variants={
-              lightMotion
-                ? undefined
-                : { visible: { transition: { staggerChildren: 0.08, delayChildren: 0.5 } } }
-            }
-          >
-            {stats.map((item, idx) => (
-              <motion.div
-                key={item.label}
-                className="stat stat-minimal"
-                variants={
-                  lightMotion
-                    ? undefined
-                    : { hidden: { opacity: 0, y: 14 }, visible: { opacity: 1, y: 0 } }
+        <motion.div
+          className="hero-v2-search"
+          ref={wrapRef}
+          initial={lightMotion ? false : { opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.26, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <div className="hero-search-shell hero-v2-searchShell">
+            <span className="hero-search-icon" aria-hidden="true">
+              <Search size={16} />
+            </span>
+            <input
+              className="input hero-search-input"
+              placeholder="Cari produk favoritmu"
+              value={q}
+              aria-label="Cari produk"
+              role="combobox"
+              aria-autocomplete="list"
+              aria-expanded={open && suggestions.length > 0}
+              aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
+              aria-activedescendant={
+                activeSuggestionIndex >= 0 ? `${listboxId}-option-${activeSuggestionIndex}` : undefined
+              }
+              onFocus={() => setOpen(true)}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setOpen(true);
+                setActiveSuggestionIndex(-1);
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowDown" && suggestions.length > 0) {
+                  e.preventDefault();
+                  setOpen(true);
+                  setActiveSuggestionIndex((prev) =>
+                    prev >= suggestions.length - 1 ? 0 : prev + 1
+                  );
+                  return;
                 }
-                whileHover={lightMotion ? undefined : { y: -4 }}
-                custom={idx}
+                if (e.key === "ArrowUp" && suggestions.length > 0) {
+                  e.preventDefault();
+                  setOpen(true);
+                  setActiveSuggestionIndex((prev) =>
+                    prev <= 0 ? suggestions.length - 1 : prev - 1
+                  );
+                  return;
+                }
+                if (e.key === "Enter") {
+                  if (open && activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
+                    e.preventDefault();
+                    goSearch(suggestions[activeSuggestionIndex]);
+                    return;
+                  }
+                  e.preventDefault();
+                  goSearch();
+                }
+                if (e.key === "Escape") {
+                  setOpen(false);
+                  setActiveSuggestionIndex(-1);
+                }
+              }}
+            />
+            {q ? (
+              <button
+                type="button"
+                className="hero-search-clear"
+                onClick={() => {
+                  setQ("");
+                  setOpen(false);
+                  setActiveSuggestionIndex(-1);
+                }}
+                aria-label="Hapus pencarian"
               >
-                <div className="stat-num">
-                  {item.value == null ? "-" : Number(item.value).toLocaleString("id-ID")}
-                </div>
-                <div className="stat-label">{item.label}</div>
+                ×
+              </button>
+            ) : null}
+            <button className="btn hero-search-btn" onClick={() => goSearch()} type="button" aria-label="Cari">
+              <ArrowRight size={16} />
+            </button>
+
+            {open && suggestions.length > 0 ? (
+              <motion.div
+                initial={lightMotion ? false : { opacity: 0, y: 8 }}
+                animate={lightMotion ? undefined : { opacity: 1, y: 0 }}
+                className="suggestions suggestions-minimal"
+                role="listbox"
+                id={listboxId}
+              >
+                {suggestions.map((sug, idx) => (
+                  <button
+                    key={sug}
+                    id={`${listboxId}-option-${idx}`}
+                    className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
+                    onClick={() => goSearch(sug)}
+                    onMouseEnter={() => setActiveSuggestionIndex(idx)}
+                    type="button"
+                    role="option"
+                    aria-selected={idx === activeSuggestionIndex}
+                  >
+                    <Search size={14} />
+                    <span>{sug}</span>
+                  </button>
+                ))}
               </motion.div>
-            ))}
-          </motion.div>
-        </div>
+            ) : null}
+          </div>
+        </motion.div>
+
+        <motion.div
+          className="hero-v2-ctas"
+          initial={lightMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.34, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <Link className="btn hero-v2-ctaPrimary" to="/produk">
+            <ScanSearch size={16} />
+            <span>Lihat katalog</span>
+          </Link>
+          <Link
+            className="btn btn-ghost hero-v2-ctaGhost"
+            to="/checkout"
+            state={{ backgroundLocation: location }}
+          >
+            <Zap size={16} />
+            <span>Checkout</span>
+          </Link>
+        </motion.div>
+
+        <motion.div
+          className="hero-v2-stats"
+          initial={lightMotion ? false : { opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {stats.map((item) => (
+            <div key={item.label} className="hero-v2-stat">
+              <div className="hero-v2-statNum">
+                {item.value == null ? "-" : <NumberCounter value={item.value} />}
+              </div>
+              <div className="hero-v2-statLabel">{item.label}</div>
+            </div>
+          ))}
+        </motion.div>
       </div>
     </section>
   );

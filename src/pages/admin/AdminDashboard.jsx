@@ -1,4 +1,5 @@
 import React, { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
@@ -1324,27 +1325,32 @@ export default function AdminDashboard() {
                   </button>
                 </div>
               </div>
-
-              <nav className="admin-mobileTabs" aria-label="Navigasi admin mobile">
-                {tabs.map((t) => {
-                  const MobileTabIcon = TAB_ICONS[t.id] || Box;
-                  return (
-                    <button
-                      key={t.id}
-                      type="button"
-                      className={`admin-mobileTab ${tab === t.id ? "active" : ""}`}
-                      onClick={() => startTransition(() => setTab(t.id))}
-                    >
-                      <span className="admin-mobileTabIcon">
-                        <MobileTabIcon size={15} />
-                      </span>
-                      <span className="admin-mobileTabLabel">{t.label}</span>
-                      <span className="admin-mobileTabMeta">{tabMeta[t.id]}</span>
-                    </button>
-                  );
-                })}
-              </nav>
             </div>
+
+            {typeof document !== "undefined"
+              ? createPortal(
+                  <nav className="admin-mobileTabs" aria-label="Navigasi admin mobile">
+                    {tabs.map((t) => {
+                      const MobileTabIcon = TAB_ICONS[t.id] || Box;
+                      return (
+                        <button
+                          key={t.id}
+                          type="button"
+                          className={`admin-mobileTab ${tab === t.id ? "active" : ""}`}
+                          onClick={() => startTransition(() => setTab(t.id))}
+                        >
+                          <span className="admin-mobileTabIcon">
+                            <MobileTabIcon size={15} />
+                          </span>
+                          <span className="admin-mobileTabLabel">{t.label}</span>
+                          <span className="admin-mobileTabMeta">{tabMeta[t.id]}</span>
+                        </button>
+                      );
+                    })}
+                  </nav>,
+                  document.body
+                )
+              : null}
 
             <div className="admin-topbar">
               <div className="admin-topbarCopy">

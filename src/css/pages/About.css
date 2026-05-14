@@ -252,10 +252,33 @@
   transform: rotate(180deg);
 }
 
+/* Smooth open/close: grid-template-rows trick for height auto animation */
+.faq-itemBodyWrap {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition:
+    grid-template-rows 0.32s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.22s ease;
+  opacity: 0;
+}
+
+.faq-item.open .faq-itemBodyWrap {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
 .faq-itemBody {
+  min-height: 0;
+  overflow: hidden;
   padding: 0 16px 16px;
   display: grid;
   gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faq-itemBodyWrap {
+    transition: none;
+  }
 }
 
 .faq-itemBody p {

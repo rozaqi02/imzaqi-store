@@ -165,14 +165,11 @@
   gap: 16px;
   align-items: start;
   min-width: 0;
-  overflow-x: hidden;
 }
 
 .catalog-content {
   min-width: 0;
   width: 100%;
-  overflow-x: hidden;
-  overflow-x: clip;
 }
 
 .catalog-sidebar {
@@ -570,6 +567,7 @@
 .catalog-grid {
   display: grid;
   gap: 14px;
+  padding: 4px 2px 8px;
 }
 
 .catalog-grid.grid {
@@ -596,7 +594,6 @@
     transform 0.3s var(--ease-out),
     border-color 0.3s var(--ease-out),
     box-shadow 0.3s var(--ease-out);
-  overflow: hidden;
 }
 
 .catalog-card::before {
@@ -608,6 +605,7 @@
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
   opacity: 0.7;
   pointer-events: none;
+  border-radius: 26px 26px 0 0;
 }
 
 .catalog-card > * {
@@ -964,8 +962,7 @@
   }
 
   .catalog-content {
-    overflow-x: hidden;
-    overflow-x: clip;
+    min-width: 0;
   }
 
   .catalog-quickFilters {
@@ -1865,3 +1862,157 @@
   color: #3f5f6c;
 }
 
+
+/* Load more button */
+.catalog-loadMore {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 16px;
+}
+
+.catalog-loadMore .btn {
+  min-width: 180px;
+}
+
+@media (max-width: 860px) {
+  /* Extra bottom clearance so load-more button clears the sticky cart bar */
+  .with-sticky-cta .catalog-loadMore {
+    padding-bottom: 24px;
+  }
+}
+
+/* ─── Catalog command: hero-style search box with tactile press ───────── */
+.catalog-commandCard {
+  flex: 1 1 100%;
+  width: 100%;
+  min-width: 0;
+}
+
+.catalog-heroSearch {
+  width: 100%;
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+
+/* Tactile press effect - mimics the hero search shell */
+.catalog-heroSearch:focus-within {
+  transform: scale(0.992);
+  border-color: rgba(0, 138, 148, 0.4) !important;
+  box-shadow:
+    inset 0 5px 14px rgba(0, 0, 0, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+    0 0 0 4px rgba(0, 214, 180, 0.14) !important;
+}
+
+:root[data-theme="light"] .catalog-heroSearch:focus-within {
+  border-color: rgba(0, 138, 148, 0.4) !important;
+  box-shadow:
+    inset 0 5px 14px rgba(67, 111, 129, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.6),
+    0 0 0 4px rgba(0, 194, 208, 0.16) !important;
+}
+
+@media (max-width: 720px) {
+  .catalog-commandCard {
+    width: 100%;
+  }
+}
+
+/* ─── Mobile filter sheet polish ───────────────────────────────────────── */
+@media (max-width: 720px) {
+  .catalog-sheet {
+    border-radius: 26px 26px 0 0;
+    max-height: 86dvh;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+
+  .catalog-sheetBody {
+    padding: 4px 16px 12px;
+  }
+
+  .catalog-sheetHead {
+    padding: 12px 16px 14px;
+  }
+
+  /* Make filter search match hero search style with tactile press */
+  .catalog-sheet .catalog-filterSearch {
+    margin-top: 8px;
+    padding: 4px;
+    border-radius: 18px;
+    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+    background: var(--skeu-control-bg, rgba(12, 18, 28, 0.5));
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.06),
+      0 6px 14px rgba(0, 0, 0, 0.1);
+    transition: transform 0.18s var(--ease-out), box-shadow 0.18s var(--ease-out), border-color 0.18s var(--ease-out);
+  }
+
+  .catalog-sheet .catalog-filterSearch:focus-within {
+    transform: scale(0.992);
+    border-color: rgba(0, 138, 148, 0.4);
+    box-shadow:
+      inset 0 4px 10px rgba(0, 0, 0, 0.18),
+      0 0 0 4px rgba(0, 214, 180, 0.14);
+  }
+
+  :root[data-theme="light"] .catalog-sheet .catalog-filterSearch:focus-within {
+    box-shadow:
+      inset 0 4px 10px rgba(67, 111, 129, 0.18),
+      0 0 0 4px rgba(0, 194, 208, 0.16);
+  }
+
+  .catalog-sheet .catalog-filterSearch svg {
+    margin-left: 8px;
+  }
+
+  .catalog-sheet .catalog-filterInput {
+    padding: 10px 8px;
+    font-size: 14px;
+  }
+
+  /* Tighter filter blocks */
+  .catalog-sheet .catalog-filterBlock {
+    padding: 11px 0;
+  }
+
+  .catalog-sheet .catalog-filterLabel {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  /* Category chips: make uniform */
+  .catalog-sheet .catalog-chipGrid {
+    gap: 8px;
+    margin-top: 10px;
+  }
+
+  .catalog-sheet .catalog-chip {
+    min-height: 36px;
+    padding: 0 13px;
+    font-size: 12px;
+  }
+
+  /* Toggle rows tighter */
+  .catalog-sheet .catalog-filterRow--toggle {
+    min-height: 38px;
+    padding: 4px 0;
+  }
+
+  /* Hide view toggle in mobile sheet (mobile is grid only) */
+  .catalog-sheet .catalog-filterBlock:has(.catalog-viewSwitch) {
+    display: none;
+  }
+
+  /* Sticky apply button at bottom */
+  .catalog-sheetFoot {
+    padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
+    background: var(--skeu-panel-bg, rgba(7, 10, 18, 0.96));
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
+  }
+
+  .catalog-sheetFoot .btn {
+    min-height: 48px;
+    border-radius: 16px;
+    font-size: 14px;
+  }
+}

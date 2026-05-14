@@ -1,18 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, CreditCard, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
-import FlowAssist from "../components/FlowAssist";
 import Hero from "../components/Hero";
 import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingIds } from "../lib/api";
-import { buildStoreInsights } from "../lib/storeInsights";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
-import { useCart } from "../context/CartContext";
 
 export default function Home() {
-  const cart = useCart();
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [topIds, setTopIds] = useState([]);
@@ -61,41 +57,12 @@ export default function Home() {
     return sorted.slice(0, 4);
   }, [products, topIds]);
 
-  const insights = useMemo(() => buildStoreInsights({ products }), [products]);
-
-  const cartCount = useMemo(
-    () => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0),
-    [cart.items]
-  );
-
   return (
     <div className="page home-page">
       <Hero products={products} />
 
       <section className="section">
         <div className="container">
-          <FlowAssist
-            eyebrow="Start cepat"
-            title="Ambil terlaris. Checkout. Simpan ID."
-            description="Masuk lewat yang paling ramai."
-            badges={[
-              insights.topProduct
-                ? { label: `Top: ${insights.topProduct.name}`, icon: <Sparkles size={13} /> }
-                : { label: `${insights.productCount} produk aktif`, icon: <Sparkles size={13} /> },
-              cartCount > 0 ? { label: `${cartCount} di bag`, tone: "emphasis" } : "Checkout siap",
-              insights.topCategory
-                ? { label: `${insights.topCategory.label} ramai`, icon: <ShieldCheck size={13} /> }
-                : { label: "Status siap", icon: <ShieldCheck size={13} /> },
-            ]}
-            actions={[
-              { label: "Katalog", to: "/produk" },
-              cartCount > 0
-                ? { label: "Checkout", to: "/checkout", ghost: true, icon: <CreditCard size={14} /> }
-                : { label: "Status", to: "/status", ghost: true, icon: <ArrowRight size={14} /> },
-            ]}
-            className="home-flowAssist reveal"
-          />
-
           <div className="layout-header home-layoutHeader">
             <div>
               <div className="home-kicker">Mulai dari sini</div>

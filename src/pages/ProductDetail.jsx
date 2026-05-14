@@ -10,6 +10,7 @@ import { formatIDR } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
+import { fireConfetti } from "../components/Confetti";
 
 function normalizeInlineText(text) {
   return String(text || "")
@@ -243,9 +244,9 @@ export default function ProductDetail() {
   const [activeTab, setActiveTab] = useState("semua");
   const [viewMode, setViewMode] = useState(() => {
     try {
-      return localStorage.getItem("pdx_viewMode") || "grid";
+      return localStorage.getItem("pdx_viewMode") || "list";
     } catch {
-      return "grid";
+      return "list";
     }
   });
 
@@ -382,7 +383,7 @@ export default function ProductDetail() {
     setQtyById((prev) => ({ ...prev, [variant.id]: safeQty }));
   }
 
-  function handleAdd(variant, qty = 1) {
+  function handleAdd(variant, qty = 1, event) {
     const stock = Number(variant?.stock ?? 999);
 
     if (stock <= 0) {
@@ -404,6 +405,12 @@ export default function ProductDetail() {
       title: "Masuk keranjang",
       duration: 2200,
     });
+
+    // Confetti burst from the click point
+    if (event && event.currentTarget) {
+      const rect = event.currentTarget.getBoundingClientRect();
+      fireConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+    }
 
     setQty(variant, 1);
   }
@@ -736,7 +743,7 @@ export default function ProductDetail() {
                         <button
                           className={`btn btn-sm btn-ghost pdx-addBtn ${out ? "btn-disabled" : ""}`}
                           type="button"
-                          onClick={() => handleAdd(variant, qty)}
+                          onClick={(e) => handleAdd(variant, qty, e)}
                           disabled={out}
                           title="Tambah ke keranjang"
                         >
@@ -745,7 +752,7 @@ export default function ProductDetail() {
                         <button
                           className={`btn btn-sm pdx-buyNowBtn ${out ? "btn-disabled" : ""}`}
                           type="button"
-                          onClick={() => { handleAdd(variant, qty); nav("/checkout", { state: { backgroundLocation: location } }); }}
+                          onClick={(e) => { handleAdd(variant, qty, e); nav("/checkout", { state: { backgroundLocation: location } }); }}
                           disabled={out}
                         >
                           <span>{out ? "Habis" : "Beli Langsung"}</span>

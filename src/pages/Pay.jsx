@@ -223,6 +223,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items }) {
         </div>
 
         {/* Checklist */}
+        {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
         <ul className="pay-confirmChecklist" role="list">
           {checklist.map((text, i) => (
             <li key={i} className="pay-confirmCheckItem">

@@ -165,13 +165,13 @@ function FaqItem({ item, open, onToggle }) {
         <ChevronDown size={17} />
       </button>
 
-      {open ? (
+      <div className="faq-itemBodyWrap" aria-hidden={!open}>
         <div className="faq-itemBody">
           {item.answer.map((line) => (
             <p key={line}>{line}</p>
           ))}
         </div>
-      ) : null}
+      </div>
     </article>
   );
 }
@@ -185,7 +185,7 @@ export default function About() {
   const [waNumber, setWaNumber] = useState("6283136049987");
   const [query, setQuery] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
-  const [openId, setOpenId] = useState(FAQ_ITEMS[0]?.id || "");
+  const [openId, setOpenId] = useState("");
 
   useEffect(() => {
     let active = true;
@@ -209,14 +209,17 @@ export default function About() {
     });
   }, [activeCategory, query]);
 
+  // Close any open item that no longer matches the current filter; never
+  // auto-open a default item — let the user choose what to expand.
   useEffect(() => {
-    if (!filteredFaq.length) {
-      setOpenId("");
-      return;
-    }
+    if (!openId) return;
     const exists = filteredFaq.some((item) => item.id === openId);
-    if (!exists) setOpenId(filteredFaq[0].id);
+    if (!exists) setOpenId("");
   }, [filteredFaq, openId]);
+
+  const handleToggle = (id) => {
+    setOpenId((prev) => (prev === id ? "" : id));
+  };
 
   const waUrl = useMemo(() => {
     const message = encodeURIComponent("Halo Admin Imzaqi Store, saya mau tanya terkait order/produk.");
@@ -285,7 +288,7 @@ export default function About() {
                       key={item.id}
                       item={item}
                       open={item.id === openId}
-                      onToggle={(id) => setOpenId((prev) => (prev === id ? "" : id))}
+                      onToggle={handleToggle}
                     />
                   ))}
                 </div>

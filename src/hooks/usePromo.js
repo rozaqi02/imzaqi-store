@@ -4,10 +4,10 @@ import { getVisitorIdAsUUID } from "../lib/visitor";
 
 const KEY = "imzaqi_store_promo_v1";
 
-function safeStorage() {
+function safeSessionStorage() {
   try {
     if (typeof window === "undefined") return null;
-    return window.localStorage;
+    return window.sessionStorage;
   } catch {
     return null;
   }
@@ -26,18 +26,29 @@ function safeParse(json, fallback) {
 }
 
 export function usePromo() {
+  // Use sessionStorage instead of localStorage so promo resets when the
+  // browser tab is closed. Also clear any legacy localStorage entry.
   const [promo, setPromo] = useState(() => {
-    const storage = safeStorage();
+    if (typeof window !== "undefined") {
+      try {
+        window.localStorage.removeItem(KEY);
+      } catch {
+        // ignore
+      }
+    }
+    const storage = safeSessionStorage();
     if (!storage) return { code: "", percent: 0 };
     return safeParse(storage.getItem(KEY), { code: "", percent: 0 });
   });
 
   useEffect(() => {
-    const storage = safeStorage();
+    const storage = safeSessionStorage();
     if (!storage) return;
     try {
       storage.setItem(KEY, JSON.stringify(promo));
-    } catch {}
+    } catch {
+      // ignore
+    }
   }, [promo]);
 
   const api = useMemo(() => ({
@@ -57,7 +68,6 @@ export function usePromo() {
 
       setPromo({ code, percent });
 
-      // Optional: record claim (idempotent by unique constraint)
       try {
         const visitor_id = getVisitorIdAsUUID();
         await supabase.from("promo_claims").insert({ visitor_id, code });

@@ -25,3 +25,9 @@
 
 /* Adaptive motion performance layer (must stay last) */
 @import "./css/motion-adaptive.css";
+
+/* Polish layer: 10 lightweight UX effects */
+@import "./css/polish.css";
+
+/* AI assistant bubble */
+@import "./css/assistant.css";

@@ -15,7 +15,6 @@ import {
   PackageCheck,
   Search,
   ShoppingBag,
-  ShoppingCart,
   SlidersHorizontal,
   Sparkles,
   X,
@@ -25,7 +24,6 @@ import { fetchProducts } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
-import { useToast } from "../context/ToastContext";
 import { formatIDR } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { useDialogA11y } from "../hooks/useDialogA11y";
@@ -547,7 +545,7 @@ export default function Products() {
     else if (sort === "name") sorted.sort(byName);
     else sorted.sort(byReco);
     return sorted;
-  }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, query, restockOnly, sort]);
+  }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, debouncedQuery, restockOnly, sort]);
 
   const activeFiltersCount =
     (query ? 1 : 0) +
@@ -700,25 +698,30 @@ export default function Products() {
           </div>
 
           <div className="catalog-command">
-            <div className="catalog-commandSearch">
-              <Search size={16} className="catalog-commandIcon" />
-              <input
-                ref={searchRef}
-                className="input catalog-commandInput"
-                value={query}
-                placeholder="Cari produk, varian, atau durasi"
-                onChange={(e) => setQuery(e.target.value)}
-              />
-              {query ? (
-                <button
-                  className="catalog-commandClear"
-                  onClick={() => setQuery("")}
-                  type="button"
-                  aria-label="Hapus pencarian"
-                >
-                  <X size={14} />
-                </button>
-              ) : null}
+            <div className="catalog-commandCard">
+              <div className="hero-search-shell catalog-heroSearch">
+                <span className="hero-search-icon" aria-hidden="true">
+                  <Search size={16} />
+                </span>
+                <input
+                  ref={searchRef}
+                  className="input hero-search-input"
+                  value={query}
+                  placeholder="Cari produk, varian, atau durasi"
+                  onChange={(e) => setQuery(e.target.value)}
+                  aria-label="Cari produk"
+                />
+                {query ? (
+                  <button
+                    className="hero-search-clear"
+                    onClick={() => setQuery("")}
+                    type="button"
+                    aria-label="Hapus pencarian"
+                  >
+                    <X size={14} />
+                  </button>
+                ) : null}
+              </div>
             </div>
 
             <div className="catalog-commandActions">
@@ -870,7 +873,7 @@ export default function Products() {
                     />
                   ))}
                   {visibleCount < filtered.length && (
-                    <div className="catalog-loadMore" style={{ gridColumn: "1 / -1", textAlign: "center", marginTop: "20px" }}>
+                    <div className="catalog-loadMore">
                       <button 
                         className="btn btn-ghost" 
                         onClick={() => setVisibleCount(prev => prev + 16)}
@@ -944,19 +947,24 @@ export default function Products() {
           )
         : null}
 
-      {cartItemCount > 0 ? (
-        <div className="sticky-cta">
-          <div className="sticky-cta-left">
-            <div className="sticky-cta-title">Keranjang</div>
-            <div className="sticky-cta-value">
-              {cartItemCount} item | {formatIDR(subtotal())}
-            </div>
-          </div>
-          <Link className="btn" to="/checkout" state={{ backgroundLocation: location }}>
-            Checkout
-          </Link>
-        </div>
-      ) : null}
+      {cartItemCount > 0 && typeof document !== "undefined"
+        ? createPortal(
+            <div className="sticky-cta">
+              <div className="sticky-cta-left">
+                <div className="sticky-cta-title">Keranjang</div>
+                <div className="sticky-cta-value">
+                  <span>{cartItemCount} item</span>
+                  <span className="sticky-cta-sep" aria-hidden="true" />
+                  <span>{formatIDR(subtotal())}</span>
+                </div>
+              </div>
+              <Link className="btn" to="/checkout" state={{ backgroundLocation: location }}>
+                Checkout
+              </Link>
+            </div>,
+            document.body
+          )
+        : null}
     </div>
   );
 }

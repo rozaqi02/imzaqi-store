@@ -4,6 +4,9 @@ import Layout from "./components/Layout";
 import RouteProgress from "./components/RouteProgress";
 import ProtectedRoute from "./components/ProtectedRoute";
 import NetworkBridge from "./components/NetworkBridge";
+import PolishEffects from "./components/PolishEffects";
+import Confetti from "./components/Confetti";
+import AssistantBubble from "./components/AssistantBubble";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
@@ -88,6 +91,9 @@ export default function App() {
     <BrowserRouter>
       <AnalyticsBridge />
       <NetworkBridge />
+      <PolishEffects />
+      <Confetti />
+      <AssistantBubble />
       <ScrollToTop />
       <RouteProgress />
       <AppRoutes />

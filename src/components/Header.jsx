@@ -47,7 +47,7 @@ const primaryItems = [
 ];
 
 const utilityItems = [
-  { to: "/status", label: "Status", icon: Activity },
+  { to: "/status", label: "Status Order", icon: Activity },
   { to: "/admin", label: "Admin", icon: Shield },
 ];
 
@@ -200,7 +200,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 
         <div className="mobile-menu-footer">
           <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-          <p className="menu-footer-text">Imzaqi Store App V.4.0</p>
+          <p className="menu-footer-text">Imzaqi Store App V.4.1</p>
         </div>
       </aside>
     </>,
@@ -331,7 +331,7 @@ export default function Header() {
               { to: "/produk", label: "Produk" },
               { to: "/tentang", label: "FAQ" },
               { to: "/testimoni", label: "Testimoni" },
-              { to: "/status", label: "Status" },
+              { to: "/status", label: "Status Order" },
             ].map((link, idx) => {
               const isActive = location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to));
               return (

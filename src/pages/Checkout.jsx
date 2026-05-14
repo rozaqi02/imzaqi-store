@@ -73,25 +73,21 @@ const desktopDrawerVariantsLite = {
 };
 
 const mobileDrawerVariants = {
-  hidden: { y: "100%", opacity: 0 },
+  hidden: { y: "100%" },
   visible: {
     y: 0,
-    opacity: 1,
     transition: {
-      type: "spring",
-      damping: 34,
-      stiffness: 320,
-      mass: 0.86,
+      type: "tween",
+      duration: 0.32,
+      ease: [0.32, 0.72, 0, 1],
     },
   },
   exit: {
     y: "100%",
-    opacity: 0,
     transition: {
-      type: "spring",
-      damping: 34,
-      stiffness: 320,
-      mass: 0.86,
+      type: "tween",
+      duration: 0.26,
+      ease: [0.32, 0.72, 0, 1],
     },
   },
 };
@@ -100,11 +96,11 @@ const mobileDrawerVariantsLite = {
   hidden: { y: "100%" },
   visible: {
     y: 0,
-    transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] },
+    transition: { type: "tween", duration: 0.28, ease: [0.32, 0.72, 0, 1] },
   },
   exit: {
     y: "100%",
-    transition: { duration: 0.16, ease: [0.22, 1, 0.36, 1] },
+    transition: { type: "tween", duration: 0.22, ease: [0.32, 0.72, 0, 1] },
   },
 };
 
@@ -131,7 +127,6 @@ export default function Checkout() {
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(max-width: 720px)").matches : false
   );
-  const [showGestureHint, setShowGestureHint] = useState(true);
 
   usePageMeta({
     title: "Checkout",
@@ -167,16 +162,6 @@ export default function Checkout() {
   useEffect(() => {
     closeButtonRef.current?.focus();
   }, []);
-
-  useEffect(() => {
-    setShowGestureHint(true);
-
-    const timer = window.setTimeout(() => {
-      setShowGestureHint(false);
-    }, isMotionOff ? 1200 : isLiteMotion ? 1500 : 3200);
-
-    return () => window.clearTimeout(timer);
-  }, [isMobileSheet, isLiteMotion, isMotionOff]);
 
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
   const backgroundLocation = location.state?.backgroundLocation;
@@ -309,7 +294,6 @@ export default function Checkout() {
         dragElastic={isLiteMotion ? 0.04 : isMobileSheet ? (reduceMotion ? 0.06 : 0.1) : reduceMotion ? 0.1 : 0.16}
         dragMomentum={false}
         dragDirectionLock
-        onDragStart={() => setShowGestureHint(false)}
         onDragEnd={(event, info) => {
           if (isMobileSheet) {
             if (info.offset.y > (isLiteMotion ? 96 : 120) || info.velocity.y > (isLiteMotion ? 440 : 520)) requestClose();
@@ -326,19 +310,12 @@ export default function Checkout() {
           }
         }}
         onMouseDown={(event) => event.stopPropagation()}
-        onPointerDown={() => setShowGestureHint(false)}
         style={{ touchAction: isMobileSheet ? "pan-y" : "none", willChange: "transform" }}
         role="dialog"
         aria-modal="true"
         aria-label="Checkout"
       >
         <div className="checkout-drawerHandle" aria-hidden="true" />
-        {showGestureHint ? (
-          <div className="checkout-drawerGesture" role="status" aria-live="polite">
-            <span className="checkout-drawerGestureDot" aria-hidden="true" />
-            <span>{isMobileSheet ? "Geser ke bawah untuk tutup" : "Geser panel atau klik X untuk tutup"}</span>
-          </div>
-        ) : null}
 
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">

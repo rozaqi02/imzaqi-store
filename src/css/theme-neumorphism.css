@@ -1064,8 +1064,11 @@ select.input {
 @media (max-width: 720px) {
   .header,
   .site-header {
-    backdrop-filter: blur(18px) saturate(150%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(150%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 24%),
+      var(--skeu-panel-bg) !important;
   }
 
   .header-inner {
@@ -3449,6 +3452,23 @@ select.input {
 
   .mobile-menu,
   .mobile-menu-lite {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+/* Mobile navbar: solid, no blur */
+@media (max-width: 768px) {
+  :root[data-theme="light"] .header,
+  :root[data-theme="light"] .site-header {
+    background: rgb(236, 247, 251) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  :root[data-theme="dark"] .header,
+  :root[data-theme="dark"] .site-header {
+    background: rgb(8, 14, 31) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }

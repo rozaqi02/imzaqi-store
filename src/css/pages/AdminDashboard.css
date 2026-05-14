@@ -2418,3 +2418,591 @@
   }
 }
 
+
+
+/* Hide bottom tab bar on desktop (sidebar takes over) */
+@media (min-width: 721px) {
+  .admin-mobileTabs {
+    display: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+   MOBILE ADMIN DASHBOARD — clean rebuild (overrides all prior rules)
+   Single source of truth for ≤720px. Designed for actual mobile use:
+   readable typography, compact spacing, full-width content panels,
+   sticky tab nav, no horizontal overflow anywhere.
+   ────────────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  /* 1. Container: full width, no double padding */
+  .admin-page .container.admin-shell,
+  .container.admin-shell {
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom)) !important;
+  }
+
+  /* 2. Shell: single column, content fills full width */
+  .admin-shell {
+    display: block !important;
+    grid-template-columns: none !important;
+    gap: 12px !important;
+    overflow: visible !important;
+  }
+
+  .admin-sidebar {
+    display: none !important;
+  }
+
+  .admin-main {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* 3. Mobile brand bar: compact sticky header */
+  .admin-mobileControls {
+    display: contents !important;
+  }
+
+  .admin-mobileBar {
+    position: sticky;
+    top: calc(var(--site-header-offset, 60px) + 8px);
+    z-index: 30;
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    gap: 10px !important;
+    padding: 10px 12px !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--brand-line, rgba(0, 138, 148, 0.16)) !important;
+    background: var(--skeu-panel-bg, rgba(255, 255, 255, 0.95)) !important;
+    box-shadow: var(--skeu-panel-shadow, 0 8px 22px rgba(67, 111, 129, 0.12)) !important;
+  }
+
+  .admin-mobileBrand {
+    display: flex !important;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .admin-mobileBrand .admin-logo {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 12px;
+    display: grid;
+    place-items: center;
+    font-weight: 1000;
+    font-size: 13px;
+  }
+
+  .admin-mobileCopy {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .admin-mobileCopy strong {
+    font-size: 13px;
+    font-weight: 1000;
+    line-height: 1.18;
+    overflow-wrap: anywhere;
+    display: block;
+  }
+
+  .admin-mobileCopy span {
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 1.3;
+    color: var(--brand-muted, rgba(13, 45, 57, 0.6));
+  }
+
+  .admin-mobileActions {
+    display: flex !important;
+    grid-template-columns: none !important;
+    gap: 6px !important;
+    flex-shrink: 0;
+  }
+
+  .admin-mobileActions .btn {
+    width: auto !important;
+    min-width: 0;
+    min-height: 34px;
+    padding: 0 10px;
+    font-size: 11px;
+    font-weight: 800;
+    border-radius: 10px !important;
+  }
+
+  /* 4. Mobile tabs → BOTTOM TAB BAR (iOS-style, thumb-reachable) */
+  .admin-mobileTabs {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    z-index: 90 !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, 1fr) !important;
+    gap: 0 !important;
+    padding: 8px 6px calc(8px + env(safe-area-inset-bottom)) !important;
+    border-top: 1px solid var(--brand-line, rgba(0, 138, 148, 0.18)) !important;
+    background: var(--skeu-panel-bg, rgba(255, 255, 255, 0.98)) !important;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08) !important;
+    backdrop-filter: none !important;
+  }
+
+  :root[data-theme="dark"] .admin-mobileTabs {
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.36) !important;
+  }
+
+  .admin-mobileTab {
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    grid-template-rows: none !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    gap: 4px !important;
+    min-height: 54px !important;
+    padding: 6px 2px !important;
+    border: 0 !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--brand-muted, rgba(13, 45, 57, 0.62)) !important;
+    cursor: pointer;
+    transition: color 0.18s var(--ease-out), transform 0.18s var(--ease-out);
+    position: relative;
+  }
+
+  .admin-mobileTab:active {
+    transform: scale(0.94);
+  }
+
+  .admin-mobileTab.active {
+    color: var(--brand-icon, #008a94) !important;
+    background: transparent !important;
+    border: 0 !important;
+  }
+
+  .admin-mobileTab.active::before {
+    content: "";
+    position: absolute;
+    top: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 24px;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #4effda, #00d6b4);
+    box-shadow: 0 2px 6px rgba(0, 214, 180, 0.4);
+  }
+
+  .admin-mobileTabIcon {
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 9px;
+    display: grid;
+    place-items: center;
+    background: transparent;
+    color: inherit;
+    transition: background 0.18s var(--ease-out), color 0.18s var(--ease-out);
+  }
+
+  .admin-mobileTab.active .admin-mobileTabIcon {
+    background: linear-gradient(135deg, rgba(79, 255, 200, 0.18), rgba(0, 214, 180, 0.1));
+    color: var(--brand-icon, #008a94);
+  }
+
+  .admin-mobileTabLabel {
+    font-size: 10.5px !important;
+    font-weight: 800 !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.01em;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: 1 !important;
+  }
+
+  .admin-mobileTabMeta {
+    display: none !important;
+  }
+
+  /* 5. Topbar: compact, no overflow */
+  .admin-topbar {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .admin-topbarCopy {
+    min-width: 0;
+  }
+
+  .admin-topbar .h2 {
+    font-size: 22px !important;
+    line-height: 1.15 !important;
+    word-break: break-word;
+  }
+
+  .admin-topbar .muted {
+    font-size: 13px;
+    line-height: 1.45;
+  }
+
+  .admin-topbar-current {
+    align-self: flex-start;
+  }
+
+  /* 6. Stats grid: 2 col, compact */
+  .admin-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .admin-statCard {
+    padding: 12px !important;
+    border-radius: 16px !important;
+    gap: 4px !important;
+  }
+
+  .admin-statIcon {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+  }
+
+  .admin-statLabel {
+    font-size: 10px !important;
+    letter-spacing: 0.06em !important;
+  }
+
+  .admin-statValue {
+    font-size: 18px !important;
+    line-height: 1.1 !important;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-statHelper {
+    font-size: 10px !important;
+    line-height: 1.3 !important;
+  }
+
+  /* 7. KPI strip: horizontal scroll */
+  .admin-kpiStrip {
+    display: flex !important;
+    overflow-x: auto;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    padding: 2px !important;
+    scrollbar-width: none;
+  }
+
+  .admin-kpiStrip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-kpiChip {
+    flex: 0 0 auto;
+    min-width: 130px;
+  }
+
+  /* 8. All admin panels: full width, compact padding */
+  .admin-panel,
+  .admin-overviewHero,
+  .admin-overview > *,
+  .admin-overviewGrid > *,
+  .admin-product-row,
+  .admin-orderCardModern,
+  .admin-promo-row,
+  .admin-card {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-panel {
+    padding: 14px !important;
+    border-radius: 20px !important;
+  }
+
+  .admin-panel-body {
+    padding: 0 !important;
+    gap: 12px;
+  }
+
+  .admin-panel-head {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    padding-bottom: 10px;
+  }
+
+  .admin-panel-title {
+    font-size: 15px !important;
+    line-height: 1.2;
+  }
+
+  .admin-panel-sub {
+    font-size: 12px !important;
+    line-height: 1.45;
+  }
+
+  /* 9. Overview grid: stack vertical */
+  .admin-overviewGrid,
+  .admin-overview {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .admin-miniGrid,
+  .admin-miniGridHero {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .admin-miniCard {
+    padding: 12px !important;
+    border-radius: 14px !important;
+  }
+
+  .admin-miniCard strong {
+    font-size: 18px !important;
+    line-height: 1.1;
+    overflow-wrap: anywhere;
+  }
+
+  .admin-miniCard span,
+  .admin-miniCard small {
+    font-size: 10px !important;
+    line-height: 1.3;
+  }
+
+  /* 10. Hero overview top: stack copy + chip row */
+  .admin-overviewHeroTop {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .admin-heroTitle {
+    font-size: 18px !important;
+    line-height: 1.18 !important;
+  }
+
+  .admin-chipRow {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+
+  .admin-chipRow button,
+  .admin-chipRow .btn {
+    flex: 1 1 0;
+    min-height: 32px;
+    padding: 0 10px;
+    font-size: 11px;
+    border-radius: 999px;
+  }
+
+  /* 11. Product list rows: stack price/actions below copy */
+  .admin-product-row,
+  .admin-orderCardModern,
+  .admin-promo-row {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+  }
+
+  .admin-product-row > *,
+  .admin-orderCardModern > *,
+  .admin-promo-row > * {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .admin-product-row .admin-product-info,
+  .admin-product-row .admin-product-meta,
+  .admin-orderCardModern .admin-order-info,
+  .admin-promo-row .admin-promo-meta {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .admin-product-row .admin-product-actions,
+  .admin-orderCardModern .admin-order-actions,
+  .admin-promo-row .admin-promo-actions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+  }
+
+  .admin-product-row .admin-product-actions .btn,
+  .admin-orderCardModern .admin-order-actions .btn,
+  .admin-promo-row .admin-promo-actions .btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 36px;
+    padding: 0 10px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  /* 12. Trend chart: horizontal scroll */
+  .admin-chartList {
+    overflow-x: auto;
+    padding-bottom: 4px;
+    scrollbar-width: thin;
+  }
+
+  .admin-chartRow {
+    grid-template-columns: 88px minmax(160px, 1fr) 76px !important;
+    gap: 8px !important;
+    padding: 8px 0 !important;
+    font-size: 11px;
+  }
+
+  .admin-chartLabel strong {
+    font-size: 12px;
+  }
+
+  .admin-chartLabel small,
+  .admin-chartValue small {
+    font-size: 10px;
+  }
+
+  .admin-chartValue strong {
+    font-size: 12px;
+  }
+
+  /* 13. Form inputs: full width, comfortable touch targets */
+  .admin-page input[type="text"],
+  .admin-page input[type="number"],
+  .admin-page input[type="email"],
+  .admin-page input[type="search"],
+  .admin-page select,
+  .admin-page textarea {
+    min-height: 42px;
+    padding: 10px 12px;
+    font-size: 14px;
+    border-radius: 12px;
+    width: 100%;
+  }
+
+  .admin-page textarea {
+    min-height: 90px;
+  }
+
+  /* 14. Reset any prior rules that may break the new layout */
+  .admin-flowAssist {
+    margin: 0 !important;
+  }
+
+  .admin-alert {
+    padding: 10px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  /* 15. Bulk input textarea styling */
+  .admin-page .admin-promo-bulk textarea {
+    font-family: ui-monospace, "SF Mono", Menlo, monospace;
+    font-size: 12px;
+  }
+}
+
+/* Desktop admin: cleaner sidebar with active indicator + breathing room */
+@media (min-width: 1101px) {
+  .admin-sidebar {
+    padding: 16px !important;
+    gap: 16px !important;
+  }
+
+  .admin-nav button {
+    position: relative;
+    transition:
+      background 0.2s var(--ease-out),
+      transform 0.2s var(--ease-out),
+      color 0.2s var(--ease-out);
+  }
+
+  .admin-nav button::before {
+    content: "";
+    position: absolute;
+    left: -16px;
+    top: 50%;
+    transform: translateY(-50%) scaleY(0);
+    width: 3px;
+    height: 24px;
+    border-radius: 0 999px 999px 0;
+    background: linear-gradient(180deg, #4effda, #00d6b4);
+    transition: transform 0.22s var(--ease-out);
+  }
+
+  .admin-nav button.active::before {
+    transform: translateY(-50%) scaleY(1);
+  }
+
+  .admin-nav button.active {
+    background: linear-gradient(135deg, rgba(79, 255, 200, 0.12), rgba(0, 214, 180, 0.06)) !important;
+    border-color: rgba(0, 214, 180, 0.22) !important;
+  }
+
+  .admin-nav button:hover:not(.active) {
+    transform: translateX(2px);
+  }
+
+  .admin-main {
+    gap: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-stats {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .admin-miniGrid,
+  .admin-miniGridHero {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .admin-mobileTabLabel {
+    font-size: 10px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .admin-statCard {
+    padding: 10px !important;
+  }
+
+  .admin-mobileTab {
+    min-height: 50px !important;
+  }
+}

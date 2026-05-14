@@ -1,0 +1,701 @@
+/*
+  10 polish effects — all lightweight and disabled appropriately on
+  mobile / coarse pointer / prefers-reduced-motion.
+*/
+
+/* ─── 1. Smooth themed scrollbar ────────────────────────────────────────── */
+@media (min-width: 721px) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 214, 180, 0.32) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, rgba(79, 255, 200, 0.42), rgba(0, 214, 180, 0.32));
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+
+  *::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, rgba(79, 255, 200, 0.68), rgba(0, 214, 180, 0.5));
+    background-clip: padding-box;
+  }
+}
+
+/* ─── 2. Themed selection ───────────────────────────────────────────────── */
+::selection {
+  background: rgba(0, 214, 180, 0.32);
+  color: var(--brand-text, #fff);
+  text-shadow: none;
+}
+
+::-moz-selection {
+  background: rgba(0, 214, 180, 0.32);
+  color: var(--brand-text, #fff);
+}
+
+:root[data-theme="light"] ::selection {
+  background: rgba(0, 138, 148, 0.22);
+  color: #0d2d39;
+}
+
+/* ─── 3. Premium focus ring (consistent across interactive elements) ───── */
+:where(button, a, select, textarea, [role="button"], [role="combobox"], [role="option"], [tabindex]):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg0, #0b1220),
+    0 0 0 4px rgba(0, 214, 180, 0.55);
+  border-radius: inherit;
+  transition: box-shadow 0.15s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+/* Plain inputs (not inside a search shell wrapper) get the focus ring too */
+input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg0, #0b1220),
+    0 0 0 4px rgba(0, 214, 180, 0.55);
+  border-radius: inherit;
+  transition: box-shadow 0.15s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+:root[data-theme="light"] :where(button, a, select, textarea, [role="button"], [role="combobox"], [role="option"], [tabindex]):focus-visible,
+:root[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus-visible {
+  box-shadow:
+    0 0 0 2px #ffffff,
+    0 0 0 4px rgba(0, 138, 148, 0.6);
+}
+
+/* ─── 4. Image fade-in on load ──────────────────────────────────────────── */
+img {
+  transition: opacity 0.4s ease, filter 0.4s ease;
+}
+
+img[loading="lazy"]:not([data-loaded]) {
+  opacity: 0;
+  filter: blur(6px);
+}
+
+img[data-loaded],
+img:not([loading]) {
+  opacity: 1;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  img {
+    transition: none !important;
+  }
+}
+
+/* ─── 5. Tap highlight remove + soft press ──────────────────────────────── */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button,
+a,
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+button:active,
+[role="button"]:active,
+a.btn:active {
+  transform: scale(0.97);
+  transition: transform 0.08s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:active,
+  [role="button"]:active,
+  a.btn:active {
+    transform: none;
+  }
+}
+
+/* ─── 6. Magnetic hover hint on key buttons (desktop) ───────────────────── */
+@media (hover: hover) and (pointer: fine) {
+  .btn:not(.btn-disabled):not([disabled]) {
+    transition:
+      transform 0.22s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+      box-shadow 0.22s var(--ease-out),
+      filter 0.22s var(--ease-out);
+  }
+
+  .btn:not(.btn-ghost):not(.btn-disabled):not([disabled]):hover {
+    transform: translateY(-2px);
+    filter: saturate(1.08) brightness(1.04);
+  }
+}
+
+/* ─── 7. Confetti layer (used by Confetti.jsx) ─────────────────────────── */
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  overflow: hidden;
+}
+
+.confetti-burst {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.confetti-piece {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 7px;
+  height: 10px;
+  border-radius: 2px;
+  transform-origin: center;
+  animation: confettiFly var(--cdur, 800ms) cubic-bezier(0.16, 0.7, 0.4, 1) forwards;
+  will-change: transform, opacity;
+}
+
+@keyframes confettiFly {
+  0% {
+    transform: translate(0, 0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--cdx), var(--cdy)) rotate(var(--crot)) scale(0.6);
+    opacity: 0;
+  }
+}
+
+/* ─── 8. Card glow on hover (desktop) ──────────────────────────────────── */
+@media (hover: hover) and (pointer: fine) {
+  .product-tile,
+  .catalog-card,
+  .pdx-variantCard {
+    position: relative;
+  }
+
+  .product-tile::after,
+  .catalog-card::after,
+  .pdx-variantCard::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    background: radial-gradient(
+      300px 200px at var(--mx, 50%) var(--my, 50%),
+      rgba(79, 255, 200, 0.18),
+      rgba(79, 255, 200, 0) 60%
+    );
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+    z-index: 0;
+  }
+
+  .product-tile:hover::after,
+  .catalog-card:hover::after,
+  .pdx-variantCard:hover::after {
+    opacity: 1;
+  }
+
+  .product-tile > *,
+  .catalog-card > *,
+  .pdx-variantCard > * {
+    position: relative;
+    z-index: 1;
+  }
+}
+
+/* ─── 9. Spotlight cursor follower (desktop only, via CSS variables) ───── */
+@media (hover: hover) and (pointer: fine) {
+  body {
+    background-image:
+      radial-gradient(
+        500px 350px at var(--cursor-x, -100px) var(--cursor-y, -100px),
+        rgba(0, 214, 180, 0.05),
+        rgba(0, 214, 180, 0) 60%
+      ),
+      var(--body-bg-original, none);
+    transition: background-position 0.3s var(--ease-out);
+  }
+}
+
+/* ─── 10. Page transition shimmer line ─────────────────────────────────── */
+.route-transition {
+  position: relative;
+}
+
+.route-transition::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    rgba(79, 255, 200, 0) 0%,
+    rgba(79, 255, 200, 0.6) 30%,
+    rgba(0, 214, 180, 0.8) 50%,
+    rgba(0, 138, 148, 0.6) 70%,
+    rgba(0, 138, 148, 0) 100%
+  );
+  transform: translateX(-100%);
+  animation: routeShimmer 1.4s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  pointer-events: none;
+  z-index: 100;
+}
+
+@keyframes routeShimmer {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .route-transition::before {
+    animation: none;
+  }
+}
+
+/* Disable expensive desktop-only effects on mobile */
+@media (max-width: 720px) {
+  .product-tile::after,
+  .catalog-card::after,
+  .pdx-variantCard::after {
+    display: none;
+  }
+}
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   POLISH PASS 2 — 10 more lightweight non-functional effects
+   All disabled on coarse pointer / reduced motion where appropriate.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ─── 11. Skeleton loader unified shimmer ──────────────────────────────── */
+.skeleton,
+.catalog-cardSkeleton,
+.testi-skel,
+.pdx-loadingLine,
+.pdx-loadingBlock {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    90deg,
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04)) 0%,
+    rgba(0, 214, 180, 0.06) 50%,
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04)) 100%
+  );
+  background-size: 200% 100%;
+  animation: polishSkeleton 1.6s ease-in-out infinite;
+}
+
+@keyframes polishSkeleton {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton,
+  .catalog-cardSkeleton,
+  .testi-skel,
+  .pdx-loadingLine,
+  .pdx-loadingBlock {
+    animation: none;
+  }
+}
+
+/* ─── 12. Animated gradient borders on key CTAs ───────────────────────── */
+.btn:not(.btn-ghost):not(.btn-disabled):not([disabled]) {
+  position: relative;
+  isolation: isolate;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:not(.btn-ghost):not(.btn-disabled):not([disabled])::after {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    padding: 1px;
+    background: linear-gradient(
+      var(--rotate, 0deg),
+      rgba(79, 255, 200, 0),
+      rgba(79, 255, 200, 0.5),
+      rgba(0, 214, 180, 0.5),
+      rgba(79, 255, 200, 0)
+    );
+    -webkit-mask:
+      linear-gradient(#fff 0 0) content-box,
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    opacity: 0;
+    pointer-events: none;
+    z-index: -1;
+    transition: opacity 0.3s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
+  }
+
+  .btn:not(.btn-ghost):not(.btn-disabled):not([disabled]):hover::after {
+    opacity: 0.6;
+    animation: polishBorderRotate 3s linear infinite;
+  }
+}
+
+@property --rotate {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes polishBorderRotate {
+  to {
+    --rotate: 360deg;
+  }
+}
+
+/* ─── 13. Soft scroll-fade at section edges ───────────────────────────── */
+.catalog-quickFilters,
+.hero-rail,
+.admin-kpiStrip,
+.admin-mobileTabs,
+.pdx-segmentControl {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 12px,
+    #000 calc(100% - 12px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 12px,
+    #000 calc(100% - 12px),
+    transparent 100%
+  );
+}
+
+/* Don't fade-mask the bottom tab bar (it's not horizontal scroll) */
+@media (max-width: 720px) {
+  .admin-mobileTabs {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+}
+
+/* ─── 14. Subtle aurora gradient on header brand text ─────────────────── */
+.brand,
+.site-brand strong,
+.admin-brand-title,
+.admin-mobileCopy strong {
+  background-image: linear-gradient(135deg, #4effda 0%, #00d6b4 50%, #008a94 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  background-size: 200% auto;
+  animation: polishAurora 6s ease-in-out infinite alternate;
+}
+
+:root[data-theme="dark"] .brand,
+:root[data-theme="dark"] .site-brand strong {
+  background-image: linear-gradient(135deg, #87ffe5 0%, #4effda 50%, #25ebc8 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes polishAurora {
+  0% { background-position: 0% center; }
+  100% { background-position: 100% center; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand,
+  .site-brand strong,
+  .admin-brand-title,
+  .admin-mobileCopy strong {
+    animation: none;
+  }
+}
+
+/* ─── 15. Badge / pill micro-pulse for "active" / "new" indicators ─────── */
+.product-tile-badge.is-new,
+.catalog-status.hot,
+.admin-statCard[data-pulse] {
+  position: relative;
+}
+
+.header-cart .pill::after,
+.catalog-status.hot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1px solid currentColor;
+  opacity: 0;
+  animation: polishPulse 2.4s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes polishPulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  100% { transform: scale(1.6); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .header-cart .pill::after,
+  .catalog-status.hot::after {
+    animation: none;
+    display: none;
+  }
+}
+
+/* ─── 16. Toast slide-in with bounce ───────────────────────────────────── */
+.toast {
+  animation: polishToastIn 0.42s cubic-bezier(0.22, 1.14, 0.36, 1) both;
+}
+
+@keyframes polishToastIn {
+  0% {
+    transform: translateY(28px) scale(0.96);
+    opacity: 0;
+  }
+  60% {
+    transform: translateY(-2px) scale(1.01);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .toast {
+    animation: none;
+  }
+}
+
+/* ─── 17. Input caret colored to brand ─────────────────────────────────── */
+input,
+textarea,
+[contenteditable] {
+  caret-color: #00d6b4;
+}
+
+:root[data-theme="dark"] input,
+:root[data-theme="dark"] textarea {
+  caret-color: #4effda;
+}
+
+/* ─── 18. Reveal-on-scroll soft entrance for sections ──────────────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal,
+  .section,
+  .catalog-card,
+  .product-tile,
+  .pdx-variantCard,
+  .admin-panel {
+    transition:
+      transform 0.5s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
+      opacity 0.5s var(--ease-out);
+  }
+
+  .reveal:not(.is-visible) {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ─── 19. Heading underline accent on hover (long-form pages) ─────────── */
+.h1,
+.h2 {
+  position: relative;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .layout-header h2:hover::after,
+  .pdx-variantsHead h2:hover::after,
+  .home-layoutHeader h2:hover::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    bottom: -4px;
+    width: 32px;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #4effda, #00d6b4);
+    animation: polishUnderlineGrow 0.4s var(--ease-out) both;
+  }
+}
+
+@keyframes polishUnderlineGrow {
+  from { width: 0; opacity: 0; }
+  to { width: 32px; opacity: 1; }
+}
+
+/* ─── 20. Page-load subtle fade for everything inside .page ───────────── */
+@media (prefers-reduced-motion: no-preference) {
+  .page {
+    animation: polishPageEnter 0.5s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
+  }
+}
+
+@keyframes polishPageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CSS CONSISTENCY LAYER
+   Unifies tokens across all pages for cohesive feel.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* Unified card surface — every "panel" looks like the same family */
+.card,
+.admin-panel,
+.admin-statCard,
+.admin-miniCard,
+.admin-mobileBar,
+.catalog-filter,
+.catalog-card,
+.product-tile,
+.pdx-variantCard,
+.pdx-heroPanel,
+.pdx-summaryPanel,
+.pdx-variantsSection,
+.checkout-panel,
+.checkout-summary,
+.status-mainCard,
+.status-sideCard,
+.pay-card,
+.pay-orderDesktop,
+.pay-orderMobile,
+.testi-tile {
+  border-radius: 20px;
+}
+
+/* Unified pill/chip rounded radius */
+.btn,
+.input,
+input[type="text"],
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="password"],
+select,
+.tab-btn,
+.toggle-btn,
+.pdx-chip,
+.catalog-chip,
+.catalog-quickChip,
+.product-tile-pill,
+.catalog-cardMeta > span,
+.hero-railItem {
+  font-feature-settings: "ss01", "cv11";
+}
+
+/* Unified focus ring on inputs to match button focus.
+   Exclude inputs that are inside a search shell wrapper (handled separately). */
+input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: rgba(0, 138, 148, 0.4) !important;
+  box-shadow:
+    0 0 0 3px rgba(0, 214, 180, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+
+:root[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+:root[data-theme="light"] select:focus,
+:root[data-theme="light"] textarea:focus {
+  border-color: rgba(0, 138, 148, 0.5) !important;
+  box-shadow:
+    0 0 0 3px rgba(0, 194, 208, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+
+/* Inputs inside search shell wrappers must NOT have their own focus ring;
+   the wrapper element provides the visual feedback via :focus-within */
+.hero-search-shell .hero-search-input:focus,
+.catalog-commandSearch .catalog-commandInput:focus,
+.catalog-heroSearch .hero-search-input:focus,
+.st-inputWrap .st-input:focus,
+.faq-searchWrap .faq-searchInput:focus,
+.testi-searchShell .testi-searchInput:focus,
+.catalog-filterSearch .catalog-filterInput:focus,
+.st-searchShell .st-searchInput:focus,
+.ai-inputBar .ai-input:focus {
+  outline: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* Consistent disabled state */
+button:disabled,
+.btn:disabled,
+.btn-disabled,
+[disabled] {
+  opacity: 0.55 !important;
+  cursor: not-allowed !important;
+  filter: saturate(0.6);
+  pointer-events: none;
+}
+
+/* Consistent muted text color across all pages */
+.muted,
+.text-muted,
+.hint,
+small {
+  color: var(--brand-muted, rgba(234, 255, 245, 0.65));
+}
+
+/* Smooth scroll for in-page anchors */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

@@ -821,6 +821,10 @@
     gap: 12px;
   }
 
+  .pdx-productCopy {
+    min-width: 0;
+  }
+
   .pdx-productIcon {
     width: 70px;
     height: 70px;
@@ -828,7 +832,10 @@
   }
 
   .pdx-title {
-    font-size: clamp(27px, 8vw, 34px);
+    font-size: clamp(24px, 6.5vw, 30px);
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    max-width: 100%;
   }
 
   .pdx-descriptionText {
@@ -858,6 +865,29 @@
   .pdx-variantFoot {
     flex-direction: column;
     align-items: stretch;
+    gap: 8px;
+  }
+
+  .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-qty,
+  .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-actionBtns {
+    width: 100%;
+  }
+
+  .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-actionBtns {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-addBtn {
+    flex: 0 0 auto;
+    width: 44px;
+    min-width: 0;
+    padding: 0;
+  }
+
+  .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-buyNowBtn {
+    flex: 1 1 auto;
+    min-width: 0;
   }
 
   .pdx-qty,
@@ -886,5 +916,30 @@
     min-height: 28px;
     padding: 0 9px;
     font-size: 10px;
+  }
+}
+
+
+/* Prevent horizontal overflow on mobile product detail */
+@media (max-width: 720px) {
+  .detail-page .container {
+    overflow-x: clip;
+  }
+
+  .detail-page .pdx-heroPanel,
+  .detail-page .pdx-summaryPanel,
+  .detail-page .pdx-variantsSection {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detail-page .pdx-summaryActionsMain {
+    flex-wrap: wrap;
+  }
+
+  .detail-page .pdx-scrollBtn,
+  .detail-page .pdx-cartBtn {
+    min-width: 0;
+    flex: 1 1 auto;
   }
 }

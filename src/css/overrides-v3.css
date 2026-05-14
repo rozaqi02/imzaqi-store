@@ -6,9 +6,8 @@
 
 @media (max-width: 680px){
   .header{
-    background:rgba(4,7,20,.56) !important;
-    backdrop-filter:blur(18px) saturate(155%) !important;
-    -webkit-backdrop-filter:blur(18px) saturate(155%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
   .header-inner{padding:12px 0;}
 }
