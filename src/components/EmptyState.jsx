@@ -4,13 +4,19 @@ import { Link } from "react-router-dom";
 export default function EmptyState({
   title,
   description,
-  icon = "[]",
+  icon,
   primaryAction,
   secondaryAction,
 }) {
+  // Support both string icons and React elements (e.g. lucide icons)
+  const iconContent = icon ?? "[]";
+  const isElement = React.isValidElement(iconContent);
+
   return (
     <div className="empty">
-      <div className="empty-icon" aria-hidden="true">{icon}</div>
+      <div className={`empty-icon${isElement ? " empty-icon-component" : ""}`} aria-hidden="true">
+        {iconContent}
+      </div>
       {title ? <div className="empty-title">{title}</div> : null}
       {description ? <div className="empty-desc">{description}</div> : null}
 
@@ -41,9 +47,8 @@ function renderAction(action, className) {
     );
   }
   return (
-    <button className={className} onClick={onClick}>
+    <button className={className} type="button" onClick={onClick}>
       {label}
     </button>
   );
 }
-

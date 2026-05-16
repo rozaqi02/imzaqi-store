@@ -244,6 +244,31 @@ export default function About() {
             </div>
           </header>
 
+          {/* ── Cara Pesan Section ── */}
+          <section className="faq-howto">
+            <div className="faq-howtoHead">
+              <div className="faq-kicker">Cara Pesan</div>
+              <h2 className="faq-howtoTitle">4 langkah mudah</h2>
+            </div>
+            <div className="faq-howtoSteps">
+              {[
+                { num: "01", icon: "🛍️", title: "Pilih Produk", desc: "Buka katalog, pilih produk dan varian yang sesuai kebutuhan dan budget." },
+                { num: "02", icon: "💳", title: "Bayar via QRIS", desc: "Scan QRIS dengan m-banking atau e-wallet. Nominal otomatis menyesuaikan total." },
+                { num: "03", icon: "📋", title: "Simpan ID Order", desc: "Setelah konfirmasi, ID order (format IMZ-XXXX) akan muncul. Simpan baik-baik." },
+                { num: "04", icon: "✅", title: "Pantau Status", desc: "Masukkan ID order di halaman Status untuk melihat progres terbaru." },
+              ].map((step) => (
+                <div key={step.num} className="faq-howtoStep">
+                  <div className="faq-howtoNum">{step.num}</div>
+                  <div className="faq-howtoEmoji">{step.icon}</div>
+                  <div className="faq-howtoCopy">
+                    <strong>{step.title}</strong>
+                    <p>{step.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
           <section className="faq-command">
             <div className="faq-searchWrap">
               <Search size={16} />

@@ -9,6 +9,7 @@ const footerColumns = [
       { label: "Produk", to: "/produk" },
       { label: "Checkout", to: "/checkout" },
       { label: "Status", to: "/status" },
+      { label: "Riwayat Order", to: "/riwayat" },
     ],
   },
   {
@@ -23,19 +24,19 @@ const footerColumns = [
   {
     label: "Perusahaan",
     links: [
+      { label: "Riwayat Order", to: "/riwayat" },
+      { label: "Status Order", to: "/status" },
       { label: "FAQ", to: "/tentang" },
-      { label: "Panduan", to: "/tentang" },
-      { label: "Media Kit", to: "/tentang" },
-      { label: "Karier", to: "/tentang" },
+      { label: "Testimoni", to: "/testimoni" },
     ],
   },
   {
     label: "Lainnya",
     links: [
       { label: "Bantuan", to: "/tentang" },
-      { label: "Blog", to: "/tentang" },
+      { label: "Cara Pesan", to: "/tentang" },
       { label: "Hubungi Kami", href: "https://wa.me/6283136049987" },
-      { label: "Kebijakan Privasi", to: "/tentang" },
+      { label: "Cek Status", to: "/status" },
     ],
   },
 ];

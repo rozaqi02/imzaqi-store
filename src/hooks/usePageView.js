@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { getVisitorIdAsUUID } from "../lib/visitor";
 
@@ -42,6 +43,39 @@ function markToday(dayISO) {
 }
 
 export function usePageView() {
+  const location = useLocation();
+
+  // Track setiap navigasi ke tabel page_views — hanya saat pathname berubah
+  useEffect(() => {
+    let cancelled = false;
+
+    async function trackView() {
+      try {
+        const visitorId = getVisitorIdAsUUID();
+        // Hanya track pathname, bukan search params — menghindari insert
+        // berulang saat user mengetik di filter/search
+        const path = location.pathname;
+        const referrer =
+          typeof document !== "undefined" ? document.referrer || null : null;
+
+        await supabase.from("page_views").insert({
+          visitor_id: visitorId,
+          path,
+          referrer,
+        });
+      } catch {
+        // Jangan crash kalau tracking gagal
+      }
+    }
+
+    if (!cancelled) trackView();
+    return () => {
+      cancelled = true;
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.pathname]);
+
+  // Increment unique visit counter (site_stats) — sekali per hari
   useEffect(() => {
     let cancelled = false;
 

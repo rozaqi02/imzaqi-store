@@ -4,14 +4,23 @@ import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
   Box,
+  Check,
   ClipboardList,
+  Copy,
   Eye,
   LayoutDashboard,
+  MapPin,
+  Pencil,
+  Plus,
   Search,
   Settings2,
   Star,
   Tags,
+  Trash2,
+  TrendingUp,
+  Users,
   Wallet,
+  X,
 } from "lucide-react";
 
 import Modal from "../../components/Modal";
@@ -25,8 +34,14 @@ import {
   fetchSettings,
   fetchTestimonials,
   upsertSetting,
+  fetchDailyStats,
+  fetchVisitorStats,
+  fetchTopPages,
+  fetchCohortReturn,
+  buildOrdersCSV,
+  downloadCSV,
 } from "../../lib/api";
-import { formatIDR, slugify } from "../../lib/format";
+import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDisplay, calcRevenueForecast, calcRemainingQuota, isPromoExpired } from "../../lib/format";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
 
@@ -211,6 +226,16 @@ export default function AdminDashboard() {
   });
   const [analyticsWindow, setAnalyticsWindow] = useState("7d");
 
+  // ── Analytics state (dari tabel daily_stats & page_views) ──
+  const [dailyStats, setDailyStats] = useState([]);
+  const [visitorStats, setVisitorStats] = useState({ totalVisitors: 0, returningVisitors: 0, newVisitors: 0 });
+  const [topPages, setTopPages] = useState([]);
+  const [analyticsLoading, setAnalyticsLoading] = useState(false);
+  const [cohortReturn, setCohortReturn] = useState(0);
+
+  // ── Bulk Actions state ──
+  const [selectedOrderIds, setSelectedOrderIds] = useState(new Set());
+
   // Products UI state
   const [visibleProductsCount, setVisibleProductsCount] = useState(20);
   const [productQuery, setProductQuery] = useState("");
@@ -249,9 +274,18 @@ export default function AdminDashboard() {
   });
 
   const [promoBulk, setPromoBulk] = useState("");
+  // Promo form state
+  const PROMO_FORM_EMPTY = { code: "", percent: "", expired_at: "", max_uses: "" };
+  const [promoFormOpen, setPromoFormOpen] = useState(false);
+  const [promoFormMode, setPromoFormMode] = useState("create"); // "create" | "edit"
+  const [promoForm, setPromoForm] = useState(PROMO_FORM_EMPTY);
+  const [promoQuery, setPromoQuery] = useState("");
+  const [copiedCode, setCopiedCode] = useState("");
+  const [promoDeleteTarget, setPromoDeleteTarget] = useState(null); // code string to confirm delete
   const [settingsWhatsApp, setSettingsWhatsApp] = useState("");
   const [settingsQrisBase, setSettingsQrisBase] = useState("");
   const [settingsQrisImageUrl, setSettingsQrisImageUrl] = useState("");
+  const [newOrderCount, setNewOrderCount] = useState(0);
   const deferredProductQuery = useDeferredValue(productQuery);
   const deferredOrderQuery = useDeferredValue(orderQuery);
   const waNumber = settings?.whatsapp?.number || "";
@@ -408,10 +442,37 @@ export default function AdminDashboard() {
     }
   }
 
+  async function refreshAnalytics(days) {
+    setAnalyticsLoading(true);
+    try {
+      const [daily, visitor, pages, cohort] = await Promise.all([
+        fetchDailyStats({ days }),
+        fetchVisitorStats({ days }),
+        fetchTopPages({ days, limit: 10 }),
+        fetchCohortReturn({ days: 7 }),
+      ]);
+      setDailyStats(daily);
+      setVisitorStats(visitor);
+      setTopPages(pages);
+      setCohortReturn(cohort);
+    } catch (e) {
+      console.warn("Gagal memuat analytics:", e);
+    } finally {
+      setAnalyticsLoading(false);
+    }
+  }
+
   useEffect(() => {
     refreshAll();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Reload analytics setiap kali window berubah
+  useEffect(() => {
+    const days = analyticsWindow === "30d" ? 30 : 7;
+    refreshAnalytics(days);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [analyticsWindow]);
 
   // Ensure selected product exists
   useEffect(() => {
@@ -709,6 +770,28 @@ export default function AdminDashboard() {
     });
   }, [selectedProduct]);
 
+  // ===== Realtime subscription for new orders =====
+  useEffect(() => {
+    const channel = supabase
+      .channel("admin-orders-realtime")
+      .on(
+        "postgres_changes",
+        { event: "INSERT", schema: "public", table: "orders" },
+        (payload) => {
+          const newOrder = payload.new;
+          setOrders((prev) => [newOrder, ...prev]);
+          toast.success(`Order baru: ${newOrder.order_code || "—"}`, { duration: 5000 });
+          setNewOrderCount((prev) => prev + 1);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   // ===== Helpers =====
   async function uploadToBucket(bucket, file, folder) {
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
@@ -1000,6 +1083,65 @@ export default function AdminDashboard() {
   }
 
   // ===== Orders actions =====
+
+  function handleExportCSV() {
+    if (!filteredOrders.length) {
+      toast.error("Tidak ada order untuk diekspor");
+      return;
+    }
+    const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+    const csv = buildOrdersCSV(filteredOrders);
+    downloadCSV(csv, `orders-${today}.csv`);
+    toast.success(`${filteredOrders.length} order diekspor`);
+  }
+
+  function buildCustomerWaUrl(order) {
+    const digits = normalizeWhatsApp(order?.customer_whatsapp || "");
+    if (!digits) return "";
+    const statusLabel = prettyStatus(order?.status);
+    const text = encodeURIComponent(
+      `Halo ${order?.customer_whatsapp || ""},\n\nUpdate order kamu:\n\nID Order: ${order?.order_code || "-"}\nStatus: ${statusLabel}\nTotal: ${formatIDR(order?.total_idr || 0)}\n\nTerima kasih sudah berbelanja di Imzaqi Store.`
+    );
+    return `https://wa.me/${digits}?text=${text}`;
+  }
+
+  async function bulkUpdateStatus(newStatus) {
+    const ids = Array.from(selectedOrderIds);
+    if (!ids.length) return;
+    const label = newStatus === "done" ? "selesai" : "dibatalkan";
+    if (!window.confirm(`Tandai ${ids.length} order sebagai ${label}?`)) return;
+
+    const tid = toast.loading(`Memperbarui ${ids.length} order...`);
+    const results = await Promise.allSettled(
+      ids.map((id) =>
+        supabase.from("orders").update({ status: newStatus }).eq("id", id)
+      )
+    );
+    toast.remove(tid);
+
+    const failed = results.filter((r) => r.status === "rejected" || r.value?.error).length;
+    const succeeded = ids.length - failed;
+
+    if (failed === 0) {
+      toast.success(`${succeeded} order diperbarui`);
+      setSelectedOrderIds(new Set());
+    } else {
+      toast.error(`${succeeded} berhasil, ${failed} gagal`);
+    }
+
+    await refreshOrders();
+  }
+
+  async function copyStatusLink(orderCode) {
+    const url = `${window.location.origin}/status?order=${encodeURIComponent(orderCode)}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Link status disalin");
+    } catch {
+      toast.error("Gagal menyalin link");
+    }
+  }
+
   async function updateOrderStatus(orderId, status) {
     const tid = toast.loading("Update status");
     setMsg("");
@@ -1098,6 +1240,92 @@ export default function AdminDashboard() {
       toast.error("Gagal update promo");
       setMsg(e?.message || String(e));
     }
+  }
+
+  async function savePromoForm() {
+    const code = String(promoForm.code || "").trim().toUpperCase();
+    const percent = Number(promoForm.percent);
+    if (!code) { toast.error("Kode promo wajib diisi"); return; }
+    if (!Number.isFinite(percent) || percent <= 0 || percent > 100) { toast.error("Diskon harus 1–100%"); return; }
+
+    const row = {
+      code,
+      percent,
+      is_active: true,
+      updated_at: new Date().toISOString(),
+      ...(promoForm.expired_at ? { expired_at: promoForm.expired_at } : { expired_at: null }),
+      ...(promoForm.max_uses !== "" && promoForm.max_uses != null
+        ? { max_uses: Number(promoForm.max_uses) }
+        : { max_uses: null }),
+    };
+
+    const tid = toast.loading(promoFormMode === "edit" ? "Menyimpan perubahan" : "Membuat promo");
+    try {
+      const { error } = await supabase.from("promo_codes").upsert([row], { onConflict: "code" });
+      if (error) {
+        // Database constraint violation — percent likely exceeds DB limit
+        if (error.message?.includes("promo_codes_percent_check")) {
+          toast.remove(tid);
+          toast.error("Database membatasi diskon maksimal 99%. Ubah constraint di Supabase SQL Editor: ALTER TABLE promo_codes DROP CONSTRAINT promo_codes_percent_check; ALTER TABLE promo_codes ADD CONSTRAINT promo_codes_percent_check CHECK (percent >= 1 AND percent <= 100);");
+          return;
+        }
+        throw error;
+      }
+      setPromos(await fetchPromoCodes());
+      setPromoFormOpen(false);
+      setPromoForm(PROMO_FORM_EMPTY);
+      toast.remove(tid);
+      toast.success(promoFormMode === "edit" ? "Promo diperbarui" : "Promo dibuat", { duration: 1400 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal simpan promo");
+      setMsg(e?.message || String(e));
+    }
+  }
+
+  async function deletePromo(code) {
+    setPromoDeleteTarget(code);
+  }
+
+  async function confirmDeletePromo() {
+    const code = promoDeleteTarget;
+    setPromoDeleteTarget(null);
+    if (!code) return;
+    const tid = toast.loading("Menghapus promo");
+    try {
+      const { error } = await supabase.from("promo_codes").delete().eq("code", code);
+      if (error) throw error;
+      setPromos(await fetchPromoCodes());
+      toast.remove(tid);
+      toast.success("Promo dihapus", { duration: 1400 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal hapus promo");
+      setMsg(e?.message || String(e));
+    }
+  }
+
+  function openCreatePromo() {
+    setPromoForm(PROMO_FORM_EMPTY);
+    setPromoFormMode("create");
+    setPromoFormOpen(true);
+  }
+
+  function openEditPromo(p) {
+    setPromoForm({
+      code: p.code,
+      percent: String(p.percent),
+      expired_at: p.expired_at ? p.expired_at.slice(0, 10) : "",
+      max_uses: p.max_uses != null ? String(p.max_uses) : "",
+    });
+    setPromoFormMode("edit");
+    setPromoFormOpen(true);
+  }
+
+  function copyPromoCode(code) {
+    navigator.clipboard?.writeText(code).catch(() => {});
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(""), 1800);
   }
 
   // ===== Testimonials actions (multi) =====
@@ -1281,7 +1509,10 @@ export default function AdminDashboard() {
                 <button
                   key={t.id}
                   className={"admin-nav-btn " + (tab === t.id ? "active" : "")}
-                  onClick={() => startTransition(() => setTab(t.id))}
+                  onClick={() => {
+                    startTransition(() => setTab(t.id));
+                    if (t.id === "orders") setNewOrderCount(0);
+                  }}
                 >
                   <span className="admin-nav-icon">
                     {React.createElement(TAB_ICONS[t.id] || Box, { size: 16 })}
@@ -1291,6 +1522,9 @@ export default function AdminDashboard() {
                     <small>{t.hint}</small>
                   </span>
                   <span className="admin-nav-badge">{tabMeta[t.id]}</span>
+                  {t.id === "orders" && newOrderCount > 0 ? (
+                    <span className="admin-nav-newBadge">{newOrderCount}</span>
+                  ) : null}
                 </button>
               ))}
             </nav>
@@ -1337,13 +1571,19 @@ export default function AdminDashboard() {
                           key={t.id}
                           type="button"
                           className={`admin-mobileTab ${tab === t.id ? "active" : ""}`}
-                          onClick={() => startTransition(() => setTab(t.id))}
+                          onClick={() => {
+                            startTransition(() => setTab(t.id));
+                            if (t.id === "orders") setNewOrderCount(0);
+                          }}
                         >
                           <span className="admin-mobileTabIcon">
                             <MobileTabIcon size={15} />
                           </span>
                           <span className="admin-mobileTabLabel">{t.label}</span>
                           <span className="admin-mobileTabMeta">{tabMeta[t.id]}</span>
+                          {t.id === "orders" && newOrderCount > 0 ? (
+                            <span className="admin-nav-newBadge">{newOrderCount}</span>
+                          ) : null}
                         </button>
                       );
                     })}
@@ -1675,6 +1915,281 @@ export default function AdminDashboard() {
                       )}
                     </div>
                   </div>
+
+                  {/* ── Panel: Visitor Analytics (dari tabel page_views) ── */}
+                  <div className="admin-panel admin-panelWide">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">
+                          <Users size={15} style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }} />
+                          Visitor Analytics
+                        </div>
+                        <div className="admin-panel-sub">
+                          Pengunjung baru vs. yang kembali lagi — {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
+                        </div>
+                      </div>
+                      {analyticsLoading ? <span className="admin-panel-sub">Memuat...</span> : null}
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      <div className="admin-miniGrid">
+                        <div className="admin-miniCard">
+                          <span>Total visitor</span>
+                          <strong>{visitorStats.totalVisitors.toLocaleString("id-ID")}</strong>
+                          <small>Unik dalam periode</small>
+                        </div>
+                        <div className="admin-miniCard">
+                          <span>Visitor baru</span>
+                          <strong>{visitorStats.newVisitors.toLocaleString("id-ID")}</strong>
+                          <small>Pertama kali berkunjung</small>
+                        </div>
+                        <div className="admin-miniCard">
+                          <span>Balik lagi</span>
+                          <strong>{visitorStats.returningVisitors.toLocaleString("id-ID")}</strong>
+                          <small>Lebih dari 1 hari kunjungan</small>
+                        </div>
+                        <div className="admin-miniCard">
+                          <span>Retention rate</span>
+                          <strong>
+                            {visitorStats.totalVisitors
+                              ? `${((visitorStats.returningVisitors / visitorStats.totalVisitors) * 100).toFixed(1)}%`
+                              : "0%"}
+                          </strong>
+                          <small>Visitor yang kembali</small>
+                        </div>
+                      </div>
+                      {visitorStats.totalVisitors > 0 ? (
+                        <div>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
+                            <small className="muted">Baru</small>
+                            <small className="muted">Kembali</small>
+                          </div>
+                          <div className="admin-chartTrack" style={{ height: 10, borderRadius: 6 }}>
+                            <span
+                              className="admin-chartBar orders"
+                              style={{
+                                width: `${clampPercent((visitorStats.newVisitors / visitorStats.totalVisitors) * 100)}%`,
+                                borderRadius: 6,
+                              }}
+                            />
+                          </div>
+                          <div style={{ display: "flex", justifyContent: "space-between", marginTop: 4 }}>
+                            <small>{visitorStats.newVisitors} baru</small>
+                            <small>{visitorStats.returningVisitors} kembali</small>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="admin-emptyInline">
+                          {analyticsLoading ? "Memuat data..." : "Belum ada data visitor. Data akan terisi setelah pengunjung datang."}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Panel: Tren Views Harian (dari daily_stats) ── */}
+                  <div className="admin-panel admin-panelWide">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">
+                          <TrendingUp size={15} style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }} />
+                          Tren Views Harian
+                        </div>
+                        <div className="admin-panel-sub">
+                          Unique views per hari dari tabel daily_stats — {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
+                        </div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body">
+                      {dailyStats.length > 0 ? (() => {
+                        const maxViews = Math.max(1, ...dailyStats.map((d) => d.uniqueViews));
+                        const maxRev = Math.max(1, ...dailyStats.map((d) => d.revenueIdr));
+                        return (
+                          <div className="admin-chartList">
+                            {dailyStats.map((point) => {
+                              const dateLabel = new Intl.DateTimeFormat("id-ID", {
+                                timeZone: "Asia/Jakarta",
+                                day: "2-digit",
+                                month: "short",
+                              }).format(new Date(point.date + "T00:00:00+07:00"));
+                              return (
+                                <div key={point.date} className="admin-chartRow">
+                                  <div className="admin-chartLabel">
+                                    <strong>{dateLabel}</strong>
+                                    <small>{point.uniqueViews} views</small>
+                                  </div>
+                                  <div className="admin-chartBars">
+                                    <div className="admin-chartTrack">
+                                      <span
+                                        className="admin-chartBar orders"
+                                        style={{ width: `${clampPercent((point.uniqueViews / maxViews) * 100)}%` }}
+                                        title={`${point.uniqueViews} views`}
+                                      />
+                                    </div>
+                                    <div className="admin-chartTrack">
+                                      <span
+                                        className="admin-chartBar revenue"
+                                        style={{ width: `${clampPercent((point.revenueIdr / maxRev) * 100)}%` }}
+                                        title={`Revenue: ${point.revenueIdr}`}
+                                      />
+                                    </div>
+                                  </div>
+                                  <div className="admin-chartValue">
+                                    <strong>{point.totalOrders} order</strong>
+                                    <small>{formatCompactIDR(point.revenueIdr)}</small>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        );
+                      })() : (
+                        <div className="admin-emptyInline">
+                          {analyticsLoading ? "Memuat data..." : "Belum ada data di tabel daily_stats. Data akan terisi otomatis setelah ada order baru."}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Panel: Top Pages ── */}
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">
+                          <MapPin size={15} style={{ display: "inline", marginRight: 6, verticalAlign: "middle" }} />
+                          Halaman Terpopuler
+                        </div>
+                        <div className="admin-panel-sub">
+                          Halaman yang paling sering dikunjungi dalam {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
+                        </div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      {topPages.length > 0 ? (() => {
+                        const maxCount = Math.max(1, ...topPages.map((p) => p.viewCount));
+                        return topPages.map((page, index) => (
+                          <div key={page.path} className="admin-rankItem">
+                            <div className="admin-rankIndex">#{index + 1}</div>
+                            <div className="admin-rankCopy" style={{ flex: 1 }}>
+                              <strong style={{ fontFamily: "monospace", fontSize: 13 }}>{page.path}</strong>
+                              <div className="admin-chartTrack" style={{ marginTop: 4 }}>
+                                <span
+                                  className="admin-chartBar orders"
+                                  style={{ width: `${clampPercent((page.viewCount / maxCount) * 100)}%` }}
+                                />
+                              </div>
+                            </div>
+                            <div className="admin-rankMeta">{page.viewCount.toLocaleString("id-ID")} views</div>
+                          </div>
+                        ));
+                      })() : (
+                        <div className="admin-emptyInline">
+                          {analyticsLoading ? "Memuat data..." : "Belum ada data page views. Data akan terisi setelah pengunjung mulai datang."}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ── Panel: Conversion Rate ── */}
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Conversion Rate</div>
+                        <div className="admin-panel-sub">Persentase visitor yang melakukan order.</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      <div className="admin-miniGrid">
+                        <div className="admin-miniCard">
+                          <span>Konversi keseluruhan</span>
+                          <strong>
+                            {storePulse.total_views
+                              ? `${calcConversionRate(orders.length, storePulse.total_views).toFixed(2)}%`
+                              : "-"}
+                          </strong>
+                          <small>{orders.length} order dari {storePulse.total_views} views</small>
+                        </div>
+                        <div className="admin-miniCard">
+                          <span>Konversi hari ini</span>
+                          <strong>
+                            {storePulse.today_views
+                              ? `${calcConversionRate(storePulse.today_orders || analyticsSummary.todayOrders, storePulse.today_views).toFixed(2)}%`
+                              : "-"}
+                          </strong>
+                          <small>{storePulse.today_views} views hari ini</small>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* ── Panel: Cohort Return ── */}
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Visitor Kembali (Cohort 7 Hari)</div>
+                        <div className="admin-panel-sub">Visitor unik yang kembali dalam 7 hari setelah kunjungan pertama.</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      {(() => {
+                        const display = formatCohortDisplay(cohortReturn, visitorStats.totalVisitors);
+                        return (
+                          <div className="admin-miniGrid">
+                            <div className="admin-miniCard">
+                              <span>Visitor kembali</span>
+                              <strong>{display.value.toLocaleString("id-ID")}</strong>
+                              <small>
+                                {display.percent != null
+                                  ? `${display.percent.toFixed(1)}% dari total visitor`
+                                  : "Belum ada data visitor"}
+                              </small>
+                            </div>
+                            <div className="admin-miniCard">
+                              <span>Total visitor unik</span>
+                              <strong>{visitorStats.totalVisitors.toLocaleString("id-ID")}</strong>
+                              <small>Dalam {analyticsWindow === "30d" ? "30" : "7"} hari terakhir</small>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
+
+                  {/* ── Panel: Revenue Forecast ── */}
+                  <div className="admin-panel">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Revenue Forecast 7 Hari</div>
+                        <div className="admin-panel-sub">Proyeksi revenue berdasarkan tren 30 hari terakhir (regresi linear).</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body admin-stack">
+                      {(() => {
+                        const forecast = calcRevenueForecast(dailyStats);
+                        if (!forecast) {
+                          return (
+                            <div className="admin-emptyInline">
+                              {analyticsLoading ? "Memuat data..." : "Data tidak cukup untuk forecast (butuh minimal 7 hari data)."}
+                            </div>
+                          );
+                        }
+                        const trendIcon = forecast.trend === "up" ? "↑" : forecast.trend === "down" ? "↓" : "→";
+                        const trendLabel = forecast.trend === "up" ? "Tren naik" : forecast.trend === "down" ? "Tren turun" : "Stabil";
+                        return (
+                          <div className="admin-miniGrid">
+                            <div className="admin-miniCard">
+                              <span>Proyeksi 7 hari ke depan</span>
+                              <strong>{formatCompactIDR(forecast.forecast7d)}</strong>
+                              <small>{trendIcon} {trendLabel}</small>
+                            </div>
+                            <div className="admin-miniCard">
+                              <span>Rata-rata per hari (forecast)</span>
+                              <strong>{formatCompactIDR(Math.round(forecast.forecast7d / 7))}</strong>
+                              <small>Berdasarkan {dailyStats.length} hari data</small>
+                            </div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : null}
@@ -1954,6 +2469,9 @@ export default function AdminDashboard() {
                   <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>
                     Refresh orders
                   </button>
+                  <button className="btn btn-sm" type="button" onClick={handleExportCSV}>
+                    Export CSV
+                  </button>
                 </div>
 
                 <div className="admin-panel-body">
@@ -2020,52 +2538,113 @@ export default function AdminDashboard() {
                       <EmptyState icon="ORD" title="Order tidak ditemukan" description="Coba ubah filter atau kata kunci pencarian." />
                     </div>
                   ) : (
-                    <div className="admin-ordersList">
-                      {filteredOrders.map((o) => {
-                        const itemCount = getOrderItemCount(o);
-                        const whatsappLink = buildWhatsAppLink(o.customer_whatsapp);
+                    <>
+                      {/* ── Bulk Action Bar ── */}
+                      {selectedOrderIds.size > 0 ? (
+                        <div className="admin-bulkBar">
+                          <span className="admin-bulkCount">{selectedOrderIds.size} order dipilih</span>
+                          <div className="admin-bulkActions">
+                            <button className="btn btn-sm" type="button" onClick={() => bulkUpdateStatus("done")}>
+                              ✓ Tandai Selesai
+                            </button>
+                            <button className="btn btn-danger btn-sm" type="button" onClick={() => bulkUpdateStatus("cancelled")}>
+                              Batalkan
+                            </button>
+                            <button className="btn btn-ghost btn-sm" type="button" onClick={() => setSelectedOrderIds(new Set())}>
+                              Batal pilih
+                            </button>
+                          </div>
+                        </div>
+                      ) : null}
 
-                        return (
-                          <article key={o.id} className="admin-orderListItem">
-                            <div className="admin-orderListMain">
-                              <div className="admin-order-code">{o.order_code || o.id}</div>
-                              <div className="admin-order-sub">
-                                {formatAdminDate(o.created_at)} | {itemCount} item | {o.customer_whatsapp || "Tanpa WA"}
-                              </div>
-                              <div className="admin-orderListMeta">
-                                {o.promo_code ? <span className="admin-orderTag">Promo {o.promo_code}</span> : null}
-                                {whatsappLink ? (
-                                  <a className="admin-orderLink" href={whatsappLink} target="_blank" rel="noreferrer">
-                                    Chat WhatsApp
-                                  </a>
-                                ) : null}
-                              </div>
-                            </div>
+                      {/* ── Select All ── */}
+                      <div className="admin-bulkSelectAll">
+                        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
+                          <input
+                            type="checkbox"
+                            checked={filteredOrders.length > 0 && filteredOrders.every((o) => selectedOrderIds.has(o.id))}
+                            onChange={(e) => {
+                              if (e.target.checked) {
+                                setSelectedOrderIds(new Set(filteredOrders.map((o) => o.id)));
+                              } else {
+                                setSelectedOrderIds(new Set());
+                              }
+                            }}
+                          />
+                          Pilih semua ({filteredOrders.length})
+                        </label>
+                      </div>
 
-                            <div className="admin-orderListRight">
-                              <StatusBadge status={o.status} />
-                              <strong className="admin-orderTotal">{formatIDR(o.total_idr)}</strong>
-                              <div className="admin-orderRowActions">
-                                <select
-                                  className="input admin-select admin-orderInlineSelect"
-                                  value={String(o.status || "pending")}
-                                  onChange={(e) => updateOrderStatus(o.id, e.target.value)}
-                                >
-                                  {ORDER_STATUS_OPTIONS.map((option) => (
-                                    <option key={option.value} value={option.value}>
-                                      {option.label}
-                                    </option>
-                                  ))}
-                                </select>
-                                <button className="btn btn-sm" type="button" onClick={() => setActiveOrderId(o.id)}>
-                                  Detail
-                                </button>
+                      <div className="admin-ordersList">
+                        {filteredOrders.map((o) => {
+                          const itemCount = getOrderItemCount(o);
+                          const whatsappLink = buildWhatsAppLink(o.customer_whatsapp);
+                          const isSelected = selectedOrderIds.has(o.id);
+
+                          return (
+                            <article key={o.id} className={`admin-orderListItem ${isSelected ? "is-selected" : ""}`}>
+                              <div className="admin-orderListCheckbox">
+                                <input
+                                  type="checkbox"
+                                  checked={isSelected}
+                                  onChange={(e) => {
+                                    setSelectedOrderIds((prev) => {
+                                      const next = new Set(prev);
+                                      if (e.target.checked) next.add(o.id);
+                                      else next.delete(o.id);
+                                      return next;
+                                    });
+                                  }}
+                                />
                               </div>
-                            </div>
-                          </article>
-                        );
-                      })}
-                    </div>
+                              <div className="admin-orderListMain">
+                                <div className="admin-order-code">{o.order_code || o.id}</div>
+                                <div className="admin-order-sub">
+                                  {formatAdminDate(o.created_at)} | {itemCount} item | {o.customer_whatsapp || "Tanpa WA"}
+                                </div>
+                                <div className="admin-orderListMeta">
+                                  {o.promo_code ? <span className="admin-orderTag">Promo {o.promo_code}</span> : null}
+                                  {whatsappLink ? (
+                                    <a className="admin-orderLink" href={whatsappLink} target="_blank" rel="noreferrer">
+                                      Chat WhatsApp
+                                    </a>
+                                  ) : null}
+                                </div>
+                              </div>
+
+                              <div className="admin-orderListRight">
+                                <StatusBadge status={o.status} />
+                                <strong className="admin-orderTotal">{formatIDR(o.total_idr)}</strong>
+                                <div className="admin-orderRowActions">
+                                  <select
+                                    className="input admin-select admin-orderInlineSelect"
+                                    value={String(o.status || "pending")}
+                                    onChange={(e) => updateOrderStatus(o.id, e.target.value)}
+                                  >
+                                    {ORDER_STATUS_OPTIONS.map((option) => (
+                                      <option key={option.value} value={option.value}>
+                                        {option.label}
+                                      </option>
+                                    ))}
+                                  </select>
+                                  <button className="btn btn-sm" type="button" onClick={() => setActiveOrderId(o.id)}>
+                                    Detail
+                                  </button>
+                                  <button
+                                    className="btn btn-ghost btn-sm"
+                                    type="button"
+                                    onClick={() => copyStatusLink(o.order_code)}
+                                    title="Salin link status"
+                                  >
+                                    Salin link
+                                  </button>
+                                </div>
+                              </div>
+                            </article>
+                          );
+                        })}
+                      </div>
+                    </>
                   )}
                 </div>
               </div>
@@ -2199,51 +2778,274 @@ export default function AdminDashboard() {
 
             {tab === "promos" ? (
               <div className="admin-panel">
+                {/* Header */}
                 <div className="admin-panel-head">
                   <div>
-                    <div className="admin-panel-title">Promo Codes</div>
-                    <div className="admin-panel-sub">Tambah atau nonaktifkan kode promo.</div>
+                    <div className="admin-panel-title">Kode Promo</div>
+                    <div className="admin-panel-sub">Buat, edit, dan kelola kode diskon untuk pelanggan.</div>
                   </div>
+                  <button className="btn" type="button" onClick={openCreatePromo}>
+                    <Plus size={15} strokeWidth={2.5} />
+                    Buat Promo
+                  </button>
                 </div>
 
                 <div className="admin-panel-body">
-                  <div className="admin-form-grid" style={{ marginBottom: 12 }}>
-                    <label className="admin-field admin-field-full">
-                      <span>Bulk input (satu baris: CODE,percent)</span>
-                      <textarea
-                        className="input admin-textarea"
-                        value={promoBulk}
-                        onChange={(e) => setPromoBulk(e.target.value)}
-                        rows={4}
-                        placeholder={"DISNEY10,10\nHEMAT20,20"}
+                  {/* Search */}
+                  {promos.length > 3 && (
+                    <div className="admin-promo-search">
+                      <Search size={14} className="admin-promo-searchIcon" />
+                      <input
+                        className="input admin-promo-searchInput"
+                        placeholder="Cari kode promo..."
+                        value={promoQuery}
+                        onChange={(e) => setPromoQuery(e.target.value)}
                       />
-                    </label>
-                    <div className="admin-form-actions" style={{ justifyContent: "flex-end" }}>
-                      <button className="btn" type="button" onClick={addPromoBulk}>
-                        Simpan Promo
-                      </button>
+                    </div>
+                  )}
+
+                  {/* Stats strip */}
+                  <div className="admin-promo-strip">
+                    <div className="admin-promo-stripItem">
+                      <strong>{promos.filter((p) => p.is_active && !isPromoExpired(p)).length}</strong>
+                      <span>Aktif</span>
+                    </div>
+                    <div className="admin-promo-stripItem">
+                      <strong>{promos.filter((p) => isPromoExpired(p)).length}</strong>
+                      <span>Kedaluwarsa</span>
+                    </div>
+                    <div className="admin-promo-stripItem">
+                      <strong>{promos.filter((p) => !p.is_active).length}</strong>
+                      <span>Nonaktif</span>
+                    </div>
+                    <div className="admin-promo-stripItem">
+                      <strong>{promos.reduce((s, p) => s + (p.used_count || 0), 0)}</strong>
+                      <span>Total pakai</span>
                     </div>
                   </div>
 
-                  <div className="admin-promos">
-                    {promos.map((p) => (
-                      <div key={p.code} className="admin-promo-row">
-                        <div>
-                          <div className="admin-promo-code">{p.code}</div>
-                          <div className="admin-promo-sub">Diskon {p.percent}%</div>
-                        </div>
-                        <button
-                          className={"btn btn-sm " + (p.is_active ? "btn-ghost" : "")}
-                          onClick={() => togglePromo(p.code, !p.is_active)}
-                        >
-                          {p.is_active ? "Nonaktifkan" : "Aktifkan"}
-                        </button>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Promo cards */}
+                  {promos.length === 0 ? (
+                    <div className="admin-emptyInline">Belum ada kode promo. Klik "Buat Promo" untuk mulai.</div>
+                  ) : (
+                    <div className="admin-promo-grid">
+                      {promos
+                        .filter((p) => {
+                          if (!promoQuery.trim()) return true;
+                          return p.code.toLowerCase().includes(promoQuery.trim().toLowerCase());
+                        })
+                        .map((p) => {
+                          const expired = isPromoExpired(p);
+                          const remaining = calcRemainingQuota(p);
+                          const usedPct = p.max_uses ? Math.min(100, ((p.used_count || 0) / p.max_uses) * 100) : 0;
+                          const statusLabel = expired ? "Kedaluwarsa" : p.is_active ? "Aktif" : "Nonaktif";
+                          const statusClass = expired ? "expired" : p.is_active ? "active" : "off";
+                          return (
+                            <div key={p.code} className={`admin-promo-card ${expired ? "is-expired" : ""} ${!p.is_active ? "is-off" : ""}`}>
+                              {/* Top row: code + status */}
+                              <div className="admin-promo-cardTop">
+                                <div className="admin-promo-cardLeft">
+                                  <div className="admin-promo-cardCode">
+                                    <span>{p.code}</span>
+                                    <button
+                                      className="admin-promo-copyBtn"
+                                      type="button"
+                                      title="Salin kode"
+                                      onClick={() => copyPromoCode(p.code)}
+                                    >
+                                      {copiedCode === p.code ? <Check size={12} /> : <Copy size={12} />}
+                                    </button>
+                                  </div>
+                                  <span className={`admin-promoBadge ${statusClass}`}>{statusLabel}</span>
+                                </div>
+                                <div className="admin-promo-cardDiscount">{p.percent}%</div>
+                              </div>
+
+                              {/* Meta row */}
+                              <div className="admin-promo-cardMeta">
+                                {p.expired_at ? (
+                                  <span className={expired ? "admin-promo-metaWarn" : ""}>
+                                    Exp: {new Date(p.expired_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}
+                                  </span>
+                                ) : (
+                                  <span className="admin-promo-metaMuted">Tanpa batas waktu</span>
+                                )}
+                                {p.max_uses != null ? (
+                                  <span>{p.used_count || 0}/{p.max_uses} dipakai</span>
+                                ) : (
+                                  <span className="admin-promo-metaMuted">Kuota tak terbatas</span>
+                                )}
+                              </div>
+
+                              {/* Quota progress bar */}
+                              {p.max_uses != null && (
+                                <div className="admin-promo-quotaTrack">
+                                  <div
+                                    className={`admin-promo-quotaBar ${usedPct >= 90 ? "is-full" : ""}`}
+                                    style={{ width: `${usedPct}%` }}
+                                  />
+                                </div>
+                              )}
+
+                              {/* Actions */}
+                              <div className="admin-promo-cardActions">
+                                <button
+                                  className="btn btn-sm btn-ghost admin-promo-editBtn"
+                                  type="button"
+                                  onClick={() => openEditPromo(p)}
+                                >
+                                  <Pencil size={13} />
+                                  Edit
+                                </button>
+                                <button
+                                  className={"btn btn-sm " + (p.is_active ? "btn-ghost" : "")}
+                                  type="button"
+                                  onClick={() => togglePromo(p.code, !p.is_active)}
+                                >
+                                  {p.is_active ? "Nonaktifkan" : "Aktifkan"}
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-danger"
+                                  type="button"
+                                  onClick={() => deletePromo(p.code)}
+                                >
+                                  <Trash2 size={13} />
+                                </button>
+                              </div>
+                            </div>
+                          );
+                        })}
+                    </div>
+                  )}
                 </div>
               </div>
             ) : null}
+
+            {/* Promo Form Modal */}
+            {promoFormOpen && createPortal(
+              <div className="modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) setPromoFormOpen(false); }}>
+                <div className="modal" style={{ maxWidth: 440 }}>
+                  <div className="modal-head">
+                    <div className="modal-title">{promoFormMode === "edit" ? "Edit Promo" : "Buat Promo Baru"}</div>
+                    <button className="modal-close" type="button" onClick={() => setPromoFormOpen(false)}>
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <div className="admin-form-grid">
+                      <label className="admin-field admin-field-full">
+                        <span>Kode Promo *</span>
+                        <input
+                          className="input"
+                          placeholder="Contoh: HEMAT20"
+                          value={promoForm.code}
+                          disabled={promoFormMode === "edit"}
+                          onChange={(e) => setPromoForm((f) => ({ ...f, code: e.target.value.toUpperCase() }))}
+                          style={{ textTransform: "uppercase", letterSpacing: "0.06em", fontWeight: 900 }}
+                        />
+                      </label>
+                      <label className="admin-field">
+                        <span>Diskon (%) *</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min={1}
+                          max={100}
+                          placeholder="Contoh: 20"
+                          value={promoForm.percent}
+                          onChange={(e) => setPromoForm((f) => ({ ...f, percent: e.target.value }))}
+                        />
+                      </label>
+                      <label className="admin-field">
+                        <span>Kuota maks (opsional)</span>
+                        <input
+                          className="input"
+                          type="number"
+                          min={1}
+                          placeholder="Kosong = tak terbatas"
+                          value={promoForm.max_uses}
+                          onChange={(e) => setPromoForm((f) => ({ ...f, max_uses: e.target.value }))}
+                        />
+                      </label>
+                      <label className="admin-field admin-field-full">
+                        <span>Tanggal kedaluwarsa (opsional)</span>
+                        <input
+                          className="input"
+                          type="date"
+                          value={promoForm.expired_at}
+                          onChange={(e) => setPromoForm((f) => ({ ...f, expired_at: e.target.value }))}
+                        />
+                      </label>
+                    </div>
+                    {promoForm.code && promoForm.percent && (
+                      <div className="admin-promo-preview">
+                        <span className="admin-promo-previewLabel">Preview</span>
+                        <div className="admin-promo-previewCode">{promoForm.code}</div>
+                        <div className="admin-promo-previewMeta">
+                          Diskon {promoForm.percent}%
+                          {promoForm.expired_at ? ` · Exp ${new Date(promoForm.expired_at + "T00:00:00").toLocaleDateString("id-ID", { day: "numeric", month: "short", year: "numeric" })}` : ""}
+                          {promoForm.max_uses ? ` · Kuota ${promoForm.max_uses}` : ""}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="modal-foot">
+                    <div className="modal-actions">
+                      <button className="btn btn-ghost" type="button" onClick={() => setPromoFormOpen(false)}>Batal</button>
+                      <button className="btn" type="button" onClick={savePromoForm}>
+                        {promoFormMode === "edit" ? "Simpan Perubahan" : "Buat Promo"}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>,
+              document.body
+            )}
+
+            {/* Delete Promo Confirm Modal */}
+            {promoDeleteTarget && createPortal(
+              <div
+                className="modal-backdrop"
+                onClick={(e) => { if (e.target === e.currentTarget) setPromoDeleteTarget(null); }}
+              >
+                <div className="modal admin-promo-deleteModal">
+                  <div className="modal-head">
+                    <div className="modal-title">Hapus Promo?</div>
+                    <button className="modal-close" type="button" onClick={() => setPromoDeleteTarget(null)}>
+                      <X size={16} />
+                    </button>
+                  </div>
+                  <div className="modal-body">
+                    <div className="admin-promo-deleteBody">
+                      <div className="admin-promo-deleteIcon">
+                        <Trash2 size={22} />
+                      </div>
+                      <div>
+                        <p className="admin-promo-deleteText">
+                          Kode promo <strong>{promoDeleteTarget}</strong> akan dihapus permanen.
+                          Tindakan ini tidak bisa dibatalkan.
+                        </p>
+                        <p className="admin-promo-deleteHint">
+                          Order yang sudah memakai kode ini tidak terpengaruh.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-foot">
+                    <div className="modal-actions">
+                      <button className="btn btn-ghost" type="button" onClick={() => setPromoDeleteTarget(null)}>
+                        Batal
+                      </button>
+                      <button className="btn btn-danger" type="button" onClick={confirmDeletePromo}>
+                        <Trash2 size={14} />
+                        Ya, Hapus
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>,
+              document.body
+            )}
 
             {tab === "testimonials" ? (
               <div className="admin-panel">
@@ -2570,6 +3372,58 @@ export default function AdminDashboard() {
       >
         {activeOrder ? (
           <div className="admin-orderBodyModern admin-orderBodyModal">
+            {/* ── Status Timeline ── */}
+            <div className="admin-orderTimeline">
+              {getTimeline(activeOrder.status).map((step, index, arr) => (
+                <div key={step.key} className="admin-timelineRow">
+                  <div className={`admin-timelineDot ${step.done ? "is-done" : step.active ? "is-active" : ""}`}>
+                    {step.done ? "✓" : null}
+                  </div>
+                  <div className="admin-timelineLabel">
+                    <strong>{step.label}</strong>
+                    <small>{step.done ? "Selesai" : step.active ? "Aktif" : "Menunggu"}</small>
+                  </div>
+                  {index < arr.length - 1 ? <div className="admin-timelineLine" /> : null}
+                </div>
+              ))}
+            </div>
+
+            {/* ── Quick Action Buttons ── */}
+            <div className="admin-orderQuickActions">
+              {String(activeOrder.status || "pending") !== "done" && String(activeOrder.status || "pending") !== "cancelled" ? (
+                <button
+                  className="btn"
+                  type="button"
+                  onClick={() => updateOrderStatus(activeOrder.id, "done")}
+                >
+                  ✓ Tandai Selesai
+                </button>
+              ) : null}
+              {String(activeOrder.status || "pending") !== "cancelled" ? (
+                <button
+                  className="btn btn-danger"
+                  type="button"
+                  onClick={() => updateOrderStatus(activeOrder.id, "cancelled")}
+                >
+                  Batalkan
+                </button>
+              ) : null}
+              {buildCustomerWaUrl(activeOrder) ? (
+                <a
+                  className="btn btn-ghost"
+                  href={buildCustomerWaUrl(activeOrder)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Kirim Notif WA
+                </a>
+              ) : (
+                <button className="btn btn-ghost" type="button" disabled title="Nomor WA tidak tersedia">
+                  Kirim Notif WA
+                </button>
+              )}
+            </div>
+
             <div className="admin-orderMetaGrid">
               <div className="admin-orderMetaCard">
                 <span>Kontak customer</span>

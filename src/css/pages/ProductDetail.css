@@ -943,3 +943,69 @@
     flex: 1 1 auto;
   }
 }
+
+/* ── Breadcrumb (item 10) ── */
+.pdx-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  font-size: 13px;
+  color: rgba(234, 255, 245, 0.68);
+}
+
+.pdx-breadcrumbLink {
+  color: rgba(234, 255, 245, 0.68);
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.18s ease, color 0.18s ease;
+}
+
+.pdx-breadcrumbLink:hover {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(234, 255, 245, 0.95);
+}
+
+.pdx-breadcrumbSep {
+  color: rgba(234, 255, 245, 0.32);
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.pdx-breadcrumbCurrent {
+  color: rgba(234, 255, 245, 0.92);
+  font-weight: 800;
+  padding: 4px 8px;
+  max-width: 60vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:root[data-theme="light"] .pdx-breadcrumb {
+  color: rgba(15, 49, 64, 0.68);
+}
+
+:root[data-theme="light"] .pdx-breadcrumbLink {
+  color: rgba(15, 49, 64, 0.68);
+}
+
+:root[data-theme="light"] .pdx-breadcrumbLink:hover {
+  background: rgba(0, 138, 148, 0.08);
+  color: rgba(15, 49, 64, 0.95);
+}
+
+:root[data-theme="light"] .pdx-breadcrumbCurrent {
+  color: rgba(15, 49, 64, 0.92);
+}
+
+:root[data-theme="light"] .pdx-breadcrumbSep {
+  color: rgba(15, 49, 64, 0.32);
+}
+
+@media (max-width: 480px) {
+  .pdx-breadcrumb { font-size: 12px; gap: 4px; }
+  .pdx-breadcrumbLink { padding: 3px 6px; }
+}

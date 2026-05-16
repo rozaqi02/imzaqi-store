@@ -572,6 +572,21 @@
   font-weight: 900;
 }
 
+/* ── Low Stock Badge (Task 9) ── */
+.product-lowStockBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 191, 74, 0.28);
+  background: rgba(255, 191, 74, 0.10);
+  color: rgba(255, 220, 120, 0.92);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
 .product-tile-price {
   font-size: 18px;
   font-weight: 1000;
@@ -1490,4 +1505,158 @@
   background: linear-gradient(135deg, #008a94 0%, #0a7289 40%, #1d6bb5 100%);
   -webkit-background-clip: text;
   background-clip: text;
+}
+
+
+/* ── Desktop hover preview on product tile (item 5) ── */
+@media (hover: hover) and (min-width: 901px) {
+  .product-tile {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .product-tile::after {
+    content: attr(data-hover-hint);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 10px 14px;
+    background: linear-gradient(180deg, rgba(0, 138, 148, 0) 0%, rgba(0, 138, 148, 0.92) 100%);
+    color: #eafff5;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-align: center;
+    transform: translateY(100%);
+    transition: transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .product-tile:hover::after {
+    transform: translateY(0);
+  }
+
+  .product-tile:hover {
+    transform: translateY(-3px);
+    border-color: rgba(79, 255, 200, 0.32) !important;
+  }
+}
+
+/* ── Item 9: Realistic skeleton matching ProductTile shape ── */
+.home-tileSkeleton {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  display: grid;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-tileSkeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.06),
+    transparent
+  );
+  transform: translateX(-100%);
+  animation: skelShimmer 1.6s infinite;
+}
+
+@keyframes skelShimmer {
+  100% { transform: translateX(100%); }
+}
+
+.home-tileSkeleton-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.home-tileSkeleton-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.home-tileSkeleton-textGroup {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+}
+
+.home-tileSkeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.home-tileSkeleton-line.w-72 { width: 72%; }
+.home-tileSkeleton-line.w-50 { width: 50%; }
+
+.home-tileSkeleton-arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.home-tileSkeleton-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.home-tileSkeleton-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.home-tileSkeleton-pill {
+  height: 24px;
+  width: 70px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.home-tileSkeleton-price {
+  height: 18px;
+  width: 90px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+:root[data-theme="light"] .home-tileSkeleton {
+  border-color: rgba(0, 138, 148, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="light"] .home-tileSkeleton-icon,
+:root[data-theme="light"] .home-tileSkeleton-line,
+:root[data-theme="light"] .home-tileSkeleton-arrow,
+:root[data-theme="light"] .home-tileSkeleton-pill,
+:root[data-theme="light"] .home-tileSkeleton-price {
+  background: rgba(0, 138, 148, 0.08);
+}
+
+:root[data-theme="light"] .home-tileSkeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
 }

@@ -17,8 +17,12 @@ function upsertMeta(selector, attrs) {
 
 /**
  * Simple per-page meta (title + description + OG) without extra deps.
+ * @param {object} options
+ * @param {string} [options.title]
+ * @param {string} [options.description]
+ * @param {string} [options.ogImage] - Optional og:image URL; only updates the tag if provided
  */
-export function usePageMeta({ title, description } = {}) {
+export function usePageMeta({ title, description, ogImage } = {}) {
   useEffect(() => {
     if (typeof document === "undefined") return;
 
@@ -34,7 +38,17 @@ export function usePageMeta({ title, description } = {}) {
       // keep OG title in sync even if no custom desc
       upsertMeta('meta[property="og:title"]', { property: "og:title", content: nextTitle });
     }
-  }, [title, description]);
+
+    // og:url — always update to current page URL
+    if (typeof window !== "undefined") {
+      upsertMeta('meta[property="og:url"]', { property: "og:url", content: window.location.href });
+    }
+
+    // og:image — only update if ogImage is explicitly provided
+    if (ogImage) {
+      upsertMeta('meta[property="og:image"]', { property: "og:image", content: ogImage });
+    }
+  }, [title, description, ogImage]);
 }
 
 export default usePageMeta;

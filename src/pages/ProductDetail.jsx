@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowLeft, ChevronDown, ChevronUp, Clock3, Grid, Info, List, Mail, Minus, Plus, Share2, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock3, Grid, Info, List, Mail, Minus, Plus, Share2, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles } from "lucide-react";
 
 import { fetchProductBySlug } from "../lib/api";
 import { useCart } from "../context/CartContext";
@@ -260,6 +260,7 @@ export default function ProductDetail() {
   usePageMeta({
     title: product?.name ? `${product.name} | Detail Produk` : "Detail Produk",
     description: product?.description || "Buka detail produk, pilih paket, lalu lanjutkan ke checkout.",
+    ogImage: product?.icon_url || undefined,
   });
 
   useEffect(() => {
@@ -427,6 +428,12 @@ export default function ProductDetail() {
   async function handleShare() {
     if (!product) return;
     const shareUrl = window.location.href;
+    const minPrice = summary.minPrice ? ` — mulai ${formatIDR(summary.minPrice)}` : "";
+    const waText = encodeURIComponent(
+      `Cek ${product.name} di Imzaqi Store${minPrice}\n${shareUrl}`
+    );
+    const waShareUrl = `https://wa.me/?text=${waText}`;
+
     const shareData = {
       title: product.name,
       text: `Beli ${product.name} di Imzaqi Store`,
@@ -436,11 +443,14 @@ export default function ProductDetail() {
       if (navigator.share) {
         await navigator.share(shareData);
       } else {
-        await navigator.clipboard.writeText(shareUrl);
-        toast.success("Tautan produk berhasil disalin", { duration: 2000 });
+        // Fallback: open WhatsApp share
+        window.open(waShareUrl, "_blank", "noopener,noreferrer");
       }
     } catch (e) {
-      console.warn("Share failed", e);
+      if (e?.name !== "AbortError") {
+        // User cancelled share — try WA fallback
+        window.open(waShareUrl, "_blank", "noopener,noreferrer");
+      }
     }
   }
 
@@ -504,10 +514,13 @@ export default function ProductDetail() {
     <div className="page detail-page detail-page-v2">
       <section className="section">
         <div className="container">
-          <Link to="/produk" className="detail-backLink">
-            <ArrowLeft size={16} />
-            <span>Kembali ke katalog</span>
-          </Link>
+          <nav className="pdx-breadcrumb" aria-label="Breadcrumb">
+            <Link to="/" className="pdx-breadcrumbLink">Home</Link>
+            <span className="pdx-breadcrumbSep" aria-hidden="true">›</span>
+            <Link to="/produk" className="pdx-breadcrumbLink">Produk</Link>
+            <span className="pdx-breadcrumbSep" aria-hidden="true">›</span>
+            <span className="pdx-breadcrumbCurrent" aria-current="page">{product?.name || "Detail"}</span>
+          </nav>
 
           <motion.div
             className="pdx-layout"

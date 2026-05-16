@@ -15,13 +15,15 @@ export default function Layout({ children, routeKey }) {
 
   return (
     <div className="app-shell">
-      {/* Global super premium background layers (fixed) */}
+      {/* Global background layers (fixed, paint-isolated) */}
       <div className="global-bg" aria-hidden="true" />
       <div className="global-noise" aria-hidden="true" />
 
       <Header />
       <main className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}`}>
-        <div key={revealKey} className="route-transition">
+        {/* key forces remount on route change for enter animation.
+            contain:layout prevents this subtree from triggering full-page repaints. */}
+        <div key={revealKey} className="route-transition" style={{ contain: "layout" }}>
           {children}
         </div>
       </main>

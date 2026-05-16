@@ -545,3 +545,44 @@
     font-size: 22px;
   }
 }
+
+/* ── Cara Pesan ── */
+.faq-howto { margin-bottom: 40px; }
+.faq-howtoHead { margin-bottom: 20px; }
+.faq-howtoTitle { font-size: clamp(22px, 3vw, 28px); font-weight: 1000; margin: 6px 0 0; }
+.faq-howtoSteps {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+.faq-howtoStep {
+  padding: 18px 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  display: flex; flex-direction: column; gap: 10px;
+}
+.faq-howtoNum {
+  font-size: 11px; font-weight: 900; letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.4); text-transform: uppercase;
+}
+.faq-howtoEmoji { font-size: 28px; line-height: 1; }
+.faq-howtoCopy strong { display: block; font-weight: 900; margin-bottom: 6px; }
+.faq-howtoCopy p { margin: 0; color: rgba(255,255,255,0.6); font-size: 13px; line-height: 1.6; }
+@media (max-width: 720px) {
+  .faq-howtoSteps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 480px) {
+  .faq-howtoSteps { grid-template-columns: 1fr; }
+}
+
+/* Cara Pesan light mode */
+:root[data-theme="light"] .faq-howtoStep {
+  border-color: rgba(0, 138, 148, 0.14);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(236, 248, 252, 0.88));
+  box-shadow: 0 8px 20px rgba(72, 118, 138, 0.1);
+}
+:root[data-theme="light"] .faq-howtoNum { color: rgba(50, 84, 95, 0.6); }
+:root[data-theme="light"] .faq-howtoTitle { color: #123744; }
+:root[data-theme="light"] .faq-howtoCopy strong { color: #123744; }
+:root[data-theme="light"] .faq-howtoCopy p { color: rgba(61, 96, 109, 0.76); }

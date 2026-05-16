@@ -5,9 +5,11 @@ import {
   BadgePercent,
   CheckCircle2,
   Clock3,
+  Mail,
   MessageSquareText,
   Package,
   Search,
+  ShieldCheck,
   Sparkles,
   WalletCards,
   XCircle,
@@ -110,7 +112,7 @@ export default function Status() {
   const [message, setMessage] = useState("");
   const [order, setOrder] = useState(null);
 
-  const waNumber = settings?.whatsapp?.number || "6283136049987";
+  const waNumber = settings?.whatsapp?.number || process.env.REACT_APP_ADMIN_WA || "6283136049987";
 
   useEffect(() => {
     let active = true;
@@ -274,7 +276,12 @@ export default function Status() {
               </label>
 
               <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
-                {loading ? "Mencari..." : "Cek status"}
+                {loading ? (
+                  <>
+                    <span className="st-checkSpinner" aria-hidden="true" />
+                    Mencari...
+                  </>
+                ) : "Cek status"}
               </button>
             </div>
 
@@ -299,6 +306,21 @@ export default function Status() {
             </section>
           ) : (
             <div className="st-layout">
+              {order.admin_note ? (
+                <article className="st-card st-noteCard st-noteTopAccent is-accent">
+                  <div className="st-cardHead">
+                    <div>
+                      <div className="st-kicker">Catatan admin</div>
+                      <h2 className="st-cardTitle">Penting untuk dibaca</h2>
+                    </div>
+                    <div className="st-cardIcon">
+                      <MessageSquareText size={16} />
+                    </div>
+                  </div>
+                  <div className="st-noteBody">{order.admin_note}</div>
+                </article>
+              ) : null}
+
               <main className="st-main">
                 <section className="st-metrics">
                   <InfoCard label="Status" value={prettyStatus(order.status)} hint="Status aktif" tone={statusMeta.tone} />
@@ -351,19 +373,64 @@ export default function Status() {
                   </div>
 
                   <div className="st-itemList">
-                    {(order.items || []).map((item, index) => (
-                      <div key={index} className="st-itemRow">
-                        <div className="st-itemMain">
-                          <div className="st-itemName">{item.product_name}</div>
-                          <div className="st-itemMeta">
-                            <span>{item.variant_name}</span>
-                            <span>{item.duration_label}</span>
-                            <span>x{item.qty}</span>
+                    {(order.items || []).map((item, index) => {
+                      const iconUrl = String(item?.product_icon_url || "").trim();
+                      const guarantee = String(item?.guarantee_text || "").trim();
+                      const variantName = String(item?.variant_name || "").trim();
+                      const durationLabel = String(item?.duration_label || "").trim();
+                      const description = String(item?.description || "").trim();
+                      const requiresEmail = !!item?.requires_buyer_email;
+                      const itemTotal = Number(item.price_idr || 0) * Number(item.qty || 0);
+                      return (
+                        <div key={index} className="st-itemRow st-itemRowDetailed">
+                          <div className="st-itemHead">
+                            <div className="st-itemIcon" aria-hidden="true">
+                              {iconUrl ? (
+                                <img src={iconUrl} alt="" loading="lazy" decoding="async" />
+                              ) : (
+                                <span>{String(item.product_name || "P").slice(0, 1).toUpperCase()}</span>
+                              )}
+                            </div>
+                            <div className="st-itemMain">
+                              <div className="st-itemName">{item.product_name}</div>
+                              {variantName ? (
+                                <div className="st-itemVariant">{variantName}</div>
+                              ) : null}
+                            </div>
+                            <div className="st-itemPrice">
+                              <span className="st-itemPriceQty">×{item.qty}</span>
+                              <b>{formatIDR(itemTotal)}</b>
+                              <small>{formatIDR(Number(item.price_idr || 0))} / pcs</small>
+                            </div>
                           </div>
+
+                          <div className="st-itemFacts">
+                            {durationLabel ? (
+                              <span className="st-itemFact">
+                                <Clock3 size={12} />
+                                <span>{durationLabel}</span>
+                              </span>
+                            ) : null}
+                            {guarantee ? (
+                              <span className="st-itemFact st-itemFact--guarantee">
+                                <ShieldCheck size={12} />
+                                <span>{guarantee}</span>
+                              </span>
+                            ) : null}
+                            {requiresEmail ? (
+                              <span className="st-itemFact st-itemFact--email">
+                                <Mail size={12} />
+                                <span>Butuh email aktivasi</span>
+                              </span>
+                            ) : null}
+                          </div>
+
+                          {description ? (
+                            <div className="st-itemDesc">{description}</div>
+                          ) : null}
                         </div>
-                        <b>{formatIDR(Number(item.price_idr || 0) * Number(item.qty || 0))}</b>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </article>
               </main>
@@ -401,19 +468,6 @@ export default function Status() {
                     </div>
                     <small>Rasio bayar {paidRatio}%</small>
                   </div>
-                </article>
-
-                <article className="st-card st-noteCard is-accent">
-                  <div className="st-cardHead">
-                    <div>
-                      <div className="st-kicker">Admin</div>
-                      <h2 className="st-cardTitle">Catatan admin</h2>
-                    </div>
-                    <div className="st-cardIcon">
-                      <MessageSquareText size={16} />
-                    </div>
-                  </div>
-                  <div className={`st-noteBody${order.admin_note ? "" : " is-empty"}`}>{order.admin_note || "Belum ada catatan admin."}</div>
                 </article>
 
                 <article className="st-card st-noteCard">

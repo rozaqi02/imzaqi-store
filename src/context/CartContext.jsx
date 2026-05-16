@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { clamp } from "../lib/format";
+import { supabase } from "../lib/supabaseClient";
 
 const CartContext = createContext(null);
 
@@ -106,6 +107,20 @@ export function CartProvider({ children }) {
     // TAMBAHKAN INI (Alias agar cart.total() jalan)
     total() {
       return items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0);
+    },
+
+    async checkStockForVariant(variantId) {
+      try {
+        const { data, error } = await supabase
+          .from("product_variants")
+          .select("id, name, stock")
+          .eq("id", variantId)
+          .single();
+        if (error) return null;
+        return data;
+      } catch {
+        return null;
+      }
     },
 
   }), [items]);

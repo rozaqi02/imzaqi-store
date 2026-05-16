@@ -13,7 +13,14 @@
 
 .admin-sidebar {
   position: sticky;
-  top: 108px;
+  top: calc(var(--site-header-offset, 86px) + 12px);
+  align-self: start;
+  max-height: calc(100vh - var(--site-header-offset, 86px) - 24px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
   padding: 16px;
   border-radius: 28px;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -23,10 +30,25 @@
   box-shadow: 0 26px 90px rgba(0, 0, 0, 0.28);
 }
 
+.admin-sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.admin-sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 999px;
+}
+
 @media (max-width: 1100px) {
   .admin-sidebar {
     position: relative;
     top: auto;
+    max-height: none;
+    overflow-y: visible;
   }
 }
 
@@ -1365,6 +1387,10 @@
 
 @media (max-width: 720px) {
   .admin-sidebar {
+    position: relative;
+    top: auto;
+    max-height: none;
+    overflow-y: visible;
     padding: 12px;
     border-radius: 26px;
     background:
@@ -3005,4 +3031,856 @@
   .admin-mobileTab {
     min-height: 50px !important;
   }
+}
+
+/* ── Realtime new order badge ── */
+.admin-nav-newBadge {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgba(255, 73, 126, 0.9), rgba(255, 120, 80, 0.9));
+  color: #fff;
+  font-size: 11px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  animation: badgePop 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgePop {
+  from { transform: scale(0); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+
+/* ── Order list item actions ── */
+.admin-orderRowActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* ── Order stats strip ── */
+.admin-orderStatsStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-orderStat {
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-orderStat span,
+.admin-orderStat strong,
+.admin-orderStat small {
+  display: block;
+}
+
+.admin-orderStat span {
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.admin-orderStat strong {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: 1000;
+}
+
+.admin-orderStat small {
+  margin-top: 4px;
+  color: rgba(255, 255, 255, 0.56);
+  font-size: 12px;
+}
+
+/* ── Order list ── */
+.admin-ordersList {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.admin-orderListItem {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-orderListMain {
+  min-width: 0;
+  flex: 1;
+}
+
+.admin-orderListRight {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.admin-orderTotal {
+  font-size: 15px;
+  font-weight: 1000;
+}
+
+.admin-orderListMeta {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+
+.admin-orderTag {
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(255, 191, 74, 0.12);
+  border: 1px solid rgba(255, 191, 74, 0.24);
+  color: rgba(255, 220, 120, 0.9);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.admin-orderLink {
+  color: rgba(160, 220, 255, 0.9);
+  font-size: 12px;
+  font-weight: 900;
+  text-decoration: none;
+}
+
+.admin-orderLink:hover {
+  text-decoration: underline;
+}
+
+.admin-status.reported {
+  background: rgba(255, 191, 74, 0.12);
+  border-color: rgba(255, 191, 74, 0.24);
+}
+
+@media (max-width: 720px) {
+  .admin-orderStatsStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-orderListItem {
+    flex-direction: column;
+  }
+
+  .admin-orderListRight {
+    align-items: flex-start;
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+}
+
+/* ── Order Detail Timeline ── */
+.admin-orderTimeline {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  margin-bottom: 16px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.admin-timelineRow {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  position: relative;
+}
+
+.admin-timelineDot {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.05);
+  display: grid;
+  place-items: center;
+  font-size: 12px;
+  font-weight: 900;
+  color: rgba(255, 255, 255, 0.4);
+  flex-shrink: 0;
+}
+
+.admin-timelineDot.is-active {
+  border-color: rgba(29, 131, 255, 0.5);
+  background: rgba(29, 131, 255, 0.16);
+  color: #9fe0ff;
+}
+
+.admin-timelineDot.is-done {
+  border-color: rgba(80, 220, 146, 0.5);
+  background: rgba(80, 220, 146, 0.16);
+  color: #a0ffd0;
+}
+
+.admin-timelineLabel {
+  margin-top: 8px;
+  text-align: center;
+}
+
+.admin-timelineLabel strong {
+  display: block;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.admin-timelineLabel small {
+  display: block;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 11px;
+}
+
+.admin-timelineLine {
+  position: absolute;
+  top: 14px;
+  left: 50%;
+  width: 100%;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+/* ── Order Quick Actions ── */
+.admin-orderQuickActions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+/* ── Bulk Action Bar ── */
+.admin-bulkBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(29, 131, 255, 0.24);
+  background: rgba(29, 131, 255, 0.1);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.admin-bulkCount {
+  font-weight: 900;
+  font-size: 14px;
+  color: #9fe0ff;
+}
+
+.admin-bulkActions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.admin-bulkSelectAll {
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.7);
+}
+
+/* ── Order list item with checkbox ── */
+.admin-orderListCheckbox {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding-right: 4px;
+}
+
+.admin-orderListItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.admin-orderListItem.is-selected {
+  border-color: rgba(29, 131, 255, 0.3);
+  background: rgba(29, 131, 255, 0.07);
+}
+
+/* ── Promo badges ── */
+.admin-promoBadge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.admin-promoBadge.expired {
+  background: rgba(255, 73, 126, 0.12);
+  border: 1px solid rgba(255, 73, 126, 0.24);
+  color: rgba(255, 160, 180, 0.9);
+}
+
+.admin-promoBadge.off {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-promo-row.is-expired {
+  opacity: 0.65;
+}
+
+/* ── Low stock badge ── */
+.product-lowStockBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 191, 74, 0.12);
+  border: 1px solid rgba(255, 191, 74, 0.24);
+  color: rgba(255, 220, 120, 0.9);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+
+/* ──────────────────────────────────────────────────────────────────
+   ADMIN DASHBOARD — MOBILE PERFORMANCE OVERRIDES (LAST WORD)
+   This block MUST be at the end of the file to override any earlier
+   mobile media query that adds expensive paint effects.
+
+   Goal: eliminate scroll lag on overview/products tabs by killing:
+   - radial-gradient backgrounds (expensive paint)
+   - layered/large box-shadow (expensive paint)
+   - hover transforms with 0.2s+ transitions
+   - hover state changes (touch devices don't need them)
+   - backdrop-filter
+   - the orange radial pseudo-element on overview hero
+   ────────────────────────────────────────────────────────────────── */
+@media (max-width: 720px) {
+  /* 1. Replace gradient + radial-gradient backgrounds with flat solids */
+  .admin-page .admin-sidebar,
+  .admin-page .admin-panel,
+  .admin-page .admin-statCard,
+  .admin-page .admin-miniCard,
+  .admin-page .admin-overviewHero,
+  .admin-page .admin-pulseCard,
+  .admin-page .admin-storyCard,
+  .admin-page .admin-trendCard {
+    background: rgba(13, 16, 28, 0.96) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16) !important;
+  }
+
+  :root[data-theme="light"] .admin-page .admin-sidebar,
+  :root[data-theme="light"] .admin-page .admin-panel,
+  :root[data-theme="light"] .admin-page .admin-statCard,
+  :root[data-theme="light"] .admin-page .admin-miniCard,
+  :root[data-theme="light"] .admin-page .admin-overviewHero,
+  :root[data-theme="light"] .admin-page .admin-pulseCard,
+  :root[data-theme="light"] .admin-page .admin-storyCard,
+  :root[data-theme="light"] .admin-page .admin-trendCard {
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 2px 8px rgba(72, 118, 138, 0.10) !important;
+  }
+
+  /* 2. Kill the decorative orange radial pseudo-element on overview hero */
+  .admin-page .admin-overviewHero::after,
+  .admin-page .admin-overviewHero::before {
+    display: none !important;
+  }
+
+  /* 3. Flatten product rows and similar list items (heavily repainted on scroll) */
+  .admin-page .admin-product-row,
+  .admin-page .admin-promo-row,
+  .admin-page .admin-variant-row,
+  .admin-page .admin-order-card,
+  .admin-page .admin-thumb,
+  .admin-page .admin-nav-btn,
+  .admin-page .admin-brand,
+  .admin-page .admin-topbar-current,
+  .admin-page .admin-chip,
+  .admin-page .admin-mobileTab {
+    background: rgba(255, 255, 255, 0.04) !important;
+    box-shadow: none !important;
+    transition: none !important;
+  }
+
+  :root[data-theme="light"] .admin-page .admin-product-row,
+  :root[data-theme="light"] .admin-page .admin-promo-row,
+  :root[data-theme="light"] .admin-page .admin-variant-row,
+  :root[data-theme="light"] .admin-page .admin-order-card,
+  :root[data-theme="light"] .admin-page .admin-thumb,
+  :root[data-theme="light"] .admin-page .admin-nav-btn,
+  :root[data-theme="light"] .admin-page .admin-brand,
+  :root[data-theme="light"] .admin-page .admin-topbar-current,
+  :root[data-theme="light"] .admin-page .admin-chip {
+    background: rgba(247, 253, 255, 0.86) !important;
+  }
+
+  /* 4. Disable hover transforms (touch devices don't hover anyway,
+        but the transitions still cost paint when state changes) */
+  .admin-page .admin-product-row:hover,
+  .admin-page .admin-promo-row:hover,
+  .admin-page .admin-nav-btn:hover,
+  .admin-page .admin-chip:hover,
+  .admin-page .admin-statCard:hover,
+  .admin-page .admin-miniCard:hover {
+    transform: none !important;
+  }
+
+  /* 5. Kill all backdrop-filter on mobile (very expensive on every paint) */
+  .admin-page *,
+  .admin-page *::before,
+  .admin-page *::after {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* 6. Disable will-change globally on mobile for admin pages
+        (will-change creates compositor layers which cost memory; on
+        many elements it actually hurts more than helps) */
+  .admin-page * {
+    will-change: auto !important;
+  }
+
+  /* 7. Constrain repaint to viewport on long scrollable lists */
+  .admin-page .admin-list,
+  .admin-page .admin-orders,
+  .admin-page .admin-variants,
+  .admin-page .admin-promos {
+    contain: content;
+  }
+
+  /* 8. Remove fixed-position bottom bar shadow which causes constant
+        repaint while scrolling (sticky/fixed elements with shadow are
+        a known mobile lag source) */
+  .admin-page .admin-mobileTabs {
+    box-shadow: 0 -1px 0 rgba(0, 0, 0, 0.08) !important;
+  }
+}
+
+/* ── Promo Redesign ─────────────────────────────────────────────── */
+
+/* Stats strip */
+.admin-promo-strip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.admin-promo-stripItem {
+  padding: 12px 14px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-promo-stripItem strong {
+  font-size: 22px;
+  font-weight: 1000;
+  letter-spacing: -0.04em;
+  line-height: 1;
+}
+
+.admin-promo-stripItem span {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+/* Search */
+.admin-promo-search {
+  position: relative;
+  margin-bottom: 14px;
+}
+
+.admin-promo-searchIcon {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(255, 255, 255, 0.4);
+  pointer-events: none;
+}
+
+.admin-promo-searchInput {
+  padding-left: 38px !important;
+}
+
+/* Promo card grid */
+.admin-promo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+/* Individual promo card */
+.admin-promo-card {
+  padding: 16px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: border-color 0.18s ease;
+}
+
+.admin-promo-card:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.admin-promo-card.is-expired {
+  opacity: 0.6;
+}
+
+.admin-promo-card.is-off {
+  opacity: 0.7;
+}
+
+/* Card top row */
+.admin-promo-cardTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.admin-promo-cardLeft {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.admin-promo-cardCode {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 15px;
+  font-weight: 1000;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+
+.admin-promo-copyBtn {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(255, 255, 255, 0.6);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+  flex-shrink: 0;
+}
+
+.admin-promo-copyBtn:hover {
+  background: rgba(79, 255, 200, 0.12);
+  color: #9fffe5;
+  border-color: rgba(79, 255, 200, 0.24);
+}
+
+/* Discount badge */
+.admin-promo-cardDiscount {
+  flex-shrink: 0;
+  min-width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  border: 1px solid rgba(79, 255, 200, 0.22);
+  background: linear-gradient(135deg, rgba(79, 255, 200, 0.16), rgba(0, 214, 180, 0.08));
+  color: #9fffe5;
+  font-size: 16px;
+  font-weight: 1000;
+  letter-spacing: -0.02em;
+}
+
+/* Meta row */
+.admin-promo-cardMeta {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.admin-promo-metaMuted {
+  color: rgba(255, 255, 255, 0.36) !important;
+  font-style: italic;
+}
+
+.admin-promo-metaWarn {
+  color: #ffd089 !important;
+}
+
+/* Quota progress bar */
+.admin-promo-quotaTrack {
+  height: 5px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.admin-promo-quotaBar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(29, 131, 255, 0.9), rgba(103, 214, 255, 0.86));
+  transition: width 0.3s ease;
+}
+
+.admin-promo-quotaBar.is-full {
+  background: linear-gradient(90deg, rgba(255, 73, 126, 0.9), rgba(255, 120, 80, 0.86));
+}
+
+/* Card actions */
+.admin-promo-cardActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-top: 2px;
+}
+
+.admin-promo-editBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Status badge variants */
+.admin-promoBadge.active {
+  background: rgba(80, 220, 146, 0.12);
+  border: 1px solid rgba(80, 220, 146, 0.24);
+  color: #9fffe5;
+}
+
+/* Preview in modal */
+.admin-promo-preview {
+  margin-top: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(79, 255, 200, 0.18);
+  background: rgba(79, 255, 200, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.admin-promo-previewLabel {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.46);
+}
+
+.admin-promo-previewCode {
+  font-size: 18px;
+  font-weight: 1000;
+  letter-spacing: 0.08em;
+  color: #9fffe5;
+}
+
+.admin-promo-previewMeta {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.58);
+}
+
+/* Light mode */
+:root[data-theme="light"] .admin-promo-stripItem {
+  border-color: rgba(0, 138, 148, 0.12);
+  background: rgba(247, 253, 255, 0.86);
+}
+
+:root[data-theme="light"] .admin-promo-stripItem strong {
+  color: #123744;
+}
+
+:root[data-theme="light"] .admin-promo-stripItem span {
+  color: rgba(50, 84, 95, 0.6);
+}
+
+:root[data-theme="light"] .admin-promo-card {
+  border-color: rgba(0, 138, 148, 0.12);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 253, 255, 0.88));
+}
+
+:root[data-theme="light"] .admin-promo-card:hover {
+  border-color: rgba(0, 138, 148, 0.22);
+}
+
+:root[data-theme="light"] .admin-promo-cardCode {
+  color: #123744;
+}
+
+:root[data-theme="light"] .admin-promo-copyBtn {
+  border-color: rgba(0, 138, 148, 0.14);
+  background: rgba(236, 248, 252, 0.86);
+  color: #3d6070;
+}
+
+:root[data-theme="light"] .admin-promo-cardDiscount {
+  border-color: rgba(0, 138, 148, 0.22);
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.12), rgba(0, 138, 148, 0.06));
+  color: #0b3f4b;
+}
+
+:root[data-theme="light"] .admin-promo-cardMeta {
+  color: rgba(50, 84, 95, 0.72);
+}
+
+:root[data-theme="light"] .admin-promo-metaMuted {
+  color: rgba(50, 84, 95, 0.4) !important;
+}
+
+:root[data-theme="light"] .admin-promo-metaWarn {
+  color: #b07000 !important;
+}
+
+:root[data-theme="light"] .admin-promo-quotaTrack {
+  background: rgba(0, 138, 148, 0.1);
+}
+
+:root[data-theme="light"] .admin-promo-preview {
+  border-color: rgba(0, 138, 148, 0.18);
+  background: rgba(214, 244, 238, 0.3);
+}
+
+:root[data-theme="light"] .admin-promo-previewCode {
+  color: #0b3f4b;
+}
+
+:root[data-theme="light"] .admin-promo-previewMeta {
+  color: #5f7781;
+}
+
+:root[data-theme="light"] .admin-promoBadge.active {
+  background: rgba(0, 138, 148, 0.1);
+  border-color: rgba(0, 138, 148, 0.22);
+  color: #0b3f4b;
+}
+
+/* Mobile responsive */
+@media (max-width: 720px) {
+  .admin-promo-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-promo-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .admin-promo-cardActions {
+    flex-direction: row;
+  }
+
+  .admin-promo-cardActions .btn {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 430px) {
+  .admin-promo-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .admin-promo-stripItem {
+    padding: 10px 12px;
+  }
+
+  .admin-promo-stripItem strong {
+    font-size: 18px;
+  }
+}
+
+/* ── Promo Delete Confirm Modal ── */
+.admin-promo-deleteModal {
+  max-width: 400px;
+}
+
+.admin-promo-deleteBody {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.admin-promo-deleteIcon {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 73, 126, 0.28);
+  background: rgba(255, 73, 126, 0.12);
+  color: rgba(255, 130, 160, 0.9);
+}
+
+.admin-promo-deleteText {
+  margin: 0 0 6px;
+  font-size: 14px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.88);
+}
+
+.admin-promo-deleteText strong {
+  color: #fff;
+  letter-spacing: 0.04em;
+}
+
+.admin-promo-deleteHint {
+  margin: 0;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.46);
+  line-height: 1.5;
+}
+
+:root[data-theme="light"] .admin-promo-deleteText {
+  color: #2d4f5b;
+}
+
+:root[data-theme="light"] .admin-promo-deleteText strong {
+  color: #123744;
+}
+
+:root[data-theme="light"] .admin-promo-deleteHint {
+  color: rgba(50, 84, 95, 0.6);
+}
+
+/* ── Admin page horizontal overflow guard ──
+   Since .app-main-admin has overflow-x:visible (needed for sticky sidebar),
+   we clip horizontal overflow at the page level instead. */
+.admin-page {
+  overflow-x: clip;
 }

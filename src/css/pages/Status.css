@@ -693,6 +693,10 @@
     gap: 14px;
   }
 
+  .st-layout {
+    grid-template-columns: 1fr;
+  }
+
   .st-hero,
   .st-search,
   .st-empty,
@@ -725,6 +729,10 @@
     grid-template-columns: 1fr;
   }
 
+  .st-aside {
+    position: static;
+  }
+
   .st-flowRail {
     display: grid;
     gap: 8px;
@@ -734,6 +742,7 @@
     width: 1px;
     height: 16px;
     margin-left: 16px;
+    background: linear-gradient(180deg, rgba(90, 190, 255, 0.18), rgba(90, 190, 255, 0.52), rgba(90, 190, 255, 0.18));
   }
 
   .st-itemRow {
@@ -812,6 +821,28 @@
 
   .st-infoCard strong {
     font-size: 19px;
+  }
+
+  /* Prevent horizontal overflow on all flex/grid children */
+  .st-wrap,
+  .st-hero,
+  .st-heroCopy,
+  .st-search,
+  .st-card,
+  .st-infoCard,
+  .st-flowStep,
+  .st-flowCopy,
+  .st-itemRow,
+  .st-itemMain,
+  .st-empty,
+  .st-searchRow,
+  .st-inputWrap,
+  .st-payRow,
+  .st-noteBody,
+  .st-aside,
+  .st-main {
+    min-width: 0;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -1049,4 +1080,297 @@
   background: linear-gradient(90deg, #4effda, #00d6b4 60%, #008a94);
   box-shadow: 0 0 12px rgba(79, 255, 200, 0.4);
   transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+
+/* ─── Detailed item rows in Status order ─── */
+.st-itemRow.st-itemRowDetailed {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 16px;
+  border: 1px solid var(--brand-line, rgba(0, 138, 148, 0.14));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 38%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 6px 14px rgba(67, 111, 129, 0.1);
+}
+
+.st-itemHead {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.st-itemIcon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--brand-line, rgba(0, 138, 148, 0.14));
+  background: var(--skeu-pill-bg, rgba(0, 138, 148, 0.06));
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    0 4px 8px rgba(67, 111, 129, 0.08);
+}
+
+.st-itemIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.st-itemIcon span {
+  font-size: 18px;
+  font-weight: 1000;
+  color: var(--brand-icon, #008a94);
+}
+
+.st-itemRowDetailed .st-itemMain {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.st-itemRowDetailed .st-itemName {
+  font-size: 15px;
+  font-weight: 1000;
+  letter-spacing: -0.01em;
+  color: var(--brand-text, #f8fafc);
+  overflow-wrap: anywhere;
+}
+
+.st-itemVariant {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--brand-muted, rgba(234, 255, 245, 0.62));
+  letter-spacing: 0.01em;
+}
+
+.st-itemRowDetailed .st-itemPrice {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.st-itemPriceQty {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--brand-muted, rgba(234, 255, 245, 0.55));
+}
+
+.st-itemRowDetailed .st-itemPrice b {
+  font-size: 15px;
+  font-weight: 1000;
+  letter-spacing: -0.01em;
+  color: var(--brand-text, #f8fafc);
+  white-space: nowrap;
+}
+
+.st-itemRowDetailed .st-itemPrice small {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--brand-muted, rgba(234, 255, 245, 0.5));
+  white-space: nowrap;
+}
+
+/* Facts pills row */
+.st-itemFacts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.st-itemFact {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--brand-line, rgba(0, 138, 148, 0.16));
+  background: var(--skeu-pill-bg, rgba(255, 255, 255, 0.05));
+  color: var(--brand-text, rgba(234, 255, 245, 0.86));
+  font-size: 10.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.st-itemFact svg {
+  flex-shrink: 0;
+}
+
+.st-itemFact--guarantee {
+  border-color: rgba(0, 214, 180, 0.32);
+  background: linear-gradient(180deg, rgba(79, 255, 200, 0.12), rgba(0, 214, 180, 0.06));
+  color: #008a94;
+}
+
+:root[data-theme="dark"] .st-itemFact--guarantee {
+  color: #4effda;
+}
+
+.st-itemFact--email {
+  border-color: rgba(234, 179, 8, 0.32);
+  background: linear-gradient(180deg, rgba(234, 179, 8, 0.16), rgba(234, 179, 8, 0.06));
+  color: #b58900;
+}
+
+:root[data-theme="dark"] .st-itemFact--email {
+  color: #fbbf24;
+}
+
+/* Description */
+.st-itemDesc {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--brand-line, rgba(0, 138, 148, 0.14));
+  font-size: 12.5px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--brand-muted, rgba(234, 255, 245, 0.74));
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+:root[data-theme="light"] .st-itemDesc {
+  color: rgba(13, 45, 57, 0.78);
+}
+
+/* Container styling — items list looks like cards stacked */
+.st-itemList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  /* override the flat items list look */
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  overflow: visible !important;
+}
+
+@media (max-width: 560px) {
+  .st-itemHead {
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 10px;
+  }
+
+  .st-itemRowDetailed .st-itemPrice {
+    grid-column: 1 / -1;
+    flex-direction: row;
+    align-items: baseline;
+    justify-content: space-between;
+    text-align: left;
+    padding-top: 8px;
+    border-top: 1px dashed var(--brand-line, rgba(0, 138, 148, 0.14));
+  }
+
+  .st-itemPriceQty {
+    order: 1;
+  }
+
+  .st-itemRowDetailed .st-itemPrice b {
+    order: 3;
+    font-size: 17px;
+  }
+
+  .st-itemRowDetailed .st-itemPrice small {
+    order: 2;
+  }
+
+  .st-itemIcon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .st-itemRowDetailed .st-itemName {
+    font-size: 14px;
+  }
+}
+
+
+/* ─── Admin note pinned to top — full-width hero card ─── */
+.st-layout {
+  /* Allow the admin note to span full width above the grid */
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.st-noteTopAccent {
+  grid-column: 1 / -1;
+  margin-bottom: 14px;
+  padding: 18px 20px !important;
+  border-radius: 18px !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.st-noteTopAccent::before {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #4effda 20%, #00d6b4 50%, #008a94 80%, transparent);
+}
+
+.st-noteTopAccent .st-cardTitle {
+  font-size: 17px !important;
+}
+
+.st-noteTopAccent .st-noteBody {
+  font-size: 14px !important;
+  line-height: 1.65;
+  margin-top: 10px;
+  white-space: pre-wrap;
+}
+
+/* On desktop, restore the 2-column grid for main + aside (admin note still spans full top) */
+@media (min-width: 901px) {
+  .st-layout {
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 16px;
+  }
+
+  .st-layout .st-main {
+    grid-column: 1;
+  }
+
+  .st-layout .st-aside {
+    grid-column: 2;
+    grid-row: 2;
+  }
+}
+
+@media (max-width: 720px) {
+  .st-noteTopAccent {
+    padding: 14px 16px !important;
+  }
+
+  .st-noteTopAccent .st-cardTitle {
+    font-size: 15px !important;
+  }
+
+  .st-noteTopAccent .st-noteBody {
+    font-size: 13px !important;
+    line-height: 1.6;
+  }
 }

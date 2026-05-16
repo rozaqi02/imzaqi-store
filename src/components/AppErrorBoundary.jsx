@@ -1,47 +1,79 @@
 import React from "react";
+import { AlertTriangle, RefreshCw, MessageCircle } from "lucide-react";
 
 export default class AppErrorBoundary extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false };
+    this.state = { hasError: false, error: null, errorInfo: null };
+    this.handleReload = this.handleReload.bind(this);
+    this.handleReset = this.handleReset.bind(this);
   }
 
-  static getDerivedStateFromError() {
-    return { hasError: true };
+  static getDerivedStateFromError(error) {
+    return { hasError: true, error };
   }
 
   componentDidCatch(error, info) {
     // eslint-disable-next-line no-console
     console.warn("UI crashed:", error, info);
+    this.setState({ errorInfo: info });
+  }
+
+  handleReload() {
+    window.location.reload();
+  }
+
+  handleReset() {
+    this.setState({ hasError: false, error: null, errorInfo: null });
   }
 
   render() {
     if (this.state.hasError) {
+      const isDev = process.env.NODE_ENV === "development";
+      const errorMsg = this.state.error?.message || "Unknown error";
+
       return (
-        <div className="page">
-          <section className="section">
-            <div className="container narrow">
-              <div className="card pad">
-                <h1 className="h2">Oops ada yang error</h1>
-                <p className="muted">
-                  Coba refresh halaman. Kalau masih error, kabari admin ya.
-                </p>
-                <div className="row" style={{ gap: 10, flexWrap: "wrap", marginTop: 10 }}>
-                  <button className="btn" onClick={() => window.location.reload()}>
-                    Refresh
-                  </button>
-                  <a
-                    className="btn btn-ghost"
-                    href="https://wa.me/6283136049987"
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    Chat admin
-                  </a>
-                </div>
-              </div>
+        <div className="aeb-page">
+          <div className="aeb-shell">
+            <div className="aeb-icon">
+              <AlertTriangle size={32} />
             </div>
-          </section>
+
+            <div className="aeb-kicker">Terjadi kesalahan</div>
+            <h1 className="aeb-title">Oops, ada yang error</h1>
+            <p className="aeb-sub">
+              Halaman mengalami masalah tak terduga. Coba refresh — biasanya langsung beres.
+            </p>
+
+            {isDev && errorMsg ? (
+              <div className="aeb-devError">
+                <code>{errorMsg}</code>
+              </div>
+            ) : null}
+
+            <div className="aeb-actions">
+              <button className="btn aeb-reloadBtn" type="button" onClick={this.handleReload}>
+                <RefreshCw size={16} />
+                Refresh halaman
+              </button>
+              <button className="btn btn-ghost aeb-resetBtn" type="button" onClick={this.handleReset}>
+                Coba lagi
+              </button>
+              <a
+                className="btn btn-ghost aeb-waBtn"
+                href="https://wa.me/6283136049987"
+                target="_blank"
+                rel="noreferrer"
+              >
+                <MessageCircle size={16} />
+                Chat admin
+              </a>
+            </div>
+
+            <p className="aeb-hint">
+              Kalau masalah terus berulang, screenshot halaman ini dan kirim ke admin.
+            </p>
+          </div>
         </div>
       );
     }
@@ -49,4 +81,3 @@ export default class AppErrorBoundary extends React.Component {
     return this.props.children;
   }
 }
-

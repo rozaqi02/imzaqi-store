@@ -281,3 +281,23 @@ color:var(--brand-text, #f8fafc);border-left:1px solid var(--brand-line, rgba(25
 [data-motion="lite"] .checkout-drawerGesture{
   animation:checkoutGestureIn .22s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both!important;
 }
+
+/* ── Stock Warning Inline (Task 8) ── */
+.checkout-stockWarn {
+  width: 100%;
+  margin-top: 6px;
+  padding: 8px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+.checkout-stockWarn.out {
+  background: rgba(255, 73, 126, 0.12);
+  border: 1px solid rgba(255, 73, 126, 0.24);
+  color: rgba(255, 160, 180, 0.9);
+}
+.checkout-stockWarn.insufficient {
+  background: rgba(255, 191, 74, 0.12);
+  border: 1px solid rgba(255, 191, 74, 0.24);
+  color: rgba(255, 220, 120, 0.9);
+}

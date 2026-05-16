@@ -992,7 +992,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location }) {
         <div className="catalog-cardBrand">
           <div className="catalog-cardIcon">
             {product.icon_url ? (
-              <img src={product.icon_url} alt="" loading="lazy" />
+              <img src={product.icon_url} alt="" loading="lazy" decoding="async" />
             ) : (
               <span>{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>
             )}

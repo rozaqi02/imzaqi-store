@@ -2016,3 +2016,44 @@
     font-size: 14px;
   }
 }
+
+/* ── Item 7: Sticky filter sidebar (desktop only) ── */
+@media (min-width: 1025px) {
+  .catalog-sidebar {
+    position: sticky;
+    top: calc(var(--site-header-offset, 80px) + 16px);
+    align-self: start;
+    max-height: calc(100vh - var(--site-header-offset, 80px) - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .catalog-sidebar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .catalog-sidebar::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .catalog-sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* ── Item 14: 3-column grid on tablet ── */
+@media (min-width: 901px) and (max-width: 1199px) {
+  .catalog-page .catalog-grid.grid,
+  .home-page .product-grid-container.grid-mode {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* iPad portrait (768-900px) — 2 columns */
+@media (min-width: 768px) and (max-width: 900px) {
+  .catalog-page .catalog-grid.grid,
+  .home-page .product-grid-container.grid-mode {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}

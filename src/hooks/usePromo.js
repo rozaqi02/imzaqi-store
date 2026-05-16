@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { getVisitorIdAsUUID } from "../lib/visitor";
+import { mapPromoResult } from "../lib/format";
 
 const KEY = "imzaqi_store_promo_v1";
 
@@ -60,11 +61,15 @@ export function usePromo() {
       const code = String(codeInput || "").trim().toUpperCase();
       if (!code) return { ok: false, message: "Kode kosong." };
 
-      const { data, error } = await supabase.rpc("validate_promo", { p_code: code });
+      const { data, error } = await supabase.rpc("validate_promo", {
+        p_code: code,
+        p_visitor_id: getVisitorIdAsUUID(),
+      });
       if (error) return { ok: false, message: "Gagal cek kode promo." };
 
-      const percent = Number(data || 0);
-      if (!percent) return { ok: false, message: "Kode tidak valid atau tidak aktif." };
+      const mapped = mapPromoResult(Number(data));
+      if (!mapped.ok) return { ok: false, message: mapped.message };
+      const percent = mapped.percent;
 
       setPromo({ code, percent });
 

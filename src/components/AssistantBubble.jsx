@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageCircle, Send, Sparkles, X } from "lucide-react";
+import { Send, Sparkles, X } from "lucide-react";
 import { ASSISTANT_QA, ASSISTANT_STARTERS, getFollowUps } from "../data/assistantQA";
 import { answerQuery } from "../lib/assistantMatcher";
 
@@ -124,14 +124,8 @@ export default function AssistantBubble() {
     setDraft("");
   }
 
-  // Focus the input when panel opens
-  useEffect(() => {
-    if (open && inputRef.current) {
-      const t = window.setTimeout(() => inputRef.current?.focus(), 280);
-      return () => window.clearTimeout(t);
-    }
-    return undefined;
-  }, [open]);
+  // Don't auto-focus input — let user choose to tap it manually
+  // (prevents keyboard from opening immediately on mobile)
 
   if (hidden || typeof document === "undefined") return null;
 
@@ -151,7 +145,23 @@ export default function AssistantBubble() {
       >
         <span className="ai-bubbleHalo" aria-hidden="true" />
         <span className="ai-bubbleIcon">
-          {open ? <X size={20} strokeWidth={2.4} /> : <MessageCircle size={22} strokeWidth={2.2} />}
+          {open ? (
+            <X size={20} strokeWidth={2.4} />
+          ) : (
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M12 2C6.48 2 2 5.58 2 10c0 2.48 1.38 4.7 3.55 6.15-.15 1.2-.75 2.3-1.55 3.1a.5.5 0 00.35.85c1.8 0 3.35-.65 4.45-1.4.7.15 1.45.3 2.2.3 5.52 0 10-3.58 10-8s-4.48-8-10-8z"
+                fill="currentColor"
+                opacity="0.92"
+              />
+              <path
+                d="M15.5 8l.9 1.8 1.8.9-1.8.9-.9 1.8-.9-1.8-1.8-.9 1.8-.9L15.5 8z"
+                fill="#032235"
+                opacity="0.9"
+              />
+              <circle cx="9" cy="10.5" r="1" fill="#032235" opacity="0.7" />
+            </svg>
+          )}
         </span>
         {!open ? <span className="ai-bubbleDot" aria-hidden="true" /> : null}
       </motion.button>

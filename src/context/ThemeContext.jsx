@@ -23,11 +23,22 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     const root = document.documentElement;
+
+    // Add no-transition class briefly to prevent flash on initial load
+    root.classList.add("no-theme-transition");
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
+
+    // Remove the class after a frame so subsequent toggles animate
+    const frame = requestAnimationFrame(() => {
+      root.classList.remove("no-theme-transition");
+    });
+
     try {
       window.localStorage.setItem(STORAGE_KEY, theme);
     } catch {}
+
+    return () => cancelAnimationFrame(frame);
   }, [theme]);
 
   const value = useMemo(

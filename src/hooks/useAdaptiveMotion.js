@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-function detectMotionMode() {
+export function detectMotionMode() {
   if (typeof window === "undefined" || !window.matchMedia) return "full";
 
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

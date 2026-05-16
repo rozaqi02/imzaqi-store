@@ -6,6 +6,7 @@ import {
   Activity,
   CircleHelp,
   Grid2x2,
+  History,
   House,
   Menu,
   MessageSquareQuote,
@@ -48,6 +49,7 @@ const primaryItems = [
 
 const utilityItems = [
   { to: "/status", label: "Status Order", icon: Activity },
+  { to: "/riwayat", label: "Riwayat", icon: History },
   { to: "/admin", label: "Admin", icon: Shield },
 ];
 
@@ -200,7 +202,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 
         <div className="mobile-menu-footer">
           <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-          <p className="menu-footer-text">Imzaqi Store App V.4.1</p>
+          <p className="menu-footer-text">Imzaqi Store App V.4.1.2</p>
         </div>
       </aside>
     </>,
@@ -283,6 +285,7 @@ export default function Header() {
         { to: "/tentang" },
         { to: "/testimoni" },
         { to: "/status" },
+        { to: "/riwayat" },
       ];
       const activeIdx = links.findIndex(
         (link) => location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to))
@@ -332,6 +335,7 @@ export default function Header() {
               { to: "/tentang", label: "FAQ" },
               { to: "/testimoni", label: "Testimoni" },
               { to: "/status", label: "Status Order" },
+              { to: "/riwayat", label: "Riwayat" },
             ].map((link, idx) => {
               const isActive = location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to));
               return (

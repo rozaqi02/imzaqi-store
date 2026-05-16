@@ -48,7 +48,8 @@ function ToastIcon({ type }) {
 }
 
 function ToastItem({ toast, onClose }) {
-  const { id, type, title, message, actionLabel, onAction } = toast;
+  const { id, type, title, message, actionLabel, onAction, duration } = toast;
+  const showProgress = duration > 0 && type !== "loading";
 
   return (
     <div className={`toast toast-${type || "info"}`} role="status" aria-live="polite">
@@ -77,6 +78,12 @@ function ToastItem({ toast, onClose }) {
       <button className="toast-close" onClick={() => onClose(id)} aria-label="Tutup">
         <X size={15} strokeWidth={2.4} />
       </button>
+
+      {showProgress ? (
+        <div className="toast-progress" aria-hidden="true">
+          <span style={{ animationDuration: `${duration}ms` }} />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -99,7 +106,7 @@ export function ToastProvider({ children }) {
     (toast) => {
       const id = toast.id || uid();
       const duration = typeof toast.duration === "number" ? toast.duration : 3200;
-      const next = { id, type: "info", ...toast };
+      const next = { id, type: "info", ...toast, duration };
 
       setToasts((prev) => {
         const trimmed = prev.slice(-2);

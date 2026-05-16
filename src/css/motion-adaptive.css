@@ -8,7 +8,7 @@
 @keyframes routeInLite {
   from {
     opacity: 0;
-    transform: translate3d(0, 6px, 0);
+    transform: translate3d(0, 5px, 0);
   }
   to {
     opacity: 1;
@@ -33,6 +33,11 @@
 [data-motion="lite"] .pay-orderMobileCard,
 [data-motion="lite"] .qris-wrap,
 [data-motion="lite"] .pay-successModal,
+[data-motion="lite"] .pay-confirmModal,
+[data-motion="lite"] .st-hero,
+[data-motion="lite"] .st-search,
+[data-motion="lite"] .st-card,
+[data-motion="lite"] .st-infoCard,
 [data-motion="lite"] .toast {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
@@ -46,6 +51,16 @@
 [data-motion="lite"] .status-mainCard,
 [data-motion="lite"] .status-sideCard,
 [data-motion="lite"] .status-emptyCard,
+[data-motion="lite"] .st-hero,
+[data-motion="lite"] .st-search,
+[data-motion="lite"] .st-card,
+[data-motion="lite"] .st-infoCard,
+[data-motion="lite"] .pay-card,
+[data-motion="lite"] .pay-orderDesktop,
+[data-motion="lite"] .pay-orderMobileCard,
+[data-motion="lite"] .qris-wrap,
+[data-motion="lite"] .pay-successModal,
+[data-motion="lite"] .pay-confirmModal,
 [data-motion="lite"] .admin-panel,
 [data-motion="lite"] .admin-card {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
@@ -58,6 +73,16 @@
 [data-motion="lite"] .checkout-summary,
 [data-motion="lite"] .product-card-modern,
 [data-motion="lite"] .catalog-card,
+[data-motion="lite"] .st-hero,
+[data-motion="lite"] .st-search,
+[data-motion="lite"] .st-card,
+[data-motion="lite"] .st-infoCard,
+[data-motion="lite"] .pay-card,
+[data-motion="lite"] .pay-orderDesktop,
+[data-motion="lite"] .pay-orderMobileCard,
+[data-motion="lite"] .qris-wrap,
+[data-motion="lite"] .pay-successModal,
+[data-motion="lite"] .pay-confirmModal,
 [data-motion="lite"] .admin-panel,
 [data-motion="lite"] .admin-orderCardModern {
   transition-property: transform, opacity, border-color, background-color !important;
@@ -71,9 +96,15 @@
 [data-motion="lite"] .skeleton::after,
 [data-motion="lite"] .catalog-cardSkeleton::after,
 [data-motion="lite"] .testi-skel::after,
+[data-motion="lite"] .qris-skeletonBox,
 [data-motion="lite"] .stock-progress-fill::after {
   animation: none !important;
   transition: none !important;
+}
+
+/* Status page: isolate repaint boundary on main wrapper */
+[data-motion="lite"] .st-wrap {
+  contain: layout paint style;
 }
 
 [data-motion="lite"] .trending-badge,
@@ -110,7 +141,8 @@
 /* Product page + detail page: reduce paint complexity while keeping style direction */
 [data-motion="lite"] .catalog-page .catalog-hero::before,
 [data-motion="lite"] .catalog-page .catalog-card::before,
-[data-motion="lite"] .catalog-page .catalog-cardSkeleton::after {
+[data-motion="lite"] .catalog-page .catalog-cardSkeleton::after,
+[data-motion="lite"] .pay-shell-hero::before {
   display: none !important;
 }
 
@@ -272,41 +304,91 @@
   scroll-behavior: auto !important;
 }
 
-/* ─── Mobile navbar: solid neumorphism (must be last) ───────────────────── */
+/* ─── Mobile navbar: match desktop (skeu-panel-bg gradient) ───────────── */
 @media (max-width: 768px) {
   html .header,
   html .site-header {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: var(--skeu-panel-bg, rgba(3, 22, 15, 0.98)) !important;
+    /* Identical to desktop: top white shimmer + skeu-panel-bg gradient */
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+      var(--skeu-panel-bg) !important;
     border-bottom: 1px solid var(--brand-line, rgba(0, 138, 148, 0.16)) !important;
+  }
+
+  :root[data-theme="light"] html .header,
+  :root[data-theme="light"] html .site-header {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.6),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.2),
-      0 12px 28px rgba(67, 111, 129, 0.14) !important;
+      0 6px 18px rgba(67, 111, 129, 0.08) !important;
   }
 
   :root[data-theme="dark"] html .header,
   :root[data-theme="dark"] html .site-header {
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.06),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.4),
-      0 14px 32px rgba(0, 0, 0, 0.36) !important;
+      0 8px 22px rgba(0, 0, 0, 0.32) !important;
   }
 }
 
 
-/* ─── Mobile checkout drawer perf: cheap shadow + paint isolation ──────── */
+/* ─── Mobile checkout: pure CSS class-swap animation (zero JS overhead) ─── */
+@media (max-width: 720px) {
+  /* Backdrop */
+  .checkout-backdrop-mobile {
+    opacity: 0;
+    transition: opacity 0.28s ease;
+    /* No backdrop-filter — expensive during animation */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .checkout-backdrop-mobile.checkout-mobile-open {
+    opacity: 1;
+  }
+
+  .checkout-backdrop-mobile.checkout-mobile-closing {
+    opacity: 0;
+    transition: opacity 0.24s ease;
+  }
+
+  /* Drawer: only transform animates — compositor-only, zero paint */
+  .checkout-drawer.checkout-mobile-entering {
+    transform: translateY(100%);
+    transition: none;
+    /* Strip all expensive properties during animation */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .checkout-drawer.checkout-mobile-open {
+    transform: translateY(0);
+    transition: transform 0.34s cubic-bezier(0.32, 0.72, 0, 1);
+    /* Restore shadow only after animation settles */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.14) !important;
+  }
+
+  .checkout-drawer.checkout-mobile-closing {
+    transform: translateY(100%);
+    transition: transform 0.26s cubic-bezier(0.32, 0.72, 0, 1);
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+}
 @media (max-width: 720px) {
   .checkout-drawer {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    /* Tiny pre-shadow only — fully painted shadow is added once animation settles */
-    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.16) !important;
+    box-shadow: none !important;
+    will-change: transform;
     transform: translateZ(0);
     backface-visibility: hidden;
-    will-change: transform;
-    contain: layout paint style;
+    contain: layout style;
   }
 
   .checkout-backdrop {
@@ -317,18 +399,16 @@
     contain: paint;
   }
 
-  /* Drawer body: contain its scroll/repaints */
   .checkout-drawerBody {
     contain: content;
     -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
   }
 
-  /* Drop expensive children effects during open */
   .checkout-drawer::before {
     display: none;
   }
 
-  /* Inner panels — disable backdrop-filter chains */
   .checkout-panel,
   .checkout-summary,
   .checkout-main {

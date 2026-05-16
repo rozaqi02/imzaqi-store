@@ -487,9 +487,20 @@ select.input {
   transition: opacity var(--dur-med) var(--ease-out);
 }
 
-.theme-toggle.is-dark .theme-toggleGlyph-dark,
+/* Hide the background glyph that's currently under the thumb to avoid
+   the double-icon visual glitch. The thumb already shows the active icon. */
 .theme-toggle:not(.is-dark) .theme-toggleGlyph-light {
-  opacity: 1;
+  opacity: 0;
+}
+
+.theme-toggle.is-dark .theme-toggleGlyph-dark {
+  opacity: 0;
+}
+
+/* Show the inactive-side glyph (the icon visible behind the empty space) */
+.theme-toggle.is-dark .theme-toggleGlyph-light,
+.theme-toggle:not(.is-dark) .theme-toggleGlyph-dark {
+  opacity: 0.55;
 }
 
 .theme-toggleThumb {
@@ -3457,18 +3468,18 @@ select.input {
   }
 }
 
-/* Mobile navbar: solid, no blur */
+/* Mobile navbar: pure white solid (matches desktop) */
 @media (max-width: 768px) {
   :root[data-theme="light"] .header,
   :root[data-theme="light"] .site-header {
-    background: rgb(236, 247, 251) !important;
+    background: #ffffff !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
   :root[data-theme="dark"] .header,
   :root[data-theme="dark"] .site-header {
-    background: rgb(8, 14, 31) !important;
+    background: #0a1622 !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }

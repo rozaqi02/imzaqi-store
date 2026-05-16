@@ -236,7 +236,7 @@ export async function upsertSetting(key, value) {
 }
 
 export async function fetchPromoCodes() {
-  const { data, error } = await supabase.from("promo_codes").select("code,percent,is_active,updated_at").order("updated_at", { ascending: false });
+  const { data, error } = await supabase.from("promo_codes").select("code,percent,is_active,updated_at,expired_at,max_uses,used_count").order("updated_at", { ascending: false });
   if (error) throw error;
   return data || [];
 }
@@ -308,4 +308,108 @@ export async function updateVariantStock(variantId, newStock) {
     .eq("id", variantId);
   
   if (error) throw error;
+}
+
+// ── Analytics: daily stats (dari tabel daily_stats) ──
+export async function fetchDailyStats({ days = 30 } = {}) {
+  const { data, error } = await supabase.rpc("get_daily_stats", { p_days: days });
+  if (error) throw error;
+  return (data || []).map((row) => ({
+    date: row.stat_date,
+    uniqueViews: Number(row.unique_views || 0),
+    totalOrders: Number(row.total_orders || 0),
+    revenueIdr: Number(row.revenue_idr || 0),
+  }));
+}
+
+// ── Analytics: visitor stats (new vs returning) ──
+export async function fetchVisitorStats({ days = 30 } = {}) {
+  const { data, error } = await supabase.rpc("get_visitor_stats", { p_days: days });
+  if (error) throw error;
+  const row = Array.isArray(data) ? data[0] : data;
+  return {
+    totalVisitors: Number(row?.total_visitors || 0),
+    returningVisitors: Number(row?.returning_visitors || 0),
+    newVisitors: Number(row?.new_visitors || 0),
+  };
+}
+
+// ── Analytics: top pages ──
+export async function fetchTopPages({ days = 30, limit = 10 } = {}) {
+  const { data, error } = await supabase.rpc("get_top_pages", { p_days: days, p_limit: limit });
+  if (error) throw error;
+  return (data || []).map((row) => ({
+    path: row.path,
+    viewCount: Number(row.view_count || 0),
+  }));
+}
+
+// ── Track page view ke tabel page_views ──
+export async function trackPageView({ visitorId, path, referrer } = {}) {
+  if (!visitorId) return;
+  const { error } = await supabase.from("page_views").insert({
+    visitor_id: visitorId,
+    path: path || null,
+    referrer: referrer || null,
+  });
+  if (error) throw error;
+}
+
+// ── CSV Export helpers ──
+export function csvEscapeValue(value) {
+  const str = value == null ? "" : String(value);
+  if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+    return '"' + str.replace(/"/g, '""') + '"';
+  }
+  return str;
+}
+
+export function buildOrdersCSV(orders) {
+  const headers = [
+    "order_code","created_at","status","customer_whatsapp",
+    "total_idr","subtotal_idr","discount_percent","promo_code",
+    "items_summary","notes","admin_note"
+  ];
+  const rows = (orders || []).map((o) => {
+    const itemsSummary = Array.isArray(o.items)
+      ? o.items.map((it) => `${it.product_name || ""} x${it.qty || 1}`).join("; ")
+      : "";
+    return [
+      o.order_code,
+      o.created_at,
+      o.status,
+      o.customer_whatsapp,
+      o.total_idr,
+      o.subtotal_idr,
+      o.discount_percent,
+      o.promo_code,
+      itemsSummary,
+      o.notes,
+      o.admin_note,
+    ].map(csvEscapeValue).join(",");
+  });
+  return [headers.join(","), ...rows].join("\n");
+}
+
+export function downloadCSV(csvString, filename) {
+  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// ── Analytics: cohort return (visitors who came back) ──
+export async function fetchCohortReturn({ days = 7 } = {}) {
+  try {
+    const { data, error } = await supabase.rpc("get_cohort_return", { p_days: days });
+    if (error) throw error;
+    return Number(data || 0);
+  } catch {
+    return 0;
+  }
 }

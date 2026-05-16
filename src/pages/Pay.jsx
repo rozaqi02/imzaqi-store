@@ -15,6 +15,7 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import { addOrderToHistory } from "../lib/orderHistory";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
 const BUYER_EMAIL_REQUIREMENT_REGEX =
@@ -171,7 +172,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
   );
 }
 
-function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items }) {
+function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }) {
   const modalRef = React.useRef(null);
 
   useDialogA11y({
@@ -185,7 +186,11 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items }) {
 
   const itemCount = (items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-  const checklist = [
+  const checklist = isFree ? [
+    "Promo 100% sudah diterapkan ke order ini",
+    "Tidak ada pembayaran yang diperlukan",
+    "Order akan langsung diproses setelah konfirmasi",
+  ] : [
     "Sudah scan QRIS dengan aplikasi m-banking / e-wallet",
     "Nominal transfer sesuai dengan total tagihan di atas",
     "Pembayaran sudah berhasil (bukan pending atau gagal)",
@@ -207,8 +212,8 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items }) {
             <ShieldCheck size={20} />
           </div>
           <div className="pay-confirmModalHeaderCopy">
-            <div className="pay-confirmModalTitle">Konfirmasi Pembayaran</div>
-            <div className="pay-confirmModalSub">Pastikan semua syarat di bawah terpenuhi</div>
+            <div className="pay-confirmModalTitle">{isFree ? "Konfirmasi Order Gratis" : "Konfirmasi Pembayaran"}</div>
+            <div className="pay-confirmModalSub">{isFree ? "Pastikan semua detail order sudah benar" : "Pastikan semua syarat di bawah terpenuhi"}</div>
           </div>
           <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
             <X size={16} />
@@ -217,9 +222,9 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items }) {
 
         {/* Total Card */}
         <div className="pay-confirmTotalCard">
-          <div className="pay-confirmTotalLabel">Total yang harus dibayar</div>
-          <div className="pay-confirmTotalAmount">{formatIDR(total)}</div>
-          <div className="pay-confirmTotalMeta">{itemCount} item &bull; via QRIS</div>
+          <div className="pay-confirmTotalLabel">{isFree ? "Total setelah promo" : "Total yang harus dibayar"}</div>
+          <div className="pay-confirmTotalAmount">{isFree ? "Gratis" : formatIDR(total)}</div>
+          <div className="pay-confirmTotalMeta">{itemCount} item &bull; {isFree ? "Promo 100%" : "via QRIS"}</div>
         </div>
 
         {/* Checklist */}
@@ -235,17 +240,19 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items }) {
           ))}
         </ul>
 
-        {/* Warning */}
+        {/* Warning — only for paid orders */}
+        {!isFree && (
         <div className="pay-confirmWarning">
           <Info size={14} />
           <span>Konfirmasi palsu akan memperlambat proses order kamu.</span>
         </div>
+        )}
 
         {/* Actions */}
         <div className="pay-confirmActionsNew">
           <button className="pay-confirmPrimaryBtn" type="button" onClick={onConfirm}>
             <Check size={16} strokeWidth={2.5} />
-            Ya, Saya Sudah Bayar
+            {isFree ? "Ya, Konfirmasi Order" : "Ya, Saya Sudah Bayar"}
           </button>
           <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
             Cek Ulang Dulu
@@ -614,6 +621,12 @@ export default function Pay() {
       setOk(true);
       setSnapshot(canonicalOrder.items);
       cart.clear();
+      addOrderToHistory({
+        order_code: generatedCode,
+        created_at: new Date().toISOString(),
+        total_idr: canonicalOrder.total,
+        status: "pending",
+      });
       if (loadingId) toast.remove(loadingId);
       toast.success("ID order berhasil dibuat.");
     } catch (error) {
@@ -682,7 +695,8 @@ export default function Pay() {
     );
   }
 
-  const canSubmit = !busy && canShowQris;
+  const isFreeOrder = total === 0 && subtotal > 0;
+  const canSubmit = !busy && (isFreeOrder ? hasValidWhatsApp && !missingBuyerEmailNote : canShowQris);
 
   function resolveItemIconUrl(item) {
     const direct = String(item?.product_icon_url || "").trim();
@@ -711,6 +725,10 @@ export default function Pay() {
           {busy ? (
             <>
               <Loader className="spinner" size={16} /> Menyimpan
+            </>
+          ) : isFreeOrder ? (
+            <>
+              <Check size={16} /> Konfirmasi Order Gratis
             </>
           ) : (
             <>
@@ -827,13 +845,15 @@ export default function Pay() {
               <div className="pay-stageGrid">
                 <div className="pay-stageMeta">
                   <div className="pay-stageLabel">Total bayar</div>
-                  <div className="pay-stageTotal">{formatIDR(total)}</div>
+                  <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
                   <div className="pay-stageHint">
-                    {canShowQris
-                      ? "Scan QR, selesaikan pembayaran, lalu simpan ID order."
-                      : missingBuyerEmailNote
-                        ? "Lengkapi email buyer di catatan agar QRIS terbuka."
-                        : "Isi WhatsApp dulu untuk membuka QR."}
+                    {isFreeOrder
+                      ? "Promo 100% diterapkan. Tidak perlu bayar, langsung konfirmasi order."
+                      : canShowQris
+                        ? "Scan QR, selesaikan pembayaran, lalu simpan ID order."
+                        : missingBuyerEmailNote
+                          ? "Lengkapi email buyer di catatan agar QRIS terbuka."
+                          : "Isi WhatsApp dulu untuk membuka QR."}
                   </div>
 
                   <div className="pay-stageRows">
@@ -859,8 +879,14 @@ export default function Pay() {
                 </div>
 
                 <div className="pay-stageVisual">
-                  <div className={`qris-wrap pay-qrisFrame ${canShowQris ? "" : "is-locked"}`}>
-                    {canShowQris ? (
+                  <div className={`qris-wrap pay-qrisFrame ${canShowQris && !isFreeOrder ? "" : "is-locked"}`}>
+                    {isFreeOrder ? (
+                      <div className="pay-qrisLocked pay-qrisFree">
+                        <span style={{ fontSize: 36 }}>🎉</span>
+                        <strong>Order Gratis</strong>
+                        <p>Promo 100% diterapkan. Tidak perlu scan QRIS atau transfer.</p>
+                      </div>
+                    ) : canShowQris ? (
                       <>
                         {!qrisLoaded && !qrisFailed ? <QRISSkeleton /> : null}
                         {qrisUrl ? (
@@ -888,8 +914,10 @@ export default function Pay() {
                     )}
                   </div>
 
-                  <div className={`pay-stageFoot ${canShowQris && !isDynamicQris ? "warning" : ""}`}>{qrisFootText}</div>
-                  {canShowQris && qrisNotice ? (
+                  <div className={`pay-stageFoot ${canShowQris && !isDynamicQris && !isFreeOrder ? "warning" : ""}`}>
+                    {isFreeOrder ? "Promo 100% aktif — tidak ada pembayaran yang diperlukan." : qrisFootText}
+                  </div>
+                  {canShowQris && qrisNotice && !isFreeOrder ? (
                     <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qrisNotice}</div>
                   ) : null}
                 </div>
@@ -918,6 +946,7 @@ export default function Pay() {
         open={showConfirmModal}
         total={total}
         items={items}
+        isFree={isFreeOrder}
         onConfirm={() => {
           setShowConfirmModal(false);
           onConfirmPaid();
@@ -933,6 +962,25 @@ export default function Pay() {
         onClose={() => nav(statusUrl)}
         onCopied={() => toast.success("ID order disalin")}
       />
+
+      {!ok && !orderCode && items.length > 0 ? (
+        <div className="pay-stickyCta">
+          <div className="pay-stickyCtaInner">
+            <div className="pay-stickyCtaInfo">
+              <div className="pay-stickyCtaLabel">Total bayar</div>
+              <div className="pay-stickyCtaTotal">{isFreeOrder ? "Gratis 🎉" : formatIDR(total)}</div>
+            </div>
+            <button
+              className="btn pay-stickyCtaBtn"
+              disabled={!canSubmit}
+              onClick={() => setShowConfirmModal(true)}
+              type="button"
+            >
+              {busy ? <><Loader className="spinner" size={16} /> Menyimpan</> : <>Saya sudah bayar</>}
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -8,6 +8,29 @@ import { fetchProducts, fetchTopSellingIds } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 
+function HomeProductSkeleton() {
+  return (
+    <div className="home-tileSkeleton" role="listitem" aria-hidden="true">
+      <div className="home-tileSkeleton-top">
+        <div className="home-tileSkeleton-icon" />
+        <div className="home-tileSkeleton-textGroup">
+          <div className="home-tileSkeleton-line w-72" />
+          <div className="home-tileSkeleton-line w-50" />
+        </div>
+        <div className="home-tileSkeleton-arrow" />
+      </div>
+      <div className="home-tileSkeleton-bottom">
+        <div className="home-tileSkeleton-pills">
+          <div className="home-tileSkeleton-pill" />
+          <div className="home-tileSkeleton-pill" />
+          <div className="home-tileSkeleton-pill" />
+        </div>
+        <div className="home-tileSkeleton-price" />
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
@@ -73,10 +96,10 @@ export default function Home() {
           <div className="product-grid-container list-mode home-popularList" role="list" aria-label="Produk populer">
             {loading ? (
               <>
-                <div className="catalog-cardSkeleton list" role="listitem" />
-                <div className="catalog-cardSkeleton list" role="listitem" />
-                <div className="catalog-cardSkeleton list" role="listitem" />
-                <div className="catalog-cardSkeleton list" role="listitem" />
+                <HomeProductSkeleton />
+                <HomeProductSkeleton />
+                <HomeProductSkeleton />
+                <HomeProductSkeleton />
               </>
             ) : error ? (
               <div className="card pad" style={{ gridColumn: "1 / -1" }}>

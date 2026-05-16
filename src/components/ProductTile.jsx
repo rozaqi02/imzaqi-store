@@ -1,7 +1,7 @@
 import React, { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
-import { formatIDR } from "../lib/format";
+import { formatIDR, classifyStock } from "../lib/format";
 
 function summarizeCatalogCopy(text) {
   const firstLine = String(text || "")
@@ -42,11 +42,20 @@ export default function ProductTile({ product }) {
       className="product-tile product-tile--list"
       role="listitem"
       aria-label={`Buka detail ${product?.name || "produk"}`}
+      data-hover-hint={`${displayPrice} • ${summary.variantsCount} varian • Lihat detail →`}
     >
       <div className="product-tile-top">
         <div className="product-tile-icon" aria-hidden="true">
           {product?.icon_url ? (
-            <img src={product.icon_url} alt="" loading="lazy" decoding="async" />
+            <img
+              src={product.icon_url}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              fetchpriority="low"
+              width="62"
+              height="62"
+            />
           ) : (
             <div className="product-tile-fallback">{String(product?.name || "P").slice(0, 1).toUpperCase()}</div>
           )}
@@ -76,6 +85,9 @@ export default function ProductTile({ product }) {
             <ShoppingBag size={14} />
             <span>{sold} terjual</span>
           </span>
+          {classifyStock(stock) === "low" ? (
+            <span className="product-lowStockBadge">Hampir habis</span>
+          ) : null}
         </div>
 
         <div className="product-tile-price" aria-label="Harga mulai">

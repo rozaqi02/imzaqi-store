@@ -1,8 +1,7 @@
 import { useEffect } from "react";
 
-// Adds subtle, high-quality reveal animations when elements scroll into view.
-// Usage: call once near the top of the app (Layout) and add className="reveal".
-// Pass a dependency (e.g. pathname) so the observer re-attaches on client-side route changes.
+// Adds subtle reveal animations when elements scroll into view.
+// Pass a dependency (e.g. pathname) so the observer re-attaches on route changes.
 export function useRevealOnScroll(dep) {
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -16,12 +15,16 @@ export function useRevealOnScroll(dep) {
     const lowMemory = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 4;
 
     if (prefersReduced || coarsePointer || saveData || lowMemory) {
-      // Keep mobile and constrained devices responsive by skipping intersection work.
-      document.querySelectorAll(".reveal").forEach((el) => el.classList.add("is-visible"));
+      // On mobile/constrained devices: skip intersection work, show everything immediately.
+      document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) =>
+        el.classList.add("is-visible")
+      );
       return undefined;
     }
 
-    const els = Array.from(document.querySelectorAll(".reveal"));
+    // Only observe elements that are NOT yet visible — avoids re-animating
+    // elements that were already revealed on a previous route visit.
+    const els = Array.from(document.querySelectorAll(".reveal:not(.is-visible)"));
     if (!els.length) return undefined;
 
     const io = new IntersectionObserver(
@@ -35,8 +38,8 @@ export function useRevealOnScroll(dep) {
       },
       {
         root: null,
-        threshold: 0.12,
-        rootMargin: "0px 0px -10% 0px",
+        threshold: 0.1,
+        rootMargin: "0px 0px -8% 0px",
       }
     );
 
