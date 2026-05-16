@@ -276,3 +276,107 @@
     align-self: flex-start;
   }
 }
+
+/* ── Order History light mode ─────────────────────────────────── */
+:root[data-theme="light"] .oh-heroIcon {
+  border-color: rgba(0, 138, 148, 0.16);
+  background: rgba(0, 138, 148, 0.10);
+  color: #0b3f4b;
+}
+
+:root[data-theme="light"] .oh-kicker {
+  color: rgba(50, 84, 95, 0.62);
+}
+
+:root[data-theme="light"] .oh-title {
+  color: #123744;
+}
+
+:root[data-theme="light"] .oh-sub {
+  color: rgba(50, 84, 95, 0.78);
+}
+
+:root[data-theme="light"] .oh-loadingDot {
+  background: rgba(0, 138, 148, 0.6);
+}
+
+:root[data-theme="light"] .oh-empty {
+  border-color: rgba(0, 138, 148, 0.16);
+  background: rgba(247, 253, 255, 0.7);
+}
+
+:root[data-theme="light"] .oh-emptyIcon {
+  border-color: rgba(0, 138, 148, 0.14);
+  background: rgba(236, 248, 252, 0.86);
+  color: rgba(50, 84, 95, 0.55);
+}
+
+:root[data-theme="light"] .oh-emptyTitle {
+  color: #123744;
+}
+
+:root[data-theme="light"] .oh-emptyText {
+  color: rgba(50, 84, 95, 0.72);
+}
+
+:root[data-theme="light"] .oh-card {
+  border-color: rgba(0, 138, 148, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 253, 255, 0.88));
+  box-shadow: 0 8px 24px rgba(72, 118, 138, 0.10);
+}
+
+:root[data-theme="light"] .oh-card:hover {
+  border-color: rgba(0, 138, 148, 0.22);
+}
+
+:root[data-theme="light"] .oh-orderCode {
+  color: #123744;
+}
+
+:root[data-theme="light"] .oh-orderDate {
+  color: rgba(50, 84, 95, 0.62);
+}
+
+:root[data-theme="light"] .oh-orderTotal {
+  color: #123744;
+}
+
+:root[data-theme="light"] .oh-statusPill {
+  border-color: rgba(0, 138, 148, 0.14);
+  color: #3d6070;
+}
+
+:root[data-theme="light"] .oh-statusPill.is-pending {
+  background: rgba(29, 131, 255, 0.10);
+  border-color: rgba(29, 131, 255, 0.24);
+  color: #1454a0;
+}
+
+:root[data-theme="light"] .oh-statusPill.is-processing {
+  background: rgba(255, 145, 0, 0.10);
+  border-color: rgba(255, 145, 0, 0.28);
+  color: #a45c00;
+}
+
+:root[data-theme="light"] .oh-statusPill.is-done {
+  background: rgba(0, 168, 110, 0.10);
+  border-color: rgba(0, 168, 110, 0.26);
+  color: #0b6f4d;
+}
+
+:root[data-theme="light"] .oh-statusPill.is-cancelled {
+  background: rgba(220, 38, 80, 0.08);
+  border-color: rgba(220, 38, 80, 0.24);
+  color: #a8203e;
+}
+
+:root[data-theme="light"] .oh-fetchError {
+  border-color: rgba(220, 130, 0, 0.22);
+  background: rgba(255, 200, 100, 0.14);
+  color: #8a4f00;
+}
+
+:root[data-theme="light"] .oh-cardActions {
+  border-top-color: rgba(0, 138, 148, 0.10);
+}
