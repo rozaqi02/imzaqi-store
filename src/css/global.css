@@ -473,15 +473,13 @@ html,body{background:#d8fff5!important;}
     );opacity:0.08;mix-blend-mode:overlay;}
 .global-noise{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='.45'/%3E%3C/svg%3E");background-size:240px/**/240px;opacity:0.07;mix-blend-mode:overlay;filter:contrast(120%)brightness(100%);}
 .app-main::before,.app-main::after{content:none!important;display:none!important;}
-@media (max-width: 768px){.header{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;background:var(--skeu-panel-bg, rgba(3, 22, 15, 0.98))!important;}.global-bg::after{content:none!important;display:none!important;}.global-noise{mix-blend-mode:normal!important;filter:none!important;opacity:0.03!important;}.trending-badge,.stock-badge-modern.low-stock,.stock-progress-fill::after{animation:none!important;}.mobile-backdrop,.mobile-menu{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}}
+@media (max-width: 768px){.global-bg::after{content:none!important;display:none!important;}.global-noise{mix-blend-mode:normal!important;filter:none!important;opacity:0.03!important;}.trending-badge,.stock-badge-modern.low-stock,.stock-progress-fill::after{animation:none!important;}.mobile-backdrop,.mobile-menu{backdrop-filter:none!important;-webkit-backdrop-filter:none!important;}}
 
-/* Force solid navbar on mobile — must come after all other header rules */
+/* Header on mobile uses same neumorphism as desktop (defined in motion-adaptive.css) */
 @media (max-width: 768px) {
   html .header,
   html .site-header {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    background: var(--skeu-panel-bg, rgba(3, 22, 15, 0.98)) !important;
+    /* Styles handled by motion-adaptive.css — no overrides needed here */
   }
 }
 @media (max-width: 720px){
@@ -1418,4 +1416,202 @@ select,
 @media (prefers-reduced-motion: reduce) {
   .page-loader-logo { animation: none; opacity: 1; transform: none; }
   .page-loader-dots span { animation: none; opacity: 0.6; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Global Neumorphism Enhancement
+   Upgrades base elements (buttons, inputs, cards, pills) to use the
+   skeuomorphic variables from theme-neumorphism.css for a tactile,
+   raised/pressed feel across both dark and light modes.
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── Buttons: raised, tactile ── */
+.btn {
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  color: #032235;
+  box-shadow: var(--skeu-accent-shadow, 0 20px 34px rgba(0, 214, 180, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 0 -3px 0 rgba(3, 66, 74, 0.36));
+}
+
+.btn:hover {
+  box-shadow:
+    0 24px 42px rgba(0, 214, 180, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -3px 0 rgba(3, 66, 74, 0.4);
+}
+
+.btn:active {
+  box-shadow:
+    0 8px 18px rgba(0, 214, 180, 0.16),
+    inset 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.btn-ghost {
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  background: var(--skeu-control-bg, linear-gradient(180deg, rgba(25, 38, 72, 0.96), rgba(10, 16, 35, 0.94)));
+  color: var(--brand-text, #f4fff9);
+  box-shadow: var(--skeu-control-shadow, 0 16px 30px rgba(0, 0, 0, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 -2px 0 rgba(0, 0, 0, 0.3));
+}
+
+.btn-ghost:hover {
+  border-color: rgba(0, 194, 208, 0.24);
+  box-shadow:
+    0 18px 36px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.32);
+}
+
+.btn-ghost:active {
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* ── Inputs: inset/pressed feel ── */
+.input {
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  background: var(--skeu-inset-bg, linear-gradient(180deg, rgba(3, 8, 18, 0.94), rgba(9, 15, 33, 0.82)));
+  box-shadow: var(--skeu-inset-shadow, inset 0 3px 8px rgba(0, 0, 0, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 1px 0 rgba(255, 255, 255, 0.03));
+  color: var(--brand-text, #f4fff9);
+}
+
+.input:focus {
+  border-color: rgba(0, 194, 208, 0.34);
+  box-shadow:
+    0 0 0 4px rgba(0, 194, 208, 0.12),
+    var(--skeu-inset-shadow, inset 0 3px 8px rgba(0, 0, 0, 0.42));
+}
+
+.input::placeholder {
+  color: var(--brand-muted, #9fd1c5);
+  opacity: 0.6;
+}
+
+/* ── Cards: raised panel ── */
+.card {
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  background: var(--skeu-panel-bg, linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96)));
+  box-shadow: var(--skeu-panel-shadow, 0 28px 60px rgba(0, 0, 0, 0.34), inset 0 1px 0 rgba(255, 255, 255, 0.1));
+}
+
+.card:hover {
+  border-color: rgba(0, 194, 208, 0.24);
+  box-shadow:
+    0 32px 72px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(0, 194, 208, 0.1);
+}
+
+/* ── Pills / badges: subtle raised ── */
+.pill,
+.tab-btn {
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  background: var(--skeu-pill-bg, linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9)));
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.tab-btn.active {
+  border-color: rgba(79, 255, 200, 0.26);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  color: #032235;
+  box-shadow:
+    0 14px 28px rgba(0, 214, 180, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.44);
+}
+
+/* ── Header: frosted glass neumorphism ── */
+.header {
+  background:
+    linear-gradient(180deg, rgba(4, 7, 20, 0.92), rgba(4, 7, 20, 0.76));
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+  border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.12));
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* ── Toast: raised panel ── */
+.toast {
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  background: var(--skeu-panel-bg, rgba(8, 14, 31, 0.96));
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(16px);
+}
+
+/* ── Light mode overrides ── */
+:root[data-theme="light"] .btn {
+  box-shadow: var(--skeu-accent-shadow);
+}
+
+:root[data-theme="light"] .btn-ghost {
+  background: var(--skeu-control-bg);
+  border-color: var(--brand-line);
+  color: var(--brand-text);
+  box-shadow: var(--skeu-control-shadow);
+}
+
+:root[data-theme="light"] .input {
+  background: var(--skeu-inset-bg);
+  border-color: var(--brand-line);
+  box-shadow: var(--skeu-inset-shadow);
+  color: var(--brand-text);
+}
+
+:root[data-theme="light"] .input:focus {
+  border-color: rgba(0, 138, 148, 0.36);
+  box-shadow:
+    0 0 0 4px rgba(0, 138, 148, 0.1),
+    var(--skeu-inset-shadow);
+}
+
+:root[data-theme="light"] .card {
+  background: var(--skeu-panel-bg);
+  border-color: var(--brand-line);
+  box-shadow: var(--skeu-panel-shadow);
+}
+
+:root[data-theme="light"] .header {
+  background: var(--brand-header-bg);
+  border-bottom-color: var(--brand-line);
+  box-shadow:
+    0 6px 24px rgba(37, 88, 110, 0.1),
+    inset 0 -1px 0 rgba(154, 191, 203, 0.2);
+}
+
+:root[data-theme="light"] .pill,
+:root[data-theme="light"] .tab-btn {
+  background: var(--skeu-pill-bg);
+  border-color: var(--brand-line);
+  box-shadow:
+    0 4px 10px rgba(37, 88, 110, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+:root[data-theme="light"] .tab-btn.active {
+  border-color: rgba(0, 138, 148, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  color: #032235;
+  box-shadow:
+    0 12px 24px rgba(0, 138, 148, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="light"] .toast {
+  background: var(--skeu-panel-bg);
+  border-color: var(--brand-line);
+  box-shadow:
+    0 16px 40px rgba(37, 88, 110, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  backdrop-filter: blur(12px);
 }

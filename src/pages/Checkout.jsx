@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ShoppingBag, Sparkles, TicketPercent, X } from "lucide-react";
+import { ArrowRight, ShoppingBag, TicketPercent, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
@@ -174,7 +174,7 @@ export default function Checkout() {
       }
 
       nav("/", { replace: true });
-    }, isMotionOff ? 100 : isMobileSheet ? 280 : (isLiteMotion ? 190 : 280));
+    }, isMotionOff ? 100 : isMobileSheet ? 400 : (isLiteMotion ? 190 : 280));
 
     return () => window.clearTimeout(timer);
   }, [backgroundLocation, closing, isLiteMotion, isMotionOff, isMobileSheet, nav]);
@@ -246,12 +246,8 @@ export default function Checkout() {
 
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
-            <div className="checkout-drawerKicker">
-              <Sparkles size={14} />
-              <span>Checkout</span>
-            </div>
             <h1 className="h1 checkout-drawerTitle">Checkout.</h1>
-            <p className="checkout-drawerSub">Cek ulang isi order, promo, dan total sebelum masuk ke pembayaran.</p>
+            <p className="checkout-drawerSub">Review order kamu sebelum lanjut bayar.</p>
           </div>
 
           <button
@@ -329,17 +325,28 @@ export default function Checkout() {
                                 -
                               </button>
                               <input
-                                className="qty"
+                                className={`qty${item.qty < 1 || item.qty > 99 ? " qty--invalid" : ""}`}
                                 type="number"
                                 min="1"
                                 max="99"
                                 value={item.qty}
-                                onChange={(e) => cart.setQty(item.variant_id, Number(e.target.value))}
+                                onChange={(e) => {
+                                  const val = Number(e.target.value);
+                                  if (Number.isFinite(val) && val >= 1 && val <= 99) {
+                                    cart.setQty(item.variant_id, val);
+                                  } else if (e.target.value === "") {
+                                    // allow clearing while typing
+                                    cart.setQty(item.variant_id, 1);
+                                  }
+                                }}
+                                aria-label="Jumlah"
+                                aria-invalid={item.qty < 1 || item.qty > 99}
                               />
                               <button
                                 className="qty-btn"
                                 onClick={() => cart.setQty(item.variant_id, item.qty + 1)}
                                 aria-label="Tambah"
+                                disabled={item.qty >= 99}
                               >
                                 +
                               </button>
@@ -450,7 +457,7 @@ export default function Checkout() {
           onMouseDown={requestClose}
           aria-hidden="true"
         />
-        <aside
+        <div
           ref={drawerRef}
           className={`checkout-drawer ${phaseClass}`}
           role="dialog"
@@ -458,7 +465,7 @@ export default function Checkout() {
           aria-label="Checkout"
         >
           {renderDrawerContent()}
-        </aside>
+        </div>
       </div>,
       document.body
     );
@@ -479,7 +486,7 @@ export default function Checkout() {
         aria-hidden="true"
       />
 
-      <motion.aside
+      <motion.div
         ref={drawerRef}
         className="checkout-drawer"
         variants={drawerVariants}
@@ -492,7 +499,7 @@ export default function Checkout() {
         aria-label="Checkout"
       >
         {renderDrawerContent()}
-      </motion.aside>
+      </motion.div>
     </div>,
     document.body
   );

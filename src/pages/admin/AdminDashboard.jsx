@@ -41,7 +41,7 @@ import {
   buildOrdersCSV,
   downloadCSV,
 } from "../../lib/api";
-import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDisplay, calcRevenueForecast, calcRemainingQuota, isPromoExpired } from "../../lib/format";
+import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDisplay, calcRevenueForecast, isPromoExpired } from "../../lib/format";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
 
@@ -445,16 +445,37 @@ export default function AdminDashboard() {
   async function refreshAnalytics(days) {
     setAnalyticsLoading(true);
     try {
-      const [daily, visitor, pages, cohort] = await Promise.all([
+      // Pakai allSettled supaya satu RPC error tidak menggagalkan semuanya.
+      const [dailyResult, visitorResult, pagesResult, cohortResult] = await Promise.allSettled([
         fetchDailyStats({ days }),
         fetchVisitorStats({ days }),
         fetchTopPages({ days, limit: 10 }),
         fetchCohortReturn({ days: 7 }),
       ]);
-      setDailyStats(daily);
-      setVisitorStats(visitor);
-      setTopPages(pages);
-      setCohortReturn(cohort);
+
+      if (dailyResult.status === "fulfilled") {
+        setDailyStats(dailyResult.value);
+      } else {
+        console.warn("fetchDailyStats gagal:", dailyResult.reason);
+      }
+
+      if (visitorResult.status === "fulfilled") {
+        setVisitorStats(visitorResult.value);
+      } else {
+        console.warn("fetchVisitorStats gagal:", visitorResult.reason);
+      }
+
+      if (pagesResult.status === "fulfilled") {
+        setTopPages(pagesResult.value);
+      } else {
+        console.warn("fetchTopPages gagal:", pagesResult.reason);
+      }
+
+      if (cohortResult.status === "fulfilled") {
+        setCohortReturn(cohortResult.value);
+      } else {
+        console.warn("fetchCohortReturn gagal:", cohortResult.reason);
+      }
     } catch (e) {
       console.warn("Gagal memuat analytics:", e);
     } finally {
@@ -1472,9 +1493,9 @@ export default function AdminDashboard() {
       : activeTab.hint;
   const isOverviewTab = activeTab.id === "overview";
   const topbarEyebrow = isOverviewTab ? activeTab.label : "Area kerja";
-  const topbarTitle = isOverviewTab ? "Operasional toko" : activeTab.label;
+  const topbarTitle = isOverviewTab ? "Dashboard" : activeTab.label;
   const topbarLead = isOverviewTab
-    ? "Pilih area kerja di kiri. Setiap panel diringkas supaya cepat dipindai saat toko lagi ramai."
+    ? "Kondisi toko hari ini. Semua yang perlu kamu tahu, satu layar."
     : activeTab.hint;
   const activeOrderWhatsApp = activeOrder ? buildWhatsAppLink(activeOrder.customer_whatsapp) : "";
 
@@ -1693,9 +1714,9 @@ export default function AdminDashboard() {
                     <div className="admin-overviewHeroTop">
                       <div>
                         <div className="admin-topbar-eyebrow">Ringkasan hari ini</div>
-                        <div className="admin-heroTitle">Satu layar untuk membaca kondisi toko hari ini.</div>
+                        <div className="admin-heroTitle">Ringkasan toko, satu pandangan.</div>
                         <div className="admin-panel-sub">
-                          Revenue, order masuk, stok tipis, dan performa promo dibungkus jadi ringkasan yang cepat dipahami.
+                          Revenue, order, stok, dan promo — semua di sini.
                         </div>
                       </div>
 
@@ -1743,7 +1764,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Tren order dan revenue</div>
-                        <div className="admin-panel-sub">Order masuk dan revenue selesai per hari untuk membaca ritme toko.</div>
+                        <div className="admin-panel-sub">Ritme toko harian — order masuk vs revenue selesai.</div>
                       </div>
                     </div>
 
@@ -1783,7 +1804,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Status order</div>
-                        <div className="admin-panel-sub">Baca distribusi antrean untuk melihat prioritas follow-up.</div>
+                        <div className="admin-panel-sub">Mana yang perlu di-follow up duluan.</div>
                       </div>
                     </div>
                     <div className="admin-panel-body admin-stack">
@@ -1809,7 +1830,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Produk paling laku</div>
-                        <div className="admin-panel-sub">Dibaca dari item dalam order yang masuk.</div>
+                        <div className="admin-panel-sub">Dari data order yang masuk.</div>
                       </div>
                     </div>
                     <div className="admin-panel-body admin-stack">
@@ -1834,7 +1855,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Promo dan kategori</div>
-                        <div className="admin-panel-sub">Gabungkan insight kategori, promo aktif, dan klaim promo.</div>
+                        <div className="admin-panel-sub">Insight promo aktif dan distribusi kategori.</div>
                       </div>
                     </div>
                     <div className="admin-panel-body admin-stack">
@@ -1883,7 +1904,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Traffic dan stok</div>
-                        <div className="admin-panel-sub">Hubungkan traffic halaman dengan kesiapan stok paket.</div>
+                        <div className="admin-panel-sub">Views vs kesiapan stok.</div>
                       </div>
                     </div>
                     <div className="admin-panel-body admin-stack">
@@ -2782,7 +2803,7 @@ export default function AdminDashboard() {
                 <div className="admin-panel-head">
                   <div>
                     <div className="admin-panel-title">Kode Promo</div>
-                    <div className="admin-panel-sub">Buat, edit, dan kelola kode diskon untuk pelanggan.</div>
+                    <div className="admin-panel-sub">Kelola diskon buat pelanggan.</div>
                   </div>
                   <button className="btn" type="button" onClick={openCreatePromo}>
                     <Plus size={15} strokeWidth={2.5} />
@@ -2824,6 +2845,47 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
+                  {/* Bulk import */}
+                  <details className="admin-promo-bulk">
+                    <summary className="admin-promo-bulkToggle">
+                      <Tags size={14} />
+                      <span>Import massal</span>
+                      <span className="admin-promo-bulkHint">Format: KODE,persen — satu per baris</span>
+                    </summary>
+                    <div className="admin-promo-bulkBody">
+                      <textarea
+                        className="input admin-promo-bulkInput"
+                        rows={4}
+                        placeholder={"DISNEY10,10\nNETFLIX20,20\nGRATIS100,100"}
+                        value={promoBulk}
+                        onChange={(e) => setPromoBulk(e.target.value)}
+                        spellCheck={false}
+                      />
+                      <div className="admin-promo-bulkActions">
+                        <button
+                          className="btn btn-sm"
+                          type="button"
+                          onClick={addPromoBulk}
+                          disabled={!promoBulk.trim()}
+                        >
+                          <Plus size={13} strokeWidth={2.5} />
+                          Simpan semua
+                        </button>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          type="button"
+                          onClick={() => setPromoBulk("")}
+                          disabled={!promoBulk.trim()}
+                        >
+                          Bersihkan
+                        </button>
+                      </div>
+                      <p className="admin-promo-bulkNote">
+                        Kode yang sudah ada akan di-update (upsert). Kode baru akan dibuat otomatis.
+                      </p>
+                    </div>
+                  </details>
+
                   {/* Promo cards */}
                   {promos.length === 0 ? (
                     <div className="admin-emptyInline">Belum ada kode promo. Klik "Buat Promo" untuk mulai.</div>
@@ -2836,7 +2898,6 @@ export default function AdminDashboard() {
                         })
                         .map((p) => {
                           const expired = isPromoExpired(p);
-                          const remaining = calcRemainingQuota(p);
                           const usedPct = p.max_uses ? Math.min(100, ((p.used_count || 0) / p.max_uses) * 100) : 0;
                           const statusLabel = expired ? "Kedaluwarsa" : p.is_active ? "Aktif" : "Nonaktif";
                           const statusClass = expired ? "expired" : p.is_active ? "active" : "off";

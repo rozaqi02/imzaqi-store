@@ -816,6 +816,28 @@
     padding: 16px;
   }
 
+  .pdx-summaryPanel {
+    padding: 14px 16px;
+    gap: 10px;
+  }
+
+  .pdx-priceValue {
+    font-size: clamp(24px, 6vw, 32px);
+  }
+
+  .pdx-summaryActionsMain {
+    display: flex;
+    gap: 8px;
+  }
+
+  .pdx-scrollBtn {
+    flex: 1;
+  }
+
+  .pdx-cartBtn {
+    font-size: 12px;
+  }
+
   .pdx-productBrand {
     grid-template-columns: 1fr;
     gap: 12px;
@@ -846,31 +868,74 @@
   .pdx-variantCard {
     padding: 14px;
     border-radius: 20px;
-  }
-
-  .pdx-variantHead {
-    grid-template-columns: 1fr;
     gap: 10px;
   }
 
+  .pdx-variantHead {
+    grid-template-columns: 1fr auto;
+    gap: 8px;
+    align-items: center;
+  }
+
+  .pdx-variantTitle {
+    font-size: 18px;
+  }
+
   .pdx-variantPriceWrap {
-    text-align: left;
-    min-width: 0;
+    text-align: right;
+    min-width: auto;
   }
 
   .pdx-variantPrice {
-    font-size: 24px;
+    font-size: 20px;
+  }
+
+  .pdx-variantNotes {
+    padding: 10px;
+    border-radius: 14px;
   }
 
   .pdx-variantFoot {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .pdx-qty {
+    min-height: 40px;
+    padding: 0 6px;
+    border-radius: 14px;
+    flex: 0 0 auto;
+  }
+
+  .pdx-qtyBtn {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+  }
+
+  .pdx-actionBtns {
+    display: flex;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .pdx-addBtn {
+    min-width: 40px;
+    width: 40px;
+    padding: 0;
+    flex: 0 0 auto;
+  }
+
+  .pdx-buyNowBtn {
+    flex: 1;
+    min-width: 0;
   }
 
   .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-qty,
   .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-actionBtns {
-    width: 100%;
+    width: auto;
   }
 
   .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-actionBtns {
@@ -880,7 +945,7 @@
 
   .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-addBtn {
     flex: 0 0 auto;
-    width: 44px;
+    width: 40px;
     min-width: 0;
     padding: 0;
   }
@@ -888,11 +953,6 @@
   .pdx-variantsGrid:not(.is-list) .pdx-variantFoot .pdx-buyNowBtn {
     flex: 1 1 auto;
     min-width: 0;
-  }
-
-  .pdx-qty,
-  .pdx-addBtn {
-    width: 100%;
   }
 }
 

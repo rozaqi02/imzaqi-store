@@ -692,8 +692,8 @@ export default function Products() {
           <div className="catalog-heroGrid">
             <div>
               <div className="catalog-eyebrow">Katalog produk</div>
-              <h1 className="h1 catalog-title">Cari paket yang pas.</h1>
-              <p className="catalog-sub">Cari, bandingkan, lalu buka detail paket tanpa pindah alur.</p>
+              <h1 className="h1 catalog-title">Mau langganan apa?</h1>
+              <p className="catalog-sub">Cari, bandingin harga, langsung checkout. Simpel.</p>
             </div>
           </div>
 
@@ -707,7 +707,7 @@ export default function Products() {
                   ref={searchRef}
                   className="input hero-search-input"
                   value={query}
-                  placeholder="Cari produk, varian, atau durasi"
+                  placeholder="Netflix, Spotify, ChatGPT..."
                   onChange={(e) => setQuery(e.target.value)}
                   aria-label="Cari produk"
                 />
@@ -799,7 +799,7 @@ export default function Products() {
               <div className="catalog-contentMeta">
                 <strong>{loading ? "..." : filtered.length}</strong>
                 <span>produk</span>
-                <em>{activeFiltersCount ? `${activeFiltersCount} filter aktif` : "Semua produk"}</em>
+                {activeFiltersCount ? <em>{activeFiltersCount} filter aktif</em> : null}
               </div>
 
               <div className="catalog-contentActions">
@@ -1009,7 +1009,6 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location }) {
         </div>
 
         <div className="catalog-cardPriceWrap">
-          <span className="catalog-cardPriceLabel">Mulai</span>
           <div className="catalog-cardPrice">{displayPrice}</div>
         </div>
       </div>

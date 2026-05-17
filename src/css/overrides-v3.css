@@ -5,10 +5,6 @@
 .header::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:1px;pointer-events:none;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(22,199,166,.55), rgba(255,255,255,0));opacity:.55;}
 
 @media (max-width: 680px){
-  .header{
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-  }
   .header-inner{padding:12px 0;}
 }
 

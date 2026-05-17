@@ -1,9 +1,11 @@
 .promo-row,
 .checkout-min-promoRow{display:flex;gap:10px;flex-wrap:wrap;}
 .cart-actions{display:flex;align-items:center;gap:10px;}
-.qty{width:58px;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:var(--text);padding:0 10px;text-align:center;}
+.qty{width:58px;height:38px;border-radius:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:var(--text);padding:0 10px;text-align:center;transition:border-color .18s ease,box-shadow .18s ease;}
+.qty--invalid{border-color:rgba(255,100,100,.5) !important;box-shadow:0 0 0 3px rgba(255,80,80,.14) !important;}
 .qty-btn{width:34px;height:34px;border-radius:12px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04);color:rgba(232,252,255,.92);cursor:pointer;font-weight:900;transition:background .18s ease,border-color .18s ease,transform .18s ease;}
 .qty-btn:hover{background:rgba(255,255,255,.07);border-color:rgba(255,255,255,.18);transform:translateY(-1px);}
+.qty-btn:disabled{opacity:.38;cursor:not-allowed;transform:none;}
 
 :root{
   --checkout-drawer-solid:#09131f;
@@ -222,12 +224,12 @@ color:var(--brand-text, #f8fafc);border-left:1px solid var(--brand-line, rgba(25
 }
 
 @media (max-width: 720px){
-  .checkout-drawer{width:100%;top:auto;left:0;right:0;bottom:0;min-height:min(72dvh, 760px);max-height:calc(100dvh - env(safe-area-inset-top));padding:12px 12px calc(14px + env(safe-area-inset-bottom));border-left:0;border-top:1px solid rgba(255,255,255,.12);border-radius:28px 28px 0 0;box-shadow:0 -20px 70px rgba(0,0,0,.34);}
+  .checkout-drawer{width:100%;top:auto;left:0;right:0;bottom:0;height:80dvh;max-height:calc(100dvh - env(safe-area-inset-top) - 40px);padding:12px 14px calc(14px + env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--brand-line, rgba(255,255,255,.12));border-radius:28px 28px 0 0;box-shadow:0 -20px 70px rgba(0,0,0,.34);contain:layout style;}
   .checkout-drawerHandle{display:block;width:52px;height:5px;border-radius:999px;background:rgba(255,255,255,.16);margin:0 auto 10px;}
   .checkout-drawerGesture{max-width:100%;margin:0 0 6px;padding:7px 11px;font-size:11px;}
   .checkout-drawerHead{gap:12px;padding-bottom:12px;}
   .checkout-drawerTitle{font-size:clamp(28px, 8vw, 34px);}
-  .checkout-drawerSub{font-size:13px;}
+  .checkout-drawerSub{font-size:13px;max-width:28ch;}
   .checkout-drawerBody{padding-right:0;padding-bottom:calc(16px + env(safe-area-inset-bottom));}
   .checkout-main{gap:12px;border-radius:24px;}
   .checkout-item-card{padding:14px;flex-wrap:wrap;}
@@ -237,7 +239,7 @@ color:var(--brand-text, #f8fafc);border-left:1px solid var(--brand-line, rgba(25
 
 @media (max-width: 560px){
   .checkout-drawerSub{display:none;}
-  .checkout-drawer{min-height:min(74dvh, 760px);padding:10px 10px calc(12px + env(safe-area-inset-bottom));border-radius:24px 24px 0 0;}
+  .checkout-drawer{height:80dvh;padding:10px 10px calc(12px + env(safe-area-inset-bottom));border-radius:24px 24px 0 0;}
   .checkout-drawerGesture{margin-bottom:4px;}
   .checkout-drawerHead{align-items:flex-start;gap:10px;}
   .checkout-drawerClose{width:40px;height:40px;border-radius:13px;}
@@ -300,4 +302,87 @@ color:var(--brand-text, #f8fafc);border-left:1px solid var(--brand-line, rgba(25
   background: rgba(255, 191, 74, 0.12);
   border: 1px solid rgba(255, 191, 74, 0.24);
   color: rgba(255, 220, 120, 0.9);
+}
+
+/* ── Mobile checkout skeleton (shown during slide-in animation) ── */
+.checkout-mobileSkeleton {
+  display: grid;
+  gap: 12px;
+  padding: 8px 0;
+  animation: checkoutSkeletonFadeIn 0.3s ease 0.1s both;
+}
+
+.checkout-mobileSkeleton-bar {
+  height: 14px;
+  width: 70%;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.checkout-mobileSkeleton-bar.short {
+  width: 45%;
+}
+
+.checkout-mobileSkeleton-bar::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.08), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.4s infinite;
+}
+
+.checkout-mobileSkeleton-block {
+  height: 120px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  position: relative;
+  overflow: hidden;
+}
+
+.checkout-mobileSkeleton-block::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.06), transparent);
+  transform: translateX(-100%);
+  animation: shimmer 1.4s infinite;
+}
+
+@keyframes checkoutSkeletonFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Content fade-in: hidden during slide, visible after ── */
+@media (max-width: 720px) {
+  /* During entering phase: content is invisible (no layout shift) */
+  .checkout-drawer.checkout-mobile-entering .checkout-drawerHead,
+  .checkout-drawer.checkout-mobile-entering .checkout-drawerBody {
+    opacity: 0;
+  }
+
+  /* After slide-in completes: fade content in */
+  .checkout-drawer.checkout-mobile-open .checkout-drawerHead {
+    animation: checkoutContentIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.08s both;
+  }
+
+  .checkout-drawer.checkout-mobile-open .checkout-drawerBody {
+    animation: checkoutContentIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  }
+
+  /* During closing: fade out quickly */
+  .checkout-drawer.checkout-mobile-closing .checkout-drawerHead,
+  .checkout-drawer.checkout-mobile-closing .checkout-drawerBody {
+    opacity: 0;
+    transition: opacity 0.15s ease;
+  }
+}
+
+@keyframes checkoutContentIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }

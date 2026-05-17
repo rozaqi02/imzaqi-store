@@ -3,40 +3,20 @@ import { Link } from "react-router-dom";
 
 const footerColumns = [
   {
-    label: "Produk",
+    label: "Navigasi",
     links: [
       { label: "Home", to: "/" },
       { label: "Produk", to: "/produk" },
-      { label: "Checkout", to: "/checkout" },
-      { label: "Status", to: "/status" },
-      { label: "Riwayat Order", to: "/riwayat" },
-    ],
-  },
-  {
-    label: "Merchant",
-    links: [
-      { label: "Hubungi Admin", href: "https://wa.me/6283136049987" },
-      { label: "Cara Bayar QRIS", to: "/tentang" },
       { label: "Testimoni", to: "/testimoni" },
-      { label: "Promo", to: "/produk" },
-    ],
-  },
-  {
-    label: "Perusahaan",
-    links: [
-      { label: "Riwayat Order", to: "/riwayat" },
-      { label: "Status Order", to: "/status" },
       { label: "FAQ", to: "/tentang" },
-      { label: "Testimoni", to: "/testimoni" },
     ],
   },
   {
-    label: "Lainnya",
+    label: "Order",
     links: [
-      { label: "Bantuan", to: "/tentang" },
-      { label: "Cara Pesan", to: "/tentang" },
-      { label: "Hubungi Kami", href: "https://wa.me/6283136049987" },
-      { label: "Cek Status", to: "/status" },
+      { label: "Checkout", to: "/checkout" },
+      { label: "Status Order", to: "/status" },
+      { label: "Riwayat Order", to: "/riwayat" },
     ],
   },
 ];
@@ -89,6 +69,33 @@ export default function Footer() {
               </div>
             ))}
 
+            <div className="site-footerGoCol">
+              <h3 className="site-footerGoTitle">Kontak</h3>
+              <div className="site-footerGoList">
+                <a
+                  className="site-footerGoLink"
+                  href="https://wa.me/6283136049987"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  WhatsApp Admin
+                </a>
+                <a
+                  className="site-footerGoLink"
+                  href="https://wa.me/6283136049987"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  0831-3604-9987
+                </a>
+                <Link className="site-footerGoLink" to="/tentang">
+                  Cara Pesan
+                </Link>
+                <Link className="site-footerGoLink" to="/tentang">
+                  Cara Bayar QRIS
+                </Link>
+              </div>
+            </div>
           </div>
 
           <div className="site-footerGoLegal">

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, FileText, Info, Loader, Phone, ShieldCheck, Sparkles, X } from "lucide-react";
+import { Check, CheckCircle2, FileText, Gift, Info, Loader, Phone, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -358,6 +358,12 @@ export default function Pay() {
       setQrisNotice("");
       setQrisMode("idle");
 
+      // Free order (100% promo) — skip QRIS entirely
+      if (total === 0) {
+        setQrisMode("free");
+        return;
+      }
+
       if (!qrisBase) {
         if (!active) return;
         setQrisMode("fallback");
@@ -511,7 +517,10 @@ export default function Pay() {
     const requestedPromo = String(promo?.code || "").trim().toUpperCase();
 
     if (requestedPromo) {
-      const { data, error } = await supabase.rpc("validate_promo", { p_code: requestedPromo });
+      const { data, error } = await supabase.rpc("validate_promo", {
+        p_code: requestedPromo,
+        p_visitor_id: getVisitorIdAsUUID(),
+      });
       if (!error) {
         const nextPercent = Number(data || 0);
         if (nextPercent > 0) {
@@ -751,12 +760,8 @@ export default function Pay() {
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
           <div className="pay-shell-copy">
-            <div className="pay-shell-kicker">
-              <Sparkles size={14} />
-              <span>Pembayaran</span>
-            </div>
-            <h1 className="h1 pay-shell-title">Pay.</h1>
-            <p className="pay-shell-sub">Bayar sesuai total, lalu simpan ID order untuk status.</p>
+            <h1 className="h1 pay-shell-title">Bayar.</h1>
+            <p className="pay-shell-sub">Scan, konfirmasi, simpan ID. Done.</p>
           </div>
         </div>
 
@@ -787,7 +792,9 @@ export default function Pay() {
                   <div className="pay-cardKicker">Kontak order</div>
                   <h2 className="h3 pay-cardTitle">WhatsApp</h2>
                 </div>
-                <span className={`pay-statePill ${canShowQris ? "live" : ""}`}>{canShowQris ? "Ready" : "Locked"}</span>
+                <span className={`pay-statePill ${isFreeOrder ? "live" : canShowQris ? "live" : ""}`}>
+                  {isFreeOrder ? "Free" : canShowQris ? "Ready" : "Locked"}
+                </span>
               </div>
 
               <WhatsAppInput
@@ -881,10 +888,30 @@ export default function Pay() {
                 <div className="pay-stageVisual">
                   <div className={`qris-wrap pay-qrisFrame ${canShowQris && !isFreeOrder ? "" : "is-locked"}`}>
                     {isFreeOrder ? (
-                      <div className="pay-qrisLocked pay-qrisFree">
-                        <span style={{ fontSize: 36 }}>🎉</span>
-                        <strong>Order Gratis</strong>
-                        <p>Promo 100% diterapkan. Tidak perlu scan QRIS atau transfer.</p>
+                      <div className="pay-freePanel">
+                        <div className="pay-freePanelIcon" aria-hidden="true">
+                          <Gift size={28} strokeWidth={1.8} />
+                        </div>
+                        <div className="pay-freePanelBadge">Promo 100%</div>
+                        <strong className="pay-freePanelTitle">Order Gratis</strong>
+                        <p className="pay-freePanelDesc">
+                          Promo 100% sudah diterapkan ke order ini.<br />
+                          Tidak perlu scan QRIS atau transfer apapun.
+                        </p>
+                        <div className="pay-freePanelChecks">
+                          <div className="pay-freePanelCheck">
+                            <Check size={12} strokeWidth={3} />
+                            <span>Diskon {promo?.code} aktif</span>
+                          </div>
+                          <div className="pay-freePanelCheck">
+                            <Check size={12} strokeWidth={3} />
+                            <span>Total tagihan: Rp 0</span>
+                          </div>
+                          <div className="pay-freePanelCheck">
+                            <Check size={12} strokeWidth={3} />
+                            <span>Konfirmasi untuk lanjut</span>
+                          </div>
+                        </div>
                       </div>
                     ) : canShowQris ? (
                       <>

@@ -388,6 +388,7 @@
 }
 
 .home-page .hero-commandCard,
+.home-page .home-howCard,
 .home-page .flow-assist,
 .home-page .stat-minimal,
 .home-page .product-tile {
@@ -400,6 +401,7 @@
 }
 
 .home-page .hero-commandCard::before,
+.home-page .home-howCard::before,
 .home-page .stat-minimal::before,
 .home-page .product-tile::after {
   content: "";
@@ -575,20 +577,22 @@
 }
 
 .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
-  /* Desktop grid cards are relatively narrow (sidebar + 3-up grid),
-     use 2 columns so meta labels don't get ellipsized to 1 char. */
-  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  /* Use flex-wrap instead of grid to prevent pill text truncation */
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 7px !important;
 }
 
 .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta>span {
   min-width: 0 !important;
   min-height: 30px !important;
   padding: 0 8px !important;
+  flex: 0 0 auto !important;
 }
 
 .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta>span>span {
-  overflow: hidden !important;
-  text-overflow: ellipsis !important;
+  overflow: visible !important;
+  text-overflow: clip !important;
   white-space: nowrap !important;
 }
 
@@ -751,7 +755,8 @@
   }
 
   .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
   }
 }
 
@@ -772,7 +777,8 @@
   }
 
   .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
-    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
   }
 
   .home-page .product-grid-container.grid-mode,
@@ -792,7 +798,8 @@
   }
 
   .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
-    grid-template-columns: 1fr !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
   }
 }
 

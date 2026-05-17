@@ -233,9 +233,9 @@ export default function About() {
           <header className="faq-hero">
             <div className="faq-heroCopy">
               <div className="faq-kicker">FAQ Center</div>
-              <h1 className="h1 faq-title">Pertanyaan yang sering ditanya.</h1>
+              <h1 className="h1 faq-title">Ada yang bingung?</h1>
               <p className="faq-sub">
-                Cari jawaban cepat tentang pembayaran, status order, varian produk, sampai aktivasi.
+                Jawaban cepat soal bayar, order, produk, dan aktivasi. Langsung ketemu.
               </p>
             </div>
             <div className="faq-heroPill">
@@ -248,7 +248,7 @@ export default function About() {
           <section className="faq-howto">
             <div className="faq-howtoHead">
               <div className="faq-kicker">Cara Pesan</div>
-              <h2 className="faq-howtoTitle">4 langkah mudah</h2>
+              <h2 className="faq-howtoTitle">Gampang banget, cuma 4 step</h2>
             </div>
             <div className="faq-howtoSteps">
               {[

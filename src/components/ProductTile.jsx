@@ -1,6 +1,6 @@
-import React, { useMemo } from "react";
+import { useMemo } from "react";
 import { Link } from "react-router-dom";
-import { ArrowUpRight, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
+import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { formatIDR, classifyStock } from "../lib/format";
 
 function summarizeCatalogCopy(text) {
@@ -13,7 +13,7 @@ function summarizeCatalogCopy(text) {
   return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
 }
 
-export default function ProductTile({ product }) {
+export default function ProductTile({ product, rank }) {
   const summary = useMemo(() => {
     const activeVariants = (product?.product_variants || []).filter((v) => v?.is_active);
     const prices = activeVariants
@@ -42,7 +42,6 @@ export default function ProductTile({ product }) {
       className="product-tile product-tile--list"
       role="listitem"
       aria-label={`Buka detail ${product?.name || "produk"}`}
-      data-hover-hint={`${displayPrice} • ${summary.variantsCount} varian • Lihat detail →`}
     >
       <div className="product-tile-top">
         <div className="product-tile-icon" aria-hidden="true">
@@ -62,7 +61,19 @@ export default function ProductTile({ product }) {
         </div>
 
         <div className="product-tile-main">
-          <div className="product-tile-name">{product?.name || "-"}</div>
+          <div className="product-tile-name">
+            {product?.name || "-"}
+            {rank === 1 ? (
+              <span className="product-tile-rankBadge product-tile-rankBadge--top">
+                <Flame size={12} />
+                <span>Terlaris</span>
+              </span>
+            ) : rank && rank <= 4 ? (
+              <span className="product-tile-rankBadge">
+                <span>#{rank}</span>
+              </span>
+            ) : null}
+          </div>
           <div className="product-tile-desc">{summary.summaryCopy}</div>
         </div>
 

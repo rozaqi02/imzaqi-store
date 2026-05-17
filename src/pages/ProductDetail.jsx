@@ -562,7 +562,7 @@ export default function ProductDetail() {
 
               <aside className="pdx-summaryPanel">
                 <div className="pdx-priceBlock">
-                  <div className="pdx-priceLabel">Mulai dari</div>
+                  <div className="pdx-priceLabel">Harga mulai</div>
                   <div className="pdx-priceValue">{formatPriceRange(summary.minPrice, summary.maxPrice)}</div>
                 </div>
 
@@ -588,9 +588,9 @@ export default function ProductDetail() {
               <div className="pdx-variantsHead">
                 <div>
                   <div className="pdx-eyebrow">Pilihan Paket</div>
-                  <h2 className="h2">Sesuaikan dengan kebutuhanmu</h2>
+                  <h2 className="h2">Pilih yang cocok.</h2>
                 </div>
-                <div className="pdx-countBadge">{displayedVariants.length} paket tersedia</div>
+                <div className="pdx-countBadge">{displayedVariants.length} paket</div>
               </div>
 
               <div className="pdx-toolbar">
@@ -701,14 +701,11 @@ export default function ProductDetail() {
                       </div>
 
                       <div className="pdx-variantPriceWrap">
-                        <div className="pdx-variantPriceLabel">Harga</div>
                         <div className="pdx-variantPrice">{formatIDR(variant.price_idr)}</div>
-                        <div className="pdx-variantSubPrice">per paket</div>
                       </div>
                     </div>
 
                     <div className={`pdx-variantNotes ${isExpanded ? 'force-show' : ''}`}>
-                      <div className="pdx-variantNotesTitle">Benefit paket</div>
                       <VariantBenefitList
                         rawText={descriptionBody || "Informasi paket akan dikirim oleh admin setelah checkout."}
                       />

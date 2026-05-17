@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { ArrowRight, ScanSearch, Search, Zap } from "lucide-react";
@@ -8,14 +8,14 @@ import NumberCounter from "./NumberCounter";
 export default function Hero({ products = [] }) {
   const nav = useNavigate();
   const location = useLocation();
-  const { totalViews, todayViews, totalOrders, weekOrders } = useLiveStats();
+  const { totalViews, todayViews, totalOrders, weekOrders } = useLiveStats({ intervalMs: 60000 });
 
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const [lightMotion, setLightMotion] = useState(() => {
     if (typeof window === "undefined" || !window.matchMedia) return false;
-    return window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
+    return window.matchMedia("(max-width: 1024px), (pointer: coarse)").matches;
   });
   const wrapRef = useRef(null);
   const stageRef = useRef(null);
@@ -36,15 +36,11 @@ export default function Hero({ products = [] }) {
 
   useEffect(() => {
     if (!window.matchMedia) return undefined;
-    const query = window.matchMedia("(max-width: 920px), (pointer: coarse)");
+    const query = window.matchMedia("(max-width: 1024px), (pointer: coarse)");
     const update = () => setLightMotion(query.matches);
     update();
-    if (query.addEventListener) {
-      query.addEventListener("change", update);
-      return () => query.removeEventListener("change", update);
-    }
-    query.addListener(update);
-    return () => query.removeListener(update);
+    query.addEventListener("change", update);
+    return () => query.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
@@ -111,10 +107,10 @@ export default function Hero({ products = [] }) {
   }
 
   const stats = [
+    { label: "Total Order", value: totalOrders, highlight: true },
+    { label: "Minggu Ini", value: weekOrders },
     { label: "Total Kunjungan", value: totalViews },
     { label: "Hari Ini", value: todayViews },
-    { label: "Total Order", value: totalOrders },
-    { label: "Minggu Ini", value: weekOrders },
   ];
 
   const listboxId = "hero-search-listbox";
@@ -206,7 +202,7 @@ export default function Hero({ products = [] }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
         >
-          Pilih paket. <span className="hero-v2-titleLine hero-v2-titleLine--accent">Bergaransi.</span>
+          Akses premium. <span className="hero-v2-titleLine hero-v2-titleLine--accent">Harga pelajar.</span>
         </motion.h1>
 
         <motion.p
@@ -215,7 +211,7 @@ export default function Hero({ products = [] }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
         >
-          Dari katalog sampai status order, langkah berikutnya selalu jelas.
+          Netflix, Spotify, Canva — semua ada. Bayar QRIS, langsung jalan.
         </motion.p>
 
         <motion.div
@@ -352,9 +348,17 @@ export default function Hero({ products = [] }) {
           transition={{ duration: 0.5, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
         >
           {stats.map((item) => (
-            <div key={item.label} className="hero-v2-stat">
+            <div key={item.label} className={`hero-v2-stat${item.highlight ? " hero-v2-stat--highlight" : ""}`}>
               <div className="hero-v2-statNum">
-                {item.value == null ? "-" : <NumberCounter value={item.value} />}
+                <motion.span
+                  key={item.value == null ? "loading" : item.value}
+                  initial={{ opacity: 0, y: 6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ display: "inline-block" }}
+                >
+                  {item.value == null ? "-" : <NumberCounter value={item.value} />}
+                </motion.span>
               </div>
               <div className="hero-v2-statLabel">{item.label}</div>
             </div>

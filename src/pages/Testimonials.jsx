@@ -115,8 +115,8 @@ export default function Testimonials() {
           <header className="testi-hero">
             <div className="testi-heroCopy">
               <div className="testi-kicker">Bukti order</div>
-              <h1 className="h1 testi-title">Galeri testimoni.</h1>
-              <p className="testi-sub">Lihat screenshot order dengan alur yang rapi dan cepat dipindai.</p>
+              <h1 className="h1 testi-title">Bukti, bukan janji.</h1>
+              <p className="testi-sub">Screenshot langsung dari buyer. Bukan editan.</p>
             </div>
 
             <div className="testi-statePill">

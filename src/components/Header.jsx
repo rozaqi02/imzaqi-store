@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
@@ -202,7 +202,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 
         <div className="mobile-menu-footer">
           <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-          <p className="menu-footer-text">Imzaqi Store App V.4.1.2</p>
+          <p className="menu-footer-text">Imzaqi Store App V.4.1.3</p>
         </div>
       </aside>
     </>,
@@ -277,7 +277,7 @@ export default function Header() {
     };
   }, [location.pathname]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const syncPill = () => {
       const links = [
         { to: "/" },
@@ -304,11 +304,8 @@ export default function Header() {
     };
 
     syncPill();
-    // Use a small timeout to allow layout to settle on initial render
-    const t = window.setTimeout(syncPill, 10);
     window.addEventListener("resize", syncPill);
     return () => {
-      window.clearTimeout(t);
       window.removeEventListener("resize", syncPill);
     };
   }, [location.pathname, isMobileViewport]);
