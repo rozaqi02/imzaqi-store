@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useState } from "react";
-import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Layout from "./components/Layout";
 import RouteProgress from "./components/RouteProgress";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -23,7 +23,6 @@ const About = React.lazy(() => import("./pages/About"));
 const Testimonials = React.lazy(() => import("./pages/Testimonials"));
 const Checkout = React.lazy(() => import("./pages/Checkout"));
 const Pay = React.lazy(() => import("./pages/Pay"));
-const OrderHistory = React.lazy(() => import("./pages/OrderHistory"));
 const AdminLogin = React.lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = React.lazy(() => import("./pages/admin/AdminDashboard"));
 
@@ -124,7 +123,7 @@ function AppRoutes() {
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/bayar" element={<Pay />} />
           <Route path="/status" element={<Status />} />
-          <Route path="/riwayat" element={<OrderHistory />} />
+          <Route path="/riwayat" element={<Navigate to="/status?tab=riwayat" replace />} />
           <Route path="/admin" element={<AdminLogin />} />
           <Route
             path="/admin/dashboard"

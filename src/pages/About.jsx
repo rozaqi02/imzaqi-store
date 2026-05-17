@@ -228,7 +228,7 @@ export default function About() {
 
   return (
     <div className="page">
-      <section className="section faq-shell reveal">
+      <section className="section faq-shell">
         <div className="container faq-wrap">
           <header className="faq-hero">
             <div className="faq-heroCopy">

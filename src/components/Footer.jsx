@@ -16,7 +16,7 @@ const footerColumns = [
     links: [
       { label: "Checkout", to: "/checkout" },
       { label: "Status Order", to: "/status" },
-      { label: "Riwayat Order", to: "/riwayat" },
+      { label: "Riwayat Order", to: "/status?tab=riwayat" },
     ],
   },
 ];

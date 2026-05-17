@@ -110,7 +110,7 @@ export default function Testimonials() {
 
   return (
     <div className="page testimonials-page">
-      <section className="section reveal testi-shell">
+      <section className="section testi-shell">
         <div className="container testi-wrap">
           <header className="testi-hero">
             <div className="testi-heroCopy">

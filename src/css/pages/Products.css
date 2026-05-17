@@ -454,7 +454,9 @@
   display: flex;
   gap: 10px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  overflow-y: visible;
+  padding-top: 4px;
+  padding-bottom: 8px;
   padding-right: 0;
   margin: 0 0 14px;
   width: 100%;
@@ -975,7 +977,9 @@
   .catalog-quickFilters {
     max-width: 100%;
     overflow-x: auto;
-    overflow-y: hidden;
+    overflow-y: visible;
+    padding-top: 4px;
+    padding-bottom: 8px;
     padding-right: 0;
   }
 }

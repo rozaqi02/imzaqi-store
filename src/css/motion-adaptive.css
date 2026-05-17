@@ -304,18 +304,66 @@
   scroll-behavior: auto !important;
 }
 
-/* ─── Mobile navbar: match desktop (skeu-panel-bg gradient) ───────────── */
+/* ─── Mobile navbar: EXACT copy of desktop neumorphism ────────────────── */
 @media (max-width: 768px) {
-  html .header,
-  html .site-header {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    /* Identical to desktop neumorphism: top white shimmer + skeu-panel-bg gradient */
+  /* Header itself — same as desktop with backdrop-filter blur.
+     Max specificity to beat any conflicting rule in any CSS file. */
+  :root html body .header,
+  :root html body .site-header,
+  :root[data-theme="light"] html body .header,
+  :root[data-theme="light"] html body .site-header,
+  :root[data-theme="dark"] html body .header,
+  :root[data-theme="dark"] html body .site-header,
+  html body[data-motion="lite"] .header,
+  html body[data-motion="lite"] .site-header {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
       var(--skeu-panel-bg) !important;
-    border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16)) !important;
+    border-bottom: 1px solid var(--brand-line) !important;
     box-shadow: var(--skeu-panel-shadow) !important;
+    backdrop-filter: blur(20px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  /* Header buttons — same neumorphism as desktop */
+  :root html body .header .header-cart,
+  :root html body .header .header-iconAction,
+  :root html body .header .nav-toggle,
+  :root[data-theme="light"] html body .header .header-cart,
+  :root[data-theme="light"] html body .header .header-iconAction,
+  :root[data-theme="light"] html body .header .nav-toggle,
+  :root[data-theme="dark"] html body .header .header-cart,
+  :root[data-theme="dark"] html body .header .header-iconAction,
+  :root[data-theme="dark"] html body .header .nav-toggle {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+      var(--skeu-control-bg) !important;
+    border-color: var(--brand-line) !important;
+    box-shadow: var(--skeu-control-shadow) !important;
+    color: var(--brand-text) !important;
+  }
+
+  /* Header bottom shimmer line — same as desktop */
+  html body .header::after,
+  html body .site-header::after {
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0),
+      rgba(79, 255, 200, 0.78),
+      rgba(0, 194, 208, 0.88),
+      rgba(255, 255, 255, 0)
+    ) !important;
+  }
+
+  /* On admin page: disable backdrop-filter on header for scroll performance */
+  html:has(.admin-page) .header,
+  html:has(.admin-page) .site-header,
+  html:has(.app-main-admin) .header,
+  html:has(.app-main-admin) .site-header {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 }
 

@@ -6,7 +6,6 @@ import {
   Activity,
   CircleHelp,
   Grid2x2,
-  History,
   House,
   Menu,
   MessageSquareQuote,
@@ -48,8 +47,7 @@ const primaryItems = [
 ];
 
 const utilityItems = [
-  { to: "/status", label: "Status Order", icon: Activity },
-  { to: "/riwayat", label: "Riwayat", icon: History },
+  { to: "/status", label: "Status & Riwayat", icon: Activity },
   { to: "/admin", label: "Admin", icon: Shield },
 ];
 
@@ -285,7 +283,6 @@ export default function Header() {
         { to: "/tentang" },
         { to: "/testimoni" },
         { to: "/status" },
-        { to: "/riwayat" },
       ];
       const activeIdx = links.findIndex(
         (link) => location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to))
@@ -332,7 +329,6 @@ export default function Header() {
               { to: "/tentang", label: "FAQ" },
               { to: "/testimoni", label: "Testimoni" },
               { to: "/status", label: "Status Order" },
-              { to: "/riwayat", label: "Riwayat" },
             ].map((link, idx) => {
               const isActive = location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to));
               return (

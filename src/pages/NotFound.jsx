@@ -7,7 +7,7 @@ const QUICK_LINKS = [
   { to: "/", label: "Home", icon: Home, desc: "Kembali ke halaman utama" },
   { to: "/produk", label: "Produk", icon: Grid2x2, desc: "Lihat semua katalog" },
   { to: "/status", label: "Status Order", icon: Activity, desc: "Cek progres ordermu" },
-  { to: "/riwayat", label: "Riwayat", icon: History, desc: "Order dari browser ini" },
+  { to: "/status?tab=riwayat", label: "Riwayat", icon: History, desc: "Order dari browser ini" },
 ];
 
 export default function NotFound() {

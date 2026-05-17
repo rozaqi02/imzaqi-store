@@ -23,7 +23,7 @@ export default function Layout({ children, routeKey }) {
       <main className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}`}>
         {/* key forces remount on route change for enter animation.
             contain:layout prevents this subtree from triggering full-page repaints. */}
-        <div key={revealKey} className="route-transition" style={{ contain: "layout" }}>
+        <div key={revealKey} className="route-transition">
           {children}
         </div>
       </main>

@@ -1368,6 +1368,8 @@
   min-width: 0 !important;
   overflow-x: clip !important;
   overflow-y: visible !important;
+  /* Padding gives shadow room to breathe */
+  padding-bottom: 8px !important;
 }
 
 .catalog-page .catalog-contentBar {
@@ -1379,7 +1381,10 @@
   max-width: 100% !important;
   min-width: 0 !important;
   overflow-x: auto !important;
-  overflow-y: hidden !important;
+  /* Don't clip Y — shadow extends below chips */
+  overflow-y: visible !important;
+  padding-top: 4px !important;
+  padding-bottom: 8px !important;
   padding-right: 0 !important;
 }
 

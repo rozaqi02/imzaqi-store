@@ -22,32 +22,51 @@ export function useRevealOnScroll(dep) {
       return undefined;
     }
 
-    // Only observe elements that are NOT yet visible — avoids re-animating
-    // elements that were already revealed on a previous route visit.
-    const els = Array.from(document.querySelectorAll(".reveal:not(.is-visible)"));
-    if (!els.length) return undefined;
+    let raf1, raf2;
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("is-visible");
-            io.unobserve(entry.target);
+    function attach() {
+      const els = Array.from(document.querySelectorAll(".reveal:not(.is-visible)"));
+      if (!els.length) return undefined;
+
+      const io = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("is-visible");
+              io.unobserve(entry.target);
+            }
           }
+        },
+        {
+          root: null,
+          // Positive bottom margin: elements near the bottom of viewport still trigger.
+          // This prevents the race condition on refresh where the page hasn't fully
+          // painted yet when the observer first fires.
+          threshold: 0,
+          rootMargin: "0px 0px 20% 0px",
         }
-      },
-      {
-        root: null,
-        threshold: 0.1,
-        rootMargin: "0px 0px -8% 0px",
-      }
-    );
+      );
 
-    els.forEach((el) => io.observe(el));
+      els.forEach((el) => io.observe(el));
+      return io;
+    }
+
+    let io;
+
+    // Double rAF: wait for browser to finish layout + paint before attaching observer.
+    // This fixes the blank-on-refresh issue on desktop where .reveal elements are
+    // already in the viewport but the observer fires before layout is complete.
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        io = attach();
+      });
+    });
 
     return () => {
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
       try {
-        io.disconnect();
+        io?.disconnect();
       } catch (_) {
         // noop
       }
