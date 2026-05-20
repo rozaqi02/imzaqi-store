@@ -413,3 +413,68 @@ export async function fetchCohortReturn({ days = 7 } = {}) {
     return 0;
   }
 }
+
+
+// ── Flash Sales ──────────────────────────────────────────────────────────
+
+export async function fetchActiveFlashSales({ useCache = true, ttlMs = 30000 } = {}) {
+  const cacheKey = "flash-sales:active";
+  const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
+  if (cached) return cached;
+
+  const now = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("flash_sales")
+    .select("id,variant_id,discount_percent,starts_at,ends_at,is_active,created_at")
+    .eq("is_active", true)
+    .lte("starts_at", now)
+    .gte("ends_at", now)
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  const result = data || [];
+  if (useCache) writePublicCache(cacheKey, result);
+  return result;
+}
+
+export async function fetchAllFlashSales() {
+  const { data, error } = await supabase
+    .from("flash_sales")
+    .select("id,variant_id,discount_percent,starts_at,ends_at,is_active,created_at")
+    .order("created_at", { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createFlashSale({ variant_id, discount_percent, starts_at, ends_at }) {
+  const { data, error } = await supabase
+    .from("flash_sales")
+    .insert({ variant_id, discount_percent, starts_at, ends_at, is_active: true })
+    .select("id")
+    .single();
+
+  if (error) throw error;
+  clearPublicCache("flash-sales:active");
+  return data;
+}
+
+export async function updateFlashSale(id, patch) {
+  const { error } = await supabase
+    .from("flash_sales")
+    .update({ ...patch })
+    .eq("id", id);
+
+  if (error) throw error;
+  clearPublicCache("flash-sales:active");
+}
+
+export async function deleteFlashSale(id) {
+  const { error } = await supabase
+    .from("flash_sales")
+    .delete()
+    .eq("id", id);
+
+  if (error) throw error;
+  clearPublicCache("flash-sales:active");
+}

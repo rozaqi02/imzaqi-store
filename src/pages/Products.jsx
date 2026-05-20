@@ -22,6 +22,7 @@ import {
 
 import { fetchProducts } from "../lib/api";
 import EmptyState from "../components/EmptyState";
+import FlashSaleBanner from "../components/FlashSaleBanner";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
 import { formatIDR } from "../lib/format";
@@ -747,6 +748,10 @@ export default function Products() {
           </div>
         </div>
       </section>
+
+      <div className="container">
+        <FlashSaleBanner />
+      </div>
 
       <section className="section reveal" style={{ paddingTop: 0 }}>
         <div className="container catalog-layout">

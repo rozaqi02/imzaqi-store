@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
 import { ChevronDown, ChevronUp, Clock3, Grid, Info, List, Mail, Minus, Plus, Share2, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles } from "lucide-react";
 
-import { fetchProductBySlug } from "../lib/api";
+import { fetchProductBySlug, fetchActiveFlashSales } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
 import { formatIDR } from "../lib/format";
@@ -240,6 +240,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [error, setError] = useState("");
+  const [flashSaleMap, setFlashSaleMap] = useState(new Map());
   const [qtyById, setQtyById] = useState({});
   const [activeTab, setActiveTab] = useState("semua");
   const [viewMode, setViewMode] = useState(() => {
@@ -270,9 +271,16 @@ export default function ProductDetail() {
       try {
         setLoading(true);
         setError("");
-        const data = await fetchProductBySlug(slug);
+        const [data, flashSales] = await Promise.all([
+          fetchProductBySlug(slug),
+          fetchActiveFlashSales().catch(() => []),
+        ]);
         if (!alive) return;
         setProduct(data);
+        // Build flash sale map: variant_id → discount_percent
+        const fsMap = new Map();
+        (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
+        setFlashSaleMap(fsMap);
       } catch (fetchError) {
         console.warn(fetchError);
         if (!alive) return;
@@ -348,14 +356,21 @@ export default function ProductDetail() {
 
   const summary = useMemo(() => {
     const prices = variants
-      .map((variant) => Number(variant?.price_idr || 0))
+      .map((variant) => {
+        const base = Number(variant?.price_idr || 0);
+        const flashDiscount = flashSaleMap.get(variant.id);
+        if (flashDiscount && flashDiscount > 0) {
+          return Math.round(base * (1 - flashDiscount / 100));
+        }
+        return base;
+      })
       .filter((value) => Number.isFinite(value) && value > 0);
 
     return {
       minPrice: prices.length ? Math.min(...prices) : 0,
       maxPrice: prices.length ? Math.max(...prices) : 0,
     };
-  }, [variants]);
+  }, [variants, flashSaleMap]);
   const cartItemCount = useMemo(
     () => (cart?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0),
     [cart?.items]
@@ -392,9 +407,16 @@ export default function ProductDetail() {
       return;
     }
 
+    // Apply flash sale price if active
+    const flashDiscount = flashSaleMap.get(variant.id);
+    const effectivePrice = flashDiscount && flashDiscount > 0
+      ? Math.round(variant.price_idr * (1 - flashDiscount / 100))
+      : variant.price_idr;
+
     add(
       {
         ...variant,
+        price_idr: effectivePrice,
         product_id: product.id,
         product_name: product.name,
         product_icon_url: product.icon_url || "",
@@ -402,7 +424,7 @@ export default function ProductDetail() {
       qty
     );
 
-    toast.success(`${variant.name} | ${formatIDR(variant.price_idr)}`, {
+    toast.success(`${variant.name} | ${formatIDR(effectivePrice)}`, {
       title: "Masuk keranjang",
       duration: 2200,
     });
@@ -701,7 +723,14 @@ export default function ProductDetail() {
                       </div>
 
                       <div className="pdx-variantPriceWrap">
-                        <div className="pdx-variantPrice">{formatIDR(variant.price_idr)}</div>
+                        {flashSaleMap.has(variant.id) ? (
+                          <>
+                            <div className="pdx-variantPrice pdx-variantPrice--flash">{formatIDR(Math.round(variant.price_idr * (1 - flashSaleMap.get(variant.id) / 100)))}</div>
+                            <div className="pdx-variantOriginalPrice">{formatIDR(variant.price_idr)}</div>
+                          </>
+                        ) : (
+                          <div className="pdx-variantPrice">{formatIDR(variant.price_idr)}</div>
+                        )}
                       </div>
                     </div>
 

@@ -40,6 +40,10 @@ import {
   fetchCohortReturn,
   buildOrdersCSV,
   downloadCSV,
+  fetchAllFlashSales,
+  createFlashSale,
+  updateFlashSale,
+  deleteFlashSale,
 } from "../../lib/api";
 import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDisplay, calcRevenueForecast, isPromoExpired } from "../../lib/format";
 import { usePageMeta } from "../../hooks/usePageMeta";
@@ -109,6 +113,7 @@ const TAB_ICONS = {
   products: Box,
   orders: ClipboardList,
   promos: Tags,
+  flashsale: TrendingUp,
   testimonials: Star,
   settings: Settings2,
 };
@@ -217,6 +222,9 @@ export default function AdminDashboard() {
   const [promos, setPromos] = useState([]);
   const [promoClaims, setPromoClaims] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
+  const [flashSales, setFlashSales] = useState([]);
+  const [flashForm, setFlashForm] = useState({ variant_id: "", discount_percent: "", starts_at: "", ends_at: "" });
+  const [flashFormOpen, setFlashFormOpen] = useState(false);
   const [settings, setSettings] = useState({});
   const [storePulse, setStorePulse] = useState({
     total_views: 0,
@@ -417,17 +425,19 @@ export default function AdminDashboard() {
 
     try {
       setLoading(true);
-      const [p, t, pr, s] = await Promise.all([
+      const [p, t, pr, s, fs] = await Promise.all([
         fetchProducts({ includeInactive: true }),
         fetchTestimonials({ includeInactive: true }),
         fetchPromoCodes(),
         fetchSettings(),
+        fetchAllFlashSales().catch(() => []),
       ]);
 
       setProducts(p);
       setTestimonials(t);
       setPromos(pr);
       setSettings(s);
+      setFlashSales(fs);
 
       await refreshOrders();
 
@@ -1472,6 +1482,7 @@ export default function AdminDashboard() {
     { id: "products", label: "Produk", hint: "Katalog dan paket aktif" },
     { id: "orders", label: "Pesanan", hint: "Antrean dan tindak lanjut" },
     { id: "promos", label: "Promo", hint: "Kode diskon dan penggunaan" },
+    { id: "flashsale", label: "Flash Sale", hint: "Diskon kilat per varian" },
     { id: "testimonials", label: "Testimoni", hint: "Bukti pelanggan yang tayang" },
     { id: "settings", label: "Pengaturan", hint: "WA, QRIS, dan operasional" },
   ];
@@ -3107,6 +3118,222 @@ export default function AdminDashboard() {
               </div>,
               document.body
             )}
+
+            {tab === "flashsale" ? (
+              <div className="admin-panel">
+                <div className="admin-panel-head">
+                  <div>
+                    <div className="admin-panel-title">Flash Sale</div>
+                    <div className="admin-panel-sub">Diskon kilat per varian. Otomatis tampil di halaman produk.</div>
+                  </div>
+                  <button className="btn btn-sm" type="button" onClick={() => setFlashFormOpen(true)}>
+                    <Plus size={14} /> Buat Flash Sale
+                  </button>
+                </div>
+
+                <div className="admin-panel-body">
+                  {flashFormOpen ? (
+                    <div className="admin-promo-card" style={{ marginBottom: 16, padding: 16 }}>
+                      <div className="admin-panel-title" style={{ fontSize: 14, marginBottom: 12 }}>
+                        {flashForm.id ? "Edit Flash Sale" : "Buat Flash Sale Baru"}
+                      </div>
+                      <div className="admin-form-grid">
+                        <label className="admin-field admin-field-full">
+                          <span>Varian (pilih dari daftar)</span>
+                          <select
+                            className="input"
+                            value={flashForm.variant_id}
+                            onChange={(e) => setFlashForm((f) => ({ ...f, variant_id: e.target.value }))}
+                          >
+                            <option value="">-- Pilih varian --</option>
+                            {(products || []).map((p) =>
+                              (p.product_variants || []).filter((v) => v.is_active).map((v) => (
+                                <option key={v.id} value={v.id}>
+                                  {p.name} — {v.name} ({formatIDR(v.price_idr)})
+                                </option>
+                              ))
+                            )}
+                          </select>
+                        </label>
+                        <label className="admin-field">
+                          <span>Diskon (%)</span>
+                          <input
+                            className="input"
+                            type="number"
+                            min="1"
+                            max="99"
+                            placeholder="10"
+                            value={flashForm.discount_percent}
+                            onChange={(e) => setFlashForm((f) => ({ ...f, discount_percent: e.target.value }))}
+                          />
+                        </label>
+                        <label className="admin-field">
+                          <span>Mulai</span>
+                          <input
+                            className="input"
+                            type="datetime-local"
+                            value={flashForm.starts_at}
+                            onChange={(e) => setFlashForm((f) => ({ ...f, starts_at: e.target.value }))}
+                          />
+                        </label>
+                        <label className="admin-field">
+                          <span>Berakhir</span>
+                          <input
+                            className="input"
+                            type="datetime-local"
+                            value={flashForm.ends_at}
+                            onChange={(e) => setFlashForm((f) => ({ ...f, ends_at: e.target.value }))}
+                          />
+                        </label>
+                      </div>
+                      <div className="admin-form-actions" style={{ marginTop: 12 }}>
+                        <button
+                          className="btn btn-ghost btn-sm"
+                          type="button"
+                          onClick={() => {
+                            setFlashFormOpen(false);
+                            setFlashForm({ variant_id: "", discount_percent: "", starts_at: "", ends_at: "" });
+                          }}
+                        >
+                          Batal
+                        </button>
+                        <button
+                          className="btn btn-sm"
+                          type="button"
+                          onClick={async () => {
+                            if (!flashForm.variant_id || !flashForm.discount_percent || !flashForm.starts_at || !flashForm.ends_at) {
+                              toast.error("Lengkapi semua field");
+                              return;
+                            }
+                            const tid = toast.loading("Menyimpan flash sale");
+                            try {
+                              if (flashForm.id) {
+                                await updateFlashSale(flashForm.id, {
+                                  variant_id: flashForm.variant_id,
+                                  discount_percent: Number(flashForm.discount_percent),
+                                  starts_at: new Date(flashForm.starts_at).toISOString(),
+                                  ends_at: new Date(flashForm.ends_at).toISOString(),
+                                });
+                              } else {
+                                await createFlashSale({
+                                  variant_id: flashForm.variant_id,
+                                  discount_percent: Number(flashForm.discount_percent),
+                                  starts_at: new Date(flashForm.starts_at).toISOString(),
+                                  ends_at: new Date(flashForm.ends_at).toISOString(),
+                                });
+                              }
+                              setFlashSales(await fetchAllFlashSales());
+                              setFlashFormOpen(false);
+                              setFlashForm({ variant_id: "", discount_percent: "", starts_at: "", ends_at: "" });
+                              toast.remove(tid);
+                              toast.success("Flash sale disimpan");
+                            } catch (e) {
+                              toast.remove(tid);
+                              toast.error(e?.message || "Gagal simpan flash sale");
+                            }
+                          }}
+                        >
+                          Simpan
+                        </button>
+                      </div>
+                    </div>
+                  ) : null}
+
+                  {flashSales.length === 0 ? (
+                    <div className="admin-emptyInline">Belum ada flash sale. Klik "Buat Flash Sale" untuk mulai.</div>
+                  ) : (
+                    <div className="admin-promo-grid">
+                      {flashSales.map((fs) => {
+                        const now = new Date();
+                        const isExpired = new Date(fs.ends_at) < now;
+                        const isUpcoming = new Date(fs.starts_at) > now;
+                        const isLive = !isExpired && !isUpcoming && fs.is_active;
+                        const variant = allVariants.find((v) => v.id === fs.variant_id);
+                        const product = (products || []).find((p) =>
+                          (p.product_variants || []).some((v) => v.id === fs.variant_id)
+                        );
+
+                        return (
+                          <div key={fs.id} className={`admin-promo-card ${isExpired ? "is-expired" : ""}`}>
+                            <div className="admin-promo-cardTop">
+                              <div className="admin-promo-cardLeft">
+                                <div className="admin-promo-cardCode">
+                                  <span>{product?.name || "?"} — {variant?.name || fs.variant_id.slice(0, 8)}</span>
+                                </div>
+                                <span className={`admin-promoBadge ${isLive ? "active" : isExpired ? "expired" : "off"}`}>
+                                  {isLive ? "Live" : isExpired ? "Berakhir" : isUpcoming ? "Akan datang" : "Nonaktif"}
+                                </span>
+                              </div>
+                              <div className="admin-promo-cardDiscount">{fs.discount_percent}%</div>
+                            </div>
+
+                            <div className="admin-promo-cardMeta">
+                              <span>Mulai: {new Date(fs.starts_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                              <span>Akhir: {new Date(fs.ends_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
+                            </div>
+
+                            <div className="admin-promo-cardActions">
+                              <button
+                                className="btn btn-sm btn-ghost"
+                                type="button"
+                                onClick={() => {
+                                  setFlashForm({
+                                    id: fs.id,
+                                    variant_id: fs.variant_id,
+                                    discount_percent: String(fs.discount_percent),
+                                    starts_at: new Date(fs.starts_at).toISOString().slice(0, 16),
+                                    ends_at: new Date(fs.ends_at).toISOString().slice(0, 16),
+                                  });
+                                  setFlashFormOpen(true);
+                                }}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="btn btn-sm btn-danger"
+                                type="button"
+                                onClick={async () => {
+                                  if (!window.confirm("Hapus flash sale ini?")) return;
+                                  const tid = toast.loading("Menghapus");
+                                  try {
+                                    await deleteFlashSale(fs.id);
+                                    setFlashSales(await fetchAllFlashSales());
+                                    toast.remove(tid);
+                                    toast.success("Dihapus");
+                                  } catch (e) {
+                                    toast.remove(tid);
+                                    toast.error("Gagal hapus");
+                                  }
+                                }}
+                              >
+                                Hapus
+                              </button>
+                              <button
+                                className="btn btn-sm btn-ghost"
+                                type="button"
+                                onClick={async () => {
+                                  const tid = toast.loading("Update");
+                                  try {
+                                    await updateFlashSale(fs.id, { is_active: !fs.is_active });
+                                    setFlashSales(await fetchAllFlashSales());
+                                    toast.remove(tid);
+                                  } catch (e) {
+                                    toast.remove(tid);
+                                    toast.error("Gagal update");
+                                  }
+                                }}
+                              >
+                                {fs.is_active ? "Nonaktifkan" : "Aktifkan"}
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
 
             {tab === "testimonials" ? (
               <div className="admin-panel">

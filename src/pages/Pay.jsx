@@ -6,7 +6,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
-import { fetchProducts, fetchSettings } from "../lib/api";
+import { fetchProducts, fetchSettings, fetchActiveFlashSales } from "../lib/api";
 import { getVisitorIdAsUUID } from "../lib/visitor";
 import { makeOrderCode } from "../lib/orderCode";
 import { buildDynamicQrisImage } from "../lib/qris";
@@ -284,7 +284,7 @@ export default function Pay() {
 
   const items = snapshot;
   const promoPercent = Number(promo?.percent || 0);
-  const subtotal = useMemo(() => items.reduce((sum, item) => sum + item.price_idr * item.qty, 0), [items]);
+  const subtotal = useMemo(() => items.reduce((sum, item) => sum + (Number(item.price_idr) || 0) * (Number(item.qty) || 0), 0), [items]);
   const { discount, total } = calcTotal(subtotal, promoPercent);
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [items]);
 
@@ -456,7 +456,23 @@ export default function Pay() {
   const statusUrl = orderCode ? `/status?order=${encodeURIComponent(orderCode)}` : "/status";
 
   async function buildCanonicalOrderPayload() {
-    const latestProducts = await fetchProducts({ includeInactive: true, useCache: false });
+    const [latestProducts, activeFlashSales] = await Promise.all([
+      fetchProducts({ includeInactive: true, useCache: false }),
+      fetchActiveFlashSales({ useCache: false }).catch((err) => {
+        console.warn("Flash sales fetch failed in canonical check:", err);
+        return null; // null = unknown, don't apply flash sale discount
+      }),
+    ]);
+
+    // Build flash sale map: variant_id → discount_percent
+    // If fetch failed (null), we skip flash sale pricing to avoid mismatch
+    const flashSaleMap = new Map();
+    if (activeFlashSales !== null) {
+      (activeFlashSales || []).forEach((sale) => {
+        flashSaleMap.set(sale.variant_id, sale.discount_percent);
+      });
+    }
+
     const variantMap = new Map();
 
     (latestProducts || []).forEach((product) => {
@@ -486,7 +502,16 @@ export default function Pay() {
       }
 
       const safeQty = sanitizeQty(item?.qty);
-      const safePrice = Math.max(0, Number(entry.variant?.price_idr || 0));
+      let safePrice = Math.max(0, Number(entry.variant?.price_idr || 0));
+
+      // Apply flash sale discount to variant price (only if flash sales were fetched successfully)
+      const flashDiscount = flashSaleMap.get(variantId);
+      if (flashDiscount && flashDiscount > 0) {
+        safePrice = Math.round(safePrice * (1 - flashDiscount / 100));
+      } else if (activeFlashSales === null) {
+        // Flash sales fetch failed — use the price from cart to avoid mismatch
+        safePrice = Math.max(0, Number(item?.price_idr || safePrice));
+      }
 
       return {
         variant_id: entry.variant.id,

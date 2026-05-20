@@ -1069,3 +1069,20 @@
   .pdx-breadcrumb { font-size: 12px; gap: 4px; }
   .pdx-breadcrumbLink { padding: 3px 6px; }
 }
+
+
+/* ── Flash Sale price in variant card ── */
+.pdx-variantPrice--flash {
+  color: #ff3c64 !important;
+}
+
+.pdx-variantOriginalPrice {
+  font-size: 12px;
+  color: var(--brand-muted, rgba(255, 255, 255, 0.5));
+  text-decoration: line-through;
+  margin-top: 2px;
+}
+
+:root[data-theme="light"] .pdx-variantPrice--flash {
+  color: #dc2050 !important;
+}

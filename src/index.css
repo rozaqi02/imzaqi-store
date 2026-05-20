@@ -13,6 +13,7 @@
 
 @import "./css/pages/AdminLogin.css";
 @import "./css/pages/AdminDashboard.css";
+@import "./css/pages/FlashSale.css";
 
 /* Brand color direction */
 @import "./css/theme-disney.css";

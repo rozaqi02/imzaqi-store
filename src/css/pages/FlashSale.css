@@ -1,0 +1,261 @@
+/* ── Flash Sale Banner ─────────────────────────────────────────────────── */
+.flash-sale-banner {
+  margin-bottom: 18px;
+  padding: 16px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 60, 100, 0.24);
+  background:
+    linear-gradient(135deg, rgba(255, 60, 100, 0.06), rgba(255, 60, 100, 0) 60%),
+    var(--skeu-panel-bg);
+  box-shadow: var(--skeu-panel-shadow);
+  overflow: hidden;
+}
+
+.flash-sale-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.flash-sale-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 1000;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #ff3c64;
+}
+
+.flash-sale-title svg {
+  color: #ff3c64;
+}
+
+/* Countdown */
+.flash-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.flash-countdown-icon {
+  margin-right: 4px;
+}
+
+.flash-countdown-num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border-radius: 8px;
+  border: 1px solid var(--brand-line);
+  background: var(--skeu-control-bg);
+  box-shadow: var(--skeu-control-shadow);
+  color: var(--brand-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.flash-countdown-sep {
+  color: var(--brand-muted);
+  font-weight: 900;
+}
+
+.flash-countdown-expired {
+  color: var(--brand-muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+/* Horizontal scroll */
+.flash-sale-scroll {
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  overflow-y: visible;
+  padding-bottom: 6px;
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.flash-sale-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Individual card */
+.flash-sale-card {
+  position: relative;
+  flex: 0 0 130px;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 10px 12px;
+  border-radius: 18px;
+  border: 1px solid var(--brand-line);
+  background: var(--skeu-control-bg);
+  box-shadow: var(--skeu-control-shadow);
+  text-align: center;
+  text-decoration: none;
+  color: var(--brand-text);
+  transition: transform 0.2s ease, border-color 0.2s ease;
+}
+
+.flash-sale-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(255, 60, 100, 0.3);
+}
+
+/* Discount badge */
+.flash-sale-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  min-width: 36px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 6px;
+  border-radius: 6px;
+  background: #ff3c64;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+}
+
+/* Product icon */
+.flash-sale-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--brand-line);
+  background: var(--skeu-inset-bg);
+  display: grid;
+  place-items: center;
+}
+
+.flash-sale-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.flash-sale-icon-fallback {
+  font-size: 18px;
+  font-weight: 1000;
+  color: var(--brand-muted);
+}
+
+/* Product name */
+.flash-sale-name {
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1.3;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* Prices */
+.flash-sale-prices {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.flash-sale-original {
+  font-size: 10px;
+  color: var(--brand-muted);
+  text-decoration: line-through;
+}
+
+.flash-sale-discounted {
+  font-size: 13px;
+  font-weight: 1000;
+  color: #ff3c64;
+  letter-spacing: -0.02em;
+}
+
+/* Meta (stock) */
+.flash-sale-meta {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--brand-muted);
+}
+
+/* ── Light mode ── */
+:root[data-theme="light"] .flash-sale-banner {
+  border-color: rgba(255, 60, 100, 0.18);
+  background:
+    linear-gradient(135deg, rgba(255, 60, 100, 0.04), rgba(255, 60, 100, 0) 60%),
+    var(--skeu-panel-bg);
+}
+
+:root[data-theme="light"] .flash-sale-card {
+  background: var(--skeu-control-bg);
+}
+
+:root[data-theme="light"] .flash-sale-discounted {
+  color: #dc2050;
+}
+
+:root[data-theme="light"] .flash-sale-title,
+:root[data-theme="light"] .flash-sale-title svg {
+  color: #dc2050;
+}
+
+:root[data-theme="light"] .flash-sale-badge {
+  background: #dc2050;
+}
+
+/* ── Mobile ── */
+@media (max-width: 720px) {
+  .flash-sale-banner {
+    margin-bottom: 14px;
+    padding: 12px;
+    border-radius: 20px;
+  }
+
+  .flash-sale-header {
+    margin-bottom: 10px;
+  }
+
+  .flash-sale-title {
+    font-size: 12px;
+  }
+
+  .flash-sale-card {
+    flex: 0 0 110px;
+    padding: 12px 8px 10px;
+    border-radius: 14px;
+  }
+
+  .flash-sale-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+
+  .flash-sale-name {
+    font-size: 10px;
+  }
+
+  .flash-countdown-num {
+    min-width: 24px;
+    height: 24px;
+    font-size: 11px;
+  }
+}
