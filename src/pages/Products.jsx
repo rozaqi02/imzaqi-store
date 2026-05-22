@@ -44,13 +44,16 @@ const NEW_PRODUCT_DAYS = 30;
 // "Baru di stok" = varian in-stock yang terakhir di-update dalam N hari terakhir.
 const RESTOCK_DAYS = 7;
 const SORT_LABELS = {
+  name: "Nama A-Z",
+  name_desc: "Nama Z-A",
   reco: "Rekomendasi",
   popular: "Terlaris",
   price_asc: "Harga termurah",
   price_desc: "Harga termahal",
   stock_desc: "Stok terbanyak",
-  name: "Nama A-Z",
 };
+
+const DEFAULT_SORT = "name";
 
 function inferCategory(product) {
   const explicit = String(product?.category || "").trim().toLowerCase();
@@ -261,12 +264,13 @@ function FilterPanel({
       <div className="catalog-filterBlock">
         <div className="catalog-filterLabel">Urutkan</div>
         <select className="input catalog-filterSelect" value={sort} onChange={(e) => setSort(e.target.value)}>
+          <option value="name">Nama A-Z</option>
+          <option value="name_desc">Nama Z-A</option>
           <option value="reco">Rekomendasi</option>
           <option value="popular">Terlaris</option>
           <option value="price_asc">Harga termurah</option>
           <option value="price_desc">Harga termahal</option>
           <option value="stock_desc">Stok terbanyak</option>
-          <option value="name">Nama A-Z</option>
         </select>
       </div>
 
@@ -313,7 +317,7 @@ export default function Products() {
   const [inStockOnly, setInStockOnly] = useState(() => params.get("ready") === "1");
   const [newOnly, setNewOnly] = useState(() => params.get("new") === "1");
   const [restockOnly, setRestockOnly] = useState(() => params.get("restock") === "1");
-  const [sort, setSort] = useState(() => params.get("sort") || "reco");
+  const [sort, setSort] = useState(() => params.get("sort") || DEFAULT_SORT);
   const [view, setView] = useState(() => params.get("view") || "grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [price, setPrice] = useState({
@@ -455,7 +459,7 @@ export default function Products() {
     if (restockOnly) nextParams.set("restock", "1");
     else nextParams.delete("restock");
 
-    if (sort !== "reco") nextParams.set("sort", sort);
+    if (sort !== DEFAULT_SORT) nextParams.set("sort", sort);
     else nextParams.delete("sort");
 
     if (view !== "grid") nextParams.set("view", view);
@@ -494,7 +498,7 @@ export default function Products() {
     setInStockOnly(false);
     setNewOnly(false);
     setRestockOnly(false);
-    setSort("reco");
+    setSort(DEFAULT_SORT);
     setView("grid");
     if (priceBounds.max > 0) setPrice({ min: priceBounds.min, max: priceBounds.max });
   }
@@ -532,6 +536,7 @@ export default function Products() {
     }
 
     const byName = (a, b) => String(a?.name || "").localeCompare(String(b?.name || ""), "id");
+    const byNameDesc = (a, b) => String(b?.name || "").localeCompare(String(a?.name || ""), "id");
     const byReco = (a, b) => (a?.sort_order || 0) - (b?.sort_order || 0);
     const byPopular = (a, b) => (b?._sold || 0) - (a?._sold || 0) || byReco(a, b);
     const byPriceAsc = (a, b) => (a?._minPrice || 0) - (b?._minPrice || 0) || byReco(a, b);
@@ -543,8 +548,9 @@ export default function Products() {
     else if (sort === "price_asc") sorted.sort(byPriceAsc);
     else if (sort === "price_desc") sorted.sort(byPriceDesc);
     else if (sort === "stock_desc") sorted.sort(byStockDesc);
-    else if (sort === "name") sorted.sort(byName);
-    else sorted.sort(byReco);
+    else if (sort === "name_desc") sorted.sort(byNameDesc);
+    else if (sort === "reco") sorted.sort(byReco);
+    else sorted.sort(byName);
     return sorted;
   }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, debouncedQuery, restockOnly, sort]);
 
@@ -555,7 +561,7 @@ export default function Products() {
     (newOnly ? 1 : 0) +
     (restockOnly ? 1 : 0) +
     (priceReady && (price.min !== priceBounds.min || price.max !== priceBounds.max) ? 1 : 0) +
-    (sort !== "reco" ? 1 : 0);
+    (sort !== DEFAULT_SORT ? 1 : 0);
 
   const skeletonCount = view === "list" ? 6 : 8;
   const insights = useMemo(() => buildStoreInsights({ products }), [products]);
@@ -662,7 +668,7 @@ export default function Products() {
       tags.push(`Harga: ${formatCompactIDR(price.min)}-${formatCompactIDR(price.max)}`);
     }
 
-    if (sort !== "reco") {
+    if (sort !== DEFAULT_SORT) {
       tags.push(`Urut: ${SORT_LABELS[sort] || sort}`);
     }
 
@@ -727,12 +733,13 @@ export default function Products() {
 
             <div className="catalog-commandActions">
               <select className="input catalog-commandSort" value={sort} onChange={(e) => setSort(e.target.value)}>
+                <option value="name">Nama A-Z</option>
+                <option value="name_desc">Nama Z-A</option>
                 <option value="reco">Rekomendasi</option>
                 <option value="popular">Terlaris</option>
                 <option value="price_asc">Harga termurah</option>
                 <option value="price_desc">Harga termahal</option>
                 <option value="stock_desc">Stok terbanyak</option>
-                <option value="name">Nama A-Z</option>
               </select>
 
               <button
