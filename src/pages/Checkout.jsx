@@ -142,6 +142,7 @@ export default function Checkout() {
   }, [closing, isMobileSheet]);
 
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
+  const hasStockIssue = useMemo(() => cart.items.some((item) => stockWarnings[item.variant_id]), [cart.items, stockWarnings]);
   const backgroundLocation = location.state?.backgroundLocation;
 
   const requestClose = useCallback(() => {
@@ -203,6 +204,13 @@ export default function Checkout() {
       return;
     }
 
+    if (hasStockIssue) {
+      const text = "Ada item yang stoknya habis atau tidak cukup. Hapus atau kurangi qty dulu.";
+      setMsg(text);
+      toast.error(text);
+      return;
+    }
+
     nav("/bayar");
   }
 
@@ -226,7 +234,7 @@ export default function Checkout() {
           ) : null}
         </div>
 
-        <button className="btn btn-wide checkout-summaryBtn" type="button" onClick={goPay} disabled={cart.items.length === 0}>
+        <button className="btn btn-wide checkout-summaryBtn" type="button" onClick={goPay} disabled={cart.items.length === 0 || hasStockIssue}>
           Lanjut ke bayar
           <ArrowRight size={16} />
         </button>

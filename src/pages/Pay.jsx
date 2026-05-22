@@ -104,10 +104,28 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
   useEffect(() => {
     if (open && typeof window !== "undefined" && window.confetti) {
       window.confetti({
-        particleCount: 90,
-        spread: 70,
-        origin: { y: 0.6 },
+        particleCount: 120,
+        spread: 80,
+        origin: { y: 0.55 },
+        colors: ["#4effda", "#25ebc8", "#00d6b4", "#ffd700", "#ff6b9d", "#a78bfa"],
       });
+      // Second burst for extra festivity
+      setTimeout(() => {
+        if (window.confetti) {
+          window.confetti({
+            particleCount: 60,
+            spread: 100,
+            origin: { y: 0.4, x: 0.3 },
+            colors: ["#4effda", "#ffd700", "#ff6b9d"],
+          });
+          window.confetti({
+            particleCount: 60,
+            spread: 100,
+            origin: { y: 0.4, x: 0.7 },
+            colors: ["#25ebc8", "#a78bfa", "#00d6b4"],
+          });
+        }
+      }, 400);
     }
   }, [open]);
 
@@ -128,15 +146,22 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
     <div className="modal-backdrop pay-overlay" onMouseDown={onClose} role="presentation">
       <div
         ref={modalRef}
-        className="modal pay-successModal"
+        className="modal pay-successModal pay-successModal--animate"
         role="dialog"
         aria-modal="true"
         aria-label="Order berhasil"
         onMouseDown={(e) => e.stopPropagation()}
       >
+        {/* CSS Confetti particles */}
+        <div className="pay-celebrationParticles" aria-hidden="true">
+          {Array.from({ length: 18 }).map((_, i) => (
+            <span key={i} className={`pay-celebrationDot pay-celebrationDot--${i % 6}`} />
+          ))}
+        </div>
+
         <div className="modal-head pay-successHead">
           <div>
-            <div className="modal-title">Order dibuat</div>
+            <div className="modal-title">Order dibuat 🎉</div>
             <div className="modal-sub">Simpan ID ini, lalu buka halaman status saat diperlukan.</div>
           </div>
           <button className="icon-btn" type="button" onClick={onClose} aria-label="Tutup">
@@ -146,11 +171,15 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
 
         <div className="modal-body">
           <div className="pay-successHero">
-            <div className="pay-successIcon">
-              <CheckCircle2 size={34} />
+            {/* Animated glow ring behind icon */}
+            <div className="pay-successIconWrap">
+              <div className="pay-successGlow" aria-hidden="true" />
+              <div className="pay-successIcon pay-successIcon--animate">
+                <CheckCircle2 size={34} />
+              </div>
             </div>
             <div className="pay-successKicker">ID ORDER</div>
-            <div className="pay-successCode">{orderCode}</div>
+            <div className="pay-successCode pay-successCode--animate">{orderCode}</div>
             <p className="pay-successLead">ID ini akan dipakai setiap kali kamu ingin mengecek progres order.</p>
           </div>
 
@@ -159,7 +188,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
               Cek Status
             </Link>
             <button className="btn btn-ghost" type="button" onClick={copyCode}>
-              {copied ? "Tersalin" : "Salin ID"}
+              {copied ? "✓ Tersalin" : "Salin ID"}
             </button>
             <a className="btn btn-ghost" href={adminWaUrl} target="_blank" rel="noreferrer">
               Hubungi Admin
@@ -541,18 +570,13 @@ export default function Pay() {
     let canonicalDiscountPercent = 0;
     const requestedPromo = String(promo?.code || "").trim().toUpperCase();
 
-    if (requestedPromo) {
-      const { data, error } = await supabase.rpc("validate_promo", {
-        p_code: requestedPromo,
-        p_visitor_id: getVisitorIdAsUUID(),
-      });
-      if (!error) {
-        const nextPercent = Number(data || 0);
-        if (nextPercent > 0) {
-          canonicalPromoCode = requestedPromo;
-          canonicalDiscountPercent = nextPercent;
-        }
-      }
+    // Use the already-validated promo data from usePromo context.
+    // Do NOT call validate_promo RPC again here — it was already called in
+    // Checkout when the user applied the code. Calling it a second time
+    // caused a double-claim bug (slot decremented twice).
+    if (requestedPromo && Number(promo?.percent || 0) > 0) {
+      canonicalPromoCode = requestedPromo;
+      canonicalDiscountPercent = Number(promo.percent);
     }
 
     const canonicalDiscount = Math.round((canonicalSubtotal * canonicalDiscountPercent) / 100);

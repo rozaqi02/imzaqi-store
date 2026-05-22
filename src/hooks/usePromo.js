@@ -73,12 +73,9 @@ export function usePromo() {
 
       setPromo({ code, percent });
 
-      try {
-        const visitor_id = getVisitorIdAsUUID();
-        await supabase.from("promo_claims").insert({ visitor_id, code });
-      } catch {
-        // ignore
-      }
+      // NOTE: promo_claims insert is NOT done here — it happens once
+      // during order creation (create_order_with_stock_check RPC) in Pay.
+      // Previously this caused a double-claim bug (slot decremented twice).
 
       return { ok: true, message: `Berhasil! Diskon ${percent}% diterapkan.` };
     },

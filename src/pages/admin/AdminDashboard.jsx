@@ -1145,7 +1145,9 @@ export default function AdminDashboard() {
     const tid = toast.loading(`Memperbarui ${ids.length} order...`);
     const results = await Promise.allSettled(
       ids.map((id) =>
-        supabase.from("orders").update({ status: newStatus }).eq("id", id)
+        newStatus === "cancelled"
+          ? supabase.rpc("cancel_order_with_stock_restore", { p_order_id: id })
+          : supabase.from("orders").update({ status: newStatus }).eq("id", id)
       )
     );
     toast.remove(tid);
@@ -1178,12 +1180,26 @@ export default function AdminDashboard() {
     setMsg("");
 
     try {
-      const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
-      if (error) throw error;
-
-      await refreshOrders();
-      toast.remove(tid);
-      toast.success("Status diperbarui", { duration: 1200 });
+      if (status === "cancelled") {
+        // Use RPC that atomically restores stock + promo slot
+        const { data, error } = await supabase.rpc("cancel_order_with_stock_restore", {
+          p_order_id: orderId,
+        });
+        if (error) throw error;
+        const result = data || {};
+        const extra = result.restored_stock
+          ? ` (stok +${result.restored_stock}${result.restored_promo ? ", promo dikembalikan" : ""})`
+          : "";
+        await refreshOrders();
+        toast.remove(tid);
+        toast.success(`Order dibatalkan${extra}`, { duration: 2400 });
+      } else {
+        const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
+        if (error) throw error;
+        await refreshOrders();
+        toast.remove(tid);
+        toast.success("Status diperbarui", { duration: 1200 });
+      }
     } catch (e) {
       toast.remove(tid);
       toast.error("Gagal update status");
