@@ -166,24 +166,6 @@ function FilterPanel({
   return (
     <div className={`catalog-filter ${compact ? "compact" : ""}`}>
       <div className="catalog-filterBlock">
-        <div className="catalog-filterLabel">Cari</div>
-        <div className="catalog-filterSearch">
-          <Search size={15} />
-          <input
-            className="input catalog-filterInput"
-            value={query}
-            placeholder="Netflix, Canva, ChatGPT"
-            onChange={(e) => setQuery(e.target.value)}
-          />
-          {query ? (
-            <button type="button" className="catalog-filterClear" onClick={() => setQuery("")} aria-label="Hapus">
-              <X size={14} />
-            </button>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="catalog-filterBlock">
         <div className="catalog-filterLabel">Kategori</div>
         <div className="catalog-chipGrid">
           {CATEGORIES.map((category) => {
@@ -206,47 +188,51 @@ function FilterPanel({
       </div>
 
       <div className="catalog-filterBlock">
-        <label className="catalog-filterRow catalog-filterRow--toggle" htmlFor={readyToggleId}>
-          <span className="catalog-filterLabel">Ready</span>
-          <span className="catalog-toggle">
-            <input
-              id={readyToggleId}
-              type="checkbox"
-              checked={inStockOnly}
-              onChange={(e) => setInStockOnly(e.target.checked)}
-            />
-            <span className="catalog-toggleUi" aria-hidden="true" />
-          </span>
-        </label>
-      </div>
+        <div className="catalog-filterLabel">Status</div>
+        <div className="catalog-toggleGroup">
+          <label className="catalog-toggleItem" htmlFor={readyToggleId}>
+            <span className="catalog-toggleItemText">
+              <span className="catalog-toggleItemTitle">Ready</span>
+              <span className="catalog-toggleItemHint">Hanya yang stoknya siap</span>
+            </span>
+            <span className="catalog-toggle">
+              <input
+                id={readyToggleId}
+                type="checkbox"
+                checked={inStockOnly}
+                onChange={(e) => setInStockOnly(e.target.checked)}
+              />
+              <span className="catalog-toggleUi" aria-hidden="true" />
+            </span>
+          </label>
 
-      <div className="catalog-filterBlock">
-        <label className="catalog-filterRow catalog-filterRow--toggle" htmlFor={newToggleId}>
-          <span className="catalog-filterLabel" title={`Produk yang ditambahkan dalam ${NEW_PRODUCT_DAYS} hari terakhir`}>
-            Produk baru
-          </span>
-          <span className="catalog-toggle">
-            <input id={newToggleId} type="checkbox" checked={newOnly} onChange={(e) => setNewOnly(e.target.checked)} />
-            <span className="catalog-toggleUi" aria-hidden="true" />
-          </span>
-        </label>
-      </div>
+          <label className="catalog-toggleItem" htmlFor={newToggleId}>
+            <span className="catalog-toggleItemText">
+              <span className="catalog-toggleItemTitle">Produk baru</span>
+              <span className="catalog-toggleItemHint">{`Rilis ${NEW_PRODUCT_DAYS} hari terakhir`}</span>
+            </span>
+            <span className="catalog-toggle">
+              <input id={newToggleId} type="checkbox" checked={newOnly} onChange={(e) => setNewOnly(e.target.checked)} />
+              <span className="catalog-toggleUi" aria-hidden="true" />
+            </span>
+          </label>
 
-      <div className="catalog-filterBlock">
-        <label className="catalog-filterRow catalog-filterRow--toggle" htmlFor={restockToggleId}>
-          <span className="catalog-filterLabel" title={`Varian in-stock yang di-update dalam ${RESTOCK_DAYS} hari terakhir`}>
-            Baru di stok
-          </span>
-          <span className="catalog-toggle">
-            <input
-              id={restockToggleId}
-              type="checkbox"
-              checked={restockOnly}
-              onChange={(e) => setRestockOnly(e.target.checked)}
-            />
-            <span className="catalog-toggleUi" aria-hidden="true" />
-          </span>
-        </label>
+          <label className="catalog-toggleItem" htmlFor={restockToggleId}>
+            <span className="catalog-toggleItemText">
+              <span className="catalog-toggleItemTitle">Baru di stok</span>
+              <span className="catalog-toggleItemHint">{`Restock ${RESTOCK_DAYS} hari terakhir`}</span>
+            </span>
+            <span className="catalog-toggle">
+              <input
+                id={restockToggleId}
+                type="checkbox"
+                checked={restockOnly}
+                onChange={(e) => setRestockOnly(e.target.checked)}
+              />
+              <span className="catalog-toggleUi" aria-hidden="true" />
+            </span>
+          </label>
+        </div>
       </div>
 
       <div className="catalog-filterBlock">
@@ -949,7 +935,10 @@ export default function Products() {
                 </div>
 
                 <div className="catalog-sheetFoot">
-                  <button type="button" className="btn btn-wide" onClick={closeFilters}>
+                  <button type="button" className="btn btn-ghost catalog-sheetReset" onClick={resetFilters}>
+                    Reset
+                  </button>
+                  <button type="button" className="btn catalog-sheetApply" onClick={closeFilters}>
                     Terapkan
                   </button>
                 </div>

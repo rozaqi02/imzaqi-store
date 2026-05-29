@@ -292,6 +292,59 @@
   line-height: 1.2;
 }
 
+/* Grouped status toggles (Ready / Produk baru / Baru di stok) */
+.catalog-toggleGroup {
+  margin-top: 12px;
+  display: grid;
+  gap: 4px;
+  padding: 6px;
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.catalog-toggleItem {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 46px;
+  padding: 8px 10px;
+  border-radius: 13px;
+  cursor: pointer;
+  user-select: none;
+  transition: background 0.18s var(--ease-out, ease);
+}
+
+.catalog-toggleItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.catalog-toggleItem:has(input:checked) {
+  background: rgba(0, 214, 180, 0.1);
+}
+
+.catalog-toggleItemText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.catalog-toggleItemTitle {
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.01em;
+  color: var(--brand-text, #eafff5);
+  line-height: 1.2;
+}
+
+.catalog-toggleItemHint {
+  font-size: 11px;
+  font-weight: 700;
+  color: rgba(234, 255, 245, 0.5);
+  line-height: 1.25;
+}
+
 .catalog-toggle {
   position: relative;
   display: inline-flex;
@@ -328,8 +381,8 @@
 }
 
 .catalog-toggle input:checked + .catalog-toggleUi {
-  background: rgba(29, 131, 255, 0.24);
-  border-color: rgba(29, 131, 255, 0.34);
+  background: rgba(0, 214, 180, 0.28);
+  border-color: rgba(0, 214, 180, 0.4);
 }
 
 .catalog-toggle input:checked + .catalog-toggleUi::after {
@@ -1237,18 +1290,17 @@
   }
 
   .catalog-quickFilters {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
-    overflow: visible;
+    /* Revert grid, let it be flex with overflow auto from base */
+    display: flex;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding-bottom: 8px;
   }
 
   .catalog-quickChip {
-    width: 100%;
     min-height: 44px;
-    justify-content: center;
-    white-space: normal;
-    line-height: 1.25;
+    white-space: nowrap;
     text-align: center;
   }
 
@@ -1316,9 +1368,7 @@
     gap: 8px;
   }
 
-  .catalog-quickFilters {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+  /* No override for quickFilters here since it is flex */
 
   .catalog-quickChip {
     min-height: 42px;
@@ -1822,7 +1872,7 @@
 
 @media (max-width: 430px) {
   .catalog-grid.grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 10px;
   }
 
@@ -1884,6 +1934,28 @@
 
 :root[data-theme="light"] .catalog-filterRow--toggle .catalog-filterLabel {
   color: #3f5f6c;
+}
+
+/* Light mode: grouped status toggles */
+:root[data-theme="light"] .catalog-toggleGroup {
+  border-color: rgba(41, 98, 121, 0.16);
+  background: rgba(255, 255, 255, 0.6);
+}
+
+:root[data-theme="light"] .catalog-toggleItem:hover {
+  background: rgba(0, 138, 148, 0.06);
+}
+
+:root[data-theme="light"] .catalog-toggleItem:has(input:checked) {
+  background: rgba(0, 138, 148, 0.1);
+}
+
+:root[data-theme="light"] .catalog-toggleItemTitle {
+  color: #163a45;
+}
+
+:root[data-theme="light"] .catalog-toggleItemHint {
+  color: #5c7d88;
 }
 
 
@@ -2027,8 +2099,10 @@
     display: none;
   }
 
-  /* Sticky apply button at bottom */
+  /* Sticky footer: Reset + Terapkan side by side */
   .catalog-sheetFoot {
+    display: flex;
+    gap: 10px;
     padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
     background: var(--skeu-panel-bg, rgba(7, 10, 18, 0.96));
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.18);
@@ -2038,6 +2112,19 @@
     min-height: 48px;
     border-radius: 16px;
     font-size: 14px;
+  }
+
+  .catalog-sheetReset {
+    flex: 0 0 38%;
+  }
+
+  .catalog-sheetApply {
+    flex: 1 1 auto;
+  }
+
+  /* Hide in-body Reset button inside the sheet (footer has its own) */
+  .catalog-sheet .catalog-filterBlock.no-border {
+    display: none;
   }
 }
 

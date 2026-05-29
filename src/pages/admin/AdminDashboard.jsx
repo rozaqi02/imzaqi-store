@@ -1510,6 +1510,7 @@ export default function AdminDashboard() {
     products: `${products.length} produk`,
     orders: `${orderStats.live} aktif`,
     promos: `${analyticsSummary.activePromos} aktif`,
+    flashsale: `${flashSales.filter(fs => { const now = new Date(); return fs.is_active && new Date(fs.ends_at) >= now && new Date(fs.starts_at) <= now; }).length} live`,
     testimonials: `${analyticsSummary.activeTestimonials} tayang`,
     settings: normalizeWhatsApp(settingsWhatsApp || waNumber) ? "WA siap" : "WA kosong",
   };
@@ -1573,6 +1574,12 @@ export default function AdminDashboard() {
                   {t.id === "orders" && newOrderCount > 0 ? (
                     <span className="admin-nav-newBadge">{newOrderCount}</span>
                   ) : null}
+                  {t.id === "flashsale" && tab !== "flashsale" && flashSales.some(fs => {
+                    const now = new Date();
+                    const end = new Date(fs.ends_at);
+                    const diff = end - now;
+                    return fs.is_active && diff > 0 && diff < 2 * 60 * 60 * 1000;
+                  }) ? <span className="admin-nav-newBadge" style={{ background: '#ff8c00' }}>!</span> : null}
                 </button>
               ))}
             </nav>
@@ -1897,6 +1904,11 @@ export default function AdminDashboard() {
                           <strong>{analyticsSummary.activeProducts}</strong>
                           <small>{analyticsSummary.inactiveProducts} nonaktif</small>
                         </div>
+                        <div className="admin-miniCard">
+                          <span>Flash sale aktif</span>
+                          <strong>{flashSales.filter(fs => { const now = new Date(); return fs.is_active && new Date(fs.ends_at) >= now && new Date(fs.starts_at) <= now; }).length}</strong>
+                          <small>{flashSales.length} total dibuat</small>
+                        </div>
                       </div>
 
                       {analyticsSummary.categories.length ? (
@@ -1955,7 +1967,29 @@ export default function AdminDashboard() {
                               <strong>{variant.name}</strong>
                               <small>{variant.duration_label || "Tanpa durasi"}</small>
                             </div>
-                            <div className="admin-rankMeta">Sisa {variant.stock}</div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                              <div className="admin-rankMeta">Sisa {variant.stock}</div>
+                              <button
+                                className="btn btn-ghost btn-sm"
+                                type="button"
+                                onClick={() => {
+                                  const newStock = window.prompt(`Stok baru untuk "${variant.name}":`, String(variant.stock || 0));
+                                  if (newStock === null) return;
+                                  const n = Number(newStock);
+                                  if (!Number.isFinite(n) || n < 0) { toast.error("Stok tidak valid"); return; }
+                                  const tid = toast.loading("Update stok");
+                                  supabase.from("product_variants").update({ stock: n, updated_at: new Date().toISOString() }).eq("id", variant.id)
+                                    .then(({ error }) => {
+                                      toast.remove(tid);
+                                      if (error) { toast.error("Gagal update stok"); return; }
+                                      toast.success(`Stok ${variant.name} → ${n}`);
+                                      refreshProducts();
+                                    });
+                                }}
+                              >
+                                Restock
+                              </button>
+                            </div>
                           </div>
                         ))
                       ) : (
@@ -2698,132 +2732,6 @@ export default function AdminDashboard() {
               </div>
             ) : null}
 
-            {false ? (
-              <div className="admin-panel">
-                <div className="admin-panel-head">
-                  <div>
-                    <div className="admin-panel-title">Orders</div>
-                    <div className="admin-panel-sub">Pantau pesanan, cek bukti bayar, lihat catatan customer, dan ubah status.</div>
-                  </div>
-                  <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>
-                    Refresh Orders
-                  </button>
-                </div>
-
-                <div className="admin-panel-body">
-                  {orders.length === 0 ? (
-                    <div className="card pad">
-                      <EmptyState icon="?" title="Belum ada order" description="Order akan muncul di sini setelah ada checkout." />
-                    </div>
-                  ) : (
-                    <div className="admin-orders">
-                      {orders.map((o) => {
-                        const itemCount = getOrderItemCount(o);
-                        const discountAmount = getOrderDiscountAmount(o);
-
-                        return (
-                          <div key={o.id} className="admin-order-card">
-                          <div className="admin-order-top">
-                            <div>
-                              <div className="admin-order-code">{o.order_code || o.id}</div>
-                              <div className="admin-order-sub">
-                                {new Date(o.created_at).toLocaleString("id-ID")} | Total <b>{formatIDR(o.total_idr)}</b>
-                                {o.customer_whatsapp ? ` | WA: ${o.customer_whatsapp}` : ""}
-                              </div>
-                            </div>
-
-                            <div className="admin-order-right">
-                              <StatusBadge status={o.status} />
-                              <select
-                                className="admin-select"
-                                value={String(o.status || "pending")}
-                                onChange={(e) => updateOrderStatus(o.id, e.target.value)}
-                              >
-                                <option value="pending">Pending</option>
-                                <option value="processing">Diproses</option>
-                                <option value="done">Sukses</option>
-                                <option value="cancelled">Dibatalkan</option>
-                              </select>
-                            </div>
-                          </div>
-
-                          <div className="admin-order-body">
-                            <div className="admin-order-items">
-                              {(o.items || []).map((it, idx) => (
-                                <div key={idx} className="admin-order-item">
-                                  <div>
-                                    <b>{it.product_name}</b>
-                                    <div className="muted" style={{ fontSize: 12 }}>
-                                      {it.variant_name} | {it.duration_label}
-                                    </div>
-                                  </div>
-                                  <div>
-                                    {it.qty} x {formatIDR(it.price_idr)}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            <div className="admin-order-pricing">
-                              <div className="admin-order-priceRow">
-                                <span>Jumlah item</span>
-                                <b>{itemCount}</b>
-                              </div>
-                              <div className="admin-order-priceRow">
-                                <span>Subtotal</span>
-                                <b>{formatIDR(o.subtotal_idr)}</b>
-                              </div>
-                              <div className="admin-order-priceRow">
-                                <span>Diskon {o.discount_percent ? `(${o.discount_percent}%)` : ""}</span>
-                                <b>- {formatIDR(discountAmount)}</b>
-                              </div>
-                              <div className="admin-order-priceRow total">
-                                <span>Total bayar</span>
-                                <b>{formatIDR(o.total_idr)}</b>
-                              </div>
-                              {o.promo_code ? <div className="admin-order-promo">Promo terpakai: {o.promo_code}</div> : null}
-                            </div>
-
-                            <div className={"admin-order-notes" + (o.notes ? "" : " empty")}>
-                              <div className="admin-order-notesTitle">Catatan customer</div>
-                              <div>{o.notes || "Tidak ada catatan tambahan."}</div>
-                            </div>
-
-                            <div className="admin-order-adminNote">
-                              <div className="admin-order-notesTitle">Catatan admin ke customer</div>
-                              <textarea
-                                className="input admin-textarea"
-                                rows={3}
-                                value={adminNoteDrafts[o.id] || ""}
-                                onChange={(e) => setAdminNoteDrafts((prev) => ({ ...prev, [o.id]: e.target.value }))}
-                                placeholder="Status tambahan, instruksi, atau info penting untuk customer."
-                              />
-                              <div className="admin-order-adminActions">
-                                <button className="btn btn-sm" type="button" onClick={() => saveOrderAdminNote(o.id)}>
-                                  Simpan Catatan
-                                </button>
-                              </div>
-                            </div>
-
-                            {o.payment_proof_url ? (
-                              <a className="admin-proof" href={o.payment_proof_url} target="_blank" rel="noreferrer">
-                                Lihat bukti bayar
-                              </a>
-                            ) : (
-                              <div className="muted" style={{ fontSize: 13 }}>
-                                Order ini dibuat tanpa upload bukti bayar.
-                              </div>
-                            )}
-                          </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ) : null}
-
             {tab === "promos" ? (
               <div className="admin-panel">
                 {/* Header */}
@@ -3202,6 +3110,21 @@ export default function AdminDashboard() {
                           />
                         </label>
                       </div>
+                      {flashForm.variant_id && flashForm.discount_percent ? (() => {
+                        const v = allVariants.find(x => x.id === flashForm.variant_id);
+                        if (!v) return null;
+                        const discounted = Math.round(v.price_idr * (1 - Number(flashForm.discount_percent) / 100));
+                        return (
+                          <div className="admin-promo-preview" style={{ marginTop: 8 }}>
+                            <span className="admin-promo-previewLabel">Preview harga</span>
+                            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
+                              <span style={{ textDecoration: 'line-through', color: 'var(--brand-muted)', fontSize: 13 }}>{formatIDR(v.price_idr)}</span>
+                              <span style={{ color: '#ff3c64', fontWeight: 900, fontSize: 16 }}>{formatIDR(discounted)}</span>
+                              <span style={{ fontSize: 11, color: 'var(--brand-muted)' }}>(-{flashForm.discount_percent}%)</span>
+                            </div>
+                          </div>
+                        );
+                      })() : null}
                       <div className="admin-form-actions" style={{ marginTop: 12 }}>
                         <button
                           className="btn btn-ghost btn-sm"
@@ -3374,6 +3297,7 @@ export default function AdminDashboard() {
                     {testimonials.map((t) => (
                       <div key={t.id} className="admin-thumb">
                         <img src={t.image_url} alt={t.caption || "testimoni"} />
+                        {t.caption ? <div className="admin-thumb-caption">{t.caption}</div> : null}
                         <div className="admin-thumb-actions">
                           <button
                             className={"btn btn-sm " + (t.is_active ? "btn-ghost" : "")}
@@ -3381,6 +3305,16 @@ export default function AdminDashboard() {
                             onClick={() => updateTestimonial(t.id, { is_active: !t.is_active })}
                           >
                             {t.is_active ? "Off" : "On"}
+                          </button>
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            type="button"
+                            onClick={() => {
+                              const newCaption = window.prompt("Edit caption:", t.caption || "");
+                              if (newCaption !== null) updateTestimonial(t.id, { caption: newCaption });
+                            }}
+                          >
+                            Caption
                           </button>
                           <button className="btn btn-danger btn-sm" type="button" onClick={() => deleteTestimonial(t.id)}>
                             Hapus

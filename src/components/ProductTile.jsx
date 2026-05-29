@@ -32,6 +32,19 @@ export default function ProductTile({ product, rank }) {
     };
   }, [product]);
 
+  const brandColor = useMemo(() => {
+    const name = String(product?.name || "").toLowerCase();
+    if (name.includes("netflix")) return "rgba(229, 9, 20, 0.4)";
+    if (name.includes("canva")) return "rgba(0, 196, 204, 0.4)";
+    if (name.includes("spotify")) return "rgba(29, 185, 84, 0.4)";
+    if (name.includes("youtube")) return "rgba(255, 0, 0, 0.4)";
+    if (name.includes("chatgpt")) return "rgba(16, 163, 127, 0.4)";
+    if (name.includes("capcut")) return "rgba(0, 0, 0, 0.3)";
+    if (name.includes("disney")) return "rgba(17, 60, 207, 0.4)";
+    if (name.includes("prime")) return "rgba(0, 168, 225, 0.4)";
+    return "rgba(255, 255, 255, 0.1)"; // default
+  }, [product?.name]);
+
   const stock = Number(summary.stock || 0);
   const sold = Number(summary.sold || 0);
   const displayPrice = summary.minPrice ? formatIDR(summary.minPrice) : "-";
@@ -44,7 +57,11 @@ export default function ProductTile({ product, rank }) {
       aria-label={`Buka detail ${product?.name || "produk"}`}
     >
       <div className="product-tile-top">
-        <div className="product-tile-icon" aria-hidden="true">
+        <div 
+          className="product-tile-icon" 
+          aria-hidden="true"
+          style={{ "--brand-color": brandColor }}
+        >
           {product?.icon_url ? (
             <img
               src={product.icon_url}

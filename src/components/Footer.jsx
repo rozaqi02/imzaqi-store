@@ -51,7 +51,7 @@ export default function Footer() {
             </Link>
 
             <div className="site-footerGoContact">
-              <a href="https://wa.me/6283136049987" target="_blank" rel="noreferrer">
+              <a href="https://wa.me/6283136049987" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
                 Contact Admin: 0831-3604-9987
               </a>
             </div>

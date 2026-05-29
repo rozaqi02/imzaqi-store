@@ -669,9 +669,22 @@ select.input {
 }
 
 :root[data-theme="light"] .mobile-menu a.active,
-:root[data-theme="light"] .admin-mobileTab.active,
+:root[data-theme="light"] .admin-mobileTab.active {
+  color: #0c4050 !important;
+}
+
 :root[data-theme="light"] .admin-nav-btn.active {
   color: #0c4050 !important;
+  border-color: rgba(0, 138, 148, 0.24) !important;
+  background:
+    linear-gradient(180deg, rgba(0, 214, 180, 0.18), rgba(0, 194, 208, 0.08)),
+    rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 12px 28px rgba(0, 138, 148, 0.12) !important;
+}
+
+:root[data-theme="light"] .admin-nav button.active::before {
+  background: linear-gradient(180deg, #00b89c, #008a94) !important;
+  box-shadow: 0 1px 4px rgba(0, 138, 148, 0.28) !important;
 }
 
 :root[data-theme="light"] .hero-eyebrow,
@@ -1248,6 +1261,13 @@ select.input {
   background:
     linear-gradient(180deg, rgba(0, 214, 180, 0.2), rgba(0, 194, 208, 0.1)) !important;
   border-color: rgba(0, 138, 148, 0.24) !important;
+}
+
+:root[data-theme="light"] .mobile-menu-lite a.active .active-indicator {
+  background: linear-gradient(135deg, #00b89c, #008a94) !important;
+  box-shadow:
+    0 0 0 6px rgba(0, 138, 148, 0.12),
+    0 2px 6px rgba(0, 138, 148, 0.24) !important;
 }
 
 :root[data-theme="light"] .mobile-menu-divider {

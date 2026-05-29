@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight, ShoppingBag, CreditCard, Hash, Activity, MessageSquareQuote } from "lucide-react";
 
@@ -72,6 +72,25 @@ export default function Home() {
   const [topIds, setTopIds] = useState([]);
   const [testimonials, setTestimonials] = useState([]);
   const [error, setError] = useState("");
+  const [activeTesti, setActiveTesti] = useState(0);
+  const testiGridRef = useRef(null);
+
+  const handleTestiScroll = () => {
+    const el = testiGridRef.current;
+    if (!el) return;
+    const cards = el.querySelectorAll(".home-testiCard");
+    let closestIndex = 0;
+    let minDiff = Infinity;
+    const containerLeft = el.getBoundingClientRect().left;
+    cards.forEach((card, idx) => {
+      const diff = Math.abs(card.getBoundingClientRect().left - containerLeft);
+      if (diff < minDiff) {
+        minDiff = diff;
+        closestIndex = idx;
+      }
+    });
+    setActiveTesti(closestIndex);
+  };
 
   usePageMeta({
     title: "Home",
@@ -149,12 +168,14 @@ export default function Home() {
                   <div className="home-howCard-icon" aria-hidden="true">
                     <Icon size={22} strokeWidth={2} />
                   </div>
-                  <h3 className="home-howCard-title">{item.title}</h3>
-                  <p className="home-howCard-desc">{item.desc}</p>
-                  <Link className="home-howCard-link" to={item.to}>
-                    {item.cta}
-                    <ArrowRight size={13} />
-                  </Link>
+                  <div className="home-howCard-content">
+                    <h3 className="home-howCard-title">{item.title}</h3>
+                    <p className="home-howCard-desc">{item.desc}</p>
+                    <Link className="home-howCard-link" to={item.to}>
+                      {item.cta}
+                      <ArrowRight size={13} />
+                    </Link>
+                  </div>
                 </div>
               );
             })}
@@ -211,7 +232,11 @@ export default function Home() {
               <h2 className="h2">Bukan cuma klaim.</h2>
             </div>
 
-            <div className="home-testiGrid">
+            <div 
+              className="home-testiGrid" 
+              ref={testiGridRef}
+              onScroll={handleTestiScroll}
+            >
               {testimonialSnippets.map((t) => (
                 <div key={t.id} className="home-testiCard">
                   <div className="home-testiCard-quote" aria-hidden="true">
@@ -223,6 +248,29 @@ export default function Home() {
                       : t.caption}
                   </p>
                 </div>
+              ))}
+            </div>
+
+            <div className="home-testiDots" aria-hidden="true">
+              {testimonialSnippets.map((_, idx) => (
+                <button
+                  key={idx}
+                  type="button"
+                  className={`home-testiDot${idx === activeTesti ? " is-active" : ""}`}
+                  onClick={() => {
+                    const el = testiGridRef.current;
+                    if (!el) return;
+                    const cards = el.querySelectorAll(".home-testiCard");
+                    if (cards[idx]) {
+                      cards[idx].scrollIntoView({
+                        behavior: "smooth",
+                        block: "nearest",
+                        inline: "start",
+                      });
+                    }
+                  }}
+                  aria-label={`Lihat testimoni ke-${idx + 1}`}
+                />
               ))}
             </div>
 

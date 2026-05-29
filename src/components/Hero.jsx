@@ -1,99 +1,62 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
-import { ArrowRight, ScanSearch, Search, Zap } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { ArrowRight, Search } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
 import NumberCounter from "./NumberCounter";
 
+/* ── Opsi C: Split Bold ──────────────────────────────────────────────────
+   Desktop: judul sangat besar di kiri (tiap baris sendiri),
+            4 stat card 2×2 di kanan.
+   Mobile:  judul besar full-width, lalu 4 stat card 2×2 di bawah copy.
+   ─────────────────────────────────────────────────────────────────────── */
+
 export default function Hero({ products = [] }) {
   const nav = useNavigate();
-  const location = useLocation();
   const { totalViews, todayViews, totalOrders, weekOrders } = useLiveStats({ intervalMs: 60000 });
 
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
-  const [lightMotion, setLightMotion] = useState(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return false;
-    return window.matchMedia("(max-width: 1024px), (pointer: coarse)").matches;
-  });
+  const [prefersReduced, setPrefersReduced] = useState(false);
   const wrapRef = useRef(null);
-  const stageRef = useRef(null);
-
-  // Pointer tracking for parallax effect (desktop only)
-  const mouseX = useMotionValue(0.5);
-  const mouseY = useMotionValue(0.5);
-  const smoothX = useSpring(mouseX, { stiffness: 80, damping: 20, mass: 0.6 });
-  const smoothY = useSpring(mouseY, { stiffness: 80, damping: 20, mass: 0.6 });
-
-  const orbAX = useTransform(smoothX, [0, 1], [-30, 30]);
-  const orbAY = useTransform(smoothY, [0, 1], [-20, 20]);
-  const orbBX = useTransform(smoothX, [0, 1], [25, -25]);
-  const orbBY = useTransform(smoothY, [0, 1], [15, -15]);
-  const orbCX = useTransform(smoothX, [0, 1], [-15, 15]);
-  const orbCY = useTransform(smoothY, [0, 1], [-25, 25]);
-  const meshRotate = useTransform(smoothX, [0, 1], [-3, 3]);
+  const listboxId = "hero-search-listbox";
 
   useEffect(() => {
-    if (!window.matchMedia) return undefined;
-    const query = window.matchMedia("(max-width: 1024px), (pointer: coarse)");
-    const update = () => setLightMotion(query.matches);
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
+    if (!window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReduced(mq.matches);
+    const h = () => setPrefersReduced(mq.matches);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
   }, []);
 
   useEffect(() => {
-    if (lightMotion || !stageRef.current) return undefined;
-    const stage = stageRef.current;
-    let frame = 0;
-    const onMove = (e) => {
-      const rect = stage.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        mouseX.set(Math.max(0, Math.min(1, x)));
-        mouseY.set(Math.max(0, Math.min(1, y)));
-      });
-    };
-    stage.addEventListener("mousemove", onMove);
-    return () => {
-      stage.removeEventListener("mousemove", onMove);
-      cancelAnimationFrame(frame);
-    };
-  }, [lightMotion, mouseX, mouseY]);
-
-  const searchIndex = useMemo(() => {
+    if (!q.trim()) { setSuggestions([]); return; }
+    const s = q.trim().toLowerCase();
     const words = [];
-    (products || []).forEach((product) => {
-      if (product?.name) words.push(product.name);
-      if (product?.slug) words.push(product.slug.replace(/-/g, " "));
-      (product?.product_variants || []).forEach((variant) => {
-        if (variant?.name) words.push(`${product.name} ${variant.name}`);
+    (products || []).forEach((p) => {
+      if (p?.name) words.push(p.name);
+      (p?.product_variants || []).forEach((v) => {
+        if (v?.name) words.push(`${p.name} – ${v.name}`);
       });
     });
-    return Array.from(new Set(words.map((text) => String(text).trim()).filter(Boolean)));
-  }, [products]);
-
-  const suggestions = useMemo(() => {
-    const s = q.trim().toLowerCase();
-    if (!s) return [];
-    return searchIndex.filter((x) => x.toLowerCase().includes(s)).slice(0, 6);
-  }, [q, searchIndex]);
+    const unique = Array.from(new Set(words.map((w) => String(w).trim()).filter(Boolean)));
+    setSuggestions(unique.filter((x) => x.toLowerCase().includes(s)).slice(0, 5));
+  }, [q, products]);
 
   useEffect(() => {
-    if (activeSuggestionIndex < suggestions.length) return;
-    setActiveSuggestionIndex(-1);
+    if (activeSuggestionIndex >= suggestions.length) setActiveSuggestionIndex(-1);
   }, [activeSuggestionIndex, suggestions.length]);
 
   useEffect(() => {
-    function onDoc(e) {
+    const onDoc = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
         setOpen(false);
         setActiveSuggestionIndex(-1);
       }
-    }
+    };
     document.addEventListener("mousedown", onDoc);
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
@@ -106,264 +69,143 @@ export default function Hero({ products = [] }) {
     nav(`/produk?q=${encodeURIComponent(term)}`);
   }
 
-  const stats = [
-    { label: "Total Order", value: totalOrders, highlight: true },
-    { label: "Minggu Ini", value: weekOrders },
-    { label: "Total Kunjungan", value: totalViews },
-    { label: "Hari Ini", value: todayViews },
+  const fade = (delay = 0) =>
+    prefersReduced
+      ? {}
+      : {
+          initial: { opacity: 0, y: 16 },
+          animate: { opacity: 1, y: 0 },
+          transition: { duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] },
+        };
+
+  const STATS = [
+    { value: totalOrders,  label: "Total order",      accent: true  },
+    { value: weekOrders,   label: "Minggu ini",        accent: false },
+    { value: totalViews,   label: "Total kunjungan",   accent: false },
+    { value: todayViews,   label: "Hari ini",          accent: false },
   ];
 
-  const listboxId = "hero-search-listbox";
-
-  // Pick up to 4 product icons for floating orbs
-  const orbProducts = useMemo(() => {
-    return (products || []).filter((p) => p?.icon_url).slice(0, 4);
-  }, [products]);
-
   return (
-    <section className="hero hero-v2 full-bleed" ref={stageRef}>
-      {/* Animated background mesh */}
-      <div className="hero-v2-bg" aria-hidden="true">
-        <motion.div
-          className="hero-v2-mesh"
-          style={lightMotion ? undefined : { rotate: meshRotate }}
-        />
-        {!lightMotion && (
-          <>
-            <motion.div className="hero-v2-orb hero-v2-orb-a" style={{ x: orbAX, y: orbAY }} />
-            <motion.div className="hero-v2-orb hero-v2-orb-b" style={{ x: orbBX, y: orbBY }} />
-            <motion.div className="hero-v2-orb hero-v2-orb-c" style={{ x: orbCX, y: orbCY }} />
-          </>
-        )}
-        <div className="hero-v2-grid" />
-      </div>
+    <section className="hc full-bleed" aria-label="Selamat datang di Imzaqi Store">
+      <div className="container hc-layout">
 
-      <div className="container hero-v2-inner">
-        {/* Floating product orbs (desktop only) */}
-        {!lightMotion && orbProducts.length > 0 && (
-          <div className="hero-v2-floaters" aria-hidden="true">
-            {orbProducts.map((p, i) => {
-              const offsets = [
-                { top: "12%", left: "8%", delay: 0 },
-                { top: "18%", right: "10%", delay: 0.4 },
-                { bottom: "20%", left: "12%", delay: 0.8 },
-                { bottom: "14%", right: "8%", delay: 1.2 },
-              ];
-              const pos = offsets[i] || offsets[0];
-              return (
-                <motion.div
-                  key={p.id}
-                  className="hero-v2-floater"
-                  style={pos}
-                  initial={{ opacity: 0, scale: 0.6, y: 20 }}
-                  animate={{
-                    opacity: 1,
-                    scale: 1,
-                    y: 0,
-                  }}
-                  transition={{
-                    delay: 0.3 + (pos.delay || 0),
-                    duration: 0.8,
-                    ease: [0.22, 1, 0.36, 1],
-                  }}
-                >
-                  <motion.div
-                    className="hero-v2-floaterInner"
-                    animate={{
-                      y: [0, -8, 0],
-                    }}
-                    transition={{
-                      delay: pos.delay || 0,
-                      duration: 4 + i * 0.5,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <img src={p.icon_url} alt="" loading="lazy" decoding="async" />
-                  </motion.div>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
+        {/* ── Kiri: judul besar + search + CTA ── */}
+        <div className="hc-copy">
+          <motion.p className="hc-kicker" {...fade(0)}>
+            Langganan digital · Bayar QRIS
+          </motion.p>
 
-        <motion.div
-          className="hero-v2-eyebrow"
-          initial={lightMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <span>Imzaqi Store</span>
-        </motion.div>
+          <motion.h1 className="hc-title" {...fade(0.06)}>
+            <span className="hc-title-line">Akses</span>
+            <span className="hc-title-line">premium.</span>
+            <span className="hc-title-line hc-title-line--accent">Harga</span>
+            <span className="hc-title-line hc-title-line--accent">pelajar.</span>
+          </motion.h1>
 
-        <motion.h1
-          className="hero-v2-title"
-          initial={lightMotion ? false : { opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-        >
-          Akses premium. <span className="hero-v2-titleLine hero-v2-titleLine--accent">Harga pelajar.</span>
-        </motion.h1>
+          <motion.p className="hc-sub" {...fade(0.16)}>
+            Netflix, Spotify, Canva, ChatGPT — semua ada.
+            Pilih paket, bayar QRIS, langsung aktif.
+          </motion.p>
 
-        <motion.p
-          className="hero-v2-sub"
-          initial={lightMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.18, ease: [0.22, 1, 0.36, 1] }}
-        >
-          Netflix, Spotify, Canva — semua ada. Bayar QRIS, langsung jalan.
-        </motion.p>
-
-        <motion.div
-          className="hero-v2-search"
-          ref={wrapRef}
-          initial={lightMotion ? false : { opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.26, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <div className="hero-search-shell hero-v2-searchShell">
-            <span className="hero-search-icon" aria-hidden="true">
-              <Search size={16} />
-            </span>
-            <input
-              className="input hero-search-input"
-              placeholder="Cari produk favoritmu"
-              value={q}
-              aria-label="Cari produk"
-              role="combobox"
-              aria-autocomplete="list"
-              aria-expanded={open && suggestions.length > 0}
-              aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
-              aria-activedescendant={
-                activeSuggestionIndex >= 0 ? `${listboxId}-option-${activeSuggestionIndex}` : undefined
-              }
-              onFocus={() => setOpen(true)}
-              onChange={(e) => {
-                setQ(e.target.value);
-                setOpen(true);
-                setActiveSuggestionIndex(-1);
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowDown" && suggestions.length > 0) {
-                  e.preventDefault();
-                  setOpen(true);
-                  setActiveSuggestionIndex((prev) =>
-                    prev >= suggestions.length - 1 ? 0 : prev + 1
-                  );
-                  return;
+          {/* Search */}
+          <motion.div className="hc-search" ref={wrapRef} {...fade(0.22)}>
+            <div className="hero-search-shell">
+              <span className="hero-search-icon" aria-hidden="true">
+                <Search size={16} />
+              </span>
+              <input
+                className="input hero-search-input"
+                placeholder="Cari Netflix, Spotify, Canva…"
+                value={q}
+                aria-label="Cari produk"
+                role="combobox"
+                aria-autocomplete="list"
+                aria-expanded={open && suggestions.length > 0}
+                aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
+                aria-activedescendant={
+                  activeSuggestionIndex >= 0
+                    ? `${listboxId}-option-${activeSuggestionIndex}`
+                    : undefined
                 }
-                if (e.key === "ArrowUp" && suggestions.length > 0) {
-                  e.preventDefault();
-                  setOpen(true);
-                  setActiveSuggestionIndex((prev) =>
-                    prev <= 0 ? suggestions.length - 1 : prev - 1
-                  );
-                  return;
-                }
-                if (e.key === "Enter") {
-                  if (open && activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
-                    e.preventDefault();
-                    goSearch(suggestions[activeSuggestionIndex]);
+                onFocus={() => setOpen(true)}
+                onChange={(e) => { setQ(e.target.value); setOpen(true); setActiveSuggestionIndex(-1); }}
+                onKeyDown={(e) => {
+                  if (e.key === "ArrowDown" && suggestions.length > 0) {
+                    e.preventDefault(); setOpen(true);
+                    setActiveSuggestionIndex((p) => p >= suggestions.length - 1 ? 0 : p + 1);
                     return;
                   }
-                  e.preventDefault();
-                  goSearch();
-                }
-                if (e.key === "Escape") {
-                  setOpen(false);
-                  setActiveSuggestionIndex(-1);
-                }
-              }}
-            />
-            {q ? (
-              <button
-                type="button"
-                className="hero-search-clear"
-                onClick={() => {
-                  setQ("");
-                  setOpen(false);
-                  setActiveSuggestionIndex(-1);
+                  if (e.key === "ArrowUp" && suggestions.length > 0) {
+                    e.preventDefault(); setOpen(true);
+                    setActiveSuggestionIndex((p) => p <= 0 ? suggestions.length - 1 : p - 1);
+                    return;
+                  }
+                  if (e.key === "Enter") {
+                    if (open && activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
+                      e.preventDefault(); goSearch(suggestions[activeSuggestionIndex]); return;
+                    }
+                    e.preventDefault(); goSearch();
+                  }
+                  if (e.key === "Escape") { setOpen(false); setActiveSuggestionIndex(-1); }
                 }}
-                aria-label="Hapus pencarian"
-              >
-                ×
+              />
+              {q ? (
+                <button type="button" className="hero-search-clear"
+                  onClick={() => { setQ(""); setOpen(false); setActiveSuggestionIndex(-1); }}
+                  aria-label="Hapus pencarian">×</button>
+              ) : null}
+              <button className="btn hero-search-btn" onClick={() => goSearch()} type="button" aria-label="Cari">
+                <ArrowRight size={16} />
               </button>
-            ) : null}
-            <button className="btn hero-search-btn" onClick={() => goSearch()} type="button" aria-label="Cari">
-              <ArrowRight size={16} />
-            </button>
-
-            {open && suggestions.length > 0 ? (
-              <motion.div
-                initial={lightMotion ? false : { opacity: 0, y: 8 }}
-                animate={lightMotion ? undefined : { opacity: 1, y: 0 }}
-                className="suggestions suggestions-minimal"
-                role="listbox"
-                id={listboxId}
-              >
-                {suggestions.map((sug, idx) => (
-                  <button
-                    key={sug}
-                    id={`${listboxId}-option-${idx}`}
-                    className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
-                    onClick={() => goSearch(sug)}
-                    onMouseEnter={() => setActiveSuggestionIndex(idx)}
-                    type="button"
-                    role="option"
-                    aria-selected={idx === activeSuggestionIndex}
-                  >
-                    <Search size={14} />
-                    <span>{sug}</span>
-                  </button>
-                ))}
-              </motion.div>
-            ) : null}
-          </div>
-        </motion.div>
-
-        <motion.div
-          className="hero-v2-ctas"
-          initial={lightMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.34, ease: [0.22, 1, 0.36, 1] }}
-        >
-          <Link className="btn hero-v2-ctaPrimary" to="/produk">
-            <ScanSearch size={16} />
-            <span>Lihat katalog</span>
-          </Link>
-          <Link
-            className="btn btn-ghost hero-v2-ctaGhost"
-            to="/checkout"
-            state={{ backgroundLocation: location }}
-          >
-            <Zap size={16} />
-            <span>Checkout</span>
-          </Link>
-        </motion.div>
-
-        <motion.div
-          className="hero-v2-stats"
-          initial={lightMotion ? false : { opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.42, ease: [0.22, 1, 0.36, 1] }}
-        >
-          {stats.map((item) => (
-            <div key={item.label} className={`hero-v2-stat${item.highlight ? " hero-v2-stat--highlight" : ""}`}>
-              <div className="hero-v2-statNum">
-                <motion.span
-                  key={item.value == null ? "loading" : item.value}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                  style={{ display: "inline-block" }}
-                >
-                  {item.value == null ? "-" : <NumberCounter value={item.value} />}
-                </motion.span>
-              </div>
-              <div className="hero-v2-statLabel">{item.label}</div>
+              {open && suggestions.length > 0 ? (
+                <div className="suggestions suggestions-minimal" role="listbox" id={listboxId}>
+                  {suggestions.map((sug, idx) => (
+                    <button
+                      key={sug}
+                      id={`${listboxId}-option-${idx}`}
+                      className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
+                      onClick={() => goSearch(sug)}
+                      onMouseEnter={() => setActiveSuggestionIndex(idx)}
+                      type="button" role="option" aria-selected={idx === activeSuggestionIndex}
+                    >
+                      <Search size={13} /><span>{sug}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
             </div>
-          ))}
-        </motion.div>
+          </motion.div>
+
+
+        </div>
+
+        {/* ── Kanan: 4 stat card 2×2 ── */}
+        <motion.aside className="hc-stats" aria-label="Statistik toko" {...fade(0.1)}>
+          <div className="hc-statsGrid">
+            {STATS.map((s, i) => (
+              <motion.div
+                key={s.label}
+                className={`hc-statCard${s.accent ? " hc-statCard--accent" : ""}`}
+                {...(prefersReduced ? {} : {
+                  initial: { opacity: 0, scale: 0.92 },
+                  animate: { opacity: 1, scale: 1 },
+                  transition: { duration: 0.45, delay: 0.12 + i * 0.06, ease: [0.22, 1, 0.36, 1] },
+                })}
+              >
+                <span className="hc-statNum">
+                  {s.value == null ? "—" : <NumberCounter value={s.value} />}
+                </span>
+                <span className="hc-statLabel">{s.label}</span>
+              </motion.div>
+            ))}
+          </div>
+
+          <p className="hc-trust">
+            <span className="hc-trustDot" aria-hidden="true" />
+            Bayar QRIS · Proses cepat
+          </p>
+        </motion.aside>
+
       </div>
     </section>
   );
