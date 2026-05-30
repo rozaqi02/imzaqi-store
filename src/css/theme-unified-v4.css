@@ -1977,7 +1977,6 @@
 }
 
 .detail-page .pdx-variantsGrid.is-list .pdx-variantTop,
-.detail-page .pdx-variantsGrid.is-list .pdx-variantNotes,
 .detail-page .pdx-variantsGrid.is-list .pdx-variantPriceLabel,
 .detail-page .pdx-variantsGrid.is-list .pdx-variantSubPrice {
   display: none !important;
@@ -2083,6 +2082,13 @@
     white-space: nowrap;
   }
 
+  .detail-page .pdx-variantsGrid.is-list .pdx-variantNotes {
+    order: initial;
+    margin-top: 4px;
+    border-top: none;
+    padding-top: 0;
+  }
+
   .detail-page .pdx-variantsGrid.is-list .pdx-variantFoot {
     flex-direction: row;
     align-items: center;
@@ -2090,6 +2096,7 @@
     gap: 6px;
     width: 100%;
     flex-wrap: wrap;
+    order: 99;
   }
 
   .detail-page .pdx-variantsGrid.is-list .pdx-variantFoot .pdx-infoBtn {
@@ -2159,8 +2166,8 @@
   flex-wrap: wrap;
 }
 
-.detail-page .pdx-variantsGrid.is-list .pdx-variantNotes.force-show {
-  display: block !important;
+.detail-page .pdx-variantsGrid.is-list .pdx-variantNotes {
+  display: block;
   width: 100%;
   order: 99; 
   margin-top: 12px;
@@ -2168,7 +2175,7 @@
   padding-top: 16px;
 }
 
-:root[data-theme="light"] .detail-page .pdx-variantsGrid.is-list .pdx-variantNotes.force-show {
+:root[data-theme="light"] .detail-page .pdx-variantsGrid.is-list .pdx-variantNotes {
   border-top-color: rgba(0, 0, 0, 0.1);
 }
 

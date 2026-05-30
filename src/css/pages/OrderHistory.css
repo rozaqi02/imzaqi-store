@@ -28,8 +28,9 @@
   display: grid;
   place-items: center;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(29, 131, 255, 0.14);
+  border: 1px solid var(--uni-line);
+  background: var(--uni-neo-control);
+  box-shadow: var(--uni-neo-control-shadow);
   color: #9fe0ff;
 }
 
@@ -90,8 +91,9 @@
   text-align: center;
   padding: 60px 24px;
   border-radius: 28px;
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed var(--uni-line);
+  background: var(--uni-neo-panel);
+  box-shadow: var(--uni-neo-panel-shadow);
 }
 
 .oh-emptyIcon {
@@ -100,9 +102,10 @@
   display: grid;
   place-items: center;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.4);
+  border: 1px solid var(--uni-line);
+  background: var(--uni-neo-control);
+  box-shadow: var(--uni-neo-control-shadow);
+  color: var(--uni-muted);
   margin-bottom: 20px;
 }
 
@@ -131,11 +134,9 @@
 .oh-card {
   padding: 18px 20px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.08), rgba(29, 131, 255, 0) 56%);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+  border: 1px solid var(--uni-line);
+  background: var(--uni-neo-panel);
+  box-shadow: var(--uni-neo-panel-shadow);
   transition: border-color 0.2s ease, transform 0.2s ease;
 }
 
@@ -196,6 +197,7 @@
   padding: 0 10px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--uni-neo-control-shadow);
   font-size: 11px;
   font-weight: 900;
   white-space: nowrap;
@@ -234,7 +236,8 @@
   padding: 8px 12px;
   border-radius: 12px;
   border: 1px solid rgba(255, 191, 74, 0.2);
-  background: rgba(255, 191, 74, 0.08);
+  background: var(--uni-neo-panel);
+  box-shadow: var(--uni-neo-panel-shadow);
   color: rgba(255, 220, 140, 0.9);
   font-size: 12px;
 }
@@ -246,7 +249,7 @@
   gap: 10px;
   margin-top: 14px;
   padding-top: 14px;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-top: 1px solid var(--uni-line);
 }
 
 .oh-cekBtn {
@@ -279,8 +282,6 @@
 
 /* ── Order History light mode ─────────────────────────────────── */
 :root[data-theme="light"] .oh-heroIcon {
-  border-color: rgba(0, 138, 148, 0.16);
-  background: rgba(0, 138, 148, 0.10);
   color: #0b3f4b;
 }
 
@@ -302,12 +303,9 @@
 
 :root[data-theme="light"] .oh-empty {
   border-color: rgba(0, 138, 148, 0.16);
-  background: rgba(247, 253, 255, 0.7);
 }
 
 :root[data-theme="light"] .oh-emptyIcon {
-  border-color: rgba(0, 138, 148, 0.14);
-  background: rgba(236, 248, 252, 0.86);
   color: rgba(50, 84, 95, 0.55);
 }
 
@@ -321,9 +319,6 @@
 
 :root[data-theme="light"] .oh-card {
   border-color: rgba(0, 138, 148, 0.12);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 253, 255, 0.88));
-  box-shadow: 0 8px 24px rgba(72, 118, 138, 0.10);
 }
 
 :root[data-theme="light"] .oh-card:hover {
@@ -373,10 +368,5 @@
 
 :root[data-theme="light"] .oh-fetchError {
   border-color: rgba(220, 130, 0, 0.22);
-  background: rgba(255, 200, 100, 0.14);
   color: #8a4f00;
-}
-
-:root[data-theme="light"] .oh-cardActions {
-  border-top-color: rgba(0, 138, 148, 0.10);
 }

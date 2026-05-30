@@ -86,8 +86,6 @@ export function usePageView() {
 
   // Increment unique visit counter (site_stats) — sekali per hari
   useEffect(() => {
-    let cancelled = false;
-
     async function hitUniqueVisit() {
       const day = todayISO("Asia/Jakarta");
       if (wasMarkedToday(day)) return;
@@ -102,21 +100,15 @@ export function usePageView() {
         });
 
         if (error) {
-          // Backward compatibility jika fungsi baru belum terpasang.
           const fallback = await supabase.rpc("increment_view");
           if (fallback.error) throw fallback.error;
         }
 
       } catch (e) {
         console.error("Gagal update unique visit", e);
-        // Jika gagal total, bisa kita hapus marker agar bisa dicoba lagi nanti
-        // tapi untuk analytics biasanya lebih baik biarkan saja
       }
     }
 
     hitUniqueVisit();
-    return () => {
-      cancelled = true;
-    };
   }, []);
 }

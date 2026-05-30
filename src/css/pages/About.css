@@ -560,6 +560,7 @@
   border-radius: 22px;
   border: 1px solid rgba(255,255,255,0.08);
   background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+  box-shadow: var(--uni-neo-panel-shadow);
   display: flex; flex-direction: column; gap: 10px;
 }
 .faq-howtoNum {
@@ -580,7 +581,7 @@
 :root[data-theme="light"] .faq-howtoStep {
   border-color: rgba(0, 138, 148, 0.14);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(236, 248, 252, 0.88));
-  box-shadow: 0 8px 20px rgba(72, 118, 138, 0.1);
+  box-shadow: var(--uni-neo-panel-shadow);
 }
 :root[data-theme="light"] .faq-howtoNum { color: rgba(50, 84, 95, 0.6); }
 :root[data-theme="light"] .faq-howtoTitle { color: #123744; }

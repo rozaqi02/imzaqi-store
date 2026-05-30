@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Sparkles, X } from "lucide-react";
+import { MessageSquareText, Send, X } from "lucide-react";
 import { ASSISTANT_QA, ASSISTANT_STARTERS, getFollowUps } from "../data/assistantQA";
 import { answerQuery } from "../lib/assistantMatcher";
 
@@ -148,19 +148,7 @@ export default function AssistantBubble() {
           {open ? (
             <X size={20} strokeWidth={2.4} />
           ) : (
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path
-                d="M12 2C6.48 2 2 5.58 2 10c0 2.48 1.38 4.7 3.55 6.15-.15 1.2-.75 2.3-1.55 3.1a.5.5 0 00.35.85c1.8 0 3.35-.65 4.45-1.4.7.15 1.45.3 2.2.3 5.52 0 10-3.58 10-8s-4.48-8-10-8z"
-                fill="currentColor"
-                opacity="0.92"
-              />
-              <path
-                d="M15.5 8l.9 1.8 1.8.9-1.8.9-.9 1.8-.9-1.8-1.8-.9 1.8-.9L15.5 8z"
-                fill="#032235"
-                opacity="0.9"
-              />
-              <circle cx="9" cy="10.5" r="1" fill="#032235" opacity="0.7" />
-            </svg>
+            <MessageSquareText size={22} strokeWidth={2.2} />
           )}
         </span>
         {!open ? <span className="ai-bubbleDot" aria-hidden="true" /> : null}
@@ -181,7 +169,7 @@ export default function AssistantBubble() {
             {/* Header */}
             <header className="ai-head">
               <div className="ai-headIcon" aria-hidden="true">
-                <Sparkles size={16} />
+                <MessageSquareText size={16} />
               </div>
               <div className="ai-headCopy">
                 <strong>Imzaqi Assistant</strong>
@@ -202,7 +190,7 @@ export default function AssistantBubble() {
               {/* Greeting */}
               <div className="ai-msg ai-msg--assistant">
                 <div className="ai-avatar" aria-hidden="true">
-                  <Sparkles size={13} />
+                  <MessageSquareText size={13} />
                 </div>
                 <div className="ai-bubbleMsg">
                   <p className="ai-bubbleText">
@@ -221,7 +209,7 @@ export default function AssistantBubble() {
                   </div>
                   <div className="ai-msg ai-msg--assistant">
                     <div className="ai-avatar" aria-hidden="true">
-                      <Sparkles size={13} />
+                      <MessageSquareText size={13} />
                     </div>
                     <div className="ai-bubbleMsg">
                       {(idx === history.length - 1 && (typing || item._pending)) || (item._pending && !item.a.length) ? (

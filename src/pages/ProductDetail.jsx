@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ChevronDown, ChevronUp, Clock3, Grid, Info, List, Mail, Minus, Plus, Share2, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles } from "lucide-react";
+import { ChevronDown, ChevronUp, Clock3, Grid, Info, List, Mail, Share2, ShieldCheck, ShoppingBag, ShoppingCart, Sparkles } from "lucide-react";
 
 import { fetchProductBySlug, fetchActiveFlashSales } from "../lib/api";
 import { useCart } from "../context/CartContext";
@@ -80,22 +80,25 @@ const SECTION_ICONS = {
   catatan: Info,
 };
 
-const INITIAL_VISIBLE = 3;
-
 function VariantBenefitList({ rawText }) {
   const [expanded, setExpanded] = useState(false);
   const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
 
   if (!sections.length) return null;
 
-  const totalItems = sections.reduce((sum, s) => sum + s.items.length, 0);
-  const canCollapse = totalItems > INITIAL_VISIBLE;
-
-  let itemCount = 0;
-
   return (
     <div className="pdx-benefitList">
-      {sections.map((section, si) => {
+      <button
+        type="button"
+        className="pdx-benefitToggle"
+        onClick={() => setExpanded((p) => !p)}
+        style={{ width: '100%', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0,0,0,0.03)', borderRadius: '12px', marginBottom: expanded ? '12px' : '0' }}
+      >
+        <span style={{ fontWeight: 600, fontSize: '13px' }}>Lihat Detail & Benefit</span>
+        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </button>
+
+      {expanded && sections.map((section, si) => {
         const SectionIcon = section.icon ? SECTION_ICONS[section.icon] || Info : null;
 
         return (
@@ -107,31 +110,16 @@ function VariantBenefitList({ rawText }) {
               </div>
             )}
             <ul className="pdx-benefitItems">
-              {section.items.map((item, ii) => {
-                itemCount++;
-                const hidden = canCollapse && !expanded && itemCount > INITIAL_VISIBLE;
-                return (
-                  <li key={ii} className={`pdx-benefitItem ${hidden ? "is-hidden" : ""}`}>
-                    <span className="pdx-benefitDot" />
-                    <span>{item}</span>
-                  </li>
-                );
-              })}
+              {section.items.map((item, ii) => (
+                <li key={ii} className="pdx-benefitItem">
+                  <span className="pdx-benefitDot" />
+                  <span>{item}</span>
+                </li>
+              ))}
             </ul>
           </div>
         );
       })}
-
-      {canCollapse && (
-        <button
-          type="button"
-          className="pdx-benefitToggle"
-          onClick={() => setExpanded((p) => !p)}
-        >
-          {expanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          <span>{expanded ? "Sembunyikan" : `Lihat semua (${totalItems})`}</span>
-        </button>
-      )}
     </div>
   );
 }
@@ -236,12 +224,14 @@ export default function ProductDetail() {
 
   const isMotionOff = motionMode === "off" || reduceMotion;
   const isLiteMotion = motionMode === "lite" && !isMotionOff;
+  
+  // Deteksi perangkat sentuh (mobile)
+  const isTouchDevice = typeof window !== 'undefined' && window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [error, setError] = useState("");
   const [flashSaleMap, setFlashSaleMap] = useState(new Map());
-  const [qtyById, setQtyById] = useState({});
   const [activeTab, setActiveTab] = useState("semua");
   const [viewMode, setViewMode] = useState(() => {
     try {
@@ -256,7 +246,6 @@ export default function ProductDetail() {
       localStorage.setItem("pdx_viewMode", viewMode);
     } catch {}
   }, [viewMode]);
-  const [expandedVariantId, setExpandedVariantId] = useState(null);
 
   usePageMeta({
     title: product?.name ? `${product.name} | Detail Produk` : "Detail Produk",
@@ -392,24 +381,7 @@ export default function ProductDetail() {
     [variants]
   );
 
-  function getMaxQty(variant) {
-    const stock = Number(variant?.stock ?? 0);
-    if (!Number.isFinite(stock)) return 99;
-    if (stock <= 0) return 1;
-    return Math.min(99, stock);
-  }
 
-  function getQty(variant) {
-    const quantity = Number(qtyById?.[variant.id] ?? 1);
-    if (!Number.isFinite(quantity)) return 1;
-    return Math.max(1, Math.min(getMaxQty(variant), quantity));
-  }
-
-  function setQty(variant, next) {
-    const maxQty = getMaxQty(variant);
-    const safeQty = Math.max(1, Math.min(maxQty, Number(next) || 1));
-    setQtyById((prev) => ({ ...prev, [variant.id]: safeQty }));
-  }
 
   function handleAdd(variant, qty = 1, event) {
     const stock = Number(variant?.stock ?? 999);
@@ -446,8 +418,6 @@ export default function ProductDetail() {
       const rect = event.currentTarget.getBoundingClientRect();
       fireConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
     }
-
-    setQty(variant, 1);
   }
   function scrollToVariants() {
     if (typeof document === "undefined") return;
@@ -592,10 +562,8 @@ export default function ProductDetail() {
                     <ExpandableProductDesc text={productDescriptionText} />
                   </div>
                 </div>
-              </article>
 
-              <aside className="pdx-summaryPanel">
-                <div className="pdx-priceBlock">
+                <div className="pdx-priceBlock" style={{ marginTop: "24px" }}>
                   <div className="pdx-priceLabel">Harga mulai</div>
                   <div className="pdx-priceValue">{formatPriceRange(summary.minPrice, summary.maxPrice)}</div>
                 </div>
@@ -615,7 +583,7 @@ export default function ProductDetail() {
                     <span>{cartItemCount > 0 ? `Buka keranjang (${cartItemCount})` : "Buka keranjang"}</span>
                   </Link>
                 </div>
-              </aside>
+              </article>
             </section>
 
             <section id="paket-tersedia" className="pdx-variantsSection">
@@ -675,11 +643,7 @@ export default function ProductDetail() {
                 return displayedVariants.map((variant) => {
                   const stock = Number(variant.stock ?? 0);
                   const out = stock <= 0;
-                  const qty = getQty(variant);
-                const maxQty = getMaxQty(variant);
-                const canDec = qty > 1;
-                const canInc = qty < maxQty;
-                const isRecommended = variant.id === recommendedVariantId;
+                  const isRecommended = variant.id === recommendedVariantId;
                 const soldCount = Math.max(0, Number(variant?.sold_count || 0));
                 const descriptionBody = String(
                   variant.description ||
@@ -698,17 +662,15 @@ export default function ProductDetail() {
                   factChips.push({ key: `email-${variant.id}`, icon: Mail, text: "Butuh Email", color: "chip-email" });
                 }
 
-                const isExpanded = expandedVariantId === variant.id;
-
                 return (
                   <motion.article
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.2 }}
-                    whileHover={isMotionOff ? {} : { scale: 1.015, transition: { duration: 0.2, ease: "easeOut" } }}
-                    whileTap={isMotionOff ? {} : { scale: 0.985 }}
+                    whileHover={isMotionOff || isTouchDevice ? {} : { scale: 1.015, transition: { duration: 0.2, ease: "easeOut" } }}
+                    whileTap={isMotionOff || isTouchDevice ? {} : { scale: 0.985 }}
                     key={variant.id}
-                    className={`pdx-variantCard ${out ? "is-out" : ""} ${isRecommended ? "is-recommended" : ""} ${isExpanded ? "is-expanded" : ""}`}
+                    className={`pdx-variantCard ${out ? "is-out" : ""} ${isRecommended ? "is-recommended" : ""}`}
                   >
                     <div className="pdx-variantTop">
                       <div className="pdx-variantBadges">
@@ -751,65 +713,31 @@ export default function ProductDetail() {
                       </div>
                     </div>
 
-                    <div className={`pdx-variantNotes ${isExpanded ? 'force-show' : ''}`}>
+                    <div className="pdx-variantNotes">
                       <VariantBenefitList
                         rawText={descriptionBody || "Informasi paket akan dikirim oleh admin setelah checkout."}
                       />
                     </div>
 
                     <div className="pdx-variantFoot">
-                      {viewMode === 'list' && (
-                        <button 
-                          type="button" 
-                          className={`btn btn-ghost btn-sm pdx-infoBtn ${isExpanded ? 'active' : ''}`} 
-                          onClick={() => setExpandedVariantId(isExpanded ? null : variant.id)}
-                          title="Lihat Deskripsi"
-                        >
-                          <Info size={16} />
-                        </button>
-                      )}
-                      
-                      <div className="pdx-qty" aria-label={`Jumlah untuk ${variant.name}`}>
-                        <button
-                          type="button"
-                          className="pdx-qtyBtn"
-                          onClick={() => setQty(variant, qty - 1)}
-                          disabled={out || !canDec}
-                          aria-label="Kurangi jumlah"
-                        >
-                          <Minus size={14} />
-                        </button>
-
-                        <div className="pdx-qtyNum" aria-label="Jumlah">
-                          {qty}
-                        </div>
-
-                        <button
-                          type="button"
-                          className="pdx-qtyBtn"
-                          onClick={() => setQty(variant, qty + 1)}
-                          disabled={out || !canInc}
-                          aria-label="Tambah jumlah"
-                        >
-                          <Plus size={14} />
-                        </button>
-                      </div>
-
-                      <div className="pdx-actionBtns">
+                      <div className="pdx-actionBtns" style={{ width: '100%', justifyContent: 'space-between', gap: '8px' }}>
                         <button
                           className={`btn btn-sm btn-ghost pdx-addBtn ${out ? "btn-disabled" : ""}`}
                           type="button"
-                          onClick={(e) => handleAdd(variant, qty, e)}
+                          onClick={(e) => handleAdd(variant, 1, e)}
                           disabled={out}
                           title="Tambah ke keranjang"
+                          style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                         >
                           <ShoppingCart size={14} />
+                          <span>Keranjang</span>
                         </button>
                         <button
                           className={`btn btn-sm pdx-buyNowBtn ${out ? "btn-disabled" : ""}`}
                           type="button"
-                          onClick={(e) => { handleAdd(variant, qty, e); nav("/checkout", { state: { backgroundLocation: location } }); }}
+                          onClick={(e) => { handleAdd(variant, 1, e); nav("/checkout", { state: { backgroundLocation: location } }); }}
                           disabled={out}
+                          style={{ flex: 1.5 }}
                         >
                           <span>{out ? "Habis" : "Beli Langsung"}</span>
                         </button>

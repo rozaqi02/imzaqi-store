@@ -144,10 +144,26 @@ body,
 .header,
 .site-header {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
-    var(--skeu-panel-bg) !important;
-  border-bottom: 1px solid var(--brand-line) !important;
-  box-shadow: var(--skeu-panel-shadow) !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 20%),
+    var(--uni-neo-panel) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  box-shadow:
+    0 18px 48px rgba(0, 0, 0, 0.44),
+    0 6px 14px rgba(0, 0, 0, 0.22),
+    -4px -4px 10px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28) !important;
+}
+
+:root[data-theme="light"] .header,
+:root[data-theme="light"] .site-header {
+  border-bottom: 1px solid rgba(119, 175, 194, 0.18) !important;
+  box-shadow:
+    0 14px 36px rgba(102, 140, 156, 0.16),
+    0 4px 10px rgba(102, 140, 156, 0.08),
+    -5px -5px 12px rgba(255, 255, 255, 0.82),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(166, 200, 211, 0.22) !important;
 }
 
 .header::after,

@@ -1261,7 +1261,7 @@
 }
 
 .hc-title-line--accent {
-  background: linear-gradient(135deg, #00fff0 0%, #00b4ff 40%, #ff00c8 80%, #00fff0 100%);
+  background: linear-gradient(135deg, #4effda 0%, #00d6b4 35%, #008a94 70%, #4effda 100%);
   background-size: 200% auto;
   animation: shine-gradient 4s linear infinite;
   -webkit-background-clip: text;
@@ -1280,7 +1280,7 @@
 }
 
 :root[data-theme="light"] .hc-title-line--accent {
-  background: linear-gradient(135deg, #00b89c 0%, #008a94 50%, #036a72 100%);
+  background: linear-gradient(135deg, #00b89c 0%, #008a94 35%, #036a72 70%, #00b89c 100%);
   background-size: 200% auto;
   animation: shine-gradient 4s linear infinite;
   -webkit-background-clip: text;
@@ -1340,11 +1340,8 @@
   padding: 18px 16px;
   border-radius: 18px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.09));
-  background:
-    linear-gradient(160deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 100%);
-  box-shadow:
-    var(--skeu-control-shadow, 0 8px 24px rgba(0, 0, 0, 0.2)),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  background: var(--uni-neo-control);
+  box-shadow: var(--uni-neo-control-shadow);
   transition: transform 0.2s var(--ease-out, ease), border-color 0.2s;
 }
 
@@ -1364,9 +1361,9 @@
 }
 
 :root[data-theme="light"] .hc-statCard {
-  background: linear-gradient(160deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 250, 252, 0.9) 100%);
-  border-color: rgba(0, 138, 148, 0.14);
-  box-shadow: 0 6px 20px rgba(0, 100, 120, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: var(--uni-neo-control);
+  border-color: var(--uni-line);
+  box-shadow: var(--uni-neo-control-shadow);
 }
 
 :root[data-theme="light"] .hc-statCard--accent {
@@ -2025,10 +2022,8 @@
   padding: 20px 18px;
   border-radius: 22px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(79, 255, 200, 0.06), transparent 52%);
-  box-shadow: 0 14px 36px rgba(0, 0, 0, 0.16);
+  background: var(--uni-neo-panel);
+  box-shadow: var(--uni-neo-panel-shadow);
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -2101,11 +2096,8 @@
 /* Light mode */
 :root[data-theme="light"] .home-testiCard {
   border-color: var(--uni-line);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 249, 253, 0.92));
-  box-shadow:
-    0 10px 24px rgba(60, 105, 120, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+  background: var(--uni-neo-panel);
+  box-shadow: var(--uni-neo-panel-shadow);
 }
 
 :root[data-theme="light"] .home-testiCard-quote {
