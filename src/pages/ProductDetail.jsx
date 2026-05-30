@@ -308,7 +308,10 @@ export default function ProductDetail() {
     const tabs = new Set();
     variants.forEach(v => {
       const n = String(v.name || "").toLowerCase();
-      if (n.match(/sharing|share/)) tabs.add("sharing");
+      if (n.match(/lifetime|selamanya/)) tabs.add("lifetime");
+      else if (n.match(/bulan/)) tabs.add("bulanan");
+      else if (n.match(/tahun/)) tabs.add("tahunan");
+      else if (n.match(/sharing|share/)) tabs.add("sharing");
       else if (n.match(/private|privat|prem|pro|standart|ultimate|diamond/)) tabs.add("private");
       else if (n.match(/fam|family|business/)) tabs.add("family");
       else if (n.match(/akun|buyer|seller/)) tabs.add("akun");
@@ -319,6 +322,9 @@ export default function ProductDetail() {
     });
     
     const tabArr = [{ id: "semua", label: "Semua Paket" }];
+    if (tabs.has("bulanan")) tabArr.push({ id: "bulanan", label: "Bulanan" });
+    if (tabs.has("tahunan")) tabArr.push({ id: "tahunan", label: "Tahunan" });
+    if (tabs.has("lifetime")) tabArr.push({ id: "lifetime", label: "Lifetime" });
     if (tabs.has("sharing")) tabArr.push({ id: "sharing", label: "Sharing" });
     if (tabs.has("private")) tabArr.push({ id: "private", label: "Private" });
     if (tabs.has("family")) tabArr.push({ id: "family", label: "Family / Biz" });
@@ -334,6 +340,9 @@ export default function ProductDetail() {
     if (activeTab === "semua") return variants;
     return variants.filter(v => {
       const n = String(v.name || "").toLowerCase();
+      const isLifetime = n.match(/lifetime|selamanya/);
+      const isBulanan = n.match(/bulan/);
+      const isTahunan = n.match(/tahun/);
       const isSharing = n.match(/sharing|share/);
       const isPrivate = n.match(/private|privat|prem|pro|standart|ultimate|diamond/);
       const isFamily = n.match(/fam|family|business/);
@@ -342,6 +351,9 @@ export default function ProductDetail() {
       const isTopup = n.match(/koin|coin|uc|cp|vp/);
       const isPromo = n.match(/promo|diskon|flash/);
       
+      if (activeTab === "lifetime") return isLifetime;
+      if (activeTab === "bulanan") return isBulanan;
+      if (activeTab === "tahunan") return isTahunan;
       if (activeTab === "sharing") return isSharing;
       if (activeTab === "private") return isPrivate;
       if (activeTab === "family") return isFamily;
@@ -349,7 +361,7 @@ export default function ProductDetail() {
       if (activeTab === "membership") return isMembership;
       if (activeTab === "topup") return isTopup;
       if (activeTab === "promo") return isPromo;
-      if (activeTab === "lainnya") return !isSharing && !isPrivate && !isFamily && !isAkun && !isMembership && !isTopup && !isPromo;
+      if (activeTab === "lainnya") return !isLifetime && !isBulanan && !isTahunan && !isSharing && !isPrivate && !isFamily && !isAkun && !isMembership && !isTopup && !isPromo;
       return true;
     });
   }, [variants, activeTab]);
@@ -689,7 +701,12 @@ export default function ProductDetail() {
                 const isExpanded = expandedVariantId === variant.id;
 
                 return (
-                  <article
+                  <motion.article
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2 }}
+                    whileHover={isMotionOff ? {} : { scale: 1.015, transition: { duration: 0.2, ease: "easeOut" } }}
+                    whileTap={isMotionOff ? {} : { scale: 0.985 }}
                     key={variant.id}
                     className={`pdx-variantCard ${out ? "is-out" : ""} ${isRecommended ? "is-recommended" : ""} ${isExpanded ? "is-expanded" : ""}`}
                   >
@@ -798,7 +815,7 @@ export default function ProductDetail() {
                         </button>
                       </div>
                     </div>
-                  </article>
+                  </motion.article>
                 );
               });
             })()}

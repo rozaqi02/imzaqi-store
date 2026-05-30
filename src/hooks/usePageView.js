@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
 import { getVisitorIdAsUUID } from "../lib/visitor";
@@ -44,24 +44,34 @@ function markToday(dayISO) {
 
 export function usePageView() {
   const location = useLocation();
+  const lastTrackedPath = useRef(null);
+  const internalReferrer = useRef(
+    typeof document !== "undefined" ? document.referrer : null
+  );
 
   // Track setiap navigasi ke tabel page_views — hanya saat pathname berubah
   useEffect(() => {
     let cancelled = false;
 
     async function trackView() {
+      const path = location.pathname;
+      
+      // Cegah duplicate tracking (misal karena React Strict Mode re-render)
+      if (lastTrackedPath.current === path) return;
+      
+      const currentReferrer = internalReferrer.current;
+      
+      // Update state untuk navigasi berikutnya
+      lastTrackedPath.current = path;
+      internalReferrer.current = path; // Jadikan path saat ini sebagai referrer untuk halaman selanjutnya
+
       try {
         const visitorId = getVisitorIdAsUUID();
-        // Hanya track pathname, bukan search params — menghindari insert
-        // berulang saat user mengetik di filter/search
-        const path = location.pathname;
-        const referrer =
-          typeof document !== "undefined" ? document.referrer || null : null;
 
         await supabase.from("page_views").insert({
           visitor_id: visitorId,
           path,
-          referrer,
+          referrer: currentReferrer || null,
         });
       } catch {
         // Jangan crash kalau tracking gagal
@@ -72,7 +82,6 @@ export function usePageView() {
     return () => {
       cancelled = true;
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname]);
 
   // Increment unique visit counter (site_stats) — sekali per hari
@@ -82,6 +91,9 @@ export function usePageView() {
     async function hitUniqueVisit() {
       const day = todayISO("Asia/Jakarta");
       if (wasMarkedToday(day)) return;
+
+      // Tandai SEBELUM request async untuk mencegah double-hit dari React Strict Mode
+      markToday(day);
 
       try {
         const visitorId = getVisitorIdAsUUID();
@@ -95,10 +107,10 @@ export function usePageView() {
           if (fallback.error) throw fallback.error;
         }
 
-        if (cancelled) return;
-        markToday(day);
       } catch (e) {
         console.error("Gagal update unique visit", e);
+        // Jika gagal total, bisa kita hapus marker agar bisa dicoba lagi nanti
+        // tapi untuk analytics biasanya lebih baik biarkan saja
       }
     }
 
