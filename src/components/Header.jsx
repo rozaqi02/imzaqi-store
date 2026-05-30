@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { createPortal } from "react-dom";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
   CircleHelp,
@@ -94,7 +94,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
   const previousPathRef = useRef(location.pathname);
   const closeTimerRef = useRef(null);
   const openFrameRef = useRef(null);
-  const [phase, setPhase] = useState(open ? "open" : "closed");
+  const [phase, setPhase] = useState("closed");
 
   const requestClose = useCallback(() => {
     if (!open || phase === "closing") return;
@@ -200,7 +200,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 
         <div className="mobile-menu-footer">
           <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-          <p className="menu-footer-text">Imzaqi Store App V.4.1.3</p>
+          <p className="menu-footer-text">Imzaqi Store App V.4.2</p>
         </div>
       </aside>
     </>,
@@ -209,11 +209,13 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 }
 
 export default function Header() {
-  const { items } = useCart();
+  const { items, remove } = useCart();
   const { isDark, toggleTheme } = useTheme();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
+  const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.price_idr * item.qty, 0), [items]);
   const [open, setOpen] = useState(false);
   const [pillStyle, setPillStyle] = useState({ width: 0, x: 0, opacity: 0 });
+  const [hoverStyle, setHoverStyle] = useState({ width: 0, x: 0, opacity: 0 });
   const navRefs = useRef([]);
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia(MOBILE_BREAKPOINT).matches : false
@@ -222,6 +224,37 @@ export default function Header() {
   const location = useLocation();
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
+
+  const [showMiniCart, setShowMiniCart] = useState(false);
+  const miniCartTimerRef = useRef(null);
+
+  const handleCartMouseEnter = () => {
+    if (isMobileViewport) return;
+    window.clearTimeout(miniCartTimerRef.current);
+    setShowMiniCart(true);
+  };
+
+  const handleCartMouseLeave = () => {
+    if (isMobileViewport) return;
+    miniCartTimerRef.current = window.setTimeout(() => {
+      setShowMiniCart(false);
+    }, 240);
+  };
+
+  const formatPrice = useCallback((price) => {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(price).replace("Rp", "Rp ");
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      window.clearTimeout(miniCartTimerRef.current);
+    };
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("nav-open", open && isMobileViewport);
@@ -315,12 +348,23 @@ export default function Header() {
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
           </Link>
 
-          <nav className="nav desktop-only" style={{ position: "relative" }}>
+          <nav 
+            className="nav desktop-only" 
+            style={{ position: "relative" }}
+            onMouseLeave={() => setHoverStyle(prev => ({ ...prev, opacity: 0 }))}
+          >
             <motion.div
               className="nav-active-pill"
               initial={false}
               animate={{ width: pillStyle.width, x: pillStyle.x, opacity: pillStyle.opacity }}
               transition={{ type: "spring", stiffness: 500, damping: 35 }}
+              style={{ left: 0 }}
+            />
+            <motion.div
+              className="nav-hover-pill"
+              initial={false}
+              animate={{ width: hoverStyle.width, x: hoverStyle.x, opacity: hoverStyle.opacity }}
+              transition={{ type: "spring", stiffness: 450, damping: 30 }}
               style={{ left: 0 }}
             />
             {[
@@ -338,6 +382,16 @@ export default function Header() {
                   className={isActive ? "active" : ""} 
                   ref={(el) => (navRefs.current[idx] = el)}
                   style={{ position: "relative", zIndex: 1 }}
+                  onMouseEnter={() => {
+                    const el = navRefs.current[idx];
+                    if (el) {
+                      setHoverStyle({
+                        width: el.offsetWidth,
+                        x: el.offsetLeft,
+                        opacity: 1,
+                      });
+                    }
+                  }}
                 >
                   {link.label}
                 </Link>
@@ -346,10 +400,90 @@ export default function Header() {
           </nav>
 
           <div className="header-actions">
-            <Link to="/checkout" state={{ backgroundLocation: location }} className="header-cart">
-              <CartIcon />
-              {cartCount > 0 ? <span className="pill">{cartCount}</span> : null}
-            </Link>
+            <div
+              className="header-cart-container"
+              onMouseEnter={handleCartMouseEnter}
+              onMouseLeave={handleCartMouseLeave}
+              style={{ position: "relative" }}
+            >
+              <Link to="/checkout" state={{ backgroundLocation: location }} className="header-cart">
+                <CartIcon />
+                {cartCount > 0 ? <span className="pill">{cartCount}</span> : null}
+              </Link>
+
+              <AnimatePresence>
+                {showMiniCart && !isMobileViewport && (
+                  <motion.div
+                    className="mini-cart-popover"
+                    initial={{ opacity: 0, y: 12, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
+                    transition={{ duration: 0.18, ease: "easeOut" }}
+                  >
+                    <div className="mini-cart-header">
+                      <h4>Keranjang</h4>
+                      <span className="mini-cart-count">{cartCount} Item</span>
+                    </div>
+
+                    <div className="mini-cart-divider" />
+
+                    {items.length === 0 ? (
+                      <div className="mini-cart-empty">
+                        <p>Keranjang kosong</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="mini-cart-items">
+                          {items.map((item) => (
+                            <div key={item.variant_id} className="mini-cart-item">
+                              {item.product_icon_url ? (
+                                <img src={item.product_icon_url} alt={item.product_name} className="mini-cart-item-icon" />
+                              ) : (
+                                <div className="mini-cart-item-fallback">
+                                  {item.product_name?.charAt(0) || "P"}
+                                </div>
+                              )}
+                              <div className="mini-cart-item-details">
+                                <div className="mini-cart-item-title">{item.product_name}</div>
+                                <div className="mini-cart-item-subtitle">{item.variant_name}</div>
+                                <div className="mini-cart-item-price">
+                                  {item.qty} × {formatPrice(item.price_idr)}
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                className="mini-cart-item-remove"
+                                onClick={() => remove(item.variant_id)}
+                                title="Hapus item"
+                              >
+                                <X size={14} />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div className="mini-cart-divider" />
+
+                        <div className="mini-cart-footer">
+                          <div className="mini-cart-total">
+                            <span>Subtotal</span>
+                            <strong>{formatPrice(totalPrice)}</strong>
+                          </div>
+                          <Link
+                            to="/checkout"
+                            state={{ backgroundLocation: location }}
+                            className="btn btn-sm btn-wide"
+                            onClick={() => setShowMiniCart(false)}
+                          >
+                            Buka Checkout
+                          </Link>
+                        </div>
+                      </>
+                    )}
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             <div className="desktop-only">
               <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />

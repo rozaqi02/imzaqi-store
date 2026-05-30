@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ShoppingBag, TicketPercent, X } from "lucide-react";
+import { ArrowRight, ArrowLeft, ShoppingBag, TicketPercent, X, Trash2 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
@@ -68,6 +68,9 @@ export default function Checkout() {
   // CSS-class-based phase for mobile (no framer-motion on mobile)
   const [mobilePhase, setMobilePhase] = useState("entering"); // entering | open | closing
   const mobileOpenFrameRef = useRef(null);
+
+  const drawerBodyRef = useRef(null);
+  const [promoStatus, setPromoStatus] = useState(null); // 'success' | 'error' | null
 
   usePageMeta({
     title: "Checkout",
@@ -186,15 +189,25 @@ export default function Checkout() {
       const text = "Kode promo kosong.";
       setMsg(text);
       toast.error(text);
+      setPromoStatus("error");
+      setTimeout(() => setPromoStatus(null), 1500);
       return;
     }
 
     setMsg("");
     const result = await apply(raw);
     setMsg(result.message);
-    if (result.ok) toast.success(result.message);
-    else toast.error(result.message);
+    if (result.ok) {
+      toast.success(result.message);
+      setPromoStatus("success");
+    } else {
+      toast.error(result.message);
+      setPromoStatus("error");
+    }
+    setTimeout(() => setPromoStatus(null), 1500);
   }
+
+
 
   function goPay() {
     if (cart.items.length === 0) {
@@ -269,7 +282,7 @@ export default function Checkout() {
           </button>
         </div>
 
-        <div className="checkout-drawerBody">
+        <div ref={drawerBodyRef} className="checkout-drawerBody">
           <div className="checkout-drawerSteps">
             <CheckoutSteps current="checkout" />
           </div>
@@ -301,108 +314,15 @@ export default function Checkout() {
               ) : (
                 <>
                   <div className="checkout-item-list">
-                    {cart.items.map((item) => {
-                      const iconUrl = String(item?.product_icon_url || "").trim();
-                      return (
-                        <div key={item.variant_id} className="checkout-item-card">
-                          <div className="checkout-item-left">
-                            <div className="checkout-item-icon app-productIcon">
-                              {iconUrl ? (
-                                <img src={iconUrl} alt={`${item.product_name} icon`} loading="lazy" decoding="async" />
-                              ) : (
-                                <span className="app-productIconFallback">
-                                  {String(item.product_name || "P").slice(0, 1).toUpperCase()}
-                                </span>
-                              )}
-                            </div>
-                            <div className="checkout-item-copy">
-                              <div className="checkout-item-name">{item.product_name}</div>
-                              <div className="checkout-item-meta">
-                                {item.variant_name} / {item.duration_label}
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="checkout-item-controls">
-                            <div className="checkout-item-stepper">
-                              <button
-                                className="qty-btn"
-                                onClick={() => cart.setQty(item.variant_id, item.qty - 1)}
-                                aria-label="Kurangi"
-                              >
-                                -
-                              </button>
-                              <input
-                                className={`qty${item.qty < 1 || item.qty > 99 ? " qty--invalid" : ""}`}
-                                type="number"
-                                min="1"
-                                max="99"
-                                value={item.qty}
-                                onChange={(e) => {
-                                  const val = Number(e.target.value);
-                                  if (Number.isFinite(val) && val >= 1 && val <= 99) {
-                                    cart.setQty(item.variant_id, val);
-                                  } else if (e.target.value === "") {
-                                    // allow clearing while typing
-                                    cart.setQty(item.variant_id, 1);
-                                  }
-                                }}
-                                aria-label="Jumlah"
-                                aria-invalid={item.qty < 1 || item.qty > 99}
-                              />
-                              <button
-                                className="qty-btn"
-                                onClick={() => cart.setQty(item.variant_id, item.qty + 1)}
-                                aria-label="Tambah"
-                                disabled={item.qty >= 99}
-                              >
-                                +
-                              </button>
-                            </div>
-
-                            <div className="checkout-item-price">{formatIDR(item.price_idr * item.qty)}</div>
-
-                            <button
-                              className="checkout-item-remove"
-                              type="button"
-                              onClick={() => {
-                                cart.remove(item.variant_id);
-                                toast.info(`${item.product_name} dihapus`, {
-                                  title: "Keranjang",
-                                  actionLabel: "Undo",
-                                  duration: 6000,
-                                  onAction: () =>
-                                    cart.add(
-                                      {
-                                        id: item.variant_id,
-                                        product_id: item.product_id,
-                                        product_name: item.product_name,
-                                        product_icon_url: item.product_icon_url || "",
-                                        name: item.variant_name,
-                                        duration_label: item.duration_label,
-                                        price_idr: item.price_idr,
-                                        description: item.description || "",
-                                        guarantee_text: item.guarantee_text || "",
-                                        requires_buyer_email: !!item.requires_buyer_email,
-                                      },
-                                      item.qty
-                                    ),
-                                });
-                              }}
-                            >
-                              Hapus
-                            </button>
-                          </div>
-                          {stockWarnings[item.variant_id] ? (
-                            <div className={`checkout-stockWarn ${stockWarnings[item.variant_id].type}`}>
-                              {stockWarnings[item.variant_id].type === "out"
-                                ? "⚠ Stok habis — pertimbangkan untuk menghapus item ini"
-                                : `⚠ Stok tersisa ${stockWarnings[item.variant_id].available}, kamu pesan ${item.qty}`}
-                            </div>
-                          ) : null}
-                        </div>
-                      );
-                    })}
+                    {cart.items.map((item) => (
+                      <CheckoutItemCard
+                        key={item.variant_id}
+                        item={item}
+                        cart={cart}
+                        toast={toast}
+                        stockWarnings={stockWarnings}
+                      />
+                    ))}
                   </div>
 
                   <div className="checkout-promo-card">
@@ -417,6 +337,7 @@ export default function Checkout() {
                           type="button"
                           onClick={() => {
                             clear();
+                            setCode("");
                             setMsg("");
                             toast.info("Promo direset.");
                           }}
@@ -426,7 +347,7 @@ export default function Checkout() {
                       ) : null}
                     </div>
 
-                    <div className="checkout-promo-controls">
+                    <div className={`checkout-promo-controls ${promoStatus ? `promo-${promoStatus}` : ""}`}>
                       <input
                         className="input"
                         placeholder="Kode promo"
@@ -455,7 +376,146 @@ export default function Checkout() {
 
   if (typeof document === "undefined") return null;
 
-  // ── MOBILE: pure CSS class-swap (no framer-motion = no JS animation overhead) ──
+  if (!backgroundLocation) {
+    // ── DEDICATED FULL-PAGE MODE (For Mobile and Direct Visits) ──
+    return (
+      <div className="page checkout-page-full">
+        <div className="container checkout-full-container">
+          <div className="checkout-full-header">
+            <button
+              onClick={() => {
+                if (window.history.length > 1) {
+                  nav(-1);
+                } else {
+                  nav("/");
+                }
+              }}
+              className="btn btn-ghost checkout-back-btn"
+              type="button"
+            >
+              <ArrowLeft size={16} />
+              <span>Kembali</span>
+            </button>
+            <div className="checkout-full-title-wrap">
+              <h1 className="h1 checkout-full-title">Checkout</h1>
+              <p className="checkout-full-sub">Review order kamu sebelum lanjut bayar.</p>
+            </div>
+          </div>
+
+          <div className="checkout-full-steps">
+            <CheckoutSteps current="checkout" />
+          </div>
+
+          <div className="checkout-full-grid">
+            <main className="checkout-full-main">
+              {cart.items.length === 0 ? (
+                <div className="card pad checkout-panel checkout-full-empty-card">
+                  <EmptyState
+                    icon={<ShoppingBag size={30} strokeWidth={2.2} />}
+                    title="Keranjang kosong"
+                    description="Mulai dari katalog, lalu tambahkan paket yang sudah cocok."
+                    primaryAction={{ label: "Produk", to: "/produk" }}
+                    secondaryAction={{ label: "Status", to: "/status" }}
+                  />
+                </div>
+              ) : (
+                <div className="checkout-full-left-cards">
+                  <section className="card pad checkout-panel checkout-full-items-panel">
+                    <div className="checkout-main-head">
+                      <div>
+                        <div className="checkout-main-kicker">Keranjang</div>
+                        <h2 className="h3 checkout-main-title">Isi Order</h2>
+                      </div>
+                      <span className="checkout-main-count">x{itemCount}</span>
+                    </div>
+
+                    <div className="checkout-item-list">
+                      {cart.items.map((item) => (
+                        <CheckoutItemCard
+                          key={item.variant_id}
+                          item={item}
+                          cart={cart}
+                          toast={toast}
+                          stockWarnings={stockWarnings}
+                        />
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="card pad checkout-panel checkout-full-promo-panel">
+                    <div className="checkout-promo-card">
+                      <div className="checkout-promo-head">
+                        <div className="checkout-promo-title">
+                          <TicketPercent size={15} />
+                          <span>Kode promo</span>
+                        </div>
+                        {promoPercent ? (
+                          <button
+                            className="btn btn-ghost btn-sm"
+                            type="button"
+                            onClick={() => {
+                              clear();
+                              setCode("");
+                              setMsg("");
+                              toast.info("Promo direset.");
+                            }}
+                          >
+                            Reset
+                          </button>
+                        ) : null}
+                      </div>
+
+                      <div className={`checkout-promo-controls ${promoStatus ? `promo-${promoStatus}` : ""}`}>
+                        <input
+                          className="input"
+                          placeholder="Kode promo"
+                          value={code}
+                          onChange={(e) => setCode(e.target.value.toUpperCase())}
+                        />
+                        <button className="btn btn-sm" type="button" onClick={onApplyPromo}>
+                          Pakai
+                        </button>
+                      </div>
+
+                      {msg ? (
+                        <div className={`checkout-promo-message ${promoPercent ? "ok" : ""}`}>{msg}</div>
+                      ) : null}
+                    </div>
+                  </section>
+                </div>
+              )}
+            </main>
+
+            {cart.items.length > 0 && (
+              <aside className="checkout-full-side">
+                {renderSummary("checkout-summary-full")}
+              </aside>
+            )}
+          </div>
+        </div>
+
+        {/* Mobile sticky floating bottom bar */}
+        {cart.items.length > 0 && (
+          <div className="checkout-mobile-floating-bar">
+            <div className="checkout-floating-bar-info">
+              <span className="checkout-floating-bar-label">Total Pembayaran</span>
+              <span className="checkout-floating-bar-price">{formatIDR(total)}</span>
+            </div>
+            <button
+              className="btn btn-primary checkout-floating-bar-btn"
+              onClick={goPay}
+              disabled={hasStockIssue}
+            >
+              <span>Bayar</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  // ── MOBILE PORTAL: pure CSS class-swap (no framer-motion = no JS animation overhead) ──
   if (isMobileSheet) {
     const phaseClass = `checkout-mobile-${mobilePhase}`;
     return createPortal(
@@ -479,7 +539,7 @@ export default function Checkout() {
     );
   }
 
-  // ── DESKTOP: framer-motion (smooth on desktop GPU) ──
+  // ── DESKTOP PORTAL: framer-motion (smooth on desktop GPU) ──
   const drawerVariants = isLiteMotion ? desktopDrawerVariantsLite : desktopDrawerVariants;
   const overlayVariants = isLiteMotion ? backdropVariantsLite : backdropVariants;
 
@@ -510,5 +570,112 @@ export default function Checkout() {
       </motion.div>
     </div>,
     document.body
+  );
+}
+
+function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
+  const handleRemove = () => {
+    cart.remove(item.variant_id);
+    toast.info(`${item.product_name} dihapus`, {
+      title: "Keranjang",
+      actionLabel: "Undo",
+      duration: 6000,
+      onAction: () =>
+        cart.add(
+          {
+            id: item.variant_id,
+            product_id: item.product_id,
+            product_name: item.product_name,
+            product_icon_url: item.product_icon_url || "",
+            name: item.variant_name,
+            duration_label: item.duration_label,
+            price_idr: item.price_idr,
+            description: item.description || "",
+            guarantee_text: item.guarantee_text || "",
+            requires_buyer_email: !!item.requires_buyer_email,
+          },
+          item.qty
+        ),
+    });
+  };
+
+  const iconUrl = String(item?.product_icon_url || "").trim();
+
+  return (
+    <div className="checkout-item-card">
+      <div className="checkout-item-left">
+        <div className="checkout-item-icon app-productIcon">
+          {iconUrl ? (
+            <img src={iconUrl} alt={`${item.product_name} icon`} loading="lazy" decoding="async" />
+          ) : (
+            <span className="app-productIconFallback">
+              {String(item.product_name || "P").slice(0, 1).toUpperCase()}
+            </span>
+          )}
+        </div>
+        <div className="checkout-item-copy">
+          <div className="checkout-item-name">{item.product_name}</div>
+          <div className="checkout-item-meta">
+            {item.variant_name} / {item.duration_label}
+          </div>
+        </div>
+      </div>
+
+      <div className="checkout-item-controls">
+        <div className="checkout-item-stepper">
+          <button
+            className="qty-btn"
+            onClick={() => cart.setQty(item.variant_id, item.qty - 1)}
+            aria-label="Kurangi"
+          >
+            -
+          </button>
+          <input
+            className={`qty${item.qty < 1 || item.qty > 99 ? " qty--invalid" : ""}`}
+            type="number"
+            min="1"
+            max="99"
+            value={item.qty}
+            onChange={(e) => {
+              const val = Number(e.target.value);
+              if (Number.isFinite(val) && val >= 1 && val <= 99) {
+                cart.setQty(item.variant_id, val);
+              } else if (e.target.value === "") {
+                cart.setQty(item.variant_id, 1);
+              }
+            }}
+            aria-label="Jumlah"
+            aria-invalid={item.qty < 1 || item.qty > 99}
+          />
+          <button
+            className="qty-btn"
+            onClick={() => cart.setQty(item.variant_id, item.qty + 1)}
+            aria-label="Tambah"
+            disabled={item.qty >= 99}
+          >
+            +
+          </button>
+        </div>
+
+        <div className="checkout-item-price">{formatIDR(item.price_idr * item.qty)}</div>
+
+        <button
+          className="checkout-item-remove"
+          type="button"
+          onClick={handleRemove}
+          aria-label="Hapus item"
+        >
+          <Trash2 size={13} />
+          <span>Hapus</span>
+        </button>
+      </div>
+      {stockWarnings[item.variant_id] ? (
+        <div className={`checkout-stockWarn ${stockWarnings[item.variant_id].type}`}>
+          {stockWarnings[item.variant_id].type === "out"
+            ? "⚠ Stok habis — pertimbangkan untuk menghapus item ini"
+            : `⚠ Stok tersisa ${stockWarnings[item.variant_id].available}, kamu pesan ${item.qty}`}
+        </div>
+      ) : null}
+    </div>
   );
 }

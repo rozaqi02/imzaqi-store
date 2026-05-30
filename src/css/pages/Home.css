@@ -501,32 +501,70 @@
   height: 22px;
   padding: 0 8px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
   font-size: 10px;
-  font-weight: 900;
+  font-weight: 1000;
   letter-spacing: 0.04em;
-  color: rgba(234, 255, 245, 0.72);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.product-tile-rankBadge--top {
-  border-color: rgba(255, 160, 50, 0.32);
-  background: rgba(255, 160, 50, 0.12);
-  color: #ffc870;
+/* Rank 1: Gold / Flame Badge */
+.product-tile-rankBadge--1 {
+  border: 1px solid rgba(255, 215, 0, 0.44);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.12) 100%);
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.25);
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.1);
 }
 
-:root[data-theme="light"] .product-tile-rankBadge {
-  border-color: rgba(0, 138, 148, 0.14);
-  background: rgba(236, 248, 252, 0.86);
-  color: #3d6070;
+/* Rank 2: Silver/Steel Badge */
+.product-tile-rankBadge--2 {
+  border: 1px solid rgba(192, 192, 192, 0.38);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(120, 120, 120, 0.08) 100%);
+  color: #e2e8f0;
 }
 
-:root[data-theme="light"] .product-tile-rankBadge--top {
-  border-color: rgba(220, 120, 0, 0.22);
-  background: rgba(255, 200, 100, 0.16);
-  color: #8b5500;
+/* Rank 3: Bronze/Copper Badge */
+.product-tile-rankBadge--3 {
+  border: 1px solid rgba(205, 127, 50, 0.36);
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.16) 0%, rgba(139, 69, 19, 0.08) 100%);
+  color: #f6ad55;
+}
+
+/* Rank 4: Neon Steel/Cyan Badge */
+.product-tile-rankBadge--4 {
+  border: 1px solid rgba(0, 214, 180, 0.38);
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.14) 0%, rgba(0, 138, 148, 0.08) 100%);
+  color: #4effda;
+  text-shadow: 0 0 8px rgba(0, 214, 180, 0.2);
+}
+
+/* Light Theme overrides for Rank Badges */
+:root[data-theme="light"] .product-tile-rankBadge--1 {
+  border-color: rgba(212, 160, 23, 0.44) !important;
+  background: linear-gradient(135deg, rgba(255, 223, 118, 0.32) 0%, rgba(255, 203, 73, 0.22) 100%) !important;
+  color: #8b6200 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] .product-tile-rankBadge--2 {
+  border-color: rgba(90, 115, 125, 0.24) !important;
+  background: linear-gradient(135deg, rgba(230, 240, 245, 0.8) 0%, rgba(200, 215, 222, 0.6) 100%) !important;
+  color: #4a626e !important;
+}
+
+:root[data-theme="light"] .product-tile-rankBadge--3 {
+  border-color: rgba(175, 96, 26, 0.28) !important;
+  background: linear-gradient(135deg, rgba(252, 235, 222, 0.8) 0%, rgba(240, 210, 185, 0.6) 100%) !important;
+  color: #804310 !important;
+}
+
+:root[data-theme="light"] .product-tile-rankBadge--4 {
+  border-color: rgba(0, 138, 148, 0.32) !important;
+  background: linear-gradient(135deg, rgba(220, 246, 248, 0.8) 0%, rgba(188, 235, 238, 0.6) 100%) !important;
+  color: #006b74 !important;
+  text-shadow: none !important;
 }
 
 .product-tile--grid .product-tile-name {
@@ -666,6 +704,35 @@
   display: flex;
   justify-content: center;
   margin-top: 28px;
+}
+
+.home-bottomCta .btn-ghost {
+  transition: transform 0.2s var(--ease-out), border-color 0.2s, box-shadow 0.2s, background 0.2s !important;
+}
+
+.home-bottomCta .btn-ghost:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 214, 180, 0.4) !important;
+  background: rgba(0, 214, 180, 0.05) !important;
+  box-shadow: 
+    0 10px 24px rgba(0, 214, 180, 0.12),
+    var(--uni-neo-control-shadow) !important;
+}
+
+.home-bottomCta .btn-ghost svg {
+  transition: transform 0.2s var(--ease-out);
+}
+
+.home-bottomCta .btn-ghost:hover svg {
+  transform: translateX(4px);
+}
+
+:root[data-theme="light"] .home-bottomCta .btn-ghost:hover {
+  border-color: rgba(0, 138, 148, 0.4) !important;
+  background: rgba(0, 138, 148, 0.05) !important;
+  box-shadow: 
+    0 8px 20px rgba(0, 138, 148, 0.1),
+    var(--uni-neo-control-shadow) !important;
 }
 
 @media (max-width: 900px) and (min-width: 721px) {
@@ -1223,6 +1290,21 @@
   flex-direction: column;
   gap: 22px;
   min-width: 0;
+  position: relative;
+}
+
+.hc-copy::before {
+  content: "";
+  position: absolute;
+  inset: -10% -20% -10% -20%;
+  background: radial-gradient(circle at 20% 30%, rgba(0, 214, 180, 0.09) 0%, rgba(0, 138, 148, 0.05) 50%, rgba(0, 0, 0, 0) 100%);
+  filter: blur(80px);
+  pointer-events: none;
+  z-index: -1;
+}
+
+:root[data-theme="light"] .hc-copy::before {
+  background: radial-gradient(circle at 20% 30%, rgba(0, 214, 180, 0.06) 0%, rgba(0, 138, 148, 0.03) 50%, rgba(0, 0, 0, 0) 100%);
 }
 
 .hc-kicker {
@@ -1763,7 +1845,6 @@
   padding-top: 12px;
   padding-bottom: 0;
   margin-top: 12px;
-  border-top: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
 }
 
 .home-howHeader {
@@ -1783,10 +1864,31 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 14px;
+  position: relative;
+}
+
+@media (min-width: 901px) {
+  .home-howGrid::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 4%;
+    right: 4%;
+    height: 2px;
+    border-top: 2px dashed rgba(0, 214, 180, 0.18);
+    pointer-events: none;
+    z-index: 1;
+    transform: translateY(-50%);
+  }
+}
+
+:root[data-theme="light"] .home-howGrid::before {
+  border-top-color: rgba(0, 138, 148, 0.22) !important;
 }
 
 .home-howCard {
   position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1835,6 +1937,22 @@
     rgba(29, 131, 255, 0.1);
   color: var(--uni-neo-icon, #9cddff);
   box-shadow: 0 4px 14px rgba(29, 131, 255, 0.2);
+  transition: transform 0.22s var(--ease-out), border-color 0.22s, box-shadow 0.22s, color 0.22s;
+}
+
+.home-howCard:hover .home-howCard-icon {
+  transform: scale(1.08);
+  border-color: rgba(0, 214, 180, 0.4);
+  box-shadow: 
+    0 6px 18px rgba(0, 214, 180, 0.35),
+    0 0 0 1px rgba(0, 214, 180, 0.1);
+  color: #4effda;
+}
+
+:root[data-theme="light"] .home-howCard:hover .home-howCard-icon {
+  border-color: rgba(0, 138, 148, 0.4) !important;
+  color: #007a85 !important;
+  box-shadow: 0 6px 16px rgba(0, 138, 148, 0.2) !important;
 }
 
 .home-howCard-content {
@@ -2158,5 +2276,215 @@
 
   .home-testiCta {
     margin-top: 16px;
+  }
+}
+
+/* ── Diskon Hub section ─────────────────────────────────────────── */
+.home-promoSection {
+  padding-top: 24px;
+  padding-bottom: 24px;
+}
+
+.home-promoHeader {
+  margin-bottom: 24px;
+}
+
+.home-promoTitle {
+  margin-top: 4px;
+}
+
+.home-promoGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+  width: 100%;
+}
+
+.home-promoCard {
+  position: relative;
+  display: flex;
+  min-height: 96px;
+  border-radius: 20px;
+  border: 1px solid var(--uni-line);
+  background: var(--uni-panel-soft);
+  box-shadow: var(--uni-soft-shadow);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.2s, border-color 0.2s;
+  outline: none;
+}
+
+@media (hover: hover) and (min-width: 721px) {
+  .home-promoCard:hover {
+    transform: translateY(-3px);
+    border-color: var(--uni-line-strong);
+    box-shadow: 
+      0 12px 28px rgba(0, 214, 180, 0.08),
+      var(--uni-shadow);
+  }
+}
+
+.home-promoCard:active {
+  transform: translateY(1.5px);
+  box-shadow: 
+    inset 0 2px 6px rgba(0, 0, 0, 0.25),
+    var(--uni-inset-shadow);
+}
+
+/* Left Stub */
+.home-promoCard-stub {
+  flex: 0 0 88px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0, 214, 180, 0.05);
+  border-right: 0;
+  text-align: center;
+}
+
+:root[data-theme="light"] .home-promoCard-stub {
+  background: rgba(0, 138, 148, 0.03);
+}
+
+.home-promoCard-percent {
+  font-size: 26px;
+  font-weight: 1000;
+  color: var(--uni-neo-icon, #4effda);
+  font-family: "Outfit", "Inter", sans-serif;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-shadow: 0 0 12px rgba(0, 214, 180, 0.25);
+}
+
+:root[data-theme="light"] .home-promoCard-percent {
+  color: #008a94;
+  text-shadow: none;
+}
+
+.home-promoCard-off {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--uni-muted, rgba(234, 255, 245, 0.6));
+  margin-top: 2px;
+}
+
+/* Divider with ticket punch cutouts */
+.home-promoCard-divider {
+  position: relative;
+  width: 1px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.home-promoCard-line {
+  width: 1px;
+  height: 70%;
+  border-left: 1.5px dashed var(--uni-line);
+}
+
+.home-promoCard-punch {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--brand-bg-start, #020611);
+  border: 1px solid var(--uni-line);
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2;
+  box-shadow: 
+    inset 0 3px 6px rgba(0, 0, 0, 0.72),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.home-promoCard-punch.top {
+  top: -10px;
+}
+
+.home-promoCard-punch.bottom {
+  bottom: -10px;
+}
+
+:root[data-theme="light"] .home-promoCard-punch {
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  box-shadow: 
+    inset 0 3px 5px rgba(0, 0, 0, 0.15),
+    0 1px 0 rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Right Content */
+.home-promoCard-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 16px;
+  gap: 4px;
+  min-width: 0; /* Allows flex children to shrink below content size for ellipsis to work */
+}
+
+.home-promoCard-code {
+  font-size: 16px;
+  font-weight: 900;
+  color: var(--uni-text, #ebf8ff);
+  font-family: "Outfit", "Inter", sans-serif;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
+}
+
+.home-promoCard-action {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(0, 214, 180, 0.75);
+}
+
+:root[data-theme="light"] .home-promoCard-action {
+  color: #008a94;
+}
+
+/* ── Responsive Tablet & Mobile Media Queries ── */
+@media (max-width: 960px) and (min-width: 721px) {
+  .home-promoGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .home-promoSection {
+    padding-top: 16px;
+    padding-bottom: 16px;
+  }
+
+  .home-promoGrid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .home-promoCard {
+    min-height: 84px;
+    border-radius: 16px;
+  }
+  
+  .home-promoCard-stub {
+    flex: 0 0 76px;
+  }
+  
+  .home-promoCard-percent {
+    font-size: 22px;
+  }
+  
+  .home-promoCard-code {
+    font-size: 14px;
   }
 }

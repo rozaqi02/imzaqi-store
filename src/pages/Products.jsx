@@ -156,6 +156,7 @@ function FilterPanel({
   onReset,
   compact = false,
   idPrefix = "",
+  categoryCounts = {},
 }) {
   const generatedPrefix = useId().replace(/:/g, "");
   const prefix = idPrefix || `catalog-${generatedPrefix}`;
@@ -171,6 +172,7 @@ function FilterPanel({
           {CATEGORIES.map((category) => {
             const Icon = category.icon;
             const active = cats.includes(category.key);
+            const count = categoryCounts[category.key] || 0;
             return (
               <button
                 key={category.key}
@@ -181,6 +183,7 @@ function FilterPanel({
               >
                 <Icon size={14} />
                 <span>{category.label}</span>
+                {count > 0 && <span className="catalog-chip-count">{count}</span>}
               </button>
             );
           })}
@@ -691,7 +694,7 @@ export default function Products() {
           </div>
 
           <div className="catalog-command">
-            <div className="catalog-commandCard">
+            <div className="catalog-commandSearch">
               <div className="hero-search-shell catalog-heroSearch">
                 <span className="hero-search-icon" aria-hidden="true">
                   <Search size={16} />
@@ -769,6 +772,7 @@ export default function Products() {
               view={view}
               setView={setView}
               onReset={resetFilters}
+              categoryCounts={insights.categoryCounts}
             />
           </aside>
 
@@ -778,7 +782,7 @@ export default function Products() {
                 <button
                   key={item.key}
                   type="button"
-                  className={`catalog-quickChip${item.active ? " active" : ""}`}
+                  className={`catalog-quickChip catalog-quickChip--${item.key}${item.active ? " active" : ""}`}
                   onClick={item.onClick}
                   aria-pressed={item.active}
                 >
@@ -931,6 +935,7 @@ export default function Products() {
                     view={view}
                     setView={setView}
                     onReset={resetFilters}
+                    categoryCounts={insights.categoryCounts}
                   />
                 </div>
 

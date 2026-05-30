@@ -48,6 +48,7 @@ import {
 import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDisplay, calcRevenueForecast, isPromoExpired } from "../../lib/format";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
+import { copyToClipboard } from "../../utils/clipboard";
 
 const BUCKET_ICONS = "product-icons"; // public
 const BUCKET_TESTIMONIALS = "testimonials"; // public
@@ -1168,7 +1169,7 @@ export default function AdminDashboard() {
   async function copyStatusLink(orderCode) {
     const url = `${window.location.origin}/status?order=${encodeURIComponent(orderCode)}`;
     try {
-      await navigator.clipboard.writeText(url);
+      await copyToClipboard(url);
       toast.success("Link status disalin");
     } catch {
       toast.error("Gagal menyalin link");
@@ -1330,6 +1331,36 @@ export default function AdminDashboard() {
     }
   }
 
+  async function toggleHomePromo(code) {
+    const visibleCodes = settings?.home_promos?.codes || [];
+    let nextCodes;
+    if (visibleCodes.includes(code)) {
+      nextCodes = visibleCodes.filter((c) => c !== code);
+    } else {
+      nextCodes = [...visibleCodes, code];
+    }
+
+    const tid = toast.loading("Mengubah pengaturan tampilan Home...");
+    try {
+      const { error } = await supabase
+        .from("site_settings")
+        .upsert({ key: "home_promos", value: { codes: nextCodes }, updated_at: new Date().toISOString() }, { onConflict: "key" });
+
+      if (error) throw error;
+
+      setSettings((prev) => ({
+        ...prev,
+        home_promos: { codes: nextCodes },
+      }));
+      toast.remove(tid);
+      toast.success("Tampilan kupon diperbarui!");
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal menyimpan pengaturan.");
+      setMsg(e?.message || String(e));
+    }
+  }
+
   async function deletePromo(code) {
     setPromoDeleteTarget(code);
   }
@@ -1370,7 +1401,7 @@ export default function AdminDashboard() {
   }
 
   function copyPromoCode(code) {
-    navigator.clipboard?.writeText(code).catch(() => {});
+    copyToClipboard(code).catch(() => {});
     setCopiedCode(code);
     setTimeout(() => setCopiedCode(""), 1800);
   }
@@ -2884,30 +2915,43 @@ export default function AdminDashboard() {
                               )}
 
                               {/* Actions */}
-                              <div className="admin-promo-cardActions">
-                                <button
-                                  className="btn btn-sm btn-ghost admin-promo-editBtn"
-                                  type="button"
-                                  onClick={() => openEditPromo(p)}
-                                >
-                                  <Pencil size={13} />
-                                  Edit
-                                </button>
-                                <button
-                                  className={"btn btn-sm " + (p.is_active ? "btn-ghost" : "")}
-                                  type="button"
-                                  onClick={() => togglePromo(p.code, !p.is_active)}
-                                >
-                                  {p.is_active ? "Nonaktifkan" : "Aktifkan"}
-                                </button>
-                                <button
-                                  className="btn btn-sm btn-danger"
-                                  type="button"
-                                  onClick={() => deletePromo(p.code)}
-                                >
-                                  <Trash2 size={13} />
-                                </button>
-                              </div>
+                              {(() => {
+                                const showOnHome = (settings?.home_promos?.codes || []).includes(p.code);
+                                return (
+                                  <div className="admin-promo-cardActions">
+                                    <button
+                                      className="btn btn-sm btn-ghost admin-promo-editBtn"
+                                      type="button"
+                                      onClick={() => openEditPromo(p)}
+                                    >
+                                      <Pencil size={13} />
+                                      Edit
+                                    </button>
+                                    <button
+                                      className={"btn btn-sm " + (p.is_active ? "btn-ghost" : "")}
+                                      type="button"
+                                      onClick={() => togglePromo(p.code, !p.is_active)}
+                                    >
+                                      {p.is_active ? "Nonaktifkan" : "Aktifkan"}
+                                    </button>
+                                    <button
+                                      className={"btn btn-sm " + (showOnHome ? "btn-primary" : "btn-ghost")}
+                                      type="button"
+                                      onClick={() => toggleHomePromo(p.code)}
+                                      title={showOnHome ? "Sembunyikan kupon dari Halaman Utama" : "Tampilkan kupon di Halaman Utama"}
+                                    >
+                                      {showOnHome ? "Tampil di Home" : "Set ke Home"}
+                                    </button>
+                                    <button
+                                      className="btn btn-sm btn-danger"
+                                      type="button"
+                                      onClick={() => deletePromo(p.code)}
+                                    >
+                                      <Trash2 size={13} />
+                                    </button>
+                                  </div>
+                                );
+                              })()}
                             </div>
                           );
                         })}

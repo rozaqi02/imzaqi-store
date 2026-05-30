@@ -1,12 +1,14 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, ShoppingBag, CreditCard, Hash, Activity, MessageSquareQuote } from "lucide-react";
+import { ArrowRight, ShoppingBag, CreditCard, Hash, Activity } from "lucide-react";
 
 import Hero from "../components/Hero";
 import ProductTile from "../components/ProductTile";
-import { fetchProducts, fetchTopSellingIds, fetchTestimonials } from "../lib/api";
+import { fetchProducts, fetchTopSellingIds, fetchPromoCodes, fetchSettings } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { useToast } from "../context/ToastContext";
+import { copyToClipboard } from "../utils/clipboard";
 
 const HOW_IT_WORKS = [
   {
@@ -21,7 +23,7 @@ const HOW_IT_WORKS = [
     step: "02",
     icon: CreditCard,
     title: "Bayar via QRIS",
-    desc: "Scan QR dengan m-banking atau e-wallet. Nominal sudah otomatis menyesuaikan total.",
+    desc: "Scan QR dengan m-banking or e-wallet. Nominal sudah otomatis menyesuaikan total.",
     to: "/tentang",
     cta: "Cara bayar",
   },
@@ -70,27 +72,9 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [topIds, setTopIds] = useState([]);
-  const [testimonials, setTestimonials] = useState([]);
+  const [promos, setPromos] = useState([]);
   const [error, setError] = useState("");
-  const [activeTesti, setActiveTesti] = useState(0);
-  const testiGridRef = useRef(null);
-
-  const handleTestiScroll = () => {
-    const el = testiGridRef.current;
-    if (!el) return;
-    const cards = el.querySelectorAll(".home-testiCard");
-    let closestIndex = 0;
-    let minDiff = Infinity;
-    const containerLeft = el.getBoundingClientRect().left;
-    cards.forEach((card, idx) => {
-      const diff = Math.abs(card.getBoundingClientRect().left - containerLeft);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestIndex = idx;
-      }
-    });
-    setActiveTesti(closestIndex);
-  };
+  const toast = useToast();
 
   usePageMeta({
     title: "Home",
@@ -101,15 +85,28 @@ export default function Home() {
     let alive = true;
     (async () => {
       try {
-        const [data, ranking, testiData] = await Promise.all([
+        const [data, ranking, promoData, settingsData] = await Promise.all([
           fetchProducts(),
           fetchTopSellingIds(),
-          fetchTestimonials({ useCache: true }).catch(() => []),
+          fetchPromoCodes().catch(() => []),
+          fetchSettings().catch(() => ({})),
         ]);
         if (!alive) return;
         setProducts(data);
         setTopIds(ranking);
-        setTestimonials(testiData);
+
+        // Get allowed codes from site settings (empty array = hidden by default)
+        const allowedHomeCodes = settingsData?.home_promos?.codes || [];
+
+        // Filter valid active promos that are explicitly allowed in the setting
+        const activePromos = (promoData || []).filter((p) => {
+          if (!p.is_active) return false;
+          if (!allowedHomeCodes.includes(p.code)) return false;
+          if (p.expired_at && new Date(p.expired_at) < new Date()) return false;
+          if (p.max_uses != null && p.used_count >= p.max_uses) return false;
+          return true;
+        }).slice(0, 3);
+        setPromos(activePromos);
       } catch (e) {
         console.warn(e);
         setError("Gagal memuat produk.");
@@ -140,15 +137,65 @@ export default function Home() {
     return sorted.slice(0, 4);
   }, [products, topIds]);
 
-  const testimonialSnippets = useMemo(() => {
-    return (testimonials || [])
-      .filter((t) => t?.caption && String(t.caption).trim().length > 10)
-      .slice(0, 3);
-  }, [testimonials]);
+  const handleCopyPromo = (code) => {
+    copyToClipboard(code).then(
+      () => {
+        if (navigator.vibrate) {
+          navigator.vibrate(12);
+        }
+        toast.success("Kupon berhasil disalin!", { title: code, duration: 2000 });
+      },
+      () => {
+        toast.error("Gagal menyalin kupon.");
+      }
+    );
+  };
 
   return (
     <div className="page home-page">
       <Hero products={products} />
+
+      {/* ── Diskon Hub ── */}
+      {promos.length > 0 && (
+        <section className="section home-promoSection" aria-label="Kupon Promo Aktif">
+          <div className="container">
+            <div className="home-promoHeader">
+              <span className="home-kicker">Diskon Hub</span>
+              <h2 className="h2 home-promoTitle">Gunakan kupon hemat.</h2>
+            </div>
+            
+            <div className="home-promoGrid">
+              {promos.map((promo) => (
+                <div 
+                  key={promo.code} 
+                  className="home-promoCard"
+                  onClick={() => handleCopyPromo(promo.code)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => e.key === "Enter" && handleCopyPromo(promo.code)}
+                  aria-label={`Salin kode promo ${promo.code} untuk diskon ${promo.percent}%`}
+                >
+                  <div className="home-promoCard-stub">
+                    <span className="home-promoCard-percent">{promo.percent}%</span>
+                    <span className="home-promoCard-off">OFF</span>
+                  </div>
+                  
+                  <div className="home-promoCard-divider">
+                    <div className="home-promoCard-punch top" />
+                    <div className="home-promoCard-line" />
+                    <div className="home-promoCard-punch bottom" />
+                  </div>
+                  
+                  <div className="home-promoCard-body">
+                    <span className="home-promoCard-code">{promo.code}</span>
+                    <span className="home-promoCard-action">Klik untuk salin</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ── How it works ── */}
       <section className="section home-howSection">
@@ -223,66 +270,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Social proof / Testimonial snippets ── */}
-      {testimonialSnippets.length > 0 ? (
-        <section className="section home-testiSection">
-          <div className="container">
-            <div className="home-testiHeader">
-              <div className="home-kicker">Kata mereka</div>
-              <h2 className="h2">Bukan cuma klaim.</h2>
-            </div>
-
-            <div 
-              className="home-testiGrid" 
-              ref={testiGridRef}
-              onScroll={handleTestiScroll}
-            >
-              {testimonialSnippets.map((t) => (
-                <div key={t.id} className="home-testiCard">
-                  <div className="home-testiCard-quote" aria-hidden="true">
-                    <MessageSquareQuote size={16} />
-                  </div>
-                  <p className="home-testiCard-text">
-                    {String(t.caption).length > 120
-                      ? `${String(t.caption).slice(0, 117).trimEnd()}...`
-                      : t.caption}
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div className="home-testiDots" aria-hidden="true">
-              {testimonialSnippets.map((_, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  className={`home-testiDot${idx === activeTesti ? " is-active" : ""}`}
-                  onClick={() => {
-                    const el = testiGridRef.current;
-                    if (!el) return;
-                    const cards = el.querySelectorAll(".home-testiCard");
-                    if (cards[idx]) {
-                      cards[idx].scrollIntoView({
-                        behavior: "smooth",
-                        block: "nearest",
-                        inline: "start",
-                      });
-                    }
-                  }}
-                  aria-label={`Lihat testimoni ke-${idx + 1}`}
-                />
-              ))}
-            </div>
-
-            <div className="home-testiCta">
-              <Link className="btn btn-ghost" to="/testimoni">
-                <span>Lihat semua testimoni</span>
-                <ArrowRight size={16} />
-              </Link>
-            </div>
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }

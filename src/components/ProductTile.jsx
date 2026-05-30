@@ -81,12 +81,12 @@ export default function ProductTile({ product, rank }) {
           <div className="product-tile-name">
             {product?.name || "-"}
             {rank === 1 ? (
-              <span className="product-tile-rankBadge product-tile-rankBadge--top">
+              <span className="product-tile-rankBadge product-tile-rankBadge--1">
                 <Flame size={12} />
                 <span>Terlaris</span>
               </span>
             ) : rank && rank <= 4 ? (
-              <span className="product-tile-rankBadge">
+              <span className={`product-tile-rankBadge product-tile-rankBadge--${rank}`}>
                 <span>#{rank}</span>
               </span>
             ) : null}

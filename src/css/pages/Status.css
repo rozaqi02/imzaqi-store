@@ -236,6 +236,16 @@
   border-radius: 18px;
 }
 
+.status-page .btn.st-checkBtn,
+.status-page button.st-checkBtn {
+  color: #ecf8ff !important;
+}
+
+:root[data-theme="light"] .status-page .btn.st-checkBtn,
+:root[data-theme="light"] .status-page button.st-checkBtn {
+  color: #123744 !important;
+}
+
 .st-searchHint {
   position: relative;
   z-index: 1;
@@ -1311,6 +1321,7 @@
   /* Allow the admin note to span full width above the grid */
   display: grid;
   grid-template-columns: minmax(0, 1fr);
+  align-items: start;
 }
 
 .st-noteTopAccent {
@@ -1348,6 +1359,7 @@
   .st-layout {
     grid-template-columns: minmax(0, 1fr) 320px;
     gap: 16px;
+    align-items: start;
   }
 
   .st-layout .st-main {
@@ -1356,7 +1368,6 @@
 
   .st-layout .st-aside {
     grid-column: 2;
-    grid-row: 2;
   }
 }
 

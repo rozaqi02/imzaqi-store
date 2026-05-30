@@ -7,6 +7,7 @@ import {
   BadgePercent,
   CheckCircle2,
   Clock3,
+  Copy,
   History,
   Mail,
   MessageSquareText,
@@ -23,6 +24,7 @@ import { fetchSettings } from "../lib/api";
 import { getOrderHistory, updateOrderHistoryStatus } from "../lib/orderHistory";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { copyToClipboard } from "../utils/clipboard";
 import "../css/pages/OrderHistory.css";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
@@ -223,7 +225,7 @@ function TabCekStatus({ settings }) {
 
   async function copyOrderCode() {
     try {
-      await navigator.clipboard.writeText(order?.order_code || "");
+      await copyToClipboard(order?.order_code || "");
       toast.success("ID disalin");
     } catch {
       toast.error("Gagal menyalin ID.");
@@ -232,6 +234,9 @@ function TabCekStatus({ settings }) {
 
   async function pasteOrderCode() {
     try {
+      if (!navigator.clipboard || !navigator.clipboard.readText) {
+        throw new Error();
+      }
       const text = await navigator.clipboard.readText();
       const normalized = normalizeOrderCode(text);
       setInput(normalized);
@@ -315,9 +320,33 @@ function TabCekStatus({ settings }) {
                   <div className="st-kicker">Catatan admin</div>
                   <h2 className="st-cardTitle">Penting untuk dibaca</h2>
                 </div>
-                <div className="st-cardIcon">
-                  <MessageSquareText size={16} />
-                </div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm st-copyNoteBtn"
+                  onClick={async () => {
+                    try {
+                      await copyToClipboard(order.admin_note);
+                      toast.success("Catatan disalin");
+                    } catch {
+                      toast.error("Gagal menyalin catatan");
+                    }
+                  }}
+                  title="Salin catatan admin"
+                  style={{
+                    minHeight: "32px",
+                    padding: "0 12px",
+                    fontSize: "11px",
+                    borderRadius: "10px",
+                    marginLeft: "auto",
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "5px",
+                    fontWeight: "800",
+                  }}
+                >
+                  <Copy size={12} />
+                  <span>Salin</span>
+                </button>
               </div>
               <div className="st-noteBody">{order.admin_note}</div>
             </article>

@@ -105,7 +105,18 @@ function ScrollToTop() {
 
 function AppRoutes() {
   const location = useLocation();
-  const backgroundLocation = location.state?.backgroundLocation;
+  const [isMobile, setIsMobile] = React.useState(() =>
+    typeof window !== "undefined" ? window.innerWidth <= 720 : false
+  );
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const onResize = () => setIsMobile(window.innerWidth <= 720);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const backgroundLocation = isMobile ? null : location.state?.backgroundLocation;
   const displayLocation = backgroundLocation || location;
 
   usePageView();
@@ -149,6 +160,26 @@ function AppRoutes() {
 }
 
 export default function App() {
+  useEffect(() => {
+    if (typeof window === "undefined" || !navigator.vibrate) return;
+
+    function handleGlobalClick(e) {
+      const target = e.target.closest(
+        "button, a, input, select, textarea, .btn, .btn-ghost, .pdx-variantCard, .hc-statCard, .ai-chip, .st-tab, .suggestion-item, .st-pasteBtn, .oh-cekBtn"
+      );
+      if (target) {
+        try {
+          navigator.vibrate(10);
+        } catch (err) {
+          // Ignore potential browser safety restrictions
+        }
+      }
+    }
+
+    document.addEventListener("click", handleGlobalClick, { passive: true });
+    return () => document.removeEventListener("click", handleGlobalClick);
+  }, []);
+
   return (
     <BrowserRouter>
       <NetworkBridge />

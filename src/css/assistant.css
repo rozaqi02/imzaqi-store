@@ -8,7 +8,7 @@
   position: fixed;
   right: 18px;
   bottom: calc(18px + env(safe-area-inset-bottom));
-  z-index: 75;
+  z-index: 9996;
   width: 56px;
   height: 56px;
   border-radius: 50%;
@@ -29,12 +29,14 @@
   transition: box-shadow 0.24s ease, transform 0.24s ease;
 }
 
-.ai-bubble:hover {
-  box-shadow:
-    8px 10px 28px rgba(0, 100, 90, 0.44),
-    -4px -4px 14px rgba(79, 255, 218, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -2px 0 rgba(0, 80, 70, 0.34);
+@media (hover: hover) {
+  .ai-bubble:hover {
+    box-shadow:
+      8px 10px 28px rgba(0, 100, 90, 0.44),
+      -4px -4px 14px rgba(79, 255, 218, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -2px 0 rgba(0, 80, 70, 0.34);
+  }
 }
 
 .ai-bubble.is-open {
@@ -113,7 +115,7 @@
   position: fixed;
   right: 18px;
   bottom: calc(86px + env(safe-area-inset-bottom));
-  z-index: 76;
+  z-index: 9995;
   width: min(380px, calc(100vw - 36px));
   height: min(560px, calc(100dvh - 140px));
   display: flex;
@@ -236,13 +238,15 @@
   transition: background 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
-.ai-headClose:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    4px 5px 10px rgba(98, 136, 151, 0.16),
-    -3px -3px 8px rgba(255, 255, 255, 0.85),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(164, 197, 209, 0.22);
+@media (hover: hover) {
+  .ai-headClose:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      4px 5px 10px rgba(98, 136, 151, 0.16),
+      -3px -3px 8px rgba(255, 255, 255, 0.85),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95),
+      inset 0 -1px 0 rgba(164, 197, 209, 0.22);
+  }
 }
 
 :root[data-theme="dark"] .ai-headClose {
@@ -532,13 +536,15 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-.ai-chip:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    4px 5px 12px rgba(102, 140, 156, 0.14),
-    -3px -3px 8px rgba(255, 255, 255, 0.78),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(166, 200, 211, 0.2);
+@media (hover: hover) {
+  .ai-chip:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      4px 5px 12px rgba(102, 140, 156, 0.14),
+      -3px -3px 8px rgba(255, 255, 255, 0.78),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -1px 0 rgba(166, 200, 211, 0.2);
+  }
 }
 
 .ai-chip:active {
@@ -557,12 +563,14 @@
     inset 0 -1px 0 rgba(0, 20, 34, 0.24);
 }
 
-:root[data-theme="dark"] .ai-chip:hover {
-  box-shadow:
-    4px 5px 14px rgba(0, 8, 18, 0.34),
-    -3px -3px 8px rgba(255, 255, 255, 0.045),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(0, 20, 34, 0.28);
+@media (hover: hover) {
+  :root[data-theme="dark"] .ai-chip:hover {
+    box-shadow:
+      4px 5px 14px rgba(0, 8, 18, 0.34),
+      -3px -3px 8px rgba(255, 255, 255, 0.045),
+      inset 0 1px 0 rgba(255, 255, 255, 0.22),
+      inset 0 -1px 0 rgba(0, 20, 34, 0.28);
+  }
 }
 
 :root[data-theme="dark"] .ai-chip:active {
@@ -626,12 +634,14 @@ body:has(.with-sticky-cta) .ai-bubble {
   white-space: nowrap;
 }
 
-.ai-bubbleLink:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    3px 4px 8px rgba(102, 140, 156, 0.14),
-    -2px -2px 6px rgba(255, 255, 255, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+@media (hover: hover) {
+  .ai-bubbleLink:hover {
+    transform: translateY(-1px);
+    box-shadow:
+      3px 4px 8px rgba(102, 140, 156, 0.14),
+      -2px -2px 6px rgba(255, 255, 255, 0.7),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
 }
 
 :root[data-theme="dark"] .ai-bubbleLink {
@@ -730,13 +740,15 @@ body:has(.with-sticky-cta) .ai-bubble {
   transition: transform 0.16s ease, box-shadow 0.16s ease;
 }
 
-.ai-sendBtn:hover:not(:disabled) {
-  transform: translateY(-1px);
-  box-shadow:
-    5px 6px 16px rgba(0, 138, 148, 0.34),
-    -3px -3px 8px rgba(79, 255, 218, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -1px 0 rgba(0, 80, 70, 0.26);
+@media (hover: hover) {
+  .ai-sendBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+      5px 6px 16px rgba(0, 138, 148, 0.34),
+      -3px -3px 8px rgba(79, 255, 218, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6),
+      inset 0 -1px 0 rgba(0, 80, 70, 0.26);
+  }
 }
 
 .ai-sendBtn:active:not(:disabled) {
@@ -751,4 +763,95 @@ body:has(.with-sticky-cta) .ai-bubble {
   opacity: 0.4;
   cursor: not-allowed;
   filter: saturate(0.5) brightness(0.9);
+}
+
+/* ─── Pulsing Glow Halo ─── */
+@keyframes aiHaloRotatePulse {
+  0% {
+    transform: rotate(0deg) scale(1);
+    opacity: 0.55;
+    filter: blur(10px);
+  }
+  50% {
+    transform: rotate(180deg) scale(1.18);
+    opacity: 0.85;
+    filter: blur(14px);
+  }
+  100% {
+    transform: rotate(360deg) scale(1);
+    opacity: 0.55;
+    filter: blur(10px);
+  }
+}
+
+.ai-bubble.ai-bubble--pulse:not(.is-open)::before {
+  animation: aiHaloRotatePulse 4s linear infinite !important;
+}
+
+/* ─── Welcome Tooltip ─── */
+.ai-tooltip {
+  position: fixed;
+  bottom: 92px;
+  right: 28px;
+  z-index: 9997;
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.ai-tooltipContent {
+  padding: 10px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--uni-line);
+  background: var(--uni-neo-control);
+  color: var(--uni-text);
+  font-size: 13px;
+  font-weight: 800;
+  white-space: nowrap;
+  box-shadow:
+    0 12px 28px rgba(0, 214, 180, 0.18),
+    var(--uni-neo-control-shadow);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-color: rgba(79, 255, 200, 0.24);
+}
+
+:root[data-theme="light"] .ai-tooltipContent {
+  border-color: rgba(0, 138, 148, 0.18);
+  box-shadow:
+    0 8px 20px rgba(0, 138, 148, 0.1),
+    var(--uni-neo-control-shadow);
+}
+
+.ai-tooltipArrow {
+  position: absolute;
+  bottom: -6px;
+  right: 24px;
+  width: 12px;
+  height: 12px;
+  background: var(--uni-neo-control);
+  border-right: 1px solid var(--uni-line);
+  border-bottom: 1px solid var(--uni-line);
+  transform: rotate(45deg);
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.05);
+  border-color: rgba(79, 255, 200, 0.24);
+}
+
+:root[data-theme="light"] .ai-tooltipArrow {
+  border-color: rgba(0, 138, 148, 0.18);
+}
+
+/* ─── Backdrop Blur Overlay ─── */
+.ai-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(3, 10, 18, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 9990;
+  pointer-events: auto;
+}
+
+:root[data-theme="light"] .ai-backdrop {
+  background: rgba(13, 29, 36, 0.26);
 }

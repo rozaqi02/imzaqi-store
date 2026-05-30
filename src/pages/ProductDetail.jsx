@@ -90,12 +90,11 @@ function VariantBenefitList({ rawText }) {
     <div className="pdx-benefitList">
       <button
         type="button"
-        className="pdx-benefitToggle"
+        className={`pdx-benefitToggle-modern ${expanded ? "is-expanded" : ""}`}
         onClick={() => setExpanded((p) => !p)}
-        style={{ width: '100%', justifyContent: 'space-between', padding: '8px 12px', background: 'rgba(0,0,0,0.03)', borderRadius: '12px', marginBottom: expanded ? '12px' : '0' }}
       >
-        <span style={{ fontWeight: 600, fontSize: '13px' }}>Lihat Detail & Benefit</span>
-        {expanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        <span>Lihat Detail & Benefit</span>
+        <ChevronDown size={16} className="pdx-benefitChevron" />
       </button>
 
       {expanded && sections.map((section, si) => {

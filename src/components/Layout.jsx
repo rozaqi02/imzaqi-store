@@ -9,9 +9,28 @@ export default function Layout({ children, routeKey }) {
   const location = useLocation();
   const revealKey = routeKey || location.pathname;
   const isAdminDashboardRoute = location.pathname.startsWith("/admin/dashboard");
+  const isCheckoutRoute = location.pathname === "/checkout";
+
+  // Check if viewport is mobile (width <= 720px)
+  const [isMobile, setIsMobile] = React.useState(() => 
+    typeof window !== "undefined" ? window.innerWidth <= 720 : false
+  );
+
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 720);
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
   useAdaptiveMotion();
   // Re-attach reveal observer whenever route changes.
   useRevealOnScroll(revealKey);
+
+  // Footer hidden on mobile checkout only; header always visible
+  const hideFooter = isCheckoutRoute && isMobile;
 
   return (
     <div className="app-shell">
@@ -20,14 +39,15 @@ export default function Layout({ children, routeKey }) {
       <div className="global-noise" aria-hidden="true" />
 
       <Header />
-      <main className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}`}>
+      <main className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}${isCheckoutRoute ? " app-main-checkout" : ""}`}>
         {/* key forces remount on route change for enter animation.
             contain:layout prevents this subtree from triggering full-page repaints. */}
         <div key={revealKey} className="route-transition">
           {children}
         </div>
       </main>
-      {isAdminDashboardRoute ? null : <Footer />}
+      {isAdminDashboardRoute || hideFooter ? null : <Footer />}
     </div>
   );
 }
+

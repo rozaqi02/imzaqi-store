@@ -319,17 +319,13 @@
 @media (max-width: 768px) {
   /* Header itself — same as desktop with backdrop-filter blur.
      Max specificity to beat any conflicting rule in any CSS file. */
-  :root html body .header,
-  :root html body .site-header,
-  :root[data-theme="light"] html body .header,
-  :root[data-theme="light"] html body .site-header,
-  :root[data-theme="dark"] html body .header,
-  :root[data-theme="dark"] html body .site-header,
+  html body .header,
+  html body .site-header,
   html body[data-motion="lite"] .header,
   html body[data-motion="lite"] .site-header {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
-      var(--skeu-panel-bg) !important;
+      linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
     border-bottom: 1px solid var(--brand-line) !important;
     box-shadow: var(--skeu-panel-shadow) !important;
     backdrop-filter: none !important;
@@ -338,16 +334,31 @@
     will-change: transform;
   }
 
+  html[data-theme="light"] body .header,
+  html[data-theme="light"] body .site-header {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0) 24%),
+      var(--uni-neo-panel) !important;
+  }
+
+  html[data-theme="dark"] body .header,
+  html[data-theme="dark"] body .site-header {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+      linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
+  }
+
+
   /* Header buttons — same neumorphism as desktop */
-  :root html body .header .header-cart,
-  :root html body .header .header-iconAction,
-  :root html body .header .nav-toggle,
-  :root[data-theme="light"] html body .header .header-cart,
-  :root[data-theme="light"] html body .header .header-iconAction,
-  :root[data-theme="light"] html body .header .nav-toggle,
-  :root[data-theme="dark"] html body .header .header-cart,
-  :root[data-theme="dark"] html body .header .header-iconAction,
-  :root[data-theme="dark"] html body .header .nav-toggle {
+  html body .header .header-cart,
+  html body .header .header-iconAction,
+  html body .header .nav-toggle,
+  html[data-theme="light"] body .header .header-cart,
+  html[data-theme="light"] body .header .header-iconAction,
+  html[data-theme="light"] body .header .nav-toggle,
+  html[data-theme="dark"] body .header .header-cart,
+  html[data-theme="dark"] body .header .header-iconAction,
+  html[data-theme="dark"] body .header .nav-toggle {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
       var(--skeu-control-bg) !important;

@@ -16,6 +16,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { addOrderToHistory } from "../lib/orderHistory";
+import { copyToClipboard } from "../utils/clipboard";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
 const BUYER_EMAIL_REQUIREMENT_REGEX =
@@ -90,6 +91,55 @@ function QRISSkeleton() {
   );
 }
 
+function QRISZoomModal({ open, qrisUrl, onClose }) {
+  const [phase, setPhase] = useState("entering");
+
+  useEffect(() => {
+    if (!open) return;
+    const f1 = requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        setPhase("open");
+      });
+    });
+    return () => cancelAnimationFrame(f1);
+  }, [open]);
+
+  if (!open || !qrisUrl) return null;
+
+  const handleClose = () => {
+    setPhase("closing");
+    setTimeout(onClose, 200);
+  };
+
+  return createPortal(
+    <div 
+      className={`pay-zoomOverlay pay-zoom-${phase}`} 
+      onClick={handleClose}
+      role="presentation"
+    >
+      <div 
+        className="pay-zoomContent" 
+        onClick={(e) => e.stopPropagation()}
+        role="dialog"
+        aria-modal="true"
+        aria-label="QRIS perbesar"
+      >
+        <button 
+          className="pay-zoomClose" 
+          type="button" 
+          onClick={handleClose} 
+          aria-label="Tutup perbesar"
+        >
+          <X size={22} />
+        </button>
+        <img src={qrisUrl} alt="QRIS Perbesar" className="pay-zoomImg" />
+        <div className="pay-zoomTip">Ketuk di luar gambar untuk kembali</div>
+      </div>
+    </div>,
+    document.body
+  );
+}
+
 function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, onCopied }) {
   const [copied, setCopied] = useState(false);
   const modalRef = React.useRef(null);
@@ -133,7 +183,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
 
   async function copyCode() {
     try {
-      await navigator.clipboard.writeText(orderCode);
+      await copyToClipboard(orderCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 1800);
       onCopied?.();
@@ -203,12 +253,19 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
 
 function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }) {
   const modalRef = React.useRef(null);
+  const [checked, setChecked] = useState([false, false, false]);
+
+  useEffect(() => {
+    if (open) {
+      setChecked([false, false, false]);
+    }
+  }, [open]);
 
   useDialogA11y({
     open,
     containerRef: modalRef,
     onClose: onCancel,
-    initialFocusSelector: ".pay-confirmPrimaryBtn",
+    initialFocusSelector: ".pay-confirmCloseBtn",
   });
 
   if (!open || typeof document === "undefined") return null;
@@ -224,6 +281,16 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
     "Nominal transfer sesuai dengan total tagihan di atas",
     "Pembayaran sudah berhasil (bukan pending atau gagal)",
   ];
+
+  const handleCheck = (index) => {
+    setChecked((prev) => {
+      const next = [...prev];
+      next[index] = !next[index];
+      return next;
+    });
+  };
+
+  const isAllChecked = checked.every(Boolean);
 
   return createPortal(
     <div className="modal-backdrop pay-overlay" onMouseDown={onCancel} role="presentation">
@@ -242,7 +309,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
           </div>
           <div className="pay-confirmModalHeaderCopy">
             <div className="pay-confirmModalTitle">{isFree ? "Konfirmasi Order Gratis" : "Konfirmasi Pembayaran"}</div>
-            <div className="pay-confirmModalSub">{isFree ? "Pastikan semua detail order sudah benar" : "Pastikan semua syarat di bawah terpenuhi"}</div>
+            <div className="pay-confirmModalSub">{isFree ? "Pastikan semua detail order sudah benar" : "Centang semua opsi untuk mengonfirmasi"}</div>
           </div>
           <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
             <X size={16} />
@@ -257,29 +324,45 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
         </div>
 
         {/* Checklist */}
-        {/* eslint-disable-next-line jsx-a11y/no-redundant-roles */}
-        <ul className="pay-confirmChecklist" role="list">
+        <div className="pay-confirmChecklist" role="group" aria-label="Persyaratan Konfirmasi">
           {checklist.map((text, i) => (
-            <li key={i} className="pay-confirmCheckItem">
-              <span className="pay-confirmCheckDot" aria-hidden="true">
-                <Check size={11} strokeWidth={3} />
+            <label key={i} className="pay-confirmCheckItem" style={{ cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                checked={checked[i]}
+                onChange={() => handleCheck(i)}
+                className="pay-confirmCheckbox-hidden"
+                style={{ display: 'none' }}
+              />
+              <span className={`pay-confirmCheckDot ${checked[i] ? 'is-checked' : ''}`} aria-hidden="true">
+                {checked[i] && <Check size={11} strokeWidth={3.5} />}
               </span>
               <span>{text}</span>
-            </li>
+            </label>
           ))}
-        </ul>
+        </div>
 
         {/* Warning — only for paid orders */}
         {!isFree && (
-        <div className="pay-confirmWarning">
-          <Info size={14} />
-          <span>Konfirmasi palsu akan memperlambat proses order kamu.</span>
-        </div>
+          <div className="pay-confirmWarning">
+            <Info size={14} />
+            <span>Konfirmasi palsu akan memperlambat proses order kamu.</span>
+          </div>
         )}
 
         {/* Actions */}
         <div className="pay-confirmActionsNew">
-          <button className="pay-confirmPrimaryBtn" type="button" onClick={onConfirm}>
+          <button 
+            className="pay-confirmPrimaryBtn" 
+            type="button" 
+            onClick={onConfirm}
+            disabled={!isAllChecked}
+            style={{ 
+              opacity: isAllChecked ? 1 : 0.42, 
+              cursor: isAllChecked ? 'pointer' : 'not-allowed',
+              filter: isAllChecked ? 'none' : 'grayscale(30%)'
+            }}
+          >
             <Check size={16} strokeWidth={2.5} />
             {isFree ? "Ya, Konfirmasi Order" : "Ya, Saya Sudah Bayar"}
           </button>
@@ -338,6 +421,7 @@ export default function Pay() {
   const [qrisMode, setQrisMode] = useState("idle");
   const [productIconLookup, setProductIconLookup] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [isZoomed, setIsZoomed] = useState(false);
 
   useEffect(() => {
     fetchSettings()
@@ -966,18 +1050,41 @@ export default function Pay() {
                       <>
                         {!qrisLoaded && !qrisFailed ? <QRISSkeleton /> : null}
                         {qrisUrl ? (
-                          <img
-                            src={qrisUrl}
-                            alt="QRIS pembayaran"
-                            className="qris-img"
-                            onLoad={() => setQrisLoaded(true)}
-                            onError={(event) => {
-                              event.target.style.display = "none";
-                              setQrisFailed(true);
-                              setQrisLoaded(true);
-                            }}
-                            style={{ display: qrisLoaded && !qrisFailed ? "block" : "none" }}
-                          />
+                          <div style={{ width: '100%' }}>
+                            <img
+                              src={qrisUrl}
+                              alt="QRIS pembayaran"
+                              className="qris-img"
+                              onLoad={() => setQrisLoaded(true)}
+                              onError={(event) => {
+                                event.target.style.display = "none";
+                                setQrisFailed(true);
+                                setQrisLoaded(true);
+                              }}
+                              onClick={() => setIsZoomed(true)}
+                              style={{ display: qrisLoaded && !qrisFailed ? "block" : "none", cursor: 'zoom-in' }}
+                            />
+                            {qrisLoaded && !qrisFailed && (
+                              <a
+                                href={qrisUrl}
+                                download="qris-imzaqi-store.png"
+                                className="btn btn-ghost btn-sm pay-qrisDownload"
+                                style={{
+                                  marginTop: '10px',
+                                  width: '100%',
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '6px',
+                                  borderRadius: '12px',
+                                  height: '38px',
+                                  fontSize: '12px'
+                                }}
+                              >
+                                Simpan QRIS ke Galeri
+                              </a>
+                            )}
+                          </div>
                         ) : null}
                         {qrisFailed ? <div className="hint subtle">QRIS gagal dimuat. Refresh lalu coba lagi.</div> : null}
                       </>
@@ -1037,6 +1144,12 @@ export default function Pay() {
         adminWaUrl={adminWaUrl}
         onClose={() => nav(statusUrl)}
         onCopied={() => toast.success("ID order disalin")}
+      />
+
+      <QRISZoomModal
+        open={isZoomed}
+        qrisUrl={qrisUrl}
+        onClose={() => setIsZoomed(false)}
       />
 
       {!ok && !orderCode && items.length > 0 ? (

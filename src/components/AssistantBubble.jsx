@@ -52,8 +52,39 @@ export default function AssistantBubble() {
   const [history, setHistory] = useState([]);
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState("");
+  const [showTooltip, setShowTooltip] = useState(false);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+
+  useEffect(() => {
+    if (hidden) return;
+    try {
+      const closedBefore = localStorage.getItem("imzaqi_assistant_opened") === "true";
+      if (!closedBefore) {
+        const timer = setTimeout(() => {
+          setShowTooltip(true);
+        }, 4000);
+        return () => clearTimeout(timer);
+      }
+    } catch (e) {
+      // LocalStorage fallback for private browsers
+    }
+  }, [hidden]);
+
+  function handleOpen() {
+    setOpen((v) => {
+      const next = !v;
+      if (next) {
+        setShowTooltip(false);
+        try {
+          localStorage.setItem("imzaqi_assistant_opened", "true");
+        } catch (e) {
+          // Ignore write restriction
+        }
+      }
+      return next;
+    });
+  }
 
   const lastItem = history.length ? history[history.length - 1] : null;
   const suggestions = useMemo(() => {
@@ -131,11 +162,39 @@ export default function AssistantBubble() {
 
   return createPortal(
     <>
+      {/* Welcome Tooltip */}
+      <AnimatePresence>
+        {showTooltip && !open ? (
+          <motion.div
+            className="ai-tooltip"
+            initial={{ opacity: 0, y: 8, scale: 0.92 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 4, scale: 0.94 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            onClick={handleOpen}
+            role="button"
+            tabIndex={0}
+            aria-label="Tanya asisten"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" || e.key === " ") {
+                e.preventDefault();
+                handleOpen();
+              }
+            }}
+          >
+            <div className="ai-tooltipContent">
+              <span>Butuh bantuan? Tanya saya! ✨</span>
+            </div>
+            <div className="ai-tooltipArrow" />
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
+
       {/* Bubble button */}
       <motion.button
         type="button"
-        className={`ai-bubble ${open ? "is-open" : ""}`}
-        onClick={() => setOpen((v) => !v)}
+        className={`ai-bubble ${open ? "is-open" : ""} ${showTooltip && !open ? "ai-bubble--pulse" : ""}`}
+        onClick={handleOpen}
         aria-label={open ? "Tutup asisten" : "Buka asisten"}
         initial={{ opacity: 0, y: 16, scale: 0.8 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -157,132 +216,143 @@ export default function AssistantBubble() {
       {/* Panel */}
       <AnimatePresence>
         {open ? (
-          <motion.aside
-            className="ai-panel"
-            initial={{ opacity: 0, y: 24, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 16, scale: 0.97 }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            role="dialog"
-            aria-label="Asisten Imzaqi"
-          >
-            {/* Header */}
-            <header className="ai-head">
-              <div className="ai-headIcon" aria-hidden="true">
-                <MessageSquareText size={16} />
-              </div>
-              <div className="ai-headCopy">
-                <strong>Imzaqi Assistant</strong>
-                <span>Selalu siap bantu — gratis 24/7</span>
-              </div>
-              <button
-                type="button"
-                className="ai-headClose"
-                onClick={() => setOpen(false)}
-                aria-label="Tutup"
-              >
-                <X size={16} />
-              </button>
-            </header>
-
-            {/* Conversation */}
-            <div className="ai-scroll" ref={scrollRef}>
-              {/* Greeting */}
-              <div className="ai-msg ai-msg--assistant">
-                <div className="ai-avatar" aria-hidden="true">
-                  <MessageSquareText size={13} />
+          <>
+            <motion.div
+              className="ai-backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.24 }}
+              onClick={() => setOpen(false)}
+              aria-hidden="true"
+            />
+            <motion.aside
+              className="ai-panel"
+              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 16, scale: 0.97 }}
+              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+              role="dialog"
+              aria-label="Asisten Imzaqi"
+            >
+              {/* Header */}
+              <header className="ai-head">
+                <div className="ai-headIcon" aria-hidden="true">
+                  <MessageSquareText size={16} />
                 </div>
-                <div className="ai-bubbleMsg">
-                  <p className="ai-bubbleText">
-                    Hai 👋 Aku asisten Imzaqi. Kamu bisa pilih topik di bawah, atau ketik pertanyaan langsung — aku coba bantu.
-                  </p>
+                <div className="ai-headCopy">
+                  <strong>Imzaqi Assistant</strong>
+                  <span>Selalu siap bantu — gratis 24/7</span>
                 </div>
-              </div>
+                <button
+                  type="button"
+                  className="ai-headClose"
+                  onClick={() => setOpen(false)}
+                  aria-label="Tutup"
+                >
+                  <X size={16} />
+                </button>
+              </header>
 
-              {/* History */}
-              {history.map((item, idx) => (
-                <React.Fragment key={`h-${idx}-${item.id}`}>
-                  <div className="ai-msg ai-msg--user">
-                    <div className="ai-bubbleMsg">
-                      <p className="ai-bubbleText">{item.q}</p>
-                    </div>
+              {/* Conversation */}
+              <div className="ai-scroll" ref={scrollRef}>
+                {/* Greeting */}
+                <div className="ai-msg ai-msg--assistant">
+                  <div className="ai-avatar" aria-hidden="true">
+                    <MessageSquareText size={13} />
                   </div>
-                  <div className="ai-msg ai-msg--assistant">
-                    <div className="ai-avatar" aria-hidden="true">
-                      <MessageSquareText size={13} />
-                    </div>
-                    <div className="ai-bubbleMsg">
-                      {(idx === history.length - 1 && (typing || item._pending)) || (item._pending && !item.a.length) ? (
-                        <div className="ai-typing">
-                          <span /><span /><span />
-                        </div>
-                      ) : (
-                        item.a.map((line, li) => <FormattedLine key={li} text={line} />)
-                      )}
-                    </div>
+                  <div className="ai-bubbleMsg">
+                    <p className="ai-bubbleText">
+                      Hai 👋 Aku asisten Imzaqi. Kamu bisa pilih topik di bawah, atau ketik pertanyaan langsung — aku coba bantu.
+                    </p>
                   </div>
-                </React.Fragment>
-              ))}
-            </div>
+                </div>
 
-            {/* Suggestions chips */}
-            <div className="ai-suggest" role="list" aria-label="Pertanyaan yang sering ditanya">
-              {history.length > 0 ? (
-                <div className="ai-suggestHead">
-                  <span>Lanjutkan dengan:</span>
-                  <button type="button" className="ai-resetBtn" onClick={reset}>
-                    Mulai ulang
-                  </button>
-                </div>
-              ) : (
-                <div className="ai-suggestHead">
-                  <span>Pilih topik atau ketik:</span>
-                </div>
-              )}
-              <div className="ai-suggestList">
-                {suggestions.map((s) => (
-                  <button
-                    key={s.id}
-                    type="button"
-                    role="listitem"
-                    className="ai-chip"
-                    onClick={() => ask(s.id)}
-                  >
-                    {s.q}
-                  </button>
+                {/* History */}
+                {history.map((item, idx) => (
+                  <React.Fragment key={`h-${idx}-${item.id}`}>
+                    <div className="ai-msg ai-msg--user">
+                      <div className="ai-bubbleMsg">
+                        <p className="ai-bubbleText">{item.q}</p>
+                      </div>
+                    </div>
+                    <div className="ai-msg ai-msg--assistant">
+                      <div className="ai-avatar" aria-hidden="true">
+                        <MessageSquareText size={13} />
+                      </div>
+                      <div className="ai-bubbleMsg">
+                        {(idx === history.length - 1 && (typing || item._pending)) || (item._pending && !item.a.length) ? (
+                          <div className="ai-typing">
+                            <span /><span /><span />
+                          </div>
+                        ) : (
+                          item.a.map((line, li) => <FormattedLine key={li} text={line} />)
+                        )}
+                      </div>
+                    </div>
+                  </React.Fragment>
                 ))}
               </div>
 
-              {/* Manual input */}
-              <form
-                className="ai-inputBar"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  askCustom();
-                }}
-              >
-                <input
-                  ref={inputRef}
-                  className="ai-input"
-                  type="text"
-                  placeholder="Ketik pertanyaanmu…"
-                  value={draft}
-                  onChange={(e) => setDraft(e.target.value)}
-                  maxLength={300}
-                  disabled={typing}
-                  aria-label="Pertanyaan kamu"
-                />
-                <button
-                  type="submit"
-                  className="ai-sendBtn"
-                  disabled={!draft.trim() || typing}
-                  aria-label="Kirim"
+              {/* Suggestions chips */}
+              <div className="ai-suggest" role="list" aria-label="Pertanyaan yang sering ditanya">
+                {history.length > 0 ? (
+                  <div className="ai-suggestHead">
+                    <span>Lanjutkan dengan:</span>
+                    <button type="button" className="ai-resetBtn" onClick={reset}>
+                      Mulai ulang
+                    </button>
+                  </div>
+                ) : (
+                  <div className="ai-suggestHead">
+                    <span>Pilih topik atau ketik:</span>
+                  </div>
+                )}
+                <div className="ai-suggestList">
+                  {suggestions.map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      role="listitem"
+                      className="ai-chip"
+                      onClick={() => ask(s.id)}
+                    >
+                      {s.q}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Manual input */}
+                <form
+                  className="ai-inputBar"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+                    askCustom();
+                  }}
                 >
-                  <Send size={15} strokeWidth={2.4} />
-                </button>
-              </form>
-            </div>
-          </motion.aside>
+                  <input
+                    ref={inputRef}
+                    className="ai-input"
+                    type="text"
+                    placeholder="Ketik pertanyaanmu…"
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    maxLength={300}
+                    disabled={typing}
+                    aria-label="Pertanyaan kamu"
+                  />
+                  <button
+                    type="submit"
+                    className="ai-sendBtn"
+                    disabled={!draft.trim() || typing}
+                    aria-label="Kirim"
+                  >
+                    <Send size={15} strokeWidth={2.4} />
+                  </button>
+                </form>
+              </div>
+            </motion.aside>
+          </>
         ) : null}
       </AnimatePresence>
     </>,
