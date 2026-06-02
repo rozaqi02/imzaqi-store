@@ -1367,8 +1367,8 @@
 
 .catalog-page .catalog-grid {
   overflow: visible !important;
-  padding: 6px 0 2px !important;
-  margin: 0 !important;
+  padding: 6px 12px 14px !important;
+  margin: 0 -12px !important;
 }
 
 .detail-page .product-detail,
@@ -1380,8 +1380,7 @@
 .catalog-page .catalog-content {
   width: 100% !important;
   min-width: 0 !important;
-  overflow-x: clip !important;
-  overflow-y: visible !important;
+  overflow: visible !important;
   /* Padding gives shadow room to breathe */
   padding-bottom: 8px !important;
 }
@@ -1397,8 +1396,8 @@
   overflow-x: auto !important;
   /* Don't clip Y — shadow extends below chips */
   overflow-y: visible !important;
-  padding-top: 4px !important;
-  padding-bottom: 8px !important;
+  padding-top: 10px !important;
+  padding-bottom: 22px !important;
   padding-right: 0 !important;
 }
 
@@ -1422,8 +1421,8 @@
   }
 
   .catalog-page .catalog-grid {
-    padding: 4px 0 0 !important;
-    margin: 0 !important;
+    padding: 4px 10px 10px !important;
+    margin: 0 -10px !important;
   }
 }
 
@@ -1585,8 +1584,8 @@
   width: 100% !important;
   min-width: 0 !important;
   overflow: visible !important;
-  margin: 0 0 12px !important;
-  padding: 2px 4px 4px 2px !important;
+  margin: -8px 0 -6px !important;
+  padding: 10px 8px 22px 4px !important;
 }
 
 .catalog-page .catalog-quickChip {
@@ -1660,8 +1659,8 @@
     overflow-x: auto !important;
     overflow-y: visible !important;
     gap: 8px !important;
-    margin: 0 0 10px !important;
-    padding: 2px 4px 10px 2px !important;
+    margin: -8px 0 -2px !important;
+    padding: 10px 4px 22px 2px !important;
     scrollbar-width: none;
   }
 

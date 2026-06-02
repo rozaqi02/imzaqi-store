@@ -325,9 +325,9 @@
   html body[data-motion="lite"] .site-header {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
-      linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
+      linear-gradient(180deg, rgba(17, 29, 58, 0.985), rgba(8, 14, 31, 0.97) 55%, rgba(4, 8, 21, 0.985) 100%) !important;
     border-bottom: 1px solid var(--brand-line) !important;
-    box-shadow: var(--skeu-panel-shadow) !important;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     transform: translateZ(0);
@@ -338,14 +338,16 @@
   html[data-theme="light"] body .site-header {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0) 24%),
-      var(--uni-neo-panel) !important;
+      linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(236, 247, 251, 0.97) 56%, rgba(221, 240, 246, 0.985) 100%) !important;
+    box-shadow: 0 5px 16px rgba(80, 115, 130, 0.12) !important;
   }
 
   html[data-theme="dark"] body .header,
   html[data-theme="dark"] body .site-header {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
-      linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
+      linear-gradient(180deg, rgba(17, 29, 58, 0.985), rgba(8, 14, 31, 0.97) 55%, rgba(4, 8, 21, 0.985) 100%) !important;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22) !important;
   }
 
 

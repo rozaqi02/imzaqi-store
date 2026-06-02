@@ -706,7 +706,7 @@ html,body{background:#d8fff5!important;}
 .nf-linkCopy small{display:block;margin-top:2px;color:rgba(255,255,255,0.5);font-size:12px;}
 .nf-linkArrow{color:rgba(255,255,255,0.3);flex-shrink:0;}
 .nf-linkCard:hover .nf-linkArrow{color:rgba(29,131,255,0.7);}
-.site-header{position:fixed!important;top:0;left:0;right:0;z-index:1000;padding:10px 0;background:linear-gradient(180deg, rgba(5,7,15,.92), rgba(5,7,15,.76));backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 18px 60px rgba(0,0,0,.18);pointer-events:auto;}
+.site-header{position:fixed!important;top:0;left:0;right:0;z-index:1000;padding:10px 0;background:linear-gradient(180deg, rgba(5,7,15,.92), rgba(5,7,15,.76));backdrop-filter:blur(20px) saturate(140%);-webkit-backdrop-filter:blur(20px) saturate(140%);border-bottom:1px solid rgba(255,255,255,.08);box-shadow:0 8px 24px rgba(0,0,0,.12);pointer-events:auto;}
 .site-headerInner{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:18px;min-height:52px;pointer-events:auto;}
 .site-brand{display:inline-flex;align-items:center;gap:12px;min-width:0;justify-self:start;}
 .site-brandLogo{display:block;width:auto;height:44px;max-width:148px;border-radius:0;box-shadow:none;object-fit:contain;}
@@ -1551,8 +1551,8 @@ select,
   -webkit-backdrop-filter: blur(20px) saturate(140%);
   border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.12));
   box-shadow:
-    0 8px 32px rgba(0, 0, 0, 0.28),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.3);
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
 }
 
 /* ── Toast: raised panel ── */
@@ -1616,8 +1616,8 @@ select,
   background: var(--brand-header-bg);
   border-bottom-color: var(--brand-line);
   box-shadow:
-    0 6px 24px rgba(37, 88, 110, 0.1),
-    inset 0 -1px 0 rgba(154, 191, 203, 0.2);
+    0 5px 18px rgba(37, 88, 110, 0.08),
+    inset 0 -1px 0 rgba(154, 191, 203, 0.1);
 }
 
 :root[data-theme="light"] .pill,

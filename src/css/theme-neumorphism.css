@@ -148,8 +148,7 @@ body,
     var(--uni-neo-panel) !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
   box-shadow:
-    0 24px 64px rgba(0, 0, 0, 0.72),
-    0 8px 20px rgba(0, 0, 0, 0.42),
+    0 8px 28px rgba(0, 0, 0, 0.44),
     -4px -4px 10px rgba(255, 255, 255, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.18),
     inset 0 -1px 0 rgba(0, 0, 0, 0.28) !important;
@@ -159,8 +158,7 @@ body,
 :root[data-theme="light"] .site-header {
   border-bottom: 1px solid rgba(119, 175, 194, 0.18) !important;
   box-shadow:
-    0 20px 48px rgba(80, 115, 130, 0.28),
-    0 6px 14px rgba(80, 115, 130, 0.16),
+    0 6px 20px rgba(80, 115, 130, 0.18),
     -5px -5px 12px rgba(255, 255, 255, 0.82),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 0 rgba(166, 200, 211, 0.22) !important;
@@ -1108,8 +1106,18 @@ select.input {
 @media (max-width: 720px) {
   .header,
   .site-header {
-    /* Mobile header uses identical neumorphism as desktop.
-       Full override is in motion-adaptive.css which loads last. */
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 20%),
+      linear-gradient(180deg, rgba(17, 29, 58, 0.985), rgba(8, 14, 31, 0.97) 55%, rgba(4, 8, 21, 0.985) 100%) !important;
+    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22) !important;
+  }
+
+  :root[data-theme="light"] .header,
+  :root[data-theme="light"] .site-header {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0) 24%),
+      linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(236, 247, 251, 0.97) 56%, rgba(221, 240, 246, 0.985) 100%) !important;
+    box-shadow: 0 5px 16px rgba(80, 115, 130, 0.12) !important;
   }
 
   .header-inner {

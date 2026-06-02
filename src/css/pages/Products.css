@@ -559,10 +559,10 @@
   gap: 10px;
   overflow-x: auto;
   overflow-y: visible;
-  padding-top: 4px;
-  padding-bottom: 8px;
+  padding-top: 10px;
+  padding-bottom: 22px;
   padding-right: 0;
-  margin: 0 0 14px;
+  margin: -6px 0 0px;
   width: 100%;
   max-width: 100%;
   min-width: 0;
@@ -1104,8 +1104,8 @@
     max-width: 100%;
     overflow-x: auto;
     overflow-y: visible;
-    padding-top: 4px;
-    padding-bottom: 8px;
+    padding-top: 10px;
+    padding-bottom: 22px;
     padding-right: 0;
   }
 }
@@ -1233,7 +1233,8 @@
 
   .catalog-quickFilters {
     gap: 8px;
-    margin-bottom: 12px;
+    margin-top: -6px;
+    margin-bottom: -2px;
   }
 
   .catalog-quickChip {
@@ -1368,7 +1369,10 @@
     display: flex;
     overflow-x: auto;
     overflow-y: visible;
-    padding-bottom: 8px;
+    padding-top: 10px;
+    padding-bottom: 22px;
+    margin-top: -6px;
+    margin-bottom: -2px;
   }
 
   .catalog-quickChip {

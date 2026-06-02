@@ -4,7 +4,7 @@ import { ArrowRight, ShoppingBag, CreditCard, Hash, Activity } from "lucide-reac
 
 import Hero from "../components/Hero";
 import ProductTile from "../components/ProductTile";
-import { fetchProducts, fetchTopSellingIds, fetchPromoCodes, fetchSettings } from "../lib/api";
+import { fetchProducts, fetchTopSellingIds, fetchPromoCodes, fetchSettings, fetchActiveFlashSales } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useToast } from "../context/ToastContext";
@@ -73,6 +73,7 @@ export default function Home() {
   const [products, setProducts] = useState([]);
   const [topIds, setTopIds] = useState([]);
   const [promos, setPromos] = useState([]);
+  const [flashSales, setFlashSales] = useState([]);
   const [error, setError] = useState("");
   const toast = useToast();
 
@@ -85,15 +86,17 @@ export default function Home() {
     let alive = true;
     (async () => {
       try {
-        const [data, ranking, promoData, settingsData] = await Promise.all([
+        const [data, ranking, promoData, settingsData, flashSalesData] = await Promise.all([
           fetchProducts(),
           fetchTopSellingIds(),
           fetchPromoCodes().catch(() => []),
           fetchSettings().catch(() => ({})),
+          fetchActiveFlashSales().catch(() => []),
         ]);
         if (!alive) return;
         setProducts(data);
         setTopIds(ranking);
+        setFlashSales(flashSalesData);
 
         // Get allowed codes from site settings (empty array = hidden by default)
         const allowedHomeCodes = settingsData?.home_promos?.codes || [];
@@ -153,7 +156,7 @@ export default function Home() {
 
   return (
     <div className="page home-page">
-      <Hero products={products} />
+      <Hero products={products} promos={promos} flashSales={flashSales} />
 
       {/* ── Diskon Hub ── */}
       {promos.length > 0 && (
