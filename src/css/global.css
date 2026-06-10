@@ -19,8 +19,9 @@ html{scroll-behavior:smooth;scrollbar-gutter:stable;}
 body{font-family:"Plus Jakarta Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,"Noto Sans","Apple Color Emoji","Segoe UI Emoji";color:var(--text);background:radial-gradient(1200px 500px at 15% -10%, rgba(29,131,255,.35) 0%, rgba(29,131,255,0) 60%),radial-gradient(900px 400px at 110% 10%, rgba(16,83,255,.28) 0%, rgba(16,83,255,0) 55%),radial-gradient(700px 300px at 40% 120%, rgba(29,131,255,.18) 0%, rgba(29,131,255,0) 55%),linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);min-height:100vh;}
 #root,.app-shell,.route-transition,.app-main,.page,.section,.container{min-width:0;max-width:100%;}
 .app-main{overflow-x: clip;}
-/* Admin page: remove overflow-x clip so position:sticky on sidebar works */
-.app-main-admin{overflow-x: visible;}
+/* Admin + catalog: remove overflow-x clip so position:sticky sidebars work */
+.app-main-admin,
+.app-main-catalog{overflow: visible !important;}
 ::selection{background:rgba(29,131,255,.28);color:#fff;}
 a{color:inherit;text-decoration:none;}
 code{color:#c8ffe7;}
@@ -95,7 +96,7 @@ body.checkout-open{overflow:hidden;}
     rgba(3,22,15,.55),
     rgba(3,22,15,0)
   );}
-.header{position:fixed;top:0;left:0;right:0;z-index:1000;background:rgba(3, 22, 15, .88);border-bottom:1px solid var(--line);padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right));pointer-events:auto;}
+.header{position:fixed;top:0;left:0;right:0;z-index:1000;border-bottom:1px solid var(--line);padding-left:calc(16px + env(safe-area-inset-left));padding-right:calc(16px + env(safe-area-inset-right));pointer-events:auto;}
 .header-inner{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:10px/**/0;}
 .brand{display:flex;align-items:center;gap:12px;min-width:120px;}
 .brand-img{height:42px;width:auto;display:block;filter:drop-shadow(0 10px 24px rgba(29,131,255,.10));}
@@ -517,7 +518,6 @@ html,body{background:#d8fff5!important;}
     display:none!important;
   }
 
-  .header,
   .toast,
   .sticky-cta,
   .mobile-backdrop,
@@ -813,17 +813,38 @@ html,body{background:#d8fff5!important;}
 }
 
 
-/* ── Theme transition (smooth dark/light switch) ── */
-html {
-  transition:
-    background-color 0.28s ease,
-    color 0.28s ease;
+/* ── Theme transition — single overlay fade (1 layer, no per-element repaint) ── */
+html.no-theme-transition,
+html.no-theme-transition *,
+html.theme-fade-active,
+html.theme-fade-active * {
+  transition: none !important;
 }
 
-/* Prevent transition on initial load */
-html.no-theme-transition,
-html.no-theme-transition * {
-  transition: none !important;
+@media (prefers-reduced-motion: no-preference) {
+  html.theme-fade-active::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: 10002;
+    pointer-events: none;
+    opacity: 1;
+    background: #020611;
+    will-change: opacity;
+  }
+
+  html[data-theme-fade="light"].theme-fade-active::after {
+    background: #d8fff5;
+  }
+
+  html[data-theme-fade="dark"].theme-fade-active::after {
+    background: #020611;
+  }
+
+  html.theme-fade-active.theme-fade-out::after {
+    opacity: 0;
+    transition: opacity 1s cubic-bezier(0.22, 1, 0.36, 1);
+  }
 }
 
 /* ── Loading spinner for buttons ── */
@@ -991,6 +1012,17 @@ html.no-theme-transition * {
 .route-transition {
   animation: routeInDirectional 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
   will-change: transform, opacity;
+}
+
+html[data-motion="full"] .route-transition:not(:has(.catalog-page)) {
+  animation: none;
+  will-change: auto;
+}
+
+.app-main-catalog .route-transition {
+  animation: none !important;
+  transform: none !important;
+  will-change: auto !important;
 }
 
 [data-motion="off"] .route-transition {
@@ -1220,14 +1252,41 @@ select,
   }
 }
 
+/* ── Floating action stack (assistant + scroll-to-top) ── */
+:root {
+  --fab-edge-x: max(18px, calc(18px + env(safe-area-inset-right)));
+  --fab-base-bottom: 18px;
+  --fab-lift: 0px;
+  --fab-assistant-size: 56px;
+  --fab-scroll-size: 44px;
+  --fab-gap: 12px;
+}
+
+@media (max-width: 720px) {
+  :root {
+    --fab-edge-x: max(14px, calc(14px + env(safe-area-inset-right)));
+    --fab-base-bottom: 14px;
+    --fab-assistant-size: 52px;
+    --fab-scroll-size: 40px;
+    --fab-gap: 10px;
+  }
+}
+
+body:has(.with-sticky-cta) {
+  --fab-lift: 78px;
+}
+
 /* ── Scroll-to-top button (item 8 CSS) ── */
 .scroll-to-top {
   position: fixed;
-  right: max(16px, calc(16px + env(safe-area-inset-right)));
-  bottom: max(80px, calc(80px + env(safe-area-inset-bottom)));
-  z-index: 92;
-  width: 44px;
-  height: 44px;
+  right: var(--fab-edge-x);
+  bottom: calc(
+    var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift) +
+      var(--fab-assistant-size) + var(--fab-gap)
+  );
+  z-index: 9997;
+  width: var(--fab-scroll-size);
+  height: var(--fab-scroll-size);
   border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.12);
   background:
@@ -1261,12 +1320,14 @@ select,
     rgba(8, 14, 31, 0.92);
 }
 
+body:has(.ai-bubble.is-open) .scroll-to-top {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 @media (max-width: 720px) {
   .scroll-to-top {
-    right: max(12px, calc(12px + env(safe-area-inset-right)));
-    bottom: max(140px, calc(140px + env(safe-area-inset-bottom)));
-    width: 40px;
-    height: 40px;
     border-radius: 12px;
   }
 }
@@ -1441,20 +1502,15 @@ select,
 
 /* ── Buttons: raised, tactile ── */
 .btn {
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 28%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
-  color: #032235;
-  box-shadow: var(--skeu-accent-shadow, 0 20px 34px rgba(0, 214, 180, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.42), inset 0 -3px 0 rgba(3, 66, 74, 0.36));
-  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  border: 1px solid var(--imzaqi-btn-border, rgba(78, 255, 218, 0.44));
+  background: var(--imzaqi-btn-face);
+  color: var(--imzaqi-btn-text, #032235);
+  box-shadow: var(--imzaqi-btn-shadow, var(--skeu-accent-shadow));
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
 }
 
 .btn:hover {
-  box-shadow:
-    0 24px 42px rgba(0, 214, 180, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -3px 0 rgba(3, 66, 74, 0.4);
+  box-shadow: var(--imzaqi-btn-shadow-hover, var(--imzaqi-btn-shadow));
 }
 
 .btn:active {
@@ -1533,27 +1589,13 @@ select,
 }
 
 .tab-btn.active {
-  border-color: rgba(79, 255, 200, 0.26);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
-  color: #032235;
-  box-shadow:
-    0 14px 28px rgba(0, 214, 180, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.44);
+  border-color: var(--imzaqi-btn-border, rgba(78, 255, 218, 0.44));
+  background: var(--imzaqi-btn-face);
+  color: var(--imzaqi-btn-text, #032235);
+  box-shadow: var(--imzaqi-btn-shadow);
 }
 
-/* ── Header: frosted glass neumorphism ── */
-.header {
-  background:
-    linear-gradient(180deg, rgba(4, 7, 20, 0.92), rgba(4, 7, 20, 0.76));
-  backdrop-filter: blur(20px) saturate(140%);
-  -webkit-backdrop-filter: blur(20px) saturate(140%);
-  border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.12));
-  box-shadow:
-    0 8px 24px rgba(0, 0, 0, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.2);
-}
+/* Header surface — neumorphism tokens applied in theme-neumorphism.css */
 
 /* ── Toast: raised panel ── */
 .toast {
@@ -1567,7 +1609,10 @@ select,
 
 /* ── Light mode overrides ── */
 :root[data-theme="light"] .btn {
-  box-shadow: var(--skeu-accent-shadow);
+  background: var(--imzaqi-btn-face);
+  color: var(--imzaqi-btn-text, #032235);
+  border-color: var(--imzaqi-btn-border);
+  box-shadow: var(--imzaqi-btn-shadow);
 }
 
 :root[data-theme="light"] .btn-ghost {
@@ -1612,13 +1657,7 @@ select,
   box-shadow: var(--skeu-panel-shadow);
 }
 
-:root[data-theme="light"] .header {
-  background: var(--brand-header-bg);
-  border-bottom-color: var(--brand-line);
-  box-shadow:
-    0 5px 18px rgba(37, 88, 110, 0.08),
-    inset 0 -1px 0 rgba(154, 191, 203, 0.1);
-}
+/* Light header — neumorphism in theme-neumorphism.css */
 
 :root[data-theme="light"] .pill,
 :root[data-theme="light"] .tab-btn {
@@ -1630,14 +1669,10 @@ select,
 }
 
 :root[data-theme="light"] .tab-btn.active {
-  border-color: rgba(0, 138, 148, 0.28);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
-  color: #032235;
-  box-shadow:
-    0 12px 24px rgba(0, 138, 148, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  border-color: var(--imzaqi-btn-border);
+  background: var(--imzaqi-btn-face);
+  color: var(--imzaqi-btn-text, #032235);
+  box-shadow: var(--imzaqi-btn-shadow);
 }
 
 :root[data-theme="light"] .toast {

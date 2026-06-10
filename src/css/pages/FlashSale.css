@@ -35,6 +35,12 @@
 }
 
 /* Countdown */
+.flash-countdown-wrap {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
 .flash-countdown {
   display: inline-flex;
   align-items: center;
@@ -71,6 +77,21 @@
   color: var(--brand-muted);
   font-size: 12px;
   font-weight: 800;
+}
+
+.flash-sale-progress {
+  width: min(220px, 42vw);
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 60, 100, 0.12);
+  overflow: hidden;
+}
+
+.flash-sale-progressFill {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #ff3c64, #ff7a96);
 }
 
 /* Horizontal scroll */

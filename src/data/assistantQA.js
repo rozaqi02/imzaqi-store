@@ -417,6 +417,37 @@ export const ASSISTANT_QA = [
 
 export const ASSISTANT_STARTERS = ASSISTANT_QA.filter((q) => q.starter).slice(0, 3);
 
+const ROUTE_STARTER_TAGS = {
+  "/bayar": ["bayar"],
+  "/checkout": ["bayar", "promo"],
+  "/status": ["status"],
+  "/produk": ["produk"],
+  "/tentang": ["toko", "bayar"],
+  "/testimoni": ["toko"],
+};
+
+/**
+ * Route-aware starter chips — prioritises Q&A matching current page.
+ */
+export function getContextualStarters(pathname = "/", history = []) {
+  const askedIds = new Set(history.map((h) => h.id));
+  const routeTags = ROUTE_STARTER_TAGS[pathname]
+    || (pathname.startsWith("/produk/") ? ["produk"] : null);
+
+  if (routeTags) {
+    const routePool = ASSISTANT_QA.filter(
+      (q) => !askedIds.has(q.id) && q.tags.some((t) => routeTags.includes(t))
+    );
+    if (routePool.length >= 3) return routePool.slice(0, 3);
+    if (routePool.length) {
+      const fallback = ASSISTANT_STARTERS.filter((q) => !askedIds.has(q.id));
+      return [...routePool, ...fallback].slice(0, 3);
+    }
+  }
+
+  return ASSISTANT_STARTERS.filter((q) => !askedIds.has(q.id)).slice(0, 3);
+}
+
 /**
  * Get follow-up suggestions based on the last asked question's tags.
  * Returns 3 distinct items, excluding ones already shown in history.

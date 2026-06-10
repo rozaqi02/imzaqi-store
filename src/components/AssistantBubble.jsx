@@ -2,9 +2,15 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { MessageSquareText, Send, X } from "lucide-react";
-import { ASSISTANT_QA, ASSISTANT_STARTERS, getFollowUps } from "../data/assistantQA";
+import { Send, X } from "lucide-react";
+import {
+  ASSISTANT_QA,
+  getContextualStarters,
+  getFollowUps,
+} from "../data/assistantQA";
+import { getRouteContext } from "../lib/assistantContext";
 import { answerQuery } from "../lib/assistantMatcher";
+import AssistantMark from "./AssistantMark";
 
 const ROUTES_HIDDEN = ["/checkout", "/bayar", "/admin"];
 
@@ -14,6 +20,14 @@ function shouldHide(pathname) {
 
 function findItem(id) {
   return ASSISTANT_QA.find((q) => q.id === id);
+}
+
+function getGreeting(pathname) {
+  const route = getRouteContext(pathname);
+  if (route) {
+    return `Hai 👋 Aku **Imzaqi AI**. Kamu lagi di halaman **${route.label}** — ${route.tip} Pilih topik atau ketik langsung.`;
+  }
+  return "Hai 👋 Aku **Imzaqi AI**, asisten pintar toko ini. Pilih topik di bawah atau ketik pertanyaanmu — aku pahami konteks halaman & obrolan sebelumnya.";
 }
 
 /** Renders a paragraph with simple bold (**text**), code (`text`), and (url) links */
@@ -56,6 +70,11 @@ export default function AssistantBubble() {
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
 
+  const greeting = useMemo(
+    () => getGreeting(location.pathname),
+    [location.pathname]
+  );
+
   useEffect(() => {
     if (hidden) return;
     try {
@@ -88,11 +107,10 @@ export default function AssistantBubble() {
 
   const lastItem = history.length ? history[history.length - 1] : null;
   const suggestions = useMemo(() => {
-    if (!history.length) return ASSISTANT_STARTERS;
+    if (!history.length) return getContextualStarters(location.pathname, history);
     return getFollowUps(lastItem, history);
-  }, [history, lastItem]);
+  }, [history, lastItem, location.pathname]);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     if (!scrollRef.current) return;
     const el = scrollRef.current;
@@ -110,15 +128,13 @@ export default function AssistantBubble() {
   async function askCustom(rawText) {
     const text = String(rawText || draft).trim();
     if (!text) return;
-    // Push placeholder so user message appears immediately
     const userTurn = { id: `u-${Date.now()}`, q: text, a: [], tags: [], _pending: true };
     setHistory((prev) => [...prev, userTurn]);
     setDraft("");
     setTyping(true);
 
     try {
-      const reply = await answerQuery(text, history);
-      // Replace placeholder with full Q&A
+      const reply = await answerQuery(text, history, { pathname: location.pathname });
       setHistory((prev) => {
         const next = [...prev];
         const idx = next.findIndex((h) => h.id === userTurn.id);
@@ -144,7 +160,6 @@ export default function AssistantBubble() {
         return next;
       });
     } finally {
-      // Small extra typing delay for natural feel
       window.setTimeout(() => setTyping(false), 200);
     }
   }
@@ -155,14 +170,10 @@ export default function AssistantBubble() {
     setDraft("");
   }
 
-  // Don't auto-focus input — let user choose to tap it manually
-  // (prevents keyboard from opening immediately on mobile)
-
   if (hidden || typeof document === "undefined") return null;
 
   return createPortal(
     <>
-      {/* Welcome Tooltip */}
       <AnimatePresence>
         {showTooltip && !open ? (
           <motion.div
@@ -174,7 +185,7 @@ export default function AssistantBubble() {
             onClick={handleOpen}
             role="button"
             tabIndex={0}
-            aria-label="Tanya asisten"
+            aria-label="Tanya Imzaqi AI"
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -183,19 +194,19 @@ export default function AssistantBubble() {
             }}
           >
             <div className="ai-tooltipContent">
-              <span>Butuh bantuan? Tanya saya! ✨</span>
+              <AssistantMark size={16} className="ai-tooltipMark" />
+              <span>Butuh bantuan? Tanya Imzaqi AI</span>
             </div>
             <div className="ai-tooltipArrow" />
           </motion.div>
         ) : null}
       </AnimatePresence>
 
-      {/* Bubble button */}
       <motion.button
         type="button"
         className={`ai-bubble ${open ? "is-open" : ""} ${showTooltip && !open ? "ai-bubble--pulse" : ""}`}
         onClick={handleOpen}
-        aria-label={open ? "Tutup asisten" : "Buka asisten"}
+        aria-label={open ? "Tutup Imzaqi AI" : "Buka Imzaqi AI"}
         initial={{ opacity: 0, y: 16, scale: 0.8 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
         transition={{ delay: 0.6, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
@@ -207,13 +218,12 @@ export default function AssistantBubble() {
           {open ? (
             <X size={20} strokeWidth={2.4} />
           ) : (
-            <MessageSquareText size={22} strokeWidth={2.2} />
+            <AssistantMark size={24} className="ai-markFab" variant="fab" />
           )}
         </span>
         {!open ? <span className="ai-bubbleDot" aria-hidden="true" /> : null}
       </motion.button>
 
-      {/* Panel */}
       <AnimatePresence>
         {open ? (
           <>
@@ -227,22 +237,32 @@ export default function AssistantBubble() {
               aria-hidden="true"
             />
             <motion.aside
-              className="ai-panel"
+              className="ai-panel ai-panel--glass"
               initial={{ opacity: 0, y: 24, scale: 0.96 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 16, scale: 0.97 }}
               transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
               role="dialog"
-              aria-label="Asisten Imzaqi"
+              aria-label="Imzaqi AI"
             >
-              {/* Header */}
-              <header className="ai-head">
+              <div className="ai-panelAmbient" aria-hidden="true">
+                <div className="ai-panelOrb ai-panelOrb--1" />
+                <div className="ai-panelOrb ai-panelOrb--2" />
+                <div className="ai-panelGrid" />
+              </div>
+              <header className="ai-head ai-head--premium">
                 <div className="ai-headIcon" aria-hidden="true">
-                  <MessageSquareText size={16} />
+                  <AssistantMark size={18} className="ai-markHead" variant="header" />
                 </div>
                 <div className="ai-headCopy">
-                  <strong>Imzaqi Assistant</strong>
-                  <span>Selalu siap bantu — gratis 24/7</span>
+                  <div className="ai-headTitleRow">
+                    <strong>Imzaqi AI</strong>
+                    <span className="ai-statusBadge">
+                      <span className="ai-statusDot" />
+                      Online
+                    </span>
+                  </div>
+                  <span>Paham konteks halaman & obrolan</span>
                 </div>
                 <button
                   type="button"
@@ -254,21 +274,16 @@ export default function AssistantBubble() {
                 </button>
               </header>
 
-              {/* Conversation */}
               <div className="ai-scroll" ref={scrollRef}>
-                {/* Greeting */}
                 <div className="ai-msg ai-msg--assistant">
                   <div className="ai-avatar" aria-hidden="true">
-                    <MessageSquareText size={13} />
+                    <AssistantMark size={14} className="ai-markAvatar" variant="avatar" />
                   </div>
-                  <div className="ai-bubbleMsg">
-                    <p className="ai-bubbleText">
-                      Hai 👋 Aku asisten Imzaqi. Kamu bisa pilih topik di bawah, atau ketik pertanyaan langsung — aku coba bantu.
-                    </p>
+                  <div className="ai-bubbleMsg ai-bubbleMsg--glass">
+                    <FormattedLine text={greeting} />
                   </div>
                 </div>
 
-                {/* History */}
                 {history.map((item, idx) => (
                   <React.Fragment key={`h-${idx}-${item.id}`}>
                     <div className="ai-msg ai-msg--user">
@@ -278,9 +293,9 @@ export default function AssistantBubble() {
                     </div>
                     <div className="ai-msg ai-msg--assistant">
                       <div className="ai-avatar" aria-hidden="true">
-                        <MessageSquareText size={13} />
+                        <AssistantMark size={14} className="ai-markAvatar" variant="avatar" />
                       </div>
-                      <div className="ai-bubbleMsg">
+                      <div className="ai-bubbleMsg ai-bubbleMsg--glass">
                         {(idx === history.length - 1 && (typing || item._pending)) || (item._pending && !item.a.length) ? (
                           <div className="ai-typing">
                             <span /><span /><span />
@@ -294,7 +309,6 @@ export default function AssistantBubble() {
                 ))}
               </div>
 
-              {/* Suggestions chips */}
               <div className="ai-suggest" role="list" aria-label="Pertanyaan yang sering ditanya">
                 {history.length > 0 ? (
                   <div className="ai-suggestHead">
@@ -322,7 +336,6 @@ export default function AssistantBubble() {
                   ))}
                 </div>
 
-                {/* Manual input */}
                 <form
                   className="ai-inputBar"
                   onSubmit={(e) => {
@@ -334,7 +347,7 @@ export default function AssistantBubble() {
                     ref={inputRef}
                     className="ai-input"
                     type="text"
-                    placeholder="Ketik pertanyaanmu…"
+                    placeholder="Tanya apa saja…"
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
                     maxLength={300}

@@ -7,18 +7,34 @@ export default function EmptyState({
   icon,
   primaryAction,
   secondaryAction,
+  suggestions = [],
 }) {
   // Support both string icons and React elements (e.g. lucide icons)
   const iconContent = icon ?? "[]";
   const isElement = React.isValidElement(iconContent);
 
   return (
-    <div className="empty">
+    <div className="empty empty--animated">
       <div className={`empty-icon${isElement ? " empty-icon-component" : ""}`} aria-hidden="true">
         {iconContent}
       </div>
       {title ? <div className="empty-title">{title}</div> : null}
       {description ? <div className="empty-desc">{description}</div> : null}
+
+      {suggestions.length ? (
+        <div className="empty-suggestions" aria-label="Saran pencarian">
+          {suggestions.map((item) => (
+            <button
+              key={item.key || item.label}
+              type="button"
+              className="empty-suggestionChip"
+              onClick={item.onClick}
+            >
+              {item.label}
+            </button>
+          ))}
+        </div>
+      ) : null}
 
       {(primaryAction || secondaryAction) ? (
         <div className="empty-actions">

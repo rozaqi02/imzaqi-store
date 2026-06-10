@@ -137,14 +137,10 @@
 .testi-filterChip.active,
 .catalog-viewBtn.active,
 .admin-chip.active {
-  border-color: rgba(79, 255, 200, 0.26) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
-  color: #032235 !important;
-  box-shadow:
-    0 16px 30px rgba(0, 214, 180, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.44) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
 /* Rebuild non-Status/FAQ pages to shared shell */
@@ -301,11 +297,9 @@
 
 /* FAQ chip override (force parity) */
 .faq-command .faq-chip.active {
-  border-color: rgba(79, 255, 200, 0.26) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
-  color: #032235 !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
 }
 
 /* Rebuild pass v5: Home */
@@ -474,14 +468,10 @@
 
 .home-page .hero-search-btn,
 .home-page .hero-ctas-minimal .btn:not(.btn-ghost) {
-  border-color: rgba(79, 255, 200, 0.26) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.36), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(135deg, #6dffe3 0%, #2ce7d8 34%, #00d6b4 56%, #008a94 100%) !important;
-  box-shadow:
-    0 18px 34px rgba(0, 214, 180, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.52),
-    inset 0 -3px 0 rgba(3, 66, 74, 0.24) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
 .home-page .flow-assist-badge.emphasis {
@@ -514,7 +504,7 @@
   border-color: rgba(79, 255, 200, 0.24) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
+    linear-gradient(180deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
   color: #032235 !important;
   box-shadow:
     0 16px 34px rgba(0, 214, 180, 0.16),
@@ -546,13 +536,12 @@
   gap: 18px !important;
 }
 
-.catalog-page .catalog-sidebar {
-  top: 96px !important;
-}
-
-.catalog-page .catalog-filter {
-  border-radius: 28px !important;
-  padding: 18px !important;
+@media (min-width: 721px) {
+  .catalog-filterShell .catalog-filter.is-sidebar {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
 }
 
 .catalog-page .catalog-command {
@@ -829,27 +818,27 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 34%),
     var(--skeu-control-bg);
   --uni-neo-panel-shadow:
-    14px 16px 30px rgba(0, 10, 28, 0.32),
-    -8px -8px 20px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -1px 0 rgba(2, 40, 50, 0.28),
-    0 0 0 1px rgba(79, 255, 200, 0.08);
+    18px 20px 38px rgba(0, 10, 28, 0.38),
+    -10px -10px 24px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -3px 0 rgba(2, 40, 50, 0.34),
+    0 0 0 1px rgba(79, 255, 200, 0.1);
   --uni-neo-control:
     linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.03) 34%),
     var(--skeu-control-bg);
   --uni-neo-control-shadow:
-    8px 9px 16px rgba(0, 10, 28, 0.24),
-    -4px -4px 10px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    inset 0 -1px 0 rgba(2, 44, 54, 0.22);
+    10px 12px 22px rgba(0, 10, 28, 0.3),
+    -6px -6px 14px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    inset 0 -2px 0 rgba(2, 44, 54, 0.28);
   --uni-neo-inset:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
     var(--skeu-inset-bg);
   --uni-neo-inset-shadow:
-    inset 8px 10px 20px rgba(0, 0, 0, 0.38),
-    inset -4px -4px 10px rgba(255, 255, 255, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.03);
+    inset 10px 12px 24px rgba(0, 0, 0, 0.44),
+    inset -6px -6px 14px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07),
+    0 1px 0 rgba(255, 255, 255, 0.04);
   --uni-neo-focus:
     0 0 0 4px rgba(79, 255, 200, 0.14),
     0 16px 32px rgba(0, 10, 28, 0.2);
@@ -870,27 +859,27 @@
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.24) 34%),
     var(--skeu-control-bg);
   --uni-neo-panel-shadow:
-    12px 14px 24px rgba(99, 138, 154, 0.16),
-    -8px -8px 16px rgba(255, 255, 255, 0.86),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(143, 181, 194, 0.3),
-    0 0 0 1px rgba(13, 124, 144, 0.08);
+    14px 16px 30px rgba(99, 138, 154, 0.2),
+    -10px -10px 22px rgba(255, 255, 255, 0.94),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(143, 181, 194, 0.34),
+    0 0 0 1px rgba(13, 124, 144, 0.1);
   --uni-neo-control:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.3) 36%),
     var(--skeu-control-bg);
   --uni-neo-control-shadow:
-    6px 7px 12px rgba(94, 133, 148, 0.14),
-    -4px -4px 8px rgba(255, 255, 255, 0.95),
+    8px 10px 18px rgba(94, 133, 148, 0.18),
+    -6px -6px 12px rgba(255, 255, 255, 0.98),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(156, 192, 203, 0.24);
+    inset 0 -2px 0 rgba(156, 192, 203, 0.28);
   --uni-neo-inset:
     linear-gradient(180deg, rgba(255, 255, 255, 0.76), rgba(255, 255, 255, 0.1) 24%),
     var(--skeu-inset-bg);
   --uni-neo-inset-shadow:
-    inset 7px 9px 16px rgba(157, 186, 197, 0.32),
-    inset -5px -5px 12px rgba(255, 255, 255, 0.78),
+    inset 9px 11px 20px rgba(157, 186, 197, 0.36),
+    inset -6px -6px 14px rgba(255, 255, 255, 0.86),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 1px 0 rgba(255, 255, 255, 0.66);
+    0 1px 0 rgba(255, 255, 255, 0.72);
   --uni-neo-focus:
     0 0 0 4px rgba(13, 124, 144, 0.16),
     0 12px 24px rgba(82, 123, 139, 0.18);
@@ -946,6 +935,7 @@
 .flow-assist,
 .product-tile,
 .catalog-command,
+.catalog-filterShell,
 .catalog-filter,
 .catalog-metric,
 .catalog-card.catalog-cardV2,
@@ -1029,15 +1019,10 @@
 .catalog-viewBtn.active,
 .testi-filterChip.active,
 .admin-chip.active {
-  border-color: rgba(79, 255, 200, 0.28) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(135deg, #6dffe3 0%, #2ce7d8 34%, #00d6b4 56%, #008a94 100%) !important;
-  color: #032235 !important;
-  box-shadow:
-    0 18px 34px rgba(0, 214, 180, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.56),
-    inset 0 -2px 0 rgba(3, 66, 74, 0.24) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
 /* Search system: adopt home search shell language globally */
@@ -1361,7 +1346,7 @@
 .detail-page .variants-grid,
 .testimonials-page .testi-grid {
   overflow: visible !important;
-  padding: 10px 8px 4px !important;
+  padding: 10px 8px 20px !important;
   margin: -10px -8px 0 !important;
 }
 
@@ -1416,7 +1401,7 @@
   .home-page .home-popularList,
   .detail-page .variants-grid,
   .testimonials-page .testi-grid {
-    padding: 8px 6px 2px !important;
+    padding: 8px 6px 18px !important;
     margin: -8px -6px 0 !important;
   }
 
@@ -1618,15 +1603,10 @@
 }
 
 .catalog-page .catalog-quickChip.active {
-  border-color: rgba(43, 223, 198, 0.44) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 28%),
-    linear-gradient(135deg, #71ffe8 0%, #35e7d8 36%, #00cdbd 62%, #0c8a9c 100%) !important;
-  color: #042534 !important;
-  box-shadow:
-    0 12px 22px rgba(0, 170, 160, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.72),
-    inset 0 -2px 0 rgba(4, 86, 96, 0.28) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
 .catalog-page .catalog-contentBar {
@@ -2248,37 +2228,26 @@
   flex: 1;
   height: 42px;
   padding: 0 18px !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
-  color: #032235 !important;
-  border: 1px solid rgba(79, 255, 200, 0.32) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  border: 1px solid var(--imzaqi-btn-border) !important;
   border-radius: 14px !important;
   font-weight: 900 !important;
   letter-spacing: 0.01em;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -2px 0 rgba(0, 122, 130, 0.22),
-    0 10px 22px rgba(0, 214, 180, 0.28),
-    0 1px 0 rgba(0, 138, 148, 0.18) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
   transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out), filter 0.22s var(--ease-out) !important;
 }
 
 .detail-page .pdx-buyNowBtn:hover {
   transform: translateY(-1px);
-  filter: saturate(1.08) brightness(1.04);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -2px 0 rgba(0, 122, 130, 0.22),
-    0 14px 28px rgba(0, 214, 180, 0.36) !important;
+  box-shadow: var(--imzaqi-btn-shadow-hover) !important;
 }
 
 .detail-page .pdx-buyNowBtn:active {
-  transform: translateY(0) scale(0.98);
+  transform: translateY(1px) scale(0.98);
   box-shadow:
-    inset 0 3px 8px rgba(0, 122, 130, 0.32),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.18),
-    0 4px 10px rgba(0, 214, 180, 0.18) !important;
+    inset 0 4px 10px rgba(0, 98, 108, 0.34),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.18) !important;
 }
 
 .detail-page .pdx-addBtn {
@@ -2421,32 +2390,26 @@
     flex-shrink: 0;
     height: 44px;
     padding: 0 18px !important;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
-      linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
-    color: #032235 !important;
-    border: 1px solid rgba(79, 255, 200, 0.32) !important;
+    background: var(--imzaqi-btn-face) !important;
+    color: var(--imzaqi-btn-text) !important;
+    border: 1px solid var(--imzaqi-btn-border) !important;
     border-radius: 14px !important;
     font-size: 13px !important;
     font-weight: 900 !important;
     letter-spacing: 0.01em;
-    box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 0.55),
-      inset 0 -2px 0 rgba(0, 122, 130, 0.22),
-      0 10px 22px rgba(0, 214, 180, 0.28) !important;
+    box-shadow: var(--imzaqi-btn-shadow) !important;
     transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), filter 0.2s var(--ease-out);
   }
 
   .detail-page .pdx-stickyCheckoutBtn:hover {
-    filter: saturate(1.08) brightness(1.04);
+    box-shadow: var(--imzaqi-btn-shadow-hover) !important;
   }
 
   .detail-page .pdx-stickyCheckoutBtn:active {
     transform: scale(0.97);
     box-shadow:
-      inset 0 3px 8px rgba(0, 122, 130, 0.32),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.18),
-      0 4px 10px rgba(0, 214, 180, 0.18) !important;
+      inset 0 4px 10px rgba(0, 98, 108, 0.34),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.18) !important;
   }
 }
 
@@ -2519,4 +2482,90 @@
   .detail-page .pdx-variantsGrid:not(.is-list) .pdx-addBtn {
     height: 42px;
   }
+}
+
+/* ─── v7: deeper neumorphism 3D sitewide ─────────────────────────────── */
+.header-nav a,
+.header-iconBtn,
+.mini-cart-drawer,
+.checkout-panel,
+.pay-card,
+.catalog-command,
+.catalog-filter,
+.hero-commandCard,
+.hero-search-btn,
+.product-tile,
+.catalog-card.catalog-cardV2,
+.detail-page-v3 .pdx-topCard,
+.detail-page-v3 .pdx-variantsSection,
+.detail-page-v3 .pdx-packCard,
+.stat-minimal,
+.flow-assist,
+.testi-card,
+.faq-item,
+.st-orderCard,
+.order-card,
+.modal-card,
+.drawer-panel,
+.toast,
+.suggestions-minimal,
+.suggestion-item {
+  border-color: var(--uni-line) !important;
+}
+
+.header-iconBtn,
+.hero-search-btn,
+.catalog-viewBtn,
+.pdx-iconBtn,
+.pdx-backLink,
+.pdx-filterChip:not(.is-active),
+.pdx-addBtn,
+.hm-quick-item,
+.hm-spotlight-card,
+.hm-trust-pill {
+  background: var(--uni-neo-control) !important;
+  box-shadow: var(--uni-neo-control-shadow) !important;
+}
+
+.header-iconBtn:active,
+.hero-search-btn:active,
+.catalog-viewBtn:active,
+.pdx-iconBtn:active,
+.pdx-backLink:active,
+.pdx-filterChip:active,
+.pdx-addBtn:active,
+.hm-quick-item:active {
+  transform: translateY(1px);
+  box-shadow: var(--uni-neo-inset-shadow) !important;
+}
+
+.hero-search-shell,
+.catalog-commandSearch,
+.catalog-filterSearch,
+.input,
+.pdx-descToggle,
+.pdx-benefitToggle-modern {
+  background: var(--uni-neo-inset) !important;
+  box-shadow: var(--uni-neo-inset-shadow) !important;
+}
+
+.btn:not(.btn-ghost):not(.btn-disabled),
+.pdx-buyNowBtn,
+.pdx-stickyCheckoutBtn,
+.catalog-chip.active,
+.catalog-quickChip.active,
+.catalog-viewBtn.active,
+.faq-chip.active,
+.testi-filterChip.active,
+.pdx-filterChip.is-active {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.btn:not(.btn-ghost):not(.btn-disabled):hover,
+.pdx-buyNowBtn:hover:not(:disabled),
+.pdx-stickyCheckoutBtn:hover {
+  box-shadow: var(--imzaqi-btn-shadow-hover) !important;
 }

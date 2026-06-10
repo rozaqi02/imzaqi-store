@@ -1,0 +1,360 @@
+/* UX motion layer — interactive polish */
+
+@keyframes uxRouteForward {
+  from { opacity: 0; transform: translate3d(28px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes uxRouteBack {
+  from { opacity: 0; transform: translate3d(-28px, 0, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes uxRouteFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes uxLoadMoreProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes uxMiniCartItemIn {
+  from {
+    opacity: 0;
+    transform: translateY(-14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes uxFlashBorderSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes uxFlashUrgentShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes uxPayStepIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes uxCheckoutQtyPulse {
+  0% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 0 rgba(79, 255, 218, 0.45); }
+  45% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 4px rgba(79, 255, 218, 0.22); }
+  100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 0 rgba(79, 255, 218, 0); }
+}
+
+@keyframes uxCheckoutRemoveFlash {
+  0% { opacity: 1; transform: translateX(0); filter: none; }
+  100% { opacity: 0.35; transform: translateX(10px); filter: blur(1px); }
+}
+
+@keyframes uxPayQrisUnlock {
+  from { opacity: 0; filter: blur(6px); transform: scale(0.96); }
+  to { opacity: 1; filter: blur(0); transform: scale(1); }
+}
+
+@keyframes uxPayQrisScan {
+  from { transform: translateY(-120%); opacity: 0; }
+  30% { opacity: 0.85; }
+  to { transform: translateY(120%); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="full"] .route-transition--forward:not(:has(.catalog-page)),
+  html[data-motion="lite"] .route-transition--forward:not(:has(.catalog-page)) {
+    animation: uxRouteForward 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  html[data-motion="full"] .route-transition--back:not(:has(.catalog-page)),
+  html[data-motion="lite"] .route-transition--back:not(:has(.catalog-page)) {
+    animation: uxRouteBack 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  html[data-motion="full"] .route-transition--fade:not(:has(.catalog-page)),
+  html[data-motion="lite"] .route-transition--fade:not(:has(.catalog-page)) {
+    animation: uxRouteFade 0.3s ease both;
+  }
+
+  .catalog-contentMeta.is-filtering strong {
+    opacity: 0.55;
+  }
+
+  .catalog-gridWrap {
+    position: relative;
+  }
+
+  .catalog-loadMoreProgress {
+    grid-column: 1 / -1;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .catalog-loadMoreProgress > span {
+    display: block;
+    height: 100%;
+    transform-origin: left center;
+    background: linear-gradient(90deg, #4effda, #00d6b4);
+    animation: uxLoadMoreProgress 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .catalog-card--loadMore {
+    animation: motionCatalogCardIn 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--reveal-i, 0) * 52ms);
+  }
+
+  .catalog-cardSkeletonV2 {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    min-height: 248px;
+  }
+
+  .catalog-cardSkeletonV2.list {
+    min-height: 156px;
+  }
+
+  .catalog-cardSkeletonTop {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .catalog-cardSkeletonIcon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.06);
+    flex: 0 0 auto;
+  }
+
+  .catalog-cardSkeletonCopy {
+    flex: 1;
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .catalog-cardSkeletonLine,
+  .catalog-cardSkeletonPrice,
+  .catalog-cardSkeletonSignals span,
+  .catalog-cardSkeletonMeta span,
+  .catalog-cardSkeletonFoot {
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .catalog-cardSkeletonLine.is-short { width: 38%; height: 10px; }
+  .catalog-cardSkeletonLine.is-title { width: 72%; height: 14px; }
+  .catalog-cardSkeletonLine.is-body { width: 90%; height: 10px; }
+  .catalog-cardSkeletonPrice { width: 72px; height: 16px; margin-left: auto; }
+  .catalog-cardSkeletonSignals { display: flex; gap: 8px; }
+  .catalog-cardSkeletonSignals span { width: 64px; height: 24px; border-radius: 12px; }
+  .catalog-cardSkeletonMeta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .catalog-cardSkeletonMeta span { width: 78px; height: 22px; }
+  .catalog-cardSkeletonFoot { width: 42%; height: 12px; }
+
+  .empty-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .empty-suggestionChip {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid rgba(79, 255, 218, 0.22);
+    background: rgba(0, 214, 180, 0.08);
+    color: rgba(234, 255, 245, 0.9);
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.16s ease, background 0.16s ease;
+  }
+
+  .empty-suggestionChip:hover {
+    transform: translateY(-1px);
+    background: rgba(0, 214, 180, 0.14);
+  }
+
+  .mini-cart-item.is-new {
+    animation: uxMiniCartItemIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .flash-sale-banner.is-urgent {
+    animation: uxFlashUrgentShake 0.42s ease-in-out infinite;
+  }
+
+  .flash-sale-banner.is-urgent .flash-countdown-num--sec {
+    color: #ff3c64;
+  }
+
+  .flash-sale-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flash-sale-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    background: conic-gradient(from 0deg, #ff3c64, #ff9bb0, #ff3c64);
+    opacity: 0.45;
+    z-index: 0;
+    animation: uxFlashBorderSpin 4s linear infinite;
+  }
+
+  .flash-sale-card > * {
+    position: relative;
+    z-index: 1;
+  }
+
+  .flash-sale-stockBar {
+    width: 100%;
+    height: 4px;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: rgba(255, 60, 100, 0.12);
+    overflow: hidden;
+  }
+
+  .flash-sale-stockBar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff3c64, #ff7a96);
+    transition: width 0.4s ease;
+  }
+
+  .pay-successSteps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .pay-successStep {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 10px 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 11px;
+    font-weight: 800;
+    color: rgba(234, 255, 245, 0.55);
+    animation: uxPayStepIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .pay-successStep:nth-child(2) { animation-delay: 0.08s; }
+  .pay-successStep:nth-child(3) { animation-delay: 0.16s; }
+
+  .pay-successStep > span {
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    font-weight: 1000;
+  }
+
+  .pay-successStep.is-done {
+    color: rgba(234, 255, 245, 0.82);
+    border-color: rgba(79, 255, 218, 0.22);
+  }
+
+  .pay-successStep.is-done > span {
+    background: rgba(0, 214, 180, 0.2);
+    color: #4effda;
+  }
+
+  .pay-successStep.is-active {
+    color: #fff;
+    border-color: rgba(79, 255, 218, 0.34);
+    box-shadow: 0 0 0 1px rgba(79, 255, 218, 0.12) inset;
+  }
+
+  .pay-successStep.is-active > span {
+    background: linear-gradient(135deg, #4effda, #00d6b4);
+    color: #032235;
+  }
+
+  .checkout-item-card.is-qty-pulse {
+    animation: uxCheckoutQtyPulse 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .checkout-item-card.is-qty-pulse .checkout-item-price {
+    transform: scale(1.06);
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .checkout-item-card.is-removing {
+    animation: uxCheckoutRemoveFlash 0.22s ease forwards;
+    pointer-events: none;
+  }
+
+  .pay-qrisFrame.is-unlocking {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pay-qrisFrame.is-unlocking::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    pointer-events: none;
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(79, 255, 218, 0.35) 48%,
+      transparent 100%
+    );
+    animation: uxPayQrisScan 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .pay-qrisFrame.is-unlocking .qris-img {
+    animation: uxPayQrisUnlock 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .product-tile-tiltWrap,
+  .flash-sale-cardInner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+}
+
+[data-motion="off"] .route-transition,
+[data-motion="off"] .catalog-card--loadMore,
+[data-motion="off"] .mini-cart-item.is-new,
+[data-motion="off"] .flash-sale-banner.is-urgent,
+[data-motion="off"] .flash-sale-card::before,
+[data-motion="off"] .pdx-packCard.is-added,
+[data-motion="off"] .checkout-item-card.is-qty-pulse,
+[data-motion="off"] .checkout-item-card.is-removing,
+[data-motion="off"] .pay-qrisFrame.is-unlocking::after,
+[data-motion="off"] .pay-qrisFrame.is-unlocking .qris-img {
+  animation: none !important;
+}
+

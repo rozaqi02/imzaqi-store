@@ -4,12 +4,15 @@ import Header from "./Header";
 import Footer from "./Footer";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
+import { useRouteDirection } from "../hooks/useRouteDirection";
 
 export default function Layout({ children, routeKey }) {
   const location = useLocation();
   const revealKey = routeKey || location.pathname;
   const isAdminDashboardRoute = location.pathname.startsWith("/admin/dashboard");
   const isCheckoutRoute = location.pathname === "/checkout";
+  const isCatalogRoute =
+    location.pathname === "/produk" || location.pathname.startsWith("/produk/");
 
   // Check if viewport is mobile (width <= 720px)
   const [isMobile, setIsMobile] = React.useState(() => 
@@ -26,6 +29,7 @@ export default function Layout({ children, routeKey }) {
   }, []);
 
   useAdaptiveMotion();
+  const routeDirection = useRouteDirection(revealKey);
   // Re-attach reveal observer whenever route changes.
   useRevealOnScroll(revealKey);
 
@@ -39,10 +43,12 @@ export default function Layout({ children, routeKey }) {
       <div className="global-noise" aria-hidden="true" />
 
       <Header />
-      <main className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}${isCheckoutRoute ? " app-main-checkout" : ""}`}>
+      <main
+        className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}${isCatalogRoute ? " app-main-catalog" : ""}${isCheckoutRoute ? " app-main-checkout" : ""}`}
+      >
         {/* key forces remount on route change for enter animation.
             contain:layout prevents this subtree from triggering full-page repaints. */}
-        <div key={revealKey} className="route-transition">
+        <div key={revealKey} className={`route-transition route-transition--${routeDirection}`}>
           {children}
         </div>
       </main>

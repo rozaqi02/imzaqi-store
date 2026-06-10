@@ -21,8 +21,12 @@ import {
 } from "lucide-react";
 
 import { fetchProducts } from "../lib/api";
+import CatalogCardSkeleton from "../components/CatalogCardSkeleton";
+import CatalogFilterSidebar from "../components/CatalogFilterSidebar";
 import EmptyState from "../components/EmptyState";
 import FlashSaleBanner from "../components/FlashSaleBanner";
+import NumberCounter from "../components/NumberCounter";
+
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
 import { formatIDR } from "../lib/format";
@@ -53,7 +57,7 @@ const SORT_LABELS = {
   stock_desc: "Stok terbanyak",
 };
 
-const DEFAULT_SORT = "name";
+const DEFAULT_SORT = "reco";
 
 function inferCategory(product) {
   const explicit = String(product?.category || "").trim().toLowerCase();
@@ -136,8 +140,6 @@ function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
 }
 
 function FilterPanel({
-  query,
-  setQuery,
   cats,
   toggleCat,
   inStockOnly,
@@ -154,7 +156,9 @@ function FilterPanel({
   view,
   setView,
   onReset,
-  compact = false,
+  variant = "sidebar",
+  showViewToggle = true,
+  showReset = true,
   idPrefix = "",
   categoryCounts = {},
 }) {
@@ -163,11 +167,14 @@ function FilterPanel({
   const readyToggleId = `${prefix}-ready`;
   const newToggleId = `${prefix}-new`;
   const restockToggleId = `${prefix}-restock`;
+  const isSheet = variant === "sheet";
 
   return (
-    <div className={`catalog-filter ${compact ? "compact" : ""}`}>
-      <div className="catalog-filterBlock">
-        <div className="catalog-filterLabel">Kategori</div>
+    <div className={`catalog-filter ${isSheet ? "is-sheet" : "is-sidebar"}`}>
+      <section className="catalog-filterSection">
+        <header className="catalog-filterSectionHead">
+          <span className="catalog-filterLabel">Kategori</span>
+        </header>
         <div className="catalog-chipGrid">
           {CATEGORIES.map((category) => {
             const Icon = category.icon;
@@ -188,10 +195,12 @@ function FilterPanel({
             );
           })}
         </div>
-      </div>
+      </section>
 
-      <div className="catalog-filterBlock">
-        <div className="catalog-filterLabel">Status</div>
+      <section className="catalog-filterSection">
+        <header className="catalog-filterSectionHead">
+          <span className="catalog-filterLabel">Status</span>
+        </header>
         <div className="catalog-toggleGroup">
           <label className="catalog-toggleItem" htmlFor={readyToggleId}>
             <span className="catalog-toggleItemText">
@@ -236,10 +245,12 @@ function FilterPanel({
             </span>
           </label>
         </div>
-      </div>
+      </section>
 
-      <div className="catalog-filterBlock">
-        <div className="catalog-filterLabel">Harga</div>
+      <section className="catalog-filterSection">
+        <header className="catalog-filterSectionHead">
+          <span className="catalog-filterLabel">Harga</span>
+        </header>
         <Range
           min={priceBounds.min}
           max={priceBounds.max}
@@ -248,10 +259,12 @@ function FilterPanel({
           step={1000}
           onChange={(next) => setPrice(next)}
         />
-      </div>
+      </section>
 
-      <div className="catalog-filterBlock">
-        <div className="catalog-filterLabel">Urutkan</div>
+      <section className="catalog-filterSection">
+        <header className="catalog-filterSectionHead">
+          <span className="catalog-filterLabel">Urutkan</span>
+        </header>
         <select className="input catalog-filterSelect" value={sort} onChange={(e) => setSort(e.target.value)}>
           <option value="name">Nama A-Z</option>
           <option value="name_desc">Nama Z-A</option>
@@ -261,37 +274,43 @@ function FilterPanel({
           <option value="price_desc">Harga termahal</option>
           <option value="stock_desc">Stok terbanyak</option>
         </select>
-      </div>
+      </section>
 
-      <div className="catalog-filterBlock">
-        <div className="catalog-filterLabel">Tampilan</div>
-        <div className="catalog-viewSwitch">
-          <button
-            type="button"
-            className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
-            onClick={() => setView("grid")}
-            aria-pressed={view === "grid"}
-          >
-            <Grid2x2 size={15} />
-            <span>Grid</span>
-          </button>
-          <button
-            type="button"
-            className={`catalog-viewBtn ${view === "list" ? "active" : ""}`}
-            onClick={() => setView("list")}
-            aria-pressed={view === "list"}
-          >
-            <List size={15} />
-            <span>List</span>
+      {showViewToggle ? (
+        <section className="catalog-filterSection catalog-filterSection--view">
+          <header className="catalog-filterSectionHead">
+            <span className="catalog-filterLabel">Tampilan</span>
+          </header>
+          <div className="catalog-viewSwitch">
+            <button
+              type="button"
+              className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
+              onClick={() => setView("grid")}
+              aria-pressed={view === "grid"}
+            >
+              <Grid2x2 size={15} />
+              <span>Grid</span>
+            </button>
+            <button
+              type="button"
+              className={`catalog-viewBtn ${view === "list" ? "active" : ""}`}
+              onClick={() => setView("list")}
+              aria-pressed={view === "list"}
+            >
+              <List size={15} />
+              <span>List</span>
+            </button>
+          </div>
+        </section>
+      ) : null}
+
+      {showReset ? (
+        <div className="catalog-filterResetRow">
+          <button type="button" className="btn btn-ghost btn-wide" onClick={onReset}>
+            Reset
           </button>
         </div>
-      </div>
-
-      <div className="catalog-filterBlock no-border">
-        <button type="button" className="btn btn-ghost btn-wide" onClick={onReset}>
-          Reset
-        </button>
-      </div>
+      ) : null}
     </div>
   );
 }
@@ -309,25 +328,62 @@ export default function Products() {
   const [sort, setSort] = useState(() => params.get("sort") || DEFAULT_SORT);
   const [view, setView] = useState(() => params.get("view") || "grid");
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [filtersSheetMounted, setFiltersSheetMounted] = useState(false);
+  const [filtersSheetVisible, setFiltersSheetVisible] = useState(false);
   const [price, setPrice] = useState({
     min: Number(params.get("pmin")) || 0,
     max: Number(params.get("pmax")) || 0,
   });
   const [priceReady, setPriceReady] = useState(false);
   const [visibleCount, setVisibleCount] = useState(16);
+  const [isFiltering, setIsFiltering] = useState(false);
+  const [loadMoreProgress, setLoadMoreProgress] = useState(false);
+  const [loadMoreBase, setLoadMoreBase] = useState(0);
+  const prevFilterSigRef = useRef("");
 
   const qParam = params.get("q") || "";
   const [query, setQuery] = useState(qParam);
   const debouncedQuery = useDebounce(query, 300);
   const searchRef = useRef(null);
+  const searchWrapRef = useRef(null);
   const sheetRef = useRef(null);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchSuggestions, setSearchSuggestions] = useState([]);
+  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const catalogListboxId = "catalog-search-listbox";
 
   const { items, subtotal } = useCart();
   const cartItemCount = items?.reduce((sum, item) => sum + (item.qty || 0), 0) || 0;
+  const [viewMorph, setViewMorph] = useState(false);
+  const prevViewRef = useRef(view);
+  const openFilters = useCallback(() => setFiltersOpen(true), []);
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
 
+  useEffect(() => {
+    if (filtersOpen) {
+      setFiltersSheetMounted(true);
+      const raf = window.requestAnimationFrame(() => {
+        window.requestAnimationFrame(() => setFiltersSheetVisible(true));
+      });
+      return () => window.cancelAnimationFrame(raf);
+    }
+
+    setFiltersSheetVisible(false);
+    const timer = window.setTimeout(() => setFiltersSheetMounted(false), 320);
+    return () => window.clearTimeout(timer);
+  }, [filtersOpen]);
+
+  useEffect(() => {
+    if (!filtersSheetMounted || typeof document === "undefined") return undefined;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [filtersSheetMounted]);
+
   useDialogA11y({
-    open: filtersOpen,
+    open: filtersSheetMounted && filtersSheetVisible,
     containerRef: sheetRef,
     onClose: closeFilters,
     initialFocusSelector: ".catalog-sheetClose",
@@ -335,7 +391,7 @@ export default function Products() {
 
   usePageMeta({
     title: "Produk",
-    description: "Katalog produk dengan alur pencarian yang ringkas, jelas, dan mudah dilanjutkan ke checkout.",
+    description: "Katalog langganan premium — cari, bandingin, langsung checkout.",
   });
 
   useEffect(() => {
@@ -361,6 +417,89 @@ export default function Products() {
   }, []);
 
   // URL Sync Effect moved below priceBounds
+
+  useEffect(() => {
+    if (!query.trim()) {
+      setSearchSuggestions([]);
+      return;
+    }
+    const term = query.trim().toLowerCase();
+    const words = [];
+    (products || []).forEach((product) => {
+      if (product?.name) words.push(product.name);
+      (product?.product_variants || []).forEach((variant) => {
+        if (variant?.name) words.push(`${product.name} – ${variant.name}`);
+      });
+    });
+    const unique = Array.from(new Set(words.map((w) => String(w).trim()).filter(Boolean)));
+    setSearchSuggestions(unique.filter((x) => x.toLowerCase().includes(term)).slice(0, 5));
+  }, [query, products]);
+
+  useEffect(() => {
+    if (activeSuggestionIndex >= searchSuggestions.length) setActiveSuggestionIndex(-1);
+  }, [activeSuggestionIndex, searchSuggestions.length]);
+
+  useEffect(() => {
+    const onDoc = (e) => {
+      if (searchWrapRef.current && !searchWrapRef.current.contains(e.target)) {
+        setSearchOpen(false);
+        setActiveSuggestionIndex(-1);
+      }
+    };
+    document.addEventListener("mousedown", onDoc);
+    return () => document.removeEventListener("mousedown", onDoc);
+  }, []);
+
+  useEffect(() => {
+    if (prevViewRef.current === view) return undefined;
+    setViewMorph(true);
+    const timer = window.setTimeout(() => setViewMorph(false), 300);
+    prevViewRef.current = view;
+    return () => window.clearTimeout(timer);
+  }, [view]);
+
+  const filterSignature = useMemo(
+    () =>
+      [
+        debouncedQuery,
+        cats.join(","),
+        inStockOnly ? 1 : 0,
+        newOnly ? 1 : 0,
+        restockOnly ? 1 : 0,
+        sort,
+        price.min,
+        price.max,
+        view,
+      ].join("|"),
+    [debouncedQuery, cats, inStockOnly, newOnly, restockOnly, sort, price.min, price.max, view]
+  );
+
+  useEffect(() => {
+    setVisibleCount(16);
+    setLoadMoreBase(0);
+  }, [filterSignature]);
+
+  useEffect(() => {
+    if (loading) return undefined;
+    if (!prevFilterSigRef.current) {
+      prevFilterSigRef.current = filterSignature;
+      return undefined;
+    }
+    if (prevFilterSigRef.current === filterSignature) return undefined;
+    prevFilterSigRef.current = filterSignature;
+    setIsFiltering(true);
+    const timer = window.setTimeout(() => setIsFiltering(false), 140);
+    return () => window.clearTimeout(timer);
+  }, [filterSignature, loading]);
+
+  const handleLoadMore = useCallback(() => {
+    setLoadMoreBase(visibleCount);
+    setLoadMoreProgress(true);
+    window.setTimeout(() => {
+      setVisibleCount((prev) => prev + 16);
+      setLoadMoreProgress(false);
+    }, 340);
+  }, [visibleCount]);
 
   useEffect(() => {
     function onKey(e) {
@@ -681,20 +820,51 @@ export default function Products() {
     view,
   ]);
 
+  const emptySuggestions = useMemo(() => {
+    const chips = [];
+
+    if (String(query || "").trim()) {
+      chips.push({ key: "clear-search", label: "Hapus pencarian", onClick: () => setQuery("") });
+    }
+    if (inStockOnly) {
+      chips.push({ key: "ready-off", label: "Tampilkan semua stok", onClick: () => setInStockOnly(false) });
+    }
+    if (cats.length) {
+      chips.push({ key: "cats-clear", label: "Semua kategori", onClick: () => setCats([]) });
+    }
+    if (sort !== DEFAULT_SORT) {
+      chips.push({ key: "sort-reset", label: "Urut default", onClick: () => setSort(DEFAULT_SORT) });
+    }
+    if (insights.topProduct?.name) {
+      chips.push({
+        key: "top-product",
+        label: insights.topProduct.name,
+        onClick: () => {
+          setQuery(insights.topProduct.name);
+          setSort("popular");
+        },
+      });
+    }
+    chips.push({ key: "streaming", label: "Streaming", onClick: () => setSoloCategory("streaming") });
+    chips.push({ key: "reset-all", label: "Reset semua", onClick: resetFilters });
+    return chips.slice(0, 5);
+    // resetFilters / setSoloCategory are stable handlers; omit to avoid recomputing every render
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cats.length, inStockOnly, insights.topProduct, query, sort]);
+
   return (
     <div className={cartItemCount > 0 ? "page with-sticky-cta catalog-page" : "page catalog-page"}>
       <section className="section catalog-hero reveal">
         <div className="container">
           <div className="catalog-heroGrid">
-            <div>
-              <div className="catalog-eyebrow">Katalog produk</div>
-              <h1 className="h1 catalog-title">Mau langganan apa?</h1>
-              <p className="catalog-sub">Cari, bandingin harga, langsung checkout. Simpel.</p>
-            </div>
+            <div className="catalog-eyebrow">Katalog</div>
+            <h1 className="h1 catalog-title">Mau langganan apa hari ini?</h1>
+            <p className="catalog-sub">Cari, bandingin, checkout. Anti ribet.</p>
           </div>
 
           <div className="catalog-command">
             <div className="catalog-commandSearch">
+              <div className="search-dropdown-anchor" ref={searchWrapRef}>
               <div className="hero-search-shell catalog-heroSearch">
                 <span className="hero-search-icon" aria-hidden="true">
                   <Search size={16} />
@@ -704,19 +874,93 @@ export default function Products() {
                   className="input hero-search-input"
                   value={query}
                   placeholder="Netflix, Spotify, ChatGPT..."
-                  onChange={(e) => setQuery(e.target.value)}
+                  onFocus={() => setSearchOpen(true)}
+                  onChange={(e) => {
+                    setQuery(e.target.value);
+                    setSearchOpen(true);
+                    setActiveSuggestionIndex(-1);
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === "ArrowDown" && searchSuggestions.length > 0) {
+                      e.preventDefault();
+                      setSearchOpen(true);
+                      setActiveSuggestionIndex((p) => (p >= searchSuggestions.length - 1 ? 0 : p + 1));
+                      return;
+                    }
+                    if (e.key === "ArrowUp" && searchSuggestions.length > 0) {
+                      e.preventDefault();
+                      setSearchOpen(true);
+                      setActiveSuggestionIndex((p) => (p <= 0 ? searchSuggestions.length - 1 : p - 1));
+                      return;
+                    }
+                    if (e.key === "Enter" && searchOpen && activeSuggestionIndex >= 0) {
+                      const pick = searchSuggestions[activeSuggestionIndex];
+                      if (pick) {
+                        e.preventDefault();
+                        setQuery(pick);
+                        setSearchOpen(false);
+                        setActiveSuggestionIndex(-1);
+                      }
+                    }
+                    if (e.key === "Escape") {
+                      setSearchOpen(false);
+                      setActiveSuggestionIndex(-1);
+                    }
+                  }}
+                  role="combobox"
+                  aria-autocomplete="list"
+                  aria-expanded={searchOpen && searchSuggestions.length > 0}
+                  aria-controls={searchOpen && searchSuggestions.length > 0 ? catalogListboxId : undefined}
+                  aria-activedescendant={
+                    activeSuggestionIndex >= 0
+                      ? `${catalogListboxId}-option-${activeSuggestionIndex}`
+                      : undefined
+                  }
                   aria-label="Cari produk"
                 />
                 {query ? (
                   <button
                     className="hero-search-clear"
-                    onClick={() => setQuery("")}
+                    onClick={() => {
+                      setQuery("");
+                      setSearchOpen(false);
+                      setActiveSuggestionIndex(-1);
+                    }}
                     type="button"
                     aria-label="Hapus pencarian"
                   >
                     <X size={14} />
                   </button>
                 ) : null}
+              </div>
+              {searchOpen && searchSuggestions.length > 0 ? (
+                <div
+                  className="suggestions suggestions--animate catalog-searchSuggestions"
+                  role="listbox"
+                  id={catalogListboxId}
+                >
+                  {searchSuggestions.map((sug, idx) => (
+                    <button
+                      key={sug}
+                      id={`${catalogListboxId}-option-${idx}`}
+                      type="button"
+                      role="option"
+                      aria-selected={idx === activeSuggestionIndex}
+                      className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
+                      style={{ "--suggest-i": idx }}
+                      onMouseEnter={() => setActiveSuggestionIndex(idx)}
+                      onClick={() => {
+                        setQuery(sug);
+                        setSearchOpen(false);
+                        setActiveSuggestionIndex(-1);
+                      }}
+                    >
+                      <Search size={13} />
+                      <span>{sug}</span>
+                    </button>
+                  ))}
+                </div>
+              ) : null}
               </div>
             </div>
 
@@ -734,11 +978,15 @@ export default function Products() {
               <button
                 type="button"
                 className="btn btn-ghost catalog-filterBtn"
-                onClick={() => setFiltersOpen(true)}
+                onClick={openFilters}
               >
                 <SlidersHorizontal size={16} />
                 <span>Filter</span>
-                {activeFiltersCount ? <span className="catalog-filterBtnCount">{activeFiltersCount}</span> : null}
+                {activeFiltersCount ? (
+                  <span className="catalog-filterBtnCount" key={activeFiltersCount}>
+                    {activeFiltersCount}
+                  </span>
+                ) : null}
               </button>
             </div>
           </div>
@@ -749,13 +997,13 @@ export default function Products() {
         <FlashSaleBanner />
       </div>
 
-      <section className="section reveal" style={{ paddingTop: 0 }}>
+      <section className="section catalog-body" style={{ paddingTop: 0 }}>
         <div className="container catalog-layout">
-          <aside className="catalog-sidebar" aria-label="Filter produk">
+          <CatalogFilterSidebar activeFiltersCount={activeFiltersCount} onReset={resetFilters}>
             <FilterPanel
               idPrefix="catalog-side"
-              query={query}
-              setQuery={setQuery}
+              variant="sidebar"
+              showReset={false}
               cats={cats}
               toggleCat={toggleCat}
               inStockOnly={inStockOnly}
@@ -774,7 +1022,7 @@ export default function Products() {
               onReset={resetFilters}
               categoryCounts={insights.categoryCounts}
             />
-          </aside>
+          </CatalogFilterSidebar>
 
           <div className="catalog-content">
             <div className="catalog-quickFilters" aria-label="Pilih cepat">
@@ -798,8 +1046,14 @@ export default function Products() {
             </div>
 
             <div className="catalog-contentBar">
-              <div className="catalog-contentMeta">
-                <strong>{loading ? "..." : filtered.length}</strong>
+              <div className={`catalog-contentMeta${isFiltering ? " is-filtering" : ""}`}>
+                <strong>
+                  {loading || isFiltering ? (
+                    "..."
+                  ) : (
+                    <NumberCounter key={filterSignature} value={filtered.length} duration={420} />
+                  )}
+                </strong>
                 <span>produk</span>
                 {activeFiltersCount ? <em>{activeFiltersCount} filter aktif</em> : null}
               </div>
@@ -841,10 +1095,15 @@ export default function Products() {
               </div>
             ) : null}
 
-            <div className={`catalog-grid ${view === "list" ? "list" : "grid"}`} role="list">
-              {loading ? (
+            <div className="catalog-gridWrap">
+            <div
+              className={`catalog-grid ${view === "list" ? "list" : "grid"}${!loading && !isFiltering ? " catalog-grid--animate" : ""}${isFiltering ? " is-filtering" : ""}${viewMorph ? " is-view-morph" : ""}`}
+              role="list"
+              key={loading ? "catalog-loading" : filterSignature}
+            >
+              {loading || isFiltering ? (
                 Array.from({ length: skeletonCount }).map((_, idx) => (
-                  <div key={idx} className={`catalog-cardSkeleton ${view === "list" ? "list" : "grid"}`} role="listitem" />
+                  <CatalogCardSkeleton key={idx} view={view} />
                 ))
               ) : error ? (
                 <div className="card pad" style={{ gridColumn: "1 / -1" }}>
@@ -860,43 +1119,53 @@ export default function Products() {
                   <EmptyState
                     icon="-"
                     title="Tidak ditemukan"
-                    description={query ? `Belum ada hasil untuk "${query}".` : "Atur ulang filter lalu coba lagi."}
+                    description={query ? `Belum ketemu "${query}". Coba kata kunci lain.` : "Reset filter dulu, terus coba lagi."}
+                    suggestions={emptySuggestions}
                     primaryAction={{ label: "Reset filter", onClick: resetFilters }}
                   />
                 </div>
               ) : (
                 <>
-                  {filtered.slice(0, visibleCount).map((product) => (
-                    <ProductCardMemo 
-                      key={product.id} 
-                      product={product} 
-                      view={view} 
+                  {filtered.slice(0, visibleCount).map((product, idx) => (
+                    <ProductCardMemo
+                      key={product.id}
+                      product={product}
+                      view={view}
                       location={location}
+                      revealIndex={loadMoreBase > 0 && idx >= loadMoreBase ? idx - loadMoreBase : idx}
+                      isLoadMore={loadMoreBase > 0 && idx >= loadMoreBase}
                     />
                   ))}
-                  {visibleCount < filtered.length && (
+                  {loadMoreProgress ? (
+                    <div className="catalog-loadMoreProgress" aria-hidden="true">
+                      <span />
+                    </div>
+                  ) : null}
+                  {visibleCount < filtered.length && !loadMoreProgress ? (
                     <div className="catalog-loadMore">
-                      <button 
-                        className="btn btn-ghost" 
-                        onClick={() => setVisibleCount(prev => prev + 16)}
-                      >
+                      <button className="btn btn-ghost" type="button" onClick={handleLoadMore}>
                         Muat Lebih Banyak
                       </button>
                     </div>
-                  )}
+                  ) : null}
                 </>
               )}
+            </div>
             </div>
           </div>
         </div>
       </section>
 
-      {filtersOpen && typeof document !== "undefined"
+      {filtersSheetMounted && typeof document !== "undefined"
         ? createPortal(
-            <div className="catalog-sheetBackdrop" onMouseDown={closeFilters} role="presentation">
+            <div
+              className={`catalog-sheetBackdrop${filtersSheetVisible ? " is-open" : ""}`}
+              onMouseDown={closeFilters}
+              role="presentation"
+            >
               <div
                 ref={sheetRef}
-                className="catalog-sheet"
+                className={`catalog-sheet${filtersSheetVisible ? " is-open" : ""}`}
                 onMouseDown={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-modal="true"
@@ -904,9 +1173,13 @@ export default function Products() {
               >
                 <div className="catalog-sheetHandle" aria-hidden="true" />
                 <div className="catalog-sheetHead">
-                  <div>
+                  <div className="catalog-sheetHeadCopy">
                     <div className="catalog-sheetTitle">Filter produk</div>
-                    <div className="catalog-sheetSub">Atur yang perlu, lalu lanjut.</div>
+                    <div className="catalog-sheetSub">
+                      {activeFiltersCount
+                        ? `${activeFiltersCount} filter aktif`
+                        : "Atur kategori, status, dan harga"}
+                    </div>
                   </div>
                   <button className="catalog-sheetClose" type="button" onClick={closeFilters} aria-label="Tutup">
                     <X size={18} />
@@ -915,10 +1188,10 @@ export default function Products() {
 
                 <div className="catalog-sheetBody">
                   <FilterPanel
-                    compact
                     idPrefix="catalog-sheet"
-                    query={query}
-                    setQuery={setQuery}
+                    variant="sheet"
+                    showViewToggle={false}
+                    showReset={false}
                     cats={cats}
                     toggleCat={toggleCat}
                     inStockOnly={inStockOnly}
@@ -944,7 +1217,7 @@ export default function Products() {
                     Reset
                   </button>
                   <button type="button" className="btn catalog-sheetApply" onClick={closeFilters}>
-                    Terapkan
+                    {loading ? "Memuat..." : `Tampilkan ${filtered.length} produk`}
                   </button>
                 </div>
               </div>
@@ -975,7 +1248,7 @@ export default function Products() {
   );
 }
 
-const ProductCardMemo = memo(function ProductCard({ product, view, location }) {
+const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0, isLoadMore = false }) {
   const stock = Number(product._stock || 0);
   const sold = Number(product._sold || 0);
   const soldOut = stock <= 0;
@@ -990,9 +1263,10 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location }) {
   return (
     <Link
       to={`/produk/${product.slug}`}
-      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}`}
+      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}${isLoadMore ? " catalog-card--loadMore" : ""}`}
       role="listitem"
       aria-label={`Buka detail ${product.name}`}
+      style={{ "--reveal-i": revealIndex }}
     >
       <div className="catalog-cardTop">
         <div className="catalog-cardBrand">

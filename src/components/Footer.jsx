@@ -43,7 +43,7 @@ export default function Footer() {
   return (
     <footer className="site-footer site-footer--gopay">
       <div className="container">
-        <div className="site-footerPanel site-footerGo">
+        <div className="site-footerPanel site-footerGo reveal">
           <div className="site-footerGoIntro">
             <Link className="site-footerGoBrand" to="/produk" aria-label="Buka katalog produk">
               <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
@@ -99,7 +99,7 @@ export default function Footer() {
           </div>
 
           <div className="site-footerGoLegal">
-            <p>Imzaqi Store berfokus pada alur simpel: pilih produk, bayar, simpan ID, lalu pantau status order.</p>
+            <p>Imzaqi Store — pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
             <p>(c) {year} imzaqi.store. All Rights Reserved.</p>
           </div>
         </div>

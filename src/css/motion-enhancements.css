@@ -1,0 +1,439 @@
+/* Motion enhancements — respects data-motion and prefers-reduced-motion */
+
+@keyframes motionChipActivate {
+  0% { transform: scale(0.94); }
+  55% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+@keyframes motionFilterCountPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes motionCatalogCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes motionGridFadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes motionEmptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes motionEmptyFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motionSuggestIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes motionSuggestItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes motionCartBump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+@keyframes motionCartFly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--fly-tx, 120px), var(--fly-ty, -80px)) scale(0.35);
+  }
+}
+
+@keyframes motionFlashSecPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
+
+@keyframes motionHeroAuraDrift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(2%, -1.5%) scale(1.03);
+    opacity: 0.92;
+  }
+}
+
+@keyframes motionRouteFadeLite {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes motionViewMorph {
+  from { opacity: 0.55; transform: scale(0.992); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motionRangeThumbPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 214, 180, 0.45); }
+  50% { box-shadow: 0 0 0 6px rgba(0, 214, 180, 0); }
+}
+
+@keyframes motionPdxAddedFlash {
+  0% { box-shadow: var(--pdx-inset-shadow), 0 0 0 0 rgba(79, 255, 218, 0.55); }
+  40% { box-shadow: var(--pdx-inset-shadow), 0 0 0 6px rgba(79, 255, 218, 0.28); }
+  100% { box-shadow: var(--pdx-inset-shadow), 0 0 0 0 rgba(79, 255, 218, 0); }
+}
+
+/* ── Catalog filter chips & toggles ── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="full"] .catalog-chip {
+    transition:
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  [data-motion="full"] .catalog-chip:active {
+    transform: scale(0.96);
+  }
+
+  [data-motion="full"] .catalog-chip.active {
+    animation: motionChipActivate 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .catalog-filterBtnCount {
+    animation: motionFilterCountPop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .pdx-filterChip {
+    transition:
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  [data-motion="full"] .pdx-filterChip:active {
+    transform: scale(0.96);
+  }
+
+  [data-motion="full"] .pdx-filterChip.is-active {
+    animation: motionChipActivate 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .faq-chip {
+    transition:
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  [data-motion="full"] .faq-chip:active {
+    transform: scale(0.96);
+  }
+
+  [data-motion="full"] .faq-chip.active {
+    animation: motionChipActivate 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .pdx-packCard.is-added {
+    animation: motionPdxAddedFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .catalog-toggleUi,
+  [data-motion="full"] .catalog-toggleUi::after {
+    transition:
+      transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  [data-motion="full"] .catalog-rangeInput:active::-webkit-slider-thumb {
+    animation: motionRangeThumbPulse 0.8s ease infinite;
+  }
+
+  /* ── Catalog grid stagger ── */
+  [data-motion="full"] .catalog-grid--animate .catalog-card {
+    animation: motionCatalogCardIn 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--reveal-i, 0) * 52ms);
+  }
+
+  [data-motion="full"] .catalog-grid.is-filtering {
+    animation: motionGridFadeOut 0.14s ease forwards;
+    pointer-events: none;
+  }
+
+  [data-motion="full"] .catalog-grid.is-view-morph {
+    animation: motionViewMorph 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* ── Empty state ── */
+  [data-motion="full"] .empty--animated .empty-icon {
+    animation: motionEmptyFloat 3.2s ease-in-out infinite;
+  }
+
+  [data-motion="full"] .empty--animated .empty-title {
+    animation: motionEmptyFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+
+  [data-motion="full"] .empty--animated .empty-desc {
+    animation: motionEmptyFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+  }
+
+  [data-motion="full"] .empty--animated .empty-actions {
+    animation: motionEmptyFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+  }
+
+  /* ── Search suggestions ── */
+  [data-motion="full"] .suggestions--animate {
+    animation: motionSuggestIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: top center;
+  }
+
+  [data-motion="full"] .suggestions--animate .suggestion-item {
+    animation: motionSuggestItemIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--suggest-i, 0) * 40ms);
+  }
+
+  [data-motion="full"] .suggestion-item:hover,
+  [data-motion="full"] .suggestion-item.is-active {
+    transform: translateX(3px);
+    transition: transform 0.16s ease, background 0.16s ease;
+  }
+
+  /* ── Cart micro-interaction ── */
+  [data-motion="full"] .header-cart .pill.is-bumping {
+    animation: motionCartBump 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .pdx-addBtn.is-pressed {
+    transform: scale(0.96);
+    transition: transform 0.12s ease;
+  }
+
+  [data-motion="full"] .cart-fly-particle {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #4effda;
+    box-shadow: 0 0 12px rgba(79, 255, 218, 0.55);
+    pointer-events: none;
+    z-index: 10001;
+    animation: motionCartFly 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* ── Flash sale ── */
+  [data-motion="full"] .flash-countdown-num--sec {
+    animation: motionFlashSecPulse 1s ease-in-out infinite;
+  }
+
+  [data-motion="full"] .flash-sale-progressFill {
+    transition: width 1s linear;
+  }
+
+  /* ── Catalog hero ambient ── */
+  [data-motion="full"] .catalog-hero::before {
+    animation: motionHeroAuraDrift 24s ease-in-out infinite;
+  }
+
+  /* ── Header shrink (whole bar, not logo only) ── */
+  @media (min-width: 721px) {
+    html[data-motion="full"] .header,
+    html[data-motion="lite"] .header {
+      --hdr-py: 10px;
+      --hdr-logo: 42px;
+      --hdr-action: 44px;
+      --hdr-action-radius: 14px;
+      --hdr-action-icon: 18px;
+      --hdr-nav-py: 10px;
+      --hdr-nav-px: 12px;
+      --hdr-nav-size: 14px;
+      --hdr-nav-gap: 14px;
+      --hdr-inner-gap: 16px;
+      --hdr-toggle-w: 58px;
+      --hdr-toggle-h: 32px;
+      --hdr-toggle-thumb: 24px;
+      --hdr-toggle-shift: 26px;
+      transition:
+        padding 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.28s ease;
+    }
+
+    html[data-motion="full"] .header.is-shrunk,
+    html[data-motion="lite"] .header.is-shrunk {
+      --hdr-py: 5px;
+      --hdr-logo: 34px;
+      --hdr-action: 38px;
+      --hdr-action-radius: 12px;
+      --hdr-action-icon: 16px;
+      --hdr-nav-py: 7px;
+      --hdr-nav-px: 9px;
+      --hdr-nav-size: 12.5px;
+      --hdr-nav-gap: 6px;
+      --hdr-inner-gap: 9px;
+      --hdr-toggle-w: 50px;
+      --hdr-toggle-h: 28px;
+      --hdr-toggle-thumb: 20px;
+      --hdr-toggle-shift: 22px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-motion="full"] .header .header-inner,
+    html[data-motion="lite"] .header .header-inner {
+      padding-top: var(--hdr-py);
+      padding-bottom: var(--hdr-py);
+      gap: var(--hdr-inner-gap);
+      transition:
+        padding 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        gap 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .brand-img,
+    html[data-motion="lite"] .header .brand-img {
+      height: var(--hdr-logo);
+      transition: height 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .nav,
+    html[data-motion="lite"] .header .nav {
+      gap: var(--hdr-nav-gap);
+      transition: gap 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .nav a,
+    html[data-motion="lite"] .header .nav a {
+      padding: var(--hdr-nav-py) var(--hdr-nav-px);
+      font-size: var(--hdr-nav-size);
+      transition:
+        padding 0.28s ease,
+        font-size 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .header-actions,
+    html[data-motion="lite"] .header .header-actions {
+      gap: calc(var(--hdr-inner-gap) * 0.65);
+      transition: gap 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .header-cart,
+    html[data-motion="lite"] .header .header-cart,
+    html[data-motion="full"] .header .header-iconAction,
+    html[data-motion="lite"] .header .header-iconAction {
+      width: var(--hdr-action);
+      height: var(--hdr-action);
+      border-radius: var(--hdr-action-radius);
+      transition:
+        width 0.28s ease,
+        height 0.28s ease,
+        border-radius 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .header-cart svg,
+    html[data-motion="lite"] .header .header-cart svg,
+    html[data-motion="full"] .header .header-iconAction svg,
+    html[data-motion="lite"] .header .header-iconAction svg {
+      width: var(--hdr-action-icon);
+      height: var(--hdr-action-icon);
+      transition: width 0.28s ease, height 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .theme-toggle,
+    html[data-motion="lite"] .header .theme-toggle {
+      width: var(--hdr-toggle-w);
+      height: var(--hdr-toggle-h);
+      transition:
+        width 0.28s ease,
+        height 0.28s ease,
+        transform 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .theme-toggleThumb,
+    html[data-motion="lite"] .header .theme-toggleThumb {
+      width: var(--hdr-toggle-thumb);
+      height: var(--hdr-toggle-thumb);
+      transition:
+        width 0.28s ease,
+        height 0.28s ease,
+        transform 0.28s ease;
+    }
+
+    html[data-motion="full"] .header .theme-toggle.is-dark .theme-toggleThumb,
+    html[data-motion="lite"] .header .theme-toggle.is-dark .theme-toggleThumb {
+      transform: translateX(var(--hdr-toggle-shift));
+    }
+
+    html[data-motion="full"] .header .nav-active-pill,
+    html[data-motion="lite"] .header .nav-active-pill,
+    html[data-motion="full"] .header .nav-hover-pill,
+    html[data-motion="lite"] .header .nav-hover-pill {
+      inset: unset !important;
+      bottom: auto !important;
+      right: auto !important;
+      will-change: transform, width, height, opacity;
+    }
+
+    html[data-motion="full"] .header.is-shrunk .nav-active-pill,
+    html[data-motion="lite"] .header.is-shrunk .nav-active-pill,
+    html[data-motion="full"] .header.is-shrunk .nav-hover-pill,
+    html[data-motion="lite"] .header.is-shrunk .nav-hover-pill {
+      border-radius: 11px !important;
+    }
+  }
+
+  /* ── Lighter route transition (non-catalog) ── */
+  [data-motion="full"] .route-transition:not(:has(.catalog-page)) {
+    animation: motionRouteFadeLite 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+[data-motion="lite"] .catalog-grid--animate .catalog-card {
+  animation: motionCatalogCardIn 0.32s ease both;
+  animation-delay: calc(var(--reveal-i, 0) * 28ms);
+}
+
+[data-motion="lite"] .suggestions--animate {
+  animation: motionSuggestIn 0.2s ease both;
+}
+
+[data-motion="off"] .catalog-grid--animate .catalog-card,
+[data-motion="off"] .empty--animated .empty-icon,
+[data-motion="off"] .flash-countdown-num--sec,
+[data-motion="off"] .catalog-hero::before {
+  animation: none !important;
+}

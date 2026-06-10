@@ -108,6 +108,11 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-orderMobileCard{display:flex;flex-direction:column;gap:14px;border-radius:28px;}
 
 .pay-overlay{z-index:1400;display:grid;place-items:center;padding:16px;}
+.pay-confirmOverlay{
+  background:rgba(4,9,20,.56);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+}
 .pay-successModal{width:min(440px,100%);background:rgba(8,14,26,.975);border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 120px rgba(0,0,0,.45);backdrop-filter:blur(20px);position:relative;overflow:hidden;}
 .pay-successModal--animate{animation:paySuccessEnter .5s cubic-bezier(0.16, 1, 0.3, 1) both;}
 .pay-successHead{padding-bottom:8px;position:relative;z-index:2;}
@@ -383,10 +388,10 @@ padding:24px 18px 20px;text-align:center;}
   .pay-stageTotal{font-size:32px;}
 }
 
-/* â”€â”€ Confirm Payment Modal â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+/* ── Confirm Payment Modal ── */
 .pay-confirmModal{
   position:relative;
-  width:min(420px,100%);
+  width:min(760px,100%);
   background:var(--skeu-panel-bg);
   border:1px solid var(--brand-line);
   border-radius:28px;
@@ -396,6 +401,32 @@ padding:24px 18px 20px;text-align:center;}
   overflow:hidden;
   padding:0;
   color:var(--brand-text);
+}
+.pay-confirmModal--animate{
+  animation:payConfirmEnter .48s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes payConfirmEnter{
+  0%{opacity:0;transform:scale(.94) translateY(16px);}
+  100%{opacity:1;transform:scale(1) translateY(0);}
+}
+@keyframes payConfirmSheetEnter{
+  0%{opacity:0;transform:translateY(100%);}
+  100%{opacity:1;transform:translateY(0);}
+}
+@keyframes payConfirmTotalPulse{
+  0%{box-shadow:var(--skeu-inset-shadow),0 0 0 0 rgba(79,255,218,.42);}
+  55%{box-shadow:var(--skeu-inset-shadow),0 0 0 6px rgba(79,255,218,.12);}
+  100%{box-shadow:var(--skeu-inset-shadow),0 0 0 0 rgba(79,255,218,0);}
+}
+@keyframes payConfirmCheckPop{
+  0%{transform:scale(.82);}
+  60%{transform:scale(1.12);}
+  100%{transform:scale(1);}
+}
+@keyframes payConfirmBtnUnlock{
+  0%{box-shadow:var(--skeu-accent-shadow),0 0 0 0 rgba(79,255,218,.5);}
+  70%{box-shadow:var(--skeu-accent-shadow),0 0 0 8px rgba(79,255,218,.14);}
+  100%{box-shadow:var(--skeu-accent-shadow),0 0 0 0 rgba(79,255,218,0);}
 }
 .pay-confirmModal::before{
   content:"";
@@ -442,10 +473,42 @@ padding:24px 18px 20px;text-align:center;}
 }
 .pay-confirmCloseBtn:hover{color:var(--brand-text);}
 
+.pay-confirmModalBody{
+  position:relative;
+  display:grid;
+  grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);
+  align-items:stretch;
+}
+.pay-confirmAside{
+  position:relative;
+  padding:18px 14px 20px 20px;
+  border-right:1px solid var(--brand-line);
+  display:flex;
+  align-items:center;
+  min-width:0;
+}
+.pay-confirmMain{
+  padding:18px 20px 20px 14px;
+  display:flex;
+  flex-direction:column;
+  min-width:0;
+}
+.pay-confirmMain .pay-confirmProgress{margin:0 0 12px;}
+.pay-confirmMain .pay-confirmChecklist{margin:0;}
+.pay-confirmMain .pay-confirmNotice{margin:12px 0 0;}
+.pay-confirmMain .pay-confirmActionsNew{
+  margin-top:auto;
+  padding:14px 0 0;
+}
+.pay-confirmAside .pay-confirmTotalAmount{
+  font-size:clamp(30px,3.2vw,42px);
+}
+
 /* Total Card */
 .pay-confirmTotalCard{
   position:relative;
-  margin:16px 20px 0;
+  margin:0;
+  width:100%;
   padding:16px 18px;
   border-radius:18px;
   border:1px solid var(--brand-line);
@@ -455,15 +518,85 @@ padding:24px 18px 20px;text-align:center;}
     var(--skeu-inset-bg);
   box-shadow:var(--skeu-inset-shadow);
   text-align:center;
+  min-height:220px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
 }
 .pay-confirmTotalLabel{font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-icon);}
 .pay-confirmTotalAmount{margin-top:6px;font-size:clamp(26px,6vw,36px);font-weight:900;letter-spacing:-.06em;color:var(--brand-icon);line-height:1;}
-.pay-confirmTotalMeta{margin-top:6px;font-size:12px;color:var(--brand-muted);}
+.pay-confirmTotalMeta{
+  margin-top:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  flex-wrap:wrap;
+  font-size:12px;
+  color:var(--brand-muted);
+}
+.pay-confirmTotalBadge{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+  min-height:24px;
+  padding:0 10px;
+  border-radius:999px;
+  border:1px solid rgba(79,255,218,.22);
+  background:rgba(0,214,180,.1);
+  font-size:10px;
+  font-weight:900;
+  letter-spacing:.08em;
+  text-transform:uppercase;
+  color:var(--brand-icon);
+}
+.pay-confirmTotalBadge.is-promo{
+  border-color:rgba(255,180,50,.24);
+  background:rgba(255,180,50,.1);
+  color:rgba(255,200,80,.95);
+}
+.pay-confirmTotalCard--pulse{
+  animation:payConfirmTotalPulse .7s cubic-bezier(0.22,1,0.36,1) .12s both;
+}
+
+.pay-confirmProgress{
+  margin:14px 20px 0;
+  display:grid;
+  gap:8px;
+}
+.pay-confirmProgressCopy{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  font-size:11px;
+  color:var(--brand-muted);
+}
+.pay-confirmProgressCopy strong{
+  font-size:11px;
+  font-weight:900;
+  color:var(--brand-icon);
+  letter-spacing:.02em;
+}
+.pay-confirmProgressTrack{
+  height:4px;
+  border-radius:999px;
+  background:rgba(255,255,255,.08);
+  overflow:hidden;
+}
+.pay-confirmProgressTrack > span{
+  display:block;
+  height:100%;
+  border-radius:inherit;
+  background:linear-gradient(90deg,#4effda,#00d6b4);
+  transition:width .28s cubic-bezier(0.22,1,0.36,1);
+}
 
 /* Checklist */
 .pay-confirmChecklist{
   list-style:none;
-  margin:16px 20px 0;
+  margin:12px 20px 0;
   padding:0;
   display:flex;flex-direction:column;gap:8px;
 }
@@ -471,6 +604,32 @@ padding:24px 18px 20px;text-align:center;}
   display:flex;align-items:flex-start;gap:10px;
   font-size:13px;line-height:1.5;
   color:var(--brand-text);
+  padding:10px 12px;
+  border-radius:14px;
+  border:1px solid transparent;
+  cursor:pointer;
+  transition:
+    background .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    transform .16s ease;
+}
+.pay-confirmCheckItem:hover{
+  background:rgba(255,255,255,.03);
+  border-color:rgba(255,255,255,.06);
+}
+.pay-confirmCheckItem.is-done{
+  background:rgba(0,214,180,.06);
+  border-color:rgba(79,255,218,.16);
+  color:rgba(234,255,245,.92);
+}
+.pay-confirmCheckText{flex:1;min-width:0;}
+.pay-confirmCheckbox-hidden{
+  position:absolute;
+  opacity:0;
+  width:0;
+  height:0;
+  pointer-events:none;
 }
 .pay-confirmCheckDot{
   flex:0 0 20px;width:20px;height:20px;
@@ -485,18 +644,25 @@ padding:24px 18px 20px;text-align:center;}
   margin-top:1px;
 }
 
-/* Warning */
-.pay-confirmWarning{
-  margin:14px 20px 0;
-  padding:10px 14px;
-  border-radius:12px;
-  border:1px solid rgba(255,180,50,.18);
-  background:rgba(255,180,50,.06);
-  display:flex;align-items:flex-start;gap:8px;
-  font-size:12px;line-height:1.5;
-  color:rgba(255,200,80,.9);
+/* Inline notice */
+.pay-confirmNotice{
+  margin:12px 20px 0;
+  padding:10px 12px 10px 14px;
+  border-radius:0 12px 12px 0;
+  border-left:3px solid rgba(255,180,50,.72);
+  background:rgba(255,180,50,.05);
+  display:flex;
+  align-items:flex-start;
+  gap:8px;
+  font-size:12px;
+  line-height:1.5;
+  color:rgba(255,200,80,.92);
 }
-.pay-confirmWarning svg{flex:0 0 14px;margin-top:1px;}
+.pay-confirmNotice svg{
+  flex:0 0 14px;
+  margin-top:1px;
+  color:rgba(255,180,50,.9);
+}
 
 /* Action Buttons */
 .pay-confirmActionsNew{
@@ -518,8 +684,17 @@ padding:24px 18px 20px;text-align:center;}
   box-shadow:var(--skeu-accent-shadow);
   transition:transform .18s,filter .18s;
 }
-.pay-confirmPrimaryBtn:hover{transform:translateY(-1px);filter:brightness(1.04);}
-.pay-confirmPrimaryBtn:active{transform:translateY(0);}
+.pay-confirmPrimaryBtn:disabled{
+  opacity:.42;
+  cursor:not-allowed;
+  filter:grayscale(30%);
+  transform:none;
+}
+.pay-confirmPrimaryBtn.is-ready{
+  animation:payConfirmBtnUnlock .55s cubic-bezier(0.22,1,0.36,1) both;
+}
+.pay-confirmPrimaryBtn:not(:disabled):hover{transform:translateY(-1px);filter:brightness(1.04);}
+.pay-confirmPrimaryBtn:not(:disabled):active{transform:translateY(0);}
 .pay-confirmSecondaryBtn{
   width:100%;height:44px;
   border-radius:14px;
@@ -537,10 +712,58 @@ padding:24px 18px 20px;text-align:center;}
 
 @media (max-width: 980px){
   .pay-confirmModal{backdrop-filter:none;-webkit-backdrop-filter:none;}
+  .pay-confirmOverlay{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+}
+@media (max-width: 680px){
+  .pay-confirmOverlay{
+    align-items:flex-end;
+    padding:0;
+  }
+  .pay-confirmModal{
+    width:100%;
+    max-width:100%;
+    border-radius:28px 28px 0 0;
+    border-bottom:none;
+  }
+  .pay-confirmModal--animate{
+    animation:payConfirmSheetEnter .42s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .pay-confirmModalBody{
+    grid-template-columns:1fr;
+  }
+  .pay-confirmAside{
+    padding:0 20px;
+    border-right:none;
+    border-bottom:1px solid var(--brand-line);
+    padding-top:16px;
+    padding-bottom:14px;
+  }
+  .pay-confirmMain{
+    padding:14px 20px 20px;
+  }
+  .pay-confirmTotalCard{
+    min-height:0;
+    padding:14px 16px;
+  }
+  .pay-confirmMain .pay-confirmActionsNew{
+    padding:16px 0 0;
+    margin-top:16px;
+  }
 }
 @media (max-width: 480px){
-  .pay-confirmModal{border-radius:24px;}
+  .pay-confirmModal{border-radius:24px 24px 0 0;}
   .pay-confirmTotalAmount{font-size:26px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .pay-confirmModal--animate,
+  .pay-confirmTotalCard--pulse,
+  .pay-confirmCheckDot.is-checked,
+  .pay-confirmPrimaryBtn.is-ready{
+    animation:none !important;
+  }
+  .pay-confirmProgressTrack > span{
+    transition:none;
+  }
 }
 
 /* ── Free order panel (100% promo) ── */
@@ -719,12 +942,25 @@ padding:24px 18px 20px;text-align:center;}
   background: linear-gradient(135deg, #4effda 0%, #00d6b4 100%) !important;
   border-color: rgba(79, 255, 200, 0.4) !important;
   color: #032235 !important;
+  animation: payConfirmCheckPop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
 :root[data-theme="light"] .pay-confirmCheckDot.is-checked {
   background: linear-gradient(135deg, #00d6b4 0%, #008a94 100%) !important;
   border-color: rgba(0, 138, 148, 0.22) !important;
   color: #fff !important;
+}
+
+:root[data-theme="light"] .pay-confirmNotice{
+  background:rgba(255,180,50,.08);
+  color:#8a5d12;
+}
+:root[data-theme="light"] .pay-confirmCheckItem.is-done{
+  background:rgba(0,214,180,.08);
+  border-color:rgba(0,138,148,.14);
+}
+:root[data-theme="light"] .pay-confirmProgressTrack{
+  background:rgba(0,138,148,.1);
 }
 
 /* ── Tap-to-Zoom QRIS Modal ── */

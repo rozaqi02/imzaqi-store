@@ -705,8 +705,8 @@ export default function Status() {
     title: activeTab === "riwayat" ? "Riwayat Order" : "Status Order",
     description:
       activeTab === "riwayat"
-        ? "Lihat semua riwayat order yang pernah dibuat dari browser ini."
-        : "Masukkan ID order untuk melihat progres, catatan, dan ringkasan order di satu tempat.",
+        ? "Semua order dari browser ini tersimpan di sini."
+        : "Masukin ID order, langsung keliatan progress-nya.",
   });
 
   useEffect(() => {
@@ -730,14 +730,14 @@ export default function Status() {
         <div className="container st-wrap">
           <header className="st-hero">
             <div className="st-heroCopy">
-              <div className="st-kicker">Order tracker</div>
+              <div className="st-kicker">Track order</div>
               <h1 className="h1 st-title">
-                {activeTab === "riwayat" ? "Riwayat Order." : "Cek status order."}
+                {activeTab === "riwayat" ? "Riwayat order kamu." : "Cek status order."}
               </h1>
               <p className="st-sub">
                 {activeTab === "riwayat"
-                  ? "Semua order dari browser ini tersimpan di sini."
-                  : "Masukkan ID order untuk lihat progres terbaru."}
+                  ? "Semua order dari browser ini nyimpen di sini."
+                  : "Masukin ID order, langsung keliatan progress-nya."}
               </p>
             </div>
           </header>

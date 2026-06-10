@@ -2,16 +2,21 @@ import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ChevronDown,
+  CircleCheck,
   CircleHelp,
+  ClipboardList,
   CreditCard,
   MessageCircle,
-  ReceiptText,
+  PackageSearch,
   Search,
   ShieldCheck,
+  ShoppingBag,
   Sparkles,
+  X,
 } from "lucide-react";
 import { fetchSettings } from "../lib/api";
 import { usePageMeta } from "../hooks/usePageMeta";
+import EmptyState from "../components/EmptyState";
 
 const FAQ_ITEMS = [
   {
@@ -19,8 +24,8 @@ const FAQ_ITEMS = [
     category: "payment",
     question: "Cara bayar di Imzaqi Store bagaimana?",
     answer: [
-      "Pilih produk dan varian dulu, lalu lanjut ke halaman bayar.",
-      "Scan QRIS sesuai total yang tampil, lalu tekan tombol konfirmasi untuk membuat ID order.",
+      "Pilih produk dan varian, lalu lanjut ke halaman bayar.",
+      "Scan QRIS sesuai total yang tampil, lalu konfirmasi untuk membuat ID order.",
     ],
     tags: ["qris", "bayar", "payment", "scan"],
   },
@@ -30,17 +35,27 @@ const FAQ_ITEMS = [
     question: "Kenapa QRIS belum muncul?",
     answer: [
       "Biasanya karena nomor WhatsApp belum valid atau ada varian yang mewajibkan catatan email buyer.",
-      "Lengkapi data yang diminta di halaman bayar, maka QRIS akan otomatis terbuka.",
+      "Lengkapi data di halaman bayar — QRIS akan terbuka otomatis.",
     ],
     tags: ["qris", "locked", "email", "catatan"],
+  },
+  {
+    id: "promo",
+    category: "payment",
+    question: "Kalau pakai promo, total otomatis terpotong?",
+    answer: [
+      "Ya, jika promo valid potongan langsung dihitung di checkout dan status order.",
+      "Jika promo tidak cocok, sistem menampilkan pesan dan total kembali normal.",
+    ],
+    tags: ["promo", "diskon", "checkout"],
   },
   {
     id: "after-pay",
     category: "order",
     question: "Setelah bayar, langkah selanjutnya apa?",
     answer: [
-      "Simpan ID order yang muncul di pop-up.",
-      "Masuk ke halaman Status dan masukkan ID tersebut untuk pantau progres terbaru.",
+      "Simpan ID order yang muncul setelah konfirmasi pembayaran.",
+      "Buka halaman Status dan masukkan ID untuk pantau progres terbaru.",
     ],
     tags: ["id order", "status", "setelah bayar"],
   },
@@ -50,7 +65,7 @@ const FAQ_ITEMS = [
     question: "Format ID order seperti apa?",
     answer: [
       "Format utama: IMZ-ABCD.",
-      "Di halaman status kamu juga bisa tempel kode pendek (ABCD), sistem akan normalisasi otomatis.",
+      "Di halaman status kamu bisa tempel kode pendek (ABCD) — sistem menormalisasi otomatis.",
     ],
     tags: ["format", "id", "imz"],
   },
@@ -60,7 +75,7 @@ const FAQ_ITEMS = [
     question: "ID order tidak ditemukan, kenapa?",
     answer: [
       "Pastikan tidak ada salah ketik, terutama huruf dan angka.",
-      "Kalau tetap tidak ketemu, kirim ID yang kamu punya ke admin agar dicek manual.",
+      "Jika tetap tidak ketemu, kirim ID ke admin untuk pengecekan manual.",
     ],
     tags: ["not found", "status", "cek order"],
   },
@@ -79,20 +94,10 @@ const FAQ_ITEMS = [
     category: "product",
     question: "Stok di website real-time tidak?",
     answer: [
-      "Ya, stok akan berkurang saat order berhasil diproses.",
-      "Kalau stok berubah saat checkout, sistem akan memberi notifikasi supaya kamu bisa review ulang.",
+      "Ya, stok berkurang saat order berhasil diproses.",
+      "Jika stok berubah saat checkout, sistem memberi notifikasi untuk review ulang.",
     ],
     tags: ["stok", "real-time", "checkout"],
-  },
-  {
-    id: "duplicate-variant",
-    category: "product",
-    question: "Boleh ada nama varian atau label durasi yang mirip?",
-    answer: [
-      "Boleh, selama detail harga, garansi, dan stoknya jelas agar tidak membingungkan buyer.",
-      "Disarankan tetap pakai penamaan konsisten supaya mudah dibaca di katalog.",
-    ],
-    tags: ["duplikat", "label durasi", "varian"],
   },
   {
     id: "buyer-email",
@@ -100,7 +105,7 @@ const FAQ_ITEMS = [
     question: "Kenapa beberapa varian wajib isi email buyer?",
     answer: [
       "Sebagian layanan butuh email buyer untuk aktivasi atau onboarding akun.",
-      "Varian yang diwajibkan akan menampilkan petunjuk otomatis di halaman bayar.",
+      "Varian yang diwajibkan menampilkan petunjuk otomatis di halaman bayar.",
     ],
     tags: ["email buyer", "aktivasi", "requires_buyer_email"],
   },
@@ -110,19 +115,9 @@ const FAQ_ITEMS = [
     question: "Catatan pembeli dipakai untuk apa?",
     answer: [
       "Untuk info khusus seperti email aktivasi, preferensi proses, atau request tambahan.",
-      "Catatan ini membantu admin memproses order lebih cepat dan akurat.",
+      "Catatan membantu admin memproses order lebih cepat dan akurat.",
     ],
     tags: ["catatan", "notes", "buyer"],
-  },
-  {
-    id: "promo",
-    category: "payment",
-    question: "Kalau pakai promo, total otomatis terpotong?",
-    answer: [
-      "Ya, jika promo valid maka potongan langsung dihitung di ringkasan checkout dan status order.",
-      "Jika promo tidak cocok, sistem akan tampilkan pesan dan total kembali normal.",
-    ],
-    tags: ["promo", "diskon", "checkout"],
   },
   {
     id: "support-channel",
@@ -130,7 +125,7 @@ const FAQ_ITEMS = [
     question: "Jika ada kendala, hubungi ke mana?",
     answer: [
       "Gunakan tombol Hubungi Admin dari halaman bayar atau status.",
-      "Sertakan ID order agar pengecekan bisa langsung diproses tanpa bolak-balik.",
+      "Sertakan ID order agar pengecekan bisa langsung diproses.",
     ],
     tags: ["admin", "wa", "support", "kendala"],
   },
@@ -145,6 +140,41 @@ const FAQ_CATEGORIES = [
   { key: "support", label: "Bantuan" },
 ];
 
+const HOWTO_STEPS = [
+  {
+    num: "01",
+    icon: ShoppingBag,
+    title: "Cari & pilih",
+    desc: "Buka katalog, pilih produk dan varian yang sesuai budget.",
+    to: "/produk",
+  },
+  {
+    num: "02",
+    icon: CreditCard,
+    title: "Bayar QRIS",
+    desc: "Scan via e-wallet atau m-banking. Nominal sudah otomatis.",
+    to: "/bayar",
+  },
+  {
+    num: "03",
+    icon: ClipboardList,
+    title: "Simpan ID",
+    desc: "Setelah bayar, catat ID order (IMZ-XXXX) yang muncul.",
+    to: "/status",
+  },
+  {
+    num: "04",
+    icon: CircleCheck,
+    title: "Pantau progress",
+    desc: "Masukkan ID di halaman Status — update real-time.",
+    to: "/status",
+  },
+];
+
+const CATEGORY_LABELS = Object.fromEntries(
+  FAQ_CATEGORIES.filter((item) => item.key !== "all").map((item) => [item.key, item.label])
+);
+
 function faqMatches(item, query) {
   if (!query) return true;
   const q = query.toLowerCase();
@@ -153,6 +183,8 @@ function faqMatches(item, query) {
 }
 
 function FaqItem({ item, open, onToggle }) {
+  const categoryLabel = CATEGORY_LABELS[item.category] || "FAQ";
+
   return (
     <article className={`faq-item${open ? " open" : ""}`}>
       <button
@@ -161,7 +193,10 @@ function FaqItem({ item, open, onToggle }) {
         aria-expanded={open}
         onClick={() => onToggle(item.id)}
       >
-        <span>{item.question}</span>
+        <span className="faq-itemQuestion">
+          <span className="faq-itemCategory">{categoryLabel}</span>
+          <span>{item.question}</span>
+        </span>
         <ChevronDown size={17} />
       </button>
 
@@ -179,7 +214,7 @@ function FaqItem({ item, open, onToggle }) {
 export default function About() {
   usePageMeta({
     title: "FAQ",
-    description: "Pusat FAQ Imzaqi Store: pembayaran, order, varian, aktivasi, dan bantuan.",
+    description: "Jawaban cepat soal bayar, order, varian, dan aktivasi — biar nggak bingung.",
   });
 
   const [waNumber, setWaNumber] = useState("6283136049987");
@@ -201,6 +236,14 @@ export default function About() {
     };
   }, []);
 
+  const categoryCounts = useMemo(() => {
+    const counts = { all: FAQ_ITEMS.length };
+    FAQ_ITEMS.forEach((item) => {
+      counts[item.category] = (counts[item.category] || 0) + 1;
+    });
+    return counts;
+  }, []);
+
   const filteredFaq = useMemo(() => {
     return FAQ_ITEMS.filter((item) => {
       const matchCategory = activeCategory === "all" || item.category === activeCategory;
@@ -209,8 +252,6 @@ export default function About() {
     });
   }, [activeCategory, query]);
 
-  // Close any open item that no longer matches the current filter; never
-  // auto-open a default item — let the user choose what to expand.
   useEffect(() => {
     if (!openId) return;
     const exists = filteredFaq.some((item) => item.id === openId);
@@ -226,50 +267,59 @@ export default function About() {
     return `https://wa.me/${waNumber}?text=${message}`;
   }, [waNumber]);
 
+  const emptySuggestions = useMemo(
+    () => [
+      { key: "clear", label: "Hapus pencarian", onClick: () => setQuery("") },
+      { key: "all", label: "Semua kategori", onClick: () => setActiveCategory("all") },
+      { key: "payment", label: "Pembayaran", onClick: () => setActiveCategory("payment") },
+      { key: "order", label: "Order", onClick: () => setActiveCategory("order") },
+    ],
+    []
+  );
+
   return (
     <div className="page">
       <section className="section faq-shell">
         <div className="container faq-wrap">
-          <header className="faq-hero">
+          <header className="faq-hero reveal">
             <div className="faq-heroCopy">
-              <div className="faq-kicker">FAQ Center</div>
+              <div className="faq-kicker">Pusat bantuan</div>
               <h1 className="h1 faq-title">Ada yang bingung?</h1>
               <p className="faq-sub">
-                Jawaban cepat soal bayar, order, produk, dan aktivasi. Langsung ketemu.
+                Bayar, order, produk, aktivasi — jawabannya ada di sini.
               </p>
             </div>
             <div className="faq-heroPill">
               <CircleHelp size={16} />
-              <span>{FAQ_ITEMS.length} FAQ siap</span>
+              <span>{filteredFaq.length} topik</span>
             </div>
           </header>
 
-          {/* ── Cara Pesan Section ── */}
-          <section className="faq-howto">
+          <section className="faq-howto reveal" aria-label="Cara pesan">
             <div className="faq-howtoHead">
-              <div className="faq-kicker">Cara Pesan</div>
-              <h2 className="faq-howtoTitle">Gampang banget, cuma 4 step</h2>
+              <div className="faq-kicker">Cara pesan</div>
+              <h2 className="faq-howtoTitle">4 langkah sampai order jalan</h2>
             </div>
             <div className="faq-howtoSteps">
-              {[
-                { num: "01", icon: "🛍️", title: "Pilih Produk", desc: "Buka katalog, pilih produk dan varian yang sesuai kebutuhan dan budget." },
-                { num: "02", icon: "💳", title: "Bayar via QRIS", desc: "Scan QRIS dengan m-banking atau e-wallet. Nominal otomatis menyesuaikan total." },
-                { num: "03", icon: "📋", title: "Simpan ID Order", desc: "Setelah konfirmasi, ID order (format IMZ-XXXX) akan muncul. Simpan baik-baik." },
-                { num: "04", icon: "✅", title: "Pantau Status", desc: "Masukkan ID order di halaman Status untuk melihat progres terbaru." },
-              ].map((step) => (
-                <div key={step.num} className="faq-howtoStep">
-                  <div className="faq-howtoNum">{step.num}</div>
-                  <div className="faq-howtoEmoji">{step.icon}</div>
-                  <div className="faq-howtoCopy">
-                    <strong>{step.title}</strong>
-                    <p>{step.desc}</p>
-                  </div>
-                </div>
-              ))}
+              {HOWTO_STEPS.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <Link key={step.num} className="faq-howtoStep" to={step.to}>
+                    <div className="faq-howtoNum">{step.num}</div>
+                    <div className="faq-howtoIcon" aria-hidden="true">
+                      <Icon size={22} />
+                    </div>
+                    <div className="faq-howtoCopy">
+                      <strong>{step.title}</strong>
+                      <p>{step.desc}</p>
+                    </div>
+                  </Link>
+                );
+              })}
             </div>
           </section>
 
-          <section className="faq-command">
+          <section className="faq-command reveal">
             <div className="faq-searchWrap">
               <Search size={16} />
               <input
@@ -277,12 +327,24 @@ export default function About() {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Cari: QRIS, ID order, email buyer, promo..."
+                aria-label="Cari FAQ"
               />
+              {query ? (
+                <button
+                  type="button"
+                  className="faq-searchClear"
+                  onClick={() => setQuery("")}
+                  aria-label="Hapus pencarian"
+                >
+                  <X size={14} />
+                </button>
+              ) : null}
             </div>
 
             <div className="faq-chips" role="tablist" aria-label="Filter kategori FAQ">
               {FAQ_CATEGORIES.map((category) => {
                 const active = category.key === activeCategory;
+                const count = categoryCounts[category.key] || 0;
                 return (
                   <button
                     key={category.key}
@@ -293,6 +355,7 @@ export default function About() {
                     onClick={() => setActiveCategory(category.key)}
                   >
                     {category.label}
+                    <span className="faq-chipCount">{count}</span>
                   </button>
                 );
               })}
@@ -319,15 +382,19 @@ export default function About() {
                 </div>
               ) : (
                 <div className="faq-empty">
-                  <div className="faq-emptyBadge">0</div>
-                  <h2>Tidak ada FAQ yang cocok.</h2>
-                  <p>Coba kata kunci lain atau pilih kategori "Semua".</p>
+                  <EmptyState
+                    icon={<PackageSearch size={28} />}
+                    title="Tidak ada FAQ yang cocok"
+                    description="Coba kata kunci lain atau pilih kategori berbeda."
+                    suggestions={emptySuggestions}
+                    primaryAction={{ label: "Lihat semua", onClick: () => { setQuery(""); setActiveCategory("all"); } }}
+                  />
                 </div>
               )}
             </main>
 
             <aside className="faq-side">
-              <article className="faq-sideCard">
+              <article className="faq-sideCard reveal">
                 <div className="faq-sideHead">
                   <Sparkles size={16} />
                   <h3>Akses cepat</h3>
@@ -345,45 +412,16 @@ export default function About() {
                 </div>
               </article>
 
-              <article className="faq-sideCard">
-                <div className="faq-sideHead">
-                  <ReceiptText size={16} />
-                  <h3>Alur singkat</h3>
-                </div>
-                <div className="faq-steps">
-                  <div className="faq-step">
-                    <span>01</span>
-                    <p>Pilih produk dan varian yang cocok.</p>
-                  </div>
-                  <div className="faq-step">
-                    <span>02</span>
-                    <p>Bayar via QRIS, lalu simpan ID order.</p>
-                  </div>
-                  <div className="faq-step">
-                    <span>03</span>
-                    <p>Pantau progres order di halaman status.</p>
-                  </div>
-                </div>
-              </article>
-
-              <article className="faq-sideCard">
+              <article className="faq-sideCard faq-sideCardAccent reveal">
                 <div className="faq-sideHead">
                   <ShieldCheck size={16} />
-                  <h3>Tips aman</h3>
+                  <h3>Butuh bantuan?</h3>
                 </div>
-                <div className="faq-tips">
-                  <p>Simpan ID order setelah pembayaran.</p>
-                  <p>Isi catatan buyer jika varian meminta email aktivasi.</p>
-                  <p>Hubungi admin dengan menyertakan ID order.</p>
-                </div>
-              </article>
-
-              <article className="faq-sideCard faq-sideCardAccent">
-                <div className="faq-sideHead">
-                  <CreditCard size={16} />
-                  <h3>Masih bingung?</h3>
-                </div>
-                <p className="faq-sideText">Tim admin siap bantu cek dari pembayaran sampai status aktivasi.</p>
+                <ul className="faq-sideTips">
+                  <li>Simpan ID order setelah pembayaran.</li>
+                  <li>Isi catatan buyer jika varian minta email aktivasi.</li>
+                  <li>Chat admin sambil sertakan ID order.</li>
+                </ul>
                 <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
                   Chat admin
                   <MessageCircle size={16} />

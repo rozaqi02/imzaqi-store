@@ -31,26 +31,41 @@
     linear-gradient(180deg, rgba(8, 12, 28, 0.98), rgba(4, 7, 20, 0.98));
   --skeu-panel-bg: linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96) 55%, rgba(4, 8, 21, 0.98) 100%);
   --skeu-panel-shadow:
-    0 28px 60px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.34),
-    0 0 0 1px rgba(0, 194, 208, 0.08);
+    16px 18px 36px rgba(0, 0, 0, 0.38),
+    -10px -10px 22px rgba(255, 255, 255, 0.04),
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.36),
+    0 0 0 1px rgba(0, 194, 208, 0.1);
   --skeu-control-bg: linear-gradient(180deg, rgba(25, 38, 72, 0.96), rgba(10, 16, 35, 0.94));
   --skeu-control-shadow:
-    0 16px 30px rgba(0, 0, 0, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
-    0 0 0 1px rgba(0, 194, 208, 0.08);
+    10px 12px 22px rgba(0, 0, 0, 0.28),
+    -6px -6px 14px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(0, 194, 208, 0.1);
   --skeu-inset-bg: linear-gradient(180deg, rgba(3, 8, 18, 0.94), rgba(9, 15, 33, 0.82));
   --skeu-inset-shadow:
-    inset 0 3px 8px rgba(0, 0, 0, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    inset 10px 12px 22px rgba(0, 0, 0, 0.46),
+    inset -5px -5px 12px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
     0 1px 0 rgba(255, 255, 255, 0.03);
   --skeu-pill-bg: linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9));
   --skeu-accent-shadow:
     0 20px 34px rgba(0, 214, 180, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
     inset 0 -3px 0 rgba(3, 66, 74, 0.36);
+  /* Imzaqi Store — green CTA (matches Products catalog-viewBtn.active grid filter) */
+  --imzaqi-btn-face:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  --imzaqi-btn-border: rgba(79, 255, 200, 0.24);
+  --imzaqi-btn-text: #032235;
+  --imzaqi-btn-shadow:
+    0 4px 14px rgba(0, 214, 180, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --imzaqi-btn-shadow-hover:
+    0 6px 18px rgba(0, 214, 180, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
 }
 
 :root[data-theme="light"] {
@@ -78,26 +93,40 @@
     linear-gradient(180deg, rgba(239, 249, 255, 0.98), rgba(214, 234, 245, 0.96));
   --skeu-panel-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 247, 251, 0.95) 56%, rgba(221, 240, 246, 0.98) 100%);
   --skeu-panel-shadow:
-    0 24px 42px rgba(67, 111, 129, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.22),
-    0 0 0 1px rgba(0, 138, 148, 0.08);
+    14px 16px 32px rgba(67, 111, 129, 0.2),
+    -10px -10px 20px rgba(255, 255, 255, 0.92),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -4px 0 rgba(154, 191, 203, 0.26),
+    0 0 0 1px rgba(0, 138, 148, 0.1);
   --skeu-control-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(232, 245, 249, 0.94));
   --skeu-control-shadow:
-    0 12px 24px rgba(67, 111, 129, 0.12),
+    8px 10px 20px rgba(67, 111, 129, 0.14),
+    -6px -6px 14px rgba(255, 255, 255, 0.96),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.24),
-    0 0 0 1px rgba(0, 138, 148, 0.08);
+    inset 0 -3px 0 rgba(154, 191, 203, 0.26),
+    0 0 0 1px rgba(0, 138, 148, 0.1);
   --skeu-inset-bg: linear-gradient(180deg, rgba(231, 243, 248, 0.98), rgba(247, 252, 255, 0.92));
   --skeu-inset-shadow:
-    inset 0 2px 6px rgba(124, 158, 171, 0.18),
+    inset 8px 10px 18px rgba(124, 158, 171, 0.24),
+    inset -5px -5px 12px rgba(255, 255, 255, 0.88),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 1px 0 rgba(255, 255, 255, 0.52);
+    0 1px 0 rgba(255, 255, 255, 0.62);
   --skeu-pill-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(232, 245, 249, 0.8));
   --skeu-accent-shadow:
     0 18px 28px rgba(0, 214, 180, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
     inset 0 -3px 0 rgba(0, 122, 130, 0.18);
+  --imzaqi-btn-face:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  --imzaqi-btn-border: rgba(0, 138, 148, 0.3);
+  --imzaqi-btn-text: #032235;
+  --imzaqi-btn-shadow:
+    0 4px 14px rgba(0, 138, 148, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --imzaqi-btn-shadow-hover:
+    0 6px 18px rgba(0, 138, 148, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
 }
 
 html,
@@ -144,24 +173,35 @@ body,
 .header,
 .site-header {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 20%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0) 44%),
+    linear-gradient(180deg, rgba(79, 255, 200, 0.07) 0%, rgba(79, 255, 200, 0) 36%),
     var(--uni-neo-panel) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.04) !important;
+  border-bottom: 1px solid rgba(0, 194, 208, 0.14) !important;
   box-shadow:
-    0 8px 28px rgba(0, 0, 0, 0.44),
-    -4px -4px 10px rgba(255, 255, 255, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.28) !important;
+    0 16px 36px rgba(0, 0, 0, 0.46),
+    0 4px 14px rgba(0, 10, 28, 0.32),
+    -8px -8px 18px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.34) !important;
+  backdrop-filter: blur(14px) saturate(125%);
+  -webkit-backdrop-filter: blur(14px) saturate(125%);
 }
 
 :root[data-theme="light"] .header,
 :root[data-theme="light"] .site-header {
-  border-bottom: 1px solid rgba(119, 175, 194, 0.18) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.55) 22%, rgba(255, 255, 255, 0) 48%),
+    linear-gradient(180deg, rgba(79, 255, 200, 0.1) 0%, rgba(79, 255, 200, 0) 40%),
+    var(--uni-neo-panel) !important;
+  border-bottom: 1px solid rgba(0, 138, 148, 0.16) !important;
   box-shadow:
-    0 6px 20px rgba(80, 115, 130, 0.18),
-    -5px -5px 12px rgba(255, 255, 255, 0.82),
+    0 12px 30px rgba(67, 111, 129, 0.18),
+    0 4px 12px rgba(80, 115, 130, 0.1),
+    -8px -8px 18px rgba(255, 255, 255, 0.94),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(166, 200, 211, 0.22) !important;
+    inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
+  backdrop-filter: blur(12px) saturate(118%);
+  -webkit-backdrop-filter: blur(12px) saturate(118%);
 }
 
 .header::after,
@@ -219,12 +259,10 @@ body,
 .btn,
 .checkout-drawer .btn:not(.btn-ghost),
 .pay-shell .btn:not(.btn-ghost) {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
-    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
-  border-color: rgba(79, 255, 200, 0.24) !important;
-  color: #032235 !important;
-  box-shadow: var(--skeu-accent-shadow) !important;
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
 .btn.btn-ghost,
@@ -339,11 +377,30 @@ select.input {
 }
 
 .hero-accent,
-.hero-highlight {
-  background: linear-gradient(135deg, #eafff5 0%, #9fffe5 42%, #4fffc8 68%, #00c2d0 100%) !important;
+.hero-highlight,
+.hm-title-accent,
+.hm-title-glow {
+  display: inline-block;
+  padding: 0.02em 0.1em 0.1em 0.02em;
+  overflow: visible;
+  line-height: 1.2;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  background: linear-gradient(135deg, #7dffe8 0%, #4effda 34%, #00c2b0 66%, #007a85 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
   color: transparent !important;
+}
+
+:root[data-theme="light"] .hero-accent,
+:root[data-theme="light"] .hero-highlight,
+:root[data-theme="light"] .hm-title-accent,
+:root[data-theme="light"] .hm-title-glow {
+  background: linear-gradient(135deg, #1ed4b8 0%, #00b8a0 38%, #008f8a 68%, #006268 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 .muted,
@@ -397,8 +454,6 @@ select.input {
 
 .hero-railIcon,
 .catalog-filterBtnCount,
-.catalog-chip.active,
-.catalog-viewBtn.active,
 .about-valueIcon,
 .mobile-sheetLinkIcon,
 .mobile-dock-link.active,
@@ -1046,9 +1101,7 @@ select.input {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .toggle-btn.active,
-:root[data-theme="light"] .catalog-chip.active,
-:root[data-theme="light"] .catalog-viewBtn.active {
+:root[data-theme="light"] .toggle-btn.active {
   color: #0c4050 !important;
 }
 
@@ -1104,22 +1157,6 @@ select.input {
 }
 
 @media (max-width: 720px) {
-  .header,
-  .site-header {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 20%),
-      linear-gradient(180deg, rgba(17, 29, 58, 0.985), rgba(8, 14, 31, 0.97) 55%, rgba(4, 8, 21, 0.985) 100%) !important;
-    box-shadow: 0 6px 22px rgba(0, 0, 0, 0.22) !important;
-  }
-
-  :root[data-theme="light"] .header,
-  :root[data-theme="light"] .site-header {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0) 24%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.985), rgba(236, 247, 251, 0.97) 56%, rgba(221, 240, 246, 0.985) 100%) !important;
-    box-shadow: 0 5px 16px rgba(80, 115, 130, 0.12) !important;
-  }
-
   .header-inner {
     gap: 8px;
   }
@@ -1169,8 +1206,6 @@ select.input {
       inset 0 -2px 0 rgba(0, 122, 130, 0.16);
   }
 
-  .header,
-  .site-header,
   .mobile-menu,
   .mobile-backdrop,
   .mobile-sheetBackdrop,
@@ -1203,8 +1238,6 @@ select.input {
     display: none !important;
   }
 
-  .header,
-  .site-header,
   .card,
   .faq-item,
   .product-detail,
@@ -2836,6 +2869,7 @@ select.input {
 .stat-minimal,
 .product-tile,
 .catalog-command,
+.catalog-filterShell,
 .catalog-filter,
 .catalog-card.catalog-cardV2,
 .catalog-sheet,

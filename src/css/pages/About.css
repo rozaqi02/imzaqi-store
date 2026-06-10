@@ -192,6 +192,42 @@
     var(--faq-panel-soft);
 }
 
+.faq-chipCount {
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  font-size: 10px;
+  font-weight: 1000;
+  display: inline-grid;
+  place-items: center;
+}
+
+.faq-chip.active .faq-chipCount {
+  background: rgba(0, 214, 180, 0.18);
+  color: #4effda;
+}
+
+.faq-searchClear {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--faq-muted);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.faq-searchClear:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--faq-text);
+}
+
 .faq-layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 340px;
@@ -243,6 +279,34 @@
   cursor: pointer;
 }
 
+.faq-itemQuestion {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.faq-itemCategory {
+  width: max-content;
+  max-width: 100%;
+  min-height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  border: 1px solid var(--faq-line);
+  background: var(--faq-inset);
+  color: var(--faq-muted);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+.faq-item.open .faq-itemCategory {
+  border-color: var(--faq-line-strong);
+  color: var(--faq-text);
+}
+
 .faq-itemHead svg {
   flex: 0 0 auto;
   transition: transform 0.24s var(--ease-out);
@@ -289,45 +353,27 @@
 }
 
 .faq-empty {
-  min-height: 250px;
-  padding: 28px;
-  display: grid;
-  align-content: center;
-  justify-items: center;
-  gap: 8px;
-  text-align: center;
+  padding: 8px 0 4px;
 }
 
-.faq-emptyBadge {
-  width: 60px;
-  height: 60px;
-  display: grid;
-  place-items: center;
-  border-radius: 18px;
-  border: 1px solid var(--faq-line-strong);
+.faq-empty .empty {
+  border: 1px solid var(--faq-line);
+  border-radius: 24px;
   background:
-    linear-gradient(180deg, rgba(145, 221, 255, 0.24), rgba(145, 221, 255, 0) 26%),
-    var(--faq-panel-soft);
-  box-shadow: var(--faq-soft-shadow);
-  color: var(--faq-text);
-  font-size: 20px;
-  font-weight: 1000;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 18%),
+    var(--faq-panel);
+  box-shadow: var(--faq-shadow);
+  padding: 28px 20px;
 }
 
-.faq-empty h2 {
+.faq-sideTips {
   margin: 0;
-  color: var(--faq-text);
-  font-size: 26px;
-  letter-spacing: -0.03em;
-}
-
-.faq-empty p,
-.faq-sideText,
-.faq-step p,
-.faq-tips p {
-  margin: 0;
+  padding: 0 0 0 18px;
+  display: grid;
+  gap: 8px;
   color: var(--faq-subtle);
-  line-height: 1.62;
+  font-size: 13px;
+  line-height: 1.55;
 }
 
 .faq-side {
@@ -357,32 +403,6 @@
 .faq-sideActions {
   display: grid;
   gap: 8px;
-}
-
-.faq-steps,
-.faq-tips {
-  display: grid;
-  gap: 8px;
-}
-
-.faq-step {
-  display: grid;
-  grid-template-columns: 34px minmax(0, 1fr);
-  align-items: start;
-  gap: 10px;
-}
-
-.faq-step span {
-  height: 28px;
-  display: grid;
-  place-items: center;
-  border-radius: 10px;
-  border: 1px solid var(--faq-line);
-  background: var(--faq-inset);
-  box-shadow: var(--faq-inset-shadow);
-  color: var(--faq-muted);
-  font-size: 11px;
-  font-weight: 900;
 }
 
 .faq-sideCardAccent {
@@ -546,44 +566,105 @@
   }
 }
 
-/* ── Cara Pesan ── */
-.faq-howto { margin-bottom: 40px; }
-.faq-howtoHead { margin-bottom: 20px; }
-.faq-howtoTitle { font-size: clamp(22px, 3vw, 28px); font-weight: 1000; margin: 6px 0 0; }
+/* ── Cara pesan ── */
+.faq-howto {
+  display: grid;
+  gap: 14px;
+}
+
+.faq-howtoHead {
+  display: grid;
+  gap: 4px;
+}
+
+.faq-howtoTitle {
+  margin: 0;
+  color: var(--faq-text);
+  font-size: clamp(22px, 3vw, 28px);
+  font-weight: 1000;
+  letter-spacing: -0.03em;
+}
+
 .faq-howtoSteps {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
+
 .faq-howtoStep {
-  padding: 18px 16px;
+  position: relative;
+  overflow: hidden;
+  padding: 16px 14px;
   border-radius: 22px;
-  border: 1px solid rgba(255,255,255,0.08);
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
-  box-shadow: var(--uni-neo-panel-shadow);
-  display: flex; flex-direction: column; gap: 10px;
-}
-.faq-howtoNum {
-  font-size: 11px; font-weight: 900; letter-spacing: 0.12em;
-  color: rgba(255,255,255,0.4); text-transform: uppercase;
-}
-.faq-howtoEmoji { font-size: 28px; line-height: 1; }
-.faq-howtoCopy strong { display: block; font-weight: 900; margin-bottom: 6px; }
-.faq-howtoCopy p { margin: 0; color: rgba(255,255,255,0.6); font-size: 13px; line-height: 1.6; }
-@media (max-width: 720px) {
-  .faq-howtoSteps { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-}
-@media (max-width: 480px) {
-  .faq-howtoSteps { grid-template-columns: 1fr; }
+  border: 1px solid var(--faq-line);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 18%),
+    var(--faq-panel);
+  box-shadow: var(--faq-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
 }
 
-/* Cara Pesan light mode */
-:root[data-theme="light"] .faq-howtoStep {
-  border-color: rgba(0, 138, 148, 0.14);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(236, 248, 252, 0.88));
-  box-shadow: var(--uni-neo-panel-shadow);
+.faq-howtoStep:hover {
+  transform: translateY(-2px);
+  border-color: var(--faq-line-strong);
 }
-:root[data-theme="light"] .faq-howtoNum { color: rgba(50, 84, 95, 0.6); }
-:root[data-theme="light"] .faq-howtoTitle { color: #123744; }
-:root[data-theme="light"] .faq-howtoCopy strong { color: #123744; }
-:root[data-theme="light"] .faq-howtoCopy p { color: rgba(61, 96, 109, 0.76); }
+
+.faq-howtoNum {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  color: var(--faq-muted);
+  text-transform: uppercase;
+}
+
+.faq-howtoIcon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--faq-line);
+  background: var(--faq-inset);
+  box-shadow: var(--faq-inset-shadow);
+  color: var(--faq-text);
+  display: grid;
+  place-items: center;
+}
+
+.faq-howtoCopy strong {
+  display: block;
+  font-weight: 900;
+  margin-bottom: 6px;
+  color: var(--faq-text);
+}
+
+.faq-howtoCopy p {
+  margin: 0;
+  color: var(--faq-subtle);
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+@media (max-width: 720px) {
+  .faq-howtoSteps {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .faq-howtoSteps {
+    grid-template-columns: 1fr;
+  }
+}
+
+:root[data-theme="light"] .faq-chipCount {
+  background: rgba(0, 138, 148, 0.08);
+}
+
+:root[data-theme="light"] .faq-chip.active .faq-chipCount {
+  background: rgba(0, 214, 180, 0.14);
+  color: #008a94;
+}

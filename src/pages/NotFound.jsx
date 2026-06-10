@@ -4,16 +4,16 @@ import { Activity, ArrowRight, Compass, Grid2x2, History, Home } from "lucide-re
 import { usePageMeta } from "../hooks/usePageMeta";
 
 const QUICK_LINKS = [
-  { to: "/", label: "Home", icon: Home, desc: "Kembali ke halaman utama" },
+  { to: "/", label: "Home", icon: Home, desc: "Balik ke beranda" },
   { to: "/produk", label: "Produk", icon: Grid2x2, desc: "Lihat semua katalog" },
-  { to: "/status", label: "Status Order", icon: Activity, desc: "Cek progres ordermu" },
+  { to: "/status", label: "Status Order", icon: Activity, desc: "Cek progress order kamu" },
   { to: "/status?tab=riwayat", label: "Riwayat", icon: History, desc: "Order dari browser ini" },
 ];
 
 export default function NotFound() {
   usePageMeta({
     title: "404 — Halaman Tidak Ditemukan",
-    description: "Halaman yang kamu cari tidak ada. Coba navigasi ke halaman lain.",
+    description: "Halaman ini nggak ada. Coba pilih halaman lain ya.",
   });
 
   return (
@@ -26,10 +26,10 @@ export default function NotFound() {
                 <Compass size={32} />
               </div>
               <div className="nf-code">404</div>
-              <h1 className="nf-title">Halaman tidak ditemukan</h1>
+              <h1 className="nf-title">Halaman hilang nih</h1>
               <p className="nf-sub">
-                URL yang kamu akses tidak ada atau sudah dipindahkan.
-                Coba salah satu halaman di bawah ini.
+                Link-nya nggak ada atau udah dipindah.
+                Pilih salah satu halaman di bawah ya.
               </p>
             </div>
 

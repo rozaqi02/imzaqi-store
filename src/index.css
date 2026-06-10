@@ -24,6 +24,10 @@
 /* Final unification layer inspired by Status/FAQ */
 @import "./css/theme-unified-v4.css";
 
+/* Motion enhancements (before adaptive overrides) */
+@import "./css/motion-enhancements.css";
+@import "./css/motion-ux.css";
+
 /* Adaptive motion performance layer (must stay last) */
 @import "./css/motion-adaptive.css";
 

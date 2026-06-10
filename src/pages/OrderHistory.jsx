@@ -45,7 +45,7 @@ function formatDate(isoString) {
 export default function OrderHistory() {
   usePageMeta({
     title: "Riwayat Order",
-    description: "Lihat semua riwayat order yang pernah dibuat dari browser ini.",
+    description: "Semua order yang pernah kamu buat dari browser ini.",
   });
 
   const [entries, setEntries] = useState([]);
@@ -110,9 +110,9 @@ export default function OrderHistory() {
               <History size={22} />
             </div>
             <div className="oh-heroCopy">
-              <div className="oh-kicker">Browser ini</div>
-              <h1 className="h1 oh-title">Riwayat Order</h1>
-              <p className="oh-sub">Semua order yang pernah dibuat dari browser ini.</p>
+              <div className="oh-kicker">Di browser ini</div>
+              <h1 className="h1 oh-title">Riwayat order kamu</h1>
+              <p className="oh-sub">Semua order yang pernah kamu buat dari sini.</p>
             </div>
           </header>
 
@@ -127,12 +127,12 @@ export default function OrderHistory() {
               <div className="oh-emptyIcon">
                 <Package size={32} />
               </div>
-              <h2 className="oh-emptyTitle">Belum ada riwayat order dari browser ini</h2>
+              <h2 className="oh-emptyTitle">Belum ada riwayat nih</h2>
               <p className="oh-emptyText">
-                Order yang kamu buat akan otomatis tersimpan di sini untuk kemudahan pengecekan status.
+                Order yang kamu buat bakal otomatis kesimpen di sini, jadi gampang dicek lagi.
               </p>
               <Link className="btn" to="/produk">
-                Lihat Produk
+                Gas belanja dulu
               </Link>
             </div>
           ) : (

@@ -74,7 +74,7 @@ export default function Checkout() {
 
   usePageMeta({
     title: "Checkout",
-    description: "Review order, promo, dan total sebelum lanjut ke halaman pembayaran.",
+    description: "Cek order & total dulu sebelum bayar — biar nggak salah.",
   });
 
   useEffect(() => {
@@ -574,35 +574,61 @@ export default function Checkout() {
 }
 
 function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
+  const [pulseKind, setPulseKind] = useState(null);
+  const pulseTimerRef = useRef(null);
+  const removeTimerRef = useRef(null);
+
+  useEffect(
+    () => () => {
+      if (pulseTimerRef.current) window.clearTimeout(pulseTimerRef.current);
+      if (removeTimerRef.current) window.clearTimeout(removeTimerRef.current);
+    },
+    []
+  );
+
+  const triggerQtyPulse = useCallback(() => {
+    setPulseKind("qty");
+    if (pulseTimerRef.current) window.clearTimeout(pulseTimerRef.current);
+    pulseTimerRef.current = window.setTimeout(() => setPulseKind(null), 380);
+  }, []);
+
   const handleRemove = () => {
-    cart.remove(item.variant_id);
-    toast.info(`${item.product_name} dihapus`, {
-      title: "Keranjang",
-      actionLabel: "Undo",
-      duration: 6000,
-      onAction: () =>
-        cart.add(
-          {
-            id: item.variant_id,
-            product_id: item.product_id,
-            product_name: item.product_name,
-            product_icon_url: item.product_icon_url || "",
-            name: item.variant_name,
-            duration_label: item.duration_label,
-            price_idr: item.price_idr,
-            description: item.description || "",
-            guarantee_text: item.guarantee_text || "",
-            requires_buyer_email: !!item.requires_buyer_email,
-          },
-          item.qty
-        ),
-    });
+    if (pulseKind === "remove") return;
+    setPulseKind("remove");
+    if (removeTimerRef.current) window.clearTimeout(removeTimerRef.current);
+    removeTimerRef.current = window.setTimeout(() => {
+      cart.remove(item.variant_id);
+      setPulseKind(null);
+      toast.info(`${item.product_name} dihapus`, {
+        title: "Keranjang",
+        actionLabel: "Undo",
+        duration: 6000,
+        onAction: () =>
+          cart.add(
+            {
+              id: item.variant_id,
+              product_id: item.product_id,
+              product_name: item.product_name,
+              product_icon_url: item.product_icon_url || "",
+              name: item.variant_name,
+              duration_label: item.duration_label,
+              price_idr: item.price_idr,
+              description: item.description || "",
+              guarantee_text: item.guarantee_text || "",
+              requires_buyer_email: !!item.requires_buyer_email,
+            },
+            item.qty
+          ),
+      });
+    }, 220);
   };
 
   const iconUrl = String(item?.product_icon_url || "").trim();
 
   return (
-    <div className="checkout-item-card">
+    <div
+      className={`checkout-item-card${pulseKind === "qty" ? " is-qty-pulse" : ""}${pulseKind === "remove" ? " is-removing" : ""}`}
+    >
       <div className="checkout-item-left">
         <div className="checkout-item-icon app-productIcon">
           {iconUrl ? (
@@ -625,7 +651,10 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
         <div className="checkout-item-stepper">
           <button
             className="qty-btn"
-            onClick={() => cart.setQty(item.variant_id, item.qty - 1)}
+            onClick={() => {
+              cart.setQty(item.variant_id, item.qty - 1);
+              triggerQtyPulse();
+            }}
             aria-label="Kurangi"
           >
             -
@@ -640,8 +669,10 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
               const val = Number(e.target.value);
               if (Number.isFinite(val) && val >= 1 && val <= 99) {
                 cart.setQty(item.variant_id, val);
+                triggerQtyPulse();
               } else if (e.target.value === "") {
                 cart.setQty(item.variant_id, 1);
+                triggerQtyPulse();
               }
             }}
             aria-label="Jumlah"
@@ -649,7 +680,10 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
           />
           <button
             className="qty-btn"
-            onClick={() => cart.setQty(item.variant_id, item.qty + 1)}
+            onClick={() => {
+              cart.setQty(item.variant_id, item.qty + 1);
+              triggerQtyPulse();
+            }}
             aria-label="Tambah"
             disabled={item.qty >= 99}
           >

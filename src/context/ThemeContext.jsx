@@ -1,7 +1,16 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 
 const ThemeContext = createContext(null);
 const STORAGE_KEY = "imzaqi-theme-v2";
+const THEME_FADE_MS = 1000;
+
+function shouldAnimateTheme() {
+  if (typeof window === "undefined") return false;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return false;
+  if (document.documentElement.dataset.motion === "off") return false;
+  return true;
+}
 
 function getInitialTheme() {
   if (typeof document !== "undefined") {
@@ -20,18 +29,19 @@ function getInitialTheme() {
 
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(getInitialTheme);
+  const fadeTimerRef = useRef(null);
 
   useEffect(() => {
     const root = document.documentElement;
 
-    // Add no-transition class briefly to prevent flash on initial load
     root.classList.add("no-theme-transition");
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
 
-    // Remove the class after a frame so subsequent toggles animate
     const frame = requestAnimationFrame(() => {
-      root.classList.remove("no-theme-transition");
+      if (!root.classList.contains("theme-fade-active")) {
+        root.classList.remove("no-theme-transition");
+      }
     });
 
     try {
@@ -41,12 +51,54 @@ export function ThemeProvider({ children }) {
     return () => cancelAnimationFrame(frame);
   }, [theme]);
 
+  useEffect(
+    () => () => {
+      if (fadeTimerRef.current != null) {
+        window.clearTimeout(fadeTimerRef.current);
+      }
+    },
+    []
+  );
+
   const value = useMemo(
     () => ({
       theme,
       isDark: theme === "dark",
       setTheme,
-      toggleTheme: () => setTheme((current) => (current === "light" ? "dark" : "light")),
+      toggleTheme: () => {
+        const next = theme === "light" ? "dark" : "light";
+
+        if (typeof document === "undefined" || !shouldAnimateTheme()) {
+          setTheme(next);
+          return;
+        }
+
+        const root = document.documentElement;
+
+        if (fadeTimerRef.current != null) {
+          window.clearTimeout(fadeTimerRef.current);
+          fadeTimerRef.current = null;
+          root.classList.remove("theme-fade-active", "theme-fade-out", "no-theme-transition");
+          delete root.dataset.themeFade;
+        }
+
+        root.dataset.themeFade = next;
+        root.classList.add("theme-fade-active", "no-theme-transition");
+
+        flushSync(() => setTheme(next));
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            root.classList.add("theme-fade-out");
+          });
+        });
+
+        fadeTimerRef.current = window.setTimeout(() => {
+          fadeTimerRef.current = null;
+          root.classList.remove("theme-fade-active", "theme-fade-out", "no-theme-transition");
+          delete root.dataset.themeFade;
+        }, THEME_FADE_MS);
+      },
     }),
     [theme]
   );

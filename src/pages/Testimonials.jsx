@@ -34,7 +34,7 @@ export default function Testimonials() {
 
   usePageMeta({
     title: "Testimoni",
-    description: "Bukti order pelanggan Imzaqi Store.",
+    description: "Bukti order asli dari buyer — bukan janji kosong.",
   });
 
   useEffect(() => {
@@ -114,9 +114,9 @@ export default function Testimonials() {
         <div className="container testi-wrap">
           <header className="testi-hero">
             <div className="testi-heroCopy">
-              <div className="testi-kicker">Bukti order</div>
-              <h1 className="h1 testi-title">Bukti, bukan janji.</h1>
-              <p className="testi-sub">Screenshot langsung dari buyer. Bukan editan.</p>
+              <div className="testi-kicker">Bukti real</div>
+              <h1 className="h1 testi-title">Bukan janji kosong.</h1>
+              <p className="testi-sub">Screenshot asli dari buyer. No edit, no cap.</p>
             </div>
 
             <div className="testi-statePill">

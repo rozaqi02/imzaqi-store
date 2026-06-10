@@ -25,6 +25,8 @@ function safeParse(json, fallback) {
 }
 
 export function CartProvider({ children }) {
+  const [bumpToken, setBumpToken] = useState(0);
+  const [lastAddedVariantId, setLastAddedVariantId] = useState(null);
   const [items, setItems] = useState(() => {
     const storage = safeStorage();
     if (!storage) return [];
@@ -42,7 +44,13 @@ export function CartProvider({ children }) {
   const api = useMemo(() => ({
     items,
 
+    bumpToken,
+    lastAddedVariantId,
+
     add(variant, qty = 1) {
+      setBumpToken((t) => t + 1);
+      setLastAddedVariantId(variant.id);
+      window.setTimeout(() => setLastAddedVariantId(null), 900);
       setItems(prev => {
         const i = prev.findIndex(x => x.variant_id === variant.id);
         if (i >= 0) {
@@ -123,7 +131,7 @@ export function CartProvider({ children }) {
       }
     },
 
-  }), [items]);
+  }), [items, bumpToken, lastAddedVariantId]);
 
   return <CartContext.Provider value={api}>{children}</CartContext.Provider>;
 }

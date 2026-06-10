@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Check, CheckCircle2, FileText, Gift, Info, Loader, Phone, ShieldCheck, X } from "lucide-react";
@@ -220,6 +220,21 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
         </div>
 
         <div className="modal-body">
+          <div className="pay-successSteps" aria-label="Langkah selanjutnya">
+            <div className="pay-successStep is-done">
+              <span>1</span>
+              Order dibuat
+            </div>
+            <div className="pay-successStep is-active">
+              <span>2</span>
+              Simpan ID
+            </div>
+            <div className="pay-successStep">
+              <span>3</span>
+              Cek status
+            </div>
+          </div>
+
           <div className="pay-successHero">
             {/* Animated glow ring behind icon */}
             <div className="pay-successIconWrap">
@@ -251,9 +266,45 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
   );
 }
 
+function useModalCountUp(active, target, duration = 520) {
+  const [value, setValue] = useState(0);
+
+  useEffect(() => {
+    if (!active) {
+      setValue(0);
+      return undefined;
+    }
+
+    const end = Number(target) || 0;
+    const reduce =
+      typeof window !== "undefined" &&
+      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+
+    if (reduce || !end) {
+      setValue(end);
+      return undefined;
+    }
+
+    const start = performance.now();
+    let frame = 0;
+    const tick = (now) => {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3);
+      setValue(Math.round(end * eased));
+      if (t < 1) frame = requestAnimationFrame(tick);
+    };
+
+    frame = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(frame);
+  }, [active, target, duration]);
+
+  return value;
+}
+
 function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }) {
   const modalRef = React.useRef(null);
   const [checked, setChecked] = useState([false, false, false]);
+  const animatedTotal = useModalCountUp(open && !isFree, total);
 
   useEffect(() => {
     if (open) {
@@ -291,84 +342,121 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
   };
 
   const isAllChecked = checked.every(Boolean);
+  const checkedCount = checked.filter(Boolean).length;
+  const remainingCount = checklist.length - checkedCount;
+  const progressPct = Math.round((checkedCount / checklist.length) * 100);
 
   return createPortal(
-    <div className="modal-backdrop pay-overlay" onMouseDown={onCancel} role="presentation">
+    <div className="modal-backdrop pay-overlay pay-confirmOverlay" onMouseDown={onCancel} role="presentation">
       <div
         ref={modalRef}
-        className="pay-confirmModal"
+        className="pay-confirmModal pay-confirmModal--animate"
         role="dialog"
         aria-modal="true"
         aria-label="Konfirmasi Pembayaran"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="pay-confirmModalHeader">
           <div className="pay-confirmModalHeaderIcon">
             <ShieldCheck size={20} />
           </div>
           <div className="pay-confirmModalHeaderCopy">
             <div className="pay-confirmModalTitle">{isFree ? "Konfirmasi Order Gratis" : "Konfirmasi Pembayaran"}</div>
-            <div className="pay-confirmModalSub">{isFree ? "Pastikan semua detail order sudah benar" : "Centang semua opsi untuk mengonfirmasi"}</div>
+            <div className="pay-confirmModalSub">
+              {isAllChecked
+                ? "Semua langkah selesai — siap dikonfirmasi"
+                : isFree
+                  ? "Centang semua detail sebelum lanjut"
+                  : "Centang semua opsi untuk mengonfirmasi"}
+            </div>
           </div>
           <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
             <X size={16} />
           </button>
         </div>
 
-        {/* Total Card */}
-        <div className="pay-confirmTotalCard">
-          <div className="pay-confirmTotalLabel">{isFree ? "Total setelah promo" : "Total yang harus dibayar"}</div>
-          <div className="pay-confirmTotalAmount">{isFree ? "Gratis" : formatIDR(total)}</div>
-          <div className="pay-confirmTotalMeta">{itemCount} item &bull; {isFree ? "Promo 100%" : "via QRIS"}</div>
-        </div>
+        <div className="pay-confirmModalBody">
+          <aside className="pay-confirmAside" aria-label="Ringkasan pembayaran">
+            <div className="pay-confirmTotalCard pay-confirmTotalCard--pulse">
+              <div className="pay-confirmTotalLabel">{isFree ? "Total setelah promo" : "Total yang harus dibayar"}</div>
+              <div className="pay-confirmTotalAmount">
+                {isFree ? "Gratis" : formatIDR(animatedTotal)}
+              </div>
+              <div className="pay-confirmTotalMeta">
+                <span>{itemCount} item</span>
+                {isFree ? (
+                  <span className="pay-confirmTotalBadge is-promo">Promo 100%</span>
+                ) : (
+                  <span className="pay-confirmTotalBadge is-qris">
+                    <Phone size={11} />
+                    QRIS
+                  </span>
+                )}
+              </div>
+            </div>
+          </aside>
 
-        {/* Checklist */}
-        <div className="pay-confirmChecklist" role="group" aria-label="Persyaratan Konfirmasi">
-          {checklist.map((text, i) => (
-            <label key={i} className="pay-confirmCheckItem" style={{ cursor: 'pointer' }}>
-              <input
-                type="checkbox"
-                checked={checked[i]}
-                onChange={() => handleCheck(i)}
-                className="pay-confirmCheckbox-hidden"
-                style={{ display: 'none' }}
-              />
-              <span className={`pay-confirmCheckDot ${checked[i] ? 'is-checked' : ''}`} aria-hidden="true">
-                {checked[i] && <Check size={11} strokeWidth={3.5} />}
-              </span>
-              <span>{text}</span>
-            </label>
-          ))}
-        </div>
+          <div className="pay-confirmMain">
+            <div className="pay-confirmProgress" aria-live="polite">
+              <div className="pay-confirmProgressCopy">
+                <span>Progress konfirmasi</span>
+                <strong>
+                  {checkedCount} dari {checklist.length} selesai
+                </strong>
+              </div>
+              <div className="pay-confirmProgressTrack" aria-hidden="true">
+                <span style={{ width: `${progressPct}%` }} />
+              </div>
+            </div>
 
-        {/* Warning — only for paid orders */}
-        {!isFree && (
-          <div className="pay-confirmWarning">
-            <Info size={14} />
-            <span>Konfirmasi palsu akan memperlambat proses order kamu.</span>
+            <div className="pay-confirmChecklist" role="group" aria-label="Persyaratan Konfirmasi">
+              {checklist.map((text, i) => (
+                <label
+                  key={text}
+                  className={`pay-confirmCheckItem${checked[i] ? " is-done" : ""}`}
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked[i]}
+                    onChange={() => handleCheck(i)}
+                    className="pay-confirmCheckbox-hidden"
+                  />
+                  <span className={`pay-confirmCheckDot${checked[i] ? " is-checked" : ""}`} aria-hidden="true">
+                    {checked[i] ? <Check size={11} strokeWidth={3.5} /> : null}
+                  </span>
+                  <span className="pay-confirmCheckText">{text}</span>
+                </label>
+              ))}
+            </div>
+
+            {!isFree ? (
+              <div className="pay-confirmNotice">
+                <ShieldCheck size={14} />
+                <span>Konfirmasi palsu memperlambat proses order.</span>
+              </div>
+            ) : null}
+
+            <div className="pay-confirmActionsNew">
+              <button
+                className={`pay-confirmPrimaryBtn${isAllChecked ? " is-ready" : ""}`}
+                type="button"
+                onClick={onConfirm}
+                disabled={!isAllChecked}
+              >
+                <Check size={16} strokeWidth={2.5} />
+                {isAllChecked
+                  ? isFree
+                    ? "Konfirmasi order"
+                    : "Konfirmasi pembayaran"
+                  : isFree
+                    ? `Centang ${remainingCount} lagi`
+                    : `Centang ${remainingCount} lagi`}
+              </button>
+              <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
+                Cek Ulang Dulu
+              </button>
+            </div>
           </div>
-        )}
-
-        {/* Actions */}
-        <div className="pay-confirmActionsNew">
-          <button 
-            className="pay-confirmPrimaryBtn" 
-            type="button" 
-            onClick={onConfirm}
-            disabled={!isAllChecked}
-            style={{ 
-              opacity: isAllChecked ? 1 : 0.42, 
-              cursor: isAllChecked ? 'pointer' : 'not-allowed',
-              filter: isAllChecked ? 'none' : 'grayscale(30%)'
-            }}
-          >
-            <Check size={16} strokeWidth={2.5} />
-            {isFree ? "Ya, Konfirmasi Order" : "Ya, Saya Sudah Bayar"}
-          </button>
-          <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
-            Cek Ulang Dulu
-          </button>
         </div>
       </div>
     </div>,
@@ -385,7 +473,7 @@ export default function Pay() {
 
   usePageMeta({
     title: "Pembayaran",
-    description: "Bayar sesuai total, lalu simpan ID order untuk halaman status.",
+    description: "Bayar sesuai total, simpan ID order, terus lacak progress-nya.",
   });
 
   const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
@@ -422,6 +510,8 @@ export default function Pay() {
   const [productIconLookup, setProductIconLookup] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
+  const [qrisJustUnlocked, setQrisJustUnlocked] = useState(false);
+  const prevCanShowQrisRef = useRef(false);
 
   useEffect(() => {
     fetchSettings()
@@ -531,6 +621,19 @@ export default function Pay() {
   }, [requiredBuyerEmailItems]);
 
   const canShowQris = hasValidWhatsApp && !missingBuyerEmailNote;
+  const isFreeOrder = total === 0 && subtotal > 0;
+
+  useEffect(() => {
+    if (!prevCanShowQrisRef.current && canShowQris && !isFreeOrder) {
+      setQrisJustUnlocked(true);
+      const timer = window.setTimeout(() => setQrisJustUnlocked(false), 700);
+      prevCanShowQrisRef.current = canShowQris;
+      return () => window.clearTimeout(timer);
+    }
+    prevCanShowQrisRef.current = canShowQris;
+    return undefined;
+  }, [canShowQris, isFreeOrder]);
+
   const isDynamicQris = qrisMode === "dynamic";
   const qrisFootText = !hasValidWhatsApp
     ? "QR akan terbuka setelah nomor WhatsApp valid."
@@ -837,7 +940,6 @@ export default function Pay() {
     );
   }
 
-  const isFreeOrder = total === 0 && subtotal > 0;
   const canSubmit = !busy && (isFreeOrder ? hasValidWhatsApp && !missingBuyerEmailNote : canShowQris);
 
   function resolveItemIconUrl(item) {
@@ -904,7 +1006,7 @@ export default function Pay() {
 
         {items.length > 0 ? (
           <div className="container pay-order-mobileWrap">
-            <aside className="card pad pay-card pay-orderMobileCard">
+            <aside className="card pad pay-card pay-orderMobileCard reveal">
               <div className="pay-orderHead">
                 <div>
                   <div className="pay-orderKicker">Order</div>
@@ -919,7 +1021,7 @@ export default function Pay() {
 
         <div className="container pay-shell-grid">
           <div className="pay-mainStack">
-            <section className="card pad pay-card pay-contactCard">
+            <section className="card pad pay-card pay-contactCard reveal" style={{ transitionDelay: "60ms" }}>
               <div className="pay-cardHead">
                 <div>
                   <div className="pay-cardKicker">Kontak order</div>
@@ -981,7 +1083,7 @@ export default function Pay() {
               </div>
             </section>
 
-            <section className="card pad pay-card pay-stageCard">
+            <section className="card pad pay-card pay-stageCard reveal" style={{ transitionDelay: "120ms" }}>
               <div className="pay-stageGrid">
                 <div className="pay-stageMeta">
                   <div className="pay-stageLabel">Total bayar</div>
@@ -1019,7 +1121,9 @@ export default function Pay() {
                 </div>
 
                 <div className="pay-stageVisual">
-                  <div className={`qris-wrap pay-qrisFrame ${canShowQris && !isFreeOrder ? "" : "is-locked"}`}>
+                  <div
+                    className={`qris-wrap pay-qrisFrame ${canShowQris && !isFreeOrder ? "" : "is-locked"}${qrisJustUnlocked ? " is-unlocking" : ""}`}
+                  >
                     {isFreeOrder ? (
                       <div className="pay-freePanel">
                         <div className="pay-freePanelIcon" aria-hidden="true">
@@ -1111,7 +1215,7 @@ export default function Pay() {
           </div>
 
           {items.length > 0 ? (
-            <aside className="card pad pay-card pay-orderDesktop">
+            <aside className="card pad pay-card pay-orderDesktop reveal" style={{ transitionDelay: "80ms" }}>
               <div className="pay-orderHead">
                 <div>
                   <div className="pay-orderKicker">Order</div>

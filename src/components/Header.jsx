@@ -17,9 +17,19 @@ import {
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import { useHeaderShrink } from "../hooks/useHeaderShrink";
 
 const MOBILE_BREAKPOINT = "(max-width: 720px)";
 const MOBILE_MENU_ANIMATION_MS = 260;
+const HEADER_SHRINK_MS = 280;
+const NAV_PILL_EASE = [0.22, 1, 0.36, 1];
+const NAV_LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/produk", label: "Produk" },
+  { to: "/tentang", label: "FAQ" },
+  { to: "/testimoni", label: "Testimoni" },
+  { to: "/status", label: "Status Order" },
+];
 
 function CartIcon() {
   return (
@@ -56,7 +66,7 @@ function ThemeToggleButton({ onToggle, isDark }) {
     <button
       type="button"
       className={`theme-toggle${isDark ? " is-dark" : ""}`}
-      onClick={onToggle}
+      onClick={(e) => onToggle(e)}
       aria-label={isDark ? "Aktifkan light mode" : "Aktifkan dark mode"}
       aria-pressed={isDark}
       title={isDark ? "Light mode" : "Dark mode"}
@@ -181,7 +191,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 
         <div className="mobile-menu-header">
           <h3>Menu</h3>
-          <p>Akses cepat.</p>
+          <p>Mau ke mana nih?</p>
         </div>
 
         <div className="mobile-menu-stack">
@@ -209,13 +219,15 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 }
 
 export default function Header() {
-  const { items, remove } = useCart();
+  const { items, remove, bumpToken, lastAddedVariantId } = useCart();
+  const isHeaderShrunk = useHeaderShrink();
   const { isDark, toggleTheme } = useTheme();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
   const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.price_idr * item.qty, 0), [items]);
   const [open, setOpen] = useState(false);
-  const [pillStyle, setPillStyle] = useState({ width: 0, x: 0, opacity: 0 });
-  const [hoverStyle, setHoverStyle] = useState({ width: 0, x: 0, opacity: 0 });
+  const [pillStyle, setPillStyle] = useState({ width: 0, height: 0, x: 0, y: 0, opacity: 0 });
+  const [hoverStyle, setHoverStyle] = useState({ width: 0, height: 0, x: 0, y: 0, opacity: 0 });
+  const navRef = useRef(null);
   const navRefs = useRef([]);
   const [isMobileViewport, setIsMobileViewport] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia(MOBILE_BREAKPOINT).matches : false
@@ -226,7 +238,17 @@ export default function Header() {
   const handleClose = useCallback(() => setOpen(false), []);
 
   const [showMiniCart, setShowMiniCart] = useState(false);
+  const [pillBump, setPillBump] = useState(false);
   const miniCartTimerRef = useRef(null);
+  const pillBumpTimerRef = useRef(null);
+
+  useEffect(() => {
+    if (!bumpToken) return undefined;
+    setPillBump(true);
+    window.clearTimeout(pillBumpTimerRef.current);
+    pillBumpTimerRef.current = window.setTimeout(() => setPillBump(false), 450);
+    return () => window.clearTimeout(pillBumpTimerRef.current);
+  }, [bumpToken]);
 
   const handleCartMouseEnter = () => {
     if (isMobileViewport) return;
@@ -308,72 +330,109 @@ export default function Header() {
     };
   }, [location.pathname]);
 
-  useLayoutEffect(() => {
-    const syncPill = () => {
-      const links = [
-        { to: "/" },
-        { to: "/produk" },
-        { to: "/tentang" },
-        { to: "/testimoni" },
-        { to: "/status" },
-      ];
-      const activeIdx = links.findIndex(
-        (link) => location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to))
-      );
+  const syncNavPill = useCallback(() => {
+    if (isMobileViewport) return;
 
-      if (activeIdx >= 0 && navRefs.current[activeIdx]) {
-        const el = navRefs.current[activeIdx];
-        setPillStyle({
-          width: el.offsetWidth,
-          x: el.offsetLeft,
-          opacity: 1,
-        });
-      } else {
-        setPillStyle((prev) => ({ ...prev, opacity: 0 }));
+    const activeIdx = NAV_LINKS.findIndex(
+      (link) => location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to))
+    );
+
+    const activeEl = activeIdx >= 0 ? navRefs.current[activeIdx] : null;
+    const navEl = navRef.current;
+
+    if (activeEl && navEl) {
+      const navRect = navEl.getBoundingClientRect();
+      const linkRect = activeEl.getBoundingClientRect();
+      setPillStyle({
+        width: linkRect.width,
+        height: linkRect.height,
+        x: linkRect.left - navRect.left,
+        y: linkRect.top - navRect.top,
+        opacity: 1,
+      });
+      return;
+    }
+
+    setPillStyle((prev) => ({ ...prev, opacity: 0 }));
+  }, [isMobileViewport, location.pathname]);
+
+  useLayoutEffect(() => {
+    syncNavPill();
+    window.addEventListener("resize", syncNavPill);
+    return () => window.removeEventListener("resize", syncNavPill);
+  }, [syncNavPill]);
+
+  useEffect(() => {
+    if (isMobileViewport) return undefined;
+
+    let raf = 0;
+    const startedAt = performance.now();
+
+    const tick = (now) => {
+      syncNavPill();
+      if (now - startedAt < HEADER_SHRINK_MS + 48) {
+        raf = window.requestAnimationFrame(tick);
       }
     };
 
-    syncPill();
-    window.addEventListener("resize", syncPill);
-    return () => {
-      window.removeEventListener("resize", syncPill);
-    };
-  }, [location.pathname, isMobileViewport]);
+    raf = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(raf);
+  }, [isHeaderShrunk, isMobileViewport, syncNavPill]);
+
+  useEffect(() => {
+    if (isMobileViewport || typeof ResizeObserver === "undefined") return undefined;
+
+    const observer = new ResizeObserver(() => syncNavPill());
+    const navEl = navRef.current;
+    if (navEl) observer.observe(navEl);
+    navRefs.current.forEach((link) => {
+      if (link) observer.observe(link);
+    });
+
+    return () => observer.disconnect();
+  }, [isMobileViewport, location.pathname, syncNavPill]);
 
   return (
     <>
-      <header ref={headerRef} className="header">
+      <header ref={headerRef} className={`header${isHeaderShrunk ? " is-shrunk" : ""}`}>
         <div className="container header-inner">
           <Link to="/" className="brand">
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
           </Link>
 
-          <nav 
-            className="nav desktop-only" 
+          <nav
+            ref={navRef}
+            className="nav desktop-only"
             style={{ position: "relative" }}
-            onMouseLeave={() => setHoverStyle(prev => ({ ...prev, opacity: 0 }))}
+            onMouseLeave={() => setHoverStyle((prev) => ({ ...prev, opacity: 0 }))}
           >
             <motion.div
               className="nav-active-pill"
               initial={false}
-              animate={{ width: pillStyle.width, x: pillStyle.x, opacity: pillStyle.opacity }}
-              transition={{ type: "spring", stiffness: 500, damping: 35 }}
-              style={{ left: 0 }}
+              animate={{
+                width: pillStyle.width,
+                height: pillStyle.height,
+                x: pillStyle.x,
+                y: pillStyle.y,
+                opacity: pillStyle.opacity,
+              }}
+              transition={{ duration: HEADER_SHRINK_MS / 1000, ease: NAV_PILL_EASE }}
+              style={{ left: 0, top: 0, bottom: "auto", right: "auto" }}
             />
             <motion.div
               className="nav-hover-pill"
               initial={false}
-              animate={{ width: hoverStyle.width, x: hoverStyle.x, opacity: hoverStyle.opacity }}
-              transition={{ type: "spring", stiffness: 450, damping: 30 }}
-              style={{ left: 0 }}
+              animate={{
+                width: hoverStyle.width,
+                height: hoverStyle.height,
+                x: hoverStyle.x,
+                y: hoverStyle.y,
+                opacity: hoverStyle.opacity,
+              }}
+              transition={{ duration: 0.22, ease: NAV_PILL_EASE }}
+              style={{ left: 0, top: 0, bottom: "auto", right: "auto" }}
             />
-            {[
-              { to: "/", label: "Home" },
-              { to: "/produk", label: "Produk" },
-              { to: "/tentang", label: "FAQ" },
-              { to: "/testimoni", label: "Testimoni" },
-              { to: "/status", label: "Status Order" },
-            ].map((link, idx) => {
+            {NAV_LINKS.map((link, idx) => {
               const isActive = location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to));
               return (
                 <Link 
@@ -384,10 +443,15 @@ export default function Header() {
                   style={{ position: "relative", zIndex: 1 }}
                   onMouseEnter={() => {
                     const el = navRefs.current[idx];
-                    if (el) {
+                    const navEl = navRef.current;
+                    if (el && navEl) {
+                      const navRect = navEl.getBoundingClientRect();
+                      const linkRect = el.getBoundingClientRect();
                       setHoverStyle({
-                        width: el.offsetWidth,
-                        x: el.offsetLeft,
+                        width: linkRect.width,
+                        height: linkRect.height,
+                        x: linkRect.left - navRect.left,
+                        y: linkRect.top - navRect.top,
                         opacity: 1,
                       });
                     }
@@ -408,7 +472,11 @@ export default function Header() {
             >
               <Link to="/checkout" state={{ backgroundLocation: location }} className="header-cart">
                 <CartIcon />
-                {cartCount > 0 ? <span className="pill">{cartCount}</span> : null}
+                {cartCount > 0 ? (
+                  <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
+                    {cartCount}
+                  </span>
+                ) : null}
               </Link>
 
               <AnimatePresence>
@@ -435,7 +503,10 @@ export default function Header() {
                       <>
                         <div className="mini-cart-items">
                           {items.map((item) => (
-                            <div key={item.variant_id} className="mini-cart-item">
+                            <div
+                              key={item.variant_id}
+                              className={`mini-cart-item${item.variant_id === lastAddedVariantId ? " is-new" : ""}`}
+                            >
                               {item.product_icon_url ? (
                                 <img src={item.product_icon_url} alt={item.product_name} className="mini-cart-item-icon" />
                               ) : (

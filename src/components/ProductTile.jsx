@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
+import { useTilt } from "../hooks/useTilt";
 import { formatIDR, classifyStock } from "../lib/format";
 
 function summarizeCatalogCopy(text) {
@@ -13,7 +14,8 @@ function summarizeCatalogCopy(text) {
   return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
 }
 
-export default function ProductTile({ product, rank }) {
+export default function ProductTile({ product, rank, layout = "list" }) {
+  const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const summary = useMemo(() => {
     const activeVariants = (product?.product_variants || []).filter((v) => v?.is_active);
     const prices = activeVariants
@@ -52,10 +54,11 @@ export default function ProductTile({ product, rank }) {
   return (
     <Link
       to={`/produk/${product.slug}`}
-      className="product-tile product-tile--list"
+      className={`product-tile product-tile--${layout === "grid" ? "grid" : "list"}`}
       role="listitem"
       aria-label={`Buka detail ${product?.name || "produk"}`}
     >
+      <div ref={tiltRef} className="product-tile-tiltWrap">
       <div className="product-tile-top">
         <div 
           className="product-tile-icon" 
@@ -121,6 +124,7 @@ export default function ProductTile({ product, rank }) {
         <div className="product-tile-price" aria-label="Harga mulai">
           {displayPrice}
         </div>
+      </div>
       </div>
     </Link>
   );
