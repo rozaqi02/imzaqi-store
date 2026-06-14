@@ -210,7 +210,7 @@
 }
 
 .admin-topbar-current strong,
-.admin-topbar-current span {
+.admin-topbar-current span:not(.admin-topbar-currentIcon) {
   display: block;
 }
 
@@ -218,7 +218,7 @@
   font-size: 14px;
 }
 
-.admin-topbar-current span {
+.admin-topbar-current span:not(.admin-topbar-currentIcon) {
   margin-top: 3px;
   color: rgba(255, 255, 255, 0.58);
   font-size: 11px;

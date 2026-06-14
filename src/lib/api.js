@@ -358,41 +358,89 @@ export async function trackPageView({ visitorId, path, referrer } = {}) {
 // ── CSV Export helpers ──
 export function csvEscapeValue(value) {
   const str = value == null ? "" : String(value);
-  if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+  if (str.includes(";") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
     return '"' + str.replace(/"/g, '""') + '"';
   }
   return str;
 }
 
+function formatCSVDate(dateStr) {
+  if (!dateStr) return "";
+  try {
+    const d = new Date(dateStr);
+    if (isNaN(d.getTime())) return dateStr;
+    const pad = (num) => String(num).padStart(2, "0");
+    const year = d.getFullYear();
+    const month = pad(d.getMonth() + 1);
+    const day = pad(d.getDate());
+    const hours = pad(d.getHours());
+    const minutes = pad(d.getMinutes());
+    const seconds = pad(d.getSeconds());
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  } catch (e) {
+    return dateStr;
+  }
+}
+
 export function buildOrdersCSV(orders) {
   const headers = [
-    "order_code","created_at","status","customer_whatsapp",
-    "total_idr","subtotal_idr","discount_percent","promo_code",
-    "items_summary","notes","admin_note"
+    "Kode Pesanan",
+    "Tanggal Pembuatan",
+    "Status",
+    "WhatsApp Pelanggan",
+    "Subtotal (IDR)",
+    "Diskon (%)",
+    "Total Bayar (IDR)",
+    "Kode Promo",
+    "Item Pesanan",
+    "Catatan Pelanggan",
+    "Catatan Admin"
   ];
+  
+  const statusMap = {
+    pending: "Menunggu Pembayaran",
+    processing: "Diproses",
+    success: "Selesai",
+    cancelled: "Dibatalkan"
+  };
+
   const rows = (orders || []).map((o) => {
     const itemsSummary = Array.isArray(o.items)
-      ? o.items.map((it) => `${it.product_name || ""} x${it.qty || 1}`).join("; ")
+      ? o.items.map((it) => {
+          const details = [it.variant_name, it.duration_label].filter(Boolean).join(" - ");
+          return details 
+            ? `${it.product_name || ""} (${details}) x${it.qty || 1}`
+            : `${it.product_name || ""} x${it.qty || 1}`;
+        }).join(" | ")
       : "";
+
+    const statusLabel = statusMap[o.status] || o.status;
+    const formattedDate = formatCSVDate(o.created_at);
+    
+    const formattedWhatsapp = o.customer_whatsapp 
+      ? (o.customer_whatsapp.startsWith("0") || o.customer_whatsapp.startsWith("+") ? `'${o.customer_whatsapp}` : o.customer_whatsapp)
+      : "";
+
     return [
       o.order_code,
-      o.created_at,
-      o.status,
-      o.customer_whatsapp,
-      o.total_idr,
+      formattedDate,
+      statusLabel,
+      formattedWhatsapp,
       o.subtotal_idr,
-      o.discount_percent,
-      o.promo_code,
+      o.discount_percent || 0,
+      o.total_idr,
+      o.promo_code || "",
       itemsSummary,
-      o.notes,
-      o.admin_note,
-    ].map(csvEscapeValue).join(",");
+      o.notes || "",
+      o.admin_note || "",
+    ].map(csvEscapeValue).join(";");
   });
-  return [headers.join(","), ...rows].join("\n");
+  
+  return [headers.join(";"), ...rows].join("\n");
 }
 
 export function downloadCSV(csvString, filename) {
-  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob(["\uFEFF" + csvString], { type: "text/csv;charset=utf-8;" });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;

@@ -2997,7 +2997,7 @@ select.input {
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 340px) {
   .product-grid-container.grid-mode,
   .catalog-grid.grid,
   .testi-grid,

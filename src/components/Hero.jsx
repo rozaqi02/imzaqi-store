@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   Eye,
+  Flame,
   Package,
   Search,
   ShieldCheck,
@@ -13,7 +14,6 @@ import {
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
 import NumberCounter from "./NumberCounter";
-import { TodayPulseIcon } from "./HeroStatIcons";
 
 const TRUST_PILLS = [
   { icon: ShieldCheck, label: "Garansi aman" },
@@ -255,7 +255,7 @@ export default function Hero({ products = [] }) {
             </div>
             <div className="hm-stat-chip hm-stat-chip--today" role="listitem">
               <span className="hm-stat-chip-icon hm-stat-chip-icon--today" aria-hidden="true">
-                <TodayPulseIcon size={15} />
+                <Flame size={14} />
               </span>
               <span className="hm-stat-chip-value">
                 <NumberCounter value={todayOrders || 0} />

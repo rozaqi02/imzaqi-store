@@ -25,7 +25,7 @@ const HEADER_SHRINK_MS = 280;
 const NAV_PILL_EASE = [0.22, 1, 0.36, 1];
 const NAV_LINKS = [
   { to: "/", label: "Home" },
-  { to: "/produk", label: "Produk" },
+  { to: "/produk", label: "Katalog" },
   { to: "/tentang", label: "FAQ" },
   { to: "/testimoni", label: "Testimoni" },
   { to: "/status", label: "Status Order" },
@@ -51,7 +51,7 @@ function CartIcon() {
 
 const primaryItems = [
   { to: "/", label: "Home", icon: House },
-  { to: "/produk", label: "Produk", icon: Grid2x2 },
+  { to: "/produk", label: "Katalog", icon: Grid2x2 },
   { to: "/tentang", label: "FAQ", icon: CircleHelp },
   { to: "/testimoni", label: "Testimoni", icon: MessageSquareQuote },
 ];

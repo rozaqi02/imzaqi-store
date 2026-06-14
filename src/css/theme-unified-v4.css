@@ -285,7 +285,7 @@
   }
 }
 
-@media (max-width: 360px) {
+@media (max-width: 340px) {
 
   .product-grid-container.grid-mode,
   .catalog-grid.grid,
@@ -775,6 +775,16 @@
     border-radius: 20px !important;
   }
 
+  .header,
+  .site-header {
+    background: linear-gradient(180deg, rgba(11, 26, 48, 0.99) 0%, rgba(8, 18, 35, 0.98) 100%) !important;
+  }
+
+  :root[data-theme="light"] .header,
+  :root[data-theme="light"] .site-header {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(240, 248, 252, 0.98) 100%) !important;
+  }
+
   .catalog-page .catalog-layout {
     grid-template-columns: 1fr !important;
   }
@@ -791,7 +801,7 @@
   }
 }
 
-@media (max-width: 380px) {
+@media (max-width: 340px) {
 
   .home-page .product-grid-container.grid-mode,
   .catalog-page .catalog-grid.grid,
