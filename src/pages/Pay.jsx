@@ -491,7 +491,7 @@ export default function Pay() {
   const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" }, qris: {} });
   const waNumber = settings?.whatsapp?.number || "6283136049987";
   const qrisBaseFromSettings = String(settings?.qris?.base_payload || "").trim();
-  const qrisBaseFromEnv = String(process.env.REACT_APP_QRIS_BASE || "").trim();
+  const qrisBaseFromEnv = String(import.meta.env.VITE_QRIS_BASE || "").trim();
   const qrisBase = qrisBaseFromSettings || qrisBaseFromEnv;
   const fallbackQrisUrl = String(settings?.qris?.image_url || "").trim() || "/qris_payment.jpeg";
 

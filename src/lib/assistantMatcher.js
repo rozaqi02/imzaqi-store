@@ -7,7 +7,7 @@
  *   - route context + conversation history signals
  *   - entity extraction (IMZ-XXXX, product aliases)
  *
- * Optionally calls remote LLM when REACT_APP_AI_ENDPOINT is set.
+ * Optionally calls remote LLM when VITE_AI_ENDPOINT is set.
  */
 
 import { ASSISTANT_QA } from "../data/assistantQA";
@@ -451,8 +451,8 @@ function buildLLMSystemPrompt(context, intent) {
 }
 
 async function callLLM(query, history, context, intent) {
-  const endpoint = process.env.REACT_APP_AI_ENDPOINT;
-  const key = process.env.REACT_APP_AI_KEY;
+  const endpoint = import.meta.env.VITE_AI_ENDPOINT;
+  const key = import.meta.env.VITE_AI_KEY;
   if (!endpoint) return null;
 
   const systemPrompt = buildLLMSystemPrompt(context, intent);

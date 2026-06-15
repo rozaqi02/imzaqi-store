@@ -299,7 +299,7 @@ export default function AdminDashboard() {
   const deferredOrderQuery = useDeferredValue(orderQuery);
   const waNumber = settings?.whatsapp?.number || "";
   const savedQrisBase = String(settings?.qris?.base_payload || "").trim();
-  const envQrisBase = String(process.env.REACT_APP_QRIS_BASE || "").trim();
+  const envQrisBase = String(import.meta.env.VITE_QRIS_BASE || "").trim();
   const qrisModeLabel = savedQrisBase || envQrisBase ? "Auto aktif" : "Fallback statis";
   const qrisModeCopy = savedQrisBase
     ? "Base QR tersimpan di database."

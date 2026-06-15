@@ -16,14 +16,9 @@
 @import "./css/pages/AdminDashboard.css";
 @import "./css/pages/FlashSale.css";
 
-/* Brand color direction */
-@import "./css/theme-disney.css";
-
-/* Theme modes and compact controls */
-@import "./css/theme-neumorphism.css";
-
-/* Final unification layer inspired by Status/FAQ */
-@import "./css/theme-unified-v4.css";
+/* Unified Theme Engine v5 */
+@import "./css/theme-variables.css";
+@import "./css/theme-consolidated.css";
 
 /* Motion enhancements (before adaptive overrides) */
 @import "./css/motion-enhancements.css";

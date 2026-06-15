@@ -21,13 +21,13 @@ root.render(
 );
 
 // Service worker: hanya register di production
-if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((err) => {
       console.warn('Service worker registration failed:', err);
     });
   });
-} else if ('serviceWorker' in navigator && process.env.NODE_ENV !== 'production') {
+} else if ('serviceWorker' in navigator && !import.meta.env.PROD) {
   // Unregister any existing SW in development to prevent caching issues
   navigator.serviceWorker.getRegistrations().then((registrations) => {
     registrations.forEach((registration) => registration.unregister());

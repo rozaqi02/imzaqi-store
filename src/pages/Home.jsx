@@ -244,7 +244,7 @@ export default function Home() {
 
   const waNumber = String(settings?.whatsapp?.number || "").trim();
   const waHref = waNumber ? `https://wa.me/${waNumber.replace(/\D/g, "")}` : null;
-  const productLayout = isDesktopGrid ? "grid" : "list";
+  const productLayout = "list";
 
   const handleCopyPromo = (code) => {
     copyToClipboard(code).then(
@@ -275,7 +275,7 @@ export default function Home() {
             />
 
             <div
-              className={`product-grid-container home-popularList ${isDesktopGrid ? "grid-mode" : "list-mode"}`}
+              className="product-grid-container home-popularList list-mode"
               role="list"
               aria-label="Produk populer"
             >

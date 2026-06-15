@@ -208,22 +208,6 @@
     overflow: hidden;
   }
 
-  .flash-sale-card::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    background: conic-gradient(from 0deg, #ff3c64, #ff9bb0, #ff3c64);
-    opacity: 0.45;
-    z-index: 0;
-    animation: uxFlashBorderSpin 4s linear infinite;
-  }
-
-  .flash-sale-card > * {
-    position: relative;
-    z-index: 1;
-  }
-
   .flash-sale-stockBar {
     width: 100%;
     height: 4px;

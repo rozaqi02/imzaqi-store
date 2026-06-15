@@ -59,7 +59,7 @@ function normalizeAmount(amount) {
 
 export function buildDynamicQrisPayload(basePayload, amount) {
   const raw = String(basePayload || "").trim();
-  if (!raw) throw new Error("REACT_APP_QRIS_BASE belum diisi.");
+  if (!raw) throw new Error("VITE_QRIS_BASE belum diisi.");
 
   const fields = parseTLV(raw).filter((field) => field.id !== "63" && field.id !== "54");
   const amountText = normalizeAmount(amount);

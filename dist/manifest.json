@@ -1,0 +1,21 @@
+{
+  "name": "Imzaqi Store",
+  "short_name": "Imzaqi",
+  "description": "Toko digital subscription — streaming, tools, dan lebih banyak lagi.",
+  "start_url": "/",
+  "display": "standalone",
+  "theme_color": "#032235",
+  "background_color": "#d8fff5",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "logo512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

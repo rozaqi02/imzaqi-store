@@ -29,7 +29,7 @@ export default class AppErrorBoundary extends React.Component {
 
   render() {
     if (this.state.hasError) {
-      const isDev = process.env.NODE_ENV === "development";
+      const isDev = import.meta.env.DEV;
       const errorMsg = this.state.error?.message || "Unknown error";
 
       return (

@@ -80,6 +80,6 @@ export function buildStoreInsights({ products = [], testimonials = [], settings 
     uncaptionedTestimonialsCount: Math.max(0, (testimonials || []).length - captionedTestimonials.length),
     latestTestimonial,
     whatsappReady: Boolean(String(whatsapp?.number || "").trim()),
-    qrisReady: Boolean(String(qris?.base_payload || qris?.image_url || process.env.REACT_APP_QRIS_BASE || "").trim()),
+    qrisReady: Boolean(String(qris?.base_payload || qris?.image_url || import.meta.env.VITE_QRIS_BASE || "").trim()),
   };
 }

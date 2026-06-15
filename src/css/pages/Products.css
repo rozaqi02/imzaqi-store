@@ -2,7 +2,7 @@
   position: relative;
   overflow: visible;
   padding-top: 0;
-  z-index: 2;
+  z-index: 20;
 }
 
 .catalog-hero::before {
@@ -27,7 +27,7 @@
 .search-dropdown-anchor {
   position: relative;
   overflow: visible;
-  z-index: 30;
+  z-index: 50;
 }
 
 .catalog-heroSearch {
@@ -36,7 +36,7 @@
 }
 
 .catalog-searchSuggestions {
-  z-index: 60;
+  z-index: 100;
 }
 
 .catalog-eyebrow {
@@ -94,7 +94,7 @@
 
 .catalog-command {
   position: relative;
-  z-index: 6;
+  z-index: 10;
   overflow: visible;
   display: flex;
   align-items: center;
@@ -202,7 +202,7 @@
   .catalog-sidebar {
     position: sticky;
     top: calc(var(--site-header-offset, 80px) + 12px);
-    z-index: 4;
+    z-index: 3;
   }
 
   .catalog-sidebar .catalog-filterShell {

@@ -1,0 +1,221 @@
+/*
+  Unified Design Tokens and CSS Variables.
+  This file consolidates theme variables from:
+  - theme-disney.css (Dark base colors)
+  - theme-neumorphism.css (Tactile glassmorphic parameters)
+  - theme-unified-v4.css (Status/FAQ page visual variables)
+*/
+
+:root,
+:root[data-theme="dark"] {
+  /* ── Disney+ Base Theme Colors (Dark Default) ── */
+  --bg0: #040714;
+  --bg1: #030b1f;
+  --bg2: #0a1d52;
+  --card: rgba(255, 255, 255, 0.06);
+  --card2: rgba(255, 255, 255, 0.09);
+  --line: rgba(0, 194, 208, 0.16);
+  --text: #f4fff9;
+  --muted: #9fd1c5;
+  --accent: #00d6b4;
+  --accent2: #00c2d0;
+  --danger: #ff4f72;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+
+  /* ── Neumorphic Skeuomorphic Tokens (Dark Mode) ── */
+  --brand-bg-start: #020611;
+  --brand-bg-end: #040714;
+  --brand-bg-mid: #081229;
+  --brand-aurora-a: rgba(0, 214, 180, 0.16);
+  --brand-aurora-b: rgba(0, 138, 148, 0.2);
+  --brand-card-top: rgba(255, 255, 255, 0.055);
+  --brand-card-bottom: rgba(255, 255, 255, 0.025);
+  --brand-card-spot: rgba(0, 214, 180, 0.12);
+  --brand-surface: rgba(7, 12, 27, 0.78);
+  --brand-surface-strong: rgba(8, 12, 28, 0.92);
+  --brand-line: rgba(0, 194, 208, 0.16);
+  --brand-text: #f4fff9;
+  --brand-muted: #9fd1c5;
+  --brand-subtle: #d9fff1;
+  --brand-icon: #9fffe5;
+  --brand-shadow: 0 22px 68px rgba(0, 0, 0, 0.32);
+  --brand-shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.18);
+  --brand-overlay: rgba(0, 0, 0, 0.56);
+  --brand-header-bg: linear-gradient(180deg, rgba(4, 7, 20, 0.94), rgba(4, 7, 20, 0.78));
+  --brand-menu-bg:
+    radial-gradient(620px 420px at 78% 16%, rgba(0, 214, 180, 0.1) 0%, rgba(0, 214, 180, 0) 72%),
+    linear-gradient(180deg, rgba(8, 12, 28, 0.98), rgba(4, 7, 20, 0.98));
+
+  /* Liquid Glass Panels (Tactile Neumorphism) */
+  --skeu-panel-bg: linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96) 55%, rgba(4, 8, 21, 0.98) 100%);
+  --skeu-panel-shadow:
+    16px 18px 36px rgba(0, 0, 0, 0.38),
+    -10px -10px 22px rgba(255, 255, 255, 0.04),
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.36),
+    0 0 0 1px rgba(0, 194, 208, 0.1);
+  --skeu-control-bg: linear-gradient(180deg, rgba(25, 38, 72, 0.96), rgba(10, 16, 35, 0.94));
+  --skeu-control-shadow:
+    10px 12px 22px rgba(0, 0, 0, 0.28),
+    -6px -6px 14px rgba(255, 255, 255, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.32),
+    0 0 0 1px rgba(0, 194, 208, 0.1);
+  --skeu-inset-bg: linear-gradient(180deg, rgba(3, 8, 18, 0.94), rgba(9, 15, 33, 0.82));
+  --skeu-inset-shadow:
+    inset 10px 12px 22px rgba(0, 0, 0, 0.46),
+    inset -5px -5px 12px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 1px 0 rgba(255, 255, 255, 0.03);
+  --skeu-pill-bg: linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9));
+  --skeu-accent-shadow:
+    0 20px 34px rgba(0, 214, 180, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42),
+    inset 0 -3px 0 rgba(3, 66, 74, 0.36);
+
+  /* Primary Button Facet (Emerald Gradient) */
+  --imzaqi-btn-face:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  --imzaqi-btn-border: rgba(79, 255, 200, 0.24);
+  --imzaqi-btn-text: #032235;
+  --imzaqi-btn-shadow:
+    0 4px 14px rgba(0, 214, 180, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  --imzaqi-btn-shadow-hover:
+    0 6px 18px rgba(0, 214, 180, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+
+  /* ── Unified Layout Design Tokens (Dark Mode) ── */
+  --uni-panel:
+    linear-gradient(172deg, rgba(12, 24, 44, 0.96) 0%, rgba(10, 20, 38, 0.95) 52%, rgba(9, 18, 34, 0.97) 100%);
+  --uni-panel-soft: linear-gradient(180deg, rgba(16, 33, 60, 0.9), rgba(11, 22, 42, 0.92));
+  --uni-inset: linear-gradient(180deg, rgba(8, 15, 31, 0.95), rgba(13, 25, 46, 0.92));
+  --uni-line: rgba(123, 184, 255, 0.22);
+  --uni-line-strong: rgba(90, 170, 255, 0.36);
+  --uni-text: #ebf8ff;
+  --uni-muted: rgba(214, 235, 255, 0.72);
+  --uni-shadow:
+    0 26px 64px rgba(1, 8, 20, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 0 0 1px rgba(78, 149, 255, 0.08);
+  --uni-soft-shadow:
+    0 16px 36px rgba(1, 8, 20, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  --uni-inset-shadow:
+    inset 0 4px 12px rgba(0, 0, 0, 0.36),
+    inset 0 1px 0 rgba(255, 255, 255, 0.04);
+
+  /* Home Page Bento Custom Mappings */
+  --home-neo-panel: var(--skeu-panel-bg);
+  /* Reduced inset white highlight for dark mode — original 0.14 was too bright on dark list cards */
+  --home-neo-panel-shadow:
+    16px 18px 36px rgba(0, 0, 0, 0.38),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.28),
+    0 0 0 1px rgba(0, 194, 208, 0.08);
+}
+
+:root[data-theme="light"] {
+  /* ── Disney+ Base Theme Colors (Light Mode) ── */
+  --bg0: #d8fff5;
+  --bg1: #d5eaff;
+  --bg2: #eefaf8;
+  --card: rgba(255, 255, 255, 0.8);
+  --card2: rgba(229, 245, 255, 0.64);
+  --line: rgba(0, 138, 148, 0.16);
+  --text: #0d2d39;
+  --muted: #395863;
+  --accent: #067b88;
+  --accent2: #00a8b5;
+  --danger: #ff5a7a;
+  --shadow: 0 18px 44px rgba(37, 88, 110, 0.14);
+
+  /* ── Neumorphic Skeuomorphic Tokens (Light Mode) ── */
+  --brand-bg-start: #d8fff5;
+  --brand-bg-end: #d5eaff;
+  --brand-bg-mid: #eefaf8;
+  --brand-aurora-a: rgba(0, 214, 180, 0.18);
+  --brand-aurora-b: rgba(0, 138, 148, 0.16);
+  --brand-card-top: rgba(255, 255, 255, 0.8);
+  --brand-card-bottom: rgba(229, 245, 255, 0.64);
+  --brand-card-spot: rgba(0, 214, 180, 0.14);
+  --brand-surface: rgba(247, 252, 255, 0.92);
+  --brand-surface-strong: rgba(250, 253, 255, 0.98);
+  --brand-line: rgba(0, 138, 148, 0.16);
+  --brand-text: #0d2d39;
+  --brand-muted: #395863;
+  --brand-subtle: #123846;
+  --brand-icon: #067b88;
+  --brand-shadow: 0 18px 44px rgba(37, 88, 110, 0.14);
+  --brand-shadow-soft: 0 10px 24px rgba(37, 88, 110, 0.1);
+  --brand-overlay: rgba(9, 26, 40, 0.18);
+  --brand-header-bg: linear-gradient(180deg, rgba(244, 252, 255, 0.9), rgba(223, 241, 248, 0.78));
+  --brand-menu-bg:
+    radial-gradient(620px 420px at 78% 16%, rgba(0, 214, 180, 0.12) 0%, rgba(0, 214, 180, 0) 72%),
+    linear-gradient(180deg, rgba(239, 249, 255, 0.98), rgba(214, 234, 245, 0.96));
+
+  /* Liquid Glass Panels (Tactile Neumorphism) */
+  --skeu-panel-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 247, 251, 0.95) 56%, rgba(221, 240, 246, 0.98) 100%);
+  --skeu-panel-shadow:
+    14px 16px 32px rgba(67, 111, 129, 0.2),
+    -10px -10px 20px rgba(255, 255, 255, 0.92),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -4px 0 rgba(154, 191, 203, 0.26),
+    0 0 0 1px rgba(0, 138, 148, 0.1);
+  --skeu-control-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(232, 245, 249, 0.94));
+  --skeu-control-shadow:
+    8px 10px 20px rgba(67, 111, 129, 0.14),
+    -6px -6px 14px rgba(255, 255, 255, 0.96),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(154, 191, 203, 0.26),
+    0 0 0 1px rgba(0, 138, 148, 0.1);
+  --skeu-inset-bg: linear-gradient(180deg, rgba(231, 243, 248, 0.98), rgba(247, 252, 255, 0.92));
+  --skeu-inset-shadow:
+    inset 8px 10px 18px rgba(124, 158, 171, 0.24),
+    inset -5px -5px 12px rgba(255, 255, 255, 0.88),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 1px 0 rgba(255, 255, 255, 0.62);
+  --skeu-pill-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(232, 245, 249, 0.8));
+  --skeu-accent-shadow:
+    0 18px 28px rgba(0, 214, 180, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.56),
+    inset 0 -3px 0 rgba(0, 122, 130, 0.18);
+
+  /* Primary Button Facet (Emerald Gradient - Light Mode Adjusted Border/Shadow) */
+  --imzaqi-btn-face:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  --imzaqi-btn-border: rgba(0, 138, 148, 0.3);
+  --imzaqi-btn-text: #032235;
+  --imzaqi-btn-shadow:
+    0 4px 14px rgba(0, 138, 148, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  --imzaqi-btn-shadow-hover:
+    0 6px 18px rgba(0, 138, 148, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+
+  /* ── Unified Layout Design Tokens (Light Mode) ── */
+  --uni-panel:
+    linear-gradient(176deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 249, 253, 0.96) 52%, rgba(228, 244, 250, 0.98) 100%);
+  --uni-panel-soft: linear-gradient(180deg, rgba(250, 254, 255, 0.96), rgba(236, 248, 252, 0.96));
+  --uni-inset: linear-gradient(180deg, rgba(233, 246, 251, 0.98), rgba(248, 253, 255, 0.93));
+  --uni-line: rgba(13, 124, 144, 0.2);
+  --uni-line-strong: rgba(13, 124, 144, 0.3);
+  --uni-text: #123744;
+  --uni-muted: rgba(50, 79, 89, 0.84);
+  --uni-shadow:
+    0 18px 42px rgba(60, 105, 120, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(13, 124, 144, 0.08);
+  --uni-soft-shadow:
+    0 12px 26px rgba(60, 105, 120, 0.13),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+  --uni-inset-shadow:
+    inset 0 2px 6px rgba(124, 158, 171, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+
+  /* Home Page Bento Custom Mappings */
+  --home-neo-panel: var(--skeu-panel-bg);
+  --home-neo-panel-shadow: var(--skeu-panel-shadow);
+}

@@ -42,6 +42,46 @@ export default function Hero({ products = [] }) {
   const wrapRef = useRef(null);
   const listboxId = "hero-search-listbox";
 
+  // Typewriter placeholder state
+  const searchQueries = useMemo(() => ["Netflix Premium", "Spotify Family", "YouTube Premium", "Canva Pro", "ChatGPT", "Disney+ Hotstar"], []);
+  const [placeholderText, setPlaceholderText] = useState("Ketik nama produk..");
+
+  useEffect(() => {
+    let currentWordIndex = 0;
+    let currentText = "";
+    let isDeleting = false;
+    let typingSpeed = 100;
+    let timer;
+
+    const handleType = () => {
+      const fullWord = searchQueries[currentWordIndex];
+      if (isDeleting) {
+        currentText = fullWord.substring(0, currentText.length - 1);
+        typingSpeed = 50;
+      } else {
+        currentText = fullWord.substring(0, currentText.length + 1);
+        typingSpeed = 100;
+      }
+
+      setPlaceholderText(`Ketik "${currentText}"`);
+
+      if (!isDeleting && currentText === fullWord) {
+        typingSpeed = 1800; // Pause at full word
+        isDeleting = true;
+      } else if (isDeleting && currentText === "") {
+        isDeleting = false;
+        currentWordIndex = (currentWordIndex + 1) % searchQueries.length;
+        typingSpeed = 500; // Pause before typing next word
+      }
+
+      timer = setTimeout(handleType, typingSpeed);
+    };
+
+    timer = setTimeout(handleType, 1000);
+    return () => clearTimeout(timer);
+  }, [searchQueries]);
+
+
   useEffect(() => {
     if (!window.matchMedia) return;
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -95,10 +135,10 @@ export default function Hero({ products = [] }) {
     prefersReduced
       ? {}
       : {
-          initial: { opacity: 0, y: 20 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
-        };
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
+      };
 
   return (
     <section className="hm-hero" aria-label="Marketplace Hero">
@@ -128,7 +168,7 @@ export default function Hero({ products = [] }) {
               </span>
               <input
                 className="input hero-search-input"
-                placeholder="Mau cari apa? Netflix, Spotify, Canva..."
+                placeholder={placeholderText}
                 value={q}
                 aria-label="Cari produk"
                 role="combobox"
