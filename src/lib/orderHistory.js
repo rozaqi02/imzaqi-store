@@ -51,3 +51,21 @@ export function updateOrderHistoryStatus(order_code, newStatus) {
     storage.setItem(HISTORY_KEY, JSON.stringify(next));
   } catch {}
 }
+
+export function removeOrderFromHistory(order_code) {
+  const storage = safeStorage();
+  if (!storage) return;
+  try {
+    const existing = getOrderHistory();
+    const next = existing.filter((entry) => entry.order_code !== order_code);
+    storage.setItem(HISTORY_KEY, JSON.stringify(next));
+  } catch {}
+}
+
+export function clearOrderHistory() {
+  const storage = safeStorage();
+  if (!storage) return;
+  try {
+    storage.removeItem(HISTORY_KEY);
+  } catch {}
+}

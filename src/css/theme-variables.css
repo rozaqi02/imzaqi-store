@@ -6,6 +6,9 @@
   - theme-unified-v4.css (Status/FAQ page visual variables)
 */
 
+/* NOTE: --uni-neo-control-shadow is also set later in theme-consolidated.css.
+   The token below aligns ghost/control buttons to the same 3D inset style as btn-primary. */
+
 :root,
 :root[data-theme="dark"] {
   /* ── Disney+ Base Theme Colors (Dark Default) ── */
@@ -56,11 +59,16 @@
     0 0 0 1px rgba(0, 194, 208, 0.1);
   --skeu-control-bg: linear-gradient(180deg, rgba(25, 38, 72, 0.96), rgba(10, 16, 35, 0.94));
   --skeu-control-shadow:
-    10px 12px 22px rgba(0, 0, 0, 0.28),
-    -6px -6px 14px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.32),
-    0 0 0 1px rgba(0, 194, 208, 0.1);
+    /* top inset highlight */
+    inset 0 2px 0 rgba(255, 255, 255, 0.22),
+    /* bottom press depth */
+    inset 0 -3px 0 rgba(0, 0, 0, 0.38),
+    /* directional shadow */
+    0 10px 18px rgba(0, 10, 22, 0.28),
+    /* border accent */
+    0 0 0 1px rgba(0, 194, 208, 0.1),
+    /* counter shadow kiri-atas */
+    -2px -2px 6px rgba(255, 255, 255, 0.04);
   --skeu-inset-bg: linear-gradient(180deg, rgba(3, 8, 18, 0.94), rgba(9, 15, 33, 0.82));
   --skeu-inset-shadow:
     inset 10px 12px 22px rgba(0, 0, 0, 0.46),
@@ -73,18 +81,29 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.42),
     inset 0 -3px 0 rgba(3, 66, 74, 0.36);
 
-  /* Primary Button Facet (Emerald Gradient) */
+  /* Primary Button Facet (Emerald Gradient) — Neumorphism 3D */
   --imzaqi-btn-face:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 26%),
     linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
-  --imzaqi-btn-border: rgba(79, 255, 200, 0.24);
+  --imzaqi-btn-border: rgba(79, 255, 200, 0.28);
   --imzaqi-btn-text: #032235;
   --imzaqi-btn-shadow:
-    0 4px 14px rgba(0, 214, 180, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    /* top inset highlight — efek permukaan mengkilap */
+    inset 0 2px 0 rgba(255, 255, 255, 0.55),
+    /* bottom inset press shadow — kedalaman tombol */
+    inset 0 -3px 0 rgba(0, 95, 82, 0.42),
+    /* outer glow — setara dengan skeu-control-shadow, tidak lebih besar */
+    0 10px 18px rgba(0, 10, 22, 0.26),
+    /* color tint di atas base shadow */
+    0 4px 10px rgba(0, 180, 150, 0.12),
+    /* counter shadow kiri-atas — kesan relief 3D */
+    -2px -2px 6px rgba(255, 255, 255, 0.04);
   --imzaqi-btn-shadow-hover:
-    0 6px 18px rgba(0, 214, 180, 0.36),
-    inset 0 1px 0 rgba(255, 255, 255, 0.32);
+    inset 0 2px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -3px 0 rgba(0, 95, 82, 0.5),
+    0 14px 24px rgba(0, 10, 22, 0.3),
+    0 6px 14px rgba(0, 180, 150, 0.18),
+    -2px -2px 6px rgba(255, 255, 255, 0.04);
 
   /* ── Unified Layout Design Tokens (Dark Mode) ── */
   --uni-panel:
@@ -182,18 +201,29 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
     inset 0 -3px 0 rgba(0, 122, 130, 0.18);
 
-  /* Primary Button Facet (Emerald Gradient - Light Mode Adjusted Border/Shadow) */
+  /* Primary Button Facet (Emerald Gradient - Light Mode) — Neumorphism 3D */
   --imzaqi-btn-face:
     linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 32%),
     linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
   --imzaqi-btn-border: rgba(0, 138, 148, 0.3);
   --imzaqi-btn-text: #032235;
   --imzaqi-btn-shadow:
+    /* top inset highlight — kuat di light mode */
+    inset 0 2px 0 rgba(255, 255, 255, 0.78),
+    /* bottom press depth */
+    inset 0 -3px 0 rgba(0, 95, 82, 0.28),
+    /* outer glow */
     0 4px 14px rgba(0, 138, 148, 0.22),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    /* directional shadow kanan-bawah */
+    3px 5px 12px rgba(0, 100, 90, 0.16),
+    /* counter shadow kiri-atas */
+    -1px -1px 5px rgba(255, 255, 255, 0.75);
   --imzaqi-btn-shadow-hover:
-    0 6px 18px rgba(0, 138, 148, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    inset 0 2px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -3px 0 rgba(0, 95, 82, 0.34),
+    0 6px 20px rgba(0, 138, 148, 0.3),
+    4px 7px 16px rgba(0, 100, 90, 0.2),
+    -1px -1px 5px rgba(255, 255, 255, 0.8);
 
   /* ── Unified Layout Design Tokens (Light Mode) ── */
   --uni-panel:

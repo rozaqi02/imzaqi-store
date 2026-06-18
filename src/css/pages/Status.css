@@ -453,10 +453,12 @@
 }
 
 .st-flowLine {
-  width: 14px;
+  width: 20px;
   align-self: center;
-  height: 1px;
-  background: linear-gradient(90deg, rgba(90, 190, 255, 0.18), rgba(90, 190, 255, 0.52), rgba(90, 190, 255, 0.18));
+  height: 2px;
+  flex-shrink: 0;
+  background: linear-gradient(90deg, rgba(90, 190, 255, 0.12), rgba(90, 190, 255, 0.64), rgba(90, 190, 255, 0.12));
+  border-radius: 999px;
 }
 
 .st-items {
@@ -1445,5 +1447,289 @@
     justify-content: center;
     padding: 0 10px;
     font-size: 12px;
+  }
+}
+
+/* ─── Status pill row (with last-updated info + fade-in) ─── */
+
+@keyframes st-pillFadeIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.st-statePillRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+  animation: st-pillFadeIn 0.28s ease both;
+}
+
+/* lastUpdated — muted tapi readable */
+.st-lastUpdated {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: var(--st-muted);
+  font-size: 12px;
+}
+
+/* Refreshing dot — sonar/ping ring */
+.st-refreshingDot {
+  position: relative;
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(145, 223, 255, 0.9);
+  flex-shrink: 0;
+}
+
+.st-refreshingDot::before {
+  content: "";
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(145, 223, 255, 0.55);
+  animation: st-sonar 1.4s ease-out infinite;
+}
+
+@keyframes st-sonar {
+  0% { opacity: 1; transform: scale(0.6); }
+  100% { opacity: 0; transform: scale(2); }
+}
+
+@keyframes st-blink {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+.st-refreshBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid var(--st-line);
+  background: var(--st-panel-soft);
+  color: var(--st-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
+}
+
+.st-refreshBtn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--st-text);
+  border-color: var(--st-line-strong);
+  transform: rotate(20deg);
+}
+
+.st-refreshBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ─── copyNoteBtn (moved from inline styles) ─── */
+
+.st-copyNoteBtn {
+  min-height: 32px;
+  padding: 0 12px;
+  font-size: 11px;
+  border-radius: 10px;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-weight: 800;
+}
+
+/* ─── infoCard strong — overflow-safe + kicker truncate ─── */
+
+.st-infoCard span {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.st-infoCard strong {
+  word-break: break-all;
+}
+
+/* ─── payProgress — label inline kanan ─── */
+
+.st-payProgress {
+  margin-top: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.st-payProgressRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.st-payTrack {
+  flex: 1;
+  height: 10px !important;
+  border-radius: 999px;
+  background: var(--skeu-pill-bg, rgba(255, 255, 255, 0.06));
+  overflow: hidden;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.16);
+}
+
+/* ─── Help card — button hierarchy ─── */
+
+.st-helpCard .st-helpActions .btn:first-child {
+  /* Gunakan token neumorphism yang sudah ada di proyek */
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
+  color: #032235 !important;
+  border: 1px solid rgba(79, 255, 200, 0.32) !important;
+  box-shadow:
+    /* inset top highlight — efek "tonjolan" neumorphism */
+    inset 0 2px 0 rgba(255, 255, 255, 0.52),
+    /* inset bottom press shadow */
+    inset 0 -3px 0 rgba(0, 100, 90, 0.38),
+    /* outer glow */
+    0 6px 20px rgba(0, 214, 180, 0.28),
+    /* subtle directional shadow kiri-bawah — signature neumorphism */
+    4px 6px 14px rgba(0, 80, 70, 0.22),
+    -2px -2px 8px rgba(255, 255, 255, 0.04) !important;
+  font-weight: 900;
+  /* akan-berasa beda dari tombol ghost */
+  letter-spacing: 0.01em;
+  transition: box-shadow 0.18s ease, transform 0.14s ease !important;
+}
+
+.st-helpCard .st-helpActions .btn:first-child:hover {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.58),
+    inset 0 -3px 0 rgba(0, 100, 90, 0.44),
+    0 10px 26px rgba(0, 214, 180, 0.38),
+    5px 8px 18px rgba(0, 80, 70, 0.28),
+    -2px -2px 8px rgba(255, 255, 255, 0.04) !important;
+  transform: translateY(-1px);
+}
+
+.st-helpCard .st-helpActions .btn:first-child:active {
+  /* Pressed state — inset melompat balik ke dalam */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 3px 8px rgba(0, 100, 90, 0.36),
+    0 2px 8px rgba(0, 214, 180, 0.18) !important;
+  transform: translateY(1px);
+}
+
+.st-helpCard .st-helpActions .btn-ghost {
+  border: 1px solid var(--st-line-strong) !important;
+  /* Subtle inset neumorphism untuk ghost juga */
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18),
+    2px 3px 8px rgba(0, 0, 0, 0.18),
+    -1px -1px 5px rgba(255, 255, 255, 0.03) !important;
+  transition: box-shadow 0.18s ease, transform 0.14s ease !important;
+}
+
+.st-helpCard .st-helpActions .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(145, 200, 255, 0.42) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+    3px 5px 12px rgba(0, 0, 0, 0.22),
+    -1px -1px 5px rgba(255, 255, 255, 0.04) !important;
+}
+
+.st-helpCard .st-helpActions .btn-ghost:active {
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.3),
+    1px 1px 4px rgba(0, 0, 0, 0.14) !important;
+  transform: translateY(1px);
+}
+
+/* Light mode override untuk help card buttons */
+:root[data-theme="light"] .st-helpCard .st-helpActions .btn:first-child {
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -3px 0 rgba(0, 110, 100, 0.28),
+    0 5px 16px rgba(0, 160, 140, 0.26),
+    3px 5px 12px rgba(0, 100, 90, 0.16),
+    -1px -1px 5px rgba(255, 255, 255, 0.6) !important;
+}
+
+:root[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 0 rgba(0, 100, 120, 0.12),
+    2px 3px 8px rgba(60, 120, 140, 0.14),
+    -1px -1px 4px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Reduced motion — pastikan tidak berat di mobile */
+@media (prefers-reduced-motion: reduce) {
+  .st-helpCard .st-helpActions .btn:first-child,
+  .st-helpCard .st-helpActions .btn-ghost {
+    transition: none !important;
+  }
+}
+
+/* ─── item icon placeholder — richer accent ─── */
+
+.st-itemIcon span {
+  font-size: 18px;
+  font-weight: 1000;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.18);
+}
+
+.st-itemIcon:not(:has(img)) {
+  background: linear-gradient(135deg, rgba(0, 159, 168, 0.28), rgba(0, 138, 148, 0.38)) !important;
+  border-color: rgba(0, 214, 180, 0.28) !important;
+}
+
+/* ─── admin note kicker — bigger + notice symbol ─── */
+
+.st-noteCard.is-accent .st-kicker {
+  font-size: 12.5px !important;
+  letter-spacing: 0.13em;
+}
+
+.st-noteCard.is-accent .st-kicker::before {
+  content: "\26A0\FE0F\00A0";
+  font-style: normal;
+}
+
+/* ─── tab switcher full width at 600px ─── */
+
+@media (max-width: 600px) {
+  .st-tabs {
+    width: 100%;
+  }
+
+  .st-tab {
+    flex: 1;
+    justify-content: center;
+  }
+}
+
+/* ─── Mobile — statePillRow spacing ─── */
+
+@media (max-width: 720px) {
+  .st-statePillRow {
+    margin-bottom: 14px;
+  }
+
+  .st-flowLine {
+    /* override to vertical dashed */
+    background: linear-gradient(180deg, rgba(90, 190, 255, 0.18), rgba(90, 190, 255, 0.6), rgba(90, 190, 255, 0.18));
+    height: 18px;
+    width: 2px;
   }
 }

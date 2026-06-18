@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import {
   Activity,
@@ -12,20 +12,32 @@ import {
   Mail,
   MessageSquareText,
   Package,
+  RefreshCw,
   Search,
   ShieldCheck,
   Sparkles,
+  Trash2,
   WalletCards,
   XCircle,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { formatIDR } from "../lib/format";
 import { fetchSettings } from "../lib/api";
-import { getOrderHistory, updateOrderHistoryStatus } from "../lib/orderHistory";
+import {
+  getOrderHistory,
+  updateOrderHistoryStatus,
+  removeOrderFromHistory,
+  clearOrderHistory,
+} from "../lib/orderHistory";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { copyToClipboard } from "../utils/clipboard";
 import "../css/pages/OrderHistory.css";
+
+// ─── Constants ───────────────────────────────────────────────────────────────
+
+const POLL_INTERVAL_MS = 30_000;
+const TERMINAL_STATUSES = new Set(["done", "cancelled"]);
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -69,12 +81,23 @@ function getTimeline(status) {
   ];
 }
 
+// Dipakai saat onChange — hanya uppercase + strip spasi, biarkan user hapus dengan bebas
+function sanitizeOrderInput(value) {
+  return String(value || "").toUpperCase().replace(/[^A-Z0-9-]/g, "");
+}
+
+// Dipakai saat lookup/submit — normalisasi penuh ke format IMZ-XXXX
 function normalizeOrderCode(value) {
-  let code = String(value || "").trim().toUpperCase();
-  code = code.replace(/\s+/g, "");
-  if (/^[A-Z0-9]{4}$/.test(code)) code = `IMZ-${code}`;
-  if (/^IMZ[A-Z0-9]{4}$/.test(code)) code = `IMZ-${code.slice(3)}`;
-  return code.replace(/^IMZ-+/, "IMZ-");
+  // Strip semua karakter non-alphanumeric kecuali dash sementara
+  const cleaned = String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (!cleaned) return "";
+  // Cek apakah sudah ada prefix IMZ
+  const withoutPrefix = cleaned.startsWith("IMZ") ? cleaned.slice(3) : cleaned;
+  // Ambil 4 karakter terakhir sebagai kode
+  const code = withoutPrefix.slice(-4);
+  if (code.length === 4) return `IMZ-${code}`;
+  // Kode belum lengkap, kembalikan mentah untuk ditampilkan error
+  return cleaned;
 }
 
 function toFriendlyStatusError() {
@@ -103,6 +126,15 @@ function formatDate(isoString) {
   } catch {
     return "-";
   }
+}
+
+function formatRelativeTime(date) {
+  const seconds = Math.round((Date.now() - date.getTime()) / 1000);
+  if (seconds < 10) return "baru saja";
+  if (seconds < 60) return `${seconds} dtk lalu`;
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes} mnt lalu`;
+  return `${Math.round(minutes / 60)} jam lalu`;
 }
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
@@ -141,8 +173,11 @@ function TabCekStatus({ settings }) {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [order, setOrder] = useState(null);
+  const [lastUpdated, setLastUpdated] = useState(null);
+  const [refreshing, setRefreshing] = useState(false);
 
   const waNumber = settings?.whatsapp?.number || "6283136049987";
+  const pollTimerRef = useRef(null);
 
   useEffect(() => {
     if (!initialParam) return;
@@ -151,6 +186,16 @@ function TabCekStatus({ settings }) {
     lookup(normalized);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [initialParam]);
+
+  // Auto-refresh polling — berhenti kalau status sudah terminal
+  useEffect(() => {
+    if (!order || TERMINAL_STATUSES.has(order.status)) return;
+    pollTimerRef.current = setInterval(() => {
+      silentRefresh(order.order_code);
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(pollTimerRef.current);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [order?.order_code, order?.status]);
 
   const statusMeta = useMemo(() => getStatusMeta(order?.status), [order?.status]);
   const StatusIcon = statusMeta.icon;
@@ -163,9 +208,10 @@ function TabCekStatus({ settings }) {
     () => (order?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0),
     [order?.items]
   );
-  const paidRatio = subtotalValue
-    ? Math.max(16, Math.min(100, Math.round((totalValue / Math.max(subtotalValue, 1)) * 100)))
-    : 100;
+  // Kalau subtotal 0, bar tetap kosong agar tidak menyesatkan
+  const paidRatio = subtotalValue > 0
+    ? Math.max(4, Math.min(100, Math.round((totalValue / subtotalValue) * 100)))
+    : 0;
 
   const createdDateLabel = useMemo(() => {
     if (!order?.created_at) return "-";
@@ -223,6 +269,24 @@ function TabCekStatus({ settings }) {
     }
   }
 
+  // Silent refresh — update status di background tanpa reset UI
+  const silentRefresh = useCallback(async (orderCode) => {
+    if (!orderCode) return;
+    setRefreshing(true);
+    try {
+      const { data, error } = await supabase.rpc("get_order_public", { p_order_code: orderCode });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row) return;
+      setOrder(row);
+      setLastUpdated(new Date());
+    } catch {
+      // silent — tidak tampil error untuk background refresh
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
+
   async function copyOrderCode() {
     try {
       await copyToClipboard(order?.order_code || "");
@@ -246,12 +310,33 @@ function TabCekStatus({ settings }) {
     }
   }
 
+  const isTerminal = order ? TERMINAL_STATUSES.has(order.status) : false;
+  const lastUpdatedLabel = lastUpdated ? formatRelativeTime(lastUpdated) : null;
+
   return (
     <>
       {order ? (
-        <div className={`st-statePill is-${statusMeta.tone}`} style={{ marginBottom: 4 }}>
-          <StatusIcon size={16} />
-          <span>{prettyStatus(order.status)}</span>
+        <div className="st-statePillRow">
+          <div className={`st-statePill is-${statusMeta.tone}`}>
+            <StatusIcon size={16} />
+            <span>{prettyStatus(order.status)}</span>
+          </div>
+          <div className="st-lastUpdated">
+            {refreshing ? <span className="st-refreshingDot" aria-hidden="true" /> : null}
+            {lastUpdatedLabel ? <span>Diperbarui {lastUpdatedLabel}</span> : null}
+            {!isTerminal ? (
+              <button
+                type="button"
+                className="st-refreshBtn"
+                onClick={() => silentRefresh(order.order_code)}
+                disabled={refreshing}
+                aria-label="Perbarui status"
+                title="Perbarui status"
+              >
+                <RefreshCw size={13} />
+              </button>
+            ) : null}
+          </div>
         </div>
       ) : null}
 
@@ -275,7 +360,7 @@ function TabCekStatus({ settings }) {
               autoCapitalize="characters"
               placeholder="Contoh: IMZ-ABCD"
               value={input}
-              onChange={(e) => setInput(normalizeOrderCode(e.target.value))}
+              onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
               onKeyDown={(e) => {
                 if (e.key === "Enter") lookup(input);
               }}
@@ -332,17 +417,6 @@ function TabCekStatus({ settings }) {
                     }
                   }}
                   title="Salin catatan admin"
-                  style={{
-                    minHeight: "32px",
-                    padding: "0 12px",
-                    fontSize: "11px",
-                    borderRadius: "10px",
-                    marginLeft: "auto",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "5px",
-                    fontWeight: "800",
-                  }}
                 >
                   <Copy size={12} />
                   <span>Salin</span>
@@ -490,10 +564,19 @@ function TabCekStatus({ settings }) {
               </div>
 
               <div className="st-payProgress">
-                <div className="st-payTrack">
+                <div
+                  className="st-payTrack"
+                  role="progressbar"
+                  aria-valuenow={paidRatio}
+                  aria-valuemin={0}
+                  aria-valuemax={100}
+                  aria-label={`Rasio bayar ${paidRatio}%`}
+                >
                   <i style={{ width: `${paidRatio}%` }} />
                 </div>
-                <small>Rasio bayar {paidRatio}%</small>
+                <small>
+                  {subtotalValue > 0 ? `Rasio bayar ${paidRatio}%` : "Data harga belum tersedia"}
+                </small>
               </div>
             </article>
 
@@ -565,55 +648,67 @@ function TabCekStatus({ settings }) {
 function TabRiwayat() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [syncing, setSyncing] = useState(false);
   const [fetchErrors, setFetchErrors] = useState({});
+  const [confirmClear, setConfirmClear] = useState(false);
+  const toast = useToast();
 
-  useEffect(() => {
+  const doSync = useCallback(async (silent = false) => {
     const history = getOrderHistory();
     setEntries(history);
-
     if (history.length === 0) {
       setLoading(false);
+      setSyncing(false);
       return;
     }
+    if (!silent) setSyncing(true);
 
-    let active = true;
+    const results = await Promise.allSettled(
+      history.map(async (entry) => {
+        const { data, error } = await supabase.rpc("get_order_public", {
+          p_order_code: entry.order_code,
+        });
+        if (error) throw error;
+        const row = Array.isArray(data) ? data[0] : data;
+        if (!row) throw new Error("not found");
+        return { order_code: entry.order_code, status: row.status };
+      })
+    );
 
-    async function syncStatuses() {
-      const results = await Promise.allSettled(
-        history.map(async (entry) => {
-          const { data, error } = await supabase.rpc("get_order_public", {
-            p_order_code: entry.order_code,
-          });
-          if (error) throw error;
-          const row = Array.isArray(data) ? data[0] : data;
-          if (!row) throw new Error("not found");
-          return { order_code: entry.order_code, status: row.status };
-        })
-      );
+    const errors = {};
+    results.forEach((result, index) => {
+      const entry = history[index];
+      if (result.status === "fulfilled") {
+        updateOrderHistoryStatus(entry.order_code, result.value.status);
+      } else {
+        errors[entry.order_code] = true;
+      }
+    });
 
-      if (!active) return;
-
-      const errors = {};
-      results.forEach((result, index) => {
-        const entry = history[index];
-        if (result.status === "fulfilled") {
-          updateOrderHistoryStatus(entry.order_code, result.value.status);
-        } else {
-          errors[entry.order_code] = true;
-        }
-      });
-
-      setFetchErrors(errors);
-      setEntries(getOrderHistory());
-      setLoading(false);
-    }
-
-    syncStatuses();
-
-    return () => {
-      active = false;
-    };
+    setFetchErrors(errors);
+    setEntries(getOrderHistory());
+    setLoading(false);
+    setSyncing(false);
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    doSync(true).then(() => { if (!active) return; });
+    return () => { active = false; };
+  }, [doSync]);
+
+  function handleRemove(order_code) {
+    removeOrderFromHistory(order_code);
+    setEntries(getOrderHistory());
+    toast.success("Entri dihapus");
+  }
+
+  function handleClearAll() {
+    clearOrderHistory();
+    setEntries([]);
+    setConfirmClear(false);
+    toast.success("Riwayat dibersihkan");
+  }
 
   if (loading) {
     return (
@@ -644,6 +739,38 @@ function TabRiwayat() {
 
   return (
     <div className="oh-list">
+      {/* Toolbar: refresh + clear all */}
+      <div className="oh-listToolbar">
+        <button
+          type="button"
+          className="btn btn-sm btn-ghost oh-refreshAllBtn"
+          onClick={() => doSync()}
+          disabled={syncing}
+          aria-label="Perbarui semua status"
+        >
+          <RefreshCw size={13} className={syncing ? "oh-spinIcon" : ""} />
+          {syncing ? "Memperbarui..." : "Perbarui"}
+        </button>
+
+        {confirmClear ? (
+          <div className="oh-confirmClear">
+            <span>Hapus semua?</span>
+            <button type="button" className="btn btn-sm" onClick={handleClearAll}>Ya, hapus</button>
+            <button type="button" className="btn btn-sm btn-ghost" onClick={() => setConfirmClear(false)}>Batal</button>
+          </div>
+        ) : (
+          <button
+            type="button"
+            className="btn btn-sm btn-ghost oh-clearAllBtn"
+            onClick={() => setConfirmClear(true)}
+            aria-label="Hapus semua riwayat"
+          >
+            <Trash2 size={13} />
+            Hapus semua
+          </button>
+        )}
+      </div>
+
       {entries.map((entry) => {
         const hasFetchError = fetchErrors[entry.order_code];
         const tone = statusTone(entry.status);
@@ -666,6 +793,15 @@ function TabRiwayat() {
                 <span className={`oh-statusPill is-${tone}`}>
                   {prettyStatus(entry.status)}
                 </span>
+                <button
+                  type="button"
+                  className="oh-removeBtn"
+                  onClick={() => handleRemove(entry.order_code)}
+                  aria-label={`Hapus ${entry.order_code} dari riwayat`}
+                  title="Hapus dari riwayat"
+                >
+                  <Trash2 size={13} />
+                </button>
               </div>
             </div>
 
@@ -745,9 +881,11 @@ export default function Status() {
           {/* Tab switcher */}
           <div className="st-tabs" role="tablist" aria-label="Pilih tampilan">
             <button
+              id="tab-cek"
               role="tab"
               type="button"
               aria-selected={activeTab === "cek"}
+              aria-controls="panel-cek"
               className={`st-tab${activeTab === "cek" ? " is-active" : ""}`}
               onClick={() => switchTab("cek")}
             >
@@ -755,9 +893,11 @@ export default function Status() {
               Cek Status
             </button>
             <button
+              id="tab-riwayat"
               role="tab"
               type="button"
               aria-selected={activeTab === "riwayat"}
+              aria-controls="panel-riwayat"
               className={`st-tab${activeTab === "riwayat" ? " is-active" : ""}`}
               onClick={() => switchTab("riwayat")}
             >
@@ -766,11 +906,24 @@ export default function Status() {
             </button>
           </div>
 
-          {activeTab === "cek" ? (
-            <TabCekStatus settings={settings} />
-          ) : (
-            <TabRiwayat />
-          )}
+          <div
+            id="panel-cek"
+            role="tabpanel"
+            aria-labelledby="tab-cek"
+            tabIndex={0}
+            hidden={activeTab !== "cek"}
+          >
+            {activeTab === "cek" ? <TabCekStatus settings={settings} /> : null}
+          </div>
+          <div
+            id="panel-riwayat"
+            role="tabpanel"
+            aria-labelledby="tab-riwayat"
+            tabIndex={0}
+            hidden={activeTab !== "riwayat"}
+          >
+            {activeTab === "riwayat" ? <TabRiwayat /> : null}
+          </div>
         </div>
       </section>
     </div>

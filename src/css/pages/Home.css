@@ -1,5 +1,43 @@
+/* ─── Visual break antara Hero dan body ─── */
 .hero {
   padding: 0 0 18px;
+}
+
+.home-body {
+  /* Subtle gradient separator antara hero dan konten */
+  background:
+    linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 0.06) 40px, rgba(0, 0, 0, 0) 80px),
+    transparent;
+  padding-top: 8px;
+}
+
+/* ─── Stat chips stagger entrance ─── */
+.hm-stats-grid .hm-stat-chip {
+  animation: hm-chipFadeUp 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.28s + var(--chip-i, 0) * 0.08s);
+}
+
+@keyframes hm-chipFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hm-stats-grid .hm-stat-chip {
+    animation: none;
+  }
+}
+
+/* ─── Trust pill hover micro-interaction ─── */
+.hm-trust-pill {
+  cursor: default;
+  transition: transform 0.18s ease, background 0.18s ease, color 0.18s ease;
+}
+
+.hm-trust-pill:hover {
+  transform: translateY(-2px) scale(1.04);
+  background: rgba(0, 214, 180, 0.14);
+  color: #4effda;
 }
 
 .hero-minimal {
@@ -147,10 +185,11 @@
   padding: 10px;
   border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(12, 18, 28, 0.72);
+  background: rgba(12, 18, 28, 0.88);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 8px 18px rgba(0, 0, 0, 0.12);
+  /* backdrop-filter only on desktop — mobile disables it via .home-page override above */
   backdrop-filter: blur(16px);
   transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
 }
@@ -225,13 +264,21 @@
   right: 0;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(7, 10, 18, 0.94);
-  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.38);
+  /* Solid enough bg that backdrop-filter is not needed for readability */
+  background: rgba(7, 10, 18, 0.97);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
   overflow-x: hidden;
   overflow-y: auto;
   max-height: min(320px, 48vh);
-  backdrop-filter: blur(14px);
+  /* backdrop-filter only applied on desktop via @media below */
   z-index: 60;
+}
+
+@media (min-width: 721px) {
+  .suggestions {
+    background: rgba(7, 10, 18, 0.94);
+    backdrop-filter: blur(14px);
+  }
 }
 
 .suggestion-item {
@@ -280,7 +327,8 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025)),
-    rgba(12, 18, 28, 0.62);
+    rgba(12, 18, 28, 0.82);
+  /* backdrop-filter only on desktop — mobile override strips it */
   backdrop-filter: blur(12px);
 }
 
@@ -378,13 +426,24 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03)),
     radial-gradient(circle at top right, rgba(29, 131, 255, 0.12), rgba(29, 131, 255, 0) 45%);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+  /*
+    Reduced blur radius: 70px -> 18px.
+    Large-radius box-shadows are rasterized in software on most mobile GPUs,
+    causing a repaint on every scroll tick when new tiles enter the viewport.
+    A tight shadow (<=20px spread) is GPU-compositable and imperceptible to users.
+  */
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
   transition:
-    transform 0.3s var(--ease-out),
-    border-color 0.3s var(--ease-out),
-    box-shadow 0.3s var(--ease-out);
-  content-visibility: visible;
-  contain: layout paint style;
+    transform 0.26s var(--ease-out),
+    border-color 0.26s var(--ease-out),
+    box-shadow 0.26s var(--ease-out);
+  /*
+    content-visibility: auto lets the browser skip layout/paint for off-screen
+    tiles entirely, which is the single biggest scroll-performance win here.
+    Use 'auto' instead of 'visible' — 'visible' is a no-op.
+  */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
 }
 
 .product-tile--grid {
@@ -1210,39 +1269,58 @@
     box-shadow: 0 14px 26px rgba(0, 0, 0, 0.16);
   }
 
-  .home-page .hero-stats-minimal,
-  .home-page .home-popularList {
-    contain: layout paint style;
-    transform: translateZ(0);
-    backface-visibility: hidden;
-  }
+  /*
+    Performance fixes for mobile scroll:
+    - backdrop-filter triggers a stencil buffer + alpha compositing pass on
+      every frame while scrolling. Disabled on all elements below the fold.
+    - box-shadow with large blur radii force software rasterization on mobile
+      GPUs. Reduced to tight shadows that can be cached.
+    - contain:layout+paint+style on the list container restricts layout
+      recalculation to within the list, preventing full-page reflow.
+    - Hover transforms disabled on touch devices (no hover anyway).
+    - will-change:auto ensures the browser releases compositor layers when
+      elements are not actively animating.
+  */
 
+  /* Kill backdrop-filter site-wide below the hero on mobile */
   .home-page .hero-search-shell,
   .home-page .suggestions,
-  .home-page .stat-minimal {
+  .home-page .stat-minimal,
+  .home-page .hm-stat-chip,
+  .home-page .hm-search-shell {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
 
-  .home-page .stat-minimal,
-  .home-page .home-popularList .product-tile,
-  .home-page .home-popularList .product-tile-pill {
-    box-shadow: 0 5px 12px rgba(0, 0, 0, 0.12) !important;
+  /* Scope layout containment to the list, not individual tiles */
+  .home-page .home-popularList {
+    contain: layout;
   }
 
+  /* Simpler shadows — avoids GPU overdraw on large blur radii */
+  .home-page .stat-minimal,
+  .home-page .hm-stat-chip,
+  .home-page .home-popularList .product-tile,
+  .home-page .home-popularList .product-tile-pill {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.14) !important;
+  }
+
+  /* Reduce tile paint cost */
   .home-page .home-popularList .product-tile {
-    padding: 14px 15px 14px 15px;
-    contain: layout paint style;
-    transition-duration: 120ms !important;
+    padding: 14px 15px;
+    /* Shorter transition reduces jank when items enter the viewport */
+    transition-duration: 100ms !important;
     will-change: auto !important;
-    transform: translateZ(0);
-    backface-visibility: hidden;
+    /* Do not add transform: translateZ(0) — it creates a new stacking context
+       and forces an extra compositing layer for EVERY tile, worsening memory
+       pressure and causing more, not fewer, frame drops */
   }
 
   .home-page .home-popularList .product-tile-pill {
     background: rgba(255, 255, 255, 0.08);
   }
 
+  /* No hover transforms on touch */
   .home-page .home-popularList .product-tile:hover {
     transform: none !important;
   }
@@ -1263,40 +1341,43 @@
   pointer-events: none;
   z-index: 0;
   overflow: hidden;
+  /* Promote bg to own compositor layer — prevents scroll jank */
+  will-change: transform;
+  transform: translateZ(0);
 }
 
+/*
+  Orb animations removed — animating filter:blur on large elements forces
+  per-frame rasterization which causes consistent frame drops on mobile.
+  Replaced with static radial gradients that look nearly identical.
+*/
 .hm-hero-orb {
   position: absolute;
   border-radius: 50%;
-  filter: blur(60px);
-  opacity: 0.55;
-  animation: hm-orb-drift 14s ease-in-out infinite alternate;
+  opacity: 0.48;
 }
 
 .hm-hero-orb--1 {
-  width: clamp(220px, 32vw, 420px);
-  height: clamp(220px, 32vw, 420px);
-  top: -8%;
-  left: -6%;
-  background: radial-gradient(circle, rgba(29, 131, 255, 0.42) 0%, rgba(29, 131, 255, 0) 72%);
+  width: clamp(280px, 38vw, 500px);
+  height: clamp(280px, 38vw, 500px);
+  top: -12%;
+  left: -8%;
+  background: radial-gradient(circle, rgba(29, 131, 255, 0.38) 0%, rgba(29, 131, 255, 0) 70%);
+  filter: blur(72px);
 }
 
 .hm-hero-orb--2 {
-  width: clamp(180px, 26vw, 340px);
-  height: clamp(180px, 26vw, 340px);
-  top: 8%;
-  right: -4%;
-  background: radial-gradient(circle, rgba(0, 214, 180, 0.34) 0%, rgba(0, 214, 180, 0) 72%);
-  animation-delay: -4s;
+  width: clamp(200px, 28vw, 380px);
+  height: clamp(200px, 28vw, 380px);
+  top: 6%;
+  right: -5%;
+  background: radial-gradient(circle, rgba(0, 214, 180, 0.28) 0%, rgba(0, 214, 180, 0) 70%);
+  filter: blur(64px);
 }
 
+/* Orb 3 removed — third animated orb was highest cost, minimal visual gain */
 .hm-hero-orb--3 {
-  width: clamp(140px, 18vw, 260px);
-  height: clamp(140px, 18vw, 260px);
-  bottom: 10%;
-  left: 38%;
-  background: radial-gradient(circle, rgba(75, 98, 255, 0.28) 0%, rgba(75, 98, 255, 0) 72%);
-  animation-delay: -8s;
+  display: none;
 }
 
 .hm-hero-grid {
@@ -1324,10 +1405,9 @@
     linear-gradient(90deg, rgba(0, 138, 148, 0.06) 1px, transparent 1px);
 }
 
-@keyframes hm-orb-drift {
-  0% { transform: translate3d(0, 0, 0) scale(1); }
-  100% { transform: translate3d(18px, -14px, 0) scale(1.06); }
-}
+/* hm-orb-drift removed — animating filter:blur on large elements forces
+   per-frame rasterization which is the primary cause of scroll frame drops
+   on mid-range Android devices. Static orbs replaced it in Hero.jsx. */
 
 @keyframes trust-pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
@@ -1480,7 +1560,13 @@
   border: 1px solid var(--uni-line);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 42%),
-    var(--uni-neo-control, rgba(255, 255, 255, 0.04));
+    var(--uni-neo-control, rgba(255, 255, 255, 0.06));
+  /*
+    No backdrop-filter here by default — chips are in the hero viewport
+    which gets a full compositor layer. backdrop-filter on children of
+    a composited layer is OK on desktop but expensive on mobile.
+    Mobile strips it via the .home-page override at <=720px.
+  */
   box-shadow: var(--uni-neo-control-shadow, none);
   min-width: 0;
 }
@@ -1510,7 +1596,20 @@
   letter-spacing: 0.02em;
   color: var(--uni-muted);
   line-height: 1.3;
-  padding-bottom: 0.06em;
+  padding-bottom: 0.02em;
+}
+
+/* Context sub-label below the main label (e.g. "sejak 2024", "order masuk") */
+.hm-stat-chip-ctx {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--uni-muted);
+  opacity: 0.58;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 :root[data-theme="light"] .hm-stat-chip {
@@ -2002,9 +2101,11 @@
   }
 }
 
+/* Orb animation already removed — this rule is kept as safety net */
 @media (prefers-reduced-motion: reduce) {
   .hm-hero-orb {
     animation: none !important;
+    opacity: 0.3;
   }
 }
 
@@ -2067,12 +2168,18 @@
     rgba(255, 255, 255, 0.06),
     transparent
   );
-  transform: translateX(-100%);
+  /*
+    Use translate() instead of translateX() to keep this on the GPU compositor.
+    Also set will-change only on the ::after pseudo-element, not the parent,
+    so only the shimmer layer gets promoted — not each entire skeleton card.
+  */
+  will-change: transform;
+  transform: translate(-100%);
   animation: skelShimmer 1.6s infinite;
 }
 
 @keyframes skelShimmer {
-  100% { transform: translateX(100%); }
+  100% { transform: translate(100%); }
 }
 
 .home-tileSkeleton-top {
@@ -2171,6 +2278,14 @@
 .home-section {
   padding: clamp(22px, 3.2vw, 34px) 0;
   border-top: 1px solid rgba(255, 255, 255, 0.06);
+  /*
+    content-visibility: auto on each section tells the browser it can skip
+    painting and laying out sections that are fully off-screen.
+    contain-intrinsic-size provides a placeholder height so the scrollbar
+    doesn't jump when sections are painted on scroll-into-view.
+  */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
 }
 
 :root[data-theme="light"] .home-section {
@@ -2217,10 +2332,25 @@
 
 /* ── How it works section ─────────────────────────────────────────────── */
 
-/* ── Desktop: 4-column card grid ── */
+/* Stagger entrance per card */
+.home-howCard {
+  animation: hm-howCardIn 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(0.1s + var(--how-i, 0) * 0.1s);
+}
+
+@keyframes hm-howCardIn {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-howCard { animation: none; }
+}
+
+/* ── Desktop: 3-column card grid (3 steps) ── */
 .home-howGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 14px;
   position: relative;
 }
@@ -2396,41 +2526,30 @@
   }
 }
 
-/* ── Mobile: compact 2-column grid ── */
+/* ── Mobile: compact cards with desc visible ── */
 @media (max-width: 720px) {
   .home-howSection {
     overflow: visible;
   }
 
-  .home-howHeader {
-    margin-bottom: 16px;
-  }
-
-  .home-howSub {
-    font-size: 13px;
-  }
-
   .home-howGrid {
-    display: flex;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    gap: 8px;
-    padding-bottom: 20px;
-    margin: 0 -16px;
-    padding-inline: 16px;
-    scrollbar-width: none;
-    -webkit-overflow-scrolling: touch;
+    /* Stack vertically di mobile — lebih readable dari horizontal scroll */
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
   }
-  .home-howGrid::-webkit-scrollbar {
-    display: none;
+
+  /* Override connector dashed line — tidak perlu di mobile vertical stack */
+  .home-howGrid::before {
+    display: none !important;
   }
 
   .home-howCard {
-    flex: 0 0 88%;
-    scroll-snap-align: center;
     padding: 14px 16px;
     border-radius: 16px;
     gap: 12px;
+    /* Kurangi animasi di mobile */
+    animation-duration: 0.28s !important;
     transition: none;
   }
 
@@ -2439,33 +2558,34 @@
   }
 
   .home-howCard-icon {
-    width: 36px;
-    height: 36px;
-    border-radius: 11px;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    flex-shrink: 0;
   }
 
   .home-howCard-icon svg {
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
   }
 
   .home-howCard-title {
     font-size: 15px;
+    font-weight: 900;
   }
 
+  /* Tampilkan desc di mobile untuk context */
   .home-howCard-desc {
-    display: none;
-  }
-
-  .home-howCard-link {
-    font-size: 12px;
+    display: block;
+    font-size: 12.5px;
+    line-height: 1.55;
+    margin-top: 2px;
   }
 
   .home-howCard-step {
     display: none;
   }
 
-  /* Connector lines don't make sense on mobile */
   .home-howCard::after {
     display: none;
   }
@@ -2495,31 +2615,133 @@
 
 .home-testiCard {
   position: relative;
-  padding: 20px 18px;
+  padding: 18px;
   border-radius: 22px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background: var(--uni-neo-panel);
-  box-shadow: var(--uni-neo-panel-shadow);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.16);
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 14px;
+  transition: transform 0.24s var(--ease-out), border-color 0.24s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .home-testiCard:hover {
+    transform: translateY(-3px);
+    border-color: rgba(78, 255, 218, 0.28);
+  }
+}
+
+/* Header row: avatar + meta + stars */
+.home-testiCard-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.home-testiCard-avatar {
+  flex-shrink: 0;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.22), rgba(29, 131, 255, 0.18));
+  border: 1px solid rgba(78, 255, 218, 0.18);
+  display: grid;
+  place-items: center;
+  font-size: 15px;
+  font-weight: 900;
+  color: #4effda;
+  text-transform: uppercase;
+}
+
+:root[data-theme="light"] .home-testiCard-avatar {
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.12), rgba(0, 138, 148, 0.08));
+  border-color: rgba(0, 138, 148, 0.16);
+  color: #008a94;
+}
+
+.home-testiCard-meta {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+/* nameRow: nama + verified badge inline */
+.home-testiCard-nameRow {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.home-testiCard-name {
+  font-size: 13px;
+  font-weight: 900;
+  color: var(--uni-text, #f8fafc);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.home-testiCard-verified {
+  flex-shrink: 0;
+  color: #4effda;
+  opacity: 0.9;
+}
+
+:root[data-theme="light"] .home-testiCard-verified {
+  color: #008a94;
+}
+
+.home-testiCard-product {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--uni-muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* right column: stars + timeAgo */
+.home-testiCard-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.home-testiCard-time {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--uni-muted);
+  opacity: 0.7;
+  white-space: nowrap;
+}
+
+.home-testiCard-stars {
+  display: flex;
+  gap: 2px;
+  flex-shrink: 0;
+  color: #fbbf24;
+}
+
+:root[data-theme="light"] .home-testiCard-stars {
+  color: #d97706;
 }
 
 .home-testiCard-quote {
-  width: 32px;
-  height: 32px;
-  border-radius: 10px;
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background: rgba(79, 255, 200, 0.08);
-  display: grid;
-  place-items: center;
-  color: var(--uni-neo-icon, #9cddff);
+  /* kept for backwards compat but no longer rendered */
+  display: none;
 }
 
 .home-testiCard-text {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.7;
+  font-size: 13px;
+  line-height: 1.72;
   color: var(--uni-muted, rgba(234, 255, 245, 0.76));
   font-style: italic;
 }

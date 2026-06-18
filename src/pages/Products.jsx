@@ -29,7 +29,7 @@ import NumberCounter from "../components/NumberCounter";
 
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
-import { formatIDR } from "../lib/format";
+import { formatIDR, summarizeCatalogCopy } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useDebounce } from "../hooks/useDebounce";
@@ -83,15 +83,6 @@ function formatCompactIDR(n) {
   return String(value);
 }
 
-function summarizeCatalogCopy(text) {
-  const firstLine = String(text || "")
-    .split(/\r?\n+/)
-    .map((line) => line.trim())
-    .find(Boolean);
-
-  if (!firstLine) return "Pilih paket lalu lanjut ke checkout.";
-  return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
-}
 
 function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
   const left = max <= min ? 0 : ((valueMin - min) / (max - min)) * 100;
@@ -197,7 +188,7 @@ function FilterPanel({
         </div>
       </section>
 
-      <section className="catalog-filterSection">
+      <section className="catalog-filterSection" style={{ "--section-i": 1 }}>
         <header className="catalog-filterSectionHead">
           <span className="catalog-filterLabel">Status</span>
         </header>
@@ -247,7 +238,7 @@ function FilterPanel({
         </div>
       </section>
 
-      <section className="catalog-filterSection">
+      <section className="catalog-filterSection" style={{ "--section-i": 2 }}>
         <header className="catalog-filterSectionHead">
           <span className="catalog-filterLabel">Harga</span>
         </header>
@@ -261,7 +252,7 @@ function FilterPanel({
         />
       </section>
 
-      <section className="catalog-filterSection">
+      <section className="catalog-filterSection" style={{ "--section-i": 3 }}>
         <header className="catalog-filterSectionHead">
           <span className="catalog-filterLabel">Urutkan</span>
         </header>
@@ -277,7 +268,7 @@ function FilterPanel({
       </section>
 
       {showViewToggle ? (
-        <section className="catalog-filterSection catalog-filterSection--view">
+        <section className="catalog-filterSection catalog-filterSection--view" style={{ "--section-i": 4 }}>
           <header className="catalog-filterSectionHead">
             <span className="catalog-filterLabel">Tampilan</span>
           </header>
@@ -965,16 +956,6 @@ export default function Products() {
             </div>
 
             <div className="catalog-commandActions">
-              <select className="input catalog-commandSort" value={sort} onChange={(e) => setSort(e.target.value)}>
-                <option value="name">Nama A-Z</option>
-                <option value="name_desc">Nama Z-A</option>
-                <option value="reco">Rekomendasi</option>
-                <option value="popular">Terlaris</option>
-                <option value="price_asc">Harga termurah</option>
-                <option value="price_desc">Harga termahal</option>
-                <option value="stock_desc">Stok terbanyak</option>
-              </select>
-
               <button
                 type="button"
                 className="btn btn-ghost catalog-filterBtn"

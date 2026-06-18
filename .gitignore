@@ -10,6 +10,7 @@
 
 # ── production / build artifacts ─────────────────────────────────
 /build
+/dist
 /build-temp
 /build-verify-*
 *.tsbuildinfo

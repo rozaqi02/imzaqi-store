@@ -141,8 +141,11 @@
 }
 
 .oh-card:hover {
-  border-color: rgba(255, 255, 255, 0.14);
-  transform: translateY(-1px);
+  border-color: rgba(145, 200, 255, 0.22);
+  transform: translateY(-2px);
+  box-shadow:
+    var(--uni-neo-panel-shadow),
+    0 12px 28px rgba(1, 8, 20, 0.28);
 }
 
 .oh-cardTop {
@@ -187,6 +190,9 @@
 
 .oh-cardRight {
   flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
 /* Status Pill */
@@ -256,6 +262,78 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+}
+
+/* Remove button (per card) */
+.oh-removeBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.32);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.oh-removeBtn:hover {
+  background: rgba(255, 73, 126, 0.12);
+  border-color: rgba(255, 73, 126, 0.24);
+  color: #ff7fa3;
+}
+
+/* List toolbar */
+.oh-listToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.oh-clearAllBtn,
+.oh-refreshAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.oh-confirmClear {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Spin animation for refresh icon */
+@keyframes oh-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.oh-spinIcon {
+  animation: oh-spin 0.8s linear infinite;
+}
+
+/* Light mode overrides */
+:root[data-theme="light"] .oh-removeBtn {
+  color: rgba(50, 84, 95, 0.38);
+}
+
+:root[data-theme="light"] .oh-removeBtn:hover {
+  background: rgba(220, 38, 80, 0.08);
+  border-color: rgba(220, 38, 80, 0.22);
+  color: #c0324e;
+}
+
+:root[data-theme="light"] .oh-confirmClear {
+  color: rgba(50, 84, 95, 0.8);
 }
 
 /* Responsive */

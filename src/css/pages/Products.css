@@ -246,15 +246,13 @@
   flex-direction: column;
   min-width: 0;
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
-    radial-gradient(circle at 12% -8%, rgba(79, 255, 218, 0.16), rgba(79, 255, 218, 0) 44%),
-    rgba(8, 12, 22, 0.9);
-  box-shadow:
-    0 34px 84px rgba(0, 0, 0, 0.42),
-    0 10px 28px rgba(0, 214, 180, 0.08),
-    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
+    radial-gradient(circle at top right, var(--brand-card-spot, rgba(0, 214, 180, 0.12)), rgba(0, 214, 180, 0) 52%),
+    var(--skeu-panel-bg);
+  box-shadow: var(--skeu-panel-shadow);
   backdrop-filter: blur(20px) saturate(145%);
   -webkit-backdrop-filter: blur(20px) saturate(145%);
   overflow: hidden;
@@ -1201,11 +1199,13 @@
   align-items: flex-end;
   justify-content: center;
   padding: 0;
-  background: rgba(3, 8, 16, 0.62);
+  background: rgba(2, 8, 18, 0.62);
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.28s ease;
   will-change: opacity;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
 }
 
 .catalog-sheetBackdrop.is-open {
@@ -1218,12 +1218,17 @@
   max-height: min(88dvh, 760px);
   overflow: hidden;
   border-radius: 28px 28px 0 0;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   border-bottom: 0;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 22%),
-    rgba(7, 10, 18, 0.98);
-  box-shadow: 0 -24px 80px rgba(0, 0, 0, 0.42);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 18%, rgba(255, 255, 255, 0) 40%),
+    radial-gradient(circle at 12% -4%, rgba(0, 214, 180, 0.12), rgba(0, 214, 180, 0) 48%),
+    var(--skeu-panel-bg, linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96)));
+  box-shadow:
+    0 -28px 80px rgba(0, 0, 0, 0.48),
+    0 -4px 18px rgba(0, 10, 28, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    0 0 0 1px rgba(0, 194, 208, 0.08);
   display: flex;
   flex-direction: column;
   transform: translate3d(0, 100%, 0);
@@ -1236,13 +1241,26 @@
   transform: translate3d(0, 0, 0);
 }
 
+/* Handle bar — lebih visible, brand teal, tap area diperbesar */
 .catalog-sheetHandle {
-  width: 44px;
-  height: 4px;
+  width: 56px;
+  height: 5px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.22);
-  margin: 10px auto 2px;
+  background: rgba(0, 214, 180, 0.4);
+  margin: 0 auto;
   flex: 0 0 auto;
+  /* Tap area diperbesar dengan padding invisible */
+  padding: 10px 20px;
+  background-clip: content-box;
+  cursor: grab;
+  transition: background 0.18s ease, transform 0.18s ease;
+}
+
+.catalog-sheetHandle:active {
+  cursor: grabbing;
+  background: rgba(0, 214, 180, 0.6);
+  background-clip: content-box;
+  transform: scaleX(0.88);
 }
 
 .catalog-sheetHead {
@@ -1250,9 +1268,16 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding: 10px 16px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 8px 16px 14px;
+  border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.12));
   flex: 0 0 auto;
+  /* Subtle fade-in border */
+  animation: sheetHeadBorderIn 0.3s ease 0.15s both;
+}
+
+@keyframes sheetHeadBorderIn {
+  from { border-bottom-color: transparent; }
+  to   { border-bottom-color: var(--brand-line, rgba(0, 194, 208, 0.12)); }
 }
 
 .catalog-sheetHeadCopy {
@@ -1263,26 +1288,45 @@
   font-size: 17px;
   font-weight: 1000;
   letter-spacing: -0.02em;
+  color: var(--brand-text, #f4fff9);
 }
 
 .catalog-sheetSub {
   margin-top: 4px;
-  color: rgba(234, 255, 245, 0.62);
+  color: var(--brand-muted, rgba(234, 255, 245, 0.62));
   font-size: 12px;
   font-weight: 800;
 }
 
+/* Neumorphic close button */
 .catalog-sheetClose {
   width: 40px;
   height: 40px;
   display: grid;
   place-items: center;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(234, 255, 245, 0.9);
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-control-bg, linear-gradient(180deg, rgba(25, 38, 72, 0.96), rgba(10, 16, 35, 0.94)));
+  box-shadow: var(--skeu-control-shadow);
+  color: var(--brand-text, rgba(234, 255, 245, 0.9));
   cursor: pointer;
   flex: 0 0 auto;
+  transition:
+    transform 0.18s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.18s ease,
+    border-color 0.18s ease;
+}
+
+.catalog-sheetClose:hover {
+  transform: scale(1.06);
+  border-color: rgba(255, 79, 114, 0.3);
+  color: #ff9ab1;
+}
+
+.catalog-sheetClose:active {
+  transform: scale(0.94);
 }
 
 .catalog-sheetBody {
@@ -1292,15 +1336,31 @@
   -webkit-overflow-scrolling: touch;
   flex: 1 1 auto;
   min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 194, 208, 0.24) transparent;
 }
 
+.catalog-sheetBody::-webkit-scrollbar {
+  width: 4px;
+}
+
+.catalog-sheetBody::-webkit-scrollbar-thumb {
+  background: rgba(0, 194, 208, 0.28);
+  border-radius: 999px;
+}
+
+/* Neumorphic foot */
 .catalog-sheetFoot {
   display: flex;
   gap: 10px;
   padding: 12px 16px calc(14px + env(safe-area-inset-bottom));
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(7, 10, 18, 0.98);
-  box-shadow: 0 -10px 28px rgba(0, 0, 0, 0.22);
+  border-top: 1px solid var(--brand-line, rgba(0, 194, 208, 0.12));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96)));
+  box-shadow:
+    0 -8px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
   flex: 0 0 auto;
 }
 
@@ -1316,6 +1376,141 @@
 
 .catalog-sheetApply {
   flex: 1 1 auto;
+}
+
+/* ── Stagger animation: filter sections muncul bertahap saat sheet buka ── */
+@keyframes sheetSectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.catalog-sheet.is-open .catalog-filterSection {
+  animation: sheetSectionIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: calc(var(--section-i, 0) * 50ms + 120ms);
+}
+
+/* ── Handle bounce hint saat sheet pertama terbuka ── */
+@keyframes sheetHandleBounce {
+  0%   { transform: scaleX(1); }
+  30%  { transform: scaleX(1.18); }
+  60%  { transform: scaleX(0.92); }
+  80%  { transform: scaleX(1.06); }
+  100% { transform: scaleX(1); }
+}
+
+.catalog-sheet.is-open .catalog-sheetHandle {
+  animation: sheetHandleBounce 0.56s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
+}
+
+/* ── Light mode overrides ── */
+:root[data-theme="light"] .catalog-sheetBackdrop {
+  background: rgba(9, 26, 40, 0.28);
+}
+
+:root[data-theme="light"] .catalog-sheet {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96) 0%, rgba(255, 255, 255, 0.6) 24%, rgba(255, 255, 255, 0) 52%),
+    radial-gradient(circle at 12% -4%, rgba(0, 194, 208, 0.1), rgba(0, 194, 208, 0) 48%),
+    var(--skeu-panel-bg);
+  border-color: rgba(0, 138, 148, 0.14);
+  box-shadow:
+    0 -28px 60px rgba(67, 111, 129, 0.18),
+    0 -4px 14px rgba(80, 115, 130, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(0, 138, 148, 0.08);
+}
+
+:root[data-theme="light"] .catalog-sheetHandle {
+  background: rgba(0, 138, 148, 0.5);
+  background-clip: content-box;
+}
+
+:root[data-theme="light"] .catalog-sheetHandle:active {
+  background: rgba(0, 138, 148, 0.72);
+  background-clip: content-box;
+}
+
+:root[data-theme="light"] .catalog-sheetHead {
+  border-color: rgba(0, 138, 148, 0.12);
+}
+
+@keyframes sheetHeadBorderInLight {
+  from { border-bottom-color: transparent; }
+  to   { border-bottom-color: rgba(0, 138, 148, 0.12); }
+}
+
+:root[data-theme="light"] .catalog-sheetTitle {
+  color: rgba(15, 49, 64, 0.96);
+}
+
+:root[data-theme="light"] .catalog-sheetSub {
+  color: rgba(50, 82, 91, 0.72);
+}
+
+:root[data-theme="light"] .catalog-sheetClose {
+  border-color: rgba(0, 138, 148, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
+    var(--skeu-control-bg);
+  box-shadow: var(--skeu-control-shadow);
+  color: rgba(15, 49, 64, 0.88);
+}
+
+:root[data-theme="light"] .catalog-sheetClose:hover {
+  border-color: rgba(255, 79, 114, 0.3);
+  color: #e0315a;
+}
+
+:root[data-theme="light"] .catalog-sheetFoot {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg);
+  border-top-color: rgba(0, 138, 148, 0.12);
+  box-shadow:
+    0 -8px 20px rgba(67, 111, 129, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+/* ── Disable animasi di reduced motion + data-motion off/lite ── */
+@media (prefers-reduced-motion: reduce) {
+  .catalog-sheetBackdrop,
+  .catalog-sheet {
+    transition: none !important;
+  }
+
+  .catalog-sheet {
+    transform: none !important;
+  }
+
+  .catalog-sheetBackdrop:not(.is-open) .catalog-sheet {
+    display: none;
+  }
+
+  .catalog-sheet.is-open .catalog-filterSection,
+  .catalog-sheet.is-open .catalog-sheetHandle,
+  .catalog-sheetHead {
+    animation: none !important;
+  }
+
+  .catalog-sheetClose {
+    transition: none !important;
+  }
+}
+
+[data-motion="lite"] .catalog-sheet.is-open .catalog-filterSection,
+[data-motion="lite"] .catalog-sheet.is-open .catalog-sheetHandle,
+[data-motion="lite"] .catalog-sheetHead,
+[data-motion="off"] .catalog-sheet.is-open .catalog-filterSection,
+[data-motion="off"] .catalog-sheet.is-open .catalog-sheetHandle,
+[data-motion="off"] .catalog-sheetHead {
+  animation: none !important;
+  transition: none !important;
 }
 
 .catalog-commandSort option,
@@ -1457,6 +1652,11 @@
   .catalog-commandSort,
   .catalog-contentActions {
     display: none;
+  }
+
+  .catalog-filterShell {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .catalog-command {

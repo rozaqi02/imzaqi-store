@@ -2,13 +2,12 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  BadgeCheck,
   ChevronDown,
   MessageCircle,
-  ShoppingBag,
-  CreditCard,
-  Hash,
-  Activity,
   Sparkles,
+  Star,
+  Zap,
 } from "lucide-react";
 
 import Hero from "../components/Hero";
@@ -20,41 +19,6 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { useToast } from "../context/ToastContext";
 import { copyToClipboard } from "../utils/clipboard";
-
-const HOW_IT_WORKS = [
-  {
-    step: "01",
-    icon: ShoppingBag,
-    title: "Cari & pilih",
-    desc: "Scroll katalog, bandingin harga, masukin keranjang. Gampang.",
-    to: "/produk",
-    cta: "Gas ke katalog",
-  },
-  {
-    step: "02",
-    icon: CreditCard,
-    title: "Bayar QRIS",
-    desc: "Scan pakai e-wallet atau m-banking. Nominal udah otomatis.",
-    to: "/tentang",
-    cta: "Cara bayarnya",
-  },
-  {
-    step: "03",
-    icon: Hash,
-    title: "Simpan ID-nya",
-    desc: "Abis bayar, catat ID order kamu. Nanti buat cek progres.",
-    to: "/status",
-    cta: "Cek status",
-  },
-  {
-    step: "04",
-    icon: Activity,
-    title: "Pantau progress",
-    desc: "Buka halaman Status kapan aja — update real-time dari admin.",
-    to: "/status",
-    cta: "Lacak order",
-  },
-];
 
 const HOME_FAQ = [
   {
@@ -83,6 +47,55 @@ const HOME_FAQ = [
       "Gunakan tombol Hubungi Admin dari halaman bayar atau status.",
       "Sertakan ID order agar pengecekan bisa langsung diproses.",
     ],
+  },
+];
+
+const HOME_TESTIMONIALS = [
+  {
+    id: "t1",
+    name: "Rizky A.",
+    product: "Netflix Premium",
+    text: "Prosesnya cepet banget, ga sampe 5 menit udah aktif. Harganya juga jauh lebih murah dari langganan biasa.",
+    rating: 5,
+    timeAgo: "2 hari lalu",
+    verified: true,
+  },
+  {
+    id: "t2",
+    name: "Sari D.",
+    product: "Spotify Family",
+    text: "Udah langganan 3 bulan, ga pernah ada masalah. Admin responsif kalau ada pertanyaan. Recommended!",
+    rating: 5,
+    timeAgo: "5 hari lalu",
+    verified: true,
+  },
+  {
+    id: "t3",
+    name: "Fajar M.",
+    product: "Canva Pro",
+    text: "QRIS-nya praktis, langsung bisa dipake. Buat pelajar kayak aku ini solusi terbaik deh.",
+    rating: 5,
+    timeAgo: "1 minggu lalu",
+    verified: true,
+  },
+];
+
+// Langkah cara kerja — 3 step visual
+const HOW_IT_WORKS = [
+  {
+    step: "01",
+    title: "Pilih & Cek Harga",
+    desc: "Browse katalog, pilih produk dan varian yang kamu mau. Harga transparan, tidak ada biaya tersembunyi.",
+  },
+  {
+    step: "02",
+    title: "Bayar Lewat QRIS",
+    desc: "Scan QRIS dari aplikasi apapun. Konfirmasi pembayaran dan dapatkan ID order dalam hitungan detik.",
+  },
+  {
+    step: "03",
+    title: "Aktif & Pantau",
+    desc: "Akun aktif dalam menit. Gunakan ID order untuk pantau status kapan saja di halaman Status.",
   },
 ];
 
@@ -146,25 +159,36 @@ function HomeProductSkeleton() {
   );
 }
 
-function useDesktopGrid(minWidth = 721) {
-  const [isDesktopGrid, setIsDesktopGrid] = useState(() =>
-    typeof window !== "undefined" ? window.innerWidth >= minWidth : true
+function HomeTestimonialCard({ item }) {
+  return (
+    <article className="home-testiCard">
+      <div className="home-testiCard-header">
+        <div className="home-testiCard-avatar" aria-hidden="true">
+          {item.name.charAt(0)}
+        </div>
+        <div className="home-testiCard-meta">
+          <span className="home-testiCard-nameRow">
+            <span className="home-testiCard-name">{item.name}</span>
+            {item.verified ? (
+              <BadgeCheck size={14} className="home-testiCard-verified" aria-label="Terverifikasi" />
+            ) : null}
+          </span>
+          <span className="home-testiCard-product">{item.product}</span>
+        </div>
+        <div className="home-testiCard-right">
+          <div className="home-testiCard-stars" aria-label={`${item.rating} bintang`}>
+            {Array.from({ length: item.rating }).map((_, i) => (
+              <Star key={i} size={12} fill="currentColor" aria-hidden="true" />
+            ))}
+          </div>
+          {item.timeAgo ? (
+            <span className="home-testiCard-time">{item.timeAgo}</span>
+          ) : null}
+        </div>
+      </div>
+      <p className="home-testiCard-text">"{item.text}"</p>
+    </article>
   );
-
-  useEffect(() => {
-    if (typeof window === "undefined" || !window.matchMedia) return undefined;
-    const mq = window.matchMedia(`(min-width: ${minWidth}px)`);
-    const sync = () => setIsDesktopGrid(mq.matches);
-    sync();
-    if (typeof mq.addEventListener === "function") mq.addEventListener("change", sync);
-    else mq.addListener(sync);
-    return () => {
-      if (typeof mq.removeEventListener === "function") mq.removeEventListener("change", sync);
-      else mq.removeListener(sync);
-    };
-  }, [minWidth]);
-
-  return isDesktopGrid;
 }
 
 export default function Home() {
@@ -176,13 +200,12 @@ export default function Home() {
   const [error, setError] = useState("");
   const [openFaqId, setOpenFaqId] = useState(HOME_FAQ[0]?.id || null);
   const toast = useToast();
-  const isDesktopGrid = useDesktopGrid();
 
   useRevealOnScroll("home");
 
   usePageMeta({
     title: "Home",
-    description: "Langganan premium buat pelajar — cepat, ringkas, anti ribet.",
+    description: "Langganan premium buat pelajar \u2014 cepat, ringkas, anti ribet.",
   });
 
   useEffect(() => {
@@ -200,12 +223,11 @@ export default function Home() {
         setTopIds(ranking);
         setSettings(settingsData || {});
 
-        const allowedHomeCodes = settingsData?.home_promos?.codes || [];
-
+        const allowedCodes = settingsData?.home_promos?.codes || [];
         const activePromos = (promoData || [])
           .filter((p) => {
             if (!p.is_active) return false;
-            if (!allowedHomeCodes.includes(p.code)) return false;
+            if (!allowedCodes.includes(p.code)) return false;
             if (p.expired_at && new Date(p.expired_at) < new Date()) return false;
             if (p.max_uses != null && p.used_count >= p.max_uses) return false;
             return true;
@@ -219,44 +241,37 @@ export default function Home() {
         if (alive) setLoading(false);
       }
     })();
-
-    return () => {
-      alive = false;
-    };
+    return () => { alive = false; };
   }, []);
 
   const popularProducts = useMemo(() => {
     if (products.length === 0) return [];
-
     const sorted = [...products].sort((a, b) => {
-      const rankA = topIds.indexOf(a.id);
-      const rankB = topIds.indexOf(b.id);
-
-      if (rankA !== -1 && rankB === -1) return -1;
-      if (rankA === -1 && rankB !== -1) return 1;
-      if (rankA !== -1 && rankB !== -1) return rankA - rankB;
-
+      const ra = topIds.indexOf(a.id);
+      const rb = topIds.indexOf(b.id);
+      if (ra !== -1 && rb === -1) return -1;
+      if (ra === -1 && rb !== -1) return 1;
+      if (ra !== -1 && rb !== -1) return ra - rb;
       return a.sort_order - b.sort_order;
     });
-
     return sorted.slice(0, 4);
   }, [products, topIds]);
 
+  const totalActiveProducts = useMemo(
+    () => products.filter((p) => (p?.product_variants || []).some((v) => v?.is_active)).length,
+    [products]
+  );
+
   const waNumber = String(settings?.whatsapp?.number || "").trim();
   const waHref = waNumber ? `https://wa.me/${waNumber.replace(/\D/g, "")}` : null;
-  const productLayout = "list";
 
   const handleCopyPromo = (code) => {
     copyToClipboard(code).then(
       () => {
-        if (navigator.vibrate) {
-          navigator.vibrate(12);
-        }
+        if (navigator.vibrate) navigator.vibrate(12);
         toast.success("Kode udah ke-copy!", { title: code, duration: 2000 });
       },
-      () => {
-        toast.error("Gagal menyalin kupon.");
-      }
+      () => toast.error("Gagal menyalin kupon.")
     );
   };
 
@@ -266,7 +281,12 @@ export default function Home() {
       <HomeStickyBar />
 
       <div className="home-body">
-        <section className="home-section reveal" style={{ transitionDelay: "40ms" }} aria-label="Produk populer">
+        {/* ── Produk Populer ── */}
+        <section
+          className="home-section reveal"
+          style={{ transitionDelay: "40ms" }}
+          aria-label="Produk populer"
+        >
           <div className="container home-sectionInner">
             <HomeSectionHead
               kicker="Produk populer"
@@ -296,29 +316,36 @@ export default function Home() {
                 </div>
               ) : (
                 popularProducts.map((p, idx) => (
-                  <ProductTile key={p.id} product={p} rank={idx + 1} layout={productLayout} />
+                  <ProductTile key={p.id} product={p} rank={idx + 1} layout="list" />
                 ))
               )}
             </div>
 
             <div className="home-sectionCta">
-              <Link className="btn btn-ghost" to="/produk">
-                Lihat semua produk
+              <Link className="btn" to="/produk">
+                {!loading && totalActiveProducts > 4
+                  ? `Lihat ${totalActiveProducts - 4} produk lainnya`
+                  : "Lihat semua produk"}
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>
           </div>
         </section>
 
-        <section className="home-section reveal" style={{ transitionDelay: "80ms" }} aria-label="Kupon Promo">
-          <div className="container home-sectionInner">
-            <HomeSectionHead
-              kicker="Kupon aktif"
-              title={promos.length > 0 ? "Diskon siap dipakai" : "Belum ada kupon aktif"}
-              sub={promos.length > 0 ? "Tap kartu untuk menyalin kode promo." : "Pantau update promo lewat admin atau FAQ."}
-            />
+        {/* ── Kupon Promo — hanya tampil jika ada promo aktif ── */}
+        {!loading && promos.length > 0 ? (
+          <section
+            className="home-section reveal"
+            style={{ transitionDelay: "80ms" }}
+            aria-label="Kupon Promo"
+          >
+            <div className="container home-sectionInner">
+              <HomeSectionHead
+                kicker="Kupon aktif"
+                title="Diskon siap dipakai"
+                sub="Tap kartu untuk menyalin kode promo."
+              />
 
-            {promos.length > 0 ? (
               <div className="home-promoGrid">
                 {promos.map((promo) => (
                   <div
@@ -334,13 +361,11 @@ export default function Home() {
                       <span className="home-promoCard-percent">{promo.percent}%</span>
                       <span className="home-promoCard-off">OFF</span>
                     </div>
-
                     <div className="home-promoCard-divider">
                       <div className="home-promoCard-punch top" />
                       <div className="home-promoCard-line" />
                       <div className="home-promoCard-punch bottom" />
                     </div>
-
                     <div className="home-promoCard-body">
                       <span className="home-promoCard-code">{promo.code}</span>
                       <span className="home-promoCard-action">Tap buat copy</span>
@@ -348,67 +373,46 @@ export default function Home() {
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="home-promoEmpty">
-                <div className="home-promoEmpty-icon" aria-hidden="true">
-                  <Sparkles size={22} />
-                </div>
-                <div className="home-promoEmpty-copy">
-                  <strong>Promo baru bakal muncul di sini</strong>
-                  <p>Pantau update lewat WhatsApp admin atau cek halaman FAQ untuk info terbaru.</p>
-                </div>
-                <div className="home-promoEmpty-actions">
-                  {waHref ? (
-                    <a className="btn btn-ghost" href={waHref} target="_blank" rel="noreferrer">
-                      <MessageCircle size={16} aria-hidden="true" />
-                      Hubungi Admin
-                    </a>
-                  ) : null}
-                  <Link className="btn" to="/tentang">
-                    Lihat FAQ
-                    <ArrowRight size={16} aria-hidden="true" />
-                  </Link>
-                </div>
-              </div>
-            )}
-          </div>
-        </section>
+            </div>
+          </section>
+        ) : null}
 
-        <section className="home-section reveal" style={{ transitionDelay: "120ms" }} aria-label="Cara beli">
+        {/* ── Cara Kerja ── */}
+        <section
+          className="home-section home-howSection reveal"
+          style={{ transitionDelay: "140ms" }}
+          aria-label="Cara kerja"
+        >
           <div className="container home-sectionInner">
             <HomeSectionHead
-              kicker="Cara beli"
-              title="Empat langkah sampai order jalan"
-              sub="Dari pilih produk sampai lacak status — semua bisa kamu pantau sendiri."
+              kicker="Cara kerja"
+              title="3 langkah, selesai dalam menit"
+              sub="Dari pilih sampai aktif, prosesnya sesimpel ini."
             />
-
-            <div className="home-howGrid" role="list">
-              {HOW_IT_WORKS.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div key={item.step} className="home-howCard" role="listitem">
-                    <div className="home-howCard-step" aria-hidden="true">
-                      {item.step}
-                    </div>
-                    <div className="home-howCard-icon" aria-hidden="true">
-                      <Icon size={22} strokeWidth={2} />
-                    </div>
-                    <div className="home-howCard-content">
-                      <h3 className="home-howCard-title">{item.title}</h3>
-                      <p className="home-howCard-desc">{item.desc}</p>
-                      <Link className="home-howCard-link" to={item.to}>
-                        {item.cta}
-                        <ArrowRight size={13} />
-                      </Link>
-                    </div>
+            <div className="home-howGrid">
+              {HOW_IT_WORKS.map((step, i) => (
+                <div key={step.step} className="home-howCard" style={{ "--how-i": i }}>
+                  <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
+                  <div className="home-howCard-icon" aria-hidden="true">
+                    <Zap size={20} />
                   </div>
-                );
-              })}
+                  <h3 className="home-howCard-title">{step.title}</h3>
+                  <p className="home-howCard-desc">{step.desc}</p>
+                  {i < HOW_IT_WORKS.length - 1 ? (
+                    <div className="home-howCard-connector" aria-hidden="true" />
+                  ) : null}
+                </div>
+              ))}
             </div>
           </div>
         </section>
 
-        <section className="home-section home-faqSection reveal" style={{ transitionDelay: "160ms" }} aria-label="FAQ singkat">
+        {/* ── FAQ Singkat ── */}
+        <section
+          className="home-section home-faqSection reveal"
+          style={{ transitionDelay: "180ms" }}
+          aria-label="FAQ singkat"
+        >
           <div className="container home-sectionInner">
             <HomeSectionHead
               kicker="FAQ"
@@ -422,7 +426,7 @@ export default function Home() {
                   key={item.id}
                   item={item}
                   open={openFaqId === item.id}
-                  onToggle={(id) => setOpenFaqId((current) => (current === id ? null : id))}
+                  onToggle={(id) => setOpenFaqId((cur) => (cur === id ? null : id))}
                 />
               ))}
             </div>

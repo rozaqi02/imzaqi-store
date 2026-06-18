@@ -84,11 +84,15 @@ function ThemeToggleButton({ onToggle, isDark }) {
   );
 }
 
-function MenuLink({ item }) {
+function MenuLink({ item, index }) {
   const Icon = item.icon;
 
   return (
-    <NavLink to={item.to} className={({ isActive }) => (isActive ? "active" : "")}>
+    <NavLink
+      to={item.to}
+      className={({ isActive }) => (isActive ? "active" : "")}
+      style={{ "--menu-i": index }}
+    >
       <span className="menu-icon">
         <Icon size={18} strokeWidth={2.1} />
       </span>
@@ -195,16 +199,16 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
         </div>
 
         <div className="mobile-menu-stack">
-          {primaryItems.map((item) => (
-            <MenuLink key={item.to} item={item} />
+          {primaryItems.map((item, idx) => (
+            <MenuLink key={item.to} item={item} index={idx} />
           ))}
         </div>
 
         <div className="mobile-menu-divider" />
 
         <div className="mobile-menu-stack">
-          {utilityItems.map((item) => (
-            <MenuLink key={item.to} item={item} />
+          {utilityItems.map((item, idx) => (
+            <MenuLink key={item.to} item={item} index={primaryItems.length + 1 + idx} />
           ))}
         </div>
 

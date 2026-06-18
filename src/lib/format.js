@@ -87,6 +87,17 @@ export function calcRevenueForecast(dailyStats) {
   return { forecast7d: Math.round(forecast7d), trend };
 }
 
+// ── Catalog ──
+export function summarizeCatalogCopy(text) {
+  const firstLine = String(text || "")
+    .split(/\r?\n+/)
+    .map((line) => line.trim())
+    .find(Boolean);
+
+  if (!firstLine) return "Pilih paket lalu lanjut ke checkout.";
+  return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
+}
+
 // ── Promo ──
 export function mapPromoResult(rpcValue) {
   const v = Number(rpcValue);

@@ -21,66 +21,92 @@ const TRUST_PILLS = [
   { icon: TrendingUp, label: "Harga pelajar" },
 ];
 
+const SEARCH_QUERIES = ["Netflix Premium", "Spotify Family", "YouTube Premium", "Canva Pro", "ChatGPT", "Disney+ Hotstar"];
+
+function useTypewriter(words) {
+  const [text, setText] = useState("Ketik nama produk..");
+
+  useEffect(() => {
+    let wordIdx = 0;
+    let charIdx = 0;
+    let deleting = false;
+    let timer;
+
+    // Natural typing: random delay per karakter agar terasa lebih human
+    const naturalDelay = () => 55 + Math.random() * 65;
+
+    const tick = () => {
+      const word = words[wordIdx];
+      if (deleting) {
+        charIdx--;
+        setText(`Ketik "${word.slice(0, charIdx)}"`);
+        // Menghapus lebih cepat dari mengetik
+        timer = setTimeout(tick, charIdx === 0 ? 480 : 38);
+        if (charIdx === 0) {
+          deleting = false;
+          wordIdx = (wordIdx + 1) % words.length;
+        }
+      } else {
+        charIdx++;
+        setText(`Ketik "${word.slice(0, charIdx)}"`);
+        if (charIdx === word.length) {
+          deleting = true;
+          // Pause lebih lama setelah kata selesai
+          timer = setTimeout(tick, 1600 + Math.random() * 400);
+        } else {
+          // Random delay per karakter untuk natural feel
+          const delay = naturalDelay();
+          timer = setTimeout(tick, delay);
+        }
+      }
+    };
+
+    timer = setTimeout(tick, 1200);
+    return () => clearTimeout(timer);
+  }, [words]);
+
+  return text;
+}
+
 export default function Hero({ products = [] }) {
   const nav = useNavigate();
   const { last7DaysViews, totalOrders, todayOrders } = useLiveStats({ intervalMs: 60000 });
+  const wrapRef = useRef(null);
+  const listboxId = "hero-search-listbox";
+
+  const placeholderText = useTypewriter(SEARCH_QUERIES);
 
   const activeProductCount = useMemo(
     () =>
-      (products || []).filter((product) =>
-        (product?.product_variants || []).some((variant) => variant?.is_active)
+      (products || []).filter((p) =>
+        (p?.product_variants || []).some((v) => v?.is_active)
       ).length,
     [products]
   );
 
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
-  const [suggestions, setSuggestions] = useState([]);
-  const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
+  const [activeIdx, setActiveIdx] = useState(-1);
   const [prefersReduced, setPrefersReduced] = useState(false);
 
-  const wrapRef = useRef(null);
-  const listboxId = "hero-search-listbox";
-
-  // Typewriter placeholder state
-  const searchQueries = useMemo(() => ["Netflix Premium", "Spotify Family", "YouTube Premium", "Canva Pro", "ChatGPT", "Disney+ Hotstar"], []);
-  const [placeholderText, setPlaceholderText] = useState("Ketik nama produk..");
+  const suggestions = useMemo(() => {
+    if (!q.trim()) return [];
+    const s = q.trim().toLowerCase();
+    const words = [];
+    (products || []).forEach((p) => {
+      if (p?.name) words.push(p.name);
+      (p?.product_variants || []).forEach((v) => {
+        if (v?.name) words.push(`${p.name} \u2013 ${v.name}`);
+      });
+    });
+    return Array.from(new Set(words.filter(Boolean)))
+      .filter((x) => x.toLowerCase().includes(s))
+      .slice(0, 5);
+  }, [q, products]);
 
   useEffect(() => {
-    let currentWordIndex = 0;
-    let currentText = "";
-    let isDeleting = false;
-    let typingSpeed = 100;
-    let timer;
-
-    const handleType = () => {
-      const fullWord = searchQueries[currentWordIndex];
-      if (isDeleting) {
-        currentText = fullWord.substring(0, currentText.length - 1);
-        typingSpeed = 50;
-      } else {
-        currentText = fullWord.substring(0, currentText.length + 1);
-        typingSpeed = 100;
-      }
-
-      setPlaceholderText(`Ketik "${currentText}"`);
-
-      if (!isDeleting && currentText === fullWord) {
-        typingSpeed = 1800; // Pause at full word
-        isDeleting = true;
-      } else if (isDeleting && currentText === "") {
-        isDeleting = false;
-        currentWordIndex = (currentWordIndex + 1) % searchQueries.length;
-        typingSpeed = 500; // Pause before typing next word
-      }
-
-      timer = setTimeout(handleType, typingSpeed);
-    };
-
-    timer = setTimeout(handleType, 1000);
-    return () => clearTimeout(timer);
-  }, [searchQueries]);
-
+    if (activeIdx >= suggestions.length) setActiveIdx(-1);
+  }, [activeIdx, suggestions.length]);
 
   useEffect(() => {
     if (!window.matchMedia) return;
@@ -92,31 +118,10 @@ export default function Hero({ products = [] }) {
   }, []);
 
   useEffect(() => {
-    if (!q.trim()) {
-      setSuggestions([]);
-      return;
-    }
-    const s = q.trim().toLowerCase();
-    const words = [];
-    (products || []).forEach((p) => {
-      if (p?.name) words.push(p.name);
-      (p?.product_variants || []).forEach((v) => {
-        if (v?.name) words.push(`${p.name} – ${v.name}`);
-      });
-    });
-    const unique = Array.from(new Set(words.map((w) => String(w).trim()).filter(Boolean)));
-    setSuggestions(unique.filter((x) => x.toLowerCase().includes(s)).slice(0, 5));
-  }, [q, products]);
-
-  useEffect(() => {
-    if (activeSuggestionIndex >= suggestions.length) setActiveSuggestionIndex(-1);
-  }, [activeSuggestionIndex, suggestions.length]);
-
-  useEffect(() => {
     const onDoc = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
         setOpen(false);
-        setActiveSuggestionIndex(-1);
+        setActiveIdx(-1);
       }
     };
     document.addEventListener("mousedown", onDoc);
@@ -127,40 +132,42 @@ export default function Hero({ products = [] }) {
     const term = String(value || q || "").trim();
     if (!term) return;
     setOpen(false);
-    setActiveSuggestionIndex(-1);
+    setActiveIdx(-1);
     nav(`/produk?q=${encodeURIComponent(term)}`);
   }
 
-  const fade = (delay = 0) =>
-    prefersReduced
-      ? {}
-      : {
-        initial: { opacity: 0, y: 20 },
+  const fadeUp = prefersReduced
+    ? {}
+    : {
+        initial: { opacity: 0, y: 18 },
         animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] },
+        transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
       };
 
   return (
     <section className="hm-hero" aria-label="Marketplace Hero">
+      {/* Static gradient bg — no animation to avoid compositor thrash */}
       <div className="hm-hero-bg" aria-hidden="true">
-        <div className="hm-hero-orb hm-hero-orb--1" />
-        <div className="hm-hero-orb hm-hero-orb--2" />
-        <div className="hm-hero-orb hm-hero-orb--3" />
         <div className="hm-hero-grid" />
       </div>
 
       <div className="container hm-container">
-        <motion.div className="hm-stage-copy" {...fade(0)}>
+        <motion.div className="hm-stage-copy" {...fadeUp}>
+          {/* Headline */}
           <h1 className="hm-main-title">
             Akses <span className="hm-title-accent">Premium</span>.
             <br />
             Harga <span className="hm-title-glow">Pelajar</span>.
           </h1>
 
+          {/* Subtitle */}
           <p className="hm-subtitle">
-            Netflix, Spotify, Canva, dan lainnya — harga ramah dompet, bayar QRIS, langsung diproses.
+            {activeProductCount > 0
+              ? `${activeProductCount}+ produk digital premium — bayar QRIS, aktif dalam menit.`
+              : "Netflix, Spotify, Canva, dan lainnya — bayar QRIS, aktif dalam menit."}
           </p>
 
+          {/* Search */}
           <div className="hm-search-container" ref={wrapRef}>
             <div className="hero-search-shell hm-search-shell">
               <span className="hero-search-icon" aria-hidden="true">
@@ -176,33 +183,31 @@ export default function Hero({ products = [] }) {
                 aria-expanded={open && suggestions.length > 0}
                 aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
                 aria-activedescendant={
-                  activeSuggestionIndex >= 0
-                    ? `${listboxId}-option-${activeSuggestionIndex}`
-                    : undefined
+                  activeIdx >= 0 ? `${listboxId}-option-${activeIdx}` : undefined
                 }
                 onFocus={() => setOpen(true)}
                 onChange={(e) => {
                   setQ(e.target.value);
                   setOpen(true);
-                  setActiveSuggestionIndex(-1);
+                  setActiveIdx(-1);
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "ArrowDown" && suggestions.length > 0) {
                     e.preventDefault();
                     setOpen(true);
-                    setActiveSuggestionIndex((p) => (p >= suggestions.length - 1 ? 0 : p + 1));
+                    setActiveIdx((p) => (p >= suggestions.length - 1 ? 0 : p + 1));
                     return;
                   }
                   if (e.key === "ArrowUp" && suggestions.length > 0) {
                     e.preventDefault();
                     setOpen(true);
-                    setActiveSuggestionIndex((p) => (p <= 0 ? suggestions.length - 1 : p - 1));
+                    setActiveIdx((p) => (p <= 0 ? suggestions.length - 1 : p - 1));
                     return;
                   }
                   if (e.key === "Enter") {
-                    if (open && activeSuggestionIndex >= 0 && suggestions[activeSuggestionIndex]) {
+                    if (open && activeIdx >= 0 && suggestions[activeIdx]) {
                       e.preventDefault();
-                      goSearch(suggestions[activeSuggestionIndex]);
+                      goSearch(suggestions[activeIdx]);
                       return;
                     }
                     e.preventDefault();
@@ -210,7 +215,7 @@ export default function Hero({ products = [] }) {
                   }
                   if (e.key === "Escape") {
                     setOpen(false);
-                    setActiveSuggestionIndex(-1);
+                    setActiveIdx(-1);
                   }
                 }}
               />
@@ -221,18 +226,24 @@ export default function Hero({ products = [] }) {
                   onClick={() => {
                     setQ("");
                     setOpen(false);
-                    setActiveSuggestionIndex(-1);
+                    setActiveIdx(-1);
                   }}
                   aria-label="Hapus pencarian"
                 >
-                  ×
+                  \u00d7
                 </button>
               ) : null}
-              <button className="btn hero-search-btn hm-search-submit" onClick={() => goSearch()} type="button" aria-label="Cari">
+              <button
+                className="btn hero-search-btn hm-search-submit"
+                onClick={() => goSearch()}
+                type="button"
+                aria-label="Cari"
+              >
                 <span className="hm-search-submit-text">Cari</span>
                 <ArrowRight size={16} />
               </button>
             </div>
+
             {open && suggestions.length > 0 ? (
               <div
                 className="suggestions suggestions-minimal suggestions--animate"
@@ -243,13 +254,13 @@ export default function Hero({ products = [] }) {
                   <button
                     key={sug}
                     id={`${listboxId}-option-${idx}`}
-                    className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
+                    className={`suggestion-item${idx === activeIdx ? " is-active" : ""}`}
                     style={{ "--suggest-i": idx }}
                     onClick={() => goSearch(sug)}
-                    onMouseEnter={() => setActiveSuggestionIndex(idx)}
+                    onMouseEnter={() => setActiveIdx(idx)}
                     type="button"
                     role="option"
-                    aria-selected={idx === activeSuggestionIndex}
+                    aria-selected={idx === activeIdx}
                   >
                     <Search size={13} />
                     <span>{sug}</span>
@@ -259,6 +270,7 @@ export default function Hero({ products = [] }) {
             ) : null}
           </div>
 
+          {/* CTA row */}
           <div className="hm-action-row">
             <div className="hm-cta-row">
               <Link className="btn" to="/produk">
@@ -283,43 +295,30 @@ export default function Hero({ products = [] }) {
             </div>
           </div>
 
+          {/* Stats — dengan stagger animation per chip */}
           <div className="hm-stats-grid" role="list" aria-label="Statistik toko">
-            <div className="hm-stat-chip" role="listitem">
-              <span className="hm-stat-chip-icon" aria-hidden="true">
-                <ShoppingBag size={14} />
-              </span>
-              <span className="hm-stat-chip-value">
-                <NumberCounter value={totalOrders || 0} />
-              </span>
-              <span className="hm-stat-chip-label">Pesanan</span>
-            </div>
-            <div className="hm-stat-chip hm-stat-chip--today" role="listitem">
-              <span className="hm-stat-chip-icon hm-stat-chip-icon--today" aria-hidden="true">
-                <Flame size={14} />
-              </span>
-              <span className="hm-stat-chip-value">
-                <NumberCounter value={todayOrders || 0} />
-              </span>
-              <span className="hm-stat-chip-label">Hari ini</span>
-            </div>
-            <div className="hm-stat-chip" role="listitem">
-              <span className="hm-stat-chip-icon" aria-hidden="true">
-                <Package size={14} />
-              </span>
-              <span className="hm-stat-chip-value">
-                <NumberCounter value={activeProductCount} />
-              </span>
-              <span className="hm-stat-chip-label">Produk</span>
-            </div>
-            <div className="hm-stat-chip" role="listitem">
-              <span className="hm-stat-chip-icon" aria-hidden="true">
-                <Eye size={14} />
-              </span>
-              <span className="hm-stat-chip-value">
-                <NumberCounter value={last7DaysViews || 0} />
-              </span>
-              <span className="hm-stat-chip-label">7 hari</span>
-            </div>
+            {[
+              { icon: ShoppingBag, value: totalOrders || 0, label: "Pesanan", ctx: "sejak 2024", extra: "" },
+              { icon: Flame, value: todayOrders || 0, label: "Hari ini", ctx: "order masuk", extra: "hm-stat-chip--today", iconExtra: "hm-stat-chip-icon--today" },
+              { icon: Package, value: activeProductCount, label: "Produk", ctx: "aktif tersedia", extra: "" },
+              { icon: Eye, value: last7DaysViews || 0, label: "7 hari", ctx: "kunjungan", extra: "" },
+            ].map((stat, i) => (
+              <div
+                key={stat.label}
+                className={`hm-stat-chip${stat.extra ? ` ${stat.extra}` : ""}`}
+                role="listitem"
+                style={{ "--chip-i": i }}
+              >
+                <span className={`hm-stat-chip-icon${stat.iconExtra ? ` ${stat.iconExtra}` : ""}`} aria-hidden="true">
+                  <stat.icon size={14} />
+                </span>
+                <span className="hm-stat-chip-value">
+                  <NumberCounter value={stat.value} />
+                </span>
+                <span className="hm-stat-chip-label">{stat.label}</span>
+                <span className="hm-stat-chip-ctx">{stat.ctx}</span>
+              </div>
+            ))}
           </div>
         </motion.div>
       </div>

@@ -2,17 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
-import { formatIDR, classifyStock } from "../lib/format";
-
-function summarizeCatalogCopy(text) {
-  const firstLine = String(text || "")
-    .split(/\r?\n+/)
-    .map((line) => line.trim())
-    .find(Boolean);
-
-  if (!firstLine) return "Pilih paket lalu lanjut ke checkout.";
-  return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
-}
+import { formatIDR, classifyStock, summarizeCatalogCopy } from "../lib/format";
 
 export default function ProductTile({ product, rank, layout = "list" }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
