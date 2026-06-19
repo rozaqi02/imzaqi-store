@@ -663,8 +663,8 @@ body,
     -8px -8px 18px rgba(255, 255, 255, 0.05),
     inset 0 1px 0 rgba(255, 255, 255, 0.24),
     inset 0 -2px 0 rgba(0, 0, 0, 0.34) !important;
-  backdrop-filter: blur(14px) saturate(125%);
-  -webkit-backdrop-filter: blur(14px) saturate(125%);
+  backdrop-filter: blur(14px) saturate(125%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(125%) !important;
 }
 
 :root[data-theme="light"] .header,
@@ -680,8 +680,8 @@ body,
     -8px -8px 18px rgba(255, 255, 255, 0.94),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
-  backdrop-filter: blur(12px) saturate(118%);
-  -webkit-backdrop-filter: blur(12px) saturate(118%);
+  backdrop-filter: blur(12px) saturate(118%) !important;
+  -webkit-backdrop-filter: blur(12px) saturate(118%) !important;
 }
 
 .header::after,

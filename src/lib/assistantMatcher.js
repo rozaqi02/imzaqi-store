@@ -481,11 +481,12 @@ async function callLLM(query, history, context, intent) {
   try {
     const ctrl = new AbortController();
     const timer = window.setTimeout(() => ctrl.abort(), 15000);
-    const res = await fetch(endpoint, {
+    // Google Generative Language API uses ?key= query param, not Bearer token
+    const url = key ? `${endpoint}?key=${key}` : endpoint;
+    const res = await fetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(key ? { Authorization: `Bearer ${key}` } : {}),
       },
       body: JSON.stringify({ model, messages }),
       signal: ctrl.signal,

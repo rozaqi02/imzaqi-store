@@ -3268,3 +3268,297 @@ body.home-stickyBar-active .home-page {
 .home-faqItem.faq-item {
   margin: 0;
 }
+
+/* ═══════════════════════════════════════════════════════════════════════
+   PREMIUM HERO REVAMP — Luxurious glow + orbit showcase
+   ═══════════════════════════════════════════════════════════════════════ */
+
+/* ── Premium layered glow background ── */
+.hm-hero-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  will-change: transform;
+  transform: translateZ(0);
+}
+
+.hm-hero-glow--1 {
+  width: clamp(320px, 44vw, 580px);
+  height: clamp(320px, 44vw, 580px);
+  top: -18%;
+  left: -10%;
+  background: radial-gradient(circle, rgba(29, 131, 255, 0.28) 0%, rgba(29, 131, 255, 0) 68%);
+  filter: blur(80px);
+  opacity: 0.7;
+  animation: hm-glowPulse 8s ease-in-out infinite alternate;
+}
+
+.hm-hero-glow--2 {
+  width: clamp(240px, 32vw, 420px);
+  height: clamp(240px, 32vw, 420px);
+  top: 5%;
+  right: -6%;
+  background: radial-gradient(circle, rgba(0, 214, 180, 0.24) 0%, rgba(0, 214, 180, 0) 68%);
+  filter: blur(70px);
+  opacity: 0.6;
+  animation: hm-glowPulse 10s ease-in-out 2s infinite alternate;
+}
+
+.hm-hero-glow--3 {
+  width: clamp(180px, 22vw, 300px);
+  height: clamp(180px, 22vw, 300px);
+  bottom: -5%;
+  left: 30%;
+  background: radial-gradient(circle, rgba(123, 100, 255, 0.18) 0%, rgba(123, 100, 255, 0) 68%);
+  filter: blur(60px);
+  opacity: 0.5;
+  animation: hm-glowPulse 12s ease-in-out 4s infinite alternate;
+}
+
+@keyframes hm-glowPulse {
+  0% { opacity: 0.4; transform: translateZ(0) scale(0.92); }
+  100% { opacity: 0.75; transform: translateZ(0) scale(1.08); }
+}
+
+:root[data-theme="light"] .hm-hero-glow--1 {
+  background: radial-gradient(circle, rgba(0, 194, 208, 0.16) 0%, rgba(0, 194, 208, 0) 68%);
+}
+
+:root[data-theme="light"] .hm-hero-glow--2 {
+  background: radial-gradient(circle, rgba(0, 138, 148, 0.12) 0%, rgba(0, 138, 148, 0) 68%);
+}
+
+:root[data-theme="light"] .hm-hero-glow--3 {
+  background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, rgba(99, 102, 241, 0) 68%);
+}
+
+/* ── Title shimmer effect ── */
+.hm-title-line {
+  margin-right: 0.22em;
+}
+
+.hm-title-accent,
+.hm-title-glow {
+  position: relative;
+}
+
+.hm-title-accent::after,
+.hm-title-glow::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.25) 44%,
+    rgba(255, 255, 255, 0.35) 50%,
+    transparent 56%
+  );
+  background-size: 250% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  animation: hm-shimmer 4s ease-in-out infinite;
+  pointer-events: none;
+}
+
+@keyframes hm-shimmer {
+  0%, 100% { background-position: 200% center; }
+  50% { background-position: -50% center; }
+}
+
+/* ── Primary CTA button with gradient ── */
+.hm-btn-primary {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #00d6b4, #008a94) !important;
+  border-color: rgba(0, 214, 180, 0.4) !important;
+  color: #fff !important;
+  box-shadow:
+    0 8px 24px rgba(0, 214, 180, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2) !important;
+  transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+}
+
+.hm-btn-primary:hover {
+  transform: translateY(-2px) !important;
+  box-shadow:
+    0 14px 36px rgba(0, 214, 180, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.hm-btn-primary::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.2) 50%,
+    transparent 70%
+  );
+  background-size: 300% 100%;
+  animation: hm-btnShine 3.5s ease-in-out infinite;
+}
+
+@keyframes hm-btnShine {
+  0%, 100% { background-position: 200% center; }
+  50% { background-position: -100% center; }
+}
+
+:root[data-theme="light"] .hm-btn-primary {
+  background: linear-gradient(135deg, #00b89c, #007a85) !important;
+  box-shadow:
+    0 8px 20px rgba(0, 138, 148, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+}
+
+/* ── Orbit showcase — desktop floating brand icons ── */
+.hm-orbit {
+  display: none;
+}
+
+@media (min-width: 961px) {
+  .hm-container {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+
+  .hm-orbit {
+    display: block;
+    position: relative;
+    width: clamp(280px, 22vw, 360px);
+    height: clamp(280px, 22vw, 360px);
+    flex-shrink: 0;
+  }
+
+  .hm-orbit-ring {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 1px solid rgba(78, 255, 218, 0.12);
+    animation: hm-orbit-spin 30s linear infinite;
+  }
+
+  .hm-orbit-ring--2 {
+    inset: 18%;
+    border-color: rgba(29, 131, 255, 0.1);
+    animation-duration: 22s;
+    animation-direction: reverse;
+  }
+
+  .hm-orbit-item {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 48px;
+    height: 48px;
+    margin: -24px 0 0 -24px;
+    border-radius: 16px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid color-mix(in srgb, var(--brand-color) 34%, rgba(255, 255, 255, 0.1));
+    box-shadow:
+      0 8px 24px color-mix(in srgb, var(--brand-color) 20%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    transform:
+      rotate(calc(360deg / var(--orbit-total) * var(--orbit-i)))
+      translateX(clamp(110px, 9.5vw, 145px))
+      rotate(calc(-360deg / var(--orbit-total) * var(--orbit-i)));
+    animation: hm-orbit-float 6s ease-in-out infinite;
+    animation-delay: calc(var(--orbit-i) * -1s);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .hm-orbit-item:hover {
+    box-shadow:
+      0 12px 32px color-mix(in srgb, var(--brand-color) 35%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12);
+    transform:
+      rotate(calc(360deg / var(--orbit-total) * var(--orbit-i)))
+      translateX(clamp(110px, 9.5vw, 145px))
+      rotate(calc(-360deg / var(--orbit-total) * var(--orbit-i)))
+      scale(1.15);
+  }
+
+  .hm-orbit-letter {
+    font-size: 18px;
+    font-weight: 1000;
+    color: var(--brand-color);
+    text-shadow: 0 0 12px color-mix(in srgb, var(--brand-color) 40%, transparent);
+  }
+
+  .hm-orbit-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    background:
+      linear-gradient(135deg, rgba(0, 214, 180, 0.12), rgba(29, 131, 255, 0.12)),
+      rgba(8, 12, 28, 0.8);
+    border: 1px solid rgba(78, 255, 218, 0.22);
+    box-shadow:
+      0 0 40px rgba(0, 214, 180, 0.15),
+      0 0 80px rgba(0, 214, 180, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    color: #4effda;
+    animation: hm-centerPulse 3s ease-in-out infinite;
+  }
+
+  @keyframes hm-centerPulse {
+    0%, 100% { box-shadow: 0 0 40px rgba(0, 214, 180, 0.15), 0 0 80px rgba(0, 214, 180, 0.05), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+    50% { box-shadow: 0 0 60px rgba(0, 214, 180, 0.25), 0 0 100px rgba(0, 214, 180, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1); }
+  }
+
+  @keyframes hm-orbit-float {
+    0%, 100% { translate: 0 0; }
+    50% { translate: 0 -6px; }
+  }
+
+  :root[data-theme="light"] .hm-orbit-ring {
+    border-color: rgba(0, 138, 148, 0.12);
+  }
+
+  :root[data-theme="light"] .hm-orbit-ring--2 {
+    border-color: rgba(0, 138, 148, 0.08);
+  }
+
+  :root[data-theme="light"] .hm-orbit-item {
+    background: rgba(255, 255, 255, 0.7);
+    border-color: color-mix(in srgb, var(--brand-color) 22%, rgba(0, 138, 148, 0.12));
+    box-shadow:
+      0 8px 20px color-mix(in srgb, var(--brand-color) 12%, transparent),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  :root[data-theme="light"] .hm-orbit-center {
+    background:
+      linear-gradient(135deg, rgba(0, 214, 180, 0.08), rgba(0, 138, 148, 0.06)),
+      rgba(255, 255, 255, 0.9);
+    border-color: rgba(0, 138, 148, 0.18);
+    color: #008a94;
+    box-shadow:
+      0 0 30px rgba(0, 138, 148, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+}
+
+/* ── Disable orbit animations on reduced motion + mobile ── */
+@media (prefers-reduced-motion: reduce) {
+  .hm-hero-glow { animation: none !important; opacity: 0.4; }
+  .hm-orbit-item { animation: none !important; }
+  .hm-orbit-ring { animation: none !important; }
+  .hm-orbit-center { animation: none !important; }
+  .hm-title-accent::after, .hm-title-glow::after { animation: none !important; }
+  .hm-btn-primary::before { animation: none !important; }
+}
+
+@media (max-width: 720px) {
+  .hm-hero-glow { animation: none !important; }
+  .hm-hero-glow--3 { display: none; }
+}

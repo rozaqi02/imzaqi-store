@@ -3,12 +3,14 @@ import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
+  Crown,
   Eye,
   Flame,
   Package,
   Search,
   ShieldCheck,
   ShoppingBag,
+  Sparkles,
   TrendingUp,
   Zap,
 } from "lucide-react";
@@ -21,7 +23,17 @@ const TRUST_PILLS = [
   { icon: TrendingUp, label: "Harga pelajar" },
 ];
 
-const SEARCH_QUERIES = ["Netflix Premium", "Spotify Family", "YouTube Premium", "Canva Pro", "ChatGPT", "Disney+ Hotstar"];
+const SEARCH_QUERIES = ["Netflix Premium", "Spotify Family", "YouTube Premium", "Canva Pro", "ChatGPT Plus", "Disney+ Hotstar"];
+
+/* ── Floating brand icons for the orbit showcase ── */
+const ORBIT_BRANDS = [
+  { name: "Netflix", color: "#E50914", letter: "N" },
+  { name: "Spotify", color: "#1DB954", letter: "S" },
+  { name: "YouTube", color: "#FF0000", letter: "Y" },
+  { name: "Canva", color: "#00C4CC", letter: "C" },
+  { name: "ChatGPT", color: "#10A37F", letter: "G" },
+  { name: "Disney+", color: "#113CCF", letter: "D" },
+];
 
 function useTypewriter(words) {
   const [text, setText] = useState("Ketik nama produk..");
@@ -32,7 +44,6 @@ function useTypewriter(words) {
     let deleting = false;
     let timer;
 
-    // Natural typing: random delay per karakter agar terasa lebih human
     const naturalDelay = () => 55 + Math.random() * 65;
 
     const tick = () => {
@@ -40,7 +51,6 @@ function useTypewriter(words) {
       if (deleting) {
         charIdx--;
         setText(`Ketik "${word.slice(0, charIdx)}"`);
-        // Menghapus lebih cepat dari mengetik
         timer = setTimeout(tick, charIdx === 0 ? 480 : 38);
         if (charIdx === 0) {
           deleting = false;
@@ -51,12 +61,9 @@ function useTypewriter(words) {
         setText(`Ketik "${word.slice(0, charIdx)}"`);
         if (charIdx === word.length) {
           deleting = true;
-          // Pause lebih lama setelah kata selesai
           timer = setTimeout(tick, 1600 + Math.random() * 400);
         } else {
-          // Random delay per karakter untuk natural feel
-          const delay = naturalDelay();
-          timer = setTimeout(tick, delay);
+          timer = setTimeout(tick, naturalDelay());
         }
       }
     };
@@ -222,6 +229,32 @@ function HeroSearch({ products = [] }) {
   );
 }
 
+/* ── Floating orbit brand icons (desktop only) ── */
+function OrbitShowcase() {
+  return (
+    <div className="hm-orbit" aria-hidden="true">
+      <div className="hm-orbit-ring" />
+      <div className="hm-orbit-ring hm-orbit-ring--2" />
+      {ORBIT_BRANDS.map((brand, i) => (
+        <div
+          key={brand.name}
+          className="hm-orbit-item"
+          style={{
+            "--orbit-i": i,
+            "--orbit-total": ORBIT_BRANDS.length,
+            "--brand-color": brand.color,
+          }}
+        >
+          <span className="hm-orbit-letter">{brand.letter}</span>
+        </div>
+      ))}
+      <div className="hm-orbit-center">
+        <Crown size={24} />
+      </div>
+    </div>
+  );
+}
+
 export default function Hero({ products = [] }) {
   const { last7DaysViews, totalOrders, todayOrders } = useLiveStats({ intervalMs: 60000 });
   const [prefersReduced, setPrefersReduced] = useState(false);
@@ -246,41 +279,53 @@ export default function Hero({ products = [] }) {
   const fadeUp = prefersReduced
     ? {}
     : {
-        initial: { opacity: 0, y: 18 },
+        initial: { opacity: 0, y: 22 },
         animate: { opacity: 1, y: 0 },
-        transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] },
+        transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
       };
 
   return (
     <section className="hm-hero" aria-label="Marketplace Hero">
-      {/* Static gradient bg — no animation to avoid compositor thrash */}
+      {/* Layered premium background */}
       <div className="hm-hero-bg" aria-hidden="true">
+        <div className="hm-hero-glow hm-hero-glow--1" />
+        <div className="hm-hero-glow hm-hero-glow--2" />
+        <div className="hm-hero-glow hm-hero-glow--3" />
         <div className="hm-hero-grid" />
       </div>
 
       <div className="container hm-container">
         <motion.div className="hm-stage-copy" {...fadeUp}>
-          {/* Headline */}
+          {/* Premium badge kicker */}
+          <div className="hm-kicker">
+            <Sparkles size={12} aria-hidden="true" />
+            <span>Premium Digital Store</span>
+          </div>
+
+          {/* Headline with shimmer accent */}
           <h1 className="hm-main-title">
-            Akses <span className="hm-title-accent">Premium</span>.
+            <span className="hm-title-line">Akses</span>
+            <span className="hm-title-accent">Premium</span>
             <br />
-            Harga <span className="hm-title-glow">Pelajar</span>.
+            <span className="hm-title-line">Harga</span>
+            <span className="hm-title-glow">Pelajar</span>
           </h1>
 
           {/* Subtitle */}
           <p className="hm-subtitle">
             {activeProductCount > 0
-              ? `${activeProductCount}+ produk digital premium — bayar QRIS, aktif dalam menit.`
-              : "Netflix, Spotify, Canva, dan lainnya — bayar QRIS, aktif dalam menit."}
+              ? `${activeProductCount}+ produk digital premium — bayar QRIS, aktif dalam hitungan menit.`
+              : "Netflix, Spotify, Canva, dan lainnya — bayar QRIS, aktif dalam hitungan menit."}
           </p>
 
-          {/* Isolated Search Component */}
+          {/* Search */}
           <HeroSearch products={products} />
 
-          {/* CTA row */}
+          {/* CTA + Trust row */}
           <div className="hm-action-row">
             <div className="hm-cta-row">
-              <Link className="btn" to="/produk">
+              <Link className="btn hm-btn-primary" to="/produk">
+                <ShoppingBag size={16} aria-hidden="true" />
                 Lihat Katalog
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
@@ -302,7 +347,7 @@ export default function Hero({ products = [] }) {
             </div>
           </div>
 
-          {/* Stats — dengan stagger animation per chip */}
+          {/* Stats grid */}
           <div className="hm-stats-grid" role="list" aria-label="Statistik toko">
             {[
               { icon: ShoppingBag, value: totalOrders || 0, label: "Pesanan", ctx: "sejak 2024", extra: "" },
@@ -328,6 +373,9 @@ export default function Hero({ products = [] }) {
             ))}
           </div>
         </motion.div>
+
+        {/* Desktop orbit showcase */}
+        <OrbitShowcase />
       </div>
     </section>
   );
