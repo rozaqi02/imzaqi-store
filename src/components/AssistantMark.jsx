@@ -1,15 +1,11 @@
 import React from "react";
 
 /**
- * Imzaqi AI mark v3 — glass neural orb, tuned for pale cyan hero background.
+ * Imzaqi AI mark v5 — clean, solid, and modern AI Spark (4-pointed star) icon.
  */
 export default function AssistantMark({ size = 24, className = "", variant = "default" }) {
   const gradId = React.useId().replace(/:/g, "");
   const glowId = `aiGlow-${gradId}`;
-  const coreId = `aiCore-${gradId}`;
-
-  const coreOpacity = variant === "fab" ? 0.98 : 0.9;
-  const ringOpacity = variant === "avatar" ? 0.42 : 0.55;
 
   return (
     <svg
@@ -19,63 +15,24 @@ export default function AssistantMark({ size = 24, className = "", variant = "de
       className={className}
       aria-hidden="true"
       focusable="false"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
-        <radialGradient id={glowId} cx="50%" cy="42%" r="58%">
-          <stop offset="0%" stopColor="#e8fffb" stopOpacity="0.95" />
-          <stop offset="45%" stopColor="#7bfff0" stopOpacity="0.72" />
-          <stop offset="100%" stopColor="#008a94" stopOpacity="0.18" />
-        </radialGradient>
-        <linearGradient id={coreId} x1="20%" y1="10%" x2="85%" y2="90%">
-          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.96" />
-          <stop offset="42%" stopColor="#b8fff2" stopOpacity="0.88" />
-          <stop offset="100%" stopColor="#00d6b4" stopOpacity="0.82" />
+        <linearGradient id={glowId} x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#7efff0" />
+          <stop offset="50%" stopColor="#00d6b4" />
+          <stop offset="100%" stopColor="#008a94" />
         </linearGradient>
       </defs>
 
-      <circle cx="12" cy="12" r="10" fill={`url(#${glowId})`} opacity="0.88" />
-      <circle
-        cx="12"
-        cy="12"
-        r="8.6"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="1.1"
-        opacity={ringOpacity * 0.65}
-      />
-      <ellipse
-        cx="12"
-        cy="12"
-        rx="8.4"
-        ry="3.1"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.95"
-        opacity={ringOpacity}
-        transform="rotate(-24 12 12)"
-      />
-      <ellipse
-        cx="12"
-        cy="12"
-        rx="8.4"
-        ry="3.1"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="0.85"
-        opacity={ringOpacity * 0.75}
-        transform="rotate(52 12 12)"
-      />
-      <circle cx="12" cy="12" r="3.15" fill={`url(#${coreId})`} opacity={coreOpacity} />
-      <circle cx="12" cy="12" r="1.35" fill="currentColor" opacity="0.28" />
-      <circle cx="18.1" cy="7.4" r="1.05" fill="currentColor" opacity="0.72" />
-      <circle cx="5.6" cy="15.8" r="0.9" fill="currentColor" opacity="0.58" />
-      <circle cx="16.4" cy="17.1" r="0.72" fill="currentColor" opacity="0.46" />
+      {/* Modern Glowing Background circle */}
+      <circle cx="12" cy="12" r="11" fill={`url(#${glowId})`} />
+
+      {/* Elegant, clean 4-pointed AI Spark */}
       <path
-        d="M12 8.1v2.2M10.2 10.9h3.6"
-        stroke="#ffffff"
-        strokeWidth="1.15"
-        strokeLinecap="round"
-        opacity="0.82"
+        d="M12 5C12 8.87 8.87 12 5 12C8.87 12 12 15.13 12 19C12 15.13 15.13 12 19 12C15.13 12 12 8.87 12 5Z"
+        fill="#ffffff"
       />
     </svg>
   );

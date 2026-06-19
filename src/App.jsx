@@ -15,10 +15,10 @@ import { ChevronUp } from "lucide-react";
 import Home from "./pages/Home";
 import Products from "./pages/Products";
 import ProductDetail from "./pages/ProductDetail";
-import Status from "./pages/Status";
-import NotFound from "./pages/NotFound";
 
 // ── Lazy-loaded pages (non-critical, reduces initial bundle) ──
+const Status = React.lazy(() => import("./pages/Status"));
+const NotFound = React.lazy(() => import("./pages/NotFound"));
 const About = React.lazy(() => import("./pages/About"));
 const Testimonials = React.lazy(() => import("./pages/Testimonials"));
 const Checkout = React.lazy(() => import("./pages/Checkout"));

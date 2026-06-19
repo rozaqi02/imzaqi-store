@@ -96,12 +96,17 @@ function CountdownDisplay({ endTime, startTime }) {
   );
 }
 
+let cachedFlashSales = null;
+let cachedFlashProducts = null;
+
 export default function FlashSaleBanner() {
-  const [flashSales, setFlashSales] = useState([]);
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [flashSales, setFlashSales] = useState(cachedFlashSales || []);
+  const [products, setProducts] = useState(cachedFlashProducts || []);
+  const [loading, setLoading] = useState(!cachedFlashSales || !cachedFlashProducts);
 
   useEffect(() => {
+    if (cachedFlashSales && cachedFlashProducts) return;
+
     let alive = true;
     (async () => {
       try {
@@ -110,6 +115,8 @@ export default function FlashSaleBanner() {
           fetchProducts({ useCache: true }),
         ]);
         if (!alive) return;
+        cachedFlashSales = sales;
+        cachedFlashProducts = prods;
         setFlashSales(sales);
         setProducts(prods);
       } catch (e) {

@@ -68,26 +68,16 @@ function useTypewriter(words) {
   return text;
 }
 
-export default function Hero({ products = [] }) {
+function HeroSearch({ products = [] }) {
   const nav = useNavigate();
-  const { last7DaysViews, totalOrders, todayOrders } = useLiveStats({ intervalMs: 60000 });
   const wrapRef = useRef(null);
   const listboxId = "hero-search-listbox";
 
   const placeholderText = useTypewriter(SEARCH_QUERIES);
 
-  const activeProductCount = useMemo(
-    () =>
-      (products || []).filter((p) =>
-        (p?.product_variants || []).some((v) => v?.is_active)
-      ).length,
-    [products]
-  );
-
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
-  const [prefersReduced, setPrefersReduced] = useState(false);
 
   const suggestions = useMemo(() => {
     if (!q.trim()) return [];
@@ -109,15 +99,6 @@ export default function Hero({ products = [] }) {
   }, [activeIdx, suggestions.length]);
 
   useEffect(() => {
-    if (!window.matchMedia) return;
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setPrefersReduced(mq.matches);
-    const h = () => setPrefersReduced(mq.matches);
-    mq.addEventListener("change", h);
-    return () => mq.removeEventListener("change", h);
-  }, []);
-
-  useEffect(() => {
     const onDoc = (e) => {
       if (wrapRef.current && !wrapRef.current.contains(e.target)) {
         setOpen(false);
@@ -135,6 +116,132 @@ export default function Hero({ products = [] }) {
     setActiveIdx(-1);
     nav(`/produk?q=${encodeURIComponent(term)}`);
   }
+
+  return (
+    <div className="hm-search-container" ref={wrapRef}>
+      <div className="hero-search-shell hm-search-shell">
+        <span className="hero-search-icon" aria-hidden="true">
+          <Search size={18} />
+        </span>
+        <input
+          className="input hero-search-input"
+          placeholder={placeholderText}
+          value={q}
+          aria-label="Cari produk"
+          role="combobox"
+          aria-autocomplete="list"
+          aria-expanded={open && suggestions.length > 0}
+          aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
+          aria-activedescendant={
+            activeIdx >= 0 ? `${listboxId}-option-${activeIdx}` : undefined
+          }
+          onFocus={() => setOpen(true)}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setOpen(true);
+            setActiveIdx(-1);
+          }}
+          onKeyDown={(e) => {
+            if (e.key === "ArrowDown" && suggestions.length > 0) {
+              e.preventDefault();
+              setOpen(true);
+              setActiveIdx((p) => (p >= suggestions.length - 1 ? 0 : p + 1));
+              return;
+            }
+            if (e.key === "ArrowUp" && suggestions.length > 0) {
+              e.preventDefault();
+              setOpen(true);
+              setActiveIdx((p) => (p <= 0 ? suggestions.length - 1 : p - 1));
+              return;
+            }
+            if (e.key === "Enter") {
+              if (open && activeIdx >= 0 && suggestions[activeIdx]) {
+                e.preventDefault();
+                goSearch(suggestions[activeIdx]);
+                return;
+              }
+              e.preventDefault();
+              goSearch();
+            }
+            if (e.key === "Escape") {
+              setOpen(false);
+              setActiveIdx(-1);
+            }
+          }}
+        />
+        {q ? (
+          <button
+            type="button"
+            className="hero-search-clear"
+            onClick={() => {
+              setQ("");
+              setOpen(false);
+              setActiveIdx(-1);
+            }}
+            aria-label="Hapus pencarian"
+          >
+            ×
+          </button>
+        ) : null}
+        <button
+          className="btn hero-search-btn hm-search-submit"
+          onClick={() => goSearch()}
+          type="button"
+          aria-label="Cari"
+        >
+          <span className="hm-search-submit-text">Cari</span>
+          <ArrowRight size={16} />
+        </button>
+      </div>
+
+      {open && suggestions.length > 0 ? (
+        <div
+          className="suggestions suggestions-minimal suggestions--animate"
+          role="listbox"
+          id={listboxId}
+        >
+          {suggestions.map((sug, idx) => (
+            <button
+              key={sug}
+              id={`${listboxId}-option-${idx}`}
+              className={`suggestion-item${idx === activeIdx ? " is-active" : ""}`}
+              style={{ "--suggest-i": idx }}
+              onClick={() => goSearch(sug)}
+              onMouseEnter={() => setActiveIdx(idx)}
+              type="button"
+              role="option"
+              aria-selected={idx === activeIdx}
+            >
+              <Search size={13} />
+              <span>{sug}</span>
+            </button>
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+export default function Hero({ products = [] }) {
+  const { last7DaysViews, totalOrders, todayOrders } = useLiveStats({ intervalMs: 60000 });
+  const [prefersReduced, setPrefersReduced] = useState(false);
+
+  const activeProductCount = useMemo(
+    () =>
+      (products || []).filter((p) =>
+        (p?.product_variants || []).some((v) => v?.is_active)
+      ).length,
+    [products]
+  );
+
+  useEffect(() => {
+    if (!window.matchMedia) return;
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setPrefersReduced(mq.matches);
+    const h = () => setPrefersReduced(mq.matches);
+    mq.addEventListener("change", h);
+    return () => mq.removeEventListener("change", h);
+  }, []);
 
   const fadeUp = prefersReduced
     ? {}
@@ -167,108 +274,8 @@ export default function Hero({ products = [] }) {
               : "Netflix, Spotify, Canva, dan lainnya — bayar QRIS, aktif dalam menit."}
           </p>
 
-          {/* Search */}
-          <div className="hm-search-container" ref={wrapRef}>
-            <div className="hero-search-shell hm-search-shell">
-              <span className="hero-search-icon" aria-hidden="true">
-                <Search size={18} />
-              </span>
-              <input
-                className="input hero-search-input"
-                placeholder={placeholderText}
-                value={q}
-                aria-label="Cari produk"
-                role="combobox"
-                aria-autocomplete="list"
-                aria-expanded={open && suggestions.length > 0}
-                aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
-                aria-activedescendant={
-                  activeIdx >= 0 ? `${listboxId}-option-${activeIdx}` : undefined
-                }
-                onFocus={() => setOpen(true)}
-                onChange={(e) => {
-                  setQ(e.target.value);
-                  setOpen(true);
-                  setActiveIdx(-1);
-                }}
-                onKeyDown={(e) => {
-                  if (e.key === "ArrowDown" && suggestions.length > 0) {
-                    e.preventDefault();
-                    setOpen(true);
-                    setActiveIdx((p) => (p >= suggestions.length - 1 ? 0 : p + 1));
-                    return;
-                  }
-                  if (e.key === "ArrowUp" && suggestions.length > 0) {
-                    e.preventDefault();
-                    setOpen(true);
-                    setActiveIdx((p) => (p <= 0 ? suggestions.length - 1 : p - 1));
-                    return;
-                  }
-                  if (e.key === "Enter") {
-                    if (open && activeIdx >= 0 && suggestions[activeIdx]) {
-                      e.preventDefault();
-                      goSearch(suggestions[activeIdx]);
-                      return;
-                    }
-                    e.preventDefault();
-                    goSearch();
-                  }
-                  if (e.key === "Escape") {
-                    setOpen(false);
-                    setActiveIdx(-1);
-                  }
-                }}
-              />
-              {q ? (
-                <button
-                  type="button"
-                  className="hero-search-clear"
-                  onClick={() => {
-                    setQ("");
-                    setOpen(false);
-                    setActiveIdx(-1);
-                  }}
-                  aria-label="Hapus pencarian"
-                >
-                  \u00d7
-                </button>
-              ) : null}
-              <button
-                className="btn hero-search-btn hm-search-submit"
-                onClick={() => goSearch()}
-                type="button"
-                aria-label="Cari"
-              >
-                <span className="hm-search-submit-text">Cari</span>
-                <ArrowRight size={16} />
-              </button>
-            </div>
-
-            {open && suggestions.length > 0 ? (
-              <div
-                className="suggestions suggestions-minimal suggestions--animate"
-                role="listbox"
-                id={listboxId}
-              >
-                {suggestions.map((sug, idx) => (
-                  <button
-                    key={sug}
-                    id={`${listboxId}-option-${idx}`}
-                    className={`suggestion-item${idx === activeIdx ? " is-active" : ""}`}
-                    style={{ "--suggest-i": idx }}
-                    onClick={() => goSearch(sug)}
-                    onMouseEnter={() => setActiveIdx(idx)}
-                    type="button"
-                    role="option"
-                    aria-selected={idx === activeIdx}
-                  >
-                    <Search size={13} />
-                    <span>{sug}</span>
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
+          {/* Isolated Search Component */}
+          <HeroSearch products={products} />
 
           {/* CTA row */}
           <div className="hm-action-row">

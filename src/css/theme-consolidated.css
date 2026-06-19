@@ -276,14 +276,10 @@ code{
 }
 
 .mobile-menu a.active {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 24%),
-    linear-gradient(135deg, rgba(0, 214, 180, 0.18), rgba(0, 194, 208, 0.08)) !important;
-  border-color: rgba(79, 255, 200, 0.22) !important;
+  background: var(--skeu-inset-bg) !important;
+  border-color: var(--brand-line) !important;
   color: var(--brand-text) !important;
-  box-shadow:
-    0 8px 20px rgba(0, 214, 180, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
 }
 
 .mobile-menu a .active-indicator {
@@ -2069,7 +2065,7 @@ select.input {
     inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
   contain: layout paint style !important;
   overscroll-behavior: contain !important;
-  will-change: auto !important;
+  will-change: transform, opacity !important;
 }
 
 .mobile-menu-stack {
@@ -2148,11 +2144,10 @@ select.input {
 }
 
 .mobile-menu-lite a.active {
+  background: var(--skeu-inset-bg) !important;
+  border-color: var(--brand-line) !important;
   color: var(--brand-text) !important;
-  border-color: rgba(79, 255, 200, 0.22) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 24%),
-    linear-gradient(135deg, rgba(0, 214, 180, 0.18), rgba(0, 194, 208, 0.08)) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
 }
 
 .mobile-menu-lite a.active .active-indicator {
@@ -2493,7 +2488,7 @@ select.input {
 .mobile-backdrop-lite {
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.22s ease;
+  transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mobile-backdrop-lite.is-open,
@@ -2516,8 +2511,8 @@ select.input {
   backface-visibility: hidden;
   pointer-events: none;
   transition:
-    transform 0.26s cubic-bezier(0.22, 1, 0.36, 1),
-    opacity 0.22s ease;
+    transform 0.5s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .mobile-menu-lite.is-open,

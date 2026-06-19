@@ -309,32 +309,14 @@ export default function AssistantBubble() {
                 ))}
               </div>
 
-              <div className="ai-suggest" role="list" aria-label="Pertanyaan yang sering ditanya">
-                {history.length > 0 ? (
-                  <div className="ai-suggestHead">
-                    <span>Lanjutkan dengan:</span>
+              <div className="ai-suggest">
+                {history.length > 0 && (
+                  <div className="ai-suggestHead" style={{ justifyContent: "flex-end", paddingBottom: "4px" }}>
                     <button type="button" className="ai-resetBtn" onClick={reset}>
                       Mulai ulang
                     </button>
                   </div>
-                ) : (
-                  <div className="ai-suggestHead">
-                    <span>Pilih topik atau ketik:</span>
-                  </div>
                 )}
-                <div className="ai-suggestList">
-                  {suggestions.map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      role="listitem"
-                      className="ai-chip"
-                      onClick={() => ask(s.id)}
-                    >
-                      {s.q}
-                    </button>
-                  ))}
-                </div>
 
                 <form
                   className="ai-inputBar"

@@ -20,7 +20,7 @@ import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useHeaderShrink } from "../hooks/useHeaderShrink";
 
 const MOBILE_BREAKPOINT = "(max-width: 720px)";
-const MOBILE_MENU_ANIMATION_MS = 260;
+const MOBILE_MENU_ANIMATION_MS = 500;
 const HEADER_SHRINK_MS = 280;
 const NAV_PILL_EASE = [0.22, 1, 0.36, 1];
 const NAV_LINKS = [

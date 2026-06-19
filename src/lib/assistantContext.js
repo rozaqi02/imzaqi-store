@@ -182,10 +182,34 @@ export function detectQuestionType(text) {
 
 export function isFollowUpQuery(text) {
   const lower = String(text || "").toLowerCase().trim();
-  if (lower.split(/\s+/).length <= 3) {
-    return FOLLOWUP_MARKERS.some((m) => lower.includes(m));
-  }
-  return FOLLOWUP_MARKERS.some((m) => lower.startsWith(m) || lower.includes(` ${m}`));
+  const words = lower.split(/\s+/).filter(Boolean);
+  
+  return FOLLOWUP_MARKERS.some((m) => {
+    if (m.includes(" ")) {
+      return lower.includes(m);
+    }
+    return words.includes(m);
+  });
+}
+
+export function isImplicitFollowUp(text) {
+  const lower = String(text || "").toLowerCase().trim();
+  const words = lower.split(/\s+/).filter(Boolean);
+  if (words.length > 3) return false;
+
+  // If it already contains explicit entities like product names or order codes,
+  // it is self-contained and not an implicit follow-up.
+  const ent = extractEntities(lower);
+  if (ent.products.length > 0 || ent.orderCodes.length > 0) return false;
+
+  const implicitKeywords = [
+    "harga", "harganya", "ada", "ready", "stok", "stoknya", "garansi", "garansinya",
+    "aktif", "durasi", "cara", "gimana", "bagaimana", "kenapa", "kok", "aman",
+    "bisa", "lacak", "cek", "bayar", "refund", "batal", "cancel", "premium", "private", "sharing",
+    "akun", "mati", "error", "gagal", "pending", "proses", "lama", "kirim", "wa", "kontak", "admin", "cs"
+  ];
+
+  return words.some((w) => implicitKeywords.some((k) => w.includes(k)));
 }
 
 /**
@@ -201,10 +225,10 @@ export function resolveFollowUpQuery(query, history = []) {
   const lastTags = last?.tags || [];
   const histEnt = getHistorySignals(history).entities;
 
-  const isShort = lower.split(/\s+/).filter(Boolean).length <= 4;
   const isFollowUp = isFollowUpQuery(raw);
+  const isImplicit = isImplicitFollowUp(raw);
 
-  if (!isShort && !isFollowUp) return raw;
+  if (!isFollowUp && !isImplicit) return raw;
 
   const tagHints = lastTags.join(" ");
   const productHint = histEnt.products[0] || "";
@@ -220,7 +244,7 @@ export function resolveFollowUpQuery(query, history = []) {
     return `${raw} — lanjutan pertanyaan: ${lastQ}`;
   }
 
-  if (lastQ && (isFollowUp || isShort)) {
+  if (lastQ) {
     return `${raw} — lanjutan: ${lastQ} — topik: ${tagHints}`;
   }
 

@@ -20,17 +20,18 @@ export function useTilt({ max = 8, scale = 1.01 } = {}) {
 
     let frame = 0;
     let active = false;
+    let rect = null;
 
     const onEnter = () => {
       active = true;
+      rect = el.getBoundingClientRect();
       el.style.transition = "transform 0.18s var(--ease-out, cubic-bezier(0.22,1,0.36,1))";
     };
 
     const onMove = (e) => {
-      if (!active) return;
+      if (!active || !rect) return;
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        const rect = el.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width;
         const y = (e.clientY - rect.top) / rect.height;
         const rx = (0.5 - y) * max;
@@ -41,6 +42,7 @@ export function useTilt({ max = 8, scale = 1.01 } = {}) {
 
     const onLeave = () => {
       active = false;
+      rect = null;
       cancelAnimationFrame(frame);
       el.style.transition = "transform 0.32s var(--ease-out, cubic-bezier(0.22,1,0.36,1))";
       el.style.transform = "";

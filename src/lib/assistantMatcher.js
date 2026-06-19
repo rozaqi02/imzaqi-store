@@ -183,10 +183,13 @@ function scoreItem(item, queryTokens, queryStr, context, intent) {
 
   const overlapQ = queryTokens.filter((t) => itemTokens.includes(t)).length;
   const overlapA = queryTokens.filter((t) => answerTokens.includes(t)).length;
+  const tagHit = item.tags.filter((tag) => queryTags.has(tag)).length;
+
+  const hasOverlap = overlapQ > 0 || overlapA > 0 || tagHit > 0 || (entities.orderCodes?.length > 0 && item.tags.includes("status"));
+  if (!hasOverlap) return 0;
+
   score += overlapQ * 1.2;
   score += overlapA * 0.95;
-
-  const tagHit = item.tags.filter((tag) => queryTags.has(tag)).length;
   score += tagHit * 1.75;
 
   itemTokens.forEach((t) => {
@@ -236,6 +239,16 @@ function scoreItem(item, queryTokens, queryStr, context, intent) {
 
   const simQ = diceCoefficient(queryStr, item.q.toLowerCase());
   const simA = diceCoefficient(queryStr, getAnswerText(item));
+
+  // Prevent false positive matching on single common question words
+  if (overlapQ === 1 && overlapA === 0 && tagHit === 0) {
+    const questionWords = ["berapa", "kapan", "gimana", "bagaimana", "apa", "apakah", "mana", "siapa", "kenapa", "mengapa", "kok"];
+    const matchedToken = queryTokens.find((t) => itemTokens.includes(t));
+    if (questionWords.includes(matchedToken) && simQ < 0.45) {
+      return 0;
+    }
+  }
+
   score += simQ * 2.0;
   score += simA * 1.1;
 
@@ -245,7 +258,7 @@ function scoreItem(item, queryTokens, queryStr, context, intent) {
 function getAdaptiveThreshold(context, intent) {
   let base = 1.15;
   if (intent?.weight >= 2) base -= 0.25;
-  if (context.historySignals?.tags?.length) base -= 0.1;
+  if (context.isFollowUp && context.historySignals?.tags?.length) base -= 0.1;
   if (context.route) base -= 0.08;
   if (intent?.id === "short") base += 0.35;
   return Math.max(0.75, base);
@@ -253,7 +266,7 @@ function getAdaptiveThreshold(context, intent) {
 
 function getStrongThreshold(context) {
   let base = 2.35;
-  if (context.historySignals?.tags?.length) base -= 0.2;
+  if (context.isFollowUp && context.historySignals?.tags?.length) base -= 0.2;
   if (context.route) base -= 0.15;
   return Math.max(1.85, base);
 }
@@ -412,27 +425,25 @@ function buildLLMSystemPrompt(context, intent) {
   const { route, entities, historySignals } = context;
   const lines = [
     "Kamu adalah Imzaqi AI, asisten cerdas untuk toko digital subscription Imzaqi Store.",
-    "Toko menjual akun premium streaming (Netflix, Spotify, Youtube), tools (ChatGPT, Canva), dll.",
-    "Pembayaran via QRIS. Kontak admin: WA 0831-3604-9987.",
-    "Garansi tertulis di tiap varian (1 bulan – lifetime).",
-    "Jawab singkat, ramah, gunakan Bahasa Indonesia. Maksimal 3 paragraf pendek.",
-    "Kalau tidak yakin, sarankan user kontak admin via WA.",
+    "Jawab pertanyaan pengguna dengan ramah, komunikatif, dan gunakan Bahasa Indonesia. Gunakan emoji secara wajar.",
+    "Berikan kebebasan penuh kepada pengguna untuk bertanya hal apa pun (termasuk topik umum seperti matematika, sains, sejarah, pemrograman, dll.). Jangan batasi jawabanmu hanya dalam lingkup Imzaqi Store. Jawablah pertanyaan umum tersebut secara cerdas, akurat, dan lengkap.",
+    "Namun, jika pengguna menanyakan hal yang spesifik tentang pembelian, produk, garansi, pembayaran, atau status pesanan di Imzaqi Store, gunakan informasi konteks toko berikut untuk menjawab:",
+    "  - Toko menjual akun premium streaming (Netflix, Spotify, Youtube, Disney+, Viu, Iqiyi, Prime Video) dan tools (ChatGPT, Canva, CapCut, Duolingo, dll.) secara 100% online.",
+    "  - Pembayaran dilakukan via scan QRIS otomatis setelah checkout.",
+    "  - Produk dikirim via WhatsApp (WA) setelah pembayaran terkonfirmasi (biasanya 5-30 menit untuk ready stock).",
+    "  - Garansi ganti akun (replace) jika terjadi kendala (tiba-tiba ter-logout) selama periode garansi yang tertulis di detail varian.",
+    "  - Kontak CS/Admin WA: 0831-3604-9987 (https://wa.me/6283136049987), aktif jam 08.00–22.00 WIB.",
+    "Jawablah dengan singkat dan padat (maksimal 3 paragraf pendek)."
   ];
 
   if (route) {
-    lines.push(`User sedang di halaman: ${route.label}. Konteks: ${route.tip}`);
-  }
-  if (intent?.id) {
-    lines.push(`Intent terdeteksi: ${intent.id} (topik: ${(intent.tags || []).join(", ") || "umum"}).`);
+    lines.push(`User sedang berada di halaman: ${route.label}.`);
   }
   if (entities.orderCodes?.length) {
-    lines.push(`Kode order disebut user: ${entities.orderCodes.join(", ")}.`);
+    lines.push(`ID Order yang disebut user: ${entities.orderCodes.join(", ")}.`);
   }
   if (entities.products?.length) {
-    lines.push(`Produk disebut user: ${entities.products.join(", ")}.`);
-  }
-  if (historySignals?.tags?.length) {
-    lines.push(`Topik percakapan sebelumnya: ${historySignals.tags.join(", ")}.`);
+    lines.push(`Nama produk yang disebut user: ${entities.products.join(", ")}.`);
   }
   if (historySignals?.lastQuestion) {
     lines.push(`Pertanyaan terakhir user: "${historySignals.lastQuestion}".`);
@@ -453,6 +464,7 @@ function buildLLMSystemPrompt(context, intent) {
 async function callLLM(query, history, context, intent) {
   const endpoint = import.meta.env.VITE_AI_ENDPOINT;
   const key = import.meta.env.VITE_AI_KEY;
+  const model = import.meta.env.VITE_AI_MODEL || "gemini-2.5-flash";
   if (!endpoint) return null;
 
   const systemPrompt = buildLLMSystemPrompt(context, intent);
@@ -468,55 +480,46 @@ async function callLLM(query, history, context, intent) {
 
   try {
     const ctrl = new AbortController();
-    const timer = window.setTimeout(() => ctrl.abort(), 12000);
+    const timer = window.setTimeout(() => ctrl.abort(), 15000);
     const res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         ...(key ? { Authorization: `Bearer ${key}` } : {}),
       },
-      body: JSON.stringify({ messages }),
+      body: JSON.stringify({ model, messages }),
       signal: ctrl.signal,
     });
     window.clearTimeout(timer);
-    if (!res.ok) return null;
+    
+    if (!res.ok) {
+      console.warn("LLM API returned status:", res.status);
+      return null;
+    }
+    
     const data = await res.json();
-    const reply = data?.reply || data?.message || data?.text;
+    const reply = 
+      data?.choices?.[0]?.message?.content || 
+      data?.reply || 
+      data?.message || 
+      data?.text;
+      
     if (typeof reply !== "string" || !reply.trim()) return null;
     return reply.trim();
-  } catch {
+  } catch (err) {
+    console.error("LLM Error:", err);
     return null;
   }
 }
 
-/**
- * Main entry: handle a free-text user query with full context.
- * @param {string} query
- * @param {Array} history - prior turns
- * @param {{ pathname?: string }} options
- */
 export async function answerQuery(query, history = [], options = {}) {
   const { pathname = "/" } = options;
   const context = buildAssistantContext({ pathname, history, query });
   const intent = detectIntent(query, context);
-  const matches = findBestMatches(query, context, 4);
-  const strongThreshold = getStrongThreshold(context);
 
-  const special = handleSpecialIntent(intent, context, query);
-  if (special && (!matches.length || matches[0].score < 1.5)) {
-    return special;
-  }
-
-  const localStrong = matches[0]?.score >= strongThreshold
-    ? synthesizeLocalAnswer(matches, context, intent, query)
-    : null;
-  if (localStrong && localStrong._source === "local-strong") {
-    return localStrong;
-  }
-
+  // ALWAYS call LLM first, giving it absolute priority
   const llmReply = await callLLM(query, history, context, intent);
   if (llmReply) {
-    const lead = buildContextualLead(context, intent, query);
     const paragraphs = llmReply
       .split(/\n\s*\n/)
       .map((p) => p.trim())
@@ -525,28 +528,25 @@ export async function answerQuery(query, history = [], options = {}) {
     return {
       id: `ai-llm-${Date.now()}`,
       q: query,
-      a: lead.length ? [...lead, ...body] : body,
+      a: body,
       tags: intent.tags?.length ? intent.tags : ["custom"],
       _source: "llm",
     };
   }
 
+  // Fallback ONLY if the LLM call fails (e.g. offline, rate limit, endpoint error)
+  const matches = findBestMatches(query, context, 4);
   const local = synthesizeLocalAnswer(matches, context, intent, query);
   if (local) return local;
-
-  const routeHint = context.route
-    ? `Kamu lagi di halaman **${context.route.label}** — coba tanya soal ${context.route.tags.join(" / ")}.`
-    : "Atau kamu bisa pilih topik lain dari saran di bawah.";
 
   return {
     id: `ai-fallback-${Date.now()}`,
     q: query,
     a: [
-      "Maaf, aku belum yakin paham maksud kamu 🙏",
-      routeHint,
-      "Untuk pertanyaan spesifik, chat admin langsung di **WA: 0831-3604-9987** (https://wa.me/6283136049987) — admin respon < 5 menit di jam aktif (08.00–22.00 WIB).",
+      "Maaf, aku sedang mengalami gangguan jaringan saat ini 🙏",
+      "Kamu bisa langsung menghubungi admin di **WA: 0831-3604-9987** (https://wa.me/6283136049987) untuk respon cepat.",
     ],
-    tags: context.route?.tags || [],
+    tags: [],
     _source: "fallback",
   };
 }

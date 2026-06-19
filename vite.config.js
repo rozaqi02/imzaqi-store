@@ -6,5 +6,23 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (
+              id.includes('react') ||
+              id.includes('framer-motion') ||
+              id.includes('lucide-react') ||
+              id.includes('@supabase')
+            ) {
+              return 'vendor';
+            }
+          }
+        }
+      }
+    }
   }
 });
