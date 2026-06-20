@@ -105,18 +105,7 @@ function ScrollToTop() {
 
 function AppRoutes() {
   const location = useLocation();
-  const [isMobile, setIsMobile] = React.useState(() =>
-    typeof window !== "undefined" ? window.innerWidth <= 720 : false
-  );
-
-  React.useEffect(() => {
-    if (typeof window === "undefined") return;
-    const onResize = () => setIsMobile(window.innerWidth <= 720);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, []);
-
-  const backgroundLocation = isMobile ? null : location.state?.backgroundLocation;
+  const backgroundLocation = location.state?.backgroundLocation || null;
   const displayLocation = backgroundLocation || location;
 
   usePageView();

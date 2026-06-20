@@ -133,6 +133,17 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
     inset 0 -4px 0 rgba(0, 0, 0, 0.28),
     0 0 0 1px rgba(0, 194, 208, 0.08);
+  --home-neo-control: var(--uni-neo-control);
+  --home-neo-control-shadow: var(--uni-neo-control-shadow);
+  --home-neo-inset: var(--uni-neo-inset);
+  --home-neo-inset-shadow: var(--uni-neo-inset-shadow);
+
+  /* Neumorphic Light Tracking Colors (Dark Mode) */
+  --shadow-color-dark: rgba(0, 0, 0, 0.45);
+  --shadow-color-light: rgba(255, 255, 255, 0.06);
+  --shadow-panel-inset-top: rgba(255, 255, 255, 0.18);
+  --shadow-panel-inset-bottom: rgba(0, 0, 0, 0.42);
+  --shadow-panel-border: rgba(0, 194, 208, 0.15);
 }
 
 :root[data-theme="light"] {
@@ -248,4 +259,24 @@
   /* Home Page Bento Custom Mappings */
   --home-neo-panel: var(--skeu-panel-bg);
   --home-neo-panel-shadow: var(--skeu-panel-shadow);
+  --home-neo-control: var(--uni-neo-control);
+  --home-neo-control-shadow: var(--uni-neo-control-shadow);
+  --home-neo-inset: var(--uni-neo-inset);
+  --home-neo-inset-shadow: var(--uni-neo-inset-shadow);
+
+  /* Neumorphic Light Tracking Colors (Light Mode) */
+  --shadow-color-dark: rgba(67, 111, 129, 0.2);
+  --shadow-color-light: rgba(255, 255, 255, 0.92);
+  --shadow-panel-inset-top: rgba(255, 255, 255, 1);
+  --shadow-panel-inset-bottom: rgba(154, 191, 203, 0.26);
+  --shadow-panel-border: rgba(0, 138, 148, 0.12);
+}
+
+/* ── Radius Tokens ── */
+:root {
+  --radius-sm: 14px;
+  --radius-md: 18px;
+  --radius-lg: 24px;
+  --radius-xl: 30px;
+  --radius-full: 999px;
 }

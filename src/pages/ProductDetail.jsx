@@ -1,10 +1,11 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowLeft,
   ChevronDown,
   Clock3,
+  Flame,
   Info,
   Mail,
   Share2,
@@ -14,7 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { fetchProductBySlug, fetchActiveFlashSales } from "../lib/api";
+import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
 import { formatIDR } from "../lib/format";
@@ -23,6 +24,8 @@ import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { fireConfetti } from "../components/Confetti";
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
+import ProductTile from "../components/ProductTile";
+import "../css/pages/ProductDetail.css";
 
 function normalizeInlineText(text) {
   return String(text || "")
@@ -168,59 +171,32 @@ function formatPriceRange(min, max) {
 
 function classifyVariant(name) {
   const n = String(name || "").toLowerCase();
-  if (n.match(/lifetime|selamanya/)) return "lifetime";
-  if (n.match(/bulan/)) return "bulanan";
-  if (n.match(/tahun/)) return "tahunan";
   if (n.match(/sharing|share/)) return "sharing";
   if (n.match(/private|privat|prem|pro|standart|ultimate|diamond/)) return "private";
   if (n.match(/fam|family|business/)) return "family";
-  if (n.match(/akun|buyer|seller/)) return "akun";
   if (n.match(/pass|member|starlight/)) return "membership";
   if (n.match(/koin|coin|uc|cp|vp/)) return "topup";
   if (n.match(/promo|diskon|flash/)) return "promo";
+  if (n.match(/akun|buyer|seller/)) return "akun";
+  if (n.match(/lifetime|selamanya/)) return "lifetime";
+  if (n.match(/bulan/)) return "bulanan";
+  if (n.match(/tahun/)) return "tahunan";
   return "lainnya";
 }
 
+function getProductCategory(name) {
+  const n = String(name || "").toLowerCase();
+  if (n.match(/netflix|youtube|spotify|disney|prime|wetv|viu|iqiyi|hbo/)) return "streaming";
+  if (n.match(/canva|chatgpt|capcut|midjourney|notion|office|zoom|github|copilot/)) return "productivity";
+  return "other";
+}
+
 function ProductDescription({ text }) {
-  const [expanded, setExpanded] = useState(false);
-  const [overflows, setOverflows] = useState(false);
-  const textRef = useRef(null);
-
-  useEffect(() => {
-    setExpanded(false);
-  }, [text]);
-
-  useLayoutEffect(() => {
-    const node = textRef.current;
-    if (!node || expanded) return;
-
-    const measure = () => {
-      setOverflows(node.scrollHeight > node.clientHeight + 2);
-    };
-
-    measure();
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-  }, [text, expanded]);
-
-  const canToggle = expanded || overflows || text.length > 96;
-
   return (
-    <div className={`pdx-descBlock ${expanded ? "is-expanded" : ""}`}>
-      <p ref={textRef} className="pdx-lead">
+    <div className="pdx-descBlock is-expanded">
+      <p className="pdx-lead">
         {text}
       </p>
-      {canToggle ? (
-        <button
-          type="button"
-          className="pdx-descToggle"
-          onClick={() => setExpanded((prev) => !prev)}
-          aria-expanded={expanded}
-        >
-          <span>{expanded ? "Ringkas" : "Selengkapnya"}</span>
-          <ChevronDown size={14} className="pdx-descChevron" />
-        </button>
-      ) : null}
     </div>
   );
 }
@@ -235,6 +211,191 @@ function StockPill({ stock }) {
   return <span className={`pdx-stockPill ${tone}`}>Stok {safe}</span>;
 }
 
+const VariantCard = React.memo(({
+  variant,
+  isSelected,
+  isAdded,
+  isRecommended,
+  flashDiscount,
+  effectivePrice,
+  descriptionBody,
+  isMotionOff,
+  motionMode,
+  onSelect,
+  onAdd,
+  onBuy
+}) => {
+  const stock = Number(variant.stock ?? 0);
+  const out = stock <= 0;
+  const disableEntranceAnim = isMotionOff || motionMode === "lite";
+
+  const cardProps = {
+    role: "button",
+    tabIndex: 0,
+    className: `pdx-packCard ${out ? "is-out" : ""} ${isRecommended ? "is-recommended" : ""} ${isSelected ? "is-selected" : ""} ${isAdded ? "is-added" : ""}`,
+    onClick: () => onSelect(variant.id),
+    onKeyDown: (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        onSelect(variant.id);
+      }
+    },
+  };
+
+  const cardChildren = (
+    <>
+      <div className="pdx-packHead">
+        <div className="pdx-packInfo">
+          {isRecommended ? (
+            <span className="pdx-packHot">
+              <Flame size={12} />
+              Rameeee
+            </span>
+          ) : null}
+          <h3 className="pdx-packName">{variant.name}</h3>
+          <div className="pdx-packMeta">
+            <StockPill stock={variant.stock} />
+            {variant.duration_label ? (
+              <span className="pdx-packMetaItem">
+                <Clock3 size={12} />
+                {variant.duration_label}
+              </span>
+            ) : null}
+            {variant.requires_buyer_email ? (
+              <span className="pdx-packMetaItem">
+                <Mail size={12} />
+                Butuh email
+              </span>
+            ) : null}
+          </div>
+        </div>
+
+        <div className="pdx-packPriceWrap">
+          {flashDiscount ? (
+            <>
+              <div className="pdx-packPrice pdx-variantPrice--flash">
+                {formatIDR(effectivePrice)}
+              </div>
+              <div className="pdx-variantOriginalPrice">
+                {formatIDR(variant.price_idr)}
+              </div>
+            </>
+          ) : (
+            <div className="pdx-packPrice">{formatIDR(variant.price_idr)}</div>
+          )}
+        </div>
+      </div>
+
+      <VariantBenefitList rawText={descriptionBody} />
+
+      <div className="pdx-packActions">
+        <button
+          className={`btn btn-sm btn-ghost pdx-addBtn ${out ? "btn-disabled" : ""}`}
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onAdd(variant, 1, e);
+          }}
+          disabled={out}
+          aria-label="Tambah ke keranjang"
+        >
+          <ShoppingCart size={14} />
+          <span className="pdx-addBtnLabel">Keranjang</span>
+        </button>
+        <button
+          className={`btn btn-sm pdx-buyNowBtn ${out ? "btn-disabled" : ""}`}
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onBuy(variant, 1, e);
+          }}
+          disabled={out}
+        >
+          {out ? "Habis" : "Beli sekarang"}
+        </button>
+      </div>
+    </>
+  );
+
+  // On mobile (lite/off motion mode), skip Framer Motion entirely to avoid its
+  // internal JS overhead (ref tracking, animation scheduler) for every card.
+  if (disableEntranceAnim) {
+    return <article {...cardProps}>{cardChildren}</article>;
+  }
+
+  return (
+    <motion.article
+      {...cardProps}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2 }}
+    >
+      {cardChildren}
+    </motion.article>
+  );
+});
+
+
+VariantCard.displayName = "VariantCard";
+
+function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
+  const [activeInfoTab, setActiveInfoTab] = useState("description");
+  // 0 = description tab (left), 1 = terms tab (right)
+  const tabIndex = activeInfoTab === "description" ? 0 : 1;
+
+  return (
+    <div className="pdx-infoTabsCard">
+      {/* Tab header with a pure-CSS sliding indicator (no Framer Motion layoutId).
+          The indicator is a single element that translates via a CSS custom property,
+          which composites on the GPU with zero layout work. */}
+      <div className="pdx-infoTabsHeader">
+        <button
+          type="button"
+          className={`pdx-infoTabBtn ${activeInfoTab === "description" ? "is-active" : ""}`}
+          onClick={() => setActiveInfoTab("description")}
+        >
+          <span className="pdx-infoTabLabel">Deskripsi</span>
+        </button>
+        <button
+          type="button"
+          className={`pdx-infoTabBtn ${activeInfoTab === "terms" ? "is-active" : ""}`}
+          onClick={() => setActiveInfoTab("terms")}
+        >
+          <span className="pdx-infoTabLabel">Syarat &amp; Ketentuan</span>
+        </button>
+      </div>
+      <div className="pdx-infoTabContent">
+        {activeInfoTab === "description" ? (
+          <ProductDescription text={productDescriptionText} />
+        ) : (
+          <ol className="pdx-termsList">
+            <li>
+              <span className="pdx-termNum">1</span>
+              <span className="pdx-termText">Transaksi hanya dianggap sah setelah pembayaran terverifikasi secara otomatis oleh sistem QRIS, dan pembeli wajib menyimpan ID Order (IMZ-XXXX) sebagai bukti pembelian.</span>
+            </li>
+            <li>
+              <span className="pdx-termNum">2</span>
+              <span className="pdx-termText">Pengiriman pesanan dilakukan secara manual ke WhatsApp terdaftar dengan waktu proses 5–30 menit (maksimal 2 jam untuk varian email) khusus pada jam operasional 08.00–22.00 WIB.</span>
+            </li>
+            <li>
+              <span className="pdx-termNum">3</span>
+              <span className="pdx-termText">Garansi replace (ganti akun) hanya berlaku jika akun mengalami kendala atau mati sebelum masa aktif durasi paket berakhir.</span>
+            </li>
+            <li>
+              <span className="pdx-termNum">4</span>
+              <span className="pdx-termText">Dilarang keras mengubah password, email, profil, PIN, atau data login lainnya pada akun bertipe sharing untuk menghindari hangusnya garansi.</span>
+            </li>
+            <li>
+              <span className="pdx-termNum">5</span>
+              <span className="pdx-termText">Segala aduan kendala wajib menyertakan ID Order valid agar dapat diproses lebih lanjut oleh admin WhatsApp.</span>
+            </li>
+          </ol>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function ProductDetail() {
   const nav = useNavigate();
   const location = useLocation();
@@ -242,13 +403,17 @@ export default function ProductDetail() {
   const toast = useToast();
   const cart = useCart();
   const { add } = cart;
-  const reduceMotion = useReducedMotion();
+  // Native reduced motion check — no longer needs framer-motion
+  const reduceMotion =
+    typeof window !== "undefined" &&
+    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
   const motionMode = useAdaptiveMotion();
 
   const isMotionOff = motionMode === "off" || reduceMotion;
 
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
+  const [allProducts, setAllProducts] = useState([]);
   const [error, setError] = useState("");
   const [flashSaleMap, setFlashSaleMap] = useState(new Map());
   const [activeTab, setActiveTab] = useState("semua");
@@ -269,12 +434,14 @@ export default function ProductDetail() {
       try {
         setLoading(true);
         setError("");
-        const [data, flashSales] = await Promise.all([
+        const [data, flashSales, productsData] = await Promise.all([
           fetchProductBySlug(slug),
           fetchActiveFlashSales().catch(() => []),
+          fetchProducts().catch(() => []),
         ]);
         if (!alive) return;
         setProduct(data);
+        setAllProducts(productsData || []);
         const fsMap = new Map();
         (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
         setFlashSaleMap(fsMap);
@@ -375,8 +542,52 @@ export default function ProductDetail() {
     []
   );
 
+  const brandColor = useMemo(() => {
+    const name = String(product?.name || "").toLowerCase();
+    if (name.includes("netflix")) return "rgba(229, 9, 20, 0.45)";
+    if (name.includes("canva")) return "rgba(0, 196, 204, 0.45)";
+    if (name.includes("spotify")) return "rgba(29, 185, 84, 0.45)";
+    if (name.includes("youtube")) return "rgba(255, 0, 0, 0.45)";
+    if (name.includes("chatgpt")) return "rgba(16, 163, 127, 0.45)";
+    if (name.includes("capcut")) return "rgba(0, 0, 0, 0.35)";
+    if (name.includes("disney")) return "rgba(17, 60, 207, 0.45)";
+    if (name.includes("prime")) return "rgba(0, 168, 225, 0.45)";
+    return "rgba(255, 255, 255, 0.15)";
+  }, [product?.name]);
+
+  const recommendations = useMemo(() => {
+    if (!product || !allProducts.length) return [];
+    const currentCat = getProductCategory(product.name);
+    
+    return allProducts
+      .filter((p) => p.id !== product.id)
+      .map((p) => {
+        let score = 0;
+        const pCat = getProductCategory(p.name);
+        
+        // Category match
+        if (pCat === currentCat && currentCat !== "other") {
+          score += 10;
+        }
+        
+        // Sub-variant count / stock factor (favor active products with stock)
+        const variantsList = p.product_variants || [];
+        const activeVariants = variantsList.filter((v) => v.is_active);
+        const totalStock = activeVariants.reduce((sum, v) => sum + Number(v.stock || 0), 0);
+        const totalSold = activeVariants.reduce((sum, v) => sum + Number(v.sold_count || 0), 0);
+        
+        if (totalStock > 0) score += 5;
+        score += Math.min(5, totalSold * 0.01); // boost popular slightly
+        
+        return { product: p, score };
+      })
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 5)
+      .map((item) => item.product);
+  }, [product, allProducts]);
+
   const productDescriptionText = useMemo(
-    () => normalizeInlineText(product?.description) || "Pilih paket, checkout, selesai.",
+    () => product?.description || "Pilih paket, checkout, selesai.",
     [product?.description]
   );
 
@@ -419,8 +630,11 @@ export default function ProductDetail() {
 
     if (event?.currentTarget) {
       const rect = event.currentTarget.getBoundingClientRect();
-      fireConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
-      spawnCartFlyParticle(rect);
+      const isMobile = window.matchMedia("(pointer: coarse), (max-width: 920px)").matches;
+      if (!isMobile && !isMotionOff) {
+        fireConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
+        spawnCartFlyParticle(rect);
+      }
       const btn = event.currentTarget;
       btn.classList.add("is-pressed");
       window.setTimeout(() => btn.classList.remove("is-pressed"), 180);
@@ -494,227 +708,174 @@ export default function ProductDetail() {
   const icon = product.icon_url;
 
   return (
-    <div className="page detail-page detail-page-v3">
+    <div className={`page detail-page detail-page-v3${cartItemCount > 0 ? " with-sticky-cta" : ""}`}>
       <section className="section">
         <div className="container">
-          <motion.div
-            className="pdx-layout"
-            initial={isMotionOff ? false : { opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={isMotionOff ? { duration: 0 } : { duration: 0.32, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <header className="pdx-topCard">
-              <div className="pdx-toolbar">
-                <Link to="/produk" className="pdx-backLink">
-                  <ArrowLeft size={15} />
-                  <span>Katalog</span>
-                </Link>
+          {/* On mobile, a plain div is used (no Framer Motion) to reduce JS overhead.
+              The route-transition CSS class from Layout.jsx handles the page enter animation. */}
+          <div className="pdx-layout">
+            <div className="pdx-mainGrid">
+              <div className="pdx-leftCol">
+                <header className="pdx-topCard" style={{ "--brand-color": brandColor }}>
+                  <div className="pdx-toolbar">
+                    <Link to="/produk" className="pdx-backLink">
+                      <ArrowLeft size={15} />
+                      <span>Katalog</span>
+                    </Link>
 
-                <div className="pdx-topActions">
-                  <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan">
-                    <Share2 size={16} />
-                  </button>
-                  <Link
-                    to="/checkout"
-                    state={{ backgroundLocation: location }}
-                    className="pdx-iconBtn"
-                    title="Keranjang"
-                  >
-                    <ShoppingCart size={16} />
-                    {cartItemCount > 0 ? <span className="pdx-cartBadge">{cartItemCount}</span> : null}
-                  </Link>
-                </div>
-              </div>
-
-              <div className="pdx-heroMain">
-                <div className="catalog-cardIcon pdx-productIcon">
-                  {icon ? (
-                    <img src={icon} alt="" fetchPriority="high" decoding="async" />
-                  ) : (
-                    <span>{String(product.name || "P").slice(0, 1).toUpperCase()}</span>
-                  )}
-                </div>
-
-                <div className="pdx-heroContent">
-                  <h1 className="pdx-title">{product.name}</h1>
-                  <ProductDescription text={productDescriptionText} />
-                </div>
-              </div>
-
-              <div className="pdx-statsStrip">
-                <div className="pdx-heroPrice">
-                  <span className="pdx-priceLabel">Mulai</span>
-                  <strong className="pdx-priceValue">
-                    {formatPriceRange(summary.minPrice, summary.maxPrice)}
-                  </strong>
-                </div>
-                <span className="pdx-heroStat">
-                  <ShoppingBag size={13} />
-                  {soldTotal} terjual
-                </span>
-                <span className="pdx-heroStat">
-                  <ShieldCheck size={13} />
-                  Garansi
-                </span>
-              </div>
-            </header>
-
-            <section id="paket-tersedia" className="pdx-variantsSection">
-              <div className="pdx-variantsHead">
-                <div>
-                  <div className="pdx-eyebrow">Pilih paket</div>
-                  <h2 className="pdx-sectionTitle">Langsung checkout.</h2>
-                </div>
-                <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
-              </div>
-
-              {categoryTabs.length > 2 ? (
-                <div className="pdx-filters">
-                  {categoryTabs.map((tab) => (
-                    <button
-                      key={tab.id}
-                      type="button"
-                      onClick={() => setActiveTab(tab.id)}
-                      className={`pdx-filterChip ${activeTab === tab.id ? "is-active" : ""}`}
-                    >
-                      {tab.label}
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-
-              <div className="pdx-packList">
-                {displayedVariants.length === 0 ? (
-                  <div className="pdx-emptyCard">
-                    <EmptyState
-                      icon="-"
-                      title={variants.length === 0 ? "Belum ada paket" : "Tidak ada paket di kategori ini"}
-                      description={
-                        variants.length === 0
-                          ? "Admin belum menambahkan varian untuk produk ini."
-                          : "Coba pilih kategori lain atau lihat semua paket."
-                      }
-                      primaryAction={
-                        variants.length > 0
-                          ? { label: "Lihat semua", onClick: () => setActiveTab("semua") }
-                          : { label: "Kembali ke katalog", onClick: () => nav("/produk") }
-                      }
-                    />
+                    <div className="pdx-topActions">
+                      <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan">
+                        <Share2 size={16} />
+                      </button>
+                    </div>
                   </div>
-                ) : (
-                  displayedVariants.map((variant) => {
-                    const stock = Number(variant.stock ?? 0);
-                    const out = stock <= 0;
-                    const isRecommended = variant.id === recommendedVariantId;
-                    const flashDiscount = flashSaleMap.get(variant.id);
-                    const effectivePrice =
-                      flashDiscount && flashDiscount > 0
-                        ? Math.round(variant.price_idr * (1 - flashDiscount / 100))
-                        : variant.price_idr;
-                    const descriptionBody = String(
-                      variant.description ||
-                        (out
-                          ? "Slot sedang habis. Cek lagi saat stok terbuka."
-                          : "Varian siap diproses setelah pembayaran terverifikasi.")
-                    )
-                      .replace(/\r\n/g, " ")
-                      .trim();
 
-                    return (
-                      <motion.article
-                        key={variant.id}
-                        role="button"
-                        tabIndex={0}
-                        className={`pdx-packCard ${out ? "is-out" : ""} ${isRecommended ? "is-recommended" : ""} ${selectedVariantId === variant.id ? "is-selected" : ""} ${addedVariantId === variant.id ? "is-added" : ""}`}
-                        initial={isMotionOff ? false : { opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2 }}
-                        onClick={() => setSelectedVariantId(variant.id)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            setSelectedVariantId(variant.id);
+                  <div className="pdx-heroMain">
+                    <div 
+                      className="catalog-cardIcon pdx-productIcon"
+                      style={{ "--brand-color": brandColor }}
+                    >
+                      {icon ? (
+                        <img src={icon} alt="" fetchPriority="high" decoding="async" />
+                      ) : (
+                        <span>{String(product.name || "P").slice(0, 1).toUpperCase()}</span>
+                      )}
+                    </div>
+
+                    <div className="pdx-heroContent">
+                      <h1 className="pdx-title">{product.name}</h1>
+                    </div>
+                  </div>
+
+                  <div className="pdx-statsStrip">
+                    <div className="pdx-heroPrice">
+                      <span className="pdx-priceLabel">Mulai dari</span>
+                      <strong className="pdx-priceValue">
+                        {summary.minPrice ? formatIDR(summary.minPrice) : "-"}
+                      </strong>
+                    </div>
+                    <div className="pdx-statsChips">
+                      <span className="pdx-heroStat">
+                        <ShoppingBag size={13} />
+                        {soldTotal} terjual
+                      </span>
+                      <span className="pdx-heroStat">
+                        <ShieldCheck size={13} />
+                        Garansi
+                      </span>
+                    </div>
+                  </div>
+                </header>
+
+                <ProductInfoTabs
+                  productDescriptionText={productDescriptionText}
+                  isMotionOff={isMotionOff}
+                />
+              </div>
+
+              <div className="pdx-rightCol">
+                <section id="paket-tersedia" className="pdx-variantsSection">
+                  <div className="pdx-variantsHead">
+                    <div className="pdx-variantsHeadTop">
+                      <div className="pdx-eyebrow">Pilih paket</div>
+                      <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
+                    </div>
+                    <h2 className="pdx-sectionTitle">Pilih Paket Terbaikmu</h2>
+                  </div>
+
+                  {categoryTabs.length > 2 ? (
+                    <div className="pdx-filters">
+                      {categoryTabs.map((tab) => (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setActiveTab(tab.id)}
+                          className={`pdx-filterChip ${activeTab === tab.id ? "is-active" : ""}`}
+                        >
+                          {tab.label}
+                        </button>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  <div className="pdx-packList">
+                    {displayedVariants.length === 0 ? (
+                      <div className="pdx-emptyCard">
+                        <EmptyState
+                          icon="-"
+                          title={variants.length === 0 ? "Belum ada paket" : "Tidak ada paket di kategori ini"}
+                          description={
+                            variants.length === 0
+                              ? "Admin belum menambahkan varian untuk produk ini."
+                              : "Coba pilih kategori lain atau lihat semua paket."
                           }
-                        }}
-                      >
-                        <div className="pdx-packHead">
-                          <div className="pdx-packInfo">
-                            {isRecommended ? (
-                              <span className="pdx-packHot">
-                                <Sparkles size={12} />
-                                Top pick
-                              </span>
-                            ) : null}
-                            <h3 className="pdx-packName">{variant.name}</h3>
-                            <div className="pdx-packMeta">
-                              <StockPill stock={variant.stock} />
-                              {variant.duration_label ? (
-                                <span className="pdx-packMetaItem">
-                                  <Clock3 size={12} />
-                                  {variant.duration_label}
-                                </span>
-                              ) : null}
-                              {variant.requires_buyer_email ? (
-                                <span className="pdx-packMetaItem">
-                                  <Mail size={12} />
-                                  Butuh email
-                                </span>
-                              ) : null}
-                            </div>
-                          </div>
+                          primaryAction={
+                            variants.length > 0
+                              ? { label: "Lihat semua", onClick: () => setActiveTab("semua") }
+                              : { label: "Kembali ke katalog", onClick: () => nav("/produk") }
+                          }
+                        />
+                      </div>
+                    ) : (
+                      displayedVariants.map((variant) => {
+                        const stock = Number(variant.stock ?? 0);
+                        const out = stock <= 0;
+                        const isRecommended = variant.id === recommendedVariantId;
+                        const flashDiscount = flashSaleMap.get(variant.id);
+                        const effectivePrice =
+                          flashDiscount && flashDiscount > 0
+                            ? Math.round(variant.price_idr * (1 - flashDiscount / 100))
+                            : variant.price_idr;
+                        const descriptionBody = String(
+                          variant.description ||
+                            (out
+                              ? "Slot sedang habis. Cek lagi saat stok terbuka."
+                              : "Varian siap diproses setelah pembayaran terverifikasi.")
+                        )
+                          .replace(/\r\n/g, " ")
+                          .trim();
 
-                          <div className="pdx-packPriceWrap">
-                            {flashDiscount ? (
-                              <>
-                                <div className="pdx-packPrice pdx-variantPrice--flash">
-                                  {formatIDR(effectivePrice)}
-                                </div>
-                                <div className="pdx-variantOriginalPrice">
-                                  {formatIDR(variant.price_idr)}
-                                </div>
-                              </>
-                            ) : (
-                              <div className="pdx-packPrice">{formatIDR(variant.price_idr)}</div>
-                            )}
-                          </div>
-                        </div>
-
-                        <VariantBenefitList rawText={descriptionBody} />
-
-                        <div className="pdx-packActions">
-                          <button
-                            className={`btn btn-sm btn-ghost pdx-addBtn ${out ? "btn-disabled" : ""}`}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAdd(variant, 1, e);
-                            }}
-                            disabled={out}
-                            aria-label="Tambah ke keranjang"
-                          >
-                            <ShoppingCart size={14} />
-                            <span className="pdx-addBtnLabel">Keranjang</span>
-                          </button>
-                          <button
-                            className={`btn btn-sm pdx-buyNowBtn ${out ? "btn-disabled" : ""}`}
-                            type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handleAdd(variant, 1, e);
+                        return (
+                          <VariantCard
+                            key={variant.id}
+                            variant={variant}
+                            isSelected={selectedVariantId === variant.id}
+                            isAdded={addedVariantId === variant.id}
+                            isRecommended={isRecommended}
+                            flashDiscount={flashDiscount}
+                            effectivePrice={effectivePrice}
+                            descriptionBody={descriptionBody}
+                            isMotionOff={isMotionOff}
+                            motionMode={motionMode}
+                            onSelect={setSelectedVariantId}
+                            onAdd={handleAdd}
+                            onBuy={(v, q, e) => {
+                              handleAdd(v, q, e);
                               nav("/checkout", { state: { backgroundLocation: location } });
                             }}
-                            disabled={out}
-                          >
-                            {out ? "Habis" : "Beli sekarang"}
-                          </button>
-                        </div>
-                      </motion.article>
-                    );
-                  })
-                )}
+                          />
+                        );
+                      })
+                    )}
+                  </div>
+                </section>
               </div>
-            </section>
-          </motion.div>
+            </div>
+
+            {recommendations.length > 0 ? (
+              <section className="pdx-recommendations">
+                <div className="pdx-recommendationsHead">
+                  <div className="pdx-eyebrow">Mungkin kamu butuh</div>
+                  <h2 className="pdx-sectionTitle">Rekomendasi lainnya</h2>
+                </div>
+                <div className="product-grid-container grid-mode pdx-recommendationsGrid" role="list">
+                  {recommendations.map((p) => (
+                    <ProductTile key={p.id} product={p} layout="grid" disableTilt={true} />
+                  ))}
+                </div>
+              </section>
+            ) : null}
+          </div>
         </div>
       </section>
 

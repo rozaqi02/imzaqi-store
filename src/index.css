@@ -3,19 +3,6 @@
 
 @import "./css/global.css";
 
-@import "./css/pages/Home.css";
-@import "./css/pages/Products.css";
-@import "./css/pages/ProductDetail.css";
-@import "./css/pages/Checkout.css";
-@import "./css/pages/Pay.css";
-@import "./css/pages/Status.css";
-@import "./css/pages/About.css";
-@import "./css/pages/Testimonials.css";
-
-@import "./css/pages/AdminLogin.css";
-@import "./css/pages/AdminDashboard.css";
-@import "./css/pages/FlashSale.css";
-
 /* Unified Theme Engine v5 */
 @import "./css/theme-variables.css";
 @import "./css/theme-consolidated.css";

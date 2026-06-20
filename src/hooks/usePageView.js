@@ -65,17 +65,22 @@ export function usePageView() {
       lastTrackedPath.current = path;
       internalReferrer.current = path; // Jadikan path saat ini sebagai referrer untuk halaman selanjutnya
 
-      try {
-        const visitorId = getVisitorIdAsUUID();
+      const visitorId = getVisitorIdAsUUID();
 
-        await supabase.from("page_views").insert({
-          visitor_id: visitorId,
-          path,
-          referrer: currentReferrer || null,
-        });
-      } catch {
-        // Jangan crash kalau tracking gagal
-      }
+      // Fire-and-forget: tidak perlu return value, tidak crash kalau gagal.
+      // Catatan: error 403 di Network tab tidak bisa disembunyikan dari kode —
+      // itu log level browser bukan JS. Fix permanen ada di RLS Supabase.
+      supabase
+        .from("page_views")
+        .insert({ visitor_id: visitorId, path, referrer: currentReferrer || null })
+        .then(({ error }) => {
+          // Abaikan error permission/network saat tracking — bukan error kritis
+          if (error && error.code !== '42501' && error.status !== 403) {
+            // Hanya log error yang tidak terduga (bukan permission denied)
+            console.debug("[pageView] insert non-critical error:", error.code);
+          }
+        })
+        .catch(() => { /* network error, abaikan */ });
     }
 
     if (!cancelled) trackView();

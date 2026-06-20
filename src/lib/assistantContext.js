@@ -119,12 +119,21 @@ export function extractEntities(text) {
   const lower = raw.toLowerCase();
 
   const orderCodes = [];
-  const orderMatches = raw.match(/\bIMZ[-\s]?[A-Z0-9]{4}\b/gi) || [];
-  orderMatches.forEach((code) => orderCodes.push(code.toUpperCase().replace(/\s/g, "-")));
+  const orderMatches = raw.match(/\bIMZ[-\s]?(?:[A-Z0-9]{8}|[A-Z0-9]{4})\b/gi) || [];
+  orderMatches.forEach((code) => {
+    let normalized = code.toUpperCase().replace(/\s/g, "-");
+    // Ensure there is a dash after IMZ if it's missing (e.g. IMZAAAA -> IMZ-AAAA)
+    if (normalized.startsWith("IMZ") && !normalized.startsWith("IMZ-")) {
+      normalized = "IMZ-" + normalized.slice(3);
+    }
+    orderCodes.push(normalized);
+  });
 
-  const shortCodes = raw.match(/\b[A-Z0-9]{4}\b/g) || [];
+  const shortCodes = raw.match(/\b(?:[A-Z0-9]{8}|[A-Z0-9]{4})\b/gi) || [];
   shortCodes.forEach((code) => {
-    if (!orderCodes.includes(`IMZ-${code}`)) orderCodes.push(`IMZ-${code}`);
+    // Avoid matching 'IMZ' itself as a short code (though length is 3, better be safe)
+    if (code.toUpperCase() === "IMZ") return;
+    if (!orderCodes.includes(`IMZ-${code.toUpperCase()}`)) orderCodes.push(`IMZ-${code.toUpperCase()}`);
   });
 
   const products = [];

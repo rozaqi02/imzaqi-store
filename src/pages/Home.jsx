@@ -1,17 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
-import {
-  ArrowRight,
-  BadgeCheck,
-  ChevronDown,
-  MessageCircle,
-  Sparkles,
-  Star,
-  Zap,
-} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { ArrowRight, ChevronDown, Search, X, Zap } from "lucide-react";
 
 import Hero from "../components/Hero";
 import HomeStickyBar from "../components/HomeStickyBar";
+import "../css/pages/Home.css";
 import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingIds, fetchPromoCodes, fetchSettings } from "../lib/api";
 import EmptyState from "../components/EmptyState";
@@ -19,6 +12,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { useToast } from "../context/ToastContext";
 import { copyToClipboard } from "../utils/clipboard";
+import { fireConfetti } from "../components/Confetti";
 
 const HOME_FAQ = [
   {
@@ -50,52 +44,25 @@ const HOME_FAQ = [
   },
 ];
 
-const HOME_TESTIMONIALS = [
-  {
-    id: "t1",
-    name: "Rizky A.",
-    product: "Netflix Premium",
-    text: "Prosesnya cepet banget, ga sampe 5 menit udah aktif. Harganya juga jauh lebih murah dari langganan biasa.",
-    rating: 5,
-    timeAgo: "2 hari lalu",
-    verified: true,
-  },
-  {
-    id: "t2",
-    name: "Sari D.",
-    product: "Spotify Family",
-    text: "Udah langganan 3 bulan, ga pernah ada masalah. Admin responsif kalau ada pertanyaan. Recommended!",
-    rating: 5,
-    timeAgo: "5 hari lalu",
-    verified: true,
-  },
-  {
-    id: "t3",
-    name: "Fajar M.",
-    product: "Canva Pro",
-    text: "QRIS-nya praktis, langsung bisa dipake. Buat pelajar kayak aku ini solusi terbaik deh.",
-    rating: 5,
-    timeAgo: "1 minggu lalu",
-    verified: true,
-  },
-];
-
-// Langkah cara kerja — 3 step visual
+// Langkah cara kerja — 3 step visual dengan detail tambahan untuk accordion
 const HOW_IT_WORKS = [
   {
     step: "01",
     title: "Pilih & Cek Harga",
     desc: "Browse katalog, pilih produk dan varian yang kamu mau. Harga transparan, tidak ada biaya tersembunyi.",
+    details: "Lihat rincian lengkap mengenai tipe akun (Private/Sharing), durasi pemakaian, serta garansi replace penuh.",
   },
   {
     step: "02",
     title: "Bayar Lewat QRIS",
     desc: "Scan QRIS dari aplikasi apapun. Konfirmasi pembayaran dan dapatkan ID order dalam hitungan detik.",
+    details: "Mendukung pembayaran via GoPay, OVO, Dana, LinkAja, ShopeePay, serta seluruh aplikasi Mobile Banking Indonesia.",
   },
   {
     step: "03",
     title: "Aktif & Pantau",
     desc: "Akun aktif dalam menit. Gunakan ID order untuk pantau status kapan saja di halaman Status.",
+    details: "Akses detail login akan dikirim secara instan. Garansi hangus/replace dapat diklaim 24 jam lewat WhatsApp Admin.",
   },
 ];
 
@@ -159,36 +126,25 @@ function HomeProductSkeleton() {
   );
 }
 
-function HomeTestimonialCard({ item }) {
-  return (
-    <article className="home-testiCard">
-      <div className="home-testiCard-header">
-        <div className="home-testiCard-avatar" aria-hidden="true">
-          {item.name.charAt(0)}
-        </div>
-        <div className="home-testiCard-meta">
-          <span className="home-testiCard-nameRow">
-            <span className="home-testiCard-name">{item.name}</span>
-            {item.verified ? (
-              <BadgeCheck size={14} className="home-testiCard-verified" aria-label="Terverifikasi" />
-            ) : null}
-          </span>
-          <span className="home-testiCard-product">{item.product}</span>
-        </div>
-        <div className="home-testiCard-right">
-          <div className="home-testiCard-stars" aria-label={`${item.rating} bintang`}>
-            {Array.from({ length: item.rating }).map((_, i) => (
-              <Star key={i} size={12} fill="currentColor" aria-hidden="true" />
-            ))}
-          </div>
-          {item.timeAgo ? (
-            <span className="home-testiCard-time">{item.timeAgo}</span>
-          ) : null}
-        </div>
-      </div>
-      <p className="home-testiCard-text">"{item.text}"</p>
-    </article>
-  );
+function ScrollProgressBar() {
+  // Use ref + direct DOM mutation instead of setState to avoid re-rendering
+  // the entire Home component tree on every scroll tick.
+  const barRef = useRef(null);
+
+  useEffect(() => {
+    const bar = barRef.current;
+    if (!bar) return undefined;
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        bar.style.width = `${(window.scrollY / totalScroll) * 100}%`;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  return <div ref={barRef} className="home-scrollProgress" />;
 }
 
 export default function Home() {
@@ -198,10 +154,16 @@ export default function Home() {
   const [promos, setPromos] = useState([]);
   const [settings, setSettings] = useState(null);
   const [error, setError] = useState("");
+  
+  // Interactive States
   const [openFaqId, setOpenFaqId] = useState(HOME_FAQ[0]?.id || null);
-  const toast = useToast();
+  const [activeStep, setActiveStep] = useState(null);
+  const [faqQuery, setFaqQuery] = useState("");
 
-  useRevealOnScroll("home");
+  const toast = useToast();
+  const nav = useNavigate();
+
+  useRevealOnScroll();
 
   usePageMeta({
     title: "Home",
@@ -262,14 +224,14 @@ export default function Home() {
     [products]
   );
 
-  const waNumber = String(settings?.whatsapp?.number || "").trim();
-  const waHref = waNumber ? `https://wa.me/${waNumber.replace(/\D/g, "")}` : null;
-
-  const handleCopyPromo = (code) => {
+  const handleCopyPromo = (code, e) => {
     copyToClipboard(code).then(
       () => {
         if (navigator.vibrate) navigator.vibrate(12);
         toast.success("Kode udah ke-copy!", { title: code, duration: 2000 });
+        if (e && e.clientX && e.clientY) {
+          fireConfetti(e.clientX, e.clientY);
+        }
       },
       () => toast.error("Gagal menyalin kupon.")
     );
@@ -277,22 +239,26 @@ export default function Home() {
 
   return (
     <div className="page home-page">
+      {/* Scroll Progress Bar */}
+      <ScrollProgressBar />
+
       <Hero products={products} />
       <HomeStickyBar />
 
       <div className="home-body">
         {/* ── Produk Populer ── */}
         <section
-          className="home-section reveal"
-          style={{ transitionDelay: "40ms" }}
+          className="home-section"
           aria-label="Produk populer"
         >
           <div className="container home-sectionInner">
-            <HomeSectionHead
-              kicker="Produk populer"
-              title="Yang paling sering dipesan"
-              sub="Langsung pilih dari daftar teratas, atau buka katalog lengkap."
-            />
+            <div className="reveal" style={{ transitionDelay: "40ms" }}>
+              <HomeSectionHead
+                kicker="Produk populer"
+                title="Yang paling sering dipesan"
+                sub="Langsung pilih dari daftar teratas, atau buka katalog lengkap."
+              />
+            </div>
 
             <div
               className="product-grid-container home-popularList list-mode"
@@ -316,12 +282,15 @@ export default function Home() {
                 </div>
               ) : (
                 popularProducts.map((p, idx) => (
-                  <ProductTile key={p.id} product={p} rank={idx + 1} layout="list" />
+                  <div key={p.id} className="reveal reveal-scale" style={{ transitionDelay: `${120 + idx * 80}ms` }}>
+                    {/* 3D Tilt disabled with disableTilt={true} */}
+                    <ProductTile product={p} rank={idx + 1} layout="list" disableTilt={true} />
+                  </div>
                 ))
               )}
             </div>
 
-            <div className="home-sectionCta">
+            <div className="home-sectionCta reveal" style={{ transitionDelay: `${120 + popularProducts.length * 80}ms` }}>
               <Link className="btn" to="/produk">
                 {!loading && totalActiveProducts > 4
                   ? `Lihat ${totalActiveProducts - 4} produk lainnya`
@@ -335,26 +304,28 @@ export default function Home() {
         {/* ── Kupon Promo — hanya tampil jika ada promo aktif ── */}
         {!loading && promos.length > 0 ? (
           <section
-            className="home-section reveal"
-            style={{ transitionDelay: "80ms" }}
+            className="home-section"
             aria-label="Kupon Promo"
           >
             <div className="container home-sectionInner">
-              <HomeSectionHead
-                kicker="Kupon aktif"
-                title="Diskon siap dipakai"
-                sub="Tap kartu untuk menyalin kode promo."
-              />
+              <div className="reveal" style={{ transitionDelay: "40ms" }}>
+                <HomeSectionHead
+                  kicker="Kupon aktif"
+                  title="Diskon siap dipakai"
+                  sub="Tap kartu untuk menyalin kode promo."
+                />
+              </div>
 
               <div className="home-promoGrid">
-                {promos.map((promo) => (
+                {promos.map((promo, idx) => (
                   <div
                     key={promo.code}
-                    className="home-promoCard"
-                    onClick={() => handleCopyPromo(promo.code)}
+                    className="home-promoCard reveal reveal-scale"
+                    style={{ transitionDelay: `${120 + idx * 80}ms` }}
+                    onClick={(e) => handleCopyPromo(promo.code, e)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === "Enter" && handleCopyPromo(promo.code)}
+                    onKeyDown={(e) => e.key === "Enter" && handleCopyPromo(promo.code, e)}
                     aria-label={`Salin kode promo ${promo.code} untuk diskon ${promo.percent}%`}
                   >
                     <div className="home-promoCard-stub">
@@ -379,59 +350,116 @@ export default function Home() {
 
         {/* ── Cara Kerja ── */}
         <section
-          className="home-section home-howSection reveal"
-          style={{ transitionDelay: "140ms" }}
+          className="home-section home-howSection"
           aria-label="Cara kerja"
         >
           <div className="container home-sectionInner">
-            <HomeSectionHead
-              kicker="Cara kerja"
-              title="3 langkah, selesai dalam menit"
-              sub="Dari pilih sampai aktif, prosesnya sesimpel ini."
-            />
+            <div className="reveal reveal-left" style={{ transitionDelay: "40ms" }}>
+              <HomeSectionHead
+                kicker="Cara kerja"
+                title="3 langkah, selesai dalam menit"
+                sub="Dari pilih sampai aktif. Tap kartu langkah untuk tips ekstra."
+              />
+            </div>
             <div className="home-howGrid">
-              {HOW_IT_WORKS.map((step, i) => (
-                <div key={step.step} className="home-howCard" style={{ "--how-i": i }}>
-                  <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
-                  <div className="home-howCard-icon" aria-hidden="true">
-                    <Zap size={20} />
+              {HOW_IT_WORKS.map((step, i) => {
+                const isOpen = activeStep === i;
+                return (
+                  <div
+                    key={step.step}
+                    className={`home-howCard reveal reveal-scale${isOpen ? " is-expanded" : ""}`}
+                    style={{ "--how-i": i, transitionDelay: `${120 + i * 80}ms`, cursor: "pointer" }}
+                    onClick={() => setActiveStep(isOpen ? null : i)}
+                    role="button"
+                    tabIndex={0}
+                    onKeyDown={(e) => e.key === "Enter" && setActiveStep(isOpen ? null : i)}
+                  >
+                    <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
+                    <div className="home-howCard-icon" aria-hidden="true">
+                      <Zap size={20} />
+                    </div>
+                    <div className="home-howCard-content">
+                      <h3 className="home-howCard-title">{step.title}</h3>
+                      <p className="home-howCard-desc">{step.desc}</p>
+                      
+                      {/* Accordion Expansion details */}
+                      <div className={`home-howCard-expandedWrap${isOpen ? " open" : ""}`}>
+                        <div className="home-howCard-expandedContent">
+                          <p>{step.details}</p>
+                        </div>
+                      </div>
+                    </div>
+                    {i < HOW_IT_WORKS.length - 1 ? (
+                      <div className="home-howCard-connector" aria-hidden="true" />
+                    ) : null}
                   </div>
-                  <h3 className="home-howCard-title">{step.title}</h3>
-                  <p className="home-howCard-desc">{step.desc}</p>
-                  {i < HOW_IT_WORKS.length - 1 ? (
-                    <div className="home-howCard-connector" aria-hidden="true" />
-                  ) : null}
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </section>
 
         {/* ── FAQ Singkat ── */}
         <section
-          className="home-section home-faqSection reveal"
-          style={{ transitionDelay: "180ms" }}
+          className="home-section home-faqSection"
           aria-label="FAQ singkat"
         >
           <div className="container home-sectionInner">
-            <HomeSectionHead
-              kicker="FAQ"
-              title="Pertanyaan yang sering ditanyakan"
-              sub="Jawaban singkat sebelum kamu order."
-            />
+            <div className="reveal" style={{ transitionDelay: "40ms" }}>
+              <HomeSectionHead
+                kicker="FAQ"
+                title="Pertanyaan yang sering ditanyakan"
+                sub="Jawaban singkat sebelum kamu order."
+              />
+            </div>
+
+            {/* FAQ Search Bar linking to about page */}
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (faqQuery.trim()) {
+                  nav(`/tentang?q=${encodeURIComponent(faqQuery.trim())}`);
+                }
+              }}
+              className="home-faqSearchWrap reveal reveal-scale"
+              style={{ transitionDelay: "80ms" }}
+            >
+              <div className="home-faqSearchShell">
+                <Search size={16} className="home-faqSearchIcon" />
+                <input
+                  type="text"
+                  placeholder="Cari pertanyaan kamu di sini... (tekan Enter)"
+                  value={faqQuery}
+                  onChange={(e) => setFaqQuery(e.target.value)}
+                  className="home-faqSearchInput"
+                  aria-label="Cari FAQ"
+                />
+                {faqQuery ? (
+                  <button
+                    type="button"
+                    className="home-faqSearchClear"
+                    onClick={() => setFaqQuery("")}
+                    aria-label="Hapus pencarian FAQ"
+                  >
+                    <X size={14} />
+                  </button>
+                ) : null}
+              </div>
+            </form>
 
             <div className="home-faqList">
-              {HOME_FAQ.map((item) => (
-                <HomeFaqItem
-                  key={item.id}
-                  item={item}
-                  open={openFaqId === item.id}
-                  onToggle={(id) => setOpenFaqId((cur) => (cur === id ? null : id))}
-                />
+              {HOME_FAQ.map((item, idx) => (
+                <div key={item.id} className="reveal reveal-blur" style={{ transitionDelay: `${120 + idx * 80}ms` }}>
+                  <HomeFaqItem
+                    item={item}
+                    open={openFaqId === item.id}
+                    onToggle={(id) => setOpenFaqId((cur) => (cur === id ? null : id))}
+                  />
+                </div>
               ))}
             </div>
 
-            <div className="home-sectionCta">
+            <div className="home-sectionCta reveal" style={{ transitionDelay: `${120 + HOME_FAQ.length * 80}ms` }}>
               <Link className="btn btn-ghost" to="/tentang">
                 Baca FAQ lengkap
                 <ArrowRight size={16} aria-hidden="true" />
@@ -443,3 +471,4 @@ export default function Home() {
     </div>
   );
 }
+

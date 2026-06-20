@@ -26,6 +26,7 @@ import {
 import Modal from "../../components/Modal";
 import EmptyState from "../../components/EmptyState";
 import FlowAssist from "../../components/FlowAssist";
+import "../../css/pages/AdminDashboard.css";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -1144,23 +1145,49 @@ export default function AdminDashboard() {
     if (!window.confirm(`Tandai ${ids.length} order sebagai ${label}?`)) return;
 
     const tid = toast.loading(`Memperbarui ${ids.length} order...`);
-    const results = await Promise.allSettled(
-      ids.map((id) =>
-        newStatus === "cancelled"
-          ? supabase.rpc("cancel_order_with_stock_restore", { p_order_id: id })
-          : supabase.from("orders").update({ status: newStatus }).eq("id", id)
-      )
-    );
+    
+    let succeededIds = [];
+    let failedIds = [];
+
+    if (newStatus === "cancelled") {
+      // Cancellation has custom database side effects (stock restore rpc), so must run individually
+      const results = await Promise.allSettled(
+        ids.map((id) => supabase.rpc("cancel_order_with_stock_restore", { p_order_id: id }))
+      );
+      results.forEach((r, idx) => {
+        const id = ids[idx];
+        if (r.status === "fulfilled" && !r.value?.error) {
+          succeededIds.push(id);
+        } else {
+          failedIds.push(id);
+        }
+      });
+    } else {
+      // Bulk update is much more efficient using Supabase .in() operator
+      const { error } = await supabase
+        .from("orders")
+        .update({ status: newStatus })
+        .in("id", ids);
+
+      if (error) {
+        failedIds = ids;
+      } else {
+        succeededIds = ids;
+      }
+    }
+
     toast.remove(tid);
 
-    const failed = results.filter((r) => r.status === "rejected" || r.value?.error).length;
-    const succeeded = ids.length - failed;
+    const succeeded = succeededIds.length;
+    const failed = failedIds.length;
 
     if (failed === 0) {
       toast.success(`${succeeded} order diperbarui`);
       setSelectedOrderIds(new Set());
     } else {
       toast.error(`${succeeded} berhasil, ${failed} gagal`);
+      // Selectively retain only failed IDs in the selection set
+      setSelectedOrderIds(new Set(failedIds));
     }
 
     await refreshOrders();
@@ -1181,6 +1208,10 @@ export default function AdminDashboard() {
     setMsg("");
 
     try {
+      // Find the order to get whatsapp number for notification
+      const orderToUpdate = orders.find((o) => o.id === orderId);
+      const customerWa = orderToUpdate?.customer_whatsapp || "";
+
       if (status === "cancelled") {
         // Use RPC that atomically restores stock + promo slot
         const { data, error } = await supabase.rpc("cancel_order_with_stock_restore", {
@@ -1193,13 +1224,52 @@ export default function AdminDashboard() {
           : "";
         await refreshOrders();
         toast.remove(tid);
-        toast.success(`Order dibatalkan${extra}`, { duration: 2400 });
+
+        // Toast with WA redirect button for cancellation
+        if (customerWa) {
+          const waDigits = normalizeWhatsApp(customerWa);
+          const orderCode = orderToUpdate?.order_code || "-";
+          const total = formatIDR(orderToUpdate?.total_idr || 0);
+          const text = encodeURIComponent(
+            `Halo ${customerWa},\n\nOrder kamu dengan ID ${orderCode} telah dibatalkan.\n\nTotal: ${total}\n\nJika ada pertanyaan, silakan hubungi admin.\n\nTerima kasih.`
+          );
+          const waUrl = `https://wa.me/${waDigits}?text=${text}`;
+          toast.success(`Order dibatalkan${extra}`, {
+            actionLabel: "Kirim WA",
+            onAction: () => {
+              window.open(waUrl, "_blank");
+            },
+            duration: 6000
+          });
+        } else {
+          toast.success(`Order dibatalkan${extra}`, { duration: 2400 });
+        }
       } else {
         const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
         if (error) throw error;
         await refreshOrders();
         toast.remove(tid);
-        toast.success("Status diperbarui", { duration: 1200 });
+
+        const statusLabel = prettyStatus(status);
+        // Toast with WA redirect button for status updates
+        if (customerWa) {
+          const waDigits = normalizeWhatsApp(customerWa);
+          const orderCode = orderToUpdate?.order_code || "-";
+          const total = formatIDR(orderToUpdate?.total_idr || 0);
+          const text = encodeURIComponent(
+            `Halo ${customerWa},\n\nUpdate order kamu:\n\nID Order: ${orderCode}\nStatus: ${statusLabel}\nTotal: ${total}\n\nTerima kasih sudah berbelanja di Imzaqi Store.`
+          );
+          const waUrl = `https://wa.me/${waDigits}?text=${text}`;
+          toast.success(`Status diperbarui ke ${statusLabel}`, {
+            actionLabel: "Kirim WA",
+            onAction: () => {
+              window.open(waUrl, "_blank");
+            },
+            duration: 6000
+          });
+        } else {
+          toast.success(`Status diperbarui ke ${statusLabel}`, { duration: 1200 });
+        }
       }
     } catch (e) {
       toast.remove(tid);
@@ -3188,6 +3258,10 @@ export default function AdminDashboard() {
                               toast.error("Lengkapi semua field");
                               return;
                             }
+                            if (new Date(flashForm.ends_at) <= new Date(flashForm.starts_at)) {
+                              toast.error("Tanggal selesai harus setelah tanggal mulai");
+                              return;
+                            }
                             const tid = toast.loading("Menyimpan flash sale");
                             try {
                               if (flashForm.id) {
@@ -3783,7 +3857,7 @@ export default function AdminDashboard() {
                 rows={3}
                 value={adminNoteDrafts[activeOrder.id] || ""}
                 onChange={(e) => setAdminNoteDrafts((prev) => ({ ...prev, [activeOrder.id]: e.target.value }))}
-                placeholder="Tulis instruksi internal atau bahan follow-up."
+                placeholder="Tulis detail/kredensial akun yang dikirimkan atau catatan penting yang AKAN dilihat langsung oleh customer di halaman status."
               />
               <div className="admin-order-adminActions">
                 {activeOrder.payment_proof_url ? (

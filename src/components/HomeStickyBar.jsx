@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { Activity, LayoutGrid, ShoppingCart } from "lucide-react";
 import { useCart } from "../context/CartContext";
 
 export default function HomeStickyBar() {
   const { items } = useCart();
+  const location = useLocation();
   const [enabled, setEnabled] = useState(false);
   const [visible, setVisible] = useState(false);
 
@@ -32,7 +33,7 @@ export default function HomeStickyBar() {
       return undefined;
     }
 
-    const hero = document.querySelector(".hm-hero");
+    const hero = document.querySelector(".hx-hero");
     if (!hero) return undefined;
 
     const io = new IntersectionObserver(
@@ -66,7 +67,7 @@ export default function HomeStickyBar() {
         <Activity size={16} aria-hidden="true" />
         <span>Status</span>
       </Link>
-      <Link to="/checkout" className="home-stickyBar-link">
+      <Link to="/checkout" state={{ backgroundLocation: location }} className="home-stickyBar-link">
         <ShoppingCart size={16} aria-hidden="true" />
         <span>Keranjang</span>
         {cartCount > 0 ? <span className="home-stickyBar-badge">{cartCount}</span> : null}

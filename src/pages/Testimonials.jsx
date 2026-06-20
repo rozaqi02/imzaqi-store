@@ -18,6 +18,7 @@ import { fetchTestimonials } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { buildStoreInsights } from "../lib/storeInsights";
+import "../css/pages/Testimonials.css";
 
 export default function Testimonials() {
   const [loading, setLoading] = useState(true);

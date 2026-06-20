@@ -269,9 +269,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   border: 1px solid transparent;
   background: transparent;
   color: rgba(255, 255, 255, 0.32);

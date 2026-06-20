@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
+import "../../css/pages/AdminLogin.css";
 
 export default function AdminLogin() {
   const nav = useNavigate();

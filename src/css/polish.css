@@ -383,10 +383,8 @@ a.btn:active {
 
 /* ─── 13. Soft scroll-fade at section edges ───────────────────────────── */
 .catalog-quickFilters,
-.hero-rail,
 .admin-kpiStrip,
-.admin-mobileTabs,
-.pdx-segmentControl {
+.admin-mobileTabs {
   -webkit-mask-image: linear-gradient(90deg,
       transparent 0%,
       #000 12px,
@@ -409,7 +407,6 @@ a.btn:active {
 
 /* ─── 14. Subtle aurora gradient on header brand text ─────────────────── */
 .brand,
-.site-brand strong,
 .admin-brand-title,
 .admin-mobileCopy strong {
   background-image: linear-gradient(135deg, #4effda 0%, #00d6b4 50%, #008a94 100%);
@@ -421,8 +418,7 @@ a.btn:active {
   animation: polishAurora 6s ease-in-out infinite alternate;
 }
 
-:root[data-theme="dark"] .brand,
-:root[data-theme="dark"] .site-brand strong {
+:root[data-theme="dark"] .brand {
   background-image: linear-gradient(135deg, #87ffe5 0%, #4effda 50%, #25ebc8 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -442,7 +438,6 @@ a.btn:active {
 @media (prefers-reduced-motion: reduce) {
 
   .brand,
-  .site-brand strong,
   .admin-brand-title,
   .admin-mobileCopy strong {
     animation: none;
@@ -450,7 +445,6 @@ a.btn:active {
 }
 
 /* ─── 15. Badge / pill micro-pulse for "active" / "new" indicators ─────── */
-.product-tile-badge.is-new,
 .catalog-status.hot,
 .admin-statCard[data-pulse] {
   position: relative;
@@ -529,18 +523,35 @@ textarea,
   caret-color: #4effda;
 }
 
+/* Scroll progress bar */
+.home-scrollProgress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3.5px;
+  background: linear-gradient(90deg, #4effda, #00d6b4, #008a94);
+  z-index: 9999;
+  width: 0%;
+  pointer-events: none;
+  transition: width 0.08s ease-out;
+}
+
 /* ─── 18. Reveal-on-scroll soft entrance for sections ──────────────────── */
 @media (prefers-reduced-motion: no-preference) {
 
   .reveal,
+  .reveal-left,
+  .reveal-scale,
+  .reveal-blur,
   .section,
   .catalog-card,
   .product-tile,
   .pdx-variantCard,
   .admin-panel {
     transition:
-      transform 0.5s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
-      opacity 0.5s var(--ease-out);
+      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
+      opacity 0.6s ease-out,
+      filter 0.6s ease-out;
   }
 
   .reveal:not(.is-visible) {
@@ -548,11 +559,32 @@ textarea,
     transform: translateY(16px);
   }
 
-  .reveal.is-visible {
+  .reveal-left:not(.is-visible) {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+
+  .reveal-scale:not(.is-visible) {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  .reveal-blur:not(.is-visible) {
+    opacity: 0;
+    filter: blur(8px);
+    transform: translateY(12px);
+  }
+
+  .reveal.is-visible,
+  .reveal-left.is-visible,
+  .reveal-scale.is-visible,
+  .reveal-blur.is-visible {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate(0) scale(1);
+    filter: none;
   }
 }
+
 
 /* ─── 19. Heading underline accent on hover (long-form pages) ─────────── */
 .h1,
@@ -562,9 +594,7 @@ textarea,
 
 @media (hover: hover) and (pointer: fine) {
 
-  .layout-header h2:hover::after,
-  .pdx-variantsHead h2:hover::after,
-  .home-layoutHeader h2:hover::after {
+    .pdx-variantsHead h2:hover::after {
     content: "";
     position: absolute;
     left: 0;
@@ -623,16 +653,11 @@ textarea,
 .catalog-card,
 .product-tile,
 .pdx-variantCard,
-.pdx-heroPanel,
-.pdx-summaryPanel,
 .pdx-variantsSection,
 .checkout-panel,
 .checkout-summary,
-.status-mainCard,
-.status-sideCard,
 .pay-card,
 .pay-orderDesktop,
-.pay-orderMobile,
 .testi-tile {
   border-radius: 20px;
 }
@@ -647,13 +672,10 @@ input[type="search"],
 input[type="password"],
 select,
 .tab-btn,
-.toggle-btn,
-.pdx-chip,
 .catalog-chip,
 .catalog-quickChip,
 .product-tile-pill,
-.catalog-cardMeta>span,
-.hero-railItem {
+.catalog-cardMeta>span {
   font-feature-settings: "ss01", "cv11";
 }
 
@@ -708,7 +730,6 @@ button:disabled,
 
 /* Consistent muted text color across all pages */
 .muted,
-.text-muted,
 .hint,
 small {
   color: var(--brand-muted, rgba(234, 255, 245, 0.65));
@@ -744,5 +765,38 @@ html {
     inset 0 2px 0 rgba(255, 255, 255, 0.9),
     inset 0 -4px 0 rgba(135, 175, 190, 0.35) !important;
   border-left: 1px solid rgba(0, 138, 148, 0.14) !important;
+}
+
+/* ─── Unified card hover elevation ─────────────────────────── */
+@media (hover: hover) {
+  .checkout-panel,
+  .pay-stageCard,
+  .pay-card,
+  .st-card,
+  .home-promoCard {
+    transition: transform 0.22s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)), box-shadow 0.22s var(--ease-out) !important;
+  }
+  .checkout-panel:hover,
+  .pay-stageCard:hover,
+  .pay-card:hover,
+  .st-card:hover,
+  .home-promoCard:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18) !important;
+  }
+}
+
+/* Light mode: remove background from text elements */
+:root[data-theme="light"] .pay-shell-title,
+:root[data-theme="light"] .pay-cardTitle,
+:root[data-theme="light"] .pay-stageTotal,
+:root[data-theme="light"] .pay-orderTitle,
+:root[data-theme="light"] .pay-orderItemName,
+:root[data-theme="light"] .pay-orderRow strong,
+:root[data-theme="light"] .pay-orderRow b,
+:root[data-theme="light"] .pay-stageRow b,
+:root[data-theme="light"] .pay-qrisLocked strong,
+:root[data-theme="light"] .pay-successCode {
+  background: transparent !important;
 }
 

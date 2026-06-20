@@ -28,6 +28,63 @@ export default function Layout({ children, routeKey }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Neumorphic Light Tracking Global Mouse Move Observer
+  React.useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const isCoarse = window.matchMedia("(pointer: coarse), (max-width: 920px)").matches;
+    if (isCoarse) return;
+
+    let lastEl = null;
+
+    const handleMouseMove = (e) => {
+      const el = e.target.closest(
+        ".product-tile, .home-promoCard, .home-howCard, .st-infoCard, .st-card, .pay-card, .card"
+      );
+
+      if (el) {
+        // Reset old hovered element style if we switched to a new card
+        if (lastEl && lastEl !== el) {
+          lastEl.style.setProperty("--light-x", "1");
+          lastEl.style.setProperty("--light-y", "1");
+        }
+        lastEl = el;
+
+        const rect = el.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const dx = e.clientX - centerX;
+        const dy = e.clientY - centerY;
+
+        // Shadow is cast in the opposite direction of the cursor (light source)
+        // Normalize light position relative to element size
+        const lx = -dx / (rect.width / 2);
+        const ly = -dy / (rect.height / 2);
+
+        // Limit range between -1.3 and 1.3 for styling sanity
+        const boundedLx = Math.max(-1.3, Math.min(1.3, lx));
+        const boundedLy = Math.max(-1.3, Math.min(1.3, ly));
+
+        el.style.setProperty("--light-x", boundedLx.toFixed(3));
+        el.style.setProperty("--light-y", boundedLy.toFixed(3));
+      } else if (lastEl) {
+        // Clean up last hovered card back to default top-left lighting
+        lastEl.style.setProperty("--light-x", "1");
+        lastEl.style.setProperty("--light-y", "1");
+        lastEl = null;
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    return () => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      if (lastEl) {
+        lastEl.style.setProperty("--light-x", "1");
+        lastEl.style.setProperty("--light-y", "1");
+      }
+    };
+  }, []);
+
   useAdaptiveMotion();
   const routeDirection = useRouteDirection(revealKey);
   // Re-attach reveal observer whenever route changes.

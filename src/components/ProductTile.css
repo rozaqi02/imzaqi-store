@@ -1,0 +1,554 @@
+/* Scoped ProductTile Stylesheet */
+
+.product-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 18px;
+  min-height: 0;
+  padding: 18px;
+  border-radius: 26px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03)),
+    radial-gradient(circle at top right, rgba(29, 131, 255, 0.12), rgba(29, 131, 255, 0) 45%);
+  /* Base shadow */
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.18);
+  transition:
+    transform 0.26s var(--ease-out),
+    border-color 0.26s var(--ease-out);
+  /*
+    content-visibility: auto lets the browser skip layout/paint for off-screen
+    tiles entirely, which is the single biggest scroll-performance win here.
+    Use 'auto' instead of 'visible' — 'visible' is a no-op.
+  */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+  z-index: 1;
+}
+
+/* GPU-accelerated hover shadow */
+.product-tile::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 36px 80px rgba(0, 0, 0, 0.28);
+  opacity: 0;
+  transition: opacity 0.26s var(--ease-out);
+  z-index: -1;
+  pointer-events: none;
+}
+
+.product-tile--grid {
+  gap: 14px;
+  padding: 16px;
+  border-radius: 28px 28px 18px 18px;
+}
+
+.product-tile--list {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 18px;
+  align-items: center;
+  min-height: 0;
+  padding: 18px 18px 18px 24px;
+  border-radius: 24px 32px 24px 28px;
+}
+
+.product-tile--list::before {
+  content: none;
+  display: none;
+}
+
+@media (hover: hover) {
+  .product-tile:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: rgba(29, 131, 255, 0.28);
+  }
+
+  .product-tile:hover::after {
+    opacity: 1;
+  }
+
+  .product-tile:hover .product-tile-arrow {
+    transform: translate(2px, -2px);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+  }
+}
+
+.product-tile-top {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 14px;
+  align-items: start;
+}
+
+.product-tile--grid .product-tile-top {
+  grid-template-columns: 1fr auto;
+  gap: 12px;
+}
+
+.product-tile--grid .product-tile-main {
+  grid-column: 1 / -1;
+}
+
+.product-tile--list .product-tile-top {
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.product-tile-icon {
+  width: 60px;
+  height: 60px;
+  display: grid;
+  place-items: center;
+  border-radius: 18px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 24px var(--brand-color, transparent);
+  transition: box-shadow 0.3s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .product-tile:hover .product-tile-icon {
+    box-shadow: 0 12px 32px var(--brand-color, transparent);
+  }
+}
+
+.product-tile--grid .product-tile-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+}
+
+.product-tile--list .product-tile-icon {
+  width: 62px;
+  height: 62px;
+  border-radius: 20px;
+}
+
+.product-tile-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.product-tile-fallback {
+  font-size: 24px;
+  font-weight: 1000;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.product-tile-main {
+  min-width: 0;
+}
+
+.product-tile-name {
+  font-size: 20px;
+  font-weight: 1000;
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.product-tile-rankBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  height: 22px;
+  padding: 0 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Rank 1: Gold / Flame Badge */
+.product-tile-rankBadge--1 {
+  border: 1px solid rgba(255, 215, 0, 0.44);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(255, 165, 0, 0.12) 100%);
+  color: #ffd700;
+  box-shadow: 0 2px 10px rgba(255, 215, 0, 0.1);
+}
+
+/* Rank 2: Silver/Steel Badge */
+.product-tile-rankBadge--2 {
+  border: 1px solid rgba(192, 192, 192, 0.38);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14) 0%, rgba(120, 120, 120, 0.08) 100%);
+  color: #e2e8f0;
+}
+
+/* Rank 3: Bronze/Copper Badge */
+.product-tile-rankBadge--3 {
+  border: 1px solid rgba(205, 127, 50, 0.36);
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.16) 0%, rgba(139, 69, 19, 0.08) 100%);
+  color: #f6ad55;
+}
+
+/* Rank 4: Neon Steel/Cyan Badge */
+.product-tile-rankBadge--4 {
+  border: 1px solid rgba(0, 214, 180, 0.38);
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.14) 0%, rgba(0, 138, 148, 0.08) 100%);
+  color: #4effda;
+}
+
+/* Light Theme overrides for Rank Badges */
+:root[data-theme="light"] .product-tile-rankBadge--1 {
+  border-color: rgba(212, 160, 23, 0.44) !important;
+  background: linear-gradient(135deg, rgba(255, 223, 118, 0.32) 0%, rgba(255, 203, 73, 0.22) 100%) !important;
+  color: #8b6200 !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+
+:root[data-theme="light"] .product-tile-rankBadge--2 {
+  border-color: rgba(90, 115, 125, 0.24) !important;
+  background: linear-gradient(135deg, rgba(230, 240, 245, 0.8) 0%, rgba(200, 215, 222, 0.6) 100%) !important;
+  color: #4a626e !important;
+}
+
+:root[data-theme="light"] .product-tile-rankBadge--3 {
+  border-color: rgba(175, 96, 26, 0.28) !important;
+  background: linear-gradient(135deg, rgba(252, 235, 222, 0.8) 0%, rgba(240, 210, 185, 0.6) 100%) !important;
+  color: #804310 !important;
+}
+
+:root[data-theme="light"] .product-tile-rankBadge--4 {
+  border-color: rgba(0, 138, 148, 0.32) !important;
+  background: linear-gradient(135deg, rgba(220, 246, 248, 0.8) 0%, rgba(188, 235, 238, 0.6) 100%) !important;
+  color: #006b74 !important;
+  text-shadow: none !important;
+}
+
+.product-tile--grid .product-tile-name {
+  font-size: 18px;
+}
+
+.product-tile--list .product-tile-name {
+  font-size: 22px;
+}
+
+.product-tile-desc {
+  margin-top: 6px;
+  color: rgba(234, 255, 245, 0.68);
+  font-size: 13px;
+  line-height: 1.6;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.product-tile--grid .product-tile-desc {
+  margin-top: 4px;
+  font-size: 12px;
+  line-height: 1.5;
+  -webkit-line-clamp: 3;
+}
+
+.product-tile--list .product-tile-desc {
+  max-width: 44ch;
+}
+
+.product-tile-arrow {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  color: rgba(234, 255, 245, 0.9);
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.25s var(--ease-out);
+}
+
+.product-tile--list .product-tile-arrow {
+  width: 40px;
+  height: 40px;
+}
+
+.product-tile-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.product-tile--grid .product-tile-bottom {
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.product-tile--list .product-tile-bottom {
+  min-width: 138px;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 10px;
+}
+
+.product-tile-pills {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* Hide pills on home page for a cleaner look */
+.home-popularList .product-tile-pills {
+  display: none !important;
+}
+
+.product-tile--grid .product-tile-pills {
+  width: 100%;
+}
+
+.product-tile--list .product-tile-pills {
+  justify-content: flex-end;
+}
+
+.product-tile-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(234, 255, 245, 0.82);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+/* ── Low Stock & Out of Stock Badges ── */
+.product-lowStockBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 191, 74, 0.28);
+  background: rgba(255, 191, 74, 0.10);
+  color: rgba(255, 220, 120, 0.92);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.product-lowStockBadge.out {
+  border-color: rgba(255, 90, 122, 0.28) !important;
+  background: rgba(255, 90, 122, 0.10) !important;
+  color: #ff5a7a !important;
+}
+
+:root[data-theme="light"] .product-lowStockBadge {
+  color: #b45309 !important;
+  border-color: rgba(180, 83, 9, 0.28) !important;
+  background: rgba(254, 243, 199, 0.8) !important;
+}
+
+:root[data-theme="light"] .product-lowStockBadge.out {
+  color: #b91c1c !important;
+  border-color: rgba(185, 28, 28, 0.28) !important;
+  background: rgba(254, 226, 226, 0.8) !important;
+}
+
+.product-tile-price {
+  font-size: 18px;
+  font-weight: 1000;
+  letter-spacing: -0.03em;
+  color: #9cddff;
+}
+
+.product-tile--grid .product-tile-price {
+  width: 100%;
+  font-size: 17px;
+  text-align: right;
+}
+
+.product-tile--list .product-tile-price {
+  font-size: 20px;
+  white-space: nowrap;
+}
+
+@media (hover: hover) and (min-width: 901px) {
+  .product-tile {
+    position: relative;
+    overflow: hidden;
+  }
+
+
+  .product-tile:hover {
+    transform: translateY(-3px);
+    border-color: rgba(79, 255, 200, 0.32) !important;
+  }
+}
+
+/* ── Realistic skeleton matching ProductTile shape ── */
+.home-tileSkeleton {
+  padding: 18px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  display: grid;
+  gap: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.home-tileSkeleton::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.08) 35%,
+    rgba(255, 255, 255, 0.03) 60%,
+    transparent 100%
+  );
+  will-change: transform;
+  transform: translate(-100%);
+  animation: skelShimmer 2s ease-in-out infinite;
+}
+
+@keyframes skelShimmer {
+  0% { transform: translate(-100%); }
+  100% { transform: translate(200%); }
+}
+
+.home-tileSkeleton-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.home-tileSkeleton-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.home-tileSkeleton-textGroup {
+  flex: 1;
+  display: grid;
+  gap: 6px;
+}
+
+.home-tileSkeleton-line {
+  height: 12px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.home-tileSkeleton-line.w-72 { width: 72%; }
+.home-tileSkeleton-line.w-50 { width: 50%; }
+
+.home-tileSkeleton-arrow {
+  width: 24px;
+  height: 24px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+  flex-shrink: 0;
+}
+
+.home-tileSkeleton-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.home-tileSkeleton-pills {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.home-tileSkeleton-pill {
+  height: 24px;
+  width: 70px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.home-tileSkeleton-price {
+  height: 18px;
+  width: 90px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+:root[data-theme="light"] .home-tileSkeleton {
+  border-color: rgba(0, 138, 148, 0.1);
+  background: rgba(255, 255, 255, 0.5);
+}
+
+:root[data-theme="light"] .home-tileSkeleton-icon,
+:root[data-theme="light"] .home-tileSkeleton-line,
+:root[data-theme="light"] .home-tileSkeleton-arrow,
+:root[data-theme="light"] .home-tileSkeleton-pill,
+:root[data-theme="light"] .home-tileSkeleton-price {
+  background: rgba(0, 138, 148, 0.08);
+}
+
+:root[data-theme="light"] .home-tileSkeleton::after {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.5),
+    transparent
+  );
+}
+
+@media (max-width: 560px) {
+  .product-tile--grid {
+    padding: 14px;
+    border-radius: 22px;
+  }
+
+  .product-tile--grid .product-tile-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 14px;
+  }
+
+  .product-tile--grid .product-tile-name {
+    font-size: 16px;
+  }
+
+  .product-tile--grid .product-tile-price {
+    font-size: 15px;
+  }
+
+  .product-tile--grid .product-tile-pill {
+    height: 28px;
+    padding: 0 8px;
+    font-size: 10px;
+  }
+
+  .product-tile--grid .product-tile-pill svg {
+    width: 11px;
+    height: 11px;
+  }
+}
+
+@media (max-width: 720px) {
+  /* Disable rank badge text shadows / glows on mobile */
+  .product-tile-rankBadge--1,
+  .product-tile-rankBadge--4 {
+    text-shadow: none !important;
+  }
+}
+

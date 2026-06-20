@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, FileText, Gift, Info, Loader, Phone, ShieldCheck, X } from "lucide-react";
+import { Check, CheckCircle2, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -17,10 +17,42 @@ import WhatsAppInput from "../components/WhatsAppInput";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { addOrderToHistory } from "../lib/orderHistory";
 import { copyToClipboard } from "../utils/clipboard";
+import "../css/pages/Pay.css";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
 const BUYER_EMAIL_REQUIREMENT_REGEX =
   /(akun\s*buyer|buyer\s*akun|email\s*(buyer|pembeli)|wajib\s*email|butuh\s*email|email\s*aktivasi|aktivasi\s*akun|account\s*activation|send\s*email)/i;
+const COPY_TIMEOUT_MS = 1800;
+const QRIS_UNLOCK_TIMEOUT_MS = 700;
+const PRODUCT_NAME_MAX_LEN = 24;
+const PRODUCT_NAME_TRIM_LEN = 21;
+
+const QRIS_INITIAL = {
+  url: "",
+  loaded: false,
+  notice: "",
+  failed: false,
+  mode: "idle",
+};
+
+function qrisReducer(state, action) {
+  switch (action.type) {
+    case "RESET":
+      return { ...QRIS_INITIAL };
+    case "FREE":
+      return { ...state, mode: "free" };
+    case "DYNAMIC":
+      return { ...state, url: action.url, mode: "dynamic" };
+    case "FALLBACK":
+      return { ...state, url: action.url, notice: action.notice, mode: "fallback" };
+    case "LOADED":
+      return { ...state, loaded: true };
+    case "FAILED":
+      return { ...state, failed: true, loaded: true, mode: "fallback" };
+    default:
+      return state;
+  }
+}
 
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
@@ -93,6 +125,14 @@ function QRISSkeleton() {
 
 function QRISZoomModal({ open, qrisUrl, onClose }) {
   const [phase, setPhase] = useState("entering");
+  const zoomContentRef = useRef(null);
+
+  useDialogA11y({
+    open,
+    containerRef: zoomContentRef,
+    onClose,
+    initialFocusSelector: ".pay-zoomClose",
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -118,6 +158,7 @@ function QRISZoomModal({ open, qrisUrl, onClose }) {
       role="presentation"
     >
       <div 
+        ref={zoomContentRef}
         className="pay-zoomContent" 
         onClick={(e) => e.stopPropagation()}
         role="dialog"
@@ -185,7 +226,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
     try {
       await copyToClipboard(orderCode);
       setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      setTimeout(() => setCopied(false), COPY_TIMEOUT_MS);
       onCopied?.();
     } catch {
       // Ignore clipboard failure.
@@ -485,7 +526,7 @@ export default function Pay() {
   const items = snapshot;
   const promoPercent = Number(promo?.percent || 0);
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + (Number(item.price_idr) || 0) * (Number(item.qty) || 0), 0), [items]);
-  const { discount, total } = calcTotal(subtotal, promoPercent);
+  const { discount, total } = useMemo(() => calcTotal(subtotal, promoPercent), [subtotal, promoPercent]);
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [items]);
 
   const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" }, qris: {} });
@@ -497,16 +538,13 @@ export default function Pay() {
 
   const [customerWhatsApp, setCustomerWhatsApp] = useState("");
   const [isWaValid, setIsWaValid] = useState(false);
+  const [buyerEmail, setBuyerEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [busy, setBusy] = useState(false);
   const [errorText, setErrorText] = useState("");
   const [ok, setOk] = useState(false);
   const [orderCode, setOrderCode] = useState("");
-  const [qrisUrl, setQrisUrl] = useState("");
-  const [qrisLoaded, setQrisLoaded] = useState(false);
-  const [qrisNotice, setQrisNotice] = useState("");
-  const [qrisFailed, setQrisFailed] = useState(false);
-  const [qrisMode, setQrisMode] = useState("idle");
+  const [qris, dispatchQris] = useReducer(qrisReducer, QRIS_INITIAL);
   const [productIconLookup, setProductIconLookup] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
@@ -555,36 +593,27 @@ export default function Pay() {
     let active = true;
 
     async function loadQris() {
-      setQrisLoaded(false);
-      setQrisFailed(false);
-      setQrisUrl("");
-      setQrisNotice("");
-      setQrisMode("idle");
+      dispatchQris({ type: "RESET" });
 
       // Free order (100% promo) — skip QRIS entirely
       if (total === 0) {
-        setQrisMode("free");
+        dispatchQris({ type: "FREE" });
         return;
       }
 
       if (!qrisBase) {
         if (!active) return;
-        setQrisMode("fallback");
-        setQrisUrl(fallbackQrisUrl);
-        setQrisNotice("QR statis aktif. Isi QRIS base di admin agar nominal otomatis lagi.");
+        dispatchQris({ type: "FALLBACK", url: fallbackQrisUrl, notice: "QR statis aktif. Isi QRIS base di admin agar nominal otomatis lagi." });
         return;
       }
 
       try {
         const { dataUrl } = await buildDynamicQrisImage(qrisBase, total);
         if (!active) return;
-        setQrisMode("dynamic");
-        setQrisUrl(dataUrl);
+        dispatchQris({ type: "DYNAMIC", url: dataUrl });
       } catch (error) {
         if (!active) return;
-        setQrisMode("fallback");
-        setQrisUrl(fallbackQrisUrl);
-        setQrisNotice(error?.message ? `${error.message} Pakai QR statis.` : "QR statis aktif.");
+        dispatchQris({ type: "FALLBACK", url: fallbackQrisUrl, notice: error?.message ? `${error.message} Pakai QR statis.` : "QR statis aktif." });
       }
     }
 
@@ -598,11 +627,16 @@ export default function Pay() {
     if (!ok && !orderCode && items.length === 0) nav("/checkout", { replace: true });
   }, [items.length, nav, ok, orderCode]);
 
-  const noteText = useMemo(() => String(notes || "").trim(), [notes]);
+  const noteText = useMemo(() => {
+    const parts = [];
+    if (buyerEmail.trim()) parts.push(`Email buyer: ${buyerEmail.trim()}`);
+    if (notes.trim()) parts.push(notes.trim());
+    return parts.join("\n");
+  }, [buyerEmail, notes]);
   const hasValidWhatsApp = Boolean(customerWhatsApp && isWaValid);
   const requiredBuyerEmailItems = useMemo(() => items.filter((item) => variantNeedsBuyerEmail(item)), [items]);
   const requiresBuyerEmailNote = requiredBuyerEmailItems.length > 0;
-  const hasEmailInNotes = useMemo(() => EMAIL_IN_TEXT_REGEX.test(noteText), [noteText]);
+  const hasEmailInNotes = Boolean(buyerEmail.trim());
   const missingBuyerEmailNote = requiresBuyerEmailNote && !hasEmailInNotes;
   const requiredEmailProductsText = useMemo(() => {
     const names = Array.from(
@@ -614,7 +648,7 @@ export default function Pay() {
     );
     if (!names.length) return "item ini";
 
-    const compact = names.map((name) => (name.length > 24 ? `${name.slice(0, 21).trimEnd()}...` : name));
+    const compact = names.map((name) => (name.length > PRODUCT_NAME_MAX_LEN ? `${name.slice(0, PRODUCT_NAME_TRIM_LEN).trimEnd()}...` : name));
     if (compact.length === 1) return compact[0];
     if (compact.length === 2) return `${compact[0]} & ${compact[1]}`;
     return `${compact[0]} +${compact.length - 1} lainnya`;
@@ -626,7 +660,7 @@ export default function Pay() {
   useEffect(() => {
     if (!prevCanShowQrisRef.current && canShowQris && !isFreeOrder) {
       setQrisJustUnlocked(true);
-      const timer = window.setTimeout(() => setQrisJustUnlocked(false), 700);
+      const timer = window.setTimeout(() => setQrisJustUnlocked(false), QRIS_UNLOCK_TIMEOUT_MS);
       prevCanShowQrisRef.current = canShowQris;
       return () => window.clearTimeout(timer);
     }
@@ -634,7 +668,7 @@ export default function Pay() {
     return undefined;
   }, [canShowQris, isFreeOrder]);
 
-  const isDynamicQris = qrisMode === "dynamic";
+  const isDynamicQris = qris.mode === "dynamic";
   const qrisFootText = !hasValidWhatsApp
     ? "QR akan terbuka setelah nomor WhatsApp valid."
     : missingBuyerEmailNote
@@ -833,7 +867,7 @@ export default function Pay() {
         Number(canonicalOrder.discountPercent) !== Number(promoPercent) ||
         Number(canonicalOrder.total) !== Number(total);
 
-      if (hasPricingMismatch) {
+      if (hasPricingMismatch && isFreeOrder) {
         setSnapshot(canonicalOrder.items);
         if (!canonicalOrder.promoCode && promo?.code) {
           clearPromo();
@@ -850,7 +884,7 @@ export default function Pay() {
       let generatedCode = "";
 
       for (let index = 0; index < 5; index += 1) {
-        generatedCode = makeOrderCode(4);
+        generatedCode = makeOrderCode(8);
         try {
           createdOrder = await createOrderWithStock(generatedCode, canonicalOrder);
           break;
@@ -861,6 +895,21 @@ export default function Pay() {
       }
 
       if (!createdOrder) throw new Error("Gagal membuat ID order.");
+
+      if (hasPricingMismatch && !isFreeOrder) {
+        // Log mismatch details in the database and mark as paid_reported for manual review
+        const mismatchNotes = `[PERINGATAN: Selisih Harga! Bayar: ${formatIDR(total)}, DB: ${formatIDR(canonicalOrder.total)}]\n` + (noteText || "");
+        await supabase
+          .from("orders")
+          .update({
+            status: "paid_reported",
+            notes: mismatchNotes
+          })
+          .eq("id", createdOrder.id);
+        
+        createdOrder.status = "paid_reported";
+        createdOrder.notes = mismatchNotes;
+      }
 
       setOrderCode(generatedCode);
       setOk(true);
@@ -981,11 +1030,6 @@ export default function Pay() {
           )}
         </button>
 
-        <div className="pay-stageLinks">
-          <Link className="btn btn-ghost btn-sm" to="/checkout" state={{ backgroundLocation: location }}>
-            Edit order
-          </Link>
-        </div>
       </div>
     );
   }
@@ -1027,7 +1071,7 @@ export default function Pay() {
                   <div className="pay-cardKicker">Kontak order</div>
                   <h2 className="h3 pay-cardTitle">WhatsApp</h2>
                 </div>
-                <span className={`pay-statePill ${isFreeOrder ? "live" : canShowQris ? "live" : ""}`}>
+                <span className={`pay-statePill ${isFreeOrder ? "free" : canShowQris ? "live" : "locked"}`}>
                   {isFreeOrder ? "Free" : canShowQris ? "Ready" : "Locked"}
                 </span>
               </div>
@@ -1046,37 +1090,57 @@ export default function Pay() {
                 className="pay-waField"
               />
 
-              <div className={`pay-notePanel ${requiresBuyerEmailNote ? "required" : ""}`}>
+              {requiresBuyerEmailNote && (
+                <div className="pay-emailPanel required">
+                  <div className="pay-emailHead">
+                    <div className="pay-emailLabelWrap">
+                      <Mail size={14} />
+                      <span className="pay-emailLabel">Email buyer</span>
+                    </div>
+                    <span className={`pay-emailState ${missingBuyerEmailNote ? "warn" : "ok"}`}>
+                      {missingBuyerEmailNote ? "Wajib diisi" : "Terisi"}
+                    </span>
+                  </div>
+
+                  <input
+                    type="email"
+                    className="input pay-emailInput"
+                    value={buyerEmail}
+                    onChange={(e) => setBuyerEmail(e.target.value)}
+                    placeholder="buyer@mail.com"
+                    aria-invalid={missingBuyerEmailNote || undefined}
+                    aria-describedby="pay-email-hint"
+                  />
+
+                  <div id="pay-email-hint" className="pay-emailHintText">
+                    {missingBuyerEmailNote
+                      ? `Item ${requiredEmailProductsText} memerlukan email buyer untuk aktivasi akun.`
+                      : "Email buyer sudah terisi. Akun akan dikirim ke email ini."}
+                  </div>
+                </div>
+              )}
+
+              <div className="pay-notePanel">
                 <div className="pay-noteHead">
                   <div className="pay-noteLabelWrap">
                     <FileText size={14} />
-                    <span className="pay-noteLabel">Catatan pembeli</span>
+                    <span className="pay-noteLabel">Catatan tambahan</span>
                   </div>
-                  <span className={`pay-noteState ${requiresBuyerEmailNote ? (missingBuyerEmailNote ? "warn" : "ok") : ""}`}>
-                    {requiresBuyerEmailNote ? (missingBuyerEmailNote ? "Wajib email" : "Email terdeteksi") : "Opsional"}
-                  </span>
+                  <span className="pay-noteState">Opsional</span>
                 </div>
 
                 <textarea
                   className="input pay-noteInput"
-                  rows={3}
+                  rows={2}
                   maxLength={400}
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  placeholder={
-                    requiresBuyerEmailNote
-                      ? "Wajib isi email buyer. Contoh: buyer@mail.com"
-                      : "Opsional, contoh: minta diproses malam ini."
-                  }
+                  placeholder="Contoh: minta diproses malam ini."
                 />
 
                 <div className="pay-noteMetaRow">
-                  <div className={`pay-noteHintText ${requiresBuyerEmailNote ? (missingBuyerEmailNote ? "warn" : "ok") : ""}`}>
-                    {requiresBuyerEmailNote
-                      ? missingBuyerEmailNote
-                        ? `Item ${requiredEmailProductsText} memerlukan email buyer untuk aktivasi akun.`
-                        : "Email buyer sudah terdeteksi di catatan."
-                      : "Tambahkan catatan jika ada request khusus untuk admin."}
+                  <div className="pay-noteHintText">
+                    Tambahkan catatan jika ada request khusus untuk admin.
                   </div>
                   <div className="pay-noteMeta">{notes.length}/400</div>
                 </div>
@@ -1152,45 +1216,33 @@ export default function Pay() {
                       </div>
                     ) : canShowQris ? (
                       <>
-                        {!qrisLoaded && !qrisFailed ? <QRISSkeleton /> : null}
-                        {qrisUrl ? (
+                        {!qris.loaded && !qris.failed ? <QRISSkeleton /> : null}
+                        {qris.url ? (
                           <div style={{ width: '100%' }}>
                             <img
-                              src={qrisUrl}
+                              src={qris.url}
                               alt="QRIS pembayaran"
                               className="qris-img"
-                              onLoad={() => setQrisLoaded(true)}
+                              onLoad={() => dispatchQris({ type: "LOADED" })}
                               onError={(event) => {
                                 event.target.style.display = "none";
-                                setQrisFailed(true);
-                                setQrisLoaded(true);
+                                dispatchQris({ type: "FAILED" });
                               }}
                               onClick={() => setIsZoomed(true)}
-                              style={{ display: qrisLoaded && !qrisFailed ? "block" : "none", cursor: 'zoom-in' }}
+                              style={{ display: qris.loaded && !qris.failed ? "block" : "none", cursor: 'zoom-in' }}
                             />
-                            {qrisLoaded && !qrisFailed && (
+                            {qris.loaded && !qris.failed && (
                               <a
-                                href={qrisUrl}
+                                href={qris.url}
                                 download="qris-imzaqi-store.png"
                                 className="btn btn-ghost btn-sm pay-qrisDownload"
-                                style={{
-                                  marginTop: '10px',
-                                  width: '100%',
-                                  display: 'inline-flex',
-                                  alignItems: 'center',
-                                  justifyContent: 'center',
-                                  gap: '6px',
-                                  borderRadius: '12px',
-                                  height: '38px',
-                                  fontSize: '12px'
-                                }}
                               >
                                 Simpan QRIS ke Galeri
                               </a>
                             )}
                           </div>
                         ) : null}
-                        {qrisFailed ? <div className="hint subtle">QRIS gagal dimuat. Refresh lalu coba lagi.</div> : null}
+                        {qris.failed ? <div className="hint subtle">QRIS gagal dimuat. Refresh lalu coba lagi.</div> : null}
                       </>
                     ) : (
                       <div className="pay-qrisLocked">
@@ -1204,8 +1256,8 @@ export default function Pay() {
                   <div className={`pay-stageFoot ${canShowQris && !isDynamicQris && !isFreeOrder ? "warning" : ""}`}>
                     {isFreeOrder ? "Promo 100% aktif — tidak ada pembayaran yang diperlukan." : qrisFootText}
                   </div>
-                  {canShowQris && qrisNotice && !isFreeOrder ? (
-                    <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qrisNotice}</div>
+                  {canShowQris && qris.notice && !isFreeOrder ? (
+                    <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qris.notice}</div>
                   ) : null}
                 </div>
 
@@ -1252,7 +1304,7 @@ export default function Pay() {
 
       <QRISZoomModal
         open={isZoomed}
-        qrisUrl={qrisUrl}
+        qrisUrl={qris.url}
         onClose={() => setIsZoomed(false)}
       />
 
@@ -1269,7 +1321,13 @@ export default function Pay() {
               onClick={() => setShowConfirmModal(true)}
               type="button"
             >
-              {busy ? <><Loader className="spinner" size={16} /> Menyimpan</> : <>Saya sudah bayar</>}
+              {busy ? (
+                <><Loader className="spinner" size={16} /> Menyimpan</>
+              ) : isFreeOrder ? (
+                <>Konfirmasi Order Gratis</>
+              ) : (
+                <>Saya sudah bayar</>
+              )}
             </button>
           </div>
         </div>

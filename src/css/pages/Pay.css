@@ -53,6 +53,20 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-noteHintText.ok{color:#9ff5d9;}
 .pay-noteMeta{margin-top:0;font-size:12px;color:rgba(255,255,255,.54);text-align:right;white-space:nowrap;}
 
+.pay-emailPanel{margin-top:12px;border-top:1px solid rgba(255,255,255,.08);padding-top:12px;display:grid;gap:10px;animation:payEmailSlideIn .4s ease both;}
+.pay-emailPanel.required{border-top-color:rgba(255,208,137,.25);}
+.pay-emailHead{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.pay-emailLabelWrap{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.74);}
+.pay-emailLabel{font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;}
+.pay-emailState{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;border-radius:999px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.03);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.64);white-space:nowrap;}
+.pay-emailState.warn{color:#ffd089;border-color:rgba(255,208,137,.36);background:rgba(255,208,137,.10);}
+.pay-emailState.ok{color:#9ff5d9;border-color:rgba(159,245,217,.28);background:rgba(159,245,217,.08);}
+.pay-emailInput{height:48px;border-radius:18px;background:rgba(255,255,255,.045);font-size:14px;padding:0 14px;}
+.pay-emailInput:focus{border-color:rgba(78,255,218,.40);box-shadow:0 0 0 4px rgba(78,255,218,.10);}
+.pay-emailHintText{font-size:12px;line-height:1.5;color:rgba(255,255,255,.58);overflow-wrap:anywhere;min-width:0;}
+.pay-emailHintText.warn{color:#ffd089;}
+.pay-emailHintText.ok{color:#9ff5d9;}
+
 .pay-stageCard{overflow:hidden;}
 .pay-stageGrid{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:18px;align-items:stretch;}
 .pay-stageMeta{display:flex;flex-direction:column;justify-content:space-between;gap:14px;min-width:0;}
@@ -107,15 +121,59 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-order-mobileWrap{display:none;margin-bottom:14px;}
 .pay-orderMobileCard{display:flex;flex-direction:column;gap:14px;border-radius:28px;}
 
-.pay-overlay{z-index:1400;display:grid;place-items:center;padding:16px;}
-.pay-confirmOverlay{
+.pay-overlay{
+  position:fixed;
+  inset:0;
+  z-index:1400;
+  display:grid;
+  place-items:center;
+  padding:16px;
   background:rgba(4,9,20,.56);
   backdrop-filter:blur(10px);
   -webkit-backdrop-filter:blur(10px);
 }
-.pay-successModal{width:min(440px,100%);background:rgba(8,14,26,.975);border:1px solid rgba(255,255,255,.12);box-shadow:0 30px 120px rgba(0,0,0,.45);backdrop-filter:blur(20px);position:relative;overflow:hidden;}
+.pay-successModal{
+  width:min(580px,100%);
+  max-height:calc(100dvh - 32px);
+  display:flex;
+  flex-direction:column;
+  border-radius:28px;
+  background:rgba(8,14,26,.975);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 30px 120px rgba(0,0,0,.45);
+  backdrop-filter:blur(20px);
+  position:relative;
+  overflow:hidden;
+}
 .pay-successModal--animate{animation:paySuccessEnter .5s cubic-bezier(0.16, 1, 0.3, 1) both;}
-.pay-successHead{padding-bottom:8px;position:relative;z-index:2;}
+.pay-successHead{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:16px;
+  padding:24px 24px 12px;
+  position:relative;
+  z-index:2;
+}
+.pay-successModal .modal-body{
+  padding:0 24px 24px;
+  flex:1;
+  min-height:0;
+  overflow-y:auto;
+  overscroll-behavior:contain;
+}
+.pay-successModal .modal-title{
+  font-size:18px;
+  font-weight:800;
+  color:#fff;
+  line-height:1.3;
+}
+.pay-successModal .modal-sub{
+  font-size:13px;
+  color:rgba(255,255,255,.56);
+  margin-top:4px;
+  line-height:1.4;
+}
 .pay-successHero{position:relative;overflow:hidden;border-radius:26px;border:1px solid rgba(31,215,255,.18);background:
   radial-gradient(120% 120% at 0% 0%, rgba(255,255,255,.12), rgba(0,0,0,0) 58%),
   linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02));
@@ -134,6 +192,7 @@ padding:24px 18px 20px;text-align:center;}
 .pay-successCode--animate::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,.18), rgba(255,255,255,0));transform:skewX(-18deg);animation:payCodeShimmer 2.4s ease-in-out .8s infinite;pointer-events:none;}
 .pay-successLead{margin:14px auto 0;max-width:24ch;line-height:1.6;color:rgba(255,255,255,.56);font-size:14px;animation:paySuccessFadeUp .5s ease .5s both;}
 .pay-successActions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:16px;animation:paySuccessFadeUp .5s ease .6s both;}
+.pay-successActions .btn{border-radius:18px;}
 
 /* ── Celebration confetti particles ── */
 .pay-celebrationParticles{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:0;}
@@ -258,15 +317,24 @@ padding:24px 18px 20px;text-align:center;}
   border-color:rgba(0,138,148,.22);
 }
 
-:root[data-theme="light"] .pay-notePanel{
+:root[data-theme="light"] .pay-notePanel,
+:root[data-theme="light"] .pay-emailPanel {
   border-top-color:rgba(0,138,148,.14);
 }
 
-:root[data-theme="light"] .pay-noteLabelWrap{color:#2d4f5b;}
-:root[data-theme="light"] .pay-noteState{color:#4f6872;border-color:rgba(0,138,148,.14);background:rgba(241,250,254,.86);}
-:root[data-theme="light"] .pay-noteInput{color:#123744;}
-:root[data-theme="light"] .pay-noteHintText{color:#5b7380;}
-:root[data-theme="light"] .pay-noteMeta{color:#5b7380;}
+:root[data-theme="light"] .pay-noteLabelWrap,
+:root[data-theme="light"] .pay-emailLabelWrap {color:#2d4f5b;}
+
+:root[data-theme="light"] .pay-noteState,
+:root[data-theme="light"] .pay-emailState {color:#4f6872;border-color:rgba(0,138,148,.14);background:rgba(241,250,254,.86);}
+
+:root[data-theme="light"] .pay-noteInput,
+:root[data-theme="light"] .pay-emailInput {color:#123744;background:rgba(247,253,255,.86);border-color:rgba(0,138,148,.14);}
+
+:root[data-theme="light"] .pay-noteHintText,
+:root[data-theme="light"] .pay-emailHintText {color:#5b7380;}
+
+:root[data-theme="light"] .pay-noteMeta {color:#5b7380;}
 
 /* Pay page comprehensive light mode overrides */
 :root[data-theme="light"] .pay-shell-hero::before{opacity:.5;}
@@ -308,6 +376,8 @@ padding:24px 18px 20px;text-align:center;}
 :root[data-theme="light"] .pay-qrisLocked strong{color:#123744;}
 :root[data-theme="light"] .pay-qrisLocked p{color:#5f7781;}
 :root[data-theme="light"] .pay-successModal{background:rgba(255,255,255,.98);border-color:rgba(0,138,148,.14);box-shadow:0 30px 80px rgba(72,118,138,.18);backdrop-filter:none;}
+:root[data-theme="light"] .pay-successModal .modal-title{color:#123744;}
+:root[data-theme="light"] .pay-successModal .modal-sub{color:#5f7781;}
 :root[data-theme="light"] .pay-successKicker{color:#5f7781;}
 :root[data-theme="light"] .pay-successCode{color:#123744;}
 :root[data-theme="light"] .pay-successLead{color:#5f7781;}
@@ -888,54 +958,6 @@ padding:24px 18px 20px;text-align:center;}
   display: none;
 }
 
-@media (max-width: 720px) {
-  .pay-stickyCta {
-    display: block;
-    position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 95;
-    padding: 10px 12px calc(10px + env(safe-area-inset-bottom));
-    background: linear-gradient(180deg, rgba(3, 22, 15, 0) 0%, rgba(3, 22, 15, 0.85) 28%, rgba(3, 22, 15, 0.96) 100%);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .pay-stickyCtaInner {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 10px 14px;
-    border-radius: 18px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    background: rgba(8, 14, 31, 0.92);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.32);
-  }
-
-  .pay-stickyCtaInfo { flex: 1; min-width: 0; }
-  .pay-stickyCtaLabel {
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.55);
-  }
-  .pay-stickyCtaTotal {
-    margin-top: 2px;
-    font-size: 18px;
-    font-weight: 1000;
-    letter-spacing: -0.02em;
-  }
-  .pay-stickyCtaBtn { min-height: 44px; padding: 0 18px; flex-shrink: 0; }
-
-  /* Reserve space at bottom of page so content isn't hidden under the sticky bar */
-  .pay-page { padding-bottom: calc(120px + env(safe-area-inset-bottom)); }
-
-  /* Hide the original inline action button on mobile to avoid duplication */
-  .pay-page .pay-stageActions { display: none; }
-}
 
 /* ── Interactive Confirm Checklist ── */
 .pay-confirmCheckDot.is-checked {

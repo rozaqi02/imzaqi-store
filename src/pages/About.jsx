@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import {
   ChevronDown,
   CircleCheck,
@@ -17,6 +17,7 @@ import {
 import { fetchSettings } from "../lib/api";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
+import "../css/pages/About.css";
 
 const FAQ_ITEMS = [
   {
@@ -218,9 +219,32 @@ export default function About() {
   });
 
   const [waNumber, setWaNumber] = useState("6283136049987");
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialQuery = searchParams.get("q") || "";
+  const [query, setQuery] = useState(initialQuery);
   const [activeCategory, setActiveCategory] = useState("all");
   const [openId, setOpenId] = useState("");
+
+  // Sync state with URL search parameters
+  useEffect(() => {
+    const q = searchParams.get("q") || "";
+    setQuery(q);
+  }, [searchParams]);
+
+  const handleQueryChange = (val) => {
+    setQuery(val);
+    setSearchParams(
+      (prev) => {
+        if (val) {
+          prev.set("q", val);
+        } else {
+          prev.delete("q");
+        }
+        return prev;
+      },
+      { replace: true }
+    );
+  };
 
   useEffect(() => {
     let active = true;
@@ -269,12 +293,12 @@ export default function About() {
 
   const emptySuggestions = useMemo(
     () => [
-      { key: "clear", label: "Hapus pencarian", onClick: () => setQuery("") },
+      { key: "clear", label: "Hapus pencarian", onClick: () => handleQueryChange("") },
       { key: "all", label: "Semua kategori", onClick: () => setActiveCategory("all") },
       { key: "payment", label: "Pembayaran", onClick: () => setActiveCategory("payment") },
       { key: "order", label: "Order", onClick: () => setActiveCategory("order") },
     ],
-    []
+    [setSearchParams]
   );
 
   return (
@@ -325,7 +349,7 @@ export default function About() {
               <input
                 className="input faq-searchInput"
                 value={query}
-                onChange={(e) => setQuery(e.target.value)}
+                onChange={(e) => handleQueryChange(e.target.value)}
                 placeholder="Cari: QRIS, ID order, email buyer, promo..."
                 aria-label="Cari FAQ"
               />
@@ -333,7 +357,7 @@ export default function About() {
                 <button
                   type="button"
                   className="faq-searchClear"
-                  onClick={() => setQuery("")}
+                  onClick={() => handleQueryChange("")}
                   aria-label="Hapus pencarian"
                 >
                   <X size={14} />
@@ -387,7 +411,7 @@ export default function About() {
                     title="Tidak ada FAQ yang cocok"
                     description="Coba kata kunci lain atau pilih kategori berbeda."
                     suggestions={emptySuggestions}
-                    primaryAction={{ label: "Lihat semua", onClick: () => { setQuery(""); setActiveCategory("all"); } }}
+                    primaryAction={{ label: "Lihat semua", onClick: () => { handleQueryChange(""); setActiveCategory("all"); } }}
                   />
                 </div>
               )}

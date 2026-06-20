@@ -99,8 +99,8 @@ export default function Footer() {
           </div>
 
           <div className="site-footerGoLegal">
-            <p>Imzaqi Store — pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
-            <p>(c) {year} imzaqi.store. All Rights Reserved.</p>
+            <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
+            <p>(c) {year} imzaqi.store. All Rights Reserved. • imzaqi store app v.5.0</p>
           </div>
         </div>
       </div>

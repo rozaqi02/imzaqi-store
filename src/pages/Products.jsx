@@ -33,6 +33,8 @@ import { formatIDR, summarizeCatalogCopy } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useDebounce } from "../hooks/useDebounce";
+import TypewriterSearchInput from "../components/TypewriterSearchInput";
+import "../css/pages/Products.css";
 
 const CATEGORIES = [
   { key: "streaming", label: "Streaming", icon: Film },
@@ -58,6 +60,15 @@ const SORT_LABELS = {
 };
 
 const DEFAULT_SORT = "reco";
+
+const SEARCH_QUERIES = [
+  "Netflix Premium",
+  "Spotify Family",
+  "YouTube Premium",
+  "Canva Pro",
+  "ChatGPT Plus",
+  "Disney+ Hotstar",
+];
 
 function inferCategory(product) {
   const explicit = String(product?.category || "").trim().toLowerCase();
@@ -325,6 +336,7 @@ export default function Products() {
     min: Number(params.get("pmin")) || 0,
     max: Number(params.get("pmax")) || 0,
   });
+  const [localPrice, setLocalPrice] = useState(price);
   const [priceReady, setPriceReady] = useState(false);
   const [visibleCount, setVisibleCount] = useState(16);
   const [isFiltering, setIsFiltering] = useState(false);
@@ -558,6 +570,20 @@ export default function Products() {
       max: clamp(prev.max, priceBounds.min, priceBounds.max),
     }));
   }, [priceBounds.min, priceBounds.max, priceReady]);
+
+  useEffect(() => {
+    setLocalPrice((prev) => {
+      if (prev.min !== price.min || prev.max !== price.max) {
+        return price;
+      }
+      return prev;
+    });
+  }, [price]);
+
+  const debouncedPrice = useDebounce(localPrice, 300);
+  useEffect(() => {
+    setPrice(debouncedPrice);
+  }, [debouncedPrice]);
 
   useEffect(() => {
     const nextParams = new URLSearchParams(params);
@@ -850,7 +876,7 @@ export default function Products() {
           <div className="catalog-heroGrid">
             <div className="catalog-eyebrow">Katalog</div>
             <h1 className="h1 catalog-title">Mau langganan apa hari ini?</h1>
-            <p className="catalog-sub">Cari, bandingin, checkout. Anti ribet.</p>
+            <p className="catalog-sub">Scroll, bandingin, co. Sat-set anti ribet! ⚡</p>
           </div>
 
           <div className="catalog-command">
@@ -860,11 +886,11 @@ export default function Products() {
                 <span className="hero-search-icon" aria-hidden="true">
                   <Search size={16} />
                 </span>
-                <input
+                <TypewriterSearchInput
                   ref={searchRef}
                   className="input hero-search-input"
                   value={query}
-                  placeholder="Netflix, Spotify, ChatGPT..."
+                  words={SEARCH_QUERIES}
                   onFocus={() => setSearchOpen(true)}
                   onChange={(e) => {
                     setQuery(e.target.value);
@@ -994,8 +1020,8 @@ export default function Products() {
               restockOnly={restockOnly}
               setRestockOnly={setRestockOnly}
               priceBounds={priceBounds}
-              price={price}
-              setPrice={setPrice}
+              price={localPrice}
+              setPrice={setLocalPrice}
               sort={sort}
               setSort={setSort}
               view={view}
@@ -1182,8 +1208,8 @@ export default function Products() {
                     restockOnly={restockOnly}
                     setRestockOnly={setRestockOnly}
                     priceBounds={priceBounds}
-                    price={price}
-                    setPrice={setPrice}
+                    price={localPrice}
+                    setPrice={setLocalPrice}
                     sort={sort}
                     setSort={setSort}
                     view={view}

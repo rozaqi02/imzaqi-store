@@ -237,16 +237,16 @@
   }
 
   /* ── Cart micro-interaction ── */
-  [data-motion="full"] .header-cart .pill.is-bumping {
+  :root:not([data-motion="off"]) .header-cart .pill.is-bumping {
     animation: motionCartBump 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  [data-motion="full"] .pdx-addBtn.is-pressed {
+  :root:not([data-motion="off"]) .pdx-addBtn.is-pressed {
     transform: scale(0.96);
     transition: transform 0.12s ease;
   }
 
-  [data-motion="full"] .cart-fly-particle {
+  :root:not([data-motion="off"]) .cart-fly-particle {
     position: fixed;
     width: 10px;
     height: 10px;
@@ -436,4 +436,117 @@
 [data-motion="off"] .flash-countdown-num--sec,
 [data-motion="off"] .catalog-hero::before {
   animation: none !important;
+}
+
+/* ── Neumorphism Depth Effects & Interactions ── */
+
+/* Opsi 1: Tactile Click Inset Transition (Efek Tekan Cekung) */
+.btn:active,
+.catalog-chip:active,
+.pdx-filterChip:active,
+.home-promoCard:active,
+.home-howCard:active,
+.faq-item:has(.faq-itemHead:active),
+.product-card-modern:active,
+.product-tile:active,
+.card:active,
+.st-infoCard:active,
+.st-card:active,
+.pay-card:active {
+  box-shadow:
+    inset 8px 10px 18px rgba(0, 0, 0, 0.42),
+    inset -5px -5px 12px rgba(255, 255, 255, 0.04) !important;
+  transform: translateY(1px) scale(0.982) !important;
+  transition: box-shadow 0.1s cubic-bezier(0.22, 1, 0.36, 1), transform 0.1s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+:root[data-theme="light"] .btn:active,
+:root[data-theme="light"] .catalog-chip:active,
+:root[data-theme="light"] .pdx-filterChip:active,
+:root[data-theme="light"] .home-promoCard:active,
+:root[data-theme="light"] .home-howCard:active,
+:root[data-theme="light"] .faq-item:has(.faq-itemHead:active),
+:root[data-theme="light"] .product-card-modern:active,
+:root[data-theme="light"] .product-tile:active,
+:root[data-theme="light"] .card:active,
+:root[data-theme="light"] .st-infoCard:active,
+:root[data-theme="light"] .st-card:active,
+:root[data-theme="light"] .pay-card:active {
+  box-shadow:
+    inset 6px 8px 14px rgba(124, 158, 171, 0.28),
+    inset -5px -5px 10px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Reset child button scale on FAQ items to prevent double shrink mismatch */
+.faq-itemHead:active {
+  transform: none !important;
+}
+
+/* Opsi 2: Dynamic Light-Source Tracking (Bayangan Mengikuti Kursor) */
+.product-tile,
+.home-promoCard,
+.home-howCard,
+.st-infoCard,
+.st-card,
+.pay-card,
+.card {
+  --light-x: 1;
+  --light-y: 1;
+  box-shadow:
+    calc(var(--light-x, 1) * 15px) calc(var(--light-y, 1) * 16px) 32px var(--shadow-color-dark),
+    calc(var(--light-x, 1) * -9px) calc(var(--light-y, 1) * -9px) 20px var(--shadow-color-light),
+    inset 0 2px 0 var(--shadow-panel-inset-top),
+    inset 0 -4px 0 var(--shadow-panel-inset-bottom),
+    0 0 0 1px var(--shadow-panel-border) !important;
+  transition: box-shadow 0.24s cubic-bezier(0.22, 1, 0.36, 1), transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.product-tile:hover,
+.home-promoCard:hover,
+.home-howCard:hover,
+.st-infoCard:hover,
+.st-card:hover,
+.pay-card:hover,
+.card:hover {
+  transform: translateY(-2px);
+}
+
+/* Opsi 3: Deep Inset Focus on Inputs (Kotak Pencarian & Form Cekung Dinamis) */
+.input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+.hero-search-shell:focus-within,
+.catalog-commandSearch:focus-within,
+.catalog-filterSearch:focus-within,
+.status-searchField:focus-within,
+.st-inputWrap:focus-within,
+.faq-searchWrap:focus-within,
+.testi-searchShell:focus-within,
+.admin-searchRow:focus-within,
+.status-commandBox:focus-within {
+  box-shadow:
+    inset 4px 6px 12px rgba(0, 0, 0, 0.48),
+    inset -3px -3px 8px rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(0, 214, 180, 0.35),
+    0 0 12px rgba(0, 214, 180, 0.15) !important;
+  border-color: rgba(0, 214, 180, 0.45) !important;
+  background: rgba(4, 7, 20, 0.6) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+}
+
+:root[data-theme="light"] .input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+:root[data-theme="light"] .hero-search-shell:focus-within,
+:root[data-theme="light"] .catalog-commandSearch:focus-within,
+:root[data-theme="light"] .catalog-filterSearch:focus-within,
+:root[data-theme="light"] .status-searchField:focus-within,
+:root[data-theme="light"] .st-inputWrap:focus-within,
+:root[data-theme="light"] .faq-searchWrap:focus-within,
+:root[data-theme="light"] .testi-searchShell:focus-within,
+:root[data-theme="light"] .admin-searchRow:focus-within,
+:root[data-theme="light"] .status-commandBox:focus-within {
+  box-shadow:
+    inset 4px 6px 10px rgba(124, 158, 171, 0.28),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(6, 123, 136, 0.35),
+    0 0 10px rgba(6, 123, 136, 0.15) !important;
+  border-color: rgba(6, 123, 136, 0.45) !important;
+  background: rgba(255, 255, 255, 0.8) !important;
 }

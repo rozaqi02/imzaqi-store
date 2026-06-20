@@ -264,7 +264,7 @@ export async function checkStockAvailability(cartItems) {
   
   const { data, error } = await supabase
     .from("product_variants")
-    .select("id, name, stock")
+    .select("id, name, stock, is_active")
     .in("id", variantIds);
   
   if (error) throw error;
@@ -273,7 +273,8 @@ export async function checkStockAvailability(cartItems) {
   (data || []).forEach(variant => {
     stockMap[variant.id] = {
       name: variant.name,
-      stock: variant.stock
+      stock: variant.stock,
+      is_active: variant.is_active
     };
   });
   
@@ -282,7 +283,7 @@ export async function checkStockAvailability(cartItems) {
   
   cartItems.forEach(item => {
     const variantStock = stockMap[item.variant_id];
-    if (!variantStock) {
+    if (!variantStock || variantStock.is_active === false) {
       outOfStock.push(item);
     } else if (variantStock.stock < item.qty) {
       insufficient.push({

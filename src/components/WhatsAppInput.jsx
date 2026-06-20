@@ -1,5 +1,6 @@
 // src/components/WhatsAppInput.jsx
 import React, { useState, useEffect } from 'react';
+import { Check, X } from 'lucide-react';
 
 const STORAGE_KEY = 'imzaqi_last_whatsapp';
 
@@ -177,18 +178,20 @@ export default function WhatsAppInput({
           disabled={disabled}
           autoFocus={autoFocus}
           required={required}
+          aria-invalid={showError || undefined}
+          aria-describedby="whatsapp-hint"
           style={isIndonesian ? { paddingLeft: '44px' } : undefined}
         />
-        {showSuccess && <span className="input-icon" style={{ right: isIndonesian ? '14px' : undefined }}>OK</span>}
-        {showError && <span className="input-icon" style={{ right: isIndonesian ? '14px' : undefined }}>X</span>}
+        {showSuccess && <span className="input-icon" style={{ right: isIndonesian ? '14px' : undefined }}><Check size={16} strokeWidth={2.5} /></span>}
+        {showError && <span className="input-icon" style={{ right: isIndonesian ? '14px' : undefined }}><X size={16} strokeWidth={2.5} /></span>}
       </div>
 
       {showError && (
-        <div className="hint error-hint">{validation.message}</div>
+        <div id="whatsapp-hint" className="hint error-hint">{validation.message}</div>
       )}
 
       {!showError && (
-        <div className="hint subtle">
+        <div id="whatsapp-hint" className="hint subtle">
           {helperText}
         </div>
       )}

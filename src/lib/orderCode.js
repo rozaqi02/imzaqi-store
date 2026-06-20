@@ -1,10 +1,15 @@
-const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // tanpa I,O,1,0
+const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const CODE_MIN = 2;
+const CODE_MAX = 10;
+const CODE_DEFAULT = 4;
 
-export function makeOrderCode(len = 4) {
+export function makeOrderCode(len = CODE_DEFAULT) {
   let out = "";
-  const n = Math.max(2, Math.min(10, Number(len) || 4));
+  const n = Math.max(CODE_MIN, Math.min(CODE_MAX, Number(len) || CODE_DEFAULT));
   for (let i = 0; i < n; i++) {
     out += ALPHABET[Math.floor(Math.random() * ALPHABET.length)];
   }
   return `IMZ-${out}`;
 }
+
+export { CODE_MIN, CODE_MAX, CODE_DEFAULT };

@@ -13,6 +13,7 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import "../css/pages/Checkout.css";
 
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
@@ -59,6 +60,7 @@ export default function Checkout() {
   const { discount, total } = calcTotal(subtotal, promoPercent);
 
   const [code, setCode] = useState(() => promo?.code || "");
+  const [isVerifying, setIsVerifying] = useState(false);
   const [msg, setMsg] = useState("");
   const [closing, setClosing] = useState(false);
   const [stockWarnings, setStockWarnings] = useState({});
@@ -85,18 +87,23 @@ export default function Checkout() {
   useEffect(() => {
     if (cart.items.length === 0) return;
     let active = true;
-    checkStockAvailability(cart.items).then((result) => {
-      if (!active) return;
-      const warnings = {};
-      result.outOfStock.forEach((item) => {
-        warnings[item.variant_id] = { type: "out", available: 0 };
-      });
-      result.insufficient.forEach((item) => {
-        warnings[item.variant_id] = { type: "insufficient", available: item.availableStock };
-      });
-      setStockWarnings(warnings);
-    }).catch(() => {});
-    return () => { active = false; };
+    const timer = setTimeout(() => {
+      checkStockAvailability(cart.items).then((result) => {
+        if (!active) return;
+        const warnings = {};
+        result.outOfStock.forEach((item) => {
+          warnings[item.variant_id] = { type: "out", available: 0 };
+        });
+        result.insufficient.forEach((item) => {
+          warnings[item.variant_id] = { type: "insufficient", available: item.availableStock };
+        });
+        setStockWarnings(warnings);
+      }).catch(() => {});
+    }, 400);
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
   }, [cart.items]);
 
   useEffect(() => {
@@ -195,16 +202,23 @@ export default function Checkout() {
     }
 
     setMsg("");
-    const result = await apply(raw);
-    setMsg(result.message);
-    if (result.ok) {
-      toast.success(result.message);
-      setPromoStatus("success");
-    } else {
-      toast.error(result.message);
-      setPromoStatus("error");
+    setIsVerifying(true);
+    try {
+      const result = await apply(raw);
+      setMsg(result.message);
+      if (result.ok) {
+        toast.success(result.message);
+        setPromoStatus("success");
+      } else {
+        toast.error(result.message);
+        setPromoStatus("error");
+      }
+    } catch (e) {
+      toast.error("Gagal verifikasi kode promo.");
+    } finally {
+      setIsVerifying(false);
+      setTimeout(() => setPromoStatus(null), 1500);
     }
-    setTimeout(() => setPromoStatus(null), 1500);
   }
 
 
@@ -353,9 +367,16 @@ export default function Checkout() {
                         placeholder="Kode promo"
                         value={code}
                         onChange={(e) => setCode(e.target.value.toUpperCase())}
+                        disabled={isVerifying}
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            if (!isVerifying) onApplyPromo();
+                          }
+                        }}
                       />
-                      <button className="btn btn-sm" type="button" onClick={onApplyPromo}>
-                        Pakai
+                      <button className="btn btn-sm" type="button" onClick={onApplyPromo} disabled={isVerifying}>
+                        {isVerifying ? "..." : "Pakai"}
                       </button>
                     </div>
 
@@ -471,9 +492,16 @@ export default function Checkout() {
                           placeholder="Kode promo"
                           value={code}
                           onChange={(e) => setCode(e.target.value.toUpperCase())}
+                          disabled={isVerifying}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              if (!isVerifying) onApplyPromo();
+                            }
+                          }}
                         />
-                        <button className="btn btn-sm" type="button" onClick={onApplyPromo}>
-                          Pakai
+                        <button className="btn btn-sm" type="button" onClick={onApplyPromo} disabled={isVerifying}>
+                          {isVerifying ? "..." : "Pakai"}
                         </button>
                       </div>
 
@@ -656,6 +684,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
               triggerQtyPulse();
             }}
             aria-label="Kurangi"
+            disabled={item.qty <= 1}
           >
             -
           </button>

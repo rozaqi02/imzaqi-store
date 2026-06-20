@@ -498,7 +498,6 @@ code{
   color:#9fffe5 !important;
 }
 
-.hero-railIcon,
 .catalog-filterBtnCount,
 .catalog-chip.active,
 .catalog-toggle input:checked + .catalog-toggleUi,
@@ -653,35 +652,35 @@ body,
 .header,
 .site-header {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0) 44%),
-    linear-gradient(180deg, rgba(79, 255, 200, 0.07) 0%, rgba(79, 255, 200, 0) 36%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 20%, rgba(255, 255, 255, 0) 44%),
+    linear-gradient(180deg, rgba(79, 255, 200, 0.12) 0%, rgba(79, 255, 200, 0) 36%),
     var(--uni-neo-panel) !important;
-  border-bottom: 1px solid rgba(0, 194, 208, 0.14) !important;
+  border-bottom: 1px solid rgba(0, 194, 208, 0.22) !important;
   box-shadow:
-    0 16px 36px rgba(0, 0, 0, 0.46),
-    0 4px 14px rgba(0, 10, 28, 0.32),
+    0 16px 40px rgba(0, 0, 0, 0.58),
+    0 6px 18px rgba(0, 10, 28, 0.42),
     -8px -8px 18px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.34) !important;
-  backdrop-filter: blur(14px) saturate(125%) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(125%) !important;
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
+    inset 0 -1.5px 0 rgba(0, 0, 0, 0.48) !important;
+  backdrop-filter: blur(16px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(130%) !important;
 }
 
 :root[data-theme="light"] .header,
 :root[data-theme="light"] .site-header {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.55) 22%, rgba(255, 255, 255, 0) 48%),
-    linear-gradient(180deg, rgba(79, 255, 200, 0.1) 0%, rgba(79, 255, 200, 0) 40%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.72) 22%, rgba(255, 255, 255, 0) 48%),
+    linear-gradient(180deg, rgba(79, 255, 200, 0.14) 0%, rgba(79, 255, 200, 0) 40%),
     var(--uni-neo-panel) !important;
-  border-bottom: 1px solid rgba(0, 138, 148, 0.16) !important;
+  border-bottom: 1px solid rgba(0, 138, 148, 0.22) !important;
   box-shadow:
-    0 12px 30px rgba(67, 111, 129, 0.18),
-    0 4px 12px rgba(80, 115, 130, 0.1),
+    0 14px 34px rgba(67, 111, 129, 0.24),
+    0 6px 16px rgba(80, 115, 130, 0.16),
     -8px -8px 18px rgba(255, 255, 255, 0.94),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
-  backdrop-filter: blur(12px) saturate(118%) !important;
-  -webkit-backdrop-filter: blur(12px) saturate(118%) !important;
+    inset 0 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(154, 191, 203, 0.36) !important;
+  backdrop-filter: blur(16px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(130%) !important;
 }
 
 .header::after,
@@ -861,11 +860,6 @@ select.input {
 .hm-title-accent,
 .hm-title-glow {
   display: inline-block;
-  padding: 0.02em 0.1em 0.1em 0.02em;
-  overflow: visible;
-  line-height: 1.2;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
   background: linear-gradient(135deg, #7dffe8 0%, #4effda 34%, #00c2b0 66%, #007a85 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
@@ -885,8 +879,6 @@ select.input {
 
 .muted,
 .hint.subtle,
-.hero-sub-minimal,
-.hero-eyebrow,
 .home-kicker,
 .catalog-sub,
 .status-sub,
@@ -932,7 +924,6 @@ select.input {
   text-shadow: 0 0 18px rgba(79, 255, 200, 0.12);
 }
 
-.hero-railIcon,
 .catalog-filterBtnCount,
 .about-valueIcon,
 .mobile-sheetLinkIcon,
@@ -1128,7 +1119,6 @@ select.input {
 :root[data-theme="light"] .checkout-promo-card,
 :root[data-theme="light"] .pay-card,
 :root[data-theme="light"] .pay-orderDesktop,
-:root[data-theme="light"] .pay-orderMobile,
 :root[data-theme="light"] .qris-wrap,
 :root[data-theme="light"] .pay-successModal,
 :root[data-theme="light"] .pay-confirmModal,
@@ -1148,7 +1138,6 @@ select.input {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-:root[data-theme="light"] .hero-railItem,
 :root[data-theme="light"] .product-tile-pill,
 :root[data-theme="light"] .catalog-chip,
 :root[data-theme="light"] .catalog-cardMeta > span,
@@ -1175,7 +1164,6 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .hero-railIcon,
 :root[data-theme="light"] .catalog-filterBtnCount,
 :root[data-theme="light"] .about-valueIcon,
 :root[data-theme="light"] .about-flowIcon,
@@ -1269,8 +1257,6 @@ select.input {
 :root[data-theme="light"] .pay-orderKicker,
 :root[data-theme="light"] .pay-orderItemMeta,
 :root[data-theme="light"] .pay-orderRow,
-:root[data-theme="light"] .pay-orderMobile summary span,
-:root[data-theme="light"] .pay-orderMobile summary b,
 :root[data-theme="light"] .pay-successKicker,
 :root[data-theme="light"] .pay-successLead,
 :root[data-theme="light"] .about-valueCard p,
@@ -1338,23 +1324,11 @@ select.input {
   background: linear-gradient(135deg, #0d3f4e 0%, #00a89a 42%, #00c2d0 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
 }
 
 :root[data-theme="light"] .cursor {
   border-right-color: rgba(0, 138, 148, 0.82) !important;
-}
-
-:root[data-theme="light"] .catalog-cardPrice,
-:root[data-theme="light"] .product-tile-price,
-:root[data-theme="light"] .product-detail-range,
-:root[data-theme="light"] .variant-price,
-:root[data-theme="light"] .variant-price-modern,
-:root[data-theme="light"] .status-metricCard b,
-:root[data-theme="light"] .checkout-summaryTotal,
-:root[data-theme="light"] .pay-stageTotal,
-:root[data-theme="light"] .pay-orderMobile summary strong {
-  color: #0b7b89 !important;
-  text-shadow: none !important;
 }
 
 :root[data-theme="light"] .admin-sidebarPulse,
@@ -1683,7 +1657,6 @@ select.input {
   .checkout-panel,
   .pay-card,
   .pay-orderDesktop,
-  .pay-orderMobile,
   .pay-successModal,
   .catalog-sheet,
   .qris-wrap,
@@ -1927,7 +1900,6 @@ select.input {
 .catalog-quickChip,
 .catalog-viewBtn,
 .toggle-btn,
-.product-detail-metaPill,
 .variant-chip,
 .variant-badge,
 .stock-pill,
@@ -1941,8 +1913,6 @@ select.input {
 .catalog-card,
 .flow-assist,
 .site-footerPanel,
-.product-detail,
-.variant-tile,
 .catalog-filter,
 .catalog-command {
   box-shadow: var(--skeu-panel-shadow) !important;
@@ -2937,8 +2907,6 @@ select.input {
 :root[data-theme="light"] .pay-stageFoot,
 :root[data-theme="light"] .pay-orderItemMeta,
 :root[data-theme="light"] .pay-orderRow,
-:root[data-theme="light"] .pay-orderMobile summary span,
-:root[data-theme="light"] .pay-orderMobile summary b,
 :root[data-theme="light"] .pay-successLead,
 :root[data-theme="light"] .pay-qrisLocked p {
   color: rgba(56, 84, 94, 0.84) !important;
@@ -2946,7 +2914,6 @@ select.input {
 
 :root[data-theme="light"] .pay-card,
 :root[data-theme="light"] .pay-orderDesktop,
-:root[data-theme="light"] .pay-orderMobile,
 :root[data-theme="light"] .pay-successModal,
 :root[data-theme="light"] .qris-wrap {
   background:
@@ -2959,7 +2926,6 @@ select.input {
 :root[data-theme="light"] .pay-statePill,
 :root[data-theme="light"] .pay-orderPromo,
 :root[data-theme="light"] .pay-orderItem,
-:root[data-theme="light"] .pay-orderMobile summary,
 :root[data-theme="light"] .pay-qrisLocked,
 :root[data-theme="light"] .pay-noteInput,
 :root[data-theme="light"] .pay-waField .input {
@@ -2980,10 +2946,6 @@ select.input {
 :root[data-theme="light"] .pay-stageRow b,
 :root[data-theme="light"] .pay-qrisLocked strong,
 :root[data-theme="light"] .pay-successCode,
-:root[data-theme="light"] .pay-orderMobile summary strong {
-  color: rgba(13, 45, 57, 0.98) !important;
-}
-
 :root[data-theme="light"] .pay-shell .btn-ghost {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
@@ -4125,10 +4087,6 @@ select.input {
 .pay-orderMobileCard,
 .qris-wrap,
 .pay-successModal,
-.product-detail,
-.product-detail-priceCard,
-.variant-tile,
-.variant-notes,
 .admin-loginShell,
 .admin-loginAside,
 .admin-loginSignal,
@@ -4147,13 +4105,9 @@ select.input {
   box-shadow: var(--uni-shadow) !important;
 }
 
-.hero-eyebrow,
 .home-kicker,
 .catalog-eyebrow,
 .catalog-sub,
-.home-summaryText,
-.testi-minimal-sub,
-.testi-miniStat span,
 .product-tile-desc,
 .catalog-cardSummary,
 .catalog-cardKicker,
@@ -4171,11 +4125,9 @@ select.input {
   color: var(--uni-muted) !important;
 }
 
-.hero-title-minimal,
 .catalog-title,
 .catalog-cardTitle,
 .product-tile-name,
-.testi-minimal-title,
 .admin-panel-title,
 .admin-heroTitle,
 .admin-brand-title,
@@ -4262,33 +4214,11 @@ select.input {
   color: var(--imzaqi-btn-text) !important;
 }
 
-/* Rebuild pass v5: Home */
-.home-page .hero-minimal::before {
-  inset: -14% -8% auto !important;
-  height: 640px !important;
-  background:
-    radial-gradient(640px 320px at 12% 12%, rgba(79, 160, 255, 0.2), rgba(79, 160, 255, 0) 70%),
-    radial-gradient(640px 320px at 88% 14%, rgba(71, 233, 225, 0.18), rgba(71, 233, 225, 0) 72%) !important;
-}
-
-.home-page .hero-minimal::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background:
-    radial-gradient(520px 220px at 14% 4%, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 76%),
-    radial-gradient(560px 220px at 84% 6%, rgba(79, 255, 200, 0.16), rgba(79, 255, 200, 0) 76%);
-  opacity: 0.68;
-}
-
-
-
-.home-page .hero-commandCard,
 .home-page .home-howCard,
 .home-page .flow-assist,
-.home-page .stat-minimal,
-.home-page .product-tile {
+.home-page .product-tile,
+.home-page .home-tileSkeleton,
+.home-page .home-promoCard {
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -4297,9 +4227,7 @@ select.input {
   box-shadow: var(--home-neo-panel-shadow) !important;
 }
 
-.home-page .hero-commandCard::before,
-.home-page .home-howCard::before,
-.home-page .stat-minimal::before {
+.home-page .home-howCard::before {
   content: "";
   position: absolute;
   inset: 1px;
@@ -4340,18 +4268,13 @@ select.input {
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34) !important;
 }
 
-.home-page .hero-commandCard {
-  border-radius: 32px !important;
-  padding: 14px !important;
-}
-
-.home-page .hero-railItem,
 .home-page .layout-toggles,
 .home-page .flow-assist-actions,
 .home-page .flow-assist-badge,
 .home-page .product-tile-pill,
-.home-page .home-bottomCta .btn-ghost,
-.home-page .hero-search-clear {
+.home-page .hero-search-clear,
+.home-page .home-howCard-icon,
+.home-page .home-stickyBar-link {
   border: 1px solid var(--brand-line) !important;
   background: var(--home-neo-control) !important;
   box-shadow: var(--home-neo-control-shadow) !important;
@@ -4383,14 +4306,6 @@ select.input {
     0 12px 30px rgba(0, 100, 120, 0.15) !important;
 }
 
-.home-page .hero-search-btn,
-.home-page .hero-ctas-minimal .btn:not(.btn-ghost) {
-  border-color: var(--imzaqi-btn-border) !important;
-  background: var(--imzaqi-btn-face) !important;
-  color: var(--imzaqi-btn-text) !important;
-  box-shadow: var(--imzaqi-btn-shadow) !important;
-}
-
 .home-page .flow-assist-badge.emphasis {
   border-color: rgba(79, 255, 200, 0.24) !important;
   background:
@@ -4402,8 +4317,7 @@ select.input {
   border-radius: 28px !important;
 }
 
-.home-page .flow-assist:hover,
-.home-page .stat-minimal:hover {
+.home-page .flow-assist:hover {
   transform: translateY(-3px);
   box-shadow:
     0 26px 52px rgba(0, 12, 30, 0.44),
@@ -4414,6 +4328,33 @@ select.input {
 
 .home-page .product-tile--list::before {
   background: linear-gradient(180deg, #50ffd0, #1ec8d6) !important;
+}
+
+/* Suggestions dropdown: panel-like but without overflow:hidden (absolutely positioned) */
+.home-page .suggestions {
+  border: 1px solid var(--brand-line) !important;
+  background: var(--home-neo-panel) !important;
+  box-shadow: var(--home-neo-panel-shadow) !important;
+}
+
+.home-page .suggestion-item {
+  background: var(--home-neo-control) !important;
+  box-shadow: var(--home-neo-control-shadow) !important;
+}
+
+/* Sticky bar: preserve position:fixed, guard depth with !important */
+.home-page .home-stickyBar {
+  background: var(--home-neo-panel-soft, var(--uni-neo-panel-soft)) !important;
+  box-shadow: var(--home-neo-panel-shadow, var(--uni-neo-panel-shadow)) !important;
+}
+
+/* Hx live badge: control depth with backdrop-filter preserved */
+.home-page .hx-live-badge {
+  border: 1px solid var(--brand-line) !important;
+  background: var(--home-neo-control) !important;
+  box-shadow: var(--home-neo-control-shadow) !important;
+  backdrop-filter: blur(4px) !important;
+  -webkit-backdrop-filter: blur(4px) !important;
 }
 
 /* Home popular list: keep parity with Produk page cards */
@@ -4574,20 +4515,7 @@ select.input {
   border-radius: 24px !important;
 }
 
-.detail-page .product-detail,
-.detail-page .variant-tile,
-.detail-page .product-detail-priceCard,
-.detail-page .variant-notes {
-  border-radius: 28px !important;
-}
 
-.detail-page .product-detail-descBubble {
-  border-color: var(--uni-line) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 20%),
-    var(--uni-panel-soft) !important;
-  box-shadow: var(--uni-soft-shadow) !important;
-}
 
 /* Rebuild pass v5: Admin */
 
@@ -4682,12 +4610,10 @@ select.input {
 
 @media (max-width: 720px) {
 
-  .home-page .hero-commandCard,
   .catalog-page .catalog-command,
   .testimonials-page .testi-toolbar,
   .pay-page .pay-card,
   .checkout-panel,
-  .detail-page .product-detail,
   .admin-page .admin-panel {
     border-radius: 20px !important;
   }
@@ -4901,19 +4827,16 @@ select.input {
 .testi-imgWrap,
 .lightbox,
 .checkout-drawer,
-.checkout-panel,
-.checkout-summary,
 .checkout-item-card,
+.checkout-panel,
 .checkout-promo-card,
+.checkout-summary,
 .pay-card,
 .pay-orderDesktop,
 .pay-orderMobileCard,
-.qris-wrap,
+.pay-stageCard,
 .pay-successModal,
-.product-detail,
-.product-detail-priceCard,
-.variant-tile,
-.variant-notes,
+.qris-wrap,
 .admin-loginShell,
 .admin-loginAside,
 .admin-loginSignal,
@@ -4933,7 +4856,7 @@ select.input {
   box-shadow: var(--uni-neo-panel-shadow) !important;
 }
 
-.hero-railItem,
+.checkout-item-remove,
 .layout-toggles,
 .flow-assist-actions,
 .flow-assist-badge,
@@ -4947,9 +4870,18 @@ select.input {
 .testi-count,
 .admin-chip,
 .tab-btn,
-.st-statePill,
+.pay-emailState,
+.pay-freePanelBadge,
+.pay-freePanelIcon,
+.pay-noteState,
+.pay-orderItem,
+.pay-orderPromo,
+.pay-shell-kicker,
+.pay-statePill,
+.st-copyNoteBtn,
 .st-pasteBtn,
-.home-bottomCta .btn-ghost,
+.st-refreshBtn,
+.st-statePill,
 .nf-radar {
   border-color: var(--uni-line) !important;
   background: var(--uni-neo-control) !important;
@@ -4975,6 +4907,7 @@ select.input {
 .status-searchField,
 .st-inputWrap,
 .faq-searchWrap,
+.home-faqSearchShell,
 .testi-searchShell,
 .admin-searchRow {
   position: relative;
@@ -5080,10 +5013,12 @@ select.input {
   color: var(--uni-neo-icon) !important;
 }
 
+.faq-searchClear,
 .hero-search-clear,
 .catalog-commandClear,
 .catalog-filterClear,
-.testi-clear {
+.testi-clear,
+.home-faqSearchClear {
   border: 1px solid var(--uni-line) !important;
   background: var(--uni-neo-control) !important;
   box-shadow: var(--uni-neo-control-shadow) !important;
@@ -5299,8 +5234,6 @@ select.input {
   margin: 0 -12px !important;
 }
 
-.detail-page .product-detail,
-.home-page .hero-commandCard,
 .home-page .flow-assist {
   overflow: visible !important;
 }
@@ -5334,7 +5267,6 @@ select.input {
 }
 
 .catalog-page .catalog-card.catalog-cardV2,
-.detail-page .variant-tile,
 .home-page .home-popularList .catalog-card.catalog-cardV2 {
   overflow: visible !important;
 }
@@ -6430,54 +6362,47 @@ select.input {
 /* ─── v7: deeper neumorphism 3D sitewide ─────────────────────────────── */
 .header-nav a,
 .header-iconBtn,
-.mini-cart-drawer,
 .checkout-panel,
 .pay-card,
 .catalog-command,
 .catalog-filter,
-.hero-commandCard,
-.hero-search-btn,
 .product-tile,
 .catalog-card.catalog-cardV2,
 .detail-page-v3 .pdx-topCard,
 .detail-page-v3 .pdx-variantsSection,
 .detail-page-v3 .pdx-packCard,
-.stat-minimal,
 .flow-assist,
 .testi-card,
 .faq-item,
-.st-orderCard,
-.order-card,
-.modal-card,
-.drawer-panel,
 .toast,
-.suggestions-minimal,
 .suggestion-item {
   border-color: var(--uni-line) !important;
 }
 
 .header-iconBtn,
-.hero-search-btn,
 .catalog-viewBtn,
 .pdx-iconBtn,
 .pdx-backLink,
 .pdx-filterChip:not(.is-active),
 .pdx-addBtn,
-.hm-quick-item,
-.hm-spotlight-card,
-.hm-trust-pill {
+.pdx-metaPill,
+.pdx-countBadge,
+.pdx-variantBadge,
+.pdx-chip,
+.pdx-qtyBtn,
+.testi-statePill,
+.testi-metric,
+.testi-sideItem {
   background: var(--uni-neo-control) !important;
   box-shadow: var(--uni-neo-control-shadow) !important;
 }
 
 .header-iconBtn:active,
-.hero-search-btn:active,
 .catalog-viewBtn:active,
 .pdx-iconBtn:active,
 .pdx-backLink:active,
 .pdx-filterChip:active,
-.pdx-addBtn:active,
-.hm-quick-item:active {
+.pdx-addBtn:active {
   transform: translateY(1px);
   box-shadow: var(--uni-neo-inset-shadow) !important;
 }

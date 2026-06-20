@@ -3,8 +3,9 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
 import { formatIDR, classifyStock, summarizeCatalogCopy } from "../lib/format";
+import "./ProductTile.css";
 
-export default function ProductTile({ product, rank, layout = "list" }) {
+export default function ProductTile({ product, rank, layout = "list", disableTilt = false }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const summary = useMemo(() => {
     const activeVariants = (product?.product_variants || []).filter((v) => v?.is_active);
@@ -48,7 +49,7 @@ export default function ProductTile({ product, rank, layout = "list" }) {
       role="listitem"
       aria-label={`Buka detail ${product?.name || "produk"}`}
     >
-      <div ref={tiltRef} className="product-tile-tiltWrap">
+      <div ref={disableTilt ? null : tiltRef} className="product-tile-tiltWrap">
       <div className="product-tile-top">
         <div 
           className="product-tile-icon" 
@@ -61,7 +62,7 @@ export default function ProductTile({ product, rank, layout = "list" }) {
               alt=""
               loading="lazy"
               decoding="async"
-              fetchpriority="low"
+              fetchPriority="low"
               width="62"
               height="62"
             />
@@ -108,6 +109,8 @@ export default function ProductTile({ product, rank, layout = "list" }) {
           </span>
           {classifyStock(stock) === "low" ? (
             <span className="product-lowStockBadge">Hampir habis</span>
+          ) : classifyStock(stock) === "out" ? (
+            <span className="product-lowStockBadge out">Habis</span>
           ) : null}
         </div>
 

@@ -202,6 +202,7 @@
   line-height: 1.6;
   overflow-wrap: anywhere;
   position: relative;
+  max-width: 72ch;
 }
 
 .pdx-descriptionText::before {
@@ -471,23 +472,51 @@
 }
 
 .pdx-stockPill.ok {
+  color: #4ade80;
   border: 1px solid rgba(34, 197, 94, 0.22);
   background: rgba(34, 197, 94, 0.16);
 }
 
 .pdx-stockPill.mid {
+  color: #fbbf24;
   border: 1px solid rgba(245, 158, 11, 0.24);
   background: rgba(245, 158, 11, 0.16);
 }
 
 .pdx-stockPill.low {
+  color: #f97316;
   border: 1px solid rgba(249, 115, 22, 0.26);
   background: rgba(249, 115, 22, 0.16);
 }
 
 .pdx-stockPill.out {
+  color: #f87171;
   border: 1px solid rgba(255, 90, 122, 0.26);
   background: rgba(255, 90, 122, 0.16);
+}
+
+:root[data-theme="light"] .pdx-stockPill.ok {
+  color: #15803d !important;
+  border-color: rgba(21, 128, 61, 0.24) !important;
+  background: rgba(220, 252, 231, 0.8) !important;
+}
+
+:root[data-theme="light"] .pdx-stockPill.mid {
+  color: #b45309 !important;
+  border-color: rgba(180, 83, 9, 0.26) !important;
+  background: rgba(254, 243, 199, 0.8) !important;
+}
+
+:root[data-theme="light"] .pdx-stockPill.low {
+  color: #c2410c !important;
+  border-color: rgba(194, 65, 12, 0.28) !important;
+  background: rgba(255, 237, 213, 0.8) !important;
+}
+
+:root[data-theme="light"] .pdx-stockPill.out {
+  color: #b91c1c !important;
+  border-color: rgba(185, 28, 28, 0.28) !important;
+  background: rgba(254, 226, 226, 0.8) !important;
 }
 
 .pdx-variantHead {
@@ -747,8 +776,10 @@
 }
 
 .pdx-qtyBtn:disabled {
-  opacity: 0.42;
+  opacity: 0.35;
   cursor: not-allowed;
+  box-shadow: none;
+  filter: saturate(0.4);
 }
 
 .pdx-qtyNum {
@@ -778,14 +809,18 @@
   background: rgba(255, 255, 255, 0.09);
 }
 
+.pdx-loadingBlock {
+  border-radius: 22px;
+}
+
 .pdx-loadingLine::after,
 .pdx-loadingBlock::after {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.18) 30%, rgba(255, 255, 255, 0.04) 55%, transparent 100%);
   transform: translateX(-100%);
-  animation: pdxShimmer 1.25s infinite;
+  animation: pdxShimmer 1.6s ease-in-out infinite;
 }
 
 .pdx-loadingLine {
@@ -811,9 +846,8 @@
 }
 
 @keyframes pdxShimmer {
-  to {
-    transform: translateX(100%);
-  }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
 }
 
 @media (max-width: 1080px) {
@@ -1011,7 +1045,7 @@
 /* Prevent horizontal overflow on mobile product detail */
 @media (max-width: 720px) {
   .detail-page .container {
-    overflow-x: clip;
+    overflow-x: visible;
   }
 
   .detail-page .pdx-heroPanel,
@@ -1022,7 +1056,7 @@
   }
   
   .detail-page .pdx-variantsSection {
-    overflow: hidden; /* Ensure nothing breaks out */
+    overflow: visible;
   }
 
   .detail-page .pdx-summaryActionsMain {
@@ -1185,6 +1219,7 @@
   --pdx-text-4: rgba(214, 235, 255, 0.44);
   --pdx-text-accent: var(--brand-icon, #4effda);
   color: var(--pdx-text-2);
+  contain: layout style;
 }
 
 :root[data-theme="light"] .detail-page-v3 {
@@ -1196,10 +1231,7 @@
 }
 
 .detail-page-v3 .container {
-  width: 100%;
-  max-width: 920px;
-  margin-inline: auto;
-  padding-inline: clamp(12px, 3vw, 24px);
+  max-width: 1100px;
 }
 
 .detail-page-v3 .pdx-layout {
@@ -1208,25 +1240,35 @@
 
 .detail-page-v3 .pdx-topCard,
 .detail-page-v3 .pdx-variantsSection,
-.detail-page-v3 .pdx-packCard,
+.detail-page-v3 .pdx-infoTabsCard,
 .detail-page-v3 .pdx-emptyCard {
   border: 1px solid var(--brand-line, var(--pdx-line));
-  border-radius: var(--uni-neo-radius-lg, 24px);
+  border-radius: 28px !important;
   background: var(--pdx-panel);
   box-shadow: var(--pdx-panel-shadow);
 }
 
+.detail-page-v3 .pdx-packCard {
+  border: 1px solid var(--brand-line, var(--pdx-line));
+  border-radius: var(--uni-neo-radius-md, 20px);
+  background: var(--pdx-inset);
+  box-shadow: var(--pdx-inset-shadow);
+}
+
 .detail-page-v3 .pdx-topCard {
-  padding: clamp(14px, 2.5vw, 22px);
+  padding: clamp(12px, 2vw, 16px) !important;
   display: grid;
-  gap: clamp(12px, 2vw, 16px);
+  gap: clamp(14px, 2.2vw, 20px);
 }
 
 .detail-page-v3 .pdx-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px;
+  padding-bottom: clamp(10px, 1.5vw, 14px);
+  border-bottom: 1px solid var(--brand-line, var(--pdx-line));
 }
 
 .detail-page-v3 .pdx-backLink {
@@ -1256,24 +1298,24 @@
 .detail-page-v3 .pdx-heroMain {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  gap: clamp(12px, 2.5vw, 18px);
-  align-items: start;
+  gap: clamp(14px, 2.5vw, 20px);
+  align-items: center;
 }
 
 .detail-page-v3 .pdx-productIcon,
 .detail-page-v3 .catalog-cardIcon.pdx-productIcon {
   position: static;
   transform: none !important;
-  flex: 0 0 58px;
-  width: 58px;
-  height: 58px;
-  border-radius: 18px !important;
+  flex: 0 0 clamp(60px, 10vw, 72px);
+  width: clamp(60px, 10vw, 72px);
+  height: clamp(60px, 10vw, 72px);
+  border-radius: clamp(18px, 3vw, 22px) !important;
   overflow: hidden;
   border: 1px solid var(--brand-line, var(--pdx-line)) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 28%),
     var(--skeu-control-bg) !important;
-  box-shadow: none !important;
+  box-shadow: 0 8px 20px var(--brand-color, rgba(0,0,0,0.15)) !important;
   display: grid;
   place-items: center;
   flex-shrink: 0;
@@ -1318,12 +1360,13 @@
   font-size: clamp(13px, 1.6vw, 14px);
   line-height: 1.6;
   overflow-wrap: anywhere;
+  white-space: pre-line !important;
 }
 
 .detail-page-v3 .pdx-descBlock:not(.is-expanded) .pdx-lead {
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
   overflow: hidden;
 }
 
@@ -1360,7 +1403,8 @@
 
 .detail-page-v3 .pdx-title {
   margin: 0;
-  font-size: clamp(22px, 4.8vw, 34px);
+  /* Slightly more compact title on desktop so left card stays lean */
+  font-size: clamp(26px, 4.5vw, 38px) !important;
   line-height: 1.08;
   letter-spacing: -0.04em;
   overflow-wrap: anywhere;
@@ -1369,14 +1413,14 @@
 
 .detail-page-v3 .pdx-statsStrip {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 12px;
-  border-radius: var(--uni-neo-radius-md, 18px);
-  border: 1px solid var(--brand-line, var(--pdx-line));
-  background: var(--pdx-inset);
-  box-shadow: var(--pdx-inset-shadow);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  margin-top: 14px;
 }
 
 .detail-page-v3 .pdx-heroPrice {
@@ -1387,11 +1431,17 @@
 }
 
 .detail-page-v3 .pdx-priceLabel {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--pdx-text-4);
 }
 
 .detail-page-v3 .pdx-heroPrice .pdx-priceValue {
   font-size: clamp(20px, 3.5vw, 28px);
+  font-weight: 1000;
+  letter-spacing: -0.03em;
   color: var(--pdx-text-accent);
 }
 
@@ -1399,8 +1449,8 @@
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  min-height: 30px;
-  padding: 0 10px;
+  min-height: 32px;
+  padding: 0 12px;
   border-radius: 999px;
   border: 1px solid var(--brand-line, var(--pdx-line));
   background: var(--pdx-soft);
@@ -1409,6 +1459,13 @@
   font-size: 11px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.detail-page-v3 .pdx-statsChips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .detail-page-v3 .pdx-topActions {
@@ -1422,7 +1479,7 @@
   position: relative;
   width: 40px;
   height: 40px;
-  border-radius: 14px;
+  border-radius: 999px;
   border: 1px solid var(--brand-line, var(--pdx-line));
   background: var(--pdx-soft);
   box-shadow: var(--pdx-soft-shadow);
@@ -1430,11 +1487,12 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
 .detail-page-v3 .pdx-iconBtn:hover {
   transform: translateY(-1px);
+  border-color: rgba(79, 255, 200, 0.3);
 }
 
 .detail-page-v3 .pdx-cartBadge {
@@ -1462,21 +1520,70 @@
 }
 
 .detail-page-v3 .pdx-variantsSection {
-  padding: clamp(14px, 2.5vw, 22px);
+  padding: clamp(16px, 2.5vw, 24px) !important;
   display: grid;
-  gap: 12px;
+  gap: 14px;
+}
+
+/* Desktop: right card is sticky and scrollable inside */
+@media (min-width: 1024px) {
+  .detail-page-v3 .pdx-variantsSection {
+    position: sticky;
+    top: 80px; /* below navbar */
+    max-height: calc(100vh - 100px);
+    /* NO overflow:hidden here — it clips the filter chip box-shadows.
+       Scroll is handled entirely by .pdx-packList below. */
+    overflow: visible;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Only the pack list scrolls; the header (title, filters) stays fixed */
+  .detail-page-v3 .pdx-packList {
+    overflow-y: auto;
+    flex: 1;
+    min-height: 0;
+    /* Small bottom padding so last card shadow isn't clipped */
+    padding-bottom: 12px;
+    padding-right: 4px; /* space for scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+  }
+
+  .detail-page-v3 .pdx-packList::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .detail-page-v3 .pdx-packList::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+  }
+
+  .detail-page-v3 .pdx-packList::-webkit-scrollbar-track {
+    background: transparent;
+  }
 }
 
 .detail-page-v3 .pdx-variantsHead {
-  align-items: flex-start;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+}
+
+.detail-page-v3 .pdx-variantsHeadTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .detail-page-v3 .pdx-filters {
   display: flex;
   gap: 8px;
   overflow-x: auto;
-  padding: 2px 2px 6px;
+  /* padding prevents filter chips from being clipped by the overflow */
+  padding: 6px 2px 24px;
   margin: 0 -2px;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
@@ -1499,7 +1606,7 @@
   border-radius: 999px;
   border: 1px solid var(--brand-line, var(--pdx-line));
   background: var(--pdx-soft);
-  box-shadow: var(--pdx-soft-shadow);
+  box-shadow: none;
   color: var(--pdx-text-3);
   font-size: 12px;
   font-weight: 900;
@@ -1511,7 +1618,7 @@
   color: var(--imzaqi-btn-text, #032235);
   border-color: var(--imzaqi-btn-border);
   background: var(--imzaqi-btn-face);
-  box-shadow: var(--imzaqi-btn-shadow);
+  box-shadow: none;
 }
 
 :root[data-theme="light"] .detail-page-v3 .pdx-filterChip.is-active {
@@ -1650,7 +1757,7 @@
 
 .detail-page-v3 .pdx-packActions .btn {
   min-height: 42px;
-  border-radius: 14px;
+  border-radius: 999px !important;
   font-size: 13px;
 }
 
@@ -1688,31 +1795,57 @@
   }
 
   .detail-page-v3 .pdx-statsStrip {
-    padding: 12px 16px;
-    gap: 10px 14px;
+    padding: 0 !important;
+    gap: 12px;
   }
 }
 
 @media (max-width: 480px) {
+  .detail-page-v3 .pdx-topCard,
+  .detail-page-v3 .pdx-variantsSection,
+  .detail-page-v3 .pdx-packCard,
+  .detail-page-v3 .pdx-infoTabsCard {
+    padding: 16px !important;
+  }
+
+  .detail-page-v3 .pdx-infoTabBtn {
+    font-size: 12px !important;
+    padding: 8px 10px !important;
+  }
+
+  /* Toolbar: tighter gap, separator border-bottom already applied on all sizes */
   .detail-page-v3 .pdx-toolbar {
     gap: 8px;
+    padding-bottom: 12px;
   }
 
-  .detail-page-v3 .pdx-backLink span {
-    display: none;
+
+  /* Icon: slightly bigger on mobile for better visual balance */
+  .detail-page-v3 .pdx-productIcon,
+  .detail-page-v3 .catalog-cardIcon.pdx-productIcon {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
   }
 
-  .detail-page-v3 .pdx-backLink {
-    width: 40px;
-    height: 40px;
-    padding: 0;
-    justify-content: center;
+  /* Hero content: more breathing room on small screens */
+  .detail-page-v3 .pdx-heroMain {
+    gap: 14px;
+    align-items: center;
   }
 
+  /* Description: allow a bit more lines on mobile before truncating */
+  .detail-page-v3 .pdx-descBlock:not(.is-expanded) .pdx-lead {
+    -webkit-line-clamp: 3;
+  }
+
+  /* Stats strip: stacked layout — price full width, chips in a row */
   .detail-page-v3 .pdx-statsStrip {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 0 !important;
   }
 
   .detail-page-v3 .pdx-heroPrice {
@@ -1720,6 +1853,19 @@
     margin-right: 0;
   }
 
+  /* Chips (terjual + garansi) side by side */
+  .detail-page-v3 .pdx-statsChips {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .detail-page-v3 .pdx-heroStat {
+    flex: 1;
+    justify-content: center;
+  }
+
+  /* Variant card: stack price below name on very small screens */
   .detail-page-v3 .pdx-packHead {
     flex-direction: column;
     gap: 8px;
@@ -1731,26 +1877,34 @@
   }
 
   .detail-page-v3 .pdx-packActions {
-    grid-template-columns: auto 1fr;
-    gap: 8px;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 6px;
   }
 }
 
 @media (max-width: 768px) {
   .detail-page-v3 .pdx-addBtn .pdx-addBtnLabel {
-    display: none;
+    display: inline !important;
   }
 
   .detail-page-v3 .pdx-addBtn {
-    width: 42px;
-    min-width: 42px;
-    padding: 0 !important;
-    justify-content: center;
+    width: auto !important;
+    min-width: 0 !important;
+    padding: 0 12px !important;
+    justify-content: center !important;
     color: var(--pdx-text-2) !important;
+    font-size: 12px !important;
   }
 
   .detail-page-v3 .pdx-packActions {
-    grid-template-columns: auto 1fr;
+    grid-template-columns: 1fr 1.2fr !important;
+    gap: 6px !important;
+  }
+
+  .detail-page-v3 .pdx-packActions .btn {
+    min-height: 38px !important;
+    font-size: 12px !important;
+    padding: 0 8px !important;
   }
 }
 
@@ -1791,14 +1945,49 @@
 }
 
 .detail-page-v3 .pdx-addBtn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  background: var(--pdx-inset);
-  box-shadow: var(--pdx-inset-shadow);
-  border: 1px solid var(--brand-line, var(--pdx-line));
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  width: auto !important;
+  height: 42px !important;
+  padding: 0 16px !important;
+  background: var(--pdx-soft) !important;
+  box-shadow: var(--pdx-soft-shadow) !important;
+  border: 1px solid var(--brand-line, var(--pdx-line)) !important;
   color: var(--pdx-text-2) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+}
+
+@media (hover: hover) {
+  .detail-page-v3 .pdx-addBtn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    border-color: rgba(79, 255, 200, 0.3) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+  }
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-addBtn {
+  background: #ffffff !important;
+  border-color: rgba(119, 175, 194, 0.18) !important;
+  box-shadow: 
+    0 4px 10px rgba(102, 140, 156, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  width: auto !important;
+  padding: 0 16px !important;
+}
+
+@media (hover: hover) {
+  :root[data-theme="light"] .detail-page-v3 .pdx-addBtn:hover:not(:disabled) {
+    background: #ffffff !important;
+    border-color: rgba(0, 138, 148, 0.24) !important;
+    box-shadow: 0 6px 14px rgba(102, 140, 156, 0.16) !important;
+  }
+}
+
+.detail-page-v3 .pdx-addBtn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow: var(--pdx-inset-shadow) !important;
 }
 
 .detail-page-v3 .pdx-benefitToggle-modern {
@@ -1817,4 +2006,490 @@
   background: var(--imzaqi-btn-face) !important;
   border-color: var(--imzaqi-btn-border) !important;
   box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   Detail Page Overhaul: Premium Glassmorphism & Grid Alignment
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Sleek Brand Glow on Top Card */
+.detail-page-v3 .pdx-topCard {
+  background: 
+    linear-gradient(166deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 255, 255, 0) 100%),
+    radial-gradient(ellipse 80% 60% at 10% 20%, var(--brand-color, rgba(78, 255, 218, 0.10)), rgba(0, 0, 0, 0) 85%),
+    radial-gradient(ellipse 50% 40% at 90% 80%, var(--brand-color, rgba(78, 255, 218, 0.05)), rgba(0, 0, 0, 0) 80%),
+    var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1)) !important;
+  box-shadow: 
+    0 30px 60px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(24px);
+  position: relative;
+  overflow: hidden;
+}
+
+/* Light mode support for Top Card */
+:root[data-theme="light"] .detail-page-v3 .pdx-topCard {
+  background: 
+    radial-gradient(ellipse 85% 65% at 10% 20%, var(--brand-color, rgba(126, 194, 224, 0.18)), rgba(0, 0, 0, 0) 85%),
+    radial-gradient(ellipse 55% 45% at 90% 80%, var(--brand-color, rgba(126, 194, 224, 0.10)), rgba(0, 0, 0, 0) 80%),
+    linear-gradient(166deg, rgba(255, 255, 255, 0.78) 0%, rgba(247, 253, 255, 0.68) 50%, rgba(235, 246, 252, 0.74) 100%) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow: 
+    0 24px 50px rgba(97, 137, 153, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+/* Add a beautiful radial brand glow behind icon */
+.detail-page-v3 .pdx-productIcon {
+  box-shadow: 
+    0 16px 36px var(--brand-color, rgba(0, 0, 0, 0.28)),
+    var(--pdx-soft-shadow) !important;
+  transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
+}
+
+
+/* 2. Redesign Variant Cards for a highly polished tactile feel */
+.detail-page-v3 .pdx-packCard {
+  background: var(--pdx-inset) !important;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08)) !important;
+  box-shadow: var(--pdx-inset-shadow) !important;
+  transition: transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.22s ease, box-shadow 0.22s ease;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .detail-page-v3 .pdx-packCard:hover:not(.is-out) {
+    transform: translateY(-3px);
+    border-color: rgba(79, 255, 200, 0.28) !important;
+    box-shadow: 
+      0 14px 28px rgba(0, 0, 0, 0.25),
+      var(--pdx-inset-shadow) !important;
+  }
+}
+
+.detail-page-v3 .pdx-packCard.is-selected {
+  border-color: rgba(79, 255, 218, 0.44) !important;
+  box-shadow: 
+    0 0 0 1px rgba(79, 255, 218, 0.26) inset,
+    0 8px 20px rgba(0, 214, 180, 0.08),
+    var(--pdx-inset-shadow) !important;
+}
+
+.detail-page-v3 .pdx-packCard.is-recommended {
+  background: 
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 36%),
+    var(--pdx-panel) !important;
+  border-color: rgba(79, 255, 200, 0.34) !important;
+  box-shadow: 
+    0 14px 30px rgba(0, 14, 32, 0.22),
+    var(--pdx-panel-shadow) !important;
+}
+
+@media (hover: hover) {
+  .detail-page-v3 .pdx-packCard.is-recommended:hover:not(.is-out) {
+    border-color: rgba(79, 255, 200, 0.48) !important;
+    box-shadow: 
+      0 20px 42px rgba(0, 214, 180, 0.22),
+      var(--pdx-panel-shadow) !important;
+  }
+}
+
+.detail-page-v3 .pdx-packCard.is-selected.is-recommended {
+  border-color: rgba(79, 255, 200, 0.52) !important;
+  box-shadow: 
+    0 0 0 1px rgba(79, 255, 218, 0.3) inset,
+    0 18px 36px rgba(0, 214, 180, 0.16),
+    var(--pdx-panel-shadow) !important;
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-packCard.is-recommended {
+  border-color: rgba(0, 194, 208, 0.38) !important;
+}
+
+@media (hover: hover) {
+  :root[data-theme="light"] .detail-page-v3 .pdx-packCard.is-recommended:hover:not(.is-out) {
+    border-color: rgba(0, 194, 208, 0.54) !important;
+  }
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-packCard.is-selected.is-recommended {
+  border-color: rgba(0, 194, 208, 0.6) !important;
+}
+
+
+
+/* Benefit toggle & items styles */
+.detail-page-v3 .pdx-benefitToggle-modern {
+  border-color: var(--brand-line, rgba(255, 255, 255, 0.08)) !important;
+  border-radius: 999px !important;
+  transition: transform 0.2s var(--ease-out), border-color 0.2s, background 0.2s;
+}
+
+@media (hover: hover) {
+  .detail-page-v3 .pdx-benefitToggle-modern:hover {
+    border-color: rgba(79, 255, 200, 0.24) !important;
+    background: rgba(255, 255, 255, 0.04) !important;
+  }
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-benefitToggle-modern {
+  background: var(--pdx-inset) !important;
+  box-shadow: var(--pdx-inset-shadow) !important;
+  border-color: rgba(119, 175, 194, 0.16) !important;
+}
+
+@media (hover: hover) {
+  :root[data-theme="light"] .detail-page-v3 .pdx-benefitToggle-modern:hover {
+    border-color: rgba(0, 138, 148, 0.24) !important;
+    background: rgba(0, 0, 0, 0.03) !important;
+  }
+}
+
+/* 3. Recommendations Row: Compact Grid Layout (Sama seperti Flash Sale, ukuran diperbesar) */
+.detail-page-v3 .pdx-recommendationsGrid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)) !important;
+  gap: 16px !important;
+  width: 100% !important;
+  padding-bottom: 24px !important; /* Prevents card bottom drop-shadows from being clipped */
+}
+
+/* Make recommended tiles layout simple and vertical (icon, name, price only) */
+.detail-page-v3 .pdx-recommendationsGrid .product-tile {
+  min-height: 0 !important;
+  height: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  text-align: center !important;
+  padding: 20px 14px 18px !important;
+  border-radius: 24px !important;
+  gap: 12px !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-tiltWrap {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 100% !important;
+  gap: 12px !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-top {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-icon {
+  width: 64px !important;
+  height: 64px !important;
+  border-radius: 18px !important;
+  margin: 0 auto !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-icon img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-main {
+  text-align: center !important;
+  width: 100% !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-name {
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  line-height: 1.35 !important;
+  text-align: center !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  max-width: 100% !important;
+  display: block !important;
+}
+
+/* Hide description, pills, and arrow button for a clean/simple look */
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-desc,
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-arrow,
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-pills {
+  display: none !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-bottom {
+  display: flex !important;
+  justify-content: center !important;
+  width: 100% !important;
+  margin-top: 4px !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-price {
+  font-size: 14px !important;
+  font-weight: 900 !important;
+  color: var(--pdx-text-accent, #4effda) !important;
+  text-align: center !important;
+  padding-right: 0 !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-price::before {
+  content: "Harga mulai " !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  color: var(--pdx-text-3, rgba(214, 235, 255, 0.58)) !important;
+  margin-right: 3px !important;
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-price {
+  color: #0b8292 !important;
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-price::before {
+  color: rgba(62, 91, 103, 0.78) !important;
+}
+
+/* Mobile & Tablet Slider (Sebaris & Bisa Slide) */
+@media (max-width: 768px) {
+  .detail-page-v3 .pdx-recommendationsGrid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important;
+    scroll-snap-type: x mandatory !important;
+    gap: 14px !important;
+    padding-bottom: 20px !important;
+    padding-inline: 16px !important;
+    margin-inline: -16px !important;
+    scrollbar-width: none !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%) !important;
+    mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%) !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid::-webkit-scrollbar {
+    display: none !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile {
+    flex: 0 0 170px !important;
+    scroll-snap-align: start !important;
+    height: auto !important;
+  }
+}
+
+/* Spacing and visual adjustments for Recommendations section */
+.detail-page-v3 .pdx-recommendations {
+  margin-top: clamp(24px, 4vw, 40px) !important; /* Distance from variants section above */
+  display: grid !important;
+  gap: 20px !important; /* Distance between text title and the recommended cards */
+}
+
+.detail-page-v3 .pdx-recommendationsHead {
+  display: grid !important;
+  gap: 6px !important;
+}
+
+/* Prevent floating action buttons (FABs) from overlapping/covering price text on mobile/tablet */
+@media (max-width: 768px) {
+  .detail-page-v3 {
+    padding-bottom: 140px !important; /* Extra bottom spacing to scroll past floating buttons */
+  }
+
+  .detail-page-v3.with-sticky-cta {
+    padding-bottom: 220px !important; /* Even more bottom spacing if sticky cart is visible */
+  }
+}
+
+/* Side-by-Side main content grid */
+.pdx-mainGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 18px;
+}
+
+@media (min-width: 1024px) {
+  .pdx-mainGrid {
+    /* Right (variants) card is noticeably wider than left (info) card */
+    grid-template-columns: 0.72fr 1.28fr;
+    align-items: start;
+    gap: 24px;
+  }
+}
+
+/* Tabs Card style & content */
+.pdx-infoTabsCard {
+  margin-top: 16px;
+  padding: clamp(12px, 2vw, 16px) !important;
+}
+
+.pdx-infoTabsHeader {
+  /* relative so the sliding indicator is positioned within this container */
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding: 4px;
+  border-radius: 999px;
+  background: var(--pdx-inset, rgba(0, 0, 0, 0.05));
+  border: 1px solid var(--brand-line, var(--pdx-line));
+  box-shadow: var(--pdx-inset-shadow);
+  margin-bottom: 10px;
+  /* --tab-index is set via inline style: 0 = left, 1 = right */
+  --tab-index: 0;
+}
+
+.pdx-infoTabBtn {
+  flex: 1;
+  text-align: center;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 800;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--pdx-text-2, rgba(255, 255, 255, 0.7));
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.22s ease, background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.pdx-infoTabBtn.is-active {
+  background: var(--imzaqi-btn-face);
+  border: 1px solid var(--imzaqi-btn-border);
+  box-shadow: var(--imzaqi-btn-shadow);
+  color: var(--imzaqi-btn-text, #032235) !important;
+  font-weight: 900;
+}
+
+:root[data-theme="light"] .pdx-infoTabBtn.is-active {
+  color: var(--imzaqi-btn-text, #032235) !important;
+}
+
+.pdx-infoTabLabel {
+  position: relative;
+  z-index: 1;
+}
+
+.pdx-infoTabContent {
+  padding-top: 4px;
+  padding-inline: 8px;
+}
+
+.pdx-termsList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 14px;
+}
+
+.pdx-termsList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.pdx-termNum {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border-radius: 50%;
+  background: rgba(0, 194, 208, 0.1);
+  color: var(--brand-icon, #00c2d0);
+  font-size: 11px;
+  font-weight: 800;
+  border: 1px solid rgba(0, 194, 208, 0.2);
+}
+
+.pdx-termText {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--pdx-text-2);
+}
+
+/* ── Low Stock & Out of Stock Badges ── */
+.product-lowStockBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 191, 74, 0.28);
+  background: rgba(255, 191, 74, 0.10);
+  color: rgba(255, 220, 120, 0.92);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+}
+
+.product-lowStockBadge.out {
+  border-color: rgba(255, 90, 122, 0.28) !important;
+  background: rgba(255, 90, 122, 0.10) !important;
+  color: #ff5a7a !important;
+}
+
+:root[data-theme="light"] .product-lowStockBadge {
+  color: #b45309 !important;
+  border-color: rgba(180, 83, 9, 0.28) !important;
+  background: rgba(254, 243, 199, 0.8) !important;
+}
+
+:root[data-theme="light"] .product-lowStockBadge.out {
+  border-color: rgba(185, 28, 28, 0.28) !important;
+  background: rgba(254, 226, 226, 0.8) !important;
+}
+
+@media (max-width: 920px) {
+  /* Disable backdrop filter on mobile for top card */
+  .detail-page-v3 .pdx-topCard {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  /* Prevent horizontal overflow and force correct widths on mobile */
+  .pdx-mainGrid,
+  .pdx-leftCol,
+  .pdx-rightCol {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .detail-page-v3 .pdx-topCard,
+  .detail-page-v3 .pdx-infoTabsCard,
+  .detail-page-v3 .pdx-variantsSection {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Simplify multi-layered shadows to tight, high-performance card shadows on mobile */
+  .detail-page-v3 {
+    --pdx-panel-shadow: 0 4px 12px rgba(0, 0, 0, 0.2) !important;
+    --pdx-soft-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
+    --pdx-inset-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  /* Performance: simplify tile rendering within recommendations on mobile */
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12) !important;
+    transition: none !important;
+    will-change: auto !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile::after {
+    display: none !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile:hover {
+    transform: none !important;
+  }
 }

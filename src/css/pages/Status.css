@@ -1074,6 +1074,7 @@
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
 }
 
 /* Pay progress bar themed */
@@ -1319,13 +1320,6 @@
 
 
 /* ─── Admin note pinned to top — full-width hero card ─── */
-.st-layout {
-  /* Allow the admin note to span full width above the grid */
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  align-items: start;
-}
-
 .st-noteTopAccent {
   grid-column: 1 / -1;
   margin-bottom: 14px;
@@ -1509,9 +1503,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   border: 1px solid var(--st-line);
   background: var(--st-panel-soft);
   color: var(--st-muted);
@@ -1519,6 +1513,10 @@
   transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.15s;
 }
 
+.st-refreshBtn:focus-visible {
+  outline: 2px solid rgba(79, 255, 200, 0.7);
+  outline-offset: 2px;
+}
 .st-refreshBtn:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
   color: var(--st-text);

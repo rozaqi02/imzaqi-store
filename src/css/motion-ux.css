@@ -1,18 +1,18 @@
 /* UX motion layer — interactive polish */
 
 @keyframes uxRouteForward {
-  from { opacity: 0; transform: translate3d(28px, 0, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
+  0% { opacity: 0; transform: translate3d(28px, 0, 0) scale(0.99); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
 @keyframes uxRouteBack {
-  from { opacity: 0; transform: translate3d(-28px, 0, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
+  0% { opacity: 0; transform: translate3d(-28px, 0, 0) scale(0.99); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
 @keyframes uxRouteFade {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  0% { opacity: 0; transform: scale(0.995); }
+  100% { opacity: 1; transform: scale(1); }
 }
 
 @keyframes uxLoadMoreProgress {
@@ -71,17 +71,17 @@
 @media (prefers-reduced-motion: no-preference) {
   html[data-motion="full"] .route-transition--forward:not(:has(.catalog-page)),
   html[data-motion="lite"] .route-transition--forward:not(:has(.catalog-page)) {
-    animation: uxRouteForward 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: uxRouteForward 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   html[data-motion="full"] .route-transition--back:not(:has(.catalog-page)),
   html[data-motion="lite"] .route-transition--back:not(:has(.catalog-page)) {
-    animation: uxRouteBack 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: uxRouteBack 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
   html[data-motion="full"] .route-transition--fade:not(:has(.catalog-page)),
   html[data-motion="lite"] .route-transition--fade:not(:has(.catalog-page)) {
-    animation: uxRouteFade 0.3s ease both;
+    animation: uxRouteFade 0.25s ease both;
   }
 
   .catalog-contentMeta.is-filtering strong {

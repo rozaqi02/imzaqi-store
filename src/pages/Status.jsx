@@ -5,6 +5,7 @@ import {
   AlertCircle,
   ArrowUpRight,
   BadgePercent,
+  Calendar,
   CheckCircle2,
   Clock3,
   Copy,
@@ -33,6 +34,7 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { copyToClipboard } from "../utils/clipboard";
 import "../css/pages/OrderHistory.css";
+import "../css/pages/Status.css";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -86,16 +88,16 @@ function sanitizeOrderInput(value) {
   return String(value || "").toUpperCase().replace(/[^A-Z0-9-]/g, "");
 }
 
-// Dipakai saat lookup/submit — normalisasi penuh ke format IMZ-XXXX
+// Dipakai saat lookup/submit — normalisasi penuh ke format IMZ-XXXX atau IMZ-XXXXXXXX
 function normalizeOrderCode(value) {
   // Strip semua karakter non-alphanumeric kecuali dash sementara
   const cleaned = String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (!cleaned) return "";
   // Cek apakah sudah ada prefix IMZ
   const withoutPrefix = cleaned.startsWith("IMZ") ? cleaned.slice(3) : cleaned;
-  // Ambil 4 karakter terakhir sebagai kode
-  const code = withoutPrefix.slice(-4);
-  if (code.length === 4) return `IMZ-${code}`;
+  // Gunakan 8 karakter jika panjangnya tepat 8, jika tidak ambil 4 karakter terakhir
+  const code = withoutPrefix.length === 8 ? withoutPrefix : withoutPrefix.slice(-4);
+  if (code.length === 4 || code.length === 8) return `IMZ-${code}`;
   // Kode belum lengkap, kembalikan mentah untuk ditampilkan error
   return cleaned;
 }
@@ -152,10 +154,13 @@ function FlowStep({ step }) {
   );
 }
 
-function InfoCard({ label, value, hint, tone = "" }) {
+function InfoCard({ label, value, hint, tone = "", icon: Icon }) {
   return (
     <article className={`st-infoCard${tone ? ` is-${tone}` : ""}`}>
-      <span>{label}</span>
+      <div className="st-infoCard-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+        <span>{label}</span>
+        {Icon && <Icon size={14} style={{ opacity: 0.8, color: "var(--st-muted)" }} />}
+      </div>
       <strong>{value}</strong>
       <small>{hint}</small>
     </article>
@@ -179,56 +184,7 @@ function TabCekStatus({ settings }) {
   const waNumber = settings?.whatsapp?.number || "6283136049987";
   const pollTimerRef = useRef(null);
 
-  useEffect(() => {
-    if (!initialParam) return;
-    const normalized = normalizeOrderCode(initialParam);
-    setInput(normalized);
-    lookup(normalized);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialParam]);
-
-  // Auto-refresh polling — berhenti kalau status sudah terminal
-  useEffect(() => {
-    if (!order || TERMINAL_STATUSES.has(order.status)) return;
-    pollTimerRef.current = setInterval(() => {
-      silentRefresh(order.order_code);
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(pollTimerRef.current);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [order?.order_code, order?.status]);
-
-  const statusMeta = useMemo(() => getStatusMeta(order?.status), [order?.status]);
-  const StatusIcon = statusMeta.icon;
-  const timeline = useMemo(() => getTimeline(order?.status), [order?.status]);
-
-  const subtotalValue = Number(order?.subtotal_idr || 0);
-  const totalValue = Number(order?.total_idr || 0);
-  const discountValue = useMemo(() => Math.max(0, subtotalValue - totalValue), [subtotalValue, totalValue]);
-  const itemCount = useMemo(
-    () => (order?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0),
-    [order?.items]
-  );
-  // Kalau subtotal 0, bar tetap kosong agar tidak menyesatkan
-  const paidRatio = subtotalValue > 0
-    ? Math.max(4, Math.min(100, Math.round((totalValue / subtotalValue) * 100)))
-    : 0;
-
-  const createdDateLabel = useMemo(() => {
-    if (!order?.created_at) return "-";
-    return new Date(order.created_at).toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }, [order?.created_at]);
-
-  const waUrl = useMemo(() => {
-    const code = order?.order_code || input || "";
-    const text = encodeURIComponent(`Halo admin, saya ingin cek order.\n\nID Order: ${code}`);
-    return `https://wa.me/${waNumber}?text=${text}`;
-  }, [input, order?.order_code, waNumber]);
-
-  async function lookup(rawValue) {
+  const lookup = useCallback(async (rawValue) => {
     const code = normalizeOrderCode(rawValue);
     setInput(code);
 
@@ -267,7 +223,7 @@ function TabCekStatus({ settings }) {
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   // Silent refresh — update status di background tanpa reset UI
   const silentRefresh = useCallback(async (orderCode) => {
@@ -286,6 +242,84 @@ function TabCekStatus({ settings }) {
       setRefreshing(false);
     }
   }, []);
+
+  useEffect(() => {
+    if (!initialParam) return;
+    const normalized = normalizeOrderCode(initialParam);
+    setInput(normalized);
+    lookup(normalized);
+  }, [initialParam, lookup]);
+
+  // Auto-refresh polling — berhenti kalau status sudah terminal
+  useEffect(() => {
+    if (!order || TERMINAL_STATUSES.has(order.status)) return;
+    pollTimerRef.current = setInterval(() => {
+      silentRefresh(order.order_code);
+    }, POLL_INTERVAL_MS);
+    return () => clearInterval(pollTimerRef.current);
+  }, [order, silentRefresh]);
+
+  const statusMeta = useMemo(() => getStatusMeta(order?.status), [order?.status]);
+  const StatusIcon = statusMeta.icon;
+  const timeline = useMemo(() => getTimeline(order?.status), [order?.status]);
+
+  const subtotalValue = Number(order?.subtotal_idr || 0);
+  const totalValue = Number(order?.total_idr || 0);
+  const discountValue = useMemo(() => Math.max(0, subtotalValue - totalValue), [subtotalValue, totalValue]);
+  const itemCount = useMemo(
+    () => (order?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0),
+    [order?.items]
+  );
+  // Kalau subtotal 0, bar tetap kosong agar tidak menyesatkan
+  const paidRatioRaw = subtotalValue > 0
+    ? Math.round((totalValue / subtotalValue) * 100)
+    : 0;
+  const paidRatioBar = Math.max(4, paidRatioRaw);
+  const paidRatio = subtotalValue > 0 ? Math.min(100, paidRatioRaw) : 0;
+
+  const statusHint = useMemo(() => {
+    const val = order?.status;
+    if (val === "pending") return "Menunggu pembayaran QRIS";
+    if (val === "paid_reported") return "Menunggu konfirmasi admin";
+    if (val === "processing") return "Sedang diproses oleh admin";
+    if (val === "done") return "Sukses, siap digunakan";
+    if (val === "cancelled") return "Pesanan dibatalkan";
+    return "Status aktif";
+  }, [order?.status]);
+
+  const statusIcon = useMemo(() => {
+    const val = order?.status;
+    if (val === "done") return CheckCircle2;
+    if (val === "processing") return Sparkles;
+    if (val === "cancelled") return XCircle;
+    return Clock3;
+  }, [order?.status]);
+
+  const totalHint = useMemo(() => {
+    return `${itemCount} item \u2022 Metode QRIS`;
+  }, [itemCount]);
+
+  const dateHint = useMemo(() => {
+    if (discountValue > 0) {
+      return `Hemat ${formatIDR(discountValue)} (Promo)`;
+    }
+    return "Metode QRIS Instant";
+  }, [discountValue]);
+
+  const createdDateLabel = useMemo(() => {
+    if (!order?.created_at) return "-";
+    return new Date(order.created_at).toLocaleDateString("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    });
+  }, [order?.created_at]);
+
+  const waUrl = useMemo(() => {
+    const code = order?.order_code || input || "";
+    const text = encodeURIComponent(`Halo admin, saya ingin cek order.\n\nID Order: ${code}`);
+    return `https://wa.me/${waNumber}?text=${text}`;
+  }, [input, order?.order_code, waNumber]);
 
   async function copyOrderCode() {
     try {
@@ -316,7 +350,7 @@ function TabCekStatus({ settings }) {
   return (
     <>
       {order ? (
-        <div className="st-statePillRow">
+        <div className="st-statePillRow" aria-live="polite" aria-atomic="true">
           <div className={`st-statePill is-${statusMeta.tone}`}>
             <StatusIcon size={16} />
             <span>{prettyStatus(order.status)}</span>
@@ -358,7 +392,7 @@ function TabCekStatus({ settings }) {
               className="input st-input"
               inputMode="text"
               autoCapitalize="characters"
-              placeholder="Contoh: IMZ-ABCD"
+              placeholder="Contoh: IMZ-ABCD atau IMZ-ABCDEFGH"
               value={input}
               onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
               onKeyDown={(e) => {
@@ -428,19 +462,34 @@ function TabCekStatus({ settings }) {
 
           <main className="st-main">
             <section className="st-metrics">
-              <InfoCard label="Status" value={prettyStatus(order.status)} hint="Status aktif" tone={statusMeta.tone} />
+              <InfoCard
+                label="Status"
+                value={prettyStatus(order.status)}
+                hint={statusHint}
+                tone={statusMeta.tone}
+                icon={statusIcon}
+              />
 
               <button className="st-infoCard st-infoAction" type="button" onClick={copyOrderCode}>
-                <span>ID order</span>
+                <div className="st-infoCard-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
+                  <span>ID order</span>
+                  <Copy size={14} style={{ opacity: 0.8, color: "var(--st-muted)" }} />
+                </div>
                 <strong>{order.order_code}</strong>
-                <small>Tap untuk salin</small>
+                <small>Tap untuk salin ID</small>
               </button>
 
-              <InfoCard label="Total bayar" value={formatIDR(totalValue)} hint={`${itemCount} item`} />
+              <InfoCard
+                label="Total bayar"
+                value={formatIDR(totalValue)}
+                hint={totalHint}
+                icon={WalletCards}
+              />
               <InfoCard
                 label="Tanggal"
                 value={createdDateLabel}
-                hint={discountValue > 0 ? `${formatIDR(discountValue)} hemat` : "Tanpa promo"}
+                hint={dateHint}
+                icon={Calendar}
               />
             </section>
 
@@ -572,7 +621,7 @@ function TabCekStatus({ settings }) {
                   aria-valuemax={100}
                   aria-label={`Rasio bayar ${paidRatio}%`}
                 >
-                  <i style={{ width: `${paidRatio}%` }} />
+                  <i style={{ width: `${paidRatioBar}%` }} />
                 </div>
                 <small>
                   {subtotalValue > 0 ? `Rasio bayar ${paidRatio}%` : "Data harga belum tersedia"}
@@ -663,27 +712,33 @@ function TabRiwayat() {
     }
     if (!silent) setSyncing(true);
 
-    const results = await Promise.allSettled(
-      history.map(async (entry) => {
-        const { data, error } = await supabase.rpc("get_order_public", {
-          p_order_code: entry.order_code,
-        });
-        if (error) throw error;
-        const row = Array.isArray(data) ? data[0] : data;
-        if (!row) throw new Error("not found");
-        return { order_code: entry.order_code, status: row.status };
-      })
-    );
-
     const errors = {};
-    results.forEach((result, index) => {
-      const entry = history[index];
-      if (result.status === "fulfilled") {
-        updateOrderHistoryStatus(entry.order_code, result.value.status);
-      } else {
+    try {
+      const codes = history.map((h) => h.order_code);
+      const { data, error } = await supabase.rpc("get_orders_public_bulk", {
+        p_order_codes: codes,
+      });
+      if (error) throw error;
+
+      const statusMap = {};
+      (data || []).forEach((row) => {
+        statusMap[row.order_code] = row.status;
+      });
+
+      history.forEach((entry) => {
+        const status = statusMap[entry.order_code];
+        if (status) {
+          updateOrderHistoryStatus(entry.order_code, status);
+        } else {
+          errors[entry.order_code] = true;
+        }
+      });
+    } catch (err) {
+      console.error("Gagal sinkronisasi riwayat:", err);
+      history.forEach((entry) => {
         errors[entry.order_code] = true;
-      }
-    });
+      });
+    }
 
     setFetchErrors(errors);
     setEntries(getOrderHistory());

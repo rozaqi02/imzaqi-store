@@ -461,11 +461,30 @@ function buildLLMSystemPrompt(context, intent) {
   return lines.join("\n");
 }
 
+let _llmConfigLogged = false;
+
 async function callLLM(query, history, context, intent) {
-  const endpoint = import.meta.env.VITE_AI_ENDPOINT;
-  const key = import.meta.env.VITE_AI_KEY;
-  const model = import.meta.env.VITE_AI_MODEL || "gemini-2.5-flash";
-  if (!endpoint) return null;
+  let endpoint = (import.meta.env.VITE_AI_ENDPOINT || "").replace(/^"|"$/g, "").trim();
+  let key = (import.meta.env.VITE_AI_KEY || "").replace(/^"|"$/g, "").trim();
+  const model = (import.meta.env.VITE_AI_MODEL || "gemini-2.5-flash").replace(/^"|"$/g, "").trim();
+
+  // Log config once for debugging in production
+  if (!_llmConfigLogged) {
+    _llmConfigLogged = true;
+    console.info("[Imzaqi AI] Config:", {
+      endpoint: endpoint ? `${endpoint.slice(0, 30)}...` : "(empty)",
+      keyPresent: key.length > 0,
+      keyLength: key.length,
+      keyStart: key.slice(0, 4),
+      model,
+    });
+  }
+  
+  // Fail fast if endpoint is missing or malformed
+  if (!endpoint || !endpoint.startsWith("http")) {
+    console.warn("[Imzaqi AI] No valid endpoint configured:", endpoint || "(empty)");
+    return null;
+  }
 
   const systemPrompt = buildLLMSystemPrompt(context, intent);
 
@@ -480,13 +499,13 @@ async function callLLM(query, history, context, intent) {
 
   try {
     const ctrl = new AbortController();
-    const timer = window.setTimeout(() => ctrl.abort(), 15000);
-    // Google Generative Language API uses ?key= query param, not Bearer token
-    const url = key ? `${endpoint}?key=${key}` : endpoint;
-    const res = await fetch(url, {
+    const timer = window.setTimeout(() => ctrl.abort(), 8000);
+    // OpenAI-compatible endpoint requires Bearer token in header
+    const res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        ...(key ? { "Authorization": `Bearer ${key}` } : {}),
       },
       body: JSON.stringify({ model, messages }),
       signal: ctrl.signal,
@@ -494,7 +513,8 @@ async function callLLM(query, history, context, intent) {
     window.clearTimeout(timer);
     
     if (!res.ok) {
-      console.warn("LLM API returned status:", res.status);
+      const errBody = await res.text().catch(() => "");
+      console.warn("[Imzaqi AI] LLM API error:", res.status, errBody.slice(0, 200));
       return null;
     }
     
@@ -505,10 +525,13 @@ async function callLLM(query, history, context, intent) {
       data?.message || 
       data?.text;
       
-    if (typeof reply !== "string" || !reply.trim()) return null;
+    if (typeof reply !== "string" || !reply.trim()) {
+      console.warn("[Imzaqi AI] LLM returned empty reply:", JSON.stringify(data).slice(0, 200));
+      return null;
+    }
     return reply.trim();
   } catch (err) {
-    console.error("LLM Error:", err);
+    console.warn("[Imzaqi AI] LLM fetch failed:", err?.name, err?.message);
     return null;
   }
 }
@@ -535,17 +558,34 @@ export async function answerQuery(query, history = [], options = {}) {
     };
   }
 
-  // Fallback ONLY if the LLM call fails (e.g. offline, rate limit, endpoint error)
+  // Fallback: try local matching (normal threshold)
   const matches = findBestMatches(query, context, 4);
   const local = synthesizeLocalAnswer(matches, context, intent, query);
   if (local) return local;
 
+  // Lenient fallback: if we have ANY match (even below threshold), show it
+  if (matches.length && matches[0].score > 0.15) {
+    const top = matches[0];
+    return {
+      id: `ai-local-lenient-${Date.now()}`,
+      q: query,
+      a: [
+        "Hmm, ini jawaban terdekat yang aku temukan:",
+        ...top.item.a,
+        "Kalau belum sesuai, coba tanya dengan kata kunci lain atau hubungi admin di **WA: 0831-3604-9987**.",
+      ],
+      tags: top.item.tags || [],
+      _source: "local-lenient",
+    };
+  }
+
+  // Ultimate fallback — no LLM and no local match at all
   return {
     id: `ai-fallback-${Date.now()}`,
     q: query,
     a: [
-      "Maaf, aku sedang mengalami gangguan jaringan saat ini 🙏",
-      "Kamu bisa langsung menghubungi admin di **WA: 0831-3604-9987** (https://wa.me/6283136049987) untuk respon cepat.",
+      "Maaf, aku belum bisa menjawab pertanyaan ini karena server AI sedang gangguan.",
+      "Coba beberapa saat lagi, atau langsung hubungi admin di **WA: 0831-3604-9987** (https://wa.me/6283136049987) untuk bantuan cepat.",
     ],
     tags: [],
     _source: "fallback",

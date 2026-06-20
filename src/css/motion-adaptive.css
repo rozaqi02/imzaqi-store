@@ -159,11 +159,7 @@
 [data-motion="lite"] .catalog-page .catalog-filter,
 [data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2,
 [data-motion="lite"] .catalog-page .catalog-quickChip,
-[data-motion="lite"] .catalog-page .catalog-sheet,
-[data-motion="lite"] .detail-page .product-detail,
-[data-motion="lite"] .detail-page .product-detail-priceCard,
-[data-motion="lite"] .detail-page .variant-tile,
-[data-motion="lite"] .detail-page .variant-notes {
+[data-motion="lite"] .catalog-page .catalog-sheet {
   background: var(--skeu-panel-bg) !important;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
 }
@@ -173,8 +169,7 @@
   -webkit-backdrop-filter: none !important;
 }
 
-[data-motion="lite"] .catalog-page .catalog-card,
-[data-motion="lite"] .detail-page .variant-tile {
+[data-motion="lite"] .catalog-page .catalog-card {
   content-visibility: visible !important;
   contain-intrinsic-size: auto !important;
   contain: layout paint style;
@@ -194,7 +189,7 @@
 }
 
 [data-motion="lite"] .catalog-page .catalog-card:hover,
-[data-motion="lite"] .detail-page .variant-tile:hover {
+[data-motion="lite"] .detail-page .pdx-variantCard:hover {
   transform: none !important;
 }
 
@@ -207,33 +202,21 @@
 }
 
 /* Home page mobile hotspots: popular list + side stats */
-[data-motion="lite"] .home-page .hero-minimal::before,
-[data-motion="lite"] .home-page .hero-minimal::after,
 [data-motion="lite"] .home-page .product-tile::before,
-[data-motion="lite"] .home-page .product-tile::after,
-[data-motion="lite"] .home-page .stat-minimal::before {
+[data-motion="lite"] .home-page .product-tile::after {
   display: none !important;
 }
 
 [data-motion="lite"] .home-page .hero-search-shell,
-[data-motion="lite"] .home-page .suggestions,
-[data-motion="lite"] .home-page .stat-minimal {
+[data-motion="lite"] .home-page .suggestions {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-[data-motion="lite"] .home-page .hero-commandCard,
 [data-motion="lite"] .home-page .flow-assist,
-[data-motion="lite"] .home-page .stat-minimal,
 [data-motion="lite"] .home-page .home-popularList .product-tile,
 [data-motion="lite"] .home-page .home-popularList .product-tile-pill {
   box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
-}
-
-[data-motion="lite"] .home-page .hero-stats-minimal {
-  contain: layout style;
-  transform: translateZ(0);
-  backface-visibility: hidden;
 }
 
 [data-motion="lite"] .home-page .home-popularList {
@@ -338,8 +321,8 @@
   scroll-behavior: auto !important;
 }
 
-/* ─── Mobile navbar: desktop neumorphism, no backdrop blur ─────────────── */
-@media (max-width: 920px) {
+/* ─── Mobile navbar: solid bg, no backdrop blur (mobile only) ─────────────── */
+@media (max-width: 768px) {
   /* Header mobile dark mode — neumorphic solid + gradasi hijau */
   :root .header,
   :root .site-header,
@@ -524,13 +507,23 @@
 }
 
 @media (max-width: 720px) {
-  /* Disable expensive hero background orb animations and reduce blur cost */
-  .hm-hero-orb {
+  /* Disable expensive hero background animations — save GPU on mobile */
+  .hx-mesh {
     animation: none !important;
-    filter: blur(40px) !important;
     will-change: auto !important;
   }
-  
+  .hx-grid-overlay {
+    animation: none !important;
+    will-change: auto !important;
+  }
+  .hx-noise {
+    display: none !important;
+  }
+  .hx-live-badge {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
   /* Disable AI assistant floating bubble animations & filters to improve scrolling FPS */
   .ai-bubble:not(.is-open)::before {
     animation: none !important;
@@ -547,13 +540,123 @@
     will-change: auto !important;
   }
 
-  /* Disable ticker dot pulse animation */
-  .hm-ticker-dot {
-    animation: none !important;
-  }
-
   /* Isolate Hero repaint boundaries */
-  .hm-hero {
+  .hx-hero {
     contain: layout paint style;
+  }
+}
+
+/* Home page: kill expensive gradients/shadows on product tiles in lite mode */
+[data-motion="lite"] .home-page .product-tile {
+  background: var(--skeu-panel-bg, rgba(11, 18, 32, 0.96)) !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  transition-duration: 120ms !important;
+}
+[data-motion="lite"] .home-page .product-tile-tiltWrap {
+  will-change: auto !important;
+}
+[data-motion="lite"] .home-page .product-tile-price {
+  text-shadow: none !important;
+}
+[data-motion="lite"] .home-page .home-howCard {
+  background: var(--skeu-panel-bg, rgba(11, 18, 32, 0.96)) !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  transition: transform 0.15s ease !important;
+}
+[data-motion="lite"] .home-page .home-howCard-icon {
+  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.06)) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+  transition: transform 0.12s ease !important;
+}
+[data-motion="lite"] .home-page .home-tileSkeleton::after {
+  will-change: auto !important;
+}
+/* State pages: kill expensive effects in lite mode */
+[data-motion="lite"] .checkout-page .checkout-panel,
+[data-motion="lite"] .pay-page .pay-stageCard,
+[data-motion="lite"] .status-page .st-card {
+  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-motion="lite"] .pay-page .pay-qrisFrame {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+[data-motion="lite"] .pay-page .pay-confirmModal,
+[data-motion="lite"] .pay-page .pay-confirmOverlay,
+[data-motion="lite"] .pay-page .pay-successModal,
+[data-motion="lite"] .pay-page .pay-zoomOverlay,
+[data-motion="lite"] .status-page .st-statePill {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-motion="lite"] .pay-page .pay-card {
+  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Home hero: kill all expensive effects in lite mode */
+[data-motion="lite"] .hx-mesh {
+  animation: none !important;
+  will-change: auto !important;
+}
+[data-motion="lite"] .hx-grid-overlay {
+  animation: none !important;
+  will-change: auto !important;
+}
+[data-motion="lite"] .hx-noise {
+  display: none !important;
+}
+[data-motion="lite"] .hx-live-badge {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Product Detail: strip all expensive effects in lite mode */
+[data-motion="lite"] .detail-page-v3 .pdx-topCard {
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-heroPanel,
+[data-motion="lite"] .detail-page-v3 .pdx-summaryPanel,
+[data-motion="lite"] .detail-page-v3 .pdx-variantsSection,
+[data-motion="lite"] .detail-page-v3 .pdx-packCard,
+[data-motion="lite"] .detail-page-v3 .pdx-variantCard {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  transition: transform 0.15s ease !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-productIcon {
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+  background: var(--skeu-control-bg) !important;
+}
+[data-motion="lite"] .detail-page-v3 {
+  contain: layout style;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 400px;
+}
+
+/* Mobile typography hierarchy */
+@media (max-width: 720px) {
+  h1, .h1, .nf-title, .checkout-full-title, .st-emptyTitle {
+    font-size: clamp(22px, 6.4vw, 34px) !important;
+  }
+  h2, .h2, .oh-title, .faq-title, .home-title {
+    font-size: clamp(18px, 5.6vw, 28px) !important;
+  }
+  h3, .h3, .oh-orderCode {
+    font-size: clamp(15px, 4.8vw, 20px) !important;
+  }
+  p, .p, body, .oh-sub, .st-emptyText, .faq-itemBody p {
+    font-size: clamp(13px, 4vw, 15px) !important;
+  }
+  .kicker, .oh-kicker, .faq-kicker, .st-kicker, .caption, small {
+    font-size: clamp(10px, 3.2vw, 12px) !important;
   }
 }
