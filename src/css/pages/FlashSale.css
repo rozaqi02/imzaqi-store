@@ -11,6 +11,36 @@
   overflow: hidden;
 }
 
+.flash-sale-banner.is-urgent {
+  animation: flashUrgent 1.2s ease-in-out infinite;
+}
+
+@keyframes flashUrgent {
+  0%, 100% {
+    border-color: rgba(255, 60, 100, 0.24);
+    box-shadow: var(--skeu-panel-shadow);
+  }
+  50% {
+    border-color: rgba(255, 60, 100, 0.5);
+    box-shadow: var(--skeu-panel-shadow), 0 0 20px rgba(255, 60, 100, 0.15);
+  }
+}
+
+html[data-theme="light"] .flash-sale-banner.is-urgent {
+  animation: flashUrgentLight 1.2s ease-in-out infinite;
+}
+
+@keyframes flashUrgentLight {
+  0%, 100% {
+    border-color: rgba(255, 60, 100, 0.18);
+    box-shadow: var(--skeu-panel-shadow);
+  }
+  50% {
+    border-color: rgba(255, 60, 100, 0.35);
+    box-shadow: var(--skeu-panel-shadow), 0 0 16px rgba(255, 60, 100, 0.1);
+  }
+}
+
 .flash-sale-header {
   display: flex;
   align-items: center;
@@ -232,27 +262,27 @@
 }
 
 /* ── Light mode ── */
-:root[data-theme="light"] .flash-sale-banner {
+html[data-theme="light"] .flash-sale-banner {
   border-color: rgba(255, 60, 100, 0.18);
   background:
     linear-gradient(135deg, rgba(255, 60, 100, 0.04), rgba(255, 60, 100, 0) 60%),
     var(--skeu-panel-bg);
 }
 
-:root[data-theme="light"] .flash-sale-card {
+html[data-theme="light"] .flash-sale-card {
   background: var(--skeu-control-bg);
 }
 
-:root[data-theme="light"] .flash-sale-discounted {
+html[data-theme="light"] .flash-sale-discounted {
   color: #dc2050;
 }
 
-:root[data-theme="light"] .flash-sale-title,
-:root[data-theme="light"] .flash-sale-title svg {
+html[data-theme="light"] .flash-sale-title,
+html[data-theme="light"] .flash-sale-title svg {
   color: #dc2050;
 }
 
-:root[data-theme="light"] .flash-sale-badge {
+html[data-theme="light"] .flash-sale-badge {
   background: #dc2050;
 }
 

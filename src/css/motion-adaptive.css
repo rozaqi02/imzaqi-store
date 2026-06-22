@@ -16,17 +16,28 @@
   }
 }
 
-[data-motion="lite"] .route-transition {
+/* Catalog routes: opacity-only fade to preserve sticky sidebar (no transform) */
+@keyframes catalogRouteFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+[data-motion="lite"] .route-transition:not(:has(.catalog-page)):not(.app-main-catalog) {
   animation: routeInLite 180ms cubic-bezier(0.22, 1, 0.36, 1) both !important;
 }
 
 [data-motion="lite"] .route-transition:has(.catalog-page),
 .route-transition:has(.catalog-page),
 .app-main-catalog .route-transition {
-  animation: none !important;
+  animation: catalogRouteFadeIn 150ms ease both !important;
   transform: none !important;
-  opacity: 1 !important;
-  will-change: auto !important;
+  will-change: opacity !important;
+}
+
+/* Reduced motion: override catalog route transitions */
+[data-motion="off"] .route-transition:has(.catalog-page),
+[data-motion="off"] .app-main-catalog .route-transition {
+  animation: none !important;
 }
 
 /*
@@ -269,29 +280,29 @@
     -webkit-filter: none !important;
   }
 
-  :root[data-theme="light"] .mobile-backdrop,
-  :root[data-theme="light"] .mobile-backdrop-lite,
-  :root[data-theme="light"] .mobile-backdrop.mobile-backdrop-lite,
-  :root[data-theme="light"] .mobile-sheetBackdrop,
-  :root[data-theme="light"] body.nav-open .mobile-backdrop,
-  :root[data-theme="light"] body.nav-open .mobile-backdrop-lite,
-  :root[data-theme="light"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
+  html[data-theme="light"] .mobile-backdrop,
+  html[data-theme="light"] .mobile-backdrop-lite,
+  html[data-theme="light"] .mobile-backdrop.mobile-backdrop-lite,
+  html[data-theme="light"] .mobile-sheetBackdrop,
+  html[data-theme="light"] body.nav-open .mobile-backdrop,
+  html[data-theme="light"] body.nav-open .mobile-backdrop-lite,
+  html[data-theme="light"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
     background: rgba(6, 17, 28, 0.68) !important;
   }
 
-  :root[data-theme="dark"] .mobile-backdrop,
-  :root[data-theme="dark"] .mobile-backdrop-lite,
-  :root[data-theme="dark"] .mobile-backdrop.mobile-backdrop-lite,
-  :root[data-theme="dark"] .mobile-sheetBackdrop,
-  :root[data-theme="dark"] body.nav-open .mobile-backdrop,
-  :root[data-theme="dark"] body.nav-open .mobile-backdrop-lite,
-  :root[data-theme="dark"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
+  html[data-theme="dark"] .mobile-backdrop,
+  html[data-theme="dark"] .mobile-backdrop-lite,
+  html[data-theme="dark"] .mobile-backdrop.mobile-backdrop-lite,
+  html[data-theme="dark"] .mobile-sheetBackdrop,
+  html[data-theme="dark"] body.nav-open .mobile-backdrop,
+  html[data-theme="dark"] body.nav-open .mobile-backdrop-lite,
+  html[data-theme="dark"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
     background: rgba(2, 9, 18, 0.56) !important;
   }
 
-  :root[data-theme="light"] .mobile-menu,
-  :root[data-theme="light"] .mobile-menu-lite,
-  :root[data-theme="light"] .mobile-menu.mobile-menu-lite {
+  html[data-theme="light"] .mobile-menu,
+  html[data-theme="light"] .mobile-menu-lite,
+  html[data-theme="light"] .mobile-menu.mobile-menu-lite {
     background:
       linear-gradient(180deg, rgba(251, 254, 255, 1), rgba(238, 247, 251, 1) 58%, rgba(228, 241, 247, 1) 100%) !important;
     border-left: 1px solid rgba(0, 138, 148, 0.2) !important;
@@ -300,9 +311,9 @@
       inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
   }
 
-  :root[data-theme="dark"] .mobile-menu,
-  :root[data-theme="dark"] .mobile-menu-lite,
-  :root[data-theme="dark"] .mobile-menu.mobile-menu-lite {
+  html[data-theme="dark"] .mobile-menu,
+  html[data-theme="dark"] .mobile-menu-lite,
+  html[data-theme="dark"] .mobile-menu.mobile-menu-lite {
     background:
       linear-gradient(180deg, rgba(17, 29, 58, 1), rgba(8, 14, 31, 1) 55%, rgba(4, 8, 21, 1) 100%) !important;
     border-left: 1px solid rgba(0, 194, 208, 0.15) !important;
@@ -324,16 +335,16 @@
 /* ─── Mobile navbar: solid bg, no backdrop blur (mobile only) ─────────────── */
 @media (max-width: 768px) {
   /* Header mobile dark mode — neumorphic solid + gradasi hijau */
-  :root .header,
-  :root .site-header,
-  :root[data-motion="lite"] .header,
-  :root[data-motion="lite"] .site-header,
-  :root[data-motion="off"] .header,
-  :root[data-motion="off"] .site-header,
-  :root[data-theme="dark"] .header,
-  :root[data-theme="dark"] .site-header,
-  :root[data-theme="dark"][data-motion="lite"] .header,
-  :root[data-theme="dark"][data-motion="lite"] .site-header {
+  html .header,
+  html .site-header,
+  html[data-motion="lite"] .header,
+  html[data-motion="lite"] .site-header,
+  html[data-motion="off"] .header,
+  html[data-motion="off"] .site-header,
+  html[data-theme="dark"] .header,
+  html[data-theme="dark"] .site-header,
+  html[data-theme="dark"][data-motion="lite"] .header,
+  html[data-theme="dark"][data-motion="lite"] .site-header {
     background:
       linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 138, 148, 0.08) 40%, rgba(0, 0, 0, 0) 70%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0) 44%),
@@ -351,10 +362,10 @@
   }
 
   /* Header mobile light mode — neumorphic + gradasi hijau */
-  :root[data-theme="light"] .header,
-  :root[data-theme="light"] .site-header,
-  :root[data-theme="light"][data-motion="lite"] .header,
-  :root[data-theme="light"][data-motion="lite"] .site-header {
+  html[data-theme="light"] .header,
+  html[data-theme="light"] .site-header,
+  html[data-theme="light"][data-motion="lite"] .header,
+  html[data-theme="light"][data-motion="lite"] .site-header {
     background:
       linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.08) 40%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
@@ -408,17 +419,17 @@
     -webkit-backdrop-filter: none !important;
   }
   
-  :root[data-theme="light"] html:has(.admin-page) .header,
-  :root[data-theme="light"] html:has(.admin-page) .site-header,
-  :root[data-theme="light"] html:has(.app-main-admin) .header,
-  :root[data-theme="light"] html:has(.app-main-admin) .site-header {
+  html[data-theme="light"] html:has(.admin-page) .header,
+  html[data-theme="light"] html:has(.admin-page) .site-header,
+  html[data-theme="light"] html:has(.app-main-admin) .header,
+  html[data-theme="light"] html:has(.app-main-admin) .site-header {
     background: linear-gradient(180deg, rgba(251, 254, 255, 1), rgba(238, 247, 251, 1) 58%, rgba(228, 241, 247, 1) 100%) !important;
   }
 
-  :root[data-theme="dark"] html:has(.admin-page) .header,
-  :root[data-theme="dark"] html:has(.admin-page) .site-header,
-  :root[data-theme="dark"] html:has(.app-main-admin) .header,
-  :root[data-theme="dark"] html:has(.app-main-admin) .site-header {
+  html[data-theme="dark"] html:has(.admin-page) .header,
+  html[data-theme="dark"] html:has(.admin-page) .site-header,
+  html[data-theme="dark"] html:has(.app-main-admin) .header,
+  html[data-theme="dark"] html:has(.app-main-admin) .site-header {
     background: linear-gradient(180deg, rgba(17, 29, 58, 1), rgba(8, 14, 31, 1) 55%, rgba(4, 8, 21, 1) 100%) !important;
   }
 }

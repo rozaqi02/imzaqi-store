@@ -142,7 +142,7 @@ export default function AssistantBubble() {
         return next;
       });
     } catch (e) {
-      console.warn("Assistant error:", e);
+      warn("Assistant error:", e);
       setHistory((prev) => {
         const next = [...prev];
         const idx = next.findIndex((h) => h.id === userTurn.id);

@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion, useReducedMotion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   ArrowRight,
   Eye,
@@ -18,12 +18,13 @@ import { useLiveStats } from "../hooks/useLiveStats";
 import NumberCounter from "./NumberCounter";
 import { supabase } from "../lib/supabaseClient";
 import TypewriterSearchInput from "./TypewriterSearchInput";
+import { useDeviceCapability } from "../hooks/useIsMobile";
 
 /* ── Data ── */
 const TRUST_ITEMS = [
   { icon: ShieldCheck, label: "Garansi Replace" },
   { icon: Zap, label: "Instan 5 Menit" },
-  { icon: Star, label: "Harga Pelajar" },
+  { icon: Star, label: "Budget Pelajar" },
 ];
 
 const SEARCH_QUERIES = [
@@ -246,7 +247,7 @@ function HeroStatsRow({ activeProductCount }) {
         },
         {
           val: weekOrders || 0,
-          label: "Order (7 Hari)",
+          label: "Order 7 Hari",
           accent: true,
           icon: Zap,
         },
@@ -257,7 +258,7 @@ function HeroStatsRow({ activeProductCount }) {
         },
         {
           val: last7DaysViews || 0,
-          label: "Views (7 Hari)",
+          label: "Views 7 Hari",
           icon: Eye,
         },
       ].map((s) => {
@@ -282,7 +283,8 @@ function HeroStatsRow({ activeProductCount }) {
 /* ── Main Hero Export ── */
 export default function Hero({ products = [] }) {
   const nav = useNavigate();
-  const prefersReduced = useReducedMotion();
+  const caps = useDeviceCapability();
+  const isMotionReduced = caps.isReducedMotion || caps.saveData || caps.lowMemory || caps.isMobile;
 
   const activeProductCount = useMemo(
     () =>
@@ -292,14 +294,18 @@ export default function Hero({ products = [] }) {
     [products]
   );
 
-  const staggerChild = (delay = 0) =>
-    prefersReduced
+  const stagger = (delay) =>
+    isMotionReduced
       ? {}
       : {
           initial: { opacity: 0, y: 24 },
           animate: { opacity: 1, y: 0 },
           transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay },
         };
+
+  const MotionTag = isMotionReduced ? "div" : motion.div;
+  const MotionH1 = isMotionReduced ? "h1" : motion.h1;
+  const MotionP = isMotionReduced ? "p" : motion.p;
 
   return (
     <section className="hx-hero" aria-label="Marketplace Hero">
@@ -310,35 +316,34 @@ export default function Hero({ products = [] }) {
       </div>
 
       <div className="container">
-        {/* We use standard div here so animation properties don't propagate incorrectly to motion children */}
         <div className="hx-hero-container">
 
           {/* 1. Live Traffic Badge */}
-          <motion.div className="hx-live-badge-container" {...staggerChild(0.06)}>
+          <MotionTag className="hx-live-badge-container" {...stagger(0.06)}>
             <ActiveShoppersBadge />
-          </motion.div>
+          </MotionTag>
 
           {/* 2. Headline */}
-          <motion.h1 className="hx-headline" {...staggerChild(0.12)}>
+          <MotionH1 className="hx-headline" {...stagger(0.12)}>
             Akses <span className="hx-headline-gradient">Premium</span>
             <br />
-            Harga <span className="hx-headline-gradient">Pelajar</span>
-          </motion.h1>
+            Budget <span className="hx-headline-gradient">Pelajar</span>
+          </MotionH1>
 
           {/* 3. Subtitle */}
-          <motion.p className="hx-subtitle" {...staggerChild(0.2)}>
+          <MotionP className="hx-subtitle" {...stagger(0.2)}>
             {activeProductCount > 0
-              ? `${activeProductCount}+ produk digital premium, bayar QRIS, aktif dalam hitungan menit.`
-              : "Netflix, Spotify, Canva, dan lainnya, bayar QRIS, aktif dalam hitungan menit."}
-          </motion.p>
+              ? `${activeProductCount}+ produk digital, bayar QRIS, auto aktif dalam hitungan menit!`
+              : "Netflix, Spotify, Canva, dan lainnya, bayar QRIS, auto aktif dalam hitungan menit!"}
+          </MotionP>
 
-          {/* 4. Search Console (Using identical style module to Products.jsx) */}
-          <motion.div className="hx-search-section" {...staggerChild(0.28)}>
+          {/* 4. Search Console */}
+          <MotionTag className="hx-search-section" {...stagger(0.28)}>
             <HeroSearch products={products} />
-          </motion.div>
+          </MotionTag>
 
           {/* 5. Trust Badges */}
-          <motion.div className="hx-brands-section" style={{ marginTop: "-8px" }} {...staggerChild(0.32)}>
+          <MotionTag className="hx-brands-section" style={{ marginTop: "-8px" }} {...stagger(0.32)}>
             <div className="hx-brands-row">
               {TRUST_ITEMS.map((item) => {
                 const Icon = item.icon;
@@ -354,25 +359,24 @@ export default function Hero({ products = [] }) {
                 );
               })}
             </div>
-          </motion.div>
+          </MotionTag>
 
-
-          {/* 7. Action CTAs */}
-          <motion.div className="hx-ctas-row" {...staggerChild(0.44)}>
+          {/* 6. Action CTAs */}
+          <MotionTag className="hx-ctas-row" {...stagger(0.44)}>
             <Link className="hx-btn-primary" to="/produk">
               <ShoppingBag size={14} aria-hidden="true" />
-              <span>Lihat Katalog</span>
+              <span>Gas Lihat Katalog</span>
               <ArrowRight size={14} aria-hidden="true" />
             </Link>
             <Link className="hx-btn-secondary" to="/status">
-              Cek Status Pesanan
+              Cek Status Order
             </Link>
-          </motion.div>
+          </MotionTag>
 
-          {/* 8. Stats Counters Row */}
-          <motion.div className="hx-stats-row" {...staggerChild(0.5)}>
+          {/* 7. Stats Counters Row */}
+          <MotionTag className="hx-stats-row" {...stagger(0.5)}>
             <HeroStatsRow activeProductCount={activeProductCount} />
-          </motion.div>
+          </MotionTag>
         </div>
       </div>
     </section>

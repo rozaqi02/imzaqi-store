@@ -9,8 +9,8 @@
 /* NOTE: --uni-neo-control-shadow is also set later in theme-consolidated.css.
    The token below aligns ghost/control buttons to the same 3D inset style as btn-primary. */
 
-:root,
-:root[data-theme="dark"] {
+html,
+html[data-theme="dark"] {
   /* ── Disney+ Base Theme Colors (Dark Default) ── */
   --bg0: #040714;
   --bg1: #030b1f;
@@ -146,7 +146,7 @@
   --shadow-panel-border: rgba(0, 194, 208, 0.15);
 }
 
-:root[data-theme="light"] {
+html[data-theme="light"] {
   /* ── Disney+ Base Theme Colors (Light Mode) ── */
   --bg0: #d8fff5;
   --bg1: #d5eaff;
@@ -273,7 +273,7 @@
 }
 
 /* ── Radius Tokens ── */
-:root {
+html {
   --radius-sm: 14px;
   --radius-md: 18px;
   --radius-lg: 24px;

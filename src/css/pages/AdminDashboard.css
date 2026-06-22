@@ -2593,7 +2593,7 @@
     -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
   }
 
-  :root[data-theme="dark"] .admin-mobileTabs {
+  html[data-theme="dark"] .admin-mobileTabs {
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.36) !important;
   }
 
@@ -3391,14 +3391,14 @@
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.16) !important;
   }
 
-  :root[data-theme="light"] .admin-page .admin-sidebar,
-  :root[data-theme="light"] .admin-page .admin-panel,
-  :root[data-theme="light"] .admin-page .admin-statCard,
-  :root[data-theme="light"] .admin-page .admin-miniCard,
-  :root[data-theme="light"] .admin-page .admin-overviewHero,
-  :root[data-theme="light"] .admin-page .admin-pulseCard,
-  :root[data-theme="light"] .admin-page .admin-storyCard,
-  :root[data-theme="light"] .admin-page .admin-trendCard {
+  html[data-theme="light"] .admin-page .admin-sidebar,
+  html[data-theme="light"] .admin-page .admin-panel,
+  html[data-theme="light"] .admin-page .admin-statCard,
+  html[data-theme="light"] .admin-page .admin-miniCard,
+  html[data-theme="light"] .admin-page .admin-overviewHero,
+  html[data-theme="light"] .admin-page .admin-pulseCard,
+  html[data-theme="light"] .admin-page .admin-storyCard,
+  html[data-theme="light"] .admin-page .admin-trendCard {
     background: rgba(255, 255, 255, 0.96) !important;
     box-shadow: 0 2px 8px rgba(72, 118, 138, 0.10) !important;
   }
@@ -3425,15 +3425,15 @@
     transition: none !important;
   }
 
-  :root[data-theme="light"] .admin-page .admin-product-row,
-  :root[data-theme="light"] .admin-page .admin-promo-row,
-  :root[data-theme="light"] .admin-page .admin-variant-row,
-  :root[data-theme="light"] .admin-page .admin-order-card,
-  :root[data-theme="light"] .admin-page .admin-thumb,
-  :root[data-theme="light"] .admin-page .admin-nav-btn,
-  :root[data-theme="light"] .admin-page .admin-brand,
-  :root[data-theme="light"] .admin-page .admin-topbar-current,
-  :root[data-theme="light"] .admin-page .admin-chip {
+  html[data-theme="light"] .admin-page .admin-product-row,
+  html[data-theme="light"] .admin-page .admin-promo-row,
+  html[data-theme="light"] .admin-page .admin-variant-row,
+  html[data-theme="light"] .admin-page .admin-order-card,
+  html[data-theme="light"] .admin-page .admin-thumb,
+  html[data-theme="light"] .admin-page .admin-nav-btn,
+  html[data-theme="light"] .admin-page .admin-brand,
+  html[data-theme="light"] .admin-page .admin-topbar-current,
+  html[data-theme="light"] .admin-page .admin-chip {
     background: rgba(247, 253, 255, 0.86) !important;
   }
 
@@ -3598,24 +3598,24 @@
   line-height: 1.5;
 }
 
-:root[data-theme="light"] .admin-promo-bulk {
+html[data-theme="light"] .admin-promo-bulk {
   border-color: rgba(0, 138, 148, 0.12);
   background: rgba(247, 253, 255, 0.6);
 }
 
-:root[data-theme="light"] .admin-promo-bulkToggle {
+html[data-theme="light"] .admin-promo-bulkToggle {
   color: #2d4f5b;
 }
 
-:root[data-theme="light"] .admin-promo-bulkHint {
+html[data-theme="light"] .admin-promo-bulkHint {
   color: rgba(50, 84, 95, 0.5);
 }
 
-:root[data-theme="light"] .admin-promo-bulkBody {
+html[data-theme="light"] .admin-promo-bulkBody {
   border-top-color: rgba(0, 138, 148, 0.1);
 }
 
-:root[data-theme="light"] .admin-promo-bulkNote {
+html[data-theme="light"] .admin-promo-bulkNote {
   color: rgba(50, 84, 95, 0.5);
 }
 
@@ -3805,74 +3805,74 @@
 }
 
 /* Light mode */
-:root[data-theme="light"] .admin-promo-stripItem {
+html[data-theme="light"] .admin-promo-stripItem {
   border-color: rgba(0, 138, 148, 0.12);
   background: rgba(247, 253, 255, 0.86);
 }
 
-:root[data-theme="light"] .admin-promo-stripItem strong {
+html[data-theme="light"] .admin-promo-stripItem strong {
   color: #123744;
 }
 
-:root[data-theme="light"] .admin-promo-stripItem span {
+html[data-theme="light"] .admin-promo-stripItem span {
   color: rgba(50, 84, 95, 0.6);
 }
 
-:root[data-theme="light"] .admin-promo-card {
+html[data-theme="light"] .admin-promo-card {
   border-color: rgba(0, 138, 148, 0.12);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(247, 253, 255, 0.88));
 }
 
-:root[data-theme="light"] .admin-promo-card:hover {
+html[data-theme="light"] .admin-promo-card:hover {
   border-color: rgba(0, 138, 148, 0.22);
 }
 
-:root[data-theme="light"] .admin-promo-cardCode {
+html[data-theme="light"] .admin-promo-cardCode {
   color: #123744;
 }
 
-:root[data-theme="light"] .admin-promo-copyBtn {
+html[data-theme="light"] .admin-promo-copyBtn {
   border-color: rgba(0, 138, 148, 0.14);
   background: rgba(236, 248, 252, 0.86);
   color: #3d6070;
 }
 
-:root[data-theme="light"] .admin-promo-cardDiscount {
+html[data-theme="light"] .admin-promo-cardDiscount {
   border-color: rgba(0, 138, 148, 0.22);
   background: linear-gradient(135deg, rgba(0, 214, 180, 0.12), rgba(0, 138, 148, 0.06));
   color: #0b3f4b;
 }
 
-:root[data-theme="light"] .admin-promo-cardMeta {
+html[data-theme="light"] .admin-promo-cardMeta {
   color: rgba(50, 84, 95, 0.72);
 }
 
-:root[data-theme="light"] .admin-promo-metaMuted {
+html[data-theme="light"] .admin-promo-metaMuted {
   color: rgba(50, 84, 95, 0.4) !important;
 }
 
-:root[data-theme="light"] .admin-promo-metaWarn {
+html[data-theme="light"] .admin-promo-metaWarn {
   color: #b07000 !important;
 }
 
-:root[data-theme="light"] .admin-promo-quotaTrack {
+html[data-theme="light"] .admin-promo-quotaTrack {
   background: rgba(0, 138, 148, 0.1);
 }
 
-:root[data-theme="light"] .admin-promo-preview {
+html[data-theme="light"] .admin-promo-preview {
   border-color: rgba(0, 138, 148, 0.18);
   background: rgba(214, 244, 238, 0.3);
 }
 
-:root[data-theme="light"] .admin-promo-previewCode {
+html[data-theme="light"] .admin-promo-previewCode {
   color: #0b3f4b;
 }
 
-:root[data-theme="light"] .admin-promo-previewMeta {
+html[data-theme="light"] .admin-promo-previewMeta {
   color: #5f7781;
 }
 
-:root[data-theme="light"] .admin-promoBadge.active {
+html[data-theme="light"] .admin-promoBadge.active {
   background: rgba(0, 138, 148, 0.1);
   border-color: rgba(0, 138, 148, 0.22);
   color: #0b3f4b;
@@ -3955,15 +3955,15 @@
   line-height: 1.5;
 }
 
-:root[data-theme="light"] .admin-promo-deleteText {
+html[data-theme="light"] .admin-promo-deleteText {
   color: #2d4f5b;
 }
 
-:root[data-theme="light"] .admin-promo-deleteText strong {
+html[data-theme="light"] .admin-promo-deleteText strong {
   color: #123744;
 }
 
-:root[data-theme="light"] .admin-promo-deleteHint {
+html[data-theme="light"] .admin-promo-deleteHint {
   color: rgba(50, 84, 95, 0.6);
 }
 

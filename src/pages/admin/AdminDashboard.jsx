@@ -50,6 +50,7 @@ import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDispla
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
 import { copyToClipboard } from "../../utils/clipboard";
+import { warn } from "../../lib/log";
 
 const BUCKET_ICONS = "product-icons"; // public
 const BUCKET_TESTIMONIALS = "testimonials"; // public
@@ -210,7 +211,7 @@ export default function AdminDashboard() {
 
   usePageMeta({
     title: "Admin Dashboard",
-    description: "Kelola produk, varian, promo, testimoni, dan pesanan.",
+    description: "Kelola produk, varian, promo, testimoni, sama pesanan.",
   });
 
   const [tab, setTab] = useState("overview");
@@ -358,7 +359,7 @@ export default function AdminDashboard() {
       if (error) throw error;
       return data || [];
     } catch (error) {
-      console.warn("Gagal memuat promo_claims", error);
+      warn("Gagal memuat promo_claims", error);
       return [];
     }
   }
@@ -375,7 +376,7 @@ export default function AdminDashboard() {
         };
       }
     } catch (error) {
-      console.warn("Gagal memuat get_public_stats", error);
+      warn("Gagal memuat get_public_stats", error);
     }
 
     try {
@@ -390,7 +391,7 @@ export default function AdminDashboard() {
         };
       }
     } catch (error) {
-      console.warn("Gagal memuat site_stats", error);
+      warn("Gagal memuat site_stats", error);
     }
 
     return {
@@ -468,28 +469,28 @@ export default function AdminDashboard() {
       if (dailyResult.status === "fulfilled") {
         setDailyStats(dailyResult.value);
       } else {
-        console.warn("fetchDailyStats gagal:", dailyResult.reason);
+        warn("fetchDailyStats gagal:", dailyResult.reason);
       }
 
       if (visitorResult.status === "fulfilled") {
         setVisitorStats(visitorResult.value);
       } else {
-        console.warn("fetchVisitorStats gagal:", visitorResult.reason);
+        warn("fetchVisitorStats gagal:", visitorResult.reason);
       }
 
       if (pagesResult.status === "fulfilled") {
         setTopPages(pagesResult.value);
       } else {
-        console.warn("fetchTopPages gagal:", pagesResult.reason);
+        warn("fetchTopPages gagal:", pagesResult.reason);
       }
 
       if (cohortResult.status === "fulfilled") {
         setCohortReturn(cohortResult.value);
       } else {
-        console.warn("fetchCohortReturn gagal:", cohortResult.reason);
+        warn("fetchCohortReturn gagal:", cohortResult.reason);
       }
     } catch (e) {
-      console.warn("Gagal memuat analytics:", e);
+      warn("Gagal memuat analytics:", e);
     } finally {
       setAnalyticsLoading(false);
     }

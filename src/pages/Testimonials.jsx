@@ -18,6 +18,7 @@ import { fetchTestimonials } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { buildStoreInsights } from "../lib/storeInsights";
+import { warn } from "../lib/log";
 import "../css/pages/Testimonials.css";
 
 export default function Testimonials() {
@@ -35,7 +36,7 @@ export default function Testimonials() {
 
   usePageMeta({
     title: "Testimoni",
-    description: "Bukti order asli dari buyer — bukan janji kosong.",
+    description: "Bukti order asli dari buyer — anti-gimik, riil adanya.",
   });
 
   useEffect(() => {
@@ -46,8 +47,8 @@ export default function Testimonials() {
         if (!alive) return;
         setItems(Array.isArray(data) ? data : []);
       } catch (e) {
-        console.warn(e);
-        setError("Gagal memuat testimoni.");
+        warn(e);
+        setError("Gagal load testimoni.");
       } finally {
         if (alive) setLoading(false);
       }
@@ -116,7 +117,7 @@ export default function Testimonials() {
           <header className="testi-hero">
             <div className="testi-heroCopy">
               <div className="testi-kicker">Bukti real</div>
-              <h1 className="h1 testi-title">Bukan janji kosong.</h1>
+              <h1 className="h1 testi-title">Anti-gimik, riil adanya.</h1>
               <p className="testi-sub">Screenshot asli dari buyer. No edit, no cap.</p>
             </div>
 

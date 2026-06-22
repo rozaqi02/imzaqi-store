@@ -225,28 +225,31 @@
     transform-origin: top center;
   }
 
-  [data-motion="full"] .suggestions--animate .suggestion-item {
+  [data-motion="full"] .suggestions--animate .suggestion-item,
+  [data-motion="lite"] .suggestions--animate .suggestion-item {
     animation: motionSuggestItemIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: calc(var(--suggest-i, 0) * 40ms);
   }
 
   [data-motion="full"] .suggestion-item:hover,
-  [data-motion="full"] .suggestion-item.is-active {
+  [data-motion="full"] .suggestion-item.is-active,
+  [data-motion="lite"] .suggestion-item:hover,
+  [data-motion="lite"] .suggestion-item.is-active {
     transform: translateX(3px);
     transition: transform 0.16s ease, background 0.16s ease;
   }
 
   /* ── Cart micro-interaction ── */
-  :root:not([data-motion="off"]) .header-cart .pill.is-bumping {
+  html:not([data-motion="off"]) .header-cart .pill.is-bumping {
     animation: motionCartBump 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  :root:not([data-motion="off"]) .pdx-addBtn.is-pressed {
+  html:not([data-motion="off"]) .pdx-addBtn.is-pressed {
     transform: scale(0.96);
     transition: transform 0.12s ease;
   }
 
-  :root:not([data-motion="off"]) .cart-fly-particle {
+  html:not([data-motion="off"]) .cart-fly-particle {
     position: fixed;
     width: 10px;
     height: 10px;
@@ -460,18 +463,18 @@
   transition: box-shadow 0.1s cubic-bezier(0.22, 1, 0.36, 1), transform 0.1s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
-:root[data-theme="light"] .btn:active,
-:root[data-theme="light"] .catalog-chip:active,
-:root[data-theme="light"] .pdx-filterChip:active,
-:root[data-theme="light"] .home-promoCard:active,
-:root[data-theme="light"] .home-howCard:active,
-:root[data-theme="light"] .faq-item:has(.faq-itemHead:active),
-:root[data-theme="light"] .product-card-modern:active,
-:root[data-theme="light"] .product-tile:active,
-:root[data-theme="light"] .card:active,
-:root[data-theme="light"] .st-infoCard:active,
-:root[data-theme="light"] .st-card:active,
-:root[data-theme="light"] .pay-card:active {
+html[data-theme="light"] .btn:active,
+html[data-theme="light"] .catalog-chip:active,
+html[data-theme="light"] .pdx-filterChip:active,
+html[data-theme="light"] .home-promoCard:active,
+html[data-theme="light"] .home-howCard:active,
+html[data-theme="light"] .faq-item:has(.faq-itemHead:active),
+html[data-theme="light"] .product-card-modern:active,
+html[data-theme="light"] .product-tile:active,
+html[data-theme="light"] .card:active,
+html[data-theme="light"] .st-infoCard:active,
+html[data-theme="light"] .st-card:active,
+html[data-theme="light"] .pay-card:active {
   box-shadow:
     inset 6px 8px 14px rgba(124, 158, 171, 0.28),
     inset -5px -5px 10px rgba(255, 255, 255, 0.8) !important;
@@ -532,16 +535,16 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
 }
 
-:root[data-theme="light"] .input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
-:root[data-theme="light"] .hero-search-shell:focus-within,
-:root[data-theme="light"] .catalog-commandSearch:focus-within,
-:root[data-theme="light"] .catalog-filterSearch:focus-within,
-:root[data-theme="light"] .status-searchField:focus-within,
-:root[data-theme="light"] .st-inputWrap:focus-within,
-:root[data-theme="light"] .faq-searchWrap:focus-within,
-:root[data-theme="light"] .testi-searchShell:focus-within,
-:root[data-theme="light"] .admin-searchRow:focus-within,
-:root[data-theme="light"] .status-commandBox:focus-within {
+html[data-theme="light"] .input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+html[data-theme="light"] .hero-search-shell:focus-within,
+html[data-theme="light"] .catalog-commandSearch:focus-within,
+html[data-theme="light"] .catalog-filterSearch:focus-within,
+html[data-theme="light"] .status-searchField:focus-within,
+html[data-theme="light"] .st-inputWrap:focus-within,
+html[data-theme="light"] .faq-searchWrap:focus-within,
+html[data-theme="light"] .testi-searchShell:focus-within,
+html[data-theme="light"] .admin-searchRow:focus-within,
+html[data-theme="light"] .status-commandBox:focus-within {
   box-shadow:
     inset 4px 6px 10px rgba(124, 158, 171, 0.28),
     inset -4px -4px 8px rgba(255, 255, 255, 0.9),

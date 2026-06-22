@@ -241,8 +241,8 @@
   color: #ecf8ff !important;
 }
 
-:root[data-theme="light"] .status-page .btn.st-checkBtn,
-:root[data-theme="light"] .status-page button.st-checkBtn {
+html[data-theme="light"] .status-page .btn.st-checkBtn,
+html[data-theme="light"] .status-page button.st-checkBtn {
   color: #123744 !important;
 }
 
@@ -632,7 +632,7 @@
 }
 
 /* Light mode */
-:root[data-theme="light"] .status-shell {
+html[data-theme="light"] .status-shell {
   --st-bg-main:
     radial-gradient(1200px 540px at 10% -8%, rgba(75, 175, 209, 0.22), rgba(75, 175, 209, 0) 64%),
     radial-gradient(980px 480px at 92% -10%, rgba(56, 146, 196, 0.18), rgba(56, 146, 196, 0) 62%);
@@ -659,7 +659,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.98);
 }
 
-:root[data-theme="light"] .status-shell::before {
+html[data-theme="light"] .status-shell::before {
   opacity: 0.86;
 }
 
@@ -1234,7 +1234,7 @@
   color: #008a94;
 }
 
-:root[data-theme="dark"] .st-itemFact--guarantee {
+html[data-theme="dark"] .st-itemFact--guarantee {
   color: #4effda;
 }
 
@@ -1244,7 +1244,7 @@
   color: #b58900;
 }
 
-:root[data-theme="dark"] .st-itemFact--email {
+html[data-theme="dark"] .st-itemFact--email {
   color: #fbbf24;
 }
 
@@ -1261,7 +1261,7 @@
   overflow-wrap: anywhere;
 }
 
-:root[data-theme="light"] .st-itemDesc {
+html[data-theme="light"] .st-itemDesc {
   color: rgba(13, 45, 57, 0.78);
 }
 
@@ -1425,7 +1425,7 @@
   color: var(--st-text);
 }
 
-:root[data-theme="light"] .st-tab.is-active {
+html[data-theme="light"] .st-tab.is-active {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(247, 253, 255, 0.94));
   box-shadow: 0 2px 8px rgba(72, 118, 138, 0.14), inset 0 1px 0 rgba(255, 255, 255, 1);
@@ -1653,7 +1653,7 @@
 }
 
 /* Light mode override untuk help card buttons */
-:root[data-theme="light"] .st-helpCard .st-helpActions .btn:first-child {
+html[data-theme="light"] .st-helpCard .st-helpActions .btn:first-child {
   box-shadow:
     inset 0 2px 0 rgba(255, 255, 255, 0.72),
     inset 0 -3px 0 rgba(0, 110, 100, 0.28),
@@ -1662,7 +1662,7 @@
     -1px -1px 5px rgba(255, 255, 255, 0.6) !important;
 }
 
-:root[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
+html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.9),
     inset 0 -2px 0 rgba(0, 100, 120, 0.12),

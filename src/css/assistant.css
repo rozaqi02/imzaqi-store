@@ -3,13 +3,13 @@
    Orbit mark identity + premium header + neumorphism surfaces.
    ────────────────────────────────────────────────────────────────── */
 
-:root {
+html {
   --ai-panel-width: min(460px, calc(100vw - 24px));
   --ai-panel-height: min(640px, calc(100dvh - 110px));
 }
 
 @media (min-width: 1024px) {
-  :root {
+  html {
     --ai-panel-width: min(500px, calc(100vw - 40px));
     --ai-panel-height: min(680px, calc(100dvh - 96px));
   }
@@ -213,7 +213,7 @@
   -webkit-mask-image: radial-gradient(ellipse 90% 80% at 50% 0%, black 10%, transparent 100%);
 }
 
-:root[data-theme="light"] .ai-panel {
+html[data-theme="light"] .ai-panel {
   border-color: rgba(255, 255, 255, 0.35); /* Soft glass highlight border */
   background: #e1eaf0; /* Softer light blue-grey */
   box-shadow:
@@ -223,15 +223,15 @@
     inset 0 -1px 0 rgba(166, 200, 211, 0.15);
 }
 
-:root[data-theme="light"] .ai-panelOrb--1 {
+html[data-theme="light"] .ai-panelOrb--1 {
   background: radial-gradient(circle, rgba(0, 194, 208, 0.18) 0%, transparent 72%);
 }
 
-:root[data-theme="light"] .ai-panelOrb--2 {
+html[data-theme="light"] .ai-panelOrb--2 {
   background: radial-gradient(circle, rgba(0, 138, 148, 0.14) 0%, transparent 72%);
 }
 
-:root[data-theme="dark"] .ai-panel {
+html[data-theme="dark"] .ai-panel {
   border-color: rgba(255, 255, 255, 0.06);
   background: #0d1624;
   box-shadow:
@@ -257,7 +257,7 @@
   z-index: 0;
 }
 
-:root[data-theme="dark"] .ai-panel::before {
+html[data-theme="dark"] .ai-panel::before {
   background:
     radial-gradient(420px 200px at 30% 50%, rgba(79, 255, 200, 0.1), transparent 60%),
     radial-gradient(420px 200px at 70% 50%, rgba(0, 194, 208, 0.08), transparent 60%);
@@ -291,11 +291,11 @@
   pointer-events: none;
 }
 
-:root[data-theme="dark"] .ai-head {
+html[data-theme="dark"] .ai-head {
   border-bottom-color: rgba(117, 178, 214, 0.12);
 }
 
-:root[data-theme="dark"] .ai-head--premium {
+html[data-theme="dark"] .ai-head--premium {
   background:
     linear-gradient(180deg, rgba(79, 255, 218, 0.08) 0%, rgba(79, 255, 218, 0) 72%),
     var(--uni-neo-panel);
@@ -369,7 +369,7 @@
   border: 1px solid rgba(16, 185, 129, 0.28);
 }
 
-:root[data-theme="dark"] .ai-statusBadge {
+html[data-theme="dark"] .ai-statusBadge {
   color: #6ee7b7;
   background: rgba(16, 185, 129, 0.12);
   border-color: rgba(52, 211, 153, 0.22);
@@ -444,7 +444,7 @@
   }
 }
 
-:root[data-theme="dark"] .ai-headClose {
+html[data-theme="dark"] .ai-headClose {
   border-color: rgba(117, 178, 214, 0.14);
   box-shadow:
     3px 4px 10px rgba(0, 8, 18, 0.28),
@@ -472,7 +472,7 @@
   transition: background 0.24s ease, box-shadow 0.24s ease;
 }
 
-:root[data-theme="dark"] .ai-scroll {
+html[data-theme="dark"] .ai-scroll {
   background: #08111e;
   box-shadow:
     inset 8px 10px 20px rgba(0, 0, 0, 0.5),
@@ -567,7 +567,7 @@
   -webkit-backdrop-filter: blur(6px);
 }
 
-:root[data-theme="light"] .ai-bubbleMsg--glass {
+html[data-theme="light"] .ai-bubbleMsg--glass {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 253, 255, 0.72)),
     var(--uni-neo-panel);
@@ -586,7 +586,7 @@
     -4px -4px 12px rgba(255, 255, 255, 0.95);
 }
 
-:root[data-theme="dark"] .ai-bubbleMsg {
+html[data-theme="dark"] .ai-bubbleMsg {
   border: none;
   background: rgba(20, 30, 48, 0.85);
   box-shadow:
@@ -651,8 +651,8 @@
   box-shadow: var(--uni-neo-inset-shadow) !important;
 }
 
-:root[data-theme="dark"] .ai-bubbleText code,
-:root[data-theme="dark"] .ai-msg .ai-bubbleText code {
+html[data-theme="dark"] .ai-bubbleText code,
+html[data-theme="dark"] .ai-msg .ai-bubbleText code {
   color: #76dbff !important;
 }
 
@@ -712,7 +712,7 @@
   background: transparent;
 }
 
-:root[data-theme="dark"] .ai-suggest {
+html[data-theme="dark"] .ai-suggest {
   border-top-color: rgba(117, 178, 214, 0.08);
 }
 
@@ -777,7 +777,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-:root[data-theme="light"] .ai-chip {
+html[data-theme="light"] .ai-chip {
   border-color: rgba(0, 138, 148, 0.12);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(240, 252, 255, 0.65)),
@@ -803,7 +803,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
-:root[data-theme="dark"] .ai-chip {
+html[data-theme="dark"] .ai-chip {
   box-shadow:
     3px 4px 10px rgba(0, 8, 18, 0.28),
     -2px -2px 6px rgba(255, 255, 255, 0.035),
@@ -812,7 +812,7 @@
 }
 
 @media (hover: hover) {
-  :root[data-theme="dark"] .ai-chip:hover {
+  html[data-theme="dark"] .ai-chip:hover {
     box-shadow:
       4px 5px 14px rgba(0, 8, 18, 0.34),
       -3px -3px 8px rgba(255, 255, 255, 0.045),
@@ -821,7 +821,7 @@
   }
 }
 
-:root[data-theme="dark"] .ai-chip:active {
+html[data-theme="dark"] .ai-chip:active {
   box-shadow:
     inset 3px 4px 10px rgba(0, 0, 0, 0.26),
     inset -2px -2px 5px rgba(255, 255, 255, 0.03),
@@ -830,7 +830,7 @@
 
 /* ─── Mobile adjustments ─── */
 @media (max-width: 720px) {
-  :root {
+  html {
     --ai-panel-width: calc(100vw - 20px);
     --ai-panel-height: min(74dvh, calc(100dvh - 96px));
   }
@@ -878,7 +878,7 @@
   }
 }
 
-:root[data-theme="dark"] .ai-bubbleLink {
+html[data-theme="dark"] .ai-bubbleLink {
   box-shadow:
     2px 3px 8px rgba(0, 8, 18, 0.24),
     -1px -1px 4px rgba(255, 255, 255, 0.03),
@@ -914,7 +914,7 @@
     background 0.18s ease;
 }
 
-:root[data-theme="dark"] .ai-inputBar {
+html[data-theme="dark"] .ai-inputBar {
   background: #060d17;
   box-shadow:
     inset 5px 6px 12px rgba(0, 0, 0, 0.65),
@@ -928,7 +928,7 @@
     0 0 0 3px rgba(0, 214, 180, 0.12);
 }
 
-:root[data-theme="dark"] .ai-inputBar:focus-within {
+html[data-theme="dark"] .ai-inputBar:focus-within {
   border-color: rgba(79, 255, 218, 0.28);
   box-shadow:
     var(--uni-neo-inset-shadow),
@@ -1069,7 +1069,7 @@
   filter: drop-shadow(0 2px 4px rgba(0, 138, 148, 0.18));
 }
 
-:root[data-theme="light"] .ai-tooltipContent {
+html[data-theme="light"] .ai-tooltipContent {
   border-color: rgba(0, 138, 148, 0.18);
   box-shadow:
     0 8px 20px rgba(0, 138, 148, 0.1),
@@ -1090,7 +1090,7 @@
   border-color: rgba(79, 255, 200, 0.24);
 }
 
-:root[data-theme="light"] .ai-tooltipArrow {
+html[data-theme="light"] .ai-tooltipArrow {
   border-color: rgba(0, 138, 148, 0.18);
 }
 
@@ -1105,6 +1105,6 @@
   pointer-events: auto;
 }
 
-:root[data-theme="light"] .ai-backdrop {
+html[data-theme="light"] .ai-backdrop {
   background: rgba(13, 29, 36, 0.26);
 }

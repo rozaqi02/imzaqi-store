@@ -76,7 +76,7 @@ export default function Checkout() {
 
   usePageMeta({
     title: "Checkout",
-    description: "Cek order & total dulu sebelum bayar — biar nggak salah.",
+    description: "Cek order & total dulu sebelum bayar — biar gak salah.",
   });
 
   useEffect(() => {
@@ -168,7 +168,9 @@ export default function Checkout() {
 
   useEffect(() => {
     function onKeyDown(event) {
-      if (event.key === "Escape") requestClose();
+      if (event.key === "Escape" && event.target.tagName !== "INPUT" && event.target.tagName !== "TEXTAREA") {
+        requestClose();
+      }
     }
 
     window.addEventListener("keydown", onKeyDown);
@@ -232,7 +234,7 @@ export default function Checkout() {
     }
 
     if (hasStockIssue) {
-      const text = "Ada item yang stoknya habis atau tidak cukup. Hapus atau kurangi qty dulu.";
+      const text = "Ada item yang stoknya abis atau gak cukup. Hapus atau kurangi qty dulu.";
       setMsg(text);
       toast.error(text);
       return;
@@ -267,7 +269,7 @@ export default function Checkout() {
         </button>
 
         <Link className="checkout-summaryLink" to="/status">
-          Sudah pegang ID? Buka status
+          Udah punya ID? Cek status
         </Link>
       </aside>
     );
@@ -282,7 +284,7 @@ export default function Checkout() {
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
             <h1 className="h1 checkout-drawerTitle">Checkout.</h1>
-            <p className="checkout-drawerSub">Review order kamu sebelum lanjut bayar.</p>
+            <p className="checkout-drawerSub">Review order sebelum lanjut bayar.</p>
           </div>
 
           <button
@@ -321,7 +323,7 @@ export default function Checkout() {
                 <EmptyState
                   icon={<ShoppingBag size={30} strokeWidth={2.2} />}
                   title="Keranjang kosong"
-                  description="Mulai dari katalog, lalu tambahkan paket yang sudah cocok."
+                  description="Gas dari katalog, tambah paket yang cocok."
                   primaryAction={{ label: "Produk", to: "/produk" }}
                   secondaryAction={{ label: "Status", to: "/status" }}
                 />
@@ -419,7 +421,7 @@ export default function Checkout() {
             </button>
             <div className="checkout-full-title-wrap">
               <h1 className="h1 checkout-full-title">Checkout</h1>
-              <p className="checkout-full-sub">Review order kamu sebelum lanjut bayar.</p>
+              <p className="checkout-full-sub">Review order sebelum lanjut bayar.</p>
             </div>
           </div>
 
@@ -434,7 +436,7 @@ export default function Checkout() {
                   <EmptyState
                     icon={<ShoppingBag size={30} strokeWidth={2.2} />}
                     title="Keranjang kosong"
-                    description="Mulai dari katalog, lalu tambahkan paket yang sudah cocok."
+                    description="Gas dari katalog, tambah paket yang cocok."
                     primaryAction={{ label: "Produk", to: "/produk" }}
                     secondaryAction={{ label: "Status", to: "/status" }}
                   />

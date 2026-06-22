@@ -17,6 +17,7 @@ import WhatsAppInput from "../components/WhatsAppInput";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { addOrderToHistory } from "../lib/orderHistory";
 import { copyToClipboard } from "../utils/clipboard";
+import { warn } from "../lib/log";
 import "../css/pages/Pay.css";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
@@ -97,22 +98,22 @@ function toFriendlyPayError(error, { hasNotes = false } = {}) {
   const raw = String(error?.message || error || "");
 
   if (hasNotes && /(notes|p_notes|function)/i.test(raw)) {
-    return "Catatan order belum tersedia sekarang. Coba kirim order tanpa catatan.";
+    return "Catatan order belum tersedia sekarang. Coba kirim tanpa catatan.";
   }
 
   if (/(stock|stok|insufficient|habis|out of stock)/i.test(raw)) {
-    return "Stok berubah. Cek ulang keranjang lalu coba lagi.";
+    return "Stok berubah. Cek ulang keranjang, coba lagi.";
   }
 
   if (/promo/i.test(raw)) {
-    return "Kode promo tidak bisa dipakai untuk order ini.";
+    return "Kode promo gak bisa dipakai buat order ini.";
   }
 
   if (/(subtotal mismatch|total mismatch|promo mismatch|harga terbaru berubah|mismatch)/i.test(raw)) {
-    return "Harga atau promo berubah. Cek ulang keranjang, lalu konfirmasi lagi.";
+    return "Harga atau promo berubah. Cek ulang keranjang, konfirmasi lagi.";
   }
 
-  return "Order belum bisa diproses. Coba lagi beberapa saat.";
+  return "Order belum bisa diproses. Coba lagi nanti.";
 }
 
 function QRISSkeleton() {
@@ -253,7 +254,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
         <div className="modal-head pay-successHead">
           <div>
             <div className="modal-title">Order dibuat 🎉</div>
-            <div className="modal-sub">Simpan ID ini, lalu buka halaman status saat diperlukan.</div>
+            <div className="modal-sub">Simpen ID ini, nanti buka halaman status kalo perlu.</div>
           </div>
           <button className="icon-btn" type="button" onClick={onClose} aria-label="Tutup">
             <X size={18} />
@@ -261,14 +262,14 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
         </div>
 
         <div className="modal-body">
-          <div className="pay-successSteps" aria-label="Langkah selanjutnya">
+            <div className="pay-successSteps" aria-label="Langkah selanjutnya">
             <div className="pay-successStep is-done">
               <span>1</span>
               Order dibuat
             </div>
             <div className="pay-successStep is-active">
               <span>2</span>
-              Simpan ID
+              Simpen ID
             </div>
             <div className="pay-successStep">
               <span>3</span>
@@ -286,7 +287,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode pay-successCode--animate">{orderCode}</div>
-            <p className="pay-successLead">ID ini akan dipakai setiap kali kamu ingin mengecek progres order.</p>
+            <p className="pay-successLead">ID ini bakal dipake tiap kali kamu ngecek progres order.</p>
           </div>
 
           <div className="pay-successActions">
@@ -297,7 +298,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
               {copied ? "✓ Tersalin" : "Salin ID"}
             </button>
             <a className="btn btn-ghost" href={adminWaUrl} target="_blank" rel="noreferrer">
-              Hubungi Admin
+              Chat Admin
             </a>
           </div>
         </div>
@@ -365,13 +366,13 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
   const itemCount = (items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
   const checklist = isFree ? [
-    "Promo 100% sudah diterapkan ke order ini",
-    "Tidak ada pembayaran yang diperlukan",
-    "Order akan langsung diproses setelah konfirmasi",
+    "Promo 100% udah diterapin ke order ini",
+    "Gak perlu bayar apa-apa",
+    "Order bakal langsung diproses abis konfirmasi",
   ] : [
-    "Sudah scan QRIS dengan aplikasi m-banking / e-wallet",
-    "Nominal transfer sesuai dengan total tagihan di atas",
-    "Pembayaran sudah berhasil (bukan pending atau gagal)",
+    "Udah scan QRIS pake m-banking / e-wallet",
+    "Nominal transfer sesuai total tagihan di atas",
+    "Pembayaran udah berhasil (bukan pending / gagal)",
   ];
 
   const handleCheck = (index) => {
@@ -402,13 +403,13 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
             <ShieldCheck size={20} />
           </div>
           <div className="pay-confirmModalHeaderCopy">
-            <div className="pay-confirmModalTitle">{isFree ? "Konfirmasi Order Gratis" : "Konfirmasi Pembayaran"}</div>
+            <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Bayar"}</div>
             <div className="pay-confirmModalSub">
               {isAllChecked
                 ? "Semua langkah selesai — siap dikonfirmasi"
                 : isFree
                   ? "Centang semua detail sebelum lanjut"
-                  : "Centang semua opsi untuk mengonfirmasi"}
+                  : "Centang semua opsi buat konfirmasi"}
             </div>
           </div>
           <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
@@ -473,7 +474,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
             {!isFree ? (
               <div className="pay-confirmNotice">
                 <ShieldCheck size={14} />
-                <span>Konfirmasi palsu memperlambat proses order.</span>
+                <span>Konfirmasi palsu bikin order makin lambat.</span>
               </div>
             ) : null}
 
@@ -487,8 +488,8 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
                 <Check size={16} strokeWidth={2.5} />
                 {isAllChecked
                   ? isFree
-                    ? "Konfirmasi order"
-                    : "Konfirmasi pembayaran"
+                    ? "Konfirm order"
+                    : "Konfirm bayar"
                   : isFree
                     ? `Centang ${remainingCount} lagi`
                     : `Centang ${remainingCount} lagi`}
@@ -513,8 +514,8 @@ export default function Pay() {
   const toast = useToast();
 
   usePageMeta({
-    title: "Pembayaran",
-    description: "Bayar sesuai total, simpan ID order, terus lacak progress-nya.",
+    title: "Bayar",
+    description: "Bayar sesuai total, simpen ID order, terus pantau progress-nya.",
   });
 
   const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
@@ -709,7 +710,7 @@ export default function Pay() {
     const [latestProducts, activeFlashSales] = await Promise.all([
       fetchProducts({ includeInactive: true, useCache: false }),
       fetchActiveFlashSales({ useCache: false }).catch((err) => {
-        console.warn("Flash sales fetch failed in canonical check:", err);
+        warn("Flash sales fetch failed in canonical check:", err);
         return null; // null = unknown, don't apply flash sale discount
       }),
     ]);
@@ -925,7 +926,7 @@ export default function Pay() {
       toast.success("ID order berhasil dibuat.");
     } catch (error) {
       const message = toFriendlyPayError(error, { hasNotes: Boolean(noteText) });
-      console.warn("Gagal memproses order:", error);
+      warn("Gagal memproses order:", error);
       setErrorText(message);
       if (loadingId) toast.remove(loadingId);
       toast.error(message);

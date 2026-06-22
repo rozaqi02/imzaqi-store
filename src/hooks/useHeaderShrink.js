@@ -24,12 +24,10 @@ export function useHeaderShrink() {
     };
 
     sync();
-    window.addEventListener("scroll", onScroll, { passive: true, capture: true });
-    document.addEventListener("scroll", onScroll, { passive: true, capture: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
 
     return () => {
-      window.removeEventListener("scroll", onScroll, { capture: true });
-      document.removeEventListener("scroll", onScroll, { capture: true });
+      window.removeEventListener("scroll", onScroll);
       document.body.classList.remove("header-is-shrunk");
       setIsShrunk(false);
     };

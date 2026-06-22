@@ -281,34 +281,34 @@
     color: #032235;
   }
 
-  :root[data-theme="light"] .pay-successStep {
+  html[data-theme="light"] .pay-successStep {
     border-color: rgba(0, 34, 53, 0.08);
     background: rgba(0, 34, 53, 0.03);
     color: rgba(0, 34, 53, 0.55);
   }
 
-  :root[data-theme="light"] .pay-successStep > span {
+  html[data-theme="light"] .pay-successStep > span {
     background: rgba(0, 34, 53, 0.06);
     color: rgba(0, 34, 53, 0.8);
   }
 
-  :root[data-theme="light"] .pay-successStep.is-done {
+  html[data-theme="light"] .pay-successStep.is-done {
     color: rgba(0, 120, 100, 0.82);
     border-color: rgba(0, 214, 180, 0.22);
   }
 
-  :root[data-theme="light"] .pay-successStep.is-done > span {
+  html[data-theme="light"] .pay-successStep.is-done > span {
     background: rgba(0, 214, 180, 0.15);
     color: #008f75;
   }
 
-  :root[data-theme="light"] .pay-successStep.is-active {
+  html[data-theme="light"] .pay-successStep.is-active {
     color: #032235;
     border-color: rgba(0, 214, 180, 0.34);
     box-shadow: 0 0 0 1px rgba(0, 214, 180, 0.12) inset;
   }
 
-  :root[data-theme="light"] .pay-successStep.is-active > span {
+  html[data-theme="light"] .pay-successStep.is-active > span {
     background: linear-gradient(135deg, #00d6b4, #4effda);
     color: #032235;
   }

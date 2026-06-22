@@ -32,6 +32,7 @@ import {
 } from "../lib/orderHistory";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { warn } from "../lib/log";
 import { copyToClipboard } from "../utils/clipboard";
 import "../css/pages/OrderHistory.css";
 import "../css/pages/Status.css";
@@ -103,7 +104,7 @@ function normalizeOrderCode(value) {
 }
 
 function toFriendlyStatusError() {
-  return "Status belum bisa diambil. Coba lagi beberapa saat.";
+  return "Status belum bisa diambil. Coba lagi nanti.";
 }
 
 function statusTone(status) {
@@ -217,7 +218,7 @@ function TabCekStatus({ settings }) {
       toast.success("Order ditemukan", { title: row.order_code || code, duration: 2200 });
     } catch (error) {
       const text = toFriendlyStatusError();
-      console.warn("Gagal mengambil status order:", error);
+      warn("Gagal mengambil status order:", error);
       setMessage(text);
       toast.error(text);
     } finally {
@@ -250,14 +251,7 @@ function TabCekStatus({ settings }) {
     lookup(normalized);
   }, [initialParam, lookup]);
 
-  // Auto-refresh polling — berhenti kalau status sudah terminal
-  useEffect(() => {
-    if (!order || TERMINAL_STATUSES.has(order.status)) return;
-    pollTimerRef.current = setInterval(() => {
-      silentRefresh(order.order_code);
-    }, POLL_INTERVAL_MS);
-    return () => clearInterval(pollTimerRef.current);
-  }, [order, silentRefresh]);
+  // Auto-refresh disabled
 
   const statusMeta = useMemo(() => getStatusMeta(order?.status), [order?.status]);
   const StatusIcon = statusMeta.icon;
@@ -279,10 +273,10 @@ function TabCekStatus({ settings }) {
 
   const statusHint = useMemo(() => {
     const val = order?.status;
-    if (val === "pending") return "Menunggu pembayaran QRIS";
-    if (val === "paid_reported") return "Menunggu konfirmasi admin";
-    if (val === "processing") return "Sedang diproses oleh admin";
-    if (val === "done") return "Sukses, siap digunakan";
+    if (val === "pending") return "Nunggu pembayaran QRIS";
+    if (val === "paid_reported") return "Nunggu konfirmasi admin";
+    if (val === "processing") return "Lagi diproses admin";
+    if (val === "done") return "Sukses, siap dipake";
     if (val === "cancelled") return "Pesanan dibatalkan";
     return "Status aktif";
   }, [order?.status]);
@@ -378,10 +372,10 @@ function TabCekStatus({ settings }) {
         <div className="st-searchHead">
           <div>
             <div className="st-kicker">ID order</div>
-            <h2 className="st-searchTitle">{order ? "Cari order lain" : "Masukkan ID"}</h2>
+            <h2 className="st-searchTitle">{order ? "Cari order lain" : "Masukin ID"}</h2>
           </div>
           <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
-            Paste
+            Tempel
           </button>
         </div>
 
@@ -405,22 +399,22 @@ function TabCekStatus({ settings }) {
             {loading ? (
               <>
                 <span className="st-checkSpinner" aria-hidden="true" />
-                Mencari...
+                Nyari...
               </>
             ) : "Cek status"}
           </button>
         </div>
 
         <div className={`st-searchHint${message ? " is-error" : ""}`}>
-          {message || (order ? "Klik kartu ID order untuk salin cepat." : "Format singkat juga bisa: ABCD")}
+          {message || (order ? "Klik kartu ID order buat salin cepet." : "Format singkat juga bisa: ABCD")}
         </div>
       </section>
 
       {!order ? (
         <section className="st-empty">
           <div className="st-emptyBadge">IMZ</div>
-          <h2 className="st-emptyTitle">Status Ordermu siap dipantau</h2>
-          <p className="st-emptyText">Tempel ID order, lalu semua ringkasan akan muncul otomatis di sini.</p>
+          <h2 className="st-emptyTitle">Status ordermu siap dipantau</h2>
+          <p className="st-emptyText">Tempel ID order, semua ringkasan bakal muncul otomatis di sini.</p>
           <div className="st-emptyActions">
             <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>
               Tempel ID
@@ -437,7 +431,7 @@ function TabCekStatus({ settings }) {
               <div className="st-cardHead">
                 <div>
                   <div className="st-kicker">Catatan admin</div>
-                  <h2 className="st-cardTitle">Penting untuk dibaca</h2>
+                  <h2 className="st-cardTitle">Penting buat dibaca</h2>
                 </div>
                 <button
                   type="button"
@@ -447,7 +441,7 @@ function TabCekStatus({ settings }) {
                       await copyToClipboard(order.admin_note);
                       toast.success("Catatan disalin");
                     } catch {
-                      toast.error("Gagal menyalin catatan");
+                      toast.error("Gagal nyalin catatan");
                     }
                   }}
                   title="Salin catatan admin"
@@ -476,7 +470,7 @@ function TabCekStatus({ settings }) {
                   <Copy size={14} style={{ opacity: 0.8, color: "var(--st-muted)" }} />
                 </div>
                 <strong>{order.order_code}</strong>
-                <small>Tap untuk salin ID</small>
+                <small>Tap buat salin ID</small>
               </button>
 
               <InfoCard
@@ -640,7 +634,7 @@ function TabCekStatus({ settings }) {
                 </div>
               </div>
               <div className={`st-noteBody${order.notes ? "" : " is-empty"}`}>
-                {order.notes || "Tidak ada catatan customer."}
+                {order.notes || "Gak ada catatan customer."}
               </div>
             </article>
 
@@ -673,7 +667,7 @@ function TabCekStatus({ settings }) {
                 </div>
               </div>
 
-              <p className="st-helpText">Jika ada kendala, kirim ID order ini ke admin agar diproses lebih cepat.</p>
+              <p className="st-helpText">Kalo ada kendala, kirim ID order ini ke admin biar diproses lebih cepet.</p>
 
               <div className="st-helpActions">
                 <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
@@ -783,10 +777,10 @@ function TabRiwayat() {
         </div>
         <h2 className="oh-emptyTitle">Belum ada riwayat order dari browser ini</h2>
         <p className="oh-emptyText">
-          Order yang kamu buat akan otomatis tersimpan di sini untuk kemudahan pengecekan status.
+          Order yang kamu buat bakal otomatis kesimpen di sini buat ngecek status.
         </p>
         <Link className="btn" to="/produk">
-          Lihat Produk
+          Intip Produk
         </Link>
       </div>
     );
@@ -804,13 +798,13 @@ function TabRiwayat() {
           aria-label="Perbarui semua status"
         >
           <RefreshCw size={13} className={syncing ? "oh-spinIcon" : ""} />
-          {syncing ? "Memperbarui..." : "Perbarui"}
+          {syncing ? "Ngupdate..." : "Perbarui"}
         </button>
 
         {confirmClear ? (
           <div className="oh-confirmClear">
-            <span>Hapus semua?</span>
-            <button type="button" className="btn btn-sm" onClick={handleClearAll}>Ya, hapus</button>
+              <span>Hapus semua?</span>
+              <button type="button" className="btn btn-sm" onClick={handleClearAll}>Yoi, hapus</button>
             <button type="button" className="btn btn-sm btn-ghost" onClick={() => setConfirmClear(false)}>Batal</button>
           </div>
         ) : (
@@ -896,7 +890,7 @@ export default function Status() {
     title: activeTab === "riwayat" ? "Riwayat Order" : "Status Order",
     description:
       activeTab === "riwayat"
-        ? "Semua order dari browser ini tersimpan di sini."
+        ? "Semua order dari browser ini kesimpen di sini."
         : "Masukin ID order, langsung keliatan progress-nya.",
   });
 
@@ -927,7 +921,7 @@ export default function Status() {
               </h1>
               <p className="st-sub">
                 {activeTab === "riwayat"
-                  ? "Semua order dari browser ini nyimpen di sini."
+                  ? "Semua order dari browser ini kesimpen di sini."
                   : "Masukin ID order, langsung keliatan progress-nya."}
               </p>
             </div>

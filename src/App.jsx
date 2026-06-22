@@ -9,7 +9,11 @@ import Confetti from "./components/Confetti";
 import AssistantBubble from "./components/AssistantBubble";
 import { usePageView } from "./hooks/usePageView";
 import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
+import { useLongTaskMonitor } from "./hooks/usePerformanceMonitor";
+import { useDeviceCapability } from "./hooks/useIsMobile";
+import { rafThrottle } from "./utils/throttle";
 import { ChevronUp } from "lucide-react";
+import { hasSavedScrollY } from "./hooks/useScrollMemory";
 
 // ── Eager-loaded pages (critical path) ──
 import Home from "./pages/Home";
@@ -47,20 +51,15 @@ function ScrollToTopButton() {
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
-    let ticking = false;
+    const throttledScroll = rafThrottle(() => {
+      setVisible(window.scrollY > 400);
+    });
 
-    function onScroll() {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          setVisible(window.scrollY > 400);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    }
-
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", throttledScroll, { passive: true });
+    return () => {
+      throttledScroll.cancel();
+      window.removeEventListener("scroll", throttledScroll);
+    };
   }, []);
 
   function scrollUp() {
@@ -87,6 +86,9 @@ function ScrollToTop() {
   const pathname = displayLocation.pathname;
 
   useEffect(() => {
+    // When navigating back to /produk with saved scroll, let Products restore it
+    if (pathname === "/produk" && hasSavedScrollY()) return;
+
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia &&
@@ -149,6 +151,9 @@ function AppRoutes() {
 }
 
 export default function App() {
+  const caps = useDeviceCapability();
+  useLongTaskMonitor();
+
   useEffect(() => {
     if (typeof window === "undefined" || !navigator.vibrate) return;
 

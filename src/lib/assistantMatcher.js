@@ -15,6 +15,7 @@ import {
   buildAssistantContext,
   detectIntent,
 } from "./assistantContext";
+import { warn, info } from "./log";
 
 const SYNONYMS = {
   garansi: ["garansi", "warranty", "klaim", "ganti", "replace", "rusak", "diganti", "logout", "ke-logout"],
@@ -471,7 +472,7 @@ async function callLLM(query, history, context, intent) {
   // Log config once for debugging in production
   if (!_llmConfigLogged) {
     _llmConfigLogged = true;
-    console.info("[Imzaqi AI] Config:", {
+    info("[Imzaqi AI] Config:", {
       endpoint: endpoint ? `${endpoint.slice(0, 30)}...` : "(empty)",
       keyPresent: key.length > 0,
       keyLength: key.length,
@@ -482,7 +483,7 @@ async function callLLM(query, history, context, intent) {
   
   // Fail fast if endpoint is missing or malformed
   if (!endpoint || !endpoint.startsWith("http")) {
-    console.warn("[Imzaqi AI] No valid endpoint configured:", endpoint || "(empty)");
+    warn("[Imzaqi AI] No valid endpoint configured:", endpoint || "(empty)");
     return null;
   }
 
@@ -514,7 +515,7 @@ async function callLLM(query, history, context, intent) {
     
     if (!res.ok) {
       const errBody = await res.text().catch(() => "");
-      console.warn("[Imzaqi AI] LLM API error:", res.status, errBody.slice(0, 200));
+      warn("[Imzaqi AI] LLM API error:", res.status, errBody.slice(0, 200));
       return null;
     }
     
@@ -526,12 +527,12 @@ async function callLLM(query, history, context, intent) {
       data?.text;
       
     if (typeof reply !== "string" || !reply.trim()) {
-      console.warn("[Imzaqi AI] LLM returned empty reply:", JSON.stringify(data).slice(0, 200));
+      warn("[Imzaqi AI] LLM returned empty reply:", JSON.stringify(data).slice(0, 200));
       return null;
     }
     return reply.trim();
   } catch (err) {
-    console.warn("[Imzaqi AI] LLM fetch failed:", err?.name, err?.message);
+    warn("[Imzaqi AI] LLM fetch failed:", err?.name, err?.message);
     return null;
   }
 }

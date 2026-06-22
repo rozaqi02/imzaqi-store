@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
+import { warn } from "../lib/log";
 import { formatIDR } from "../lib/format";
 import "../css/pages/FlashSale.css";
 
@@ -121,7 +122,7 @@ export default function FlashSaleBanner() {
         setFlashSales(sales);
         setProducts(prods);
       } catch (e) {
-        console.warn("Flash sale load failed:", e);
+        warn("Flash sale load failed:", e);
       } finally {
         if (alive) setLoading(false);
       }

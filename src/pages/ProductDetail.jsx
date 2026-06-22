@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -22,6 +22,9 @@ import { formatIDR } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
+import { useDeviceCapability } from "../hooks/useIsMobile";
+import { useLongTaskMonitor } from "../hooks/usePerformanceMonitor";
+import { warn } from "../lib/log";
 import { fireConfetti } from "../components/Confetti";
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import ProductTile from "../components/ProductTile";
@@ -205,10 +208,50 @@ function StockPill({ stock }) {
   const value = Number(stock ?? 0);
   const safe = Number.isFinite(value) ? value : 0;
 
-  if (safe <= 0) return <span className="pdx-stockPill out">Habis</span>;
+  if (safe <= 0) return <span className="pdx-stockPill out">Abis</span>;
 
   const tone = safe <= 5 ? "low" : safe <= 20 ? "mid" : "ok";
   return <span className={`pdx-stockPill ${tone}`}>Stok {safe}</span>;
+}
+
+function LazyProductImage({ src, alt, className, fetchPriority }) {
+  const [loaded, setLoaded] = useState(false);
+  const [isInView, setIsInView] = useState(false);
+  const imgRef = useRef(null);
+
+  useEffect(() => {
+    if (!imgRef.current) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setIsInView(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+    observer.observe(imgRef.current);
+    return () => observer.disconnect();
+  }, []);
+
+  return (
+    <div ref={imgRef} className={className} style={{ position: "relative" }}>
+      {isInView ? (
+        <img
+          src={src}
+          alt={alt}
+          fetchPriority={fetchPriority}
+          decoding="async"
+          loading="lazy"
+          onLoad={() => setLoaded(true)}
+          style={{ opacity: loaded ? 1 : 0, transition: "opacity 0.2s" }}
+        />
+      ) : null}
+      {!loaded && isInView ? (
+        <div className="pdx-imgPlaceholder" style={{ position: "absolute", inset: 0 }} />
+      ) : null}
+    </div>
+  );
 }
 
 const VariantCard = React.memo(({
@@ -311,7 +354,7 @@ const VariantCard = React.memo(({
           }}
           disabled={out}
         >
-          {out ? "Habis" : "Beli sekarang"}
+          {out ? "Abis" : "Beli sekarang"}
         </button>
       </div>
     </>
@@ -403,10 +446,11 @@ export default function ProductDetail() {
   const toast = useToast();
   const cart = useCart();
   const { add } = cart;
-  // Native reduced motion check — no longer needs framer-motion
-  const reduceMotion =
-    typeof window !== "undefined" &&
-    window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
+  const caps = useDeviceCapability();
+
+  useLongTaskMonitor();
+
+  const reduceMotion = caps.isReducedMotion;
   const motionMode = useAdaptiveMotion();
 
   const isMotionOff = motionMode === "off" || reduceMotion;
@@ -423,7 +467,7 @@ export default function ProductDetail() {
 
   usePageMeta({
     title: product?.name ? `${product.name} | Detail Produk` : "Detail Produk",
-    description: product?.description || "Pilih paket yang cocok, terus lanjut checkout.",
+    description: product?.description || "Pilih paket yang cocok, lanjut checkout.",
     ogImage: product?.icon_url || undefined,
   });
 
@@ -446,7 +490,7 @@ export default function ProductDetail() {
         (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
         setFlashSaleMap(fsMap);
       } catch (fetchError) {
-        console.warn(fetchError);
+        warn(fetchError);
         if (!alive) return;
         setError("Produk tidak ditemukan atau gagal dimuat.");
       } finally {
@@ -595,7 +639,7 @@ export default function ProductDetail() {
     const stock = Number(variant?.stock ?? 999);
 
     if (stock <= 0) {
-      toast.error("Produk ini sedang habis", { title: variant.name, duration: 2500 });
+      toast.error("Produk ini lagi abis", { title: variant.name, duration: 2500 });
       return;
     }
 
@@ -619,7 +663,7 @@ export default function ProductDetail() {
     toast.success(`${variant.name} · ${formatIDR(effectivePrice)}`, {
       title: "Masuk keranjang",
       duration: 3200,
-      actionLabel: "Lihat keranjang",
+      actionLabel: "Intip keranjang",
       onAction: () => nav("/checkout", { state: { backgroundLocation: location } }),
     });
 
@@ -630,8 +674,7 @@ export default function ProductDetail() {
 
     if (event?.currentTarget) {
       const rect = event.currentTarget.getBoundingClientRect();
-      const isMobile = window.matchMedia("(pointer: coarse), (max-width: 920px)").matches;
-      if (!isMobile && !isMotionOff) {
+      if (!caps.isMobile && !isMotionOff) {
         fireConfetti(rect.left + rect.width / 2, rect.top + rect.height / 2);
         spawnCartFlyParticle(rect);
       }
@@ -695,8 +738,8 @@ export default function ProductDetail() {
               <EmptyState
                 icon="?"
                 title="Produk tidak ditemukan"
-                description={error || "Produk tidak tersedia."}
-                primaryAction={{ label: "Kembali ke katalog", onClick: () => nav("/produk") }}
+                description={error || "Produk gak tersedia."}
+                primaryAction={{ label: "Balik ke katalog", onClick: () => nav("/produk") }}
               />
             </div>
           </div>
@@ -803,16 +846,16 @@ export default function ProductDetail() {
                       <div className="pdx-emptyCard">
                         <EmptyState
                           icon="-"
-                          title={variants.length === 0 ? "Belum ada paket" : "Tidak ada paket di kategori ini"}
+                          title={variants.length === 0 ? "Belum ada paket" : "Gak ada paket di kategori ini"}
                           description={
                             variants.length === 0
-                              ? "Admin belum menambahkan varian untuk produk ini."
-                              : "Coba pilih kategori lain atau lihat semua paket."
+                              ? "Admin belum nambahin varian buat produk ini."
+                              : "Coba pilih kategori lain atau intip semua paket."
                           }
                           primaryAction={
                             variants.length > 0
-                              ? { label: "Lihat semua", onClick: () => setActiveTab("semua") }
-                              : { label: "Kembali ke katalog", onClick: () => nav("/produk") }
+                              ? { label: "Intip semua", onClick: () => setActiveTab("semua") }
+                              : { label: "Balik ke katalog", onClick: () => nav("/produk") }
                           }
                         />
                       </div>
@@ -829,8 +872,8 @@ export default function ProductDetail() {
                         const descriptionBody = String(
                           variant.description ||
                             (out
-                              ? "Slot sedang habis. Cek lagi saat stok terbuka."
-                              : "Varian siap diproses setelah pembayaran terverifikasi.")
+                              ? "Slot lagi abis. Cek lagi kalo stok udah kebuka."
+                              : "Varian siap diproses abis pembayaran diverifikasi.")
                         )
                           .replace(/\r\n/g, " ")
                           .trim();

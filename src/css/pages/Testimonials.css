@@ -22,7 +22,7 @@
   --testi-inset-shadow: var(--uni-inset-shadow);
 }
 
-:root[data-theme="light"] .testi-shell,
+html[data-theme="light"] .testi-shell,
 [data-theme="light"] .testi-shell {
   --testi-bg-main:
     radial-gradient(1200px 540px at 10% -8%, rgba(44, 120, 255, 0.16), rgba(44, 120, 255, 0) 64%),
@@ -608,12 +608,12 @@
   font-weight: 800;
 }
 
-:root[data-theme="light"] .testi-searchIcon,
+html[data-theme="light"] .testi-searchIcon,
 [data-theme="light"] .testi-searchIcon {
   color: #1d95aa;
 }
 
-:root[data-theme="light"] .testimonials-page .btn-ghost,
+html[data-theme="light"] .testimonials-page .btn-ghost,
 [data-theme="light"] .testimonials-page .btn-ghost {
   border-color: rgba(13, 124, 144, 0.2);
   background:
@@ -622,13 +622,13 @@
   color: #123744;
 }
 
-:root[data-theme="light"] .testi-overlay,
+html[data-theme="light"] .testi-overlay,
 [data-theme="light"] .testi-overlay {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(17, 52, 66, 0.42));
 }
 
-:root[data-theme="light"] .testi-overlayPill,
-:root[data-theme="light"] .testi-captionPill,
+html[data-theme="light"] .testi-overlayPill,
+html[data-theme="light"] .testi-captionPill,
 [data-theme="light"] .testi-overlayPill,
 [data-theme="light"] .testi-captionPill {
   border-color: rgba(13, 124, 144, 0.2);
@@ -638,20 +638,20 @@
   color: #123744;
 }
 
-:root[data-theme="light"] .testi-captionPill.is-muted,
+html[data-theme="light"] .testi-captionPill.is-muted,
 [data-theme="light"] .testi-captionPill.is-muted {
   color: rgba(67, 93, 102, 0.88);
 }
 
-:root[data-theme="light"] .lightbox,
+html[data-theme="light"] .lightbox,
 [data-theme="light"] .lightbox {
   border-color: rgba(13, 124, 144, 0.2);
   background:
     linear-gradient(176deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 249, 253, 0.96) 52%, rgba(228, 244, 250, 0.98) 100%);
 }
 
-:root[data-theme="light"] .lightbox-close,
-:root[data-theme="light"] .lightbox-nav,
+html[data-theme="light"] .lightbox-close,
+html[data-theme="light"] .lightbox-nav,
 [data-theme="light"] .lightbox-close,
 [data-theme="light"] .lightbox-nav {
   border-color: rgba(13, 124, 144, 0.2);
@@ -661,7 +661,7 @@
   color: #123744;
 }
 
-:root[data-theme="light"] .lightbox-caption,
+html[data-theme="light"] .lightbox-caption,
 [data-theme="light"] .lightbox-caption {
   color: #123744;
 }

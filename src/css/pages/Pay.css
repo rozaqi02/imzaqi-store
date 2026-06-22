@@ -271,7 +271,7 @@ padding:24px 18px 20px;text-align:center;}
 .pay-shell .btn:not(.btn-ghost):hover{transform:translateY(-1px);filter:brightness(1.02);}
 .pay-shell .btn-ghost{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.10);color:rgba(255,255,255,.72);}
 
-:root[data-theme="light"] .pay-shell .steps{
+html[data-theme="light"] .pay-shell .steps{
   border-color:rgba(0,138,148,.14);
   background:
     linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.16)),
@@ -279,7 +279,7 @@ padding:24px 18px 20px;text-align:center;}
   box-shadow:var(--skeu-control-shadow);
 }
 
-:root[data-theme="light"] .pay-shell .step{
+html[data-theme="light"] .pay-shell .step{
   border-color:rgba(0,138,148,.12);
   background:
     linear-gradient(180deg, rgba(255,255,255,.84), rgba(255,255,255,.58)),
@@ -287,10 +287,10 @@ padding:24px 18px 20px;text-align:center;}
   color:#123744;
 }
 
-:root[data-theme="light"] .pay-shell .step-title{color:#123744;}
-:root[data-theme="light"] .pay-shell .step-sub{color:#5f7781;}
+html[data-theme="light"] .pay-shell .step-title{color:#123744;}
+html[data-theme="light"] .pay-shell .step-sub{color:#5f7781;}
 
-:root[data-theme="light"] .pay-shell .step-dot{
+html[data-theme="light"] .pay-shell .step-dot{
   border-color:rgba(0,138,148,.16);
   background:
     linear-gradient(180deg, rgba(255,255,255,.94), rgba(255,255,255,.7)),
@@ -298,107 +298,107 @@ padding:24px 18px 20px;text-align:center;}
   color:#2e4e5a;
 }
 
-:root[data-theme="light"] .pay-shell .step.active{
+html[data-theme="light"] .pay-shell .step.active{
   border-color:rgba(0,138,148,.24);
   background:
     linear-gradient(180deg, rgba(255,255,255,.96), rgba(239,251,255,.82)),
     rgba(230,248,253,.95);
 }
 
-:root[data-theme="light"] .pay-shell .step.active .step-dot{
+html[data-theme="light"] .pay-shell .step.active .step-dot{
   border-color:rgba(79,255,200,.42);
   background:linear-gradient(135deg, #4effda 0%, #25ebc8 40%, #00d6b4 62%, #008a94 100%);
   color:#032235;
 }
 
-:root[data-theme="light"] .pay-shell .step.done .step-dot{
+html[data-theme="light"] .pay-shell .step.done .step-dot{
   color:#0d3643;
   background:rgba(214,244,238,.92);
   border-color:rgba(0,138,148,.22);
 }
 
-:root[data-theme="light"] .pay-notePanel,
-:root[data-theme="light"] .pay-emailPanel {
+html[data-theme="light"] .pay-notePanel,
+html[data-theme="light"] .pay-emailPanel {
   border-top-color:rgba(0,138,148,.14);
 }
 
-:root[data-theme="light"] .pay-noteLabelWrap,
-:root[data-theme="light"] .pay-emailLabelWrap {color:#2d4f5b;}
+html[data-theme="light"] .pay-noteLabelWrap,
+html[data-theme="light"] .pay-emailLabelWrap {color:#2d4f5b;}
 
-:root[data-theme="light"] .pay-noteState,
-:root[data-theme="light"] .pay-emailState {color:#4f6872;border-color:rgba(0,138,148,.14);background:rgba(241,250,254,.86);}
+html[data-theme="light"] .pay-noteState,
+html[data-theme="light"] .pay-emailState {color:#4f6872;border-color:rgba(0,138,148,.14);background:rgba(241,250,254,.86);}
 
-:root[data-theme="light"] .pay-noteInput,
-:root[data-theme="light"] .pay-emailInput {color:#123744;background:rgba(247,253,255,.86);border-color:rgba(0,138,148,.14);}
+html[data-theme="light"] .pay-noteInput,
+html[data-theme="light"] .pay-emailInput {color:#123744;background:rgba(247,253,255,.86);border-color:rgba(0,138,148,.14);}
 
-:root[data-theme="light"] .pay-noteHintText,
-:root[data-theme="light"] .pay-emailHintText {color:#5b7380;}
+html[data-theme="light"] .pay-noteHintText,
+html[data-theme="light"] .pay-emailHintText {color:#5b7380;}
 
-:root[data-theme="light"] .pay-noteMeta {color:#5b7380;}
+html[data-theme="light"] .pay-noteMeta {color:#5b7380;}
 
 /* Pay page comprehensive light mode overrides */
-:root[data-theme="light"] .pay-shell-hero::before{opacity:.5;}
-:root[data-theme="light"] .pay-shell-kicker{color:#3d6070;border-color:rgba(0,138,148,.16);background:rgba(236,248,252,.86);backdrop-filter:none;}
-:root[data-theme="light"] .pay-shell-title{color:#123744;}
-:root[data-theme="light"] .pay-shell-sub{color:#5f7781;}
-:root[data-theme="light"] .pay-card{background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(247,253,255,.88));border-color:rgba(0,138,148,.14);box-shadow:0 16px 40px rgba(72,118,138,.14);backdrop-filter:none;-webkit-backdrop-filter:none;}
-:root[data-theme="light"] .pay-cardKicker{color:#5f7781;}
-:root[data-theme="light"] .pay-cardTitle{color:#123744;}
-:root[data-theme="light"] .pay-statePill{color:#3d6070;border-color:rgba(0,138,148,.14);background:rgba(236,248,252,.86);}
-:root[data-theme="light"] .pay-statePill.live{color:#0b3f4b;border-color:rgba(0,138,148,.22);background:rgba(214,244,238,.92);}
-:root[data-theme="light"] .pay-waField .label{color:#5f7781;}
-:root[data-theme="light"] .pay-waField .hint{color:#6b8a96;}
-:root[data-theme="light"] .pay-waField .input{background:rgba(231,243,249,.86);color:#123744;}
-:root[data-theme="light"] .pay-waField .input-icon{color:#3d6070;}
-:root[data-theme="light"] .pay-waField .required{color:#123744;}
-:root[data-theme="light"] .pay-stageLabel{color:#5f7781;}
-:root[data-theme="light"] .pay-stageTotal{color:#123744;}
-:root[data-theme="light"] .pay-stageHint{color:#5f7781;}
-:root[data-theme="light"] .pay-stageRow{color:#5f7781;}
-:root[data-theme="light"] .pay-stageRow b{color:#123744;}
-:root[data-theme="light"] .pay-stageFoot{color:#6b8a96;}
-:root[data-theme="light"] .pay-stageGrid{border-color:rgba(0,138,148,.10);}
-:root[data-theme="light"] .qris-wrap{border-color:rgba(0,138,148,.14);background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.90));box-shadow:0 14px 32px rgba(72,118,138,.12);}
-:root[data-theme="light"] .qris-skeletonBox{border-color:rgba(0,138,148,.10);background:linear-gradient(90deg, rgba(0,138,148,.04), rgba(0,138,148,.08), rgba(0,138,148,.04));background-size:200% 100%;}
-:root[data-theme="light"] .pay-orderDesktop{background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.90));border-color:rgba(0,138,148,.12);box-shadow:0 14px 32px rgba(72,118,138,.12);}
-:root[data-theme="light"] .pay-orderKicker{color:#5f7781;}
-:root[data-theme="light"] .pay-orderTitle{color:#123744;}
-:root[data-theme="light"] .pay-orderPromo{color:#3d6070;border-color:rgba(0,138,148,.14);background:rgba(236,248,252,.86);}
-:root[data-theme="light"] .pay-orderItem{border-color:rgba(0,138,148,.10);background:rgba(247,253,255,.86);}
-:root[data-theme="light"] .pay-orderItemName{color:#123744;}
-:root[data-theme="light"] .pay-orderItemMeta{color:#6b8a96;}
-:root[data-theme="light"] .pay-orderItem b{color:#123744;}
-:root[data-theme="light"] .pay-orderRow{color:#5f7781;}
-:root[data-theme="light"] .pay-orderRow strong,
-:root[data-theme="light"] .pay-orderRow b{color:#123744;}
-:root[data-theme="light"] .pay-orderMobileCard{background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.90));border-color:rgba(0,138,148,.12);}
-:root[data-theme="light"] .pay-qrisLocked{border-color:rgba(0,138,148,.14);background:linear-gradient(160deg, rgba(236,248,252,.86), rgba(247,253,255,.90));color:#3d6070;}
-:root[data-theme="light"] .pay-qrisLocked strong{color:#123744;}
-:root[data-theme="light"] .pay-qrisLocked p{color:#5f7781;}
-:root[data-theme="light"] .pay-successModal{background:rgba(255,255,255,.98);border-color:rgba(0,138,148,.14);box-shadow:0 30px 80px rgba(72,118,138,.18);backdrop-filter:none;}
-:root[data-theme="light"] .pay-successModal .modal-title{color:#123744;}
-:root[data-theme="light"] .pay-successModal .modal-sub{color:#5f7781;}
-:root[data-theme="light"] .pay-successKicker{color:#5f7781;}
-:root[data-theme="light"] .pay-successCode{color:#123744;}
-:root[data-theme="light"] .pay-successLead{color:#5f7781;}
-:root[data-theme="light"] .pay-successHero{border-color:rgba(0,138,148,.18);background:linear-gradient(180deg, rgba(236,248,252,.92), rgba(247,253,255,.86));}
-:root[data-theme="light"] .pay-successIcon{border-color:rgba(0,138,148,.14);background:rgba(236,248,252,.86);}
-:root[data-theme="light"] .pay-successIcon--animate svg{color:#008a94;}
-:root[data-theme="light"] .pay-successGlow{background:radial-gradient(circle, rgba(0,138,148,.22), rgba(0,138,148,0) 70%);}
-:root[data-theme="light"] .pay-successCode--animate::after{background:linear-gradient(90deg, rgba(0,138,148,0), rgba(0,138,148,.12), rgba(0,138,148,0));}
-:root[data-theme="light"] .icon-btn{border-color:rgba(0,138,148,.14);background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.88));color:#3d6070;}
-:root[data-theme="light"] .pay-shell .btn-ghost{background:rgba(236,248,252,.86);border-color:rgba(0,138,148,.14);color:#3d6070;}
-:root[data-theme="light"] .pay-confirmModal{background:rgba(255,255,255,.98);border-color:rgba(0,138,148,.14);box-shadow:0 24px 60px rgba(72,118,138,.16);backdrop-filter:none;}
-:root[data-theme="light"] .pay-confirmModalTitle{color:#123744;}
-:root[data-theme="light"] .pay-confirmModalSub{color:#5f7781;}
-:root[data-theme="light"] .pay-confirmTotalLabel{color:#5f7781;}
-:root[data-theme="light"] .pay-confirmTotalAmount{color:#0b3f4b;}
-:root[data-theme="light"] .pay-confirmTotalMeta{color:#6b8a96;}
-:root[data-theme="light"] .pay-confirmCheckItem{color:#123744;}
-:root[data-theme="light"] .pay-stickyCtaLabel{color:#5f7781;}
-:root[data-theme="light"] .pay-stickyCtaTotal{color:#123744;}
-:root[data-theme="light"] .pay-stickyCtaInner{background:rgba(255,255,255,.96);border-color:rgba(0,138,148,.14);box-shadow:0 8px 24px rgba(72,118,138,.14);}
-:root[data-theme="light"] .pay-stickyCta{background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.88) 28%, rgba(255,255,255,.98) 100%);backdrop-filter:none;border-top-color:rgba(0,138,148,.10);}
+html[data-theme="light"] .pay-shell-hero::before{opacity:.5;}
+html[data-theme="light"] .pay-shell-kicker{color:#3d6070;border-color:rgba(0,138,148,.16);background:rgba(236,248,252,.86);backdrop-filter:none;}
+html[data-theme="light"] .pay-shell-title{color:#123744;}
+html[data-theme="light"] .pay-shell-sub{color:#5f7781;}
+html[data-theme="light"] .pay-card{background:linear-gradient(180deg, rgba(255,255,255,.92), rgba(247,253,255,.88));border-color:rgba(0,138,148,.14);box-shadow:0 16px 40px rgba(72,118,138,.14);backdrop-filter:none;-webkit-backdrop-filter:none;}
+html[data-theme="light"] .pay-cardKicker{color:#5f7781;}
+html[data-theme="light"] .pay-cardTitle{color:#123744;}
+html[data-theme="light"] .pay-statePill{color:#3d6070;border-color:rgba(0,138,148,.14);background:rgba(236,248,252,.86);}
+html[data-theme="light"] .pay-statePill.live{color:#0b3f4b;border-color:rgba(0,138,148,.22);background:rgba(214,244,238,.92);}
+html[data-theme="light"] .pay-waField .label{color:#5f7781;}
+html[data-theme="light"] .pay-waField .hint{color:#6b8a96;}
+html[data-theme="light"] .pay-waField .input{background:rgba(231,243,249,.86);color:#123744;}
+html[data-theme="light"] .pay-waField .input-icon{color:#3d6070;}
+html[data-theme="light"] .pay-waField .required{color:#123744;}
+html[data-theme="light"] .pay-stageLabel{color:#5f7781;}
+html[data-theme="light"] .pay-stageTotal{color:#123744;}
+html[data-theme="light"] .pay-stageHint{color:#5f7781;}
+html[data-theme="light"] .pay-stageRow{color:#5f7781;}
+html[data-theme="light"] .pay-stageRow b{color:#123744;}
+html[data-theme="light"] .pay-stageFoot{color:#6b8a96;}
+html[data-theme="light"] .pay-stageGrid{border-color:rgba(0,138,148,.10);}
+html[data-theme="light"] .qris-wrap{border-color:rgba(0,138,148,.14);background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.90));box-shadow:0 14px 32px rgba(72,118,138,.12);}
+html[data-theme="light"] .qris-skeletonBox{border-color:rgba(0,138,148,.10);background:linear-gradient(90deg, rgba(0,138,148,.04), rgba(0,138,148,.08), rgba(0,138,148,.04));background-size:200% 100%;}
+html[data-theme="light"] .pay-orderDesktop{background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.90));border-color:rgba(0,138,148,.12);box-shadow:0 14px 32px rgba(72,118,138,.12);}
+html[data-theme="light"] .pay-orderKicker{color:#5f7781;}
+html[data-theme="light"] .pay-orderTitle{color:#123744;}
+html[data-theme="light"] .pay-orderPromo{color:#3d6070;border-color:rgba(0,138,148,.14);background:rgba(236,248,252,.86);}
+html[data-theme="light"] .pay-orderItem{border-color:rgba(0,138,148,.10);background:rgba(247,253,255,.86);}
+html[data-theme="light"] .pay-orderItemName{color:#123744;}
+html[data-theme="light"] .pay-orderItemMeta{color:#6b8a96;}
+html[data-theme="light"] .pay-orderItem b{color:#123744;}
+html[data-theme="light"] .pay-orderRow{color:#5f7781;}
+html[data-theme="light"] .pay-orderRow strong,
+html[data-theme="light"] .pay-orderRow b{color:#123744;}
+html[data-theme="light"] .pay-orderMobileCard{background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.90));border-color:rgba(0,138,148,.12);}
+html[data-theme="light"] .pay-qrisLocked{border-color:rgba(0,138,148,.14);background:linear-gradient(160deg, rgba(236,248,252,.86), rgba(247,253,255,.90));color:#3d6070;}
+html[data-theme="light"] .pay-qrisLocked strong{color:#123744;}
+html[data-theme="light"] .pay-qrisLocked p{color:#5f7781;}
+html[data-theme="light"] .pay-successModal{background:rgba(255,255,255,.98);border-color:rgba(0,138,148,.14);box-shadow:0 30px 80px rgba(72,118,138,.18);backdrop-filter:none;}
+html[data-theme="light"] .pay-successModal .modal-title{color:#123744;}
+html[data-theme="light"] .pay-successModal .modal-sub{color:#5f7781;}
+html[data-theme="light"] .pay-successKicker{color:#5f7781;}
+html[data-theme="light"] .pay-successCode{color:#123744;}
+html[data-theme="light"] .pay-successLead{color:#5f7781;}
+html[data-theme="light"] .pay-successHero{border-color:rgba(0,138,148,.18);background:linear-gradient(180deg, rgba(236,248,252,.92), rgba(247,253,255,.86));}
+html[data-theme="light"] .pay-successIcon{border-color:rgba(0,138,148,.14);background:rgba(236,248,252,.86);}
+html[data-theme="light"] .pay-successIcon--animate svg{color:#008a94;}
+html[data-theme="light"] .pay-successGlow{background:radial-gradient(circle, rgba(0,138,148,.22), rgba(0,138,148,0) 70%);}
+html[data-theme="light"] .pay-successCode--animate::after{background:linear-gradient(90deg, rgba(0,138,148,0), rgba(0,138,148,.12), rgba(0,138,148,0));}
+html[data-theme="light"] .icon-btn{border-color:rgba(0,138,148,.14);background:linear-gradient(180deg, rgba(255,255,255,.94), rgba(247,253,255,.88));color:#3d6070;}
+html[data-theme="light"] .pay-shell .btn-ghost{background:rgba(236,248,252,.86);border-color:rgba(0,138,148,.14);color:#3d6070;}
+html[data-theme="light"] .pay-confirmModal{background:rgba(255,255,255,.98);border-color:rgba(0,138,148,.14);box-shadow:0 24px 60px rgba(72,118,138,.16);backdrop-filter:none;}
+html[data-theme="light"] .pay-confirmModalTitle{color:#123744;}
+html[data-theme="light"] .pay-confirmModalSub{color:#5f7781;}
+html[data-theme="light"] .pay-confirmTotalLabel{color:#5f7781;}
+html[data-theme="light"] .pay-confirmTotalAmount{color:#0b3f4b;}
+html[data-theme="light"] .pay-confirmTotalMeta{color:#6b8a96;}
+html[data-theme="light"] .pay-confirmCheckItem{color:#123744;}
+html[data-theme="light"] .pay-stickyCtaLabel{color:#5f7781;}
+html[data-theme="light"] .pay-stickyCtaTotal{color:#123744;}
+html[data-theme="light"] .pay-stickyCtaInner{background:rgba(255,255,255,.96);border-color:rgba(0,138,148,.14);box-shadow:0 8px 24px rgba(72,118,138,.14);}
+html[data-theme="light"] .pay-stickyCta{background:linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,.88) 28%, rgba(255,255,255,.98) 100%);backdrop-filter:none;border-top-color:rgba(0,138,148,.10);}
 
 @media (max-width: 980px){
   .pay-shell-hero::before{display:none;}
@@ -922,7 +922,7 @@ padding:24px 18px 20px;text-align:center;}
 }
 
 /* Light mode */
-:root[data-theme="light"] .pay-freePanelIcon {
+html[data-theme="light"] .pay-freePanelIcon {
   border-color: rgba(0, 138, 148, 0.24);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.6) 28%),
@@ -931,27 +931,27 @@ padding:24px 18px 20px;text-align:center;}
   color: #008a94;
 }
 
-:root[data-theme="light"] .pay-freePanelBadge {
+html[data-theme="light"] .pay-freePanelBadge {
   border-color: rgba(0, 138, 148, 0.24);
   background: rgba(0, 138, 148, 0.08);
   color: #006e78;
 }
 
-:root[data-theme="light"] .pay-freePanelTitle {
+html[data-theme="light"] .pay-freePanelTitle {
   color: #123744;
 }
 
-:root[data-theme="light"] .pay-freePanelDesc {
+html[data-theme="light"] .pay-freePanelDesc {
   color: #5f7781;
 }
 
-:root[data-theme="light"] .pay-freePanelCheck {
+html[data-theme="light"] .pay-freePanelCheck {
   border-color: rgba(0, 138, 148, 0.16);
   background: rgba(0, 138, 148, 0.05);
   color: #2d4f5b;
 }
 
-:root[data-theme="light"] .pay-freePanelCheck svg {
+html[data-theme="light"] .pay-freePanelCheck svg {
   color: #008a94;
 }
 .pay-stickyCta {
@@ -967,21 +967,21 @@ padding:24px 18px 20px;text-align:center;}
   animation: payConfirmCheckPop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-:root[data-theme="light"] .pay-confirmCheckDot.is-checked {
+html[data-theme="light"] .pay-confirmCheckDot.is-checked {
   background: linear-gradient(135deg, #00d6b4 0%, #008a94 100%) !important;
   border-color: rgba(0, 138, 148, 0.22) !important;
   color: #fff !important;
 }
 
-:root[data-theme="light"] .pay-confirmNotice{
+html[data-theme="light"] .pay-confirmNotice{
   background:rgba(255,180,50,.08);
   color:#8a5d12;
 }
-:root[data-theme="light"] .pay-confirmCheckItem.is-done{
+html[data-theme="light"] .pay-confirmCheckItem.is-done{
   background:rgba(0,214,180,.08);
   border-color:rgba(0,138,148,.14);
 }
-:root[data-theme="light"] .pay-confirmProgressTrack{
+html[data-theme="light"] .pay-confirmProgressTrack{
   background:rgba(0,138,148,.1);
 }
 
@@ -1068,22 +1068,22 @@ padding:24px 18px 20px;text-align:center;}
 }
 
 /* Light mode overrides for Zoom */
-:root[data-theme="light"] .pay-zoomOverlay {
+html[data-theme="light"] .pay-zoomOverlay {
   background: rgba(238, 247, 250, 0.9);
 }
 
-:root[data-theme="light"] .pay-zoomClose {
+html[data-theme="light"] .pay-zoomClose {
   border-color: rgba(0, 138, 148, 0.14);
   background: rgba(0, 138, 148, 0.05);
   color: #123744;
 }
 
-:root[data-theme="light"] .pay-zoomImg {
+html[data-theme="light"] .pay-zoomImg {
   border-color: rgba(0, 138, 148, 0.14);
   box-shadow: 0 20px 50px rgba(72, 118, 138, 0.14);
 }
 
-:root[data-theme="light"] .pay-zoomTip {
+html[data-theme="light"] .pay-zoomTip {
   color: #5f7781;
 }
 

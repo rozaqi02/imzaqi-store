@@ -6,6 +6,14 @@ import { CartProvider } from "./context/CartContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext";
 import AppErrorBoundary from "./components/AppErrorBoundary";
+import { warn } from "./lib/log";
+
+// Measure scrollbar width to prevent layout shift when body overflow toggles
+if (typeof document !== "undefined") {
+  const w = document.documentElement.clientWidth;
+  const w2 = window.innerWidth;
+  if (w2 > w) document.documentElement.style.setProperty("--scrollbar-width", `${w2 - w}px`);
+}
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
@@ -24,7 +32,7 @@ root.render(
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').catch((err) => {
-      console.warn('Service worker registration failed:', err);
+      warn('Service worker registration failed:', err);
     });
   });
 } else if ('serviceWorker' in navigator && !import.meta.env.PROD) {

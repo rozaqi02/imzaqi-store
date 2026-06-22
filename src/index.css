@@ -19,3 +19,6 @@
 
 /* AI assistant bubble */
 @import "./css/assistant.css";
+
+/* Overrides v3 (Mobile blur, footer redesign, genZ accents) */
+@import "./css/overrides-v3.css";

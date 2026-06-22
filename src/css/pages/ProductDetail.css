@@ -1525,38 +1525,33 @@
   gap: 14px;
 }
 
-/* Desktop: right card is sticky and scrollable inside */
+/* Desktop: right card is static and not scrollable */
 @media (min-width: 1024px) {
   .detail-page-v3 .pdx-variantsSection {
-    position: sticky;
-    top: 80px; /* below navbar */
-    max-height: calc(100vh - 100px);
-    /* NO overflow:hidden here — it clips the filter chip box-shadows.
-       Scroll is handled entirely by .pdx-packList below. */
+    position: static;
+    top: auto;
+    max-height: none;
     overflow: visible;
-    display: flex;
-    flex-direction: column;
+    display: block;
   }
 
-  /* Only the pack list scrolls; the header (title, filters) stays fixed */
   .detail-page-v3 .pdx-packList {
-    overflow-y: auto;
-    flex: 1;
-    min-height: 0;
-    /* Small bottom padding so last card shadow isn't clipped */
-    padding-bottom: 12px;
-    padding-right: 4px; /* space for scrollbar */
-    scrollbar-width: thin;
-    scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+    overflow-y: visible;
+    flex: none;
+    min-height: auto;
+    padding-bottom: 0;
+    padding-right: 0;
+    scrollbar-width: auto;
+    scrollbar-color: auto;
   }
 
   .detail-page-v3 .pdx-packList::-webkit-scrollbar {
-    width: 4px;
+    width: 0;
   }
 
   .detail-page-v3 .pdx-packList::-webkit-scrollbar-thumb {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 999px;
+    background: transparent;
+    border-radius: 0;
   }
 
   .detail-page-v3 .pdx-packList::-webkit-scrollbar-track {
@@ -2117,6 +2112,77 @@
   border-color: rgba(0, 194, 208, 0.6) !important;
 }
 
+/* ── Neumorphic Depth Enhancements ── */
+
+/* 1. Text drop shadow — anchors text to glass surface */
+.detail-page-v3 .pdx-title {
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+.detail-page-v3 .pdx-heroPrice .pdx-priceValue {
+  text-shadow: 0 2px 8px rgba(0, 214, 180, 0.15);
+}
+
+.detail-page-v3 .pdx-priceLabel,
+.detail-page-v3 .pdx-eyebrow,
+.detail-page-v3 .pdx-variantPriceLabel {
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-title {
+  text-shadow: 0 1px 3px rgba(67, 111, 129, 0.1);
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-heroPrice .pdx-priceValue {
+  text-shadow: 0 2px 6px rgba(0, 138, 148, 0.12);
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-priceLabel {
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+/* 2. Press/sink state — card depresses into surface */
+.detail-page-v3 .pdx-packCard:active:not(.is-out) {
+  transform: translateY(1px) scale(0.98);
+  box-shadow:
+    inset 0 4px 14px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(79, 255, 200, 0.12) inset !important;
+}
+
+/* 3. Focus ring glow — replaces default outline */
+.detail-page-v3 .pdx-packCard:focus-visible,
+.detail-page-v3 .pdx-backLink:focus-visible,
+.detail-page-v3 .pdx-filterChip:focus-visible,
+.detail-page-v3 .pdx-iconBtn:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px rgba(79, 255, 200, 0.4),
+    0 0 16px rgba(79, 255, 200, 0.12);
+}
+
+.detail-page-v3 .pdx-packCard:focus-visible {
+  border-color: rgba(79, 255, 200, 0.4) !important;
+}
+
+/* 4. Enhanced image depth — product icon sits above glass */
+.detail-page-v3 .pdx-productIcon {
+  transition:
+    transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
+    box-shadow 0.3s ease !important;
+}
+
+.detail-page-v3 .pdx-productIcon:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 20px 42px var(--brand-color, rgba(0, 0, 0, 0.32)),
+    var(--pdx-soft-shadow) !important;
+}
+
+/* 5. Back link active state */
+.detail-page-v3 .pdx-backLink:active {
+  transform: translateY(1px);
+  box-shadow: var(--pdx-inset-shadow);
+}
 
 
 /* Benefit toggle & items styles */
@@ -2307,14 +2373,14 @@
 /* Side-by-Side main content grid */
 .pdx-mainGrid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: 1.5fr 1fr;
   gap: 18px;
 }
 
 @media (min-width: 1024px) {
   .pdx-mainGrid {
-    /* Right (variants) card is noticeably wider than left (info) card */
-    grid-template-columns: 0.72fr 1.28fr;
+    /* Left (info) card is wider than right (variants) card */
+    grid-template-columns: 1.5fr 1fr;
     align-items: start;
     gap: 24px;
   }
@@ -2447,6 +2513,11 @@
 }
 
 @media (max-width: 920px) {
+  /* Ensure section title still visible on mobile */
+  .detail-page-v3 .pdx-sectionTitle {
+    font-size: clamp(16px, 4vw, 20px) !important;
+  }
+
   /* Disable backdrop filter on mobile for top card */
   .detail-page-v3 .pdx-topCard {
     backdrop-filter: none !important;
@@ -2491,5 +2562,15 @@
 
   .detail-page-v3 .pdx-recommendationsGrid .product-tile:hover {
     transform: none !important;
+  }
+
+  /* Stack left and right cards on mobile */
+  .pdx-mainGrid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Ensure pack list is always visible on mobile */
+  .pdx-packList {
+    display: block;
   }
 }

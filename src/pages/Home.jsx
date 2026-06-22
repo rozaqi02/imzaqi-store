@@ -13,33 +13,34 @@ import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { useToast } from "../context/ToastContext";
 import { copyToClipboard } from "../utils/clipboard";
 import { fireConfetti } from "../components/Confetti";
+import { warn } from "../lib/log";
 
 const HOME_FAQ = [
   {
     id: "home-pay",
-    category: "Pembayaran",
-    question: "Cara bayar di Imzaqi Store bagaimana?",
+    category: "Bayar",
+    question: "Gimana cara bayarnya?",
     answer: [
-      "Pilih produk dan varian, lalu lanjut ke halaman bayar.",
-      "Scan QRIS sesuai total yang tampil, lalu konfirmasi untuk membuat ID order.",
+      "Pilih produk + varian, lanjut ke halaman bayar.",
+      "Scan QRIS sesuai total, konfirmasi, dapet ID order.",
     ],
   },
   {
     id: "home-after-pay",
     category: "Order",
-    question: "Setelah bayar, langkah selanjutnya apa?",
+    question: "Udah bayar, terus gimana?",
     answer: [
-      "Simpan ID order yang muncul setelah konfirmasi pembayaran.",
-      "Buka halaman Status dan masukkan ID untuk pantau progres terbaru.",
+      "Simpen ID order yang muncul abis konfirmasi.",
+      "Buka halaman Status, masukin ID buat pantau progres.",
     ],
   },
   {
     id: "home-support",
     category: "Bantuan",
-    question: "Kalau ada kendala, hubungi ke mana?",
+    question: "Error/error, hubungi ke mana?",
     answer: [
-      "Gunakan tombol Hubungi Admin dari halaman bayar atau status.",
-      "Sertakan ID order agar pengecekan bisa langsung diproses.",
+      "Pencet tombol Hubungi Admin di halaman bayar atau status.",
+      "Sertain ID order biar ceknya cepet diproses.",
     ],
   },
 ];
@@ -48,21 +49,21 @@ const HOME_FAQ = [
 const HOW_IT_WORKS = [
   {
     step: "01",
-    title: "Pilih & Cek Harga",
-    desc: "Browse katalog, pilih produk dan varian yang kamu mau. Harga transparan, tidak ada biaya tersembunyi.",
-    details: "Lihat rincian lengkap mengenai tipe akun (Private/Sharing), durasi pemakaian, serta garansi replace penuh.",
+    title: "Pilih & Cek",
+    desc: "Browse katalog, pilih produk dan varian yang kamu mau. Harganya transparan, no biaya tersembunyi.",
+    details: "Cek rincian tipe akun (Private/Sharing), durasi, dan garansi replace full.",
   },
   {
     step: "02",
-    title: "Bayar Lewat QRIS",
-    desc: "Scan QRIS dari aplikasi apapun. Konfirmasi pembayaran dan dapatkan ID order dalam hitungan detik.",
-    details: "Mendukung pembayaran via GoPay, OVO, Dana, LinkAja, ShopeePay, serta seluruh aplikasi Mobile Banking Indonesia.",
+    title: "Bayar QRIS",
+    desc: "Scan QRIS dari app apa aja. Konfirmasi, dapet ID order dalam hitungan detik.",
+    details: "Support GoPay, OVO, Dana, LinkAja, ShopeePay, dan M-Banking apapun.",
   },
   {
     step: "03",
-    title: "Aktif & Pantau",
-    desc: "Akun aktif dalam menit. Gunakan ID order untuk pantau status kapan saja di halaman Status.",
-    details: "Akses detail login akan dikirim secara instan. Garansi hangus/replace dapat diklaim 24 jam lewat WhatsApp Admin.",
+    title: "Gas & Pantau",
+    desc: "Akun aktif dalam hitungan menit. Pake ID order buat pantau status di halaman Status.",
+    details: "Detail login dikirim instan. Garansi hangus/replace bisa diklaim 24 jam lewat WhatsApp Admin.",
   },
 ];
 
@@ -167,7 +168,7 @@ export default function Home() {
 
   usePageMeta({
     title: "Home",
-    description: "Langganan premium buat pelajar \u2014 cepat, ringkas, anti ribet.",
+    description: "Langganan premium budget pelajar \u2014 cepet, gampang, anti ribet.",
   });
 
   useEffect(() => {
@@ -197,7 +198,7 @@ export default function Home() {
           .slice(0, 3);
         setPromos(activePromos);
       } catch (e) {
-        console.warn(e);
+        warn(e);
         setError("Gagal memuat produk.");
       } finally {
         if (alive) setLoading(false);
@@ -246,24 +247,24 @@ export default function Home() {
       <HomeStickyBar />
 
       <div className="home-body">
-        {/* ── Produk Populer ── */}
+        {/* ── Produk Favorit ── */}
         <section
           className="home-section"
-          aria-label="Produk populer"
+          aria-label="Produk favorit"
         >
           <div className="container home-sectionInner">
             <div className="reveal" style={{ transitionDelay: "40ms" }}>
               <HomeSectionHead
-                kicker="Produk populer"
-                title="Yang paling sering dipesan"
-                sub="Langsung pilih dari daftar teratas, atau buka katalog lengkap."
+                kicker="Produk favorit"
+                title="Yang lagi viral"
+                sub="Gas pilih langsung dari daftar teratas, atau intip katalog lengkap."
               />
             </div>
 
             <div
               className="product-grid-container home-popularList list-mode"
               role="list"
-              aria-label="Produk populer"
+              aria-label="Produk favorit"
             >
               {loading ? (
                 <>
@@ -293,7 +294,7 @@ export default function Home() {
             <div className="home-sectionCta reveal" style={{ transitionDelay: `${120 + popularProducts.length * 80}ms` }}>
               <Link className="btn" to="/produk">
                 {!loading && totalActiveProducts > 4
-                  ? `Lihat ${totalActiveProducts - 4} produk lainnya`
+                  ? `Intip ${totalActiveProducts - 4} produk lainnya`
                   : "Lihat semua produk"}
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
@@ -310,9 +311,9 @@ export default function Home() {
             <div className="container home-sectionInner">
               <div className="reveal" style={{ transitionDelay: "40ms" }}>
                 <HomeSectionHead
-                  kicker="Kupon aktif"
-                  title="Diskon siap dipakai"
-                  sub="Tap kartu untuk menyalin kode promo."
+                  kicker="Promo aktif"
+                  title="Diskon, gas!"
+                  sub="Tap kartu buat salin kode promo."
                 />
               </div>
 
@@ -339,7 +340,7 @@ export default function Home() {
                     </div>
                     <div className="home-promoCard-body">
                       <span className="home-promoCard-code">{promo.code}</span>
-                      <span className="home-promoCard-action">Tap buat copy</span>
+                      <span className="home-promoCard-action">Tap buat salin</span>
                     </div>
                   </div>
                 ))}
@@ -356,9 +357,9 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal reveal-left" style={{ transitionDelay: "40ms" }}>
               <HomeSectionHead
-                kicker="Cara kerja"
-                title="3 langkah, selesai dalam menit"
-                sub="Dari pilih sampai aktif. Tap kartu langkah untuk tips ekstra."
+                kicker="Gampang"
+                title="3 langkah doang, gas!"
+                sub="Dari pilih sampai aktif. Tap kartu buat tips ekstra."
               />
             </div>
             <div className="home-howGrid">
@@ -408,8 +409,8 @@ export default function Home() {
             <div className="reveal" style={{ transitionDelay: "40ms" }}>
               <HomeSectionHead
                 kicker="FAQ"
-                title="Pertanyaan yang sering ditanyakan"
-                sub="Jawaban singkat sebelum kamu order."
+                title="Yang sering ditanyakan"
+                sub="Jawaban singkat biar makin pede."
               />
             </div>
 
@@ -428,7 +429,7 @@ export default function Home() {
                 <Search size={16} className="home-faqSearchIcon" />
                 <input
                   type="text"
-                  placeholder="Cari pertanyaan kamu di sini... (tekan Enter)"
+                  placeholder="Cari pertanyaan di sini... (Enter)"
                   value={faqQuery}
                   onChange={(e) => setFaqQuery(e.target.value)}
                   className="home-faqSearchInput"
@@ -461,7 +462,7 @@ export default function Home() {
 
             <div className="home-sectionCta reveal" style={{ transitionDelay: `${120 + HOME_FAQ.length * 80}ms` }}>
               <Link className="btn btn-ghost" to="/tentang">
-                Baca FAQ lengkap
+                Baca FAQ Lengkap
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>

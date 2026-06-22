@@ -4,6 +4,7 @@ import { supabase } from "../../lib/supabaseClient";
 import { useNavigate } from "react-router-dom";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
+import { warn } from "../../lib/log";
 import "../../css/pages/AdminLogin.css";
 
 export default function AdminLogin() {
@@ -22,7 +23,7 @@ export default function AdminLogin() {
 
   usePageMeta({
     title: "Admin Login",
-    description: "Masuk ke ruang admin untuk mengelola order, produk, promo, dan operasional toko.",
+    description: "Masuk ke ruang admin buat kelola order, produk, promo, sama operasional toko.",
   });
 
   async function onLogin(e) {
@@ -37,7 +38,7 @@ export default function AdminLogin() {
         ? "Email atau password salah."
         : "Login belum bisa diproses.";
       setMsg(nextMessage);
-      console.warn("Admin login gagal:", error);
+      warn("Admin login gagal:", error);
       toast.error("Login gagal");
       setSubmitting(false);
       return;
@@ -58,7 +59,7 @@ export default function AdminLogin() {
           <div className="admin-loginShell">
             <div className="admin-loginAside">
               <h1 className="h2">Masuk ke Admin Dashboard.</h1>
-              <p className="admin-loginSub">Kelola orderan, produk, promo, dan QRIS.</p>
+              <p className="admin-loginSub">Kelola orderan, produk, promo, sama QRIS.</p>
 
               <div className="admin-loginSignals">
                 <div className="admin-loginSignal">

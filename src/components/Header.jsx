@@ -18,9 +18,10 @@ import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useHeaderShrink } from "../hooks/useHeaderShrink";
+import { useIsMobile } from "../hooks/useIsMobile";
+import { rafThrottle } from "../utils/throttle";
 
-const MOBILE_BREAKPOINT = "(max-width: 720px)";
-const MOBILE_MENU_ANIMATION_MS = 500;
+const MOBILE_MENU_ANIMATION_MS = 250;
 const HEADER_SHRINK_MS = 280;
 const NAV_PILL_EASE = [0.22, 1, 0.36, 1];
 const NAV_LINKS = [
@@ -164,7 +165,10 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
     }
 
     if (previousPathRef.current !== location.pathname) {
-      requestClose();
+      // Close immediately on navigation — route transition handles visual continuity
+      window.clearTimeout(closeTimerRef.current);
+      onClose();
+      setPhase("closed");
     }
 
     previousPathRef.current = location.pathname;
@@ -233,9 +237,7 @@ export default function Header() {
   const [hoverStyle, setHoverStyle] = useState({ width: 0, height: 0, x: 0, y: 0, opacity: 0 });
   const navRef = useRef(null);
   const navRefs = useRef([]);
-  const [isMobileViewport, setIsMobileViewport] = useState(() =>
-    typeof window !== "undefined" ? window.matchMedia(MOBILE_BREAKPOINT).matches : false
-  );
+  const isMobileViewport = useIsMobile();
   const headerRef = useRef(null);
   const location = useLocation();
   const handleOpen = useCallback(() => setOpen(true), []);
@@ -288,19 +290,6 @@ export default function Header() {
   }, [isMobileViewport, open]);
 
   useEffect(() => {
-    if (typeof window === "undefined") return undefined;
-    const media = window.matchMedia(MOBILE_BREAKPOINT);
-    const sync = () => setIsMobileViewport(media.matches);
-    sync();
-    if (typeof media.addEventListener === "function") {
-      media.addEventListener("change", sync);
-      return () => media.removeEventListener("change", sync);
-    }
-    media.addListener(sync);
-    return () => media.removeListener(sync);
-  }, []);
-
-  useEffect(() => {
     if (!isMobileViewport && open) setOpen(false);
   }, [isMobileViewport, open]);
 
@@ -308,27 +297,26 @@ export default function Header() {
     if (typeof window === "undefined") return undefined;
 
     const root = document.documentElement;
-    let frame = 0;
     let observer;
 
-    const syncHeaderOffset = () => {
-      window.cancelAnimationFrame(frame);
-      frame = window.requestAnimationFrame(() => {
-        const nextHeight = Math.ceil(headerRef.current?.getBoundingClientRect().height || 0);
-        root.style.setProperty("--site-header-offset", `${nextHeight}px`);
-      });
-    };
+    const syncHeaderOffset = rafThrottle(() => {
+      const nextHeight = Math.ceil(headerRef.current?.getBoundingClientRect().height || 0);
+      root.style.setProperty("--site-header-offset", `${nextHeight}px`);
+    });
 
     syncHeaderOffset();
-    window.addEventListener("resize", syncHeaderOffset);
 
+    // Prefer ResizeObserver (fires only on actual size changes).
+    // Fall back to window resize only when ResizeObserver is unavailable.
     if (typeof ResizeObserver !== "undefined" && headerRef.current) {
       observer = new ResizeObserver(syncHeaderOffset);
       observer.observe(headerRef.current);
+    } else {
+      window.addEventListener("resize", syncHeaderOffset);
     }
 
     return () => {
-      window.cancelAnimationFrame(frame);
+      syncHeaderOffset.cancel();
       window.removeEventListener("resize", syncHeaderOffset);
       observer?.disconnect();
     };
@@ -362,9 +350,17 @@ export default function Header() {
 
   useLayoutEffect(() => {
     syncNavPill();
-    window.addEventListener("resize", syncNavPill);
-    return () => window.removeEventListener("resize", syncNavPill);
-  }, [syncNavPill]);
+
+    // Nav pill resize sync only needed on desktop — on mobile the nav is hidden
+    if (isMobileViewport) return undefined;
+
+    const throttledResize = rafThrottle(syncNavPill);
+    window.addEventListener("resize", throttledResize);
+    return () => {
+      throttledResize.cancel();
+      window.removeEventListener("resize", throttledResize);
+    };
+  }, [syncNavPill, isMobileViewport]);
 
   useEffect(() => {
     if (isMobileViewport) return undefined;
@@ -386,14 +382,18 @@ export default function Header() {
   useEffect(() => {
     if (isMobileViewport || typeof ResizeObserver === "undefined") return undefined;
 
-    const observer = new ResizeObserver(() => syncNavPill());
+    const throttledSync = rafThrottle(syncNavPill);
+    const observer = new ResizeObserver(() => throttledSync());
     const navEl = navRef.current;
     if (navEl) observer.observe(navEl);
     navRefs.current.forEach((link) => {
       if (link) observer.observe(link);
     });
 
-    return () => observer.disconnect();
+    return () => {
+      throttledSync.cancel();
+      observer.disconnect();
+    };
   }, [isMobileViewport, location.pathname, syncNavPill]);
 
   return (

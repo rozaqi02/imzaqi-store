@@ -5,6 +5,7 @@ import Footer from "./Footer";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useRouteDirection } from "../hooks/useRouteDirection";
+import { rafThrottle } from "../utils/throttle";
 
 export default function Layout({ children, routeKey }) {
   const location = useLocation();
@@ -21,11 +22,14 @@ export default function Layout({ children, routeKey }) {
 
   React.useEffect(() => {
     if (typeof window === "undefined") return;
-    const handleResize = () => {
+    const handleResize = rafThrottle(() => {
       setIsMobile(window.innerWidth <= 720);
-    };
+    });
     window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
+    return () => {
+      handleResize.cancel();
+      window.removeEventListener("resize", handleResize);
+    };
   }, []);
 
   // Neumorphic Light Tracking Global Mouse Move Observer

@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 
 import { fetchProducts } from "../lib/api";
+import { warn } from "../lib/log";
 import CatalogCardSkeleton from "../components/CatalogCardSkeleton";
 import CatalogFilterSidebar from "../components/CatalogFilterSidebar";
 import EmptyState from "../components/EmptyState";
@@ -33,6 +34,7 @@ import { formatIDR, summarizeCatalogCopy } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useDebounce } from "../hooks/useDebounce";
+import { saveScrollY, consumeSavedScrollY } from "../hooks/useScrollMemory";
 import TypewriterSearchInput from "../components/TypewriterSearchInput";
 import "../css/pages/Products.css";
 
@@ -53,10 +55,10 @@ const SORT_LABELS = {
   name: "Nama A-Z",
   name_desc: "Nama Z-A",
   reco: "Rekomendasi",
-  popular: "Terlaris",
-  price_asc: "Harga termurah",
-  price_desc: "Harga termahal",
-  stock_desc: "Stok terbanyak",
+  popular: "Best Seller",
+  price_asc: "Termurah",
+  price_desc: "Termahal",
+  stock_desc: "Stok Terbanyak",
 };
 
 const DEFAULT_SORT = "reco";
@@ -207,7 +209,7 @@ function FilterPanel({
           <label className="catalog-toggleItem" htmlFor={readyToggleId}>
             <span className="catalog-toggleItemText">
               <span className="catalog-toggleItemTitle">Ready</span>
-              <span className="catalog-toggleItemHint">Hanya yang stoknya siap</span>
+              <span className="catalog-toggleItemHint">Stok aman, gas!</span>
             </span>
             <span className="catalog-toggle">
               <input
@@ -222,7 +224,7 @@ function FilterPanel({
 
           <label className="catalog-toggleItem" htmlFor={newToggleId}>
             <span className="catalog-toggleItemText">
-              <span className="catalog-toggleItemTitle">Produk baru</span>
+              <span className="catalog-toggleItemTitle">Baru rilis</span>
               <span className="catalog-toggleItemHint">{`Rilis ${NEW_PRODUCT_DAYS} hari terakhir`}</span>
             </span>
             <span className="catalog-toggle">
@@ -265,16 +267,16 @@ function FilterPanel({
 
       <section className="catalog-filterSection" style={{ "--section-i": 3 }}>
         <header className="catalog-filterSectionHead">
-          <span className="catalog-filterLabel">Urutkan</span>
+          <span className="catalog-filterLabel">Urutin</span>
         </header>
         <select className="input catalog-filterSelect" value={sort} onChange={(e) => setSort(e.target.value)}>
           <option value="name">Nama A-Z</option>
           <option value="name_desc">Nama Z-A</option>
           <option value="reco">Rekomendasi</option>
-          <option value="popular">Terlaris</option>
-          <option value="price_asc">Harga termurah</option>
-          <option value="price_desc">Harga termahal</option>
-          <option value="stock_desc">Stok terbanyak</option>
+          <option value="popular">Best Seller</option>
+          <option value="price_asc">Termurah</option>
+          <option value="price_desc">Termahal</option>
+          <option value="stock_desc">Stok Terbanyak</option>
         </select>
       </section>
 
@@ -338,11 +340,9 @@ export default function Products() {
   });
   const [localPrice, setLocalPrice] = useState(price);
   const [priceReady, setPriceReady] = useState(false);
-  const [visibleCount, setVisibleCount] = useState(16);
   const [isFiltering, setIsFiltering] = useState(false);
-  const [loadMoreProgress, setLoadMoreProgress] = useState(false);
-  const [loadMoreBase, setLoadMoreBase] = useState(0);
   const prevFilterSigRef = useRef("");
+  const pendingScrollRef = useRef(null);
 
   const qParam = params.get("q") || "";
   const [query, setQuery] = useState(qParam);
@@ -361,6 +361,30 @@ export default function Products() {
   const prevViewRef = useRef(view);
   const openFilters = useCallback(() => setFiltersOpen(true), []);
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
+
+  // Scroll memory: capture position immediately on product link click (before navigation).
+  // Click fires synchronously, so scrollY is guaranteed correct at the moment of interaction.
+  // Also saves on scroll as fallback for non-click navigation (e.g., browser back into Products).
+  useEffect(() => {
+    const onClick = (e) => {
+      if (e.target.closest('a[href^="/produk/"]')) saveScrollY();
+    };
+    window.addEventListener("click", onClick, { capture: true, passive: true });
+    return () => window.removeEventListener("click", onClick, { capture: true });
+  }, []);
+
+  // Deferred scroll restoration: wait for products + DOM to fully settle
+  useEffect(() => {
+    if (pendingScrollRef.current === null) return;
+    if (loading || isFiltering) return;
+    const y = pendingScrollRef.current;
+    pendingScrollRef.current = null;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        window.scrollTo({ top: y, behavior: "auto" });
+      });
+    });
+  }, [loading, isFiltering]);
 
   useEffect(() => {
     if (filtersOpen) {
@@ -406,11 +430,15 @@ export default function Products() {
         if (!alive) return;
         setProducts(data);
       } catch (e) {
-        console.warn(e);
+        warn(e);
         if (!alive) return;
-        setError("Gagal memuat produk.");
+        setError("Gagal load produk.");
       } finally {
-        if (alive) setLoading(false);
+        if (alive) {
+          setLoading(false);
+          const savedY = consumeSavedScrollY();
+          if (savedY !== null) pendingScrollRef.current = savedY;
+        }
       }
     })();
 
@@ -478,11 +506,6 @@ export default function Products() {
   );
 
   useEffect(() => {
-    setVisibleCount(16);
-    setLoadMoreBase(0);
-  }, [filterSignature]);
-
-  useEffect(() => {
     if (loading) return undefined;
     if (!prevFilterSigRef.current) {
       prevFilterSigRef.current = filterSignature;
@@ -494,15 +517,6 @@ export default function Products() {
     const timer = window.setTimeout(() => setIsFiltering(false), 140);
     return () => window.clearTimeout(timer);
   }, [filterSignature, loading]);
-
-  const handleLoadMore = useCallback(() => {
-    setLoadMoreBase(visibleCount);
-    setLoadMoreProgress(true);
-    window.setTimeout(() => {
-      setVisibleCount((prev) => prev + 16);
-      setLoadMoreProgress(false);
-    }, 340);
-  }, [visibleCount]);
 
   useEffect(() => {
     function onKey(e) {
@@ -724,7 +738,7 @@ export default function Products() {
     () => [
       {
         key: "popular",
-        label: insights.topProduct ? `Terlaris: ${insights.topProduct.name}` : "Urutkan terlaris",
+        label: insights.topProduct ? `Best Seller: ${insights.topProduct.name}` : "Urut best seller",
         active: sort === "popular",
         onClick: () => setSort("popular"),
       },
@@ -736,13 +750,12 @@ export default function Products() {
       },
       {
         key: "new",
-        label: freshnessCounts.newProducts ? `Produk baru ${freshnessCounts.newProducts}` : "Produk baru",
+        label: freshnessCounts.newProducts ? `Baru rilis ${freshnessCounts.newProducts}` : "Baru rilis",
         active: newOnly,
-        onClick: () => setNewOnly((prev) => !prev),
+        action: () => setNewOnly((p) => !p),
       },
       {
-        key: "restock",
-        label: freshnessCounts.restocked ? `Baru di stok ${freshnessCounts.restocked}` : "Baru di stok",
+        label: freshnessCounts.restocked ? `Restock ${freshnessCounts.restocked}` : "Restock",
         active: restockOnly,
         onClick: () => setRestockOnly((prev) => !prev),
       },
@@ -876,7 +889,7 @@ export default function Products() {
           <div className="catalog-heroGrid">
             <div className="catalog-eyebrow">Katalog</div>
             <h1 className="h1 catalog-title">Mau langganan apa hari ini?</h1>
-            <p className="catalog-sub">Scroll, bandingin, co. Sat-set anti ribet! ⚡</p>
+            <p className="catalog-sub">Scroll dulu, gas aja kalo cocok.</p>
           </div>
 
           <div className="catalog-command">
@@ -1113,48 +1126,44 @@ export default function Products() {
                   <CatalogCardSkeleton key={idx} view={view} />
                 ))
               ) : error ? (
-                <div className="card pad" style={{ gridColumn: "1 / -1" }}>
+                <div className="card pad catalog-emptyResult" style={{ gridColumn: "1 / -1" }}>
                   <EmptyState
                     icon="!"
-                    title="Gagal memuat"
+                    title="Gagal load"
                     description={error}
-                    primaryAction={{ label: "Refresh", onClick: () => window.location.reload() }}
+                    primaryAction={{ label: "Coba ulang", onClick: () => window.location.reload() }}
+                    suggestions={[
+                      { key: "back", label: "Balik ke Beranda", onClick: () => window.location.href = "/" },
+                    ]}
                   />
                 </div>
               ) : filtered.length === 0 ? (
-                <div className="card pad" style={{ gridColumn: "1 / -1" }}>
+                <div className="card pad catalog-emptyResult" style={{ gridColumn: "1 / -1" }}>
                   <EmptyState
                     icon="-"
-                    title="Tidak ditemukan"
-                    description={query ? `Belum ketemu "${query}". Coba kata kunci lain.` : "Reset filter dulu, terus coba lagi."}
+                    title={query ? `Hasil untuk "${query}"` : "Tidak ditemukan"}
+                    description={
+                      query
+                        ? `Belum nemu "${query}". Coba kata kunci lain atau intip yang lagi viral.`
+                        : inStockOnly
+                          ? "Belum ada produk yang ready saat ini. Cek lagi nanti, ya!"
+                          : "Reset filternya dulu, baru coba lagi."
+                    }
                     suggestions={emptySuggestions}
                     primaryAction={{ label: "Reset filter", onClick: resetFilters }}
                   />
                 </div>
               ) : (
                 <>
-                  {filtered.slice(0, visibleCount).map((product, idx) => (
+                  {filtered.map((product, idx) => (
                     <ProductCardMemo
                       key={product.id}
                       product={product}
                       view={view}
                       location={location}
-                      revealIndex={loadMoreBase > 0 && idx >= loadMoreBase ? idx - loadMoreBase : idx}
-                      isLoadMore={loadMoreBase > 0 && idx >= loadMoreBase}
+                      revealIndex={idx}
                     />
                   ))}
-                  {loadMoreProgress ? (
-                    <div className="catalog-loadMoreProgress" aria-hidden="true">
-                      <span />
-                    </div>
-                  ) : null}
-                  {visibleCount < filtered.length && !loadMoreProgress ? (
-                    <div className="catalog-loadMore">
-                      <button className="btn btn-ghost" type="button" onClick={handleLoadMore}>
-                        Muat Lebih Banyak
-                      </button>
-                    </div>
-                  ) : null}
                 </>
               )}
             </div>
@@ -1185,7 +1194,7 @@ export default function Products() {
                     <div className="catalog-sheetSub">
                       {activeFiltersCount
                         ? `${activeFiltersCount} filter aktif`
-                        : "Atur kategori, status, dan harga"}
+                        : "Atur kategori, status, sama harga"}
                     </div>
                   </div>
                   <button className="catalog-sheetClose" type="button" onClick={closeFilters} aria-label="Tutup">
@@ -1255,7 +1264,7 @@ export default function Products() {
   );
 }
 
-const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0, isLoadMore = false }) {
+const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0 }) {
   const stock = Number(product._stock || 0);
   const sold = Number(product._sold || 0);
   const soldOut = stock <= 0;
@@ -1270,7 +1279,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
   return (
     <Link
       to={`/produk/${product.slug}`}
-      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}${isLoadMore ? " catalog-card--loadMore" : ""}`}
+      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}`}
       role="listitem"
       aria-label={`Buka detail ${product.name}`}
       style={{ "--reveal-i": revealIndex }}
@@ -1295,8 +1304,8 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
           </div>
         </div>
 
-        <div className="catalog-cardPriceWrap">
-          <div className="catalog-cardPrice">{displayPrice}</div>
+          <div className="catalog-cardPriceWrap">
+          <div className="catalog-cardPrice"><span className="catalog-cardPriceLabel">Mulai</span> {displayPrice}</div>
         </div>
       </div>
 
@@ -1341,7 +1350,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
       </div>
 
       <div className="catalog-cardFoot">
-        <span>Lihat paket</span>
+        <span>Intip paket</span>
         <ArrowRight size={15} />
       </div>
     </Link>

@@ -1,5 +1,6 @@
 import React from "react";
 import { AlertTriangle, RefreshCw, MessageCircle } from "lucide-react";
+import { warn } from "../lib/log";
 
 export default class AppErrorBoundary extends React.Component {
   constructor(props) {
@@ -14,8 +15,7 @@ export default class AppErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, info) {
-    // eslint-disable-next-line no-console
-    console.warn("UI crashed:", error, info);
+    warn("UI crashed:", error, info);
     this.setState({ errorInfo: info });
   }
 

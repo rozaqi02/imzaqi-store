@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fetchDailyStats, fetchVisitorStats, fetchTopPages } from "../lib/api";
+import { warn } from "../lib/log";
 
 const DEFAULT_DAILY = [];
 const DEFAULT_VISITOR = { totalVisitors: 0, returningVisitors: 0, newVisitors: 0 };
@@ -30,7 +31,7 @@ export function useAnalytics({ days = 30 } = {}) {
       })
       .catch((err) => {
         if (!alive) return;
-        console.warn("useAnalytics: gagal memuat data", err);
+        warn("useAnalytics: gagal memuat data", err);
         setError(err?.message || String(err));
       })
       .finally(() => {

@@ -573,10 +573,10 @@ code{
 
 @media (max-width: 920px) {
   /* Dark mode mobile header */
-  :root .header,
-  :root .site-header,
-  :root[data-theme="dark"] .header,
-  :root[data-theme="dark"] .site-header {
+  html .header,
+  html .site-header,
+  html[data-theme="dark"] .header,
+  html[data-theme="dark"] .site-header {
     background:
       linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 138, 148, 0.08) 40%, rgba(0, 0, 0, 0) 70%),
       linear-gradient(180deg, rgba(8, 12, 28, 0.96) 0%, rgba(4, 7, 20, 0.94) 100%) !important;
@@ -585,8 +585,8 @@ code{
   }
 
   /* Light mode mobile header */
-  :root[data-theme="light"] .header,
-  :root[data-theme="light"] .site-header {
+  html[data-theme="light"] .header,
+  html[data-theme="light"] .site-header {
     background:
       linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.08) 40%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 252, 255, 1) 100%) !important;
@@ -666,8 +666,8 @@ body,
   -webkit-backdrop-filter: blur(16px) saturate(130%) !important;
 }
 
-:root[data-theme="light"] .header,
-:root[data-theme="light"] .site-header {
+html[data-theme="light"] .header,
+html[data-theme="light"] .site-header {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.72) 22%, rgba(255, 255, 255, 0) 48%),
     linear-gradient(180deg, rgba(79, 255, 200, 0.14) 0%, rgba(79, 255, 200, 0) 40%),
@@ -867,10 +867,10 @@ select.input {
   color: transparent !important;
 }
 
-:root[data-theme="light"] .hero-accent,
-:root[data-theme="light"] .hero-highlight,
-:root[data-theme="light"] .hm-title-accent,
-:root[data-theme="light"] .hm-title-glow {
+html[data-theme="light"] .hero-accent,
+html[data-theme="light"] .hero-highlight,
+html[data-theme="light"] .hm-title-accent,
+html[data-theme="light"] .hm-title-glow {
   background: linear-gradient(135deg, #1ed4b8 0%, #00b8a0 38%, #008f8a 68%, #006268 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
@@ -1001,7 +1001,7 @@ select.input {
   transform: scale(1.06) !important;
   box-shadow: 0 10px 18px rgba(0, 0, 0, 0.24), var(--skeu-control-shadow) !important;
 }
-:root[data-theme="light"] .theme-toggle:hover {
+html[data-theme="light"] .theme-toggle:hover {
   box-shadow: 0 8px 16px rgba(67, 111, 129, 0.12), var(--skeu-control-shadow) !important;
 }
 
@@ -1098,37 +1098,37 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .hero-commandCard,
-:root[data-theme="light"] .stat-minimal,
-:root[data-theme="light"] .catalog-command,
-:root[data-theme="light"] .catalog-filter,
-:root[data-theme="light"] .catalog-card,
-:root[data-theme="light"] .status-command,
-:root[data-theme="light"] .status-emptyCard,
-:root[data-theme="light"] .status-mainCard,
-:root[data-theme="light"] .status-sideCard,
-:root[data-theme="light"] .status-orderHero,
-:root[data-theme="light"] .status-balancePanel,
-:root[data-theme="light"] .status-noteCard,
-:root[data-theme="light"] .status-helpCard,
-:root[data-theme="light"] .status-promoCard,
-:root[data-theme="light"] .status-itemCard,
-:root[data-theme="light"] .checkout-panel,
-:root[data-theme="light"] .checkout-summary,
-:root[data-theme="light"] .checkout-item-card,
-:root[data-theme="light"] .checkout-promo-card,
-:root[data-theme="light"] .pay-card,
-:root[data-theme="light"] .pay-orderDesktop,
-:root[data-theme="light"] .qris-wrap,
-:root[data-theme="light"] .pay-successModal,
-:root[data-theme="light"] .pay-confirmModal,
-:root[data-theme="light"] .product-detail-summaryCard,
-:root[data-theme="light"] .detail-flow,
-:root[data-theme="light"] .testi-toolbar,
-:root[data-theme="light"] .testi-imgWrap,
-:root[data-theme="light"] .catalog-sheet,
-:root[data-theme="light"] .product-card-modern,
-:root[data-theme="light"] .variant-card-modern {
+html[data-theme="light"] .hero-commandCard,
+html[data-theme="light"] .stat-minimal,
+html[data-theme="light"] .catalog-command,
+html[data-theme="light"] .catalog-filter,
+html[data-theme="light"] .catalog-card,
+html[data-theme="light"] .status-command,
+html[data-theme="light"] .status-emptyCard,
+html[data-theme="light"] .status-mainCard,
+html[data-theme="light"] .status-sideCard,
+html[data-theme="light"] .status-orderHero,
+html[data-theme="light"] .status-balancePanel,
+html[data-theme="light"] .status-noteCard,
+html[data-theme="light"] .status-helpCard,
+html[data-theme="light"] .status-promoCard,
+html[data-theme="light"] .status-itemCard,
+html[data-theme="light"] .checkout-panel,
+html[data-theme="light"] .checkout-summary,
+html[data-theme="light"] .checkout-item-card,
+html[data-theme="light"] .checkout-promo-card,
+html[data-theme="light"] .pay-card,
+html[data-theme="light"] .pay-orderDesktop,
+html[data-theme="light"] .qris-wrap,
+html[data-theme="light"] .pay-successModal,
+html[data-theme="light"] .pay-confirmModal,
+html[data-theme="light"] .product-detail-summaryCard,
+html[data-theme="light"] .detail-flow,
+html[data-theme="light"] .testi-toolbar,
+html[data-theme="light"] .testi-imgWrap,
+html[data-theme="light"] .catalog-sheet,
+html[data-theme="light"] .product-card-modern,
+html[data-theme="light"] .variant-card-modern {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 22%),
     radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
@@ -1138,24 +1138,24 @@ select.input {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-:root[data-theme="light"] .product-tile-pill,
-:root[data-theme="light"] .catalog-chip,
-:root[data-theme="light"] .catalog-cardMeta > span,
-:root[data-theme="light"] .status-orderPill,
-:root[data-theme="light"] .status-itemMeta span,
-:root[data-theme="light"] .status-promoCard span,
-:root[data-theme="light"] .about-miniBadge,
-:root[data-theme="light"] .about-sectionBadge,
-:root[data-theme="light"] .testi-miniBadge,
-:root[data-theme="light"] .detail-flowItem span,
-:root[data-theme="light"] .checkout-summaryBadge,
-:root[data-theme="light"] .checkout-summaryRail span,
-:root[data-theme="light"] .pay-orderPromo,
-:root[data-theme="light"] .pay-statePill,
-:root[data-theme="light"] .admin-mobileTab,
-:root[data-theme="light"] .flow-assist-badge,
-:root[data-theme="light"] .mobile-dock-link,
-:root[data-theme="light"] .mobile-dock-icon {
+html[data-theme="light"] .product-tile-pill,
+html[data-theme="light"] .catalog-chip,
+html[data-theme="light"] .catalog-cardMeta > span,
+html[data-theme="light"] .status-orderPill,
+html[data-theme="light"] .status-itemMeta span,
+html[data-theme="light"] .status-promoCard span,
+html[data-theme="light"] .about-miniBadge,
+html[data-theme="light"] .about-sectionBadge,
+html[data-theme="light"] .testi-miniBadge,
+html[data-theme="light"] .detail-flowItem span,
+html[data-theme="light"] .checkout-summaryBadge,
+html[data-theme="light"] .checkout-summaryRail span,
+html[data-theme="light"] .pay-orderPromo,
+html[data-theme="light"] .pay-statePill,
+html[data-theme="light"] .admin-mobileTab,
+html[data-theme="light"] .flow-assist-badge,
+html[data-theme="light"] .mobile-dock-link,
+html[data-theme="light"] .mobile-dock-icon {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
     var(--skeu-pill-bg) !important;
@@ -1164,42 +1164,42 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .catalog-filterBtnCount,
-:root[data-theme="light"] .about-valueIcon,
-:root[data-theme="light"] .about-flowIcon,
-:root[data-theme="light"] .product-detail-summaryIcon,
-:root[data-theme="light"] .status-emptyHead span,
-:root[data-theme="light"] .status-commandBox > svg,
-:root[data-theme="light"] .catalog-commandIcon,
-:root[data-theme="light"] .testi-searchIcon,
-:root[data-theme="light"] .mobile-menu a .menu-icon,
-:root[data-theme="light"] .mobile-dock-link.active .mobile-dock-icon,
-:root[data-theme="light"] .admin-mobileTabIcon,
-:root[data-theme="light"] .admin-nav-icon {
+html[data-theme="light"] .catalog-filterBtnCount,
+html[data-theme="light"] .about-valueIcon,
+html[data-theme="light"] .about-flowIcon,
+html[data-theme="light"] .product-detail-summaryIcon,
+html[data-theme="light"] .status-emptyHead span,
+html[data-theme="light"] .status-commandBox > svg,
+html[data-theme="light"] .catalog-commandIcon,
+html[data-theme="light"] .testi-searchIcon,
+html[data-theme="light"] .mobile-menu a .menu-icon,
+html[data-theme="light"] .mobile-dock-link.active .mobile-dock-icon,
+html[data-theme="light"] .admin-mobileTabIcon,
+html[data-theme="light"] .admin-nav-icon {
   background: rgba(0, 214, 180, 0.12) !important;
   border-color: rgba(0, 138, 148, 0.14) !important;
   color: var(--brand-icon) !important;
 }
 
-:root[data-theme="light"] .flow-assist::after {
+html[data-theme="light"] .flow-assist::after {
   border-color: rgba(0, 138, 148, 0.14) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 26%),
     linear-gradient(135deg, rgba(0, 214, 180, 0.16), rgba(0, 194, 208, 0.04)) !important;
 }
 
-:root[data-theme="light"] .mobile-menu a,
-:root[data-theme="light"] .mobile-menu-close,
-:root[data-theme="light"] .mobile-menu a .menu-icon {
+html[data-theme="light"] .mobile-menu a,
+html[data-theme="light"] .mobile-menu-close,
+html[data-theme="light"] .mobile-menu a .menu-icon {
   color: rgba(15, 49, 64, 0.84) !important;
 }
 
-:root[data-theme="light"] .mobile-menu a.active,
-:root[data-theme="light"] .admin-mobileTab.active {
+html[data-theme="light"] .mobile-menu a.active,
+html[data-theme="light"] .admin-mobileTab.active {
   color: #0c4050 !important;
 }
 
-:root[data-theme="light"] .admin-nav-btn.active {
+html[data-theme="light"] .admin-nav-btn.active {
   color: #0c4050 !important;
   border-color: rgba(0, 138, 148, 0.24) !important;
   background:
@@ -1208,146 +1208,146 @@ select.input {
   box-shadow: 0 12px 28px rgba(0, 138, 148, 0.12) !important;
 }
 
-:root[data-theme="light"] .admin-nav button.active::before {
+html[data-theme="light"] .admin-nav button.active::before {
   background: linear-gradient(180deg, #00b89c, #008a94) !important;
   box-shadow: 0 1px 4px rgba(0, 138, 148, 0.28) !important;
 }
 
-:root[data-theme="light"] .hero-eyebrow,
-:root[data-theme="light"] .home-kicker,
-:root[data-theme="light"] .catalog-eyebrow,
-:root[data-theme="light"] .status-kicker,
-:root[data-theme="light"] .about-minimal-sub,
-:root[data-theme="light"] .testi-minimal-sub,
-:root[data-theme="light"] .hero-sub-minimal,
-:root[data-theme="light"] .catalog-sub,
-:root[data-theme="light"] .status-sub,
-:root[data-theme="light"] .product-detail-desc,
-:root[data-theme="light"] .product-tile-desc,
-:root[data-theme="light"] .about-miniStat span,
-:root[data-theme="light"] .testi-miniStat span,
-:root[data-theme="light"] .catalog-metric span,
-:root[data-theme="light"] .catalog-filterLabel,
-:root[data-theme="light"] .status-commandLabel,
-:root[data-theme="light"] .status-message,
-:root[data-theme="light"] .status-emptyHead small,
-:root[data-theme="light"] .status-metricCard span,
-:root[data-theme="light"] .status-balanceBar span,
-:root[data-theme="light"] .status-itemMeta,
-:root[data-theme="light"] .status-noteCard.empty,
-:root[data-theme="light"] .checkout-drawerKicker,
-:root[data-theme="light"] .checkout-drawerSub,
-:root[data-theme="light"] .checkout-main-kicker,
-:root[data-theme="light"] .checkout-item-meta,
-:root[data-theme="light"] .checkout-promo-message,
-:root[data-theme="light"] .checkout-summaryLabel,
-:root[data-theme="light"] .checkout-summaryRow,
-:root[data-theme="light"] .checkout-summaryLink,
-:root[data-theme="light"] .pay-shell-kicker,
-:root[data-theme="light"] .pay-shell-sub,
-:root[data-theme="light"] .pay-cardKicker,
-:root[data-theme="light"] .pay-waField .label,
-:root[data-theme="light"] .pay-waField .hint,
-:root[data-theme="light"] .pay-noteToggle summary,
-:root[data-theme="light"] .pay-noteMeta,
-:root[data-theme="light"] .pay-stageLabel,
-:root[data-theme="light"] .pay-stageHint,
-:root[data-theme="light"] .pay-stageRow,
-:root[data-theme="light"] .pay-stageFoot,
-:root[data-theme="light"] .pay-orderKicker,
-:root[data-theme="light"] .pay-orderItemMeta,
-:root[data-theme="light"] .pay-orderRow,
-:root[data-theme="light"] .pay-successKicker,
-:root[data-theme="light"] .pay-successLead,
-:root[data-theme="light"] .about-valueCard p,
-:root[data-theme="light"] .about-flowCard p,
-:root[data-theme="light"] .about-faqBody,
-:root[data-theme="light"] .about-flowNum,
-:root[data-theme="light"] .detail-flowItem,
-:root[data-theme="light"] .catalog-cardFoot,
-:root[data-theme="light"] .flow-assist-desc,
-:root[data-theme="light"] .mobile-dock-link,
-:root[data-theme="light"] .product-desc-modern,
-:root[data-theme="light"] .product-desc-modern,
-:root[data-theme="light"] .admin-mobileCopy span,
-:root[data-theme="light"] .admin-mobileTabMeta {
+html[data-theme="light"] .hero-eyebrow,
+html[data-theme="light"] .home-kicker,
+html[data-theme="light"] .catalog-eyebrow,
+html[data-theme="light"] .status-kicker,
+html[data-theme="light"] .about-minimal-sub,
+html[data-theme="light"] .testi-minimal-sub,
+html[data-theme="light"] .hero-sub-minimal,
+html[data-theme="light"] .catalog-sub,
+html[data-theme="light"] .status-sub,
+html[data-theme="light"] .product-detail-desc,
+html[data-theme="light"] .product-tile-desc,
+html[data-theme="light"] .about-miniStat span,
+html[data-theme="light"] .testi-miniStat span,
+html[data-theme="light"] .catalog-metric span,
+html[data-theme="light"] .catalog-filterLabel,
+html[data-theme="light"] .status-commandLabel,
+html[data-theme="light"] .status-message,
+html[data-theme="light"] .status-emptyHead small,
+html[data-theme="light"] .status-metricCard span,
+html[data-theme="light"] .status-balanceBar span,
+html[data-theme="light"] .status-itemMeta,
+html[data-theme="light"] .status-noteCard.empty,
+html[data-theme="light"] .checkout-drawerKicker,
+html[data-theme="light"] .checkout-drawerSub,
+html[data-theme="light"] .checkout-main-kicker,
+html[data-theme="light"] .checkout-item-meta,
+html[data-theme="light"] .checkout-promo-message,
+html[data-theme="light"] .checkout-summaryLabel,
+html[data-theme="light"] .checkout-summaryRow,
+html[data-theme="light"] .checkout-summaryLink,
+html[data-theme="light"] .pay-shell-kicker,
+html[data-theme="light"] .pay-shell-sub,
+html[data-theme="light"] .pay-cardKicker,
+html[data-theme="light"] .pay-waField .label,
+html[data-theme="light"] .pay-waField .hint,
+html[data-theme="light"] .pay-noteToggle summary,
+html[data-theme="light"] .pay-noteMeta,
+html[data-theme="light"] .pay-stageLabel,
+html[data-theme="light"] .pay-stageHint,
+html[data-theme="light"] .pay-stageRow,
+html[data-theme="light"] .pay-stageFoot,
+html[data-theme="light"] .pay-orderKicker,
+html[data-theme="light"] .pay-orderItemMeta,
+html[data-theme="light"] .pay-orderRow,
+html[data-theme="light"] .pay-successKicker,
+html[data-theme="light"] .pay-successLead,
+html[data-theme="light"] .about-valueCard p,
+html[data-theme="light"] .about-flowCard p,
+html[data-theme="light"] .about-faqBody,
+html[data-theme="light"] .about-flowNum,
+html[data-theme="light"] .detail-flowItem,
+html[data-theme="light"] .catalog-cardFoot,
+html[data-theme="light"] .flow-assist-desc,
+html[data-theme="light"] .mobile-dock-link,
+html[data-theme="light"] .product-desc-modern,
+html[data-theme="light"] .product-desc-modern,
+html[data-theme="light"] .admin-mobileCopy span,
+html[data-theme="light"] .admin-mobileTabMeta {
   color: rgba(50, 82, 91, 0.82) !important;
 }
 
-:root[data-theme="light"] .hero-title-minimal,
-:root[data-theme="light"] .catalog-title,
-:root[data-theme="light"] .status-title,
-:root[data-theme="light"] .about-minimal-title,
-:root[data-theme="light"] .testi-minimal-title,
-:root[data-theme="light"] .status-emptyHead strong,
-:root[data-theme="light"] .status-itemTitle,
-:root[data-theme="light"] .status-sideHead,
-:root[data-theme="light"] .catalog-cardTitle,
-:root[data-theme="light"] .product-name-modern,
-:root[data-theme="light"] .product-tile-name,
-:root[data-theme="light"] .product-detail-title,
-:root[data-theme="light"] .detail-flowItem small,
-:root[data-theme="light"] .checkout-item-name,
-:root[data-theme="light"] .checkout-promo-title,
-:root[data-theme="light"] .checkout-summaryRow b,
-:root[data-theme="light"] .pay-cardTitle,
-:root[data-theme="light"] .pay-stageRow b,
-:root[data-theme="light"] .pay-orderTitle,
-:root[data-theme="light"] .pay-orderItemName,
-:root[data-theme="light"] .pay-orderRow strong,
-:root[data-theme="light"] .pay-orderRow b,
-:root[data-theme="light"] .pay-successCode,
-:root[data-theme="light"] .about-flowCard h3,
-:root[data-theme="light"] .about-faqHead,
-:root[data-theme="light"] .testi-count,
-:root[data-theme="light"] .flow-assist-title,
-:root[data-theme="light"] .mobile-dock-link.active,
-:root[data-theme="light"] .admin-mobileCopy strong,
-:root[data-theme="light"] .admin-mobileTabLabel {
+html[data-theme="light"] .hero-title-minimal,
+html[data-theme="light"] .catalog-title,
+html[data-theme="light"] .status-title,
+html[data-theme="light"] .about-minimal-title,
+html[data-theme="light"] .testi-minimal-title,
+html[data-theme="light"] .status-emptyHead strong,
+html[data-theme="light"] .status-itemTitle,
+html[data-theme="light"] .status-sideHead,
+html[data-theme="light"] .catalog-cardTitle,
+html[data-theme="light"] .product-name-modern,
+html[data-theme="light"] .product-tile-name,
+html[data-theme="light"] .product-detail-title,
+html[data-theme="light"] .detail-flowItem small,
+html[data-theme="light"] .checkout-item-name,
+html[data-theme="light"] .checkout-promo-title,
+html[data-theme="light"] .checkout-summaryRow b,
+html[data-theme="light"] .pay-cardTitle,
+html[data-theme="light"] .pay-stageRow b,
+html[data-theme="light"] .pay-orderTitle,
+html[data-theme="light"] .pay-orderItemName,
+html[data-theme="light"] .pay-orderRow strong,
+html[data-theme="light"] .pay-orderRow b,
+html[data-theme="light"] .pay-successCode,
+html[data-theme="light"] .about-flowCard h3,
+html[data-theme="light"] .about-faqHead,
+html[data-theme="light"] .testi-count,
+html[data-theme="light"] .flow-assist-title,
+html[data-theme="light"] .mobile-dock-link.active,
+html[data-theme="light"] .admin-mobileCopy strong,
+html[data-theme="light"] .admin-mobileTabLabel {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .status-sideCard,
-:root[data-theme="light"] .status-noteCard,
-:root[data-theme="light"] .status-noteCard strong,
-:root[data-theme="light"] .status-noteCard b,
-:root[data-theme="light"] .status-noteCard span {
+html[data-theme="light"] .status-sideCard,
+html[data-theme="light"] .status-noteCard,
+html[data-theme="light"] .status-noteCard strong,
+html[data-theme="light"] .status-noteCard b,
+html[data-theme="light"] .status-noteCard span {
   color: rgba(15, 49, 64, 0.92) !important;
   text-shadow: none !important;
 }
 
-:root[data-theme="light"] .status-sideCard.emphasis .status-noteCard {
+html[data-theme="light"] .status-sideCard.emphasis .status-noteCard {
   color: rgba(12, 64, 80, 0.94) !important;
 }
 
-:root[data-theme="light"] .hero-highlight {
+html[data-theme="light"] .hero-highlight {
   background: linear-gradient(135deg, #0d3f4e 0%, #00a89a 42%, #00c2d0 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
 }
 
-:root[data-theme="light"] .cursor {
+html[data-theme="light"] .cursor {
   border-right-color: rgba(0, 138, 148, 0.82) !important;
 }
 
-:root[data-theme="light"] .admin-sidebarPulse,
-:root[data-theme="light"] .admin-variant-row,
-:root[data-theme="light"] .admin-thumb,
-:root[data-theme="light"] .admin-order-item,
-:root[data-theme="light"] .admin-order-pricing,
-:root[data-theme="light"] .admin-order-adminNote,
-:root[data-theme="light"] .admin-order-notes.empty,
-:root[data-theme="light"] .admin-rankItem,
-:root[data-theme="light"] .admin-alertItem,
-:root[data-theme="light"] .admin-focusRow,
-:root[data-theme="light"] .admin-searchRow,
-:root[data-theme="light"] .admin-field-switch,
-:root[data-theme="light"] .admin-mobileBrand,
-:root[data-theme="light"] .admin-chip,
-:root[data-theme="light"] .admin-nav-badge,
-:root[data-theme="light"] .admin-categoryTag,
-:root[data-theme="light"] .admin-chevron {
+html[data-theme="light"] .admin-sidebarPulse,
+html[data-theme="light"] .admin-variant-row,
+html[data-theme="light"] .admin-thumb,
+html[data-theme="light"] .admin-order-item,
+html[data-theme="light"] .admin-order-pricing,
+html[data-theme="light"] .admin-order-adminNote,
+html[data-theme="light"] .admin-order-notes.empty,
+html[data-theme="light"] .admin-rankItem,
+html[data-theme="light"] .admin-alertItem,
+html[data-theme="light"] .admin-focusRow,
+html[data-theme="light"] .admin-searchRow,
+html[data-theme="light"] .admin-field-switch,
+html[data-theme="light"] .admin-mobileBrand,
+html[data-theme="light"] .admin-chip,
+html[data-theme="light"] .admin-nav-badge,
+html[data-theme="light"] .admin-categoryTag,
+html[data-theme="light"] .admin-chevron {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(232, 245, 249, 0.76)),
     radial-gradient(circle at top right, rgba(0, 214, 180, 0.06), rgba(0, 214, 180, 0) 60%) !important;
@@ -1355,7 +1355,7 @@ select.input {
   box-shadow: 0 12px 28px rgba(67, 111, 129, 0.08) !important;
 }
 
-:root[data-theme="light"] .admin-order-notes {
+html[data-theme="light"] .admin-order-notes {
   background:
     linear-gradient(180deg, rgba(235, 252, 248, 0.96), rgba(219, 244, 247, 0.84)),
     radial-gradient(circle at top right, rgba(0, 194, 208, 0.08), rgba(0, 194, 208, 0) 62%) !important;
@@ -1363,66 +1363,66 @@ select.input {
   color: rgba(15, 49, 64, 0.92) !important;
 }
 
-:root[data-theme="light"] .admin-topbarCopy .muted,
-:root[data-theme="light"] .admin-statLabel,
-:root[data-theme="light"] .admin-statHelper,
-:root[data-theme="light"] .admin-miniCard span,
-:root[data-theme="light"] .admin-miniCard small,
-:root[data-theme="light"] .admin-sidebarPulse span,
-:root[data-theme="light"] .admin-sidebarPulse small,
-:root[data-theme="light"] .admin-chartLabel small,
-:root[data-theme="light"] .admin-chartValue small,
-:root[data-theme="light"] .admin-rankCopy small,
-:root[data-theme="light"] .admin-alertItem small,
-:root[data-theme="light"] .admin-emptyInline,
-:root[data-theme="light"] .admin-statusMetricTop span,
-:root[data-theme="light"] .admin-order-sub,
-:root[data-theme="light"] .admin-variant-sub,
-:root[data-theme="light"] .admin-variant-desc,
-:root[data-theme="light"] .admin-promo-sub,
-:root[data-theme="light"] .admin-order-priceRow,
-:root[data-theme="light"] .admin-order-notesTitle,
-:root[data-theme="light"] .admin-orderMetaCard span,
-:root[data-theme="light"] .admin-orderMetaCard small,
-:root[data-theme="light"] .admin-focusRow span {
+html[data-theme="light"] .admin-topbarCopy .muted,
+html[data-theme="light"] .admin-statLabel,
+html[data-theme="light"] .admin-statHelper,
+html[data-theme="light"] .admin-miniCard span,
+html[data-theme="light"] .admin-miniCard small,
+html[data-theme="light"] .admin-sidebarPulse span,
+html[data-theme="light"] .admin-sidebarPulse small,
+html[data-theme="light"] .admin-chartLabel small,
+html[data-theme="light"] .admin-chartValue small,
+html[data-theme="light"] .admin-rankCopy small,
+html[data-theme="light"] .admin-alertItem small,
+html[data-theme="light"] .admin-emptyInline,
+html[data-theme="light"] .admin-statusMetricTop span,
+html[data-theme="light"] .admin-order-sub,
+html[data-theme="light"] .admin-variant-sub,
+html[data-theme="light"] .admin-variant-desc,
+html[data-theme="light"] .admin-promo-sub,
+html[data-theme="light"] .admin-order-priceRow,
+html[data-theme="light"] .admin-order-notesTitle,
+html[data-theme="light"] .admin-orderMetaCard span,
+html[data-theme="light"] .admin-orderMetaCard small,
+html[data-theme="light"] .admin-focusRow span {
   color: rgba(50, 82, 91, 0.84) !important;
 }
 
-:root[data-theme="light"] .admin-brand-title,
-:root[data-theme="light"] .admin-nav-copy strong,
-:root[data-theme="light"] .admin-topbar-current strong,
-:root[data-theme="light"] .admin-panel-title,
-:root[data-theme="light"] .admin-product-name,
-:root[data-theme="light"] .admin-variant-title,
-:root[data-theme="light"] .admin-order-code,
-:root[data-theme="light"] .admin-promo-code,
-:root[data-theme="light"] .admin-heroTitle,
-:root[data-theme="light"] .admin-miniCard strong,
-:root[data-theme="light"] .admin-chartLabel strong,
-:root[data-theme="light"] .admin-chartValue strong,
-:root[data-theme="light"] .admin-rankCopy strong,
-:root[data-theme="light"] .admin-rankMeta,
-:root[data-theme="light"] .admin-statusMetricTop strong,
-:root[data-theme="light"] .admin-sidebarPulse strong,
-:root[data-theme="light"] .admin-focusRow strong,
-:root[data-theme="light"] .admin-order-priceRow b,
-:root[data-theme="light"] .admin-order-item b,
-:root[data-theme="light"] .admin-order-adminNote,
-:root[data-theme="light"] .admin-orderMetaCard strong,
-:root[data-theme="light"] .admin-emptyInline {
+html[data-theme="light"] .admin-brand-title,
+html[data-theme="light"] .admin-nav-copy strong,
+html[data-theme="light"] .admin-topbar-current strong,
+html[data-theme="light"] .admin-panel-title,
+html[data-theme="light"] .admin-product-name,
+html[data-theme="light"] .admin-variant-title,
+html[data-theme="light"] .admin-order-code,
+html[data-theme="light"] .admin-promo-code,
+html[data-theme="light"] .admin-heroTitle,
+html[data-theme="light"] .admin-miniCard strong,
+html[data-theme="light"] .admin-chartLabel strong,
+html[data-theme="light"] .admin-chartValue strong,
+html[data-theme="light"] .admin-rankCopy strong,
+html[data-theme="light"] .admin-rankMeta,
+html[data-theme="light"] .admin-statusMetricTop strong,
+html[data-theme="light"] .admin-sidebarPulse strong,
+html[data-theme="light"] .admin-focusRow strong,
+html[data-theme="light"] .admin-order-priceRow b,
+html[data-theme="light"] .admin-order-item b,
+html[data-theme="light"] .admin-order-adminNote,
+html[data-theme="light"] .admin-orderMetaCard strong,
+html[data-theme="light"] .admin-emptyInline {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .admin-chip,
-:root[data-theme="light"] .admin-nav-badge,
-:root[data-theme="light"] .admin-categoryTag,
-:root[data-theme="light"] .admin-product-pill,
-:root[data-theme="light"] .admin-status,
-:root[data-theme="light"] .admin-orderMetaCard a {
+html[data-theme="light"] .admin-chip,
+html[data-theme="light"] .admin-nav-badge,
+html[data-theme="light"] .admin-categoryTag,
+html[data-theme="light"] .admin-product-pill,
+html[data-theme="light"] .admin-status,
+html[data-theme="light"] .admin-orderMetaCard a {
   color: rgba(12, 64, 80, 0.9) !important;
 }
 
-:root[data-theme="light"] .admin-proof {
+html[data-theme="light"] .admin-proof {
   border-color: rgba(0, 138, 148, 0.18) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 28%),
@@ -1431,37 +1431,37 @@ select.input {
   box-shadow: 0 14px 28px rgba(0, 194, 208, 0.16) !important;
 }
 
-:root[data-theme="light"] .hero-search-icon,
-:root[data-theme="light"] .hero-search-input,
-:root[data-theme="light"] .hero-search-input::placeholder,
-:root[data-theme="light"] .hero-search-clear,
-:root[data-theme="light"] .suggestion-item,
-:root[data-theme="light"] .catalog-commandInput,
-:root[data-theme="light"] .catalog-filterInput,
-:root[data-theme="light"] .catalog-commandClear,
-:root[data-theme="light"] .catalog-filterClear,
-:root[data-theme="light"] .status-commandPaste,
-:root[data-theme="light"] .status-commandInput,
-:root[data-theme="light"] .testi-searchInput,
-:root[data-theme="light"] .testi-clear,
-:root[data-theme="light"] .checkout-item-remove {
+html[data-theme="light"] .hero-search-icon,
+html[data-theme="light"] .hero-search-input,
+html[data-theme="light"] .hero-search-input::placeholder,
+html[data-theme="light"] .hero-search-clear,
+html[data-theme="light"] .suggestion-item,
+html[data-theme="light"] .catalog-commandInput,
+html[data-theme="light"] .catalog-filterInput,
+html[data-theme="light"] .catalog-commandClear,
+html[data-theme="light"] .catalog-filterClear,
+html[data-theme="light"] .status-commandPaste,
+html[data-theme="light"] .status-commandInput,
+html[data-theme="light"] .testi-searchInput,
+html[data-theme="light"] .testi-clear,
+html[data-theme="light"] .checkout-item-remove {
   color: rgba(20, 59, 72, 0.84) !important;
 }
 
-:root[data-theme="light"] .catalog-metric,
-:root[data-theme="light"] .catalog-filterSearch,
-:root[data-theme="light"] .catalog-cardSkeleton,
-:root[data-theme="light"] .status-metricCard,
-:root[data-theme="light"] .status-min-node,
-:root[data-theme="light"] .status-orderCode,
-:root[data-theme="light"] .about-miniStat,
-:root[data-theme="light"] .about-flowCard,
-:root[data-theme="light"] .about-faqItem,
-:root[data-theme="light"] .about-finalCard,
-:root[data-theme="light"] .testi-miniStat,
-:root[data-theme="light"] .testi-skel,
-:root[data-theme="light"] .lightbox,
-:root[data-theme="light"] .suggestions {
+html[data-theme="light"] .catalog-metric,
+html[data-theme="light"] .catalog-filterSearch,
+html[data-theme="light"] .catalog-cardSkeleton,
+html[data-theme="light"] .status-metricCard,
+html[data-theme="light"] .status-min-node,
+html[data-theme="light"] .status-orderCode,
+html[data-theme="light"] .about-miniStat,
+html[data-theme="light"] .about-flowCard,
+html[data-theme="light"] .about-faqItem,
+html[data-theme="light"] .about-finalCard,
+html[data-theme="light"] .testi-miniStat,
+html[data-theme="light"] .testi-skel,
+html[data-theme="light"] .lightbox,
+html[data-theme="light"] .suggestions {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(229, 244, 249, 0.76)),
     radial-gradient(circle at top right, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 60%) !important;
@@ -1469,18 +1469,18 @@ select.input {
   box-shadow: 0 20px 54px rgba(37, 88, 110, 0.12) !important;
 }
 
-:root[data-theme="light"] .lightbox-backdrop,
-:root[data-theme="light"] .catalog-sheetBackdrop {
+html[data-theme="light"] .lightbox-backdrop,
+html[data-theme="light"] .catalog-sheetBackdrop {
   background: rgba(9, 26, 40, 0.24) !important;
 }
 
-:root[data-theme="light"] .status-emptyGlow {
+html[data-theme="light"] .status-emptyGlow {
   background: radial-gradient(circle, rgba(0, 194, 208, 0.18), rgba(0, 194, 208, 0)) !important;
 }
 
-:root[data-theme="light"] .header-cart,
-:root[data-theme="light"] .header-iconAction,
-:root[data-theme="light"] .nav-toggle {
+html[data-theme="light"] .header-cart,
+html[data-theme="light"] .header-iconAction,
+html[data-theme="light"] .nav-toggle {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
     var(--skeu-control-bg) !important;
@@ -1489,105 +1489,105 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .nav-toggle span {
+html[data-theme="light"] .nav-toggle span {
   background: rgba(15, 49, 64, 0.88) !important;
 }
 
-:root[data-theme="light"] .toggle-btn,
-:root[data-theme="light"] .catalog-viewBtn,
-:root[data-theme="light"] .catalog-status,
-:root[data-theme="light"] .catalog-rangeValues,
-:root[data-theme="light"] .catalog-sheetTitle,
-:root[data-theme="light"] .catalog-sheetClose,
-:root[data-theme="light"] .status-orderCode,
-:root[data-theme="light"] .status-min-node,
-:root[data-theme="light"] .status-min-nodeDot,
-:root[data-theme="light"] .status-commandPaste,
-:root[data-theme="light"] .stat-num,
-:root[data-theme="light"] .about-miniStat strong,
-:root[data-theme="light"] .testi-miniStat strong,
-:root[data-theme="light"] .lightbox-close,
-:root[data-theme="light"] .lightbox-nav,
-:root[data-theme="light"] .lightbox-caption {
+html[data-theme="light"] .toggle-btn,
+html[data-theme="light"] .catalog-viewBtn,
+html[data-theme="light"] .catalog-status,
+html[data-theme="light"] .catalog-rangeValues,
+html[data-theme="light"] .catalog-sheetTitle,
+html[data-theme="light"] .catalog-sheetClose,
+html[data-theme="light"] .status-orderCode,
+html[data-theme="light"] .status-min-node,
+html[data-theme="light"] .status-min-nodeDot,
+html[data-theme="light"] .status-commandPaste,
+html[data-theme="light"] .stat-num,
+html[data-theme="light"] .about-miniStat strong,
+html[data-theme="light"] .testi-miniStat strong,
+html[data-theme="light"] .lightbox-close,
+html[data-theme="light"] .lightbox-nav,
+html[data-theme="light"] .lightbox-caption {
   color: rgba(15, 49, 64, 0.92) !important;
 }
 
-:root[data-theme="light"] .stat-label,
-:root[data-theme="light"] .home-summaryText,
-:root[data-theme="light"] .catalog-metric span,
-:root[data-theme="light"] .catalog-contentMeta span,
-:root[data-theme="light"] .catalog-sheetSub,
-:root[data-theme="light"] .status-orderCodeBlock span,
-:root[data-theme="light"] .status-orderDate span,
-:root[data-theme="light"] .about-miniStat span,
-:root[data-theme="light"] .testi-miniStat span {
+html[data-theme="light"] .stat-label,
+html[data-theme="light"] .home-summaryText,
+html[data-theme="light"] .catalog-metric span,
+html[data-theme="light"] .catalog-contentMeta span,
+html[data-theme="light"] .catalog-sheetSub,
+html[data-theme="light"] .status-orderCodeBlock span,
+html[data-theme="light"] .status-orderDate span,
+html[data-theme="light"] .about-miniStat span,
+html[data-theme="light"] .testi-miniStat span {
   color: rgba(50, 82, 91, 0.82) !important;
 }
 
-:root[data-theme="light"] .status-noteCard.empty {
+html[data-theme="light"] .status-noteCard.empty {
   color: rgba(65, 94, 103, 0.84) !important;
 }
 
-:root[data-theme="light"] .catalog-metric strong,
-:root[data-theme="light"] .catalog-contentMeta strong,
-:root[data-theme="light"] .catalog-sheetTitle,
-:root[data-theme="light"] .status-orderCode,
-:root[data-theme="light"] .status-min-node span,
-:root[data-theme="light"] .about-faqItem,
-:root[data-theme="light"] .product-tile-fallback,
-:root[data-theme="light"] .app-productIconFallback,
-:root[data-theme="light"] .lightbox-caption {
+html[data-theme="light"] .catalog-metric strong,
+html[data-theme="light"] .catalog-contentMeta strong,
+html[data-theme="light"] .catalog-sheetTitle,
+html[data-theme="light"] .status-orderCode,
+html[data-theme="light"] .status-min-node span,
+html[data-theme="light"] .about-faqItem,
+html[data-theme="light"] .product-tile-fallback,
+html[data-theme="light"] .app-productIconFallback,
+html[data-theme="light"] .lightbox-caption {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .toggle-btn.active {
+html[data-theme="light"] .toggle-btn.active {
   color: #0c4050 !important;
 }
 
-:root[data-theme="light"] .product-tile-arrow,
-:root[data-theme="light"] .catalog-sheetHandle,
-:root[data-theme="light"] .catalog-cardIcon span,
-:root[data-theme="light"] .status-orderCode svg,
-:root[data-theme="light"] .status-min-nodeDot svg,
-:root[data-theme="light"] .lightbox-close svg,
-:root[data-theme="light"] .lightbox-nav svg {
+html[data-theme="light"] .product-tile-arrow,
+html[data-theme="light"] .catalog-sheetHandle,
+html[data-theme="light"] .catalog-cardIcon span,
+html[data-theme="light"] .status-orderCode svg,
+html[data-theme="light"] .status-min-nodeDot svg,
+html[data-theme="light"] .lightbox-close svg,
+html[data-theme="light"] .lightbox-nav svg {
   color: #0b7b89 !important;
 }
 
-:root[data-theme="light"] .catalog-status,
-:root[data-theme="light"] .status-orderCode,
-:root[data-theme="light"] .status-min-node,
-:root[data-theme="light"] .status-metricCard,
-:root[data-theme="light"] .lightbox-close,
-:root[data-theme="light"] .lightbox-nav {
+html[data-theme="light"] .catalog-status,
+html[data-theme="light"] .status-orderCode,
+html[data-theme="light"] .status-min-node,
+html[data-theme="light"] .status-metricCard,
+html[data-theme="light"] .lightbox-close,
+html[data-theme="light"] .lightbox-nav {
   border-color: rgba(0, 138, 148, 0.14) !important;
 }
 
-:root[data-theme="light"] .catalog-viewBtn,
-:root[data-theme="light"] .toggle-btn,
-:root[data-theme="light"] .product-tile-arrow,
-:root[data-theme="light"] .testi-count {
+html[data-theme="light"] .catalog-viewBtn,
+html[data-theme="light"] .toggle-btn,
+html[data-theme="light"] .product-tile-arrow,
+html[data-theme="light"] .testi-count {
   background: rgba(255, 255, 255, 0.72) !important;
   border-color: rgba(0, 138, 148, 0.12) !important;
 }
 
-:root[data-theme="light"] .mobile-menu a .menu-icon,
-:root[data-theme="light"] .admin-mobileTabIcon,
-:root[data-theme="light"] .admin-nav-icon {
+html[data-theme="light"] .mobile-menu a .menu-icon,
+html[data-theme="light"] .admin-mobileTabIcon,
+html[data-theme="light"] .admin-nav-icon {
   border: 1px solid rgba(0, 138, 148, 0.14) !important;
   border-radius: 12px !important;
 }
 
-:root[data-theme="light"] .mobile-menu a.active .menu-icon,
-:root[data-theme="light"] .admin-mobileTab.active .admin-mobileTabIcon,
-:root[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
+html[data-theme="light"] .mobile-menu a.active .menu-icon,
+html[data-theme="light"] .admin-mobileTab.active .admin-mobileTabIcon,
+html[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
   background: rgba(0, 214, 180, 0.16) !important;
   color: #0c4050 !important;
 }
 
 @media (max-width: 720px) {
-  :root[data-theme="light"] .mobile-menu,
-  :root[data-theme="light"] .mobile-backdrop {
+  html[data-theme="light"] .mobile-menu,
+  html[data-theme="light"] .mobile-backdrop {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     filter: none !important;
@@ -1606,45 +1606,47 @@ select.input {
 }
 
 @media (max-width: 720px) {
-  :root,
-  :root[data-theme="dark"] {
+  html,
+  html[data-theme="dark"] {
     --brand-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
     --brand-shadow-soft: 0 8px 16px rgba(0, 0, 0, 0.14);
     --skeu-panel-shadow:
-      0 14px 28px rgba(0, 0, 0, 0.22),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.26),
-      0 0 0 1px rgba(0, 194, 208, 0.06);
+      0 6px 10px rgba(0, 0, 0, 0.22),
+      0 14px 28px rgba(0, 0, 0, 0.18),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -2.5px 0 rgba(0, 0, 0, 0.3);
     --skeu-control-shadow:
-      0 10px 18px rgba(0, 0, 0, 0.16),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.22),
-      0 0 0 1px rgba(0, 194, 208, 0.06);
+      0 6px 10px rgba(0, 0, 0, 0.16),
+      0 10px 18px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.26);
     --skeu-accent-shadow:
       0 12px 20px rgba(0, 214, 180, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.34),
       inset 0 -2px 0 rgba(3, 66, 74, 0.28);
   }
 
-  :root[data-theme="light"] {
+  html[data-theme="light"] {
     --brand-shadow: 0 12px 20px rgba(67, 111, 129, 0.12);
     --brand-shadow-soft: 0 8px 14px rgba(67, 111, 129, 0.1);
     --skeu-panel-shadow:
-      0 12px 22px rgba(67, 111, 129, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.2),
-      0 0 0 1px rgba(0, 138, 148, 0.08);
+      0 6px 10px rgba(67, 111, 129, 0.1),
+      0 12px 22px rgba(67, 111, 129, 0.1),
+      inset 0 1.5px 0 rgba(255, 255, 255, 1),
+      inset 0 -2.5px 0 rgba(154, 191, 203, 0.22);
     --skeu-control-shadow:
-      0 8px 16px rgba(67, 111, 129, 0.1),
+      0 6px 10px rgba(67, 111, 129, 0.08),
+      0 8px 16px rgba(67, 111, 129, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.18),
-      0 0 0 1px rgba(0, 138, 148, 0.08);
+      inset 0 -2px 0 rgba(154, 191, 203, 0.2);
     --skeu-accent-shadow:
       0 10px 18px rgba(0, 214, 180, 0.16),
       inset 0 1px 0 rgba(255, 255, 255, 0.46),
       inset 0 -2px 0 rgba(0, 122, 130, 0.16);
   }
+}
 
+@media (max-width: 720px) {
   .mobile-menu,
   .mobile-backdrop,
   .mobile-sheetBackdrop,
@@ -1736,58 +1738,58 @@ select.input {
   }
 }
 
-:root[data-theme="light"] .mobile-menu-header h3 {
+html[data-theme="light"] .mobile-menu-header h3 {
   background: none !important;
   -webkit-text-fill-color: #0f3140 !important;
   color: #0f3140 !important;
 }
 
-:root[data-theme="light"] .mobile-menu-header p {
+html[data-theme="light"] .mobile-menu-header p {
   color: rgba(15, 49, 64, 0.72) !important;
 }
 
-:root[data-theme="light"] .mobile-menu a {
+html[data-theme="light"] .mobile-menu a {
   color: rgba(15, 49, 64, 0.96) !important;
   font-weight: 800 !important;
 }
 
-:root[data-theme="light"] .mobile-menu a .menu-icon {
+html[data-theme="light"] .mobile-menu a .menu-icon {
   color: rgba(8, 63, 78, 0.92) !important;
 }
 
-:root[data-theme="light"] .mobile-menu a.active {
+html[data-theme="light"] .mobile-menu a.active {
   color: #063848 !important;
   background:
     linear-gradient(180deg, rgba(0, 214, 180, 0.2), rgba(0, 194, 208, 0.1)) !important;
   border-color: rgba(0, 138, 148, 0.24) !important;
 }
 
-:root[data-theme="light"] .mobile-menu-lite a.active .active-indicator {
+html[data-theme="light"] .mobile-menu-lite a.active .active-indicator {
   background: linear-gradient(135deg, #00b89c, #008a94) !important;
   box-shadow:
     0 0 0 6px rgba(0, 138, 148, 0.12),
     0 2px 6px rgba(0, 138, 148, 0.24) !important;
 }
 
-:root[data-theme="light"] .mobile-menu-divider {
+html[data-theme="light"] .mobile-menu-divider {
   background: linear-gradient(90deg, transparent 0%, rgba(0, 138, 148, 0.26) 50%, transparent 100%) !important;
 }
 
-:root[data-theme="light"] .mobile-menu-footer {
+html[data-theme="light"] .mobile-menu-footer {
   border-top-color: rgba(12, 87, 100, 0.14) !important;
 }
 
-:root[data-theme="light"] .checkout-drawer,
-:root[data-theme="light"] .checkout-mobileBar,
-:root[data-theme="light"] .pay-mobileBar {
+html[data-theme="light"] .checkout-drawer,
+html[data-theme="light"] .checkout-mobileBar,
+html[data-theme="light"] .pay-mobileBar {
   background: #f2fbff !important;
   border-color: rgba(0, 138, 148, 0.14) !important;
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-:root[data-theme="light"] .checkout-drawerClose,
-:root[data-theme="light"] .checkout-drawerGesture,
-:root[data-theme="light"] .checkout-item-remove {
+html[data-theme="light"] .checkout-drawerClose,
+html[data-theme="light"] .checkout-drawerGesture,
+html[data-theme="light"] .checkout-item-remove {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
     var(--skeu-control-bg) !important;
@@ -1796,28 +1798,28 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .checkout-drawerHandle {
+html[data-theme="light"] .checkout-drawerHandle {
   background: rgba(11, 123, 137, 0.26) !important;
   box-shadow: 0 0 0 6px rgba(0, 194, 208, 0.08) !important;
 }
 
-:root[data-theme="light"] .checkout-drawerGestureDot {
+html[data-theme="light"] .checkout-drawerGestureDot {
   background: #0b7b89 !important;
   box-shadow: 0 0 0 6px rgba(0, 194, 208, 0.1), 0 0 18px rgba(0, 194, 208, 0.18) !important;
 }
 
-:root[data-theme="light"] .checkout-mobileBarCopy span,
-:root[data-theme="light"] .pay-mobileBarCopy span {
+html[data-theme="light"] .checkout-mobileBarCopy span,
+html[data-theme="light"] .pay-mobileBarCopy span {
   color: rgba(50, 82, 91, 0.78) !important;
 }
 
-:root[data-theme="light"] .checkout-mobileBarCopy strong,
-:root[data-theme="light"] .pay-mobileBarCopy strong,
-:root[data-theme="light"] .checkout-item-price {
+html[data-theme="light"] .checkout-mobileBarCopy strong,
+html[data-theme="light"] .pay-mobileBarCopy strong,
+html[data-theme="light"] .checkout-item-price {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .pay-qrisLocked {
+html[data-theme="light"] .pay-qrisLocked {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(229, 244, 249, 0.78)),
     radial-gradient(circle at top right, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 60%) !important;
@@ -1825,12 +1827,12 @@ select.input {
   color: rgba(15, 49, 64, 0.9) !important;
 }
 
-:root[data-theme="light"] .pay-qrisLocked p {
+html[data-theme="light"] .pay-qrisLocked p {
   color: rgba(50, 82, 91, 0.82) !important;
 }
 
-:root,
-:root[data-theme="dark"] {
+html,
+html[data-theme="dark"] {
   --checkout-drawer-solid: #081320;
   --checkout-panel-solid: #101a2b;
   --checkout-summary-solid: #0d1726;
@@ -1838,7 +1840,7 @@ select.input {
   --checkout-mobilebar-solid: #0b1524;
 }
 
-:root[data-theme="light"] {
+html[data-theme="light"] {
   --checkout-drawer-solid: #f3fbff;
   --checkout-panel-solid: #f7fdff;
   --checkout-summary-solid: #edf8fb;
@@ -1846,18 +1848,19 @@ select.input {
   --checkout-mobilebar-solid: #f2fbff;
 }
 
-:root,
-:root[data-theme="dark"] {
+html,
+html[data-theme="dark"] {
   --skeu-panel-shadow:
-    0 34px 74px rgba(0, 0, 0, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.11),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.38),
-    0 0 0 1px rgba(0, 194, 208, 0.08);
+    0 8px 14px rgba(0, 0, 0, 0.28),
+    0 34px 74px rgba(0, 0, 0, 0.34),
+    -16px -16px 38px rgba(255, 255, 255, 0.08),
+    inset 0 2px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -4px 0 rgba(0, 0, 0, 0.42);
   --skeu-control-shadow:
-    0 18px 32px rgba(0, 0, 0, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.34),
-    0 0 0 1px rgba(0, 194, 208, 0.08);
+    0 8px 12px rgba(0, 0, 0, 0.22),
+    0 18px 32px rgba(0, 0, 0, 0.22),
+    inset 0 2px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.38);
   --skeu-inset-shadow:
     inset 0 3px 9px rgba(0, 0, 0, 0.46),
     inset 0 1px 0 rgba(255, 255, 255, 0.05),
@@ -1868,17 +1871,18 @@ select.input {
     inset 0 -3px 0 rgba(3, 66, 74, 0.36);
 }
 
-:root[data-theme="light"] {
+html[data-theme="light"] {
   --skeu-panel-shadow:
-    0 28px 54px rgba(67, 111, 129, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.24),
-    0 0 0 1px rgba(0, 138, 148, 0.08);
+    0 6px 10px rgba(67, 111, 129, 0.12),
+    0 28px 54px rgba(67, 111, 129, 0.16),
+    -14px -14px 32px rgba(255, 255, 255, 0.92),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -4px 0 rgba(154, 191, 203, 0.28);
   --skeu-control-shadow:
-    0 18px 30px rgba(67, 111, 129, 0.15),
+    0 6px 10px rgba(67, 111, 129, 0.1),
+    0 18px 30px rgba(67, 111, 129, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.26),
-    0 0 0 1px rgba(0, 138, 148, 0.08);
+    inset 0 -3px 0 rgba(154, 191, 203, 0.3);
   --skeu-inset-shadow:
     inset 0 2px 7px rgba(124, 158, 171, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 1),
@@ -1998,8 +2002,8 @@ select.input {
   transform: scale(1.06) !important;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), var(--skeu-control-shadow) !important;
 }
-:root[data-theme="light"] .header-cart:hover,
-:root[data-theme="light"] .header-iconAction:hover {
+html[data-theme="light"] .header-cart:hover,
+html[data-theme="light"] .header-iconAction:hover {
   box-shadow: 0 10px 18px rgba(67, 111, 129, 0.16), var(--skeu-control-shadow) !important;
 }
 
@@ -2276,48 +2280,48 @@ select.input {
   color: var(--brand-subtle) !important;
 }
 
-:root[data-theme="light"] .product-detail-desc,
-:root[data-theme="light"] .product-detail-priceHint,
-:root[data-theme="light"] .product-detail-glanceCopy,
-:root[data-theme="light"] .product-detail-note,
-:root[data-theme="light"] .product-detail-cartCopy,
-:root[data-theme="light"] .variants-copy,
-:root[data-theme="light"] .variant-summary,
-:root[data-theme="light"] .variant-noteBody,
-:root[data-theme="light"] .variant-noteItem,
-:root[data-theme="light"] .catalog-cardSummary,
-:root[data-theme="light"] .catalog-cardKicker,
-:root[data-theme="light"] .variant-subPrice,
-:root[data-theme="light"] .menu-footer-text,
-:root[data-theme="light"] .menu-footer-version,
-:root[data-theme="light"] .site-footerLead,
-:root[data-theme="light"] .site-footerLabel,
-:root[data-theme="light"] .site-footerMeta a,
-:root[data-theme="light"] .site-footerBottom {
+html[data-theme="light"] .product-detail-desc,
+html[data-theme="light"] .product-detail-priceHint,
+html[data-theme="light"] .product-detail-glanceCopy,
+html[data-theme="light"] .product-detail-note,
+html[data-theme="light"] .product-detail-cartCopy,
+html[data-theme="light"] .variants-copy,
+html[data-theme="light"] .variant-summary,
+html[data-theme="light"] .variant-noteBody,
+html[data-theme="light"] .variant-noteItem,
+html[data-theme="light"] .catalog-cardSummary,
+html[data-theme="light"] .catalog-cardKicker,
+html[data-theme="light"] .variant-subPrice,
+html[data-theme="light"] .menu-footer-text,
+html[data-theme="light"] .menu-footer-version,
+html[data-theme="light"] .site-footerLead,
+html[data-theme="light"] .site-footerLabel,
+html[data-theme="light"] .site-footerMeta a,
+html[data-theme="light"] .site-footerBottom {
   color: rgba(43, 72, 82, 0.9) !important;
 }
 
-:root[data-theme="light"] .product-detail-metaPill,
-:root[data-theme="light"] .variants-count,
-:root[data-theme="light"] .variant-chip,
-:root[data-theme="light"] .stock-pill,
-:root[data-theme="light"] .product-detail-cartAction,
-:root[data-theme="light"] .modal-title,
-:root[data-theme="light"] .site-footerHeadline,
-:root[data-theme="light"] .site-footerList a,
-:root[data-theme="light"] .site-footerBottom a,
-:root[data-theme="light"] .mobile-menu-lite a,
-:root[data-theme="light"] .mobile-menu-lite .mobile-menu-header h3 {
+html[data-theme="light"] .product-detail-metaPill,
+html[data-theme="light"] .variants-count,
+html[data-theme="light"] .variant-chip,
+html[data-theme="light"] .stock-pill,
+html[data-theme="light"] .product-detail-cartAction,
+html[data-theme="light"] .modal-title,
+html[data-theme="light"] .site-footerHeadline,
+html[data-theme="light"] .site-footerList a,
+html[data-theme="light"] .site-footerBottom a,
+html[data-theme="light"] .mobile-menu-lite a,
+html[data-theme="light"] .mobile-menu-lite .mobile-menu-header h3 {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .modal-backdrop {
+html[data-theme="light"] .modal-backdrop {
   background: rgba(8, 108, 122, 0.18) !important;
   backdrop-filter: blur(14px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
 }
 
-:root[data-theme="light"] .modal {
+html[data-theme="light"] .modal {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 249, 252, 0.94)),
     rgba(246, 251, 253, 0.98) !important;
@@ -2328,13 +2332,13 @@ select.input {
   color: rgba(13, 45, 57, 0.96) !important;
 }
 
-:root[data-theme="light"] .modal-head,
-:root[data-theme="light"] .modal-foot {
+html[data-theme="light"] .modal-head,
+html[data-theme="light"] .modal-foot {
   border-color: rgba(0, 138, 148, 0.12) !important;
 }
 
-:root[data-theme="light"] .modal-close,
-:root[data-theme="light"] .admin-field-switch {
+html[data-theme="light"] .modal-close,
+html[data-theme="light"] .admin-field-switch {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
     rgba(248, 253, 255, 0.96) !important;
@@ -2343,18 +2347,18 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .modal-close:hover {
+html[data-theme="light"] .modal-close:hover {
   color: rgba(10, 115, 119, 0.96) !important;
 }
 
-:root[data-theme="light"] .mobile-sheetBackdrop {
+html[data-theme="light"] .mobile-sheetBackdrop {
   background: rgba(8, 108, 122, 0.16) !important;
   backdrop-filter: blur(14px) saturate(130%) !important;
   -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
 }
 
-:root[data-theme="light"] .mobile-sheet,
-:root[data-theme="light"] .mobile-sheetMeta {
+html[data-theme="light"] .mobile-sheet,
+html[data-theme="light"] .mobile-sheetMeta {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(238, 248, 252, 0.94)),
     rgba(246, 251, 253, 0.98) !important;
@@ -2363,13 +2367,13 @@ select.input {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-:root[data-theme="light"] .mobile-sheetHandle {
+html[data-theme="light"] .mobile-sheetHandle {
   background: rgba(11, 123, 137, 0.26) !important;
   box-shadow: 0 0 0 6px rgba(0, 194, 208, 0.08) !important;
 }
 
-:root[data-theme="light"] .mobile-sheetClose,
-:root[data-theme="light"] .mobile-sheetLink {
+html[data-theme="light"] .mobile-sheetClose,
+html[data-theme="light"] .mobile-sheetLink {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
     rgba(248, 253, 255, 0.96) !important;
@@ -2378,20 +2382,20 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .mobile-sheetBrand span,
-:root[data-theme="light"] .mobile-sheetTitle,
-:root[data-theme="light"] .mobile-sheetMeta,
-:root[data-theme="light"] .mobile-sheetMetaLink {
+html[data-theme="light"] .mobile-sheetBrand span,
+html[data-theme="light"] .mobile-sheetTitle,
+html[data-theme="light"] .mobile-sheetMeta,
+html[data-theme="light"] .mobile-sheetMetaLink {
   color: rgba(50, 82, 91, 0.88) !important;
 }
 
-:root[data-theme="light"] .mobile-sheetBrand strong,
-:root[data-theme="light"] .mobile-sheetLinkLabel,
-:root[data-theme="light"] .mobile-sheetLink {
+html[data-theme="light"] .mobile-sheetBrand strong,
+html[data-theme="light"] .mobile-sheetLinkLabel,
+html[data-theme="light"] .mobile-sheetLink {
   color: rgba(13, 45, 57, 0.96) !important;
 }
 
-:root[data-theme="light"] .mobile-sheetLinkIcon {
+html[data-theme="light"] .mobile-sheetLinkIcon {
   background: rgba(0, 214, 180, 0.12) !important;
   border: 1px solid rgba(0, 138, 148, 0.14) !important;
   color: #0b7b89 !important;
@@ -2404,31 +2408,31 @@ select.input {
 }
 
 @media (max-width: 720px) {
-  :root,
-  :root[data-theme="dark"] {
+  html,
+  html[data-theme="dark"] {
     --skeu-panel-shadow:
-      0 14px 28px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.24),
-      0 0 0 1px rgba(0, 194, 208, 0.06);
+      0 6px 10px rgba(0, 0, 0, 0.2),
+      0 14px 28px rgba(0, 0, 0, 0.16),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -2.5px 0 rgba(0, 0, 0, 0.28);
     --skeu-control-shadow:
-      0 10px 18px rgba(0, 0, 0, 0.14),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.2),
-      0 0 0 1px rgba(0, 194, 208, 0.06);
+      0 6px 10px rgba(0, 0, 0, 0.14),
+      0 10px 18px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.24);
   }
 
-  :root[data-theme="light"] {
+  html[data-theme="light"] {
     --skeu-panel-shadow:
-      0 12px 22px rgba(67, 111, 129, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.18),
-      0 0 0 1px rgba(0, 138, 148, 0.08);
+      0 6px 10px rgba(67, 111, 129, 0.1),
+      0 12px 22px rgba(67, 111, 129, 0.08),
+      inset 0 1.5px 0 rgba(255, 255, 255, 1),
+      inset 0 -2.5px 0 rgba(154, 191, 203, 0.2);
     --skeu-control-shadow:
-      0 8px 16px rgba(67, 111, 129, 0.1),
+      0 6px 10px rgba(67, 111, 129, 0.08),
+      0 8px 16px rgba(67, 111, 129, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.16),
-      0 0 0 1px rgba(0, 138, 148, 0.08);
+      inset 0 -2px 0 rgba(154, 191, 203, 0.18);
   }
 
   .mobile-backdrop {
@@ -2528,19 +2532,19 @@ select.input {
 }
 
 .mobile-menu-lite.is-open .mobile-menu-header {
-  transition-delay: 0.04s;
+  transition-delay: 0.03s;
 }
 
 .mobile-menu-lite.is-open .mobile-menu-stack a {
-  transition-delay: 0.06s;
+  transition-delay: 0.04s;
 }
 
 .mobile-menu-lite.is-open .mobile-menu-divider {
-  transition-delay: 0.08s;
+  transition-delay: 0.06s;
 }
 
 .mobile-menu-lite.is-open .mobile-menu-footer {
-  transition-delay: 0.10s;
+  transition-delay: 0.08s;
 }
 
 .mobile-menu-lite a {
@@ -2570,25 +2574,25 @@ select.input {
   -webkit-filter: none !important;
 }
 
-:root[data-theme="dark"] .mobile-backdrop-lite {
+html[data-theme="dark"] .mobile-backdrop-lite {
   background: rgba(2, 9, 18, 0.46) !important;
 }
 
-:root[data-theme="dark"] .mobile-menu-lite {
+html[data-theme="dark"] .mobile-menu-lite {
   background:
     linear-gradient(180deg, rgba(22, 34, 61, 0.84), rgba(8, 14, 31, 0.92) 58%, rgba(5, 9, 22, 0.94) 100%) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-:root[data-theme="light"] .mobile-menu-lite {
+html[data-theme="light"] .mobile-menu-lite {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.84), rgba(237, 247, 251, 0.9) 58%, rgba(226, 241, 247, 0.94) 100%) !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
 
-:root[data-theme="light"] .mobile-backdrop-lite {
+html[data-theme="light"] .mobile-backdrop-lite {
   background: rgba(8, 22, 34, 0.52) !important;
 }
 
@@ -2726,7 +2730,7 @@ select.input {
   gap: 8px;
 }
 
-:root[data-theme="light"] .site-footerPanel {
+html[data-theme="light"] .site-footerPanel {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 249, 252, 0.94)),
     rgba(246, 251, 253, 0.96) !important;
@@ -2736,19 +2740,19 @@ select.input {
     inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
 }
 
-:root[data-theme="light"] .site-footerTop,
-:root[data-theme="light"] .site-footerBottom,
-:root[data-theme="light"] .mobile-menu-footer {
+html[data-theme="light"] .site-footerTop,
+html[data-theme="light"] .site-footerBottom,
+html[data-theme="light"] .mobile-menu-footer {
   border-color: rgba(8, 108, 122, 0.12) !important;
 }
 
-:root[data-theme="light"] .site-footerBadge {
+html[data-theme="light"] .site-footerBadge {
   background: rgba(255, 255, 255, 0.84) !important;
   border-color: rgba(0, 138, 148, 0.12) !important;
   color: rgba(70, 97, 107, 0.84) !important;
 }
 
-:root[data-theme="light"] .site-footerActions .btn-ghost {
+html[data-theme="light"] .site-footerActions .btn-ghost {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
     rgba(247, 252, 255, 0.94) !important;
@@ -2756,21 +2760,21 @@ select.input {
   color: rgba(15, 49, 64, 0.92) !important;
 }
 
-:root[data-theme="light"] .site-footerHeadline,
-:root[data-theme="light"] .site-footerList a,
-:root[data-theme="light"] .site-footerBottom a {
+html[data-theme="light"] .site-footerHeadline,
+html[data-theme="light"] .site-footerList a,
+html[data-theme="light"] .site-footerBottom a {
   color: rgba(13, 45, 57, 0.96) !important;
 }
 
-:root[data-theme="light"] .site-footerLead,
-:root[data-theme="light"] .site-footerLabel,
-:root[data-theme="light"] .site-footerMeta a,
-:root[data-theme="light"] .site-footerBottom,
-:root[data-theme="light"] .menu-footer-text {
+html[data-theme="light"] .site-footerLead,
+html[data-theme="light"] .site-footerLabel,
+html[data-theme="light"] .site-footerMeta a,
+html[data-theme="light"] .site-footerBottom,
+html[data-theme="light"] .menu-footer-text {
   color: rgba(56, 84, 94, 0.9) !important;
 }
 
-:root[data-theme="light"] .toast {
+html[data-theme="light"] .toast {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
     rgba(246, 251, 253, 0.98) !important;
@@ -2781,16 +2785,16 @@ select.input {
     inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
 }
 
-:root[data-theme="light"] .toast-title,
-:root[data-theme="light"] .toast-msg {
+html[data-theme="light"] .toast-title,
+html[data-theme="light"] .toast-msg {
   color: rgba(13, 45, 57, 0.96) !important;
 }
 
-:root[data-theme="light"] .toast-msg {
+html[data-theme="light"] .toast-msg {
   color: rgba(56, 84, 94, 0.9) !important;
 }
 
-:root[data-theme="light"] .toast-icon {
+html[data-theme="light"] .toast-icon {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
     rgba(249, 253, 255, 0.98) !important;
@@ -2798,8 +2802,8 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .toast-action,
-:root[data-theme="light"] .toast-close {
+html[data-theme="light"] .toast-action,
+html[data-theme="light"] .toast-close {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 26%),
     rgba(248, 253, 255, 0.98) !important;
@@ -2808,8 +2812,8 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .toast-action:hover,
-:root[data-theme="light"] .toast-close:hover {
+html[data-theme="light"] .toast-action:hover,
+html[data-theme="light"] .toast-close:hover {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 255, 255, 0) 28%),
     rgba(242, 250, 253, 0.98) !important;
@@ -2830,7 +2834,7 @@ select.input {
   text-shadow: none !important;
 }
 
-:root[data-theme="light"] .sticky-cta {
+html[data-theme="light"] .sticky-cta {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
     rgba(246, 251, 253, 0.98) !important;
@@ -2842,17 +2846,17 @@ select.input {
   -webkit-backdrop-filter: none !important;
 }
 
-:root[data-theme="light"] .sticky-cta-title {
+html[data-theme="light"] .sticky-cta-title {
   color: rgba(56, 84, 94, 0.86) !important;
 }
 
-:root[data-theme="light"] .sticky-cta-value {
+html[data-theme="light"] .sticky-cta-value {
   color: rgba(13, 45, 57, 0.98) !important;
 }
 
-:root[data-theme="light"] .qty-btn,
-:root[data-theme="light"] .qty,
-:root[data-theme="light"] .checkout-main-count {
+html[data-theme="light"] .qty-btn,
+html[data-theme="light"] .qty,
+html[data-theme="light"] .checkout-main-count {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
     rgba(248, 253, 255, 0.96) !important;
@@ -2861,61 +2865,61 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .qty-btn {
+html[data-theme="light"] .qty-btn {
   font-size: 18px;
   font-weight: 900;
 }
 
-:root[data-theme="light"] .qty {
+html[data-theme="light"] .qty {
   font-weight: 900;
 }
 
-:root[data-theme="light"] .checkout-summaryBadge,
-:root[data-theme="light"] .checkout-summaryLabel,
-:root[data-theme="light"] .checkout-main-kicker,
-:root[data-theme="light"] .checkout-drawerSub,
-:root[data-theme="light"] .checkout-summaryLink,
-:root[data-theme="light"] .checkout-summaryRow span,
-:root[data-theme="light"] .checkout-promo-title,
-:root[data-theme="light"] .checkout-promo-message {
+html[data-theme="light"] .checkout-summaryBadge,
+html[data-theme="light"] .checkout-summaryLabel,
+html[data-theme="light"] .checkout-main-kicker,
+html[data-theme="light"] .checkout-drawerSub,
+html[data-theme="light"] .checkout-summaryLink,
+html[data-theme="light"] .checkout-summaryRow span,
+html[data-theme="light"] .checkout-promo-title,
+html[data-theme="light"] .checkout-promo-message {
   color: rgba(56, 84, 94, 0.88) !important;
 }
 
-:root[data-theme="light"] .checkout-drawerTitle,
-:root[data-theme="light"] .checkout-summaryTotal,
-:root[data-theme="light"] .checkout-summaryRow b,
-:root[data-theme="light"] .checkout-main-title,
-:root[data-theme="light"] .checkout-main-count,
-:root[data-theme="light"] .checkout-item-price {
+html[data-theme="light"] .checkout-drawerTitle,
+html[data-theme="light"] .checkout-summaryTotal,
+html[data-theme="light"] .checkout-summaryRow b,
+html[data-theme="light"] .checkout-main-title,
+html[data-theme="light"] .checkout-main-count,
+html[data-theme="light"] .checkout-item-price {
   color: rgba(13, 45, 57, 0.98) !important;
 }
 
-:root[data-theme="light"] .pay-shell-kicker,
-:root[data-theme="light"] .pay-cardKicker,
-:root[data-theme="light"] .pay-orderKicker,
-:root[data-theme="light"] .pay-stageLabel,
-:root[data-theme="light"] .pay-waField .label {
+html[data-theme="light"] .pay-shell-kicker,
+html[data-theme="light"] .pay-cardKicker,
+html[data-theme="light"] .pay-orderKicker,
+html[data-theme="light"] .pay-stageLabel,
+html[data-theme="light"] .pay-waField .label {
   color: rgba(63, 90, 100, 0.76) !important;
 }
 
-:root[data-theme="light"] .pay-shell-sub,
-:root[data-theme="light"] .pay-waField .hint,
-:root[data-theme="light"] .pay-noteToggle summary,
-:root[data-theme="light"] .pay-noteMeta,
-:root[data-theme="light"] .pay-stageHint,
-:root[data-theme="light"] .pay-stageRow,
-:root[data-theme="light"] .pay-stageFoot,
-:root[data-theme="light"] .pay-orderItemMeta,
-:root[data-theme="light"] .pay-orderRow,
-:root[data-theme="light"] .pay-successLead,
-:root[data-theme="light"] .pay-qrisLocked p {
+html[data-theme="light"] .pay-shell-sub,
+html[data-theme="light"] .pay-waField .hint,
+html[data-theme="light"] .pay-noteToggle summary,
+html[data-theme="light"] .pay-noteMeta,
+html[data-theme="light"] .pay-stageHint,
+html[data-theme="light"] .pay-stageRow,
+html[data-theme="light"] .pay-stageFoot,
+html[data-theme="light"] .pay-orderItemMeta,
+html[data-theme="light"] .pay-orderRow,
+html[data-theme="light"] .pay-successLead,
+html[data-theme="light"] .pay-qrisLocked p {
   color: rgba(56, 84, 94, 0.84) !important;
 }
 
-:root[data-theme="light"] .pay-card,
-:root[data-theme="light"] .pay-orderDesktop,
-:root[data-theme="light"] .pay-successModal,
-:root[data-theme="light"] .qris-wrap {
+html[data-theme="light"] .pay-card,
+html[data-theme="light"] .pay-orderDesktop,
+html[data-theme="light"] .pay-successModal,
+html[data-theme="light"] .qris-wrap {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(241, 249, 252, 0.94)),
     rgba(246, 251, 253, 0.96) !important;
@@ -2923,12 +2927,12 @@ select.input {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-:root[data-theme="light"] .pay-statePill,
-:root[data-theme="light"] .pay-orderPromo,
-:root[data-theme="light"] .pay-orderItem,
-:root[data-theme="light"] .pay-qrisLocked,
-:root[data-theme="light"] .pay-noteInput,
-:root[data-theme="light"] .pay-waField .input {
+html[data-theme="light"] .pay-statePill,
+html[data-theme="light"] .pay-orderPromo,
+html[data-theme="light"] .pay-orderItem,
+html[data-theme="light"] .pay-qrisLocked,
+html[data-theme="light"] .pay-noteInput,
+html[data-theme="light"] .pay-waField .input {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 28%),
     rgba(248, 253, 255, 0.96) !important;
@@ -2936,17 +2940,17 @@ select.input {
   color: rgba(13, 45, 57, 0.96) !important;
 }
 
-:root[data-theme="light"] .pay-shell-title,
-:root[data-theme="light"] .pay-cardTitle,
-:root[data-theme="light"] .pay-stageTotal,
-:root[data-theme="light"] .pay-orderTitle,
-:root[data-theme="light"] .pay-orderItemName,
-:root[data-theme="light"] .pay-orderRow strong,
-:root[data-theme="light"] .pay-orderRow b,
-:root[data-theme="light"] .pay-stageRow b,
-:root[data-theme="light"] .pay-qrisLocked strong,
-:root[data-theme="light"] .pay-successCode,
-:root[data-theme="light"] .pay-shell .btn-ghost {
+html[data-theme="light"] .pay-shell-title,
+html[data-theme="light"] .pay-cardTitle,
+html[data-theme="light"] .pay-stageTotal,
+html[data-theme="light"] .pay-orderTitle,
+html[data-theme="light"] .pay-orderItemName,
+html[data-theme="light"] .pay-orderRow strong,
+html[data-theme="light"] .pay-orderRow b,
+html[data-theme="light"] .pay-stageRow b,
+html[data-theme="light"] .pay-qrisLocked strong,
+html[data-theme="light"] .pay-successCode,
+html[data-theme="light"] .pay-shell .btn-ghost {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 26%),
     rgba(247, 252, 255, 0.94) !important;
@@ -3111,39 +3115,39 @@ select.input {
   }
 }
 
-:root[data-theme="light"] .site-footerQuickLink,
-:root[data-theme="light"] .site-footerCol,
-:root[data-theme="light"] .site-footerList a,
-:root[data-theme="light"] .site-footerBottomMain,
-:root[data-theme="light"] .site-footerBottomItem {
+html[data-theme="light"] .site-footerQuickLink,
+html[data-theme="light"] .site-footerCol,
+html[data-theme="light"] .site-footerList a,
+html[data-theme="light"] .site-footerBottomMain,
+html[data-theme="light"] .site-footerBottomItem {
   border-color: rgba(0, 138, 148, 0.14) !important;
 }
 
-:root[data-theme="light"] .site-footerQuickLink,
-:root[data-theme="light"] .site-footerCol,
-:root[data-theme="light"] .site-footerBottomMain,
-:root[data-theme="light"] .site-footerBottomItem {
+html[data-theme="light"] .site-footerQuickLink,
+html[data-theme="light"] .site-footerCol,
+html[data-theme="light"] .site-footerBottomMain,
+html[data-theme="light"] .site-footerBottomItem {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 26%),
     rgba(247, 252, 255, 0.96) !important;
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-:root[data-theme="light"] .site-footerQuickIcon,
-:root[data-theme="light"] .site-footerList a {
+html[data-theme="light"] .site-footerQuickIcon,
+html[data-theme="light"] .site-footerList a {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 24%),
     rgba(248, 253, 255, 0.98) !important;
   border-color: rgba(0, 138, 148, 0.14) !important;
 }
 
-:root[data-theme="light"] .site-footerQuickCopy strong,
-:root[data-theme="light"] .site-footerBottomMain,
-:root[data-theme="light"] .site-footerBottomItem {
+html[data-theme="light"] .site-footerQuickCopy strong,
+html[data-theme="light"] .site-footerBottomMain,
+html[data-theme="light"] .site-footerBottomItem {
   color: rgba(13, 45, 57, 0.96) !important;
 }
 
-:root[data-theme="light"] .site-footerQuickCopy span {
+html[data-theme="light"] .site-footerQuickCopy span {
   color: rgba(56, 84, 94, 0.88) !important;
 }
 
@@ -3256,13 +3260,13 @@ select.input {
   color: var(--brand-text) !important;
 }
 
-:root[data-theme="light"] .catalog-commandSearch,
-:root[data-theme="light"] .catalog-filterSearch,
-:root[data-theme="light"] .status-searchField,
-:root[data-theme="light"] .st-inputWrap,
-:root[data-theme="light"] .faq-searchWrap,
-:root[data-theme="light"] .hero-search-shell,
-:root[data-theme="light"] .testi-searchShell {
+html[data-theme="light"] .catalog-commandSearch,
+html[data-theme="light"] .catalog-filterSearch,
+html[data-theme="light"] .status-searchField,
+html[data-theme="light"] .st-inputWrap,
+html[data-theme="light"] .faq-searchWrap,
+html[data-theme="light"] .hero-search-shell,
+html[data-theme="light"] .testi-searchShell {
   border-color: rgba(0, 138, 148, 0.16) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 24%),
@@ -3274,19 +3278,19 @@ select.input {
     0 0 0 1px rgba(0, 138, 148, 0.08) !important;
 }
 
-:root[data-theme="light"] .catalog-commandSearch .catalog-commandInput,
-:root[data-theme="light"] .catalog-filterSearch .catalog-filterInput,
-:root[data-theme="light"] .status-searchField .status-searchInput,
-:root[data-theme="light"] .st-inputWrap .st-input,
-:root[data-theme="light"] .faq-searchWrap .faq-searchInput,
-:root[data-theme="light"] .hero-search-shell .hero-search-input,
-:root[data-theme="light"] .testi-searchShell .testi-searchInput {
+html[data-theme="light"] .catalog-commandSearch .catalog-commandInput,
+html[data-theme="light"] .catalog-filterSearch .catalog-filterInput,
+html[data-theme="light"] .status-searchField .status-searchInput,
+html[data-theme="light"] .st-inputWrap .st-input,
+html[data-theme="light"] .faq-searchWrap .faq-searchInput,
+html[data-theme="light"] .hero-search-shell .hero-search-input,
+html[data-theme="light"] .testi-searchShell .testi-searchInput {
   color: #123744 !important;
 }
 
-:root[data-theme="light"] .catalog-commandClear,
-:root[data-theme="light"] .catalog-filterClear,
-:root[data-theme="light"] .hero-search-clear {
+html[data-theme="light"] .catalog-commandClear,
+html[data-theme="light"] .catalog-filterClear,
+html[data-theme="light"] .hero-search-clear {
   border-color: rgba(0, 138, 148, 0.16) !important;
 }
 
@@ -3363,31 +3367,31 @@ select.input {
   padding: 0 !important;
 }
 
-:root[data-theme="light"] .catalog-title,
-:root[data-theme="light"] .catalog-cardTitle,
-:root[data-theme="light"] .product-tile-name,
-:root[data-theme="light"] .testi-minimal-title,
-:root[data-theme="light"] .admin-panel-title,
-:root[data-theme="light"] .admin-heroTitle,
-:root[data-theme="light"] .admin-brand-title {
+html[data-theme="light"] .catalog-title,
+html[data-theme="light"] .catalog-cardTitle,
+html[data-theme="light"] .product-tile-name,
+html[data-theme="light"] .testi-minimal-title,
+html[data-theme="light"] .admin-panel-title,
+html[data-theme="light"] .admin-heroTitle,
+html[data-theme="light"] .admin-brand-title {
   color: #123744 !important;
 }
 
-:root[data-theme="light"] .catalog-eyebrow,
-:root[data-theme="light"] .catalog-sub,
-:root[data-theme="light"] .catalog-cardKicker,
-:root[data-theme="light"] .catalog-cardSummary,
-:root[data-theme="light"] .home-summaryText,
-:root[data-theme="light"] .product-tile-desc,
-:root[data-theme="light"] .testi-minimal-sub,
-:root[data-theme="light"] .testi-miniStat span,
-:root[data-theme="light"] .admin-panel-sub,
-:root[data-theme="light"] .admin-brand-sub,
-:root[data-theme="light"] .admin-topbar-eyebrow,
-:root[data-theme="light"] .admin-nav-copy small,
-:root[data-theme="light"] .admin-statLabel,
-:root[data-theme="light"] .admin-miniCard span,
-:root[data-theme="light"] .admin-miniCard small {
+html[data-theme="light"] .catalog-eyebrow,
+html[data-theme="light"] .catalog-sub,
+html[data-theme="light"] .catalog-cardKicker,
+html[data-theme="light"] .catalog-cardSummary,
+html[data-theme="light"] .home-summaryText,
+html[data-theme="light"] .product-tile-desc,
+html[data-theme="light"] .testi-minimal-sub,
+html[data-theme="light"] .testi-miniStat span,
+html[data-theme="light"] .admin-panel-sub,
+html[data-theme="light"] .admin-brand-sub,
+html[data-theme="light"] .admin-topbar-eyebrow,
+html[data-theme="light"] .admin-nav-copy small,
+html[data-theme="light"] .admin-statLabel,
+html[data-theme="light"] .admin-miniCard span,
+html[data-theme="light"] .admin-miniCard small {
   color: rgba(46, 76, 88, 0.9) !important;
 }
 
@@ -3471,7 +3475,7 @@ select.input {
       inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
   }
 
-  :root[data-theme="light"] .site-footer--gopay .site-footerPanel {
+  html[data-theme="light"] .site-footer--gopay .site-footerPanel {
     border-color: rgba(172, 206, 255, 0.22) !important;
     background:
       radial-gradient(120% 120% at 0% 0%, rgba(47, 92, 158, 0.26), rgba(0, 0, 0, 0) 58%),
@@ -3619,7 +3623,7 @@ select.input {
 }
 
 /* Light mode polish for footer variant */
-:root[data-theme="light"] .site-footer--gopay .site-footerPanel {
+html[data-theme="light"] .site-footer--gopay .site-footerPanel {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(238, 249, 252, 0.96)),
     rgba(246, 251, 253, 0.98) !important;
@@ -3629,26 +3633,26 @@ select.input {
     inset 0 1px 0 rgba(255, 255, 255, 0.98) !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerTop,
-:root[data-theme="light"] .site-footer--gopay .site-footerBottom {
+html[data-theme="light"] .site-footer--gopay .site-footerTop,
+html[data-theme="light"] .site-footer--gopay .site-footerBottom {
   border-color: rgba(8, 108, 122, 0.14) !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerHeadline,
-:root[data-theme="light"] .site-footer--gopay .site-footerList a,
-:root[data-theme="light"] .site-footer--gopay .site-footerBottom a {
+html[data-theme="light"] .site-footer--gopay .site-footerHeadline,
+html[data-theme="light"] .site-footer--gopay .site-footerList a,
+html[data-theme="light"] .site-footer--gopay .site-footerBottom a {
   color: rgba(13, 45, 57, 0.98) !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerLead,
-:root[data-theme="light"] .site-footer--gopay .site-footerLabel,
-:root[data-theme="light"] .site-footer--gopay .site-footerMeta a,
-:root[data-theme="light"] .site-footer--gopay .site-footerBottom {
+html[data-theme="light"] .site-footer--gopay .site-footerLead,
+html[data-theme="light"] .site-footer--gopay .site-footerLabel,
+html[data-theme="light"] .site-footer--gopay .site-footerMeta a,
+html[data-theme="light"] .site-footer--gopay .site-footerBottom {
   color: rgba(56, 84, 94, 0.9) !important;
 }
 
 @media (max-width: 680px) {
-  :root[data-theme="light"] .site-footer--gopay .site-footerPanel {
+  html[data-theme="light"] .site-footer--gopay .site-footerPanel {
     border-color: rgba(0, 138, 148, 0.18) !important;
     background:
       radial-gradient(130% 120% at 0% 0%, rgba(94, 188, 204, 0.26), rgba(0, 0, 0, 0) 58%),
@@ -3658,27 +3662,27 @@ select.input {
       inset 0 1px 0 rgba(255, 255, 255, 1) !important;
   }
 
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileBrand,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileBrand span,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileColTitle,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileReach a,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLegal a {
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileBrand,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileBrand span,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileColTitle,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileReach a,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileLegal a {
     color: #123744 !important;
   }
 
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileContactIntro a,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLink,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileReach p,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLegal p {
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileContactIntro a,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileLink,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileReach p,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileLegal p {
     color: rgba(36, 72, 84, 0.92) !important;
   }
 
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileBrand img {
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileBrand img {
     border-color: rgba(0, 138, 148, 0.2) !important;
     background: rgba(255, 255, 255, 0.88) !important;
   }
 
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileSocialBtn {
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileSocialBtn {
     border-color: rgba(0, 138, 148, 0.18) !important;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0) 26%),
@@ -3687,8 +3691,8 @@ select.input {
     box-shadow: var(--skeu-control-shadow) !important;
   }
 
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileReach,
-  :root[data-theme="light"] .site-footer--gopay .site-footerMobileLegal {
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileReach,
+  html[data-theme="light"] .site-footer--gopay .site-footerMobileLegal {
     border-top-color: rgba(0, 138, 148, 0.16) !important;
   }
 }
@@ -3890,7 +3894,7 @@ select.input {
 }
 
 /* Light mode: keep gopay structure, remove boxy card look */
-:root[data-theme="light"] .site-footer--gopay .site-footerPanel.site-footerGo {
+html[data-theme="light"] .site-footer--gopay .site-footerPanel.site-footerGo {
   border-color: rgba(0, 138, 148, 0.18) !important;
   background:
     radial-gradient(130% 120% at 0% 0%, rgba(95, 189, 205, 0.22), rgba(0, 0, 0, 0) 58%),
@@ -3900,21 +3904,21 @@ select.input {
     inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerGoBrand,
-:root[data-theme="light"] .site-footer--gopay .site-footerGoBrand span,
-:root[data-theme="light"] .site-footer--gopay .site-footerGoTitle,
-:root[data-theme="light"] .site-footer--gopay .site-footerGoReach a {
+html[data-theme="light"] .site-footer--gopay .site-footerGoBrand,
+html[data-theme="light"] .site-footer--gopay .site-footerGoBrand span,
+html[data-theme="light"] .site-footer--gopay .site-footerGoTitle,
+html[data-theme="light"] .site-footer--gopay .site-footerGoReach a {
   color: #123744 !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerGoContact a,
-:root[data-theme="light"] .site-footer--gopay .site-footerGoLink,
-:root[data-theme="light"] .site-footer--gopay .site-footerGoReach p,
-:root[data-theme="light"] .site-footer--gopay .site-footerGoLegal p {
+html[data-theme="light"] .site-footer--gopay .site-footerGoContact a,
+html[data-theme="light"] .site-footer--gopay .site-footerGoLink,
+html[data-theme="light"] .site-footer--gopay .site-footerGoReach p,
+html[data-theme="light"] .site-footer--gopay .site-footerGoLegal p {
   color: rgba(36, 72, 84, 0.92) !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerGoSocialBtn {
+html[data-theme="light"] .site-footer--gopay .site-footerGoSocialBtn {
   border-color: rgba(0, 138, 148, 0.18) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0) 26%),
@@ -3922,12 +3926,12 @@ select.input {
   color: rgba(17, 59, 73, 0.92) !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerGoBrand img {
+html[data-theme="light"] .site-footer--gopay .site-footerGoBrand img {
   border-color: rgba(0, 138, 148, 0.2) !important;
   background: rgba(255, 255, 255, 0.88) !important;
 }
 
-:root[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
+html[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
   border-top-color: rgba(0, 138, 148, 0.16) !important;
 }
 
@@ -3940,13 +3944,13 @@ select.input {
     background: rgba(2, 9, 18, 0.44) !important;
   }
 
-  :root[data-theme="light"] .mobile-backdrop,
-  :root[data-theme="light"] .mobile-backdrop-lite {
+  html[data-theme="light"] .mobile-backdrop,
+  html[data-theme="light"] .mobile-backdrop-lite {
     background: rgba(8, 22, 34, 0.52) !important;
   }
 
-  :root[data-theme="dark"] .mobile-backdrop,
-  :root[data-theme="dark"] .mobile-backdrop-lite {
+  html[data-theme="dark"] .mobile-backdrop,
+  html[data-theme="dark"] .mobile-backdrop-lite {
     background: rgba(2, 9, 18, 0.48) !important;
   }
 
@@ -4251,7 +4255,7 @@ select.input {
   opacity: 0.4;
 }
 
-:root[data-theme="dark"] .home-page .product-tile::after {
+html[data-theme="dark"] .home-page .product-tile::after {
   opacity: 0.15;
 }
 
@@ -4297,7 +4301,7 @@ select.input {
     0 12px 30px rgba(0, 0, 0, 0.4) !important;
 }
 
-:root[data-theme="light"] .home-page .hero-search-shell:focus-within {
+html[data-theme="light"] .home-page .hero-search-shell:focus-within {
   border-color: rgba(0, 214, 180, 0.5) !important;
   background: rgba(255, 255, 255, 0.8) !important;
   box-shadow:
@@ -4573,7 +4577,7 @@ select.input {
   border: none !important;
 }
 
-:root[data-theme="light"] .nav-active-pill {
+html[data-theme="light"] .nav-active-pill {
   background: linear-gradient(
     180deg,
     rgba(255, 255, 255, 0.96) 0%,
@@ -4630,8 +4634,8 @@ select.input {
   }
 
   /* Light mode mobile — neumorphic + gradasi hijau */
-  :root[data-theme="light"] .header,
-  :root[data-theme="light"] .site-header {
+  html[data-theme="light"] .header,
+  html[data-theme="light"] .site-header {
     background:
       linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.08) 40%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.55) 22%, rgba(255, 255, 255, 0) 48%),
@@ -4672,22 +4676,33 @@ select.input {
 }
 
 /* Unified pass v6: advanced global neumorphism (light + dark, all pages) */
-:root,
-:root[data-theme="dark"] {
+html,
+html[data-theme="dark"] {
   --uni-neo-panel:
-    linear-gradient(162deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 22%, rgba(255, 255, 255, 0) 48%),
-    radial-gradient(120% 100% at -8% -18%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 54%),
-    radial-gradient(90% 100% at 102% -12%, rgba(79, 255, 200, 0.16), rgba(79, 255, 200, 0) 56%),
+    conic-gradient(from 158deg at 22% -14%,
+      rgba(255, 255, 255, 0.2) 0deg,
+      rgba(255, 255, 255, 0.05) 26deg,
+      transparent 52deg
+    ),
+    conic-gradient(from 160deg at 82% 104%,
+      rgba(79, 255, 200, 0.12) 0deg,
+      transparent 32deg
+    ),
     var(--skeu-panel-bg);
   --uni-neo-panel-soft:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0.02) 34%),
     var(--skeu-control-bg);
   --uni-neo-panel-shadow:
-    18px 20px 38px rgba(0, 10, 28, 0.38),
-    -10px -10px 24px rgba(255, 255, 255, 0.06),
-    inset 0 2px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -3px 0 rgba(2, 40, 50, 0.34),
-    0 0 0 1px rgba(79, 255, 200, 0.1);
+    /* tight edge shadow — wet/glossy contact */
+    0 6px 10px rgba(0, 0, 0, 0.32),
+    /* broad lift shadow — main depth */
+    26px 30px 56px rgba(0, 10, 28, 0.32),
+    /* counter light — top-left glow */
+    -14px -14px 32px rgba(255, 255, 255, 0.12),
+    /* top inset highlight */
+    inset 0 2.5px 0 rgba(255, 255, 255, 0.34),
+    /* bottom inset depth */
+    inset 0 -4px 0 rgba(2, 40, 50, 0.4);
   --uni-neo-control:
     linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.03) 34%),
     var(--skeu-control-bg);
@@ -4718,21 +4733,32 @@ select.input {
   --uni-neo-icon: #21afbf;
 }
 
-:root[data-theme="light"] {
+html[data-theme="light"] {
   --uni-neo-panel:
-    linear-gradient(162deg, rgba(255, 255, 255, 0.99) 0%, rgba(255, 255, 255, 0.58) 28%, rgba(255, 255, 255, 0) 58%),
-    radial-gradient(120% 100% at -8% -18%, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 54%),
-    radial-gradient(90% 100% at 102% -12%, rgba(79, 255, 200, 0.14), rgba(79, 255, 200, 0) 56%),
+    conic-gradient(from 158deg at 22% -14%,
+      rgba(255, 255, 255, 0.99) 0deg,
+      rgba(255, 255, 255, 0.5) 26deg,
+      transparent 52deg
+    ),
+    conic-gradient(from 160deg at 82% 104%,
+      rgba(79, 255, 200, 0.1) 0deg,
+      transparent 32deg
+    ),
     var(--skeu-panel-bg);
   --uni-neo-panel-soft:
     linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.24) 34%),
     var(--skeu-control-bg);
   --uni-neo-panel-shadow:
-    14px 16px 30px rgba(99, 138, 154, 0.2),
-    -10px -10px 22px rgba(255, 255, 255, 0.94),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(143, 181, 194, 0.34),
-    0 0 0 1px rgba(13, 124, 144, 0.1);
+    /* tight edge shadow */
+    0 6px 10px rgba(67, 111, 129, 0.14),
+    /* broad lift shadow */
+    20px 22px 44px rgba(67, 111, 129, 0.18),
+    /* counter light — top-left glow */
+    -12px -12px 28px rgba(255, 255, 255, 0.92),
+    /* top inset highlight */
+    inset 0 2.5px 0 rgba(255, 255, 255, 1),
+    /* bottom inset depth */
+    inset 0 -4px 0 rgba(143, 181, 194, 0.36);
   --uni-neo-control:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.3) 36%),
     var(--skeu-control-bg);
@@ -5287,8 +5313,8 @@ select.input {
 }
 
 /* Legacy polish v7: closer to old imzaqi.store color language + cleaner typography */
-:root,
-:root[data-theme="dark"] {
+html,
+html[data-theme="dark"] {
   --uni-line: rgba(117, 178, 214, 0.26);
   --uni-line-strong: rgba(111, 220, 255, 0.48);
   --uni-text: #e9f6ff;
@@ -5329,7 +5355,7 @@ select.input {
   --uni-neo-icon: #76dbff;
 }
 
-:root[data-theme="light"] {
+html[data-theme="light"] {
   --uni-line: rgba(119, 175, 194, 0.34);
   --uni-line-strong: rgba(28, 135, 160, 0.52);
   --uni-text: #173849;
@@ -5546,8 +5572,8 @@ select.input {
 }
 
 /* Light-mode readability fixes for Admin + Status */
-:root[data-theme="light"] .admin-page .admin-kpiChip,
-:root[data-theme="light"] .admin-page .admin-orderStat {
+html[data-theme="light"] .admin-page .admin-kpiChip,
+html[data-theme="light"] .admin-page .admin-orderStat {
   border-color: rgba(34, 122, 147, 0.22) !important;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(239, 248, 252, 0.9)) !important;
   box-shadow:
@@ -5556,51 +5582,51 @@ select.input {
     inset 0 -1px 0 rgba(137, 177, 191, 0.24) !important;
 }
 
-:root[data-theme="light"] .admin-page .admin-kpiChip span,
-:root[data-theme="light"] .admin-page .admin-orderStat span {
+html[data-theme="light"] .admin-page .admin-kpiChip span,
+html[data-theme="light"] .admin-page .admin-orderStat span {
   color: rgba(34, 72, 86, 0.92) !important;
 }
 
-:root[data-theme="light"] .admin-page .admin-kpiChip strong,
-:root[data-theme="light"] .admin-page .admin-orderStat strong,
-:root[data-theme="light"] .admin-page .admin-order-code,
-:root[data-theme="light"] .admin-page .admin-orderTotal {
+html[data-theme="light"] .admin-page .admin-kpiChip strong,
+html[data-theme="light"] .admin-page .admin-orderStat strong,
+html[data-theme="light"] .admin-page .admin-order-code,
+html[data-theme="light"] .admin-page .admin-orderTotal {
   color: #143746 !important;
 }
 
-:root[data-theme="light"] .admin-page .admin-kpiChip small,
-:root[data-theme="light"] .admin-page .admin-orderStat small,
-:root[data-theme="light"] .admin-page .admin-order-sub,
-:root[data-theme="light"] .admin-page .admin-orderListMeta {
+html[data-theme="light"] .admin-page .admin-kpiChip small,
+html[data-theme="light"] .admin-page .admin-orderStat small,
+html[data-theme="light"] .admin-page .admin-order-sub,
+html[data-theme="light"] .admin-page .admin-orderListMeta {
   color: rgba(49, 83, 96, 0.88) !important;
 }
 
-:root[data-theme="light"] .admin-page .admin-orderTag {
+html[data-theme="light"] .admin-page .admin-orderTag {
   border-color: rgba(60, 166, 109, 0.32) !important;
   background: rgba(228, 252, 238, 0.95) !important;
   color: #1f6242 !important;
 }
 
-:root[data-theme="light"] .admin-page .admin-orderLink {
+html[data-theme="light"] .admin-page .admin-orderLink {
   border-color: rgba(35, 123, 164, 0.3) !important;
   background: rgba(226, 244, 255, 0.96) !important;
   color: #1a5a7a !important;
 }
 
-:root[data-theme="light"] .admin-page .admin-orderInlineSelect {
+html[data-theme="light"] .admin-page .admin-orderInlineSelect {
   color: #163949 !important;
 }
 
-:root[data-theme="light"] .status-page .st-noteBody {
+html[data-theme="light"] .status-page .st-noteBody {
   color: rgba(28, 68, 84, 0.94) !important;
 }
 
-:root[data-theme="light"] .status-page .st-noteBody b,
-:root[data-theme="light"] .status-page .st-noteBody strong {
+html[data-theme="light"] .status-page .st-noteBody b,
+html[data-theme="light"] .status-page .st-noteBody strong {
   color: #123744 !important;
 }
 
-:root[data-theme="light"] .status-page .st-noteBody.is-empty {
+html[data-theme="light"] .status-page .st-noteBody.is-empty {
   color: rgba(62, 98, 112, 0.82) !important;
 }
 
@@ -5654,7 +5680,7 @@ select.input {
     inset 0 -2px 8px rgba(0, 214, 180, 0.08) !important;
 }
 
-:root[data-theme="light"] .detail-page .pdx-summaryPanel {
+html[data-theme="light"] .detail-page .pdx-summaryPanel {
   background: linear-gradient(160deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.5)) !important;
   box-shadow: 
     0 24px 60px rgba(50, 90, 105, 0.2),
@@ -5706,7 +5732,7 @@ select.input {
   border: 1px solid var(--uni-line) !important;
 }
 
-:root[data-theme="light"] .detail-page .pdx-segmentControl {
+html[data-theme="light"] .detail-page .pdx-segmentControl {
   background: rgba(0, 0, 0, 0.03) !important;
   box-shadow: 
     inset 0 2px 4px rgba(0, 0, 0, 0.06),
@@ -5745,7 +5771,7 @@ select.input {
   z-index: -1;
 }
 
-:root[data-theme="light"] .detail-page .pdx-segmentPill {
+html[data-theme="light"] .detail-page .pdx-segmentPill {
   box-shadow: 
     0 4px 12px rgba(60, 100, 115, 0.1),
     inset 0 1px 1px rgba(255, 255, 255, 1) !important;
@@ -5778,7 +5804,7 @@ select.input {
   flex-shrink: 0;
 }
 
-:root[data-theme="light"] .detail-page .pdx-viewToggle {
+html[data-theme="light"] .detail-page .pdx-viewToggle {
   background: rgba(0, 0, 0, 0.03) !important;
   box-shadow: 
     inset 0 2px 4px rgba(0, 0, 0, 0.06),
@@ -5804,7 +5830,7 @@ select.input {
   background: rgba(255, 255, 255, 0.05) !important;
 }
 
-:root[data-theme="light"] .detail-page .pdx-viewBtn:hover {
+html[data-theme="light"] .detail-page .pdx-viewBtn:hover {
   background: rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -6008,7 +6034,7 @@ select.input {
 }
 
 /* 7. Toggle Light Mode Fix & Info Button */
-:root[data-theme="light"] .detail-page .pdx-viewBtn.active {
+html[data-theme="light"] .detail-page .pdx-viewBtn.active {
   background: var(--uni-neo-control) !important;
   color: var(--uni-text) !important;
   box-shadow: 
@@ -6030,7 +6056,7 @@ select.input {
   padding-top: 16px;
 }
 
-:root[data-theme="light"] .detail-page .pdx-variantsGrid.is-list .pdx-variantNotes {
+html[data-theme="light"] .detail-page .pdx-variantsGrid.is-list .pdx-variantNotes {
   border-top-color: rgba(0, 0, 0, 0.1);
 }
 
@@ -6048,7 +6074,7 @@ select.input {
   transition: all 0.3s ease;
 }
 
-:root[data-theme="light"] .detail-page .pdx-infoBtn {
+html[data-theme="light"] .detail-page .pdx-infoBtn {
   background: rgba(0, 0, 0, 0.04) !important;
   color: var(--uni-text) !important;
 }
@@ -6084,7 +6110,7 @@ select.input {
   transform: translateY(-2px);
   background: var(--uni-neo-hover) !important;
 }
-:root[data-theme="light"] .detail-page .pdx-shareBtn {
+html[data-theme="light"] .detail-page .pdx-shareBtn {
   border-color: rgba(0, 0, 0, 0.05) !important;
   box-shadow: inset 0 1px 1px rgba(255, 255, 255, 1), 0 2px 8px rgba(60, 100, 115, 0.1) !important;
 }
@@ -6161,7 +6187,7 @@ select.input {
     inset 0 -1px 0 rgba(255, 255, 255, 0.4) !important;
 }
 
-:root[data-theme="dark"] .detail-page .pdx-addBtn {
+html[data-theme="dark"] .detail-page .pdx-addBtn {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     inset 0 -2px 0 rgba(0, 0, 0, 0.4),
@@ -6203,7 +6229,7 @@ select.input {
     animation: slideUpCart 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  :root[data-theme="light"] .detail-page .pdx-mobileStickyCart {
+  html[data-theme="light"] .detail-page .pdx-mobileStickyCart {
     background: rgba(255, 255, 255, 0.82) !important;
     border-color: rgba(0, 138, 148, 0.18) !important;
     box-shadow:
@@ -6296,7 +6322,7 @@ select.input {
   box-shadow: 0 4px 12px rgba(255, 77, 109, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
-:root[data-theme="light"] .header-cart .pill {
+html[data-theme="light"] .header-cart .pill {
   box-shadow: 0 4px 12px rgba(255, 77, 109, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
 }
 
@@ -6468,7 +6494,7 @@ select.input {
 }
 
 /* ── Light mode: catalog filter sidebar ── */
-:root[data-theme="light"] .catalog-filterShell {
+html[data-theme="light"] .catalog-filterShell {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 22%),
     radial-gradient(circle at 18% 0%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
@@ -6478,58 +6504,58 @@ select.input {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-:root[data-theme="light"] .catalog-filterHead {
+html[data-theme="light"] .catalog-filterHead {
   background: rgba(255, 255, 255, 0.06) !important;
   border-color: rgba(0, 138, 148, 0.1) !important;
 }
 
-:root[data-theme="light"] .catalog-filterHeadTitle {
+html[data-theme="light"] .catalog-filterHeadTitle {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .catalog-filterHeadSub {
+html[data-theme="light"] .catalog-filterHeadSub {
   color: rgba(50, 82, 91, 0.72) !important;
 }
 
-:root[data-theme="light"] .catalog-filterLabel {
+html[data-theme="light"] .catalog-filterLabel {
   color: rgba(50, 82, 91, 0.72) !important;
 }
 
-:root[data-theme="light"] .catalog-filterHeadReset {
+html[data-theme="light"] .catalog-filterHeadReset {
   background: rgba(255, 255, 255, 0.72) !important;
   border-color: rgba(0, 138, 148, 0.16) !important;
   color: rgba(15, 49, 64, 0.88) !important;
 }
 
-:root[data-theme="light"] .catalog-filterHeadReset:hover {
+html[data-theme="light"] .catalog-filterHeadReset:hover {
   background: rgba(255, 255, 255, 0.88) !important;
   border-color: rgba(0, 138, 148, 0.28) !important;
 }
 
-:root[data-theme="light"] .catalog-filterHeadIcon {
+html[data-theme="light"] .catalog-filterHeadIcon {
   background: rgba(0, 214, 180, 0.12) !important;
   border-color: rgba(0, 138, 148, 0.18) !important;
   color: #0b7b89 !important;
 }
 
-:root[data-theme="light"] .catalog-filterSection {
+html[data-theme="light"] .catalog-filterSection {
   border-color: rgba(0, 138, 148, 0.08) !important;
 }
 
-:root[data-theme="light"] .catalog-toggleGroup {
+html[data-theme="light"] .catalog-toggleGroup {
   background: rgba(255, 255, 255, 0.5) !important;
   border-color: rgba(0, 138, 148, 0.1) !important;
 }
 
-:root[data-theme="light"] .catalog-toggleItemTitle {
+html[data-theme="light"] .catalog-toggleItemTitle {
   color: rgba(15, 49, 64, 0.96) !important;
 }
 
-:root[data-theme="light"] .catalog-toggleItemHint {
+html[data-theme="light"] .catalog-toggleItemHint {
   color: rgba(50, 82, 91, 0.65) !important;
 }
 
-:root[data-theme="light"] .catalog-rangeValues {
+html[data-theme="light"] .catalog-rangeValues {
   color: rgba(15, 49, 64, 0.88) !important;
 }
 

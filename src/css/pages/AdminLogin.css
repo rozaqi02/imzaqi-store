@@ -99,21 +99,21 @@
   color: var(--brand-muted, rgba(234, 255, 245, 0.72));
 }
 
-:root[data-theme="light"] .admin-loginAside {
+html[data-theme="light"] .admin-loginAside {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(239, 249, 253, 0.78)),
     radial-gradient(circle at top left, rgba(24, 152, 173, 0.16), rgba(24, 152, 173, 0) 52%);
 }
 
-:root[data-theme="light"] .admin-loginSub {
+html[data-theme="light"] .admin-loginSub {
   color: rgba(23, 66, 80, 0.86);
 }
 
-:root[data-theme="light"] .admin-loginSignal {
+html[data-theme="light"] .admin-loginSignal {
   color: rgba(18, 54, 67, 0.94);
 }
 
-:root[data-theme="light"] .admin-loginForm .hint {
+html[data-theme="light"] .admin-loginForm .hint {
   color: rgba(26, 72, 86, 0.84);
 }
 

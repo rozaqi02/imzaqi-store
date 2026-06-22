@@ -44,7 +44,7 @@
   color: var(--brand-text, #fff);
 }
 
-:root[data-theme="light"] ::selection {
+html[data-theme="light"] ::selection {
   background: rgba(0, 138, 148, 0.22);
   color: #0d2d39;
 }
@@ -69,8 +69,8 @@ input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.tes
   transition: box-shadow 0.15s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
 }
 
-:root[data-theme="light"] :where(button, a, select, textarea, [role="button"], [role="combobox"], [role="option"], [tabindex]):focus-visible,
-:root[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus-visible {
+html[data-theme="light"] :where(button, a, select, textarea, [role="button"], [role="combobox"], [role="option"], [tabindex]):focus-visible,
+html[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus-visible {
   box-shadow:
     0 0 0 2px #ffffff,
     0 0 0 4px rgba(0, 138, 148, 0.6);
@@ -418,7 +418,7 @@ a.btn:active {
   animation: polishAurora 6s ease-in-out infinite alternate;
 }
 
-:root[data-theme="dark"] .brand {
+html[data-theme="dark"] .brand {
   background-image: linear-gradient(135deg, #87ffe5 0%, #4effda 50%, #25ebc8 100%);
   -webkit-background-clip: text;
   background-clip: text;
@@ -518,8 +518,8 @@ textarea,
   caret-color: #00d6b4;
 }
 
-:root[data-theme="dark"] input,
-:root[data-theme="dark"] textarea {
+html[data-theme="dark"] input,
+html[data-theme="dark"] textarea {
   caret-color: #4effda;
 }
 
@@ -691,9 +691,9 @@ textarea:focus {
     inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
-:root[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
-:root[data-theme="light"] select:focus,
-:root[data-theme="light"] textarea:focus {
+html[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+html[data-theme="light"] select:focus,
+html[data-theme="light"] textarea:focus {
   border-color: rgba(0, 138, 148, 0.5) !important;
   box-shadow:
     0 0 0 3px rgba(0, 194, 208, 0.16),
@@ -747,7 +747,7 @@ html {
 }
 
 /* Light mode specific overrides for mobile menu panel background and shadows to isolate them from global cards */
-:root[data-theme="light"] .mobile-menu-lite {
+html[data-theme="light"] .mobile-menu-lite {
   background: linear-gradient(180deg, #e4eff4, #cee0ea 56%, #bfd4e1 100%) !important;
   box-shadow:
     -18px 0 48px rgba(50, 85, 100, 0.28),
@@ -757,7 +757,7 @@ html {
   border-left: 1px solid rgba(0, 138, 148, 0.14) !important;
 }
 
-:root[data-theme="light"] .mobile-menu {
+html[data-theme="light"] .mobile-menu {
   background: linear-gradient(180deg, #e4eff4, #cee0ea 56%, #bfd4e1 100%) !important;
   box-shadow:
     -18px 0 48px rgba(50, 85, 100, 0.28),
@@ -787,16 +787,16 @@ html {
 }
 
 /* Light mode: remove background from text elements */
-:root[data-theme="light"] .pay-shell-title,
-:root[data-theme="light"] .pay-cardTitle,
-:root[data-theme="light"] .pay-stageTotal,
-:root[data-theme="light"] .pay-orderTitle,
-:root[data-theme="light"] .pay-orderItemName,
-:root[data-theme="light"] .pay-orderRow strong,
-:root[data-theme="light"] .pay-orderRow b,
-:root[data-theme="light"] .pay-stageRow b,
-:root[data-theme="light"] .pay-qrisLocked strong,
-:root[data-theme="light"] .pay-successCode {
+html[data-theme="light"] .pay-shell-title,
+html[data-theme="light"] .pay-cardTitle,
+html[data-theme="light"] .pay-stageTotal,
+html[data-theme="light"] .pay-orderTitle,
+html[data-theme="light"] .pay-orderItemName,
+html[data-theme="light"] .pay-orderRow strong,
+html[data-theme="light"] .pay-orderRow b,
+html[data-theme="light"] .pay-stageRow b,
+html[data-theme="light"] .pay-qrisLocked strong,
+html[data-theme="light"] .pay-successCode {
   background: transparent !important;
 }
 

@@ -413,7 +413,7 @@
 }
 
 /* Light mode */
-:root[data-theme="light"] .faq-shell {
+html[data-theme="light"] .faq-shell {
   --faq-panel:
     linear-gradient(174deg, rgba(247, 253, 255, 0.98) 0%, rgba(236, 247, 252, 0.96) 56%, rgba(231, 243, 249, 0.98) 100%);
   --faq-panel-soft:
@@ -437,7 +437,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.98);
 }
 
-:root[data-theme="light"] .faq-shell::before {
+html[data-theme="light"] .faq-shell::before {
   opacity: 0.84;
 }
 
@@ -661,11 +661,11 @@
   }
 }
 
-:root[data-theme="light"] .faq-chipCount {
+html[data-theme="light"] .faq-chipCount {
   background: rgba(0, 138, 148, 0.08);
 }
 
-:root[data-theme="light"] .faq-chip.active .faq-chipCount {
+html[data-theme="light"] .faq-chip.active .faq-chipCount {
   background: rgba(0, 214, 180, 0.14);
   color: #008a94;
 }
