@@ -4688,7 +4688,6 @@ html[data-theme="light"] .site-header {
   inset: 0;
   z-index: 9999;
   background: rgba(0, 0, 0, 0.62);
-  -webkit-backdrop-filter: blur(16px) saturate(130%);
   backdrop-filter: blur(16px) saturate(130%);
 }
 

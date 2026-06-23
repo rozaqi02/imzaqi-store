@@ -2318,7 +2318,6 @@ html[data-theme="light"] .mobile-menu-lite .mobile-menu-header h3 {
 html[data-theme="light"] .modal-backdrop {
   background: rgba(8, 108, 122, 0.18) !important;
   backdrop-filter: blur(14px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
 }
 
 html[data-theme="light"] .modal {
@@ -2354,7 +2353,6 @@ html[data-theme="light"] .modal-close:hover {
 html[data-theme="light"] .mobile-sheetBackdrop {
   background: rgba(8, 108, 122, 0.16) !important;
   backdrop-filter: blur(14px) saturate(130%) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(130%) !important;
 }
 
 html[data-theme="light"] .mobile-sheet,
