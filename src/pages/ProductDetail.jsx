@@ -23,6 +23,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useDeviceCapability } from "../hooks/useIsMobile";
+import VariantCompareModal from "../components/VariantCompareModal";
 import { useLongTaskMonitor } from "../hooks/usePerformanceMonitor";
 import { warn } from "../lib/log";
 import { fireConfetti } from "../components/Confetti";
@@ -250,6 +251,7 @@ function LazyProductImage({ src, alt, className, fetchPriority }) {
       {!loaded && isInView ? (
         <div className="pdx-imgPlaceholder" style={{ position: "absolute", inset: 0 }} />
       ) : null}
+
     </div>
   );
 }
@@ -264,6 +266,7 @@ const VariantCard = React.memo(({
   descriptionBody,
   isMotionOff,
   motionMode,
+  maxVariantStock,
   onSelect,
   onAdd,
   onBuy
@@ -311,6 +314,16 @@ const VariantCard = React.memo(({
               </span>
             ) : null}
           </div>
+          {stock > 0 && maxVariantStock > 1 ? (
+            <div className="pdx-stockBarWrap">
+              <div className="pdx-stockBar" role="progressbar" aria-valuenow={stock} aria-valuemin={0} aria-valuemax={maxVariantStock}>
+                <span className="pdx-stockBarFill" style={{ width: `${(stock / maxVariantStock) * 100}%` }} />
+              </div>
+              {stock <= 3 ? (
+                <span className="pdx-stockUrgency">Hanya sisa {stock}!</span>
+              ) : null}
+            </div>
+          ) : null}
         </div>
 
         <div className="pdx-packPriceWrap">
@@ -463,6 +476,7 @@ export default function ProductDetail() {
   const [activeTab, setActiveTab] = useState("semua");
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [addedVariantId, setAddedVariantId] = useState(null);
+  const [compareOpen, setCompareOpen] = useState(false);
   const addedFlashTimerRef = useRef(null);
 
   usePageMeta({
@@ -564,6 +578,11 @@ export default function ProductDetail() {
 
   const soldTotal = useMemo(
     () => variants.reduce((sum, variant) => sum + Math.max(0, Number(variant?.sold_count || 0)), 0),
+    [variants]
+  );
+
+  const maxVariantStock = useMemo(
+    () => Math.max(1, ...variants.map((v) => Number(v.stock || 0))),
     [variants]
   );
 
@@ -821,7 +840,14 @@ export default function ProductDetail() {
                   <div className="pdx-variantsHead">
                     <div className="pdx-variantsHeadTop">
                       <div className="pdx-eyebrow">Pilih paket</div>
-                      <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
+                      <div className="pdx-variantsHeadRight">
+                        <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
+                        {variants.length > 1 ? (
+                          <button className="pdx-compareBtn" type="button" onClick={() => setCompareOpen(true)}>
+                            Bandingkan
+                          </button>
+                        ) : null}
+                      </div>
                     </div>
                     <h2 className="pdx-sectionTitle">Pilih Paket Terbaikmu</h2>
                   </div>
@@ -890,6 +916,7 @@ export default function ProductDetail() {
                             descriptionBody={descriptionBody}
                             isMotionOff={isMotionOff}
                             motionMode={motionMode}
+                            maxVariantStock={maxVariantStock}
                             onSelect={setSelectedVariantId}
                             onAdd={handleAdd}
                             onBuy={(v, q, e) => {
@@ -942,6 +969,13 @@ export default function ProductDetail() {
           </div>
         </div>
       ) : null}
+
+      <VariantCompareModal
+        open={compareOpen}
+        variants={variants}
+        flashSaleMap={flashSaleMap}
+        onClose={() => setCompareOpen(false)}
+      />
     </div>
   );
 }

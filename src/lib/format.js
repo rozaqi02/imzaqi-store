@@ -118,3 +118,23 @@ export function isPromoExpired(promo) {
   if (!promo?.expired_at) return false;
   return new Date(promo.expired_at) < new Date();
 }
+
+const ACCOUNT_TYPE_KEYWORDS = [
+  { keyword: "private", label: "Private", color: "var(--accent, #00d6b4)" },
+  { keyword: "sharing", label: "Sharing", color: "#5b8def" },
+  { keyword: "family", label: "Family", color: "#a855f7" },
+  { keyword: "premium", label: "Premium", color: "#f59e0b" },
+  { keyword: "student", label: "Student", color: "#10b981" },
+  { keyword: "basic", label: "Basic", color: "#94a3b8" },
+];
+
+export function detectAccountTypes(variants) {
+  const found = [];
+  if (!variants || !variants.length) return found;
+  ACCOUNT_TYPE_KEYWORDS.forEach(({ keyword, label, color }) => {
+    if ((variants || []).some((v) => String(v?.name || "").toLowerCase().includes(keyword))) {
+      found.push({ label, color });
+    }
+  });
+  return found;
+}

@@ -2,7 +2,7 @@ import { useMemo } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
-import { formatIDR, classifyStock, summarizeCatalogCopy } from "../lib/format";
+import { formatIDR, classifyStock, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
 import "./ProductTile.css";
 
 export default function ProductTile({ product, rank, layout = "list", disableTilt = false }) {
@@ -41,6 +41,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
   const stock = Number(summary.stock || 0);
   const sold = Number(summary.sold || 0);
   const displayPrice = summary.minPrice ? formatIDR(summary.minPrice) : "-";
+  const accountTypes = useMemo(() => detectAccountTypes(product?.product_variants), [product]);
 
   return (
     <Link
@@ -106,6 +107,14 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
           <span className="product-tile-pill home-popularSold" title={`${sold} terjual`}>
             <ShoppingBag size={14} />
             <span>{sold} terjual</span>
+          </span>
+          {accountTypes.map((t) => (
+            <span key={t.label} className="product-typeBadge" style={{ "--type-color": t.color }}>
+              {t.label}
+            </span>
+          ))}
+          <span className="product-tile-pill home-deliveryPill" title="Estimasi pengiriman">
+            <span>5 Menit</span>
           </span>
           {classifyStock(stock) === "low" ? (
             <span className="product-lowStockBadge">Hampir habis</span>

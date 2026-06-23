@@ -328,6 +328,34 @@ html[data-theme="light"] .product-tile-rankBadge--4 {
   font-weight: 900;
 }
 
+/* ── Account Type Badge ── */
+.product-typeBadge {
+  display: inline-flex;
+  align-items: center;
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 999px;
+  border: 1px solid var(--type-color, var(--accent, #00d6b4));
+  background: color-mix(in srgb, var(--type-color, var(--accent)) 14%, transparent);
+  color: var(--type-color, var(--accent));
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  line-height: 1;
+}
+
+html[data-theme="light"] .product-typeBadge {
+  background: color-mix(in srgb, var(--type-color, var(--accent)) 20%, white);
+  color: var(--type-color, var(--accent));
+}
+
+/* ── Delivery ETA Badge ── */
+@media (max-width: 560px) {
+  .home-deliveryPill {
+    display: none;
+  }
+}
+
 /* ── Low Stock & Out of Stock Badges ── */
 .product-lowStockBadge {
   display: inline-flex;

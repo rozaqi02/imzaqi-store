@@ -1801,4 +1801,76 @@ html[data-theme="light"] .home-faqSearchInput {
   }
 }
 
+/* ── Onboarding Banner ── */
+.hx-onboardBanner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: rgba(0, 214, 180, 0.1);
+  border: 1px solid rgba(0, 214, 180, 0.2);
+  margin-top: 14px;
+}
+
+html[data-theme="light"] .hx-onboardBanner {
+  background: rgba(0, 138, 148, 0.08);
+  border-color: rgba(0, 138, 148, 0.18);
+}
+
+.hx-onboardText {
+  flex: 1;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.75);
+  line-height: 1.5;
+}
+
+html[data-theme="light"] .hx-onboardText {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.hx-onboardText strong {
+  color: var(--accent, #00d6b4);
+  font-weight: 700;
+}
+
+.hx-onboardClose {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.15s;
+}
+
+.hx-onboardClose:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+html[data-theme="light"] .hx-onboardClose {
+  background: rgba(0, 0, 0, 0.06);
+  color: rgba(0, 0, 0, 0.4);
+}
+
+html[data-theme="light"] .hx-onboardClose:hover {
+  background: rgba(0, 0, 0, 0.12);
+  color: rgba(0, 0, 0, 0.6);
+}
+
+@media (max-width: 560px) {
+  .hx-onboardBanner {
+    padding: 8px 10px;
+    margin-top: 10px;
+  }
+  .hx-onboardText {
+    font-size: 11px;
+  }
+}
+
 

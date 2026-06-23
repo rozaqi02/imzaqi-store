@@ -30,7 +30,7 @@ import NumberCounter from "../components/NumberCounter";
 
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
-import { formatIDR, summarizeCatalogCopy } from "../lib/format";
+import { formatIDR, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useDebounce } from "../hooks/useDebounce";
@@ -1275,6 +1275,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
   const categoryLabel = category?.label || "Digital";
   const CategoryIcon = category?.icon || Sparkles;
   const summaryCopy = summarizeCatalogCopy(product.description);
+  const accountTypes = useMemo(() => detectAccountTypes(product._vars || product.product_variants), [product]);
 
   return (
     <Link
@@ -1321,20 +1322,25 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
             <CircleAlert size={13} />
             <span>Habis</span>
           </span>
-        ) : low ? (
-          <span className="catalog-status warn">
-            <CircleAlert size={13} />
-            <span>Stok: {stock}</span>
-          </span>
         ) : (
           <span className="catalog-status ok">
             <PackageCheck size={13} />
-            <span>Ready</span>
+            <span>Stok: {stock}</span>
           </span>
         )}
+        {sold > 0 ? (
+          <span className="catalog-status muted">
+            <span>{sold} terjual</span>
+          </span>
+        ) : null}
       </div>
 
       <div className="catalog-cardMeta">
+        {accountTypes.map((t) => (
+          <span key={t.label} className="catalog-metaType" style={{ "--type-color": t.color }}>
+            {t.label}
+          </span>
+        ))}
         <span>
           <Layers3 size={13} />
           <span>{product._vars?.length || 0} varian</span>

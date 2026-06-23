@@ -280,6 +280,38 @@ function HeroStatsRow({ activeProductCount }) {
   );
 }
 
+const VISITED_KEY = "imzaqi_visited_v1";
+
+function OnboardingBanner() {
+  const [show, setShow] = useState(() => {
+    try {
+      return !window.localStorage.getItem(VISITED_KEY);
+    } catch { return false; }
+  });
+
+  if (!show) return null;
+
+  return (
+    <div className="hx-onboardBanner">
+      <span className="hx-onboardText">
+        Pertama kali? Ketik <strong>Netflix Premium</strong> atau{" "}
+        <strong>Gas Lihat Katalog</strong> mulai belanja!
+      </span>
+      <button
+        className="hx-onboardClose"
+        type="button"
+        onClick={() => {
+          try { window.localStorage.setItem(VISITED_KEY, "1"); } catch {}
+          setShow(false);
+        }}
+        aria-label="Tutup"
+      >
+        <X size={14} />
+      </button>
+    </div>
+  );
+}
+
 /* ── Main Hero Export ── */
 export default function Hero({ products = [] }) {
   const nav = useNavigate();
@@ -341,6 +373,9 @@ export default function Hero({ products = [] }) {
           <MotionTag className="hx-search-section" {...stagger(0.28)}>
             <HeroSearch products={products} />
           </MotionTag>
+
+          {/* 4b. Onboarding banner */}
+          <OnboardingBanner />
 
           {/* 5. Trust Badges */}
           <MotionTag className="hx-brands-section" style={{ marginTop: "-8px" }} {...stagger(0.32)}>

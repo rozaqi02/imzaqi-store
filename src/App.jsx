@@ -12,7 +12,7 @@ import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
 import { useLongTaskMonitor } from "./hooks/usePerformanceMonitor";
 import { useDeviceCapability } from "./hooks/useIsMobile";
 import { rafThrottle } from "./utils/throttle";
-import { ChevronUp } from "lucide-react";
+import { ArrowRight, ChevronUp, X } from "lucide-react";
 import { hasSavedScrollY } from "./hooks/useScrollMemory";
 
 // ── Eager-loaded pages (critical path) ──
@@ -42,6 +42,49 @@ function PageLoader() {
           <span />
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Floating recent order button ──
+function FloatingOrderStatus() {
+  const [order, setOrder] = useState(null);
+  const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    try {
+      const history = getOrderHistory();
+      if (history.length > 0 && history[0]?.order_code) {
+        const last = history[0];
+        const age = Date.now() - new Date(last.created_at).getTime();
+        if (age < 86400000) setOrder(last);
+      }
+    } catch {}
+  }, []);
+
+  if (!order || dismissed) return null;
+
+  return (
+    <div className="floating-order-status">
+      <button
+        className="floating-order-btn"
+        type="button"
+        onClick={() => {
+          window.location.href = `/status?order=${encodeURIComponent(order.order_code)}`;
+        }}
+      >
+        <span className="floating-order-dot" />
+        <span className="floating-order-code">{order.order_code}</span>
+        <ArrowRight size={14} />
+      </button>
+      <button
+        className="floating-order-dismiss"
+        type="button"
+        onClick={() => setDismissed(true)}
+        aria-label="Tutup"
+      >
+        <X size={12} />
+      </button>
     </div>
   );
 }
@@ -182,6 +225,7 @@ export default function App() {
       <AssistantBubble />
       <ScrollToTop />
       <RouteProgress />
+      <FloatingOrderStatus />
       <ScrollToTopButton />
       <AppRoutes />
     </BrowserRouter>

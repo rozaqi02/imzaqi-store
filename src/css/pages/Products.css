@@ -2173,6 +2173,29 @@ html[data-theme="light"] .catalog-sheetFoot {
   border: 1px solid rgba(41, 212, 156, 0.28);
 }
 
+.catalog-card.catalog-cardV2 .catalog-status.muted {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  font-weight: 600;
+}
+
+.catalog-card.catalog-cardV2 .catalog-metaType {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 9px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.02em;
+  border: 1px solid var(--type-color, var(--accent));
+  background: color-mix(in srgb, var(--type-color, var(--accent)) 14%, transparent);
+  color: var(--type-color, var(--accent));
+  flex: 0 0 auto;
+  line-height: 1;
+}
+
 .catalog-card.catalog-cardV2 .catalog-cardMeta {
   margin-top: 0;
   display: flex;

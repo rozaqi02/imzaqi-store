@@ -253,6 +253,11 @@ function TabCekStatus({ settings }) {
 
   // Auto-refresh disabled
 
+  const recentOrders = useMemo(() => {
+    const all = getOrderHistory();
+    return all.slice(0, 3);
+  }, []);
+
   const statusMeta = useMemo(() => getStatusMeta(order?.status), [order?.status]);
   const StatusIcon = statusMeta.icon;
   const timeline = useMemo(() => getTimeline(order?.status), [order?.status]);
@@ -409,6 +414,32 @@ function TabCekStatus({ settings }) {
           {message || (order ? "Klik kartu ID order buat salin cepet." : "Format singkat juga bisa: ABCD")}
         </div>
       </section>
+
+      {recentOrders.length > 0 ? (
+        <section className="st-recent">
+          <div className="st-recentHead">
+            <History size={14} />
+            <span>Order terakhir</span>
+          </div>
+          <div className="st-recentList">
+            {recentOrders.map((r) => (
+              <button
+                key={r.order_code}
+                className="st-recentChip"
+                type="button"
+                onClick={() => {
+                  const code = r.order_code;
+                  setInput(code);
+                  lookup(code);
+                }}
+              >
+                <span className="st-recentCode">{r.order_code}</span>
+                {r.total_idr ? <span className="st-recentPrice">{formatIDR(r.total_idr)}</span> : null}
+              </button>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       {!order ? (
         <section className="st-empty">
