@@ -415,6 +415,26 @@ html[data-theme="light"] .pay-stickyCta{background:linear-gradient(180deg, rgba(
 }
 
 @media (max-width: 720px){
+  /* Performance optimizations: kill backdrop-filter and large box-shadows on mobile */
+  .pay-card,
+  .pay-shell-kicker,
+  .pay-orderDesktop,
+  .pay-stickyCta,
+  .pay-confirmOverlay {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .pay-card {
+    background: #111d3a !important; /* solid panel fallback for dark mode */
+    box-shadow: 0 6px 18px rgba(0, 0, 0, 0.28) !important;
+  }
+
+  html[data-theme="light"] .pay-card {
+    background: #ffffff !important; /* solid panel fallback for light mode */
+    box-shadow: 0 6px 18px rgba(40, 65, 80, 0.08) !important;
+  }
+
   .pay-shell-title{font-size:34px;}
   .pay-shell-sub{max-width:none;font-size:14px;}
   .pay-mainStack{gap:12px;}

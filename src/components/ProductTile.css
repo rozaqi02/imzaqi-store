@@ -696,6 +696,17 @@ html[data-theme="light"] .home-tileSkeleton::after {
 }
 
 @media (max-width: 560px) {
+  /* GPU acceleration and height intrinsic size settings to resolve scrollbar jumping */
+  .product-tile {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    contain-intrinsic-size: auto 216px !important;
+  }
+
+  .product-tile--list {
+    contain-intrinsic-size: auto 120px !important;
+  }
+
   .product-tile--grid {
     padding: 14px;
     border-radius: 22px;
@@ -724,6 +735,19 @@ html[data-theme="light"] .home-tileSkeleton::after {
   .product-tile--grid .product-tile-pill svg {
     width: 11px;
     height: 11px;
+  }
+}
+
+@media (max-width: 900px) and (min-width: 561px) {
+  /* Tablet optimizations for product tiles */
+  .product-tile {
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    contain-intrinsic-size: auto 240px !important;
+  }
+
+  .product-tile--list {
+    contain-intrinsic-size: auto 130px !important;
   }
 }
 

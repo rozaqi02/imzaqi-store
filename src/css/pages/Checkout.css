@@ -225,7 +225,7 @@ html[data-theme="light"] .checkout-drawer .step.done .step-dot{
 
 @media (max-width: 720px){
   .checkout-backdrop{backdrop-filter:none !important;-webkit-backdrop-filter:none !important;background:rgba(3,8,18,.65) !important;}
-  .checkout-drawer{width:100%;top:auto;left:0;right:0;bottom:0;height:92dvh;max-height:calc(100dvh - env(safe-area-inset-top) - 40px);padding:12px 14px calc(14px + env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--brand-line, rgba(255,255,255,.12));border-radius:28px 28px 0 0;box-shadow:0 -20px 70px rgba(0,0,0,.34);contain:layout style;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
+  .checkout-drawer{width:100%;top:auto;left:0;right:0;bottom:0;height:92dvh;max-height:calc(100dvh - env(safe-area-inset-top) - 40px);padding:12px 14px calc(14px + env(safe-area-inset-bottom));border-left:0;border-top:1px solid var(--brand-line, rgba(255,255,255,.12));border-radius:28px 28px 0 0;box-shadow:0 -8px 24px rgba(0,0,0,.26) !important;contain:layout style;backdrop-filter:none !important;-webkit-backdrop-filter:none !important;}
   .checkout-drawerHandle{display:block;width:52px;height:5px;border-radius:999px;background:rgba(255,255,255,.16);margin:0 auto 10px;}
   .checkout-drawerGesture{max-width:100%;margin:0 0 6px;padding:7px 11px;font-size:11px;}
   .checkout-drawerHead{gap:12px;padding-bottom:12px;}
@@ -653,18 +653,20 @@ html[data-theme="light"] .checkout-back-btn:hover {
     bottom: 0;
     z-index: 1000;
     padding: 14px 20px calc(14px + env(safe-area-inset-bottom));
-    background: rgba(11, 20, 36, 0.88);
-    backdrop-filter: blur(20px) saturate(150%);
+    background: #0b1424; /* Solid background to prevent scroll lag on mobile */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 22px 22px 0 0;
-    box-shadow: 0 -6px 28px rgba(0, 0, 0, 0.3), 0 -1px 0 rgba(255, 255, 255, 0.05) inset;
+    box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.22), 0 -1px 0 rgba(255, 255, 255, 0.05) inset;
   }
 
   html[data-theme="light"] .checkout-mobile-floating-bar {
-    background: rgba(255, 255, 255, 0.92);
-    backdrop-filter: blur(20px) saturate(150%);
+    background: #ffffff; /* Solid white background to prevent scroll lag on mobile */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     border-top-color: rgba(0, 138, 148, 0.12);
-    box-shadow: 0 -6px 28px rgba(67, 111, 129, 0.08), 0 -1px 0 rgba(255, 255, 255, 0.6) inset;
+    box-shadow: 0 -4px 16px rgba(67, 111, 129, 0.06), 0 -1px 0 rgba(255, 255, 255, 0.6) inset;
   }
 
   .checkout-floating-bar-info {

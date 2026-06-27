@@ -1608,6 +1608,15 @@ html[data-theme="light"] .catalog-sheetFoot {
 }
 
 @media (max-width: 900px) and (min-width: 721px) {
+  /* Simplify card rendering for tablets to prevent scroll frame drops */
+  .catalog-card {
+    background: var(--card, rgba(255, 255, 255, 0.04)) !important;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18) !important;
+  }
+  .catalog-card::before {
+    display: none !important;
+  }
+
   .catalog-heroGrid {
     max-width: 680px;
   }
@@ -1826,11 +1835,21 @@ html[data-theme="light"] .catalog-sheetFoot {
 
   /* simplify card rendering on mobile — skip expensive gradients + large shadow */
   .catalog-card {
-    background: var(--card, rgba(255, 255, 255, 0.04));
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+    background: var(--card, rgba(255, 255, 255, 0.04)) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
+    /* GPU layer promotion for silky smooth scrolling on mobile */
+    will-change: transform;
+    transform: translate3d(0, 0, 0);
+    /* Mobile-appropriate height estimates to solve scrollbar jumping and layout reflows */
+    contain-intrinsic-size: auto 195px !important;
   }
+
+  .catalog-card.list {
+    contain-intrinsic-size: auto 120px !important;
+  }
+
   .catalog-card::before {
-    display: none;
+    display: none !important;
   }
 }
 
