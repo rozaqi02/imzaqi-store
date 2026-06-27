@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { useTheme } from "../context/ThemeContext";
+import { useToast } from "../context/ToastContext";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useHeaderShrink } from "../hooks/useHeaderShrink";
 import { useIsMobile } from "../hooks/useIsMobile";
@@ -230,21 +231,55 @@ export default function Header() {
   const { items, remove, bumpToken, lastAddedVariantId } = useCart();
   const isHeaderShrunk = useHeaderShrink();
   const { isDark, toggleTheme } = useTheme();
+  const toast = useToast();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
   const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.price_idr * item.qty, 0), [items]);
   const [open, setOpen] = useState(false);
-  const [pillStyle, setPillStyle] = useState({ width: 0, height: 0, x: 0, y: 0, opacity: 0 });
-  const [hoverStyle, setHoverStyle] = useState({ width: 0, height: 0, x: 0, y: 0, opacity: 0 });
-  const navRef = useRef(null);
-  const navRefs = useRef([]);
-  const isMobileViewport = useIsMobile();
+  const isMobileViewport = useIsMobile("(max-width: 1024px)");
   const headerRef = useRef(null);
+  const navRef = useRef(null);
   const location = useLocation();
+
+  const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
+
+  const updatePill = useCallback(() => {
+    const nav = navRef.current;
+    if (!nav) return;
+    const activeLink = nav.querySelector("a.active");
+    if (activeLink) {
+      setPillStyle({
+        left: activeLink.offsetLeft,
+        top: activeLink.offsetTop,
+        width: activeLink.offsetWidth,
+        height: activeLink.offsetHeight,
+        opacity: 1,
+      });
+    } else {
+      setPillStyle((prev) => ({ ...prev, opacity: 0 }));
+    }
+  }, []);
+
+  useLayoutEffect(() => {
+    updatePill();
+  }, [location.pathname, updatePill]);
+
+  useEffect(() => {
+    updatePill();
+    if (typeof window === "undefined") return undefined;
+    window.addEventListener("resize", updatePill);
+    return () => window.removeEventListener("resize", updatePill);
+  }, [updatePill]);
+
+  useEffect(() => {
+    const timer = window.setTimeout(updatePill, HEADER_SHRINK_MS + 20);
+    return () => window.clearTimeout(timer);
+  }, [isHeaderShrunk, updatePill]);
   const handleOpen = useCallback(() => setOpen(true), []);
   const handleClose = useCallback(() => setOpen(false), []);
 
   const [showMiniCart, setShowMiniCart] = useState(false);
   const [pillBump, setPillBump] = useState(false);
+  const [cartShake, setCartShake] = useState(false);
   const miniCartTimerRef = useRef(null);
   const pillBumpTimerRef = useRef(null);
 
@@ -306,8 +341,6 @@ export default function Header() {
 
     syncHeaderOffset();
 
-    // Prefer ResizeObserver (fires only on actual size changes).
-    // Fall back to window resize only when ResizeObserver is unavailable.
     if (typeof ResizeObserver !== "undefined" && headerRef.current) {
       observer = new ResizeObserver(syncHeaderOffset);
       observer.observe(headerRef.current);
@@ -322,80 +355,6 @@ export default function Header() {
     };
   }, [location.pathname]);
 
-  const syncNavPill = useCallback(() => {
-    if (isMobileViewport) return;
-
-    const activeIdx = NAV_LINKS.findIndex(
-      (link) => location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to))
-    );
-
-    const activeEl = activeIdx >= 0 ? navRefs.current[activeIdx] : null;
-    const navEl = navRef.current;
-
-    if (activeEl && navEl) {
-      const navRect = navEl.getBoundingClientRect();
-      const linkRect = activeEl.getBoundingClientRect();
-      setPillStyle({
-        width: linkRect.width,
-        height: linkRect.height,
-        x: linkRect.left - navRect.left,
-        y: linkRect.top - navRect.top,
-        opacity: 1,
-      });
-      return;
-    }
-
-    setPillStyle((prev) => ({ ...prev, opacity: 0 }));
-  }, [isMobileViewport, location.pathname]);
-
-  useLayoutEffect(() => {
-    syncNavPill();
-
-    // Nav pill resize sync only needed on desktop — on mobile the nav is hidden
-    if (isMobileViewport) return undefined;
-
-    const throttledResize = rafThrottle(syncNavPill);
-    window.addEventListener("resize", throttledResize);
-    return () => {
-      throttledResize.cancel();
-      window.removeEventListener("resize", throttledResize);
-    };
-  }, [syncNavPill, isMobileViewport]);
-
-  useEffect(() => {
-    if (isMobileViewport) return undefined;
-
-    let raf = 0;
-    const startedAt = performance.now();
-
-    const tick = (now) => {
-      syncNavPill();
-      if (now - startedAt < HEADER_SHRINK_MS + 48) {
-        raf = window.requestAnimationFrame(tick);
-      }
-    };
-
-    raf = window.requestAnimationFrame(tick);
-    return () => window.cancelAnimationFrame(raf);
-  }, [isHeaderShrunk, isMobileViewport, syncNavPill]);
-
-  useEffect(() => {
-    if (isMobileViewport || typeof ResizeObserver === "undefined") return undefined;
-
-    const throttledSync = rafThrottle(syncNavPill);
-    const observer = new ResizeObserver(() => throttledSync());
-    const navEl = navRef.current;
-    if (navEl) observer.observe(navEl);
-    navRefs.current.forEach((link) => {
-      if (link) observer.observe(link);
-    });
-
-    return () => {
-      throttledSync.cancel();
-      observer.disconnect();
-    };
-  }, [isMobileViewport, location.pathname, syncNavPill]);
-
   return (
     <>
       <header ref={headerRef} className={`header${isHeaderShrunk ? " is-shrunk" : ""}`}>
@@ -404,62 +363,23 @@ export default function Header() {
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
           </Link>
 
-          <nav
-            ref={navRef}
-            className="nav desktop-only"
-            style={{ position: "relative" }}
-            onMouseLeave={() => setHoverStyle((prev) => ({ ...prev, opacity: 0 }))}
-          >
-            <motion.div
+          <nav ref={navRef} className="nav desktop-only">
+            <div
               className="nav-active-pill"
-              initial={false}
-              animate={{
-                width: pillStyle.width,
-                height: pillStyle.height,
-                x: pillStyle.x,
-                y: pillStyle.y,
+              style={{
+                transform: `translate(${pillStyle.left}px, ${pillStyle.top}px)`,
+                width: `${pillStyle.width}px`,
+                height: `${pillStyle.height}px`,
                 opacity: pillStyle.opacity,
               }}
-              transition={{ duration: HEADER_SHRINK_MS / 1000, ease: NAV_PILL_EASE }}
-              style={{ left: 0, top: 0, bottom: "auto", right: "auto" }}
             />
-            <motion.div
-              className="nav-hover-pill"
-              initial={false}
-              animate={{
-                width: hoverStyle.width,
-                height: hoverStyle.height,
-                x: hoverStyle.x,
-                y: hoverStyle.y,
-                opacity: hoverStyle.opacity,
-              }}
-              transition={{ duration: 0.22, ease: NAV_PILL_EASE }}
-              style={{ left: 0, top: 0, bottom: "auto", right: "auto" }}
-            />
-            {NAV_LINKS.map((link, idx) => {
+            {NAV_LINKS.map((link) => {
               const isActive = location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to));
               return (
-                <Link 
-                  key={link.to} 
-                  to={link.to} 
-                  className={isActive ? "active" : ""} 
-                  ref={(el) => (navRefs.current[idx] = el)}
-                  style={{ position: "relative", zIndex: 1 }}
-                  onMouseEnter={() => {
-                    const el = navRefs.current[idx];
-                    const navEl = navRef.current;
-                    if (el && navEl) {
-                      const navRect = navEl.getBoundingClientRect();
-                      const linkRect = el.getBoundingClientRect();
-                      setHoverStyle({
-                        width: linkRect.width,
-                        height: linkRect.height,
-                        x: linkRect.left - navRect.left,
-                        y: linkRect.top - navRect.top,
-                        opacity: 1,
-                      });
-                    }
-                  }}
+                <Link
+                  key={link.to}
+                  to={link.to}
+                  className={isActive ? "active" : ""}
                 >
                   {link.label}
                 </Link>
@@ -474,7 +394,11 @@ export default function Header() {
               onMouseLeave={handleCartMouseLeave}
               style={{ position: "relative" }}
             >
-              <Link to="/checkout" state={{ backgroundLocation: location }} className="header-cart">
+              <Link
+                to="/checkout"
+                state={{ backgroundLocation: location }}
+                className={`header-cart${cartShake ? " is-shaking" : ""}`}
+              >
                 <CartIcon />
                 {cartCount > 0 ? (
                   <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>

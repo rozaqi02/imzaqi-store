@@ -1,5 +1,5 @@
 // src/components/WhatsAppInput.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Check, X } from 'lucide-react';
 
 const STORAGE_KEY = 'imzaqi_last_whatsapp';
@@ -84,13 +84,22 @@ export default function WhatsAppInput({
   const [internalValue, setInternalValue] = useState(() => formatWhatsAppNumber(value));
   const [validation, setValidation] = useState({ valid: false, message: '' });
   const [touched, setTouched] = useState(false);
+  const autoFilledRef = useRef(false);
   const [lastSavedNumber, setLastSavedNumber] = useState('');
 
   useEffect(() => {
-    if (rememberLast) {
+    if (rememberLast && !autoFilledRef.current) {
       try {
         const saved = localStorage.getItem(STORAGE_KEY);
-        if (saved) setLastSavedNumber(formatWhatsAppNumber(saved));
+        if (saved) {
+          const formatted = formatWhatsAppNumber(saved);
+          setLastSavedNumber(formatted);
+          if (!value) {
+            autoFilledRef.current = true;
+            setInternalValue(formatted);
+            if (onChange) onChange(formatted);
+          }
+        }
       } catch (e) {}
     }
   }, [rememberLast]);

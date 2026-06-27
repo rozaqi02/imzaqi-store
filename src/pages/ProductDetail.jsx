@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, memo } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -27,7 +27,11 @@ import VariantCompareModal from "../components/VariantCompareModal";
 import { useLongTaskMonitor } from "../hooks/usePerformanceMonitor";
 import { warn } from "../lib/log";
 import { fireConfetti } from "../components/Confetti";
+
+// ── Live viewer & countdown removed (fake data — hurts trust) ──────────────
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
+import { addRecentlyViewed } from "../lib/recentlyViewed";
+import RecentlyViewed from "../components/RecentlyViewed";
 import ProductTile from "../components/ProductTile";
 import "../css/pages/ProductDetail.css";
 
@@ -99,11 +103,23 @@ const SECTION_ICONS = {
   catatan: Info,
 };
 
-function VariantBenefitList({ rawText }) {
+function VariantBenefitList({ rawText, variant }) {
   const [expanded, setExpanded] = useState(false);
   const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
 
-  if (!sections.length) return null;
+  // Build structured info rows from variant DB fields
+  const infoRows = useMemo(() => {
+    const rows = [];
+    if (variant?.duration_label) rows.push({ icon: Clock3, label: "Durasi", value: variant.duration_label });
+    if (variant?.guarantee_text) rows.push({ icon: ShieldCheck, label: "Garansi", value: variant.guarantee_text });
+    if (variant?.requires_buyer_email) rows.push({ icon: Mail, label: "Email buyer", value: "Wajib sertakan email aktif saat checkout" });
+    if (typeof variant?.stock === "number") rows.push({ icon: Sparkles, label: "Stok tersedia", value: `${variant.stock} unit` });
+    if (typeof variant?.sold_count === "number" && variant.sold_count > 0) rows.push({ icon: ShoppingBag, label: "Terjual", value: `${variant.sold_count}×` });
+    return rows;
+  }, [variant]);
+
+  const hasContent = infoRows.length > 0 || sections.length > 0;
+  if (!hasContent) return null;
 
   return (
     <div className="pdx-benefitList">
@@ -116,10 +132,22 @@ function VariantBenefitList({ rawText }) {
         <ChevronDown size={15} className="pdx-benefitChevron" />
       </button>
 
-      {expanded
-        ? sections.map((section, si) => {
-            const SectionIcon = section.icon ? SECTION_ICONS[section.icon] || Info : null;
+      {expanded ? (
+        <>
+          {infoRows.length > 0 ? (
+            <div className="pdx-infoRows">
+              {infoRows.map(({ icon: Icon, label, value }) => (
+                <div key={label} className="pdx-infoRow">
+                  <span className="pdx-infoRow-icon"><Icon size={13} /></span>
+                  <span className="pdx-infoRow-label">{label}</span>
+                  <span className="pdx-infoRow-value">{value}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
 
+          {sections.map((section, si) => {
+            const SectionIcon = section.icon ? SECTION_ICONS[section.icon] || Info : null;
             return (
               <div key={si} className={`pdx-benefitSection ${section.label ? "has-label" : ""}`}>
                 {section.label ? (
@@ -138,8 +166,9 @@ function VariantBenefitList({ rawText }) {
                 </ul>
               </div>
             );
-          })
-        : null}
+          })}
+        </>
+      ) : null}
     </div>
   );
 }
@@ -304,7 +333,17 @@ const VariantCard = React.memo(({
             {variant.duration_label ? (
               <span className="pdx-packMetaItem">
                 <Clock3 size={12} />
-                {variant.duration_label}
+                {String(variant.duration_label).toLowerCase().startsWith("durasi")
+                  ? variant.duration_label
+                  : `Durasi ${variant.duration_label}`}
+              </span>
+            ) : null}
+            {variant.guarantee_text ? (
+              <span className="pdx-packMetaItem pdx-packMetaItem--guarantee">
+                <ShieldCheck size={12} />
+                {String(variant.guarantee_text).toLowerCase().startsWith("garansi")
+                  ? variant.guarantee_text
+                  : `Garansi ${variant.guarantee_text}`}
               </span>
             ) : null}
             {variant.requires_buyer_email ? (
@@ -316,12 +355,9 @@ const VariantCard = React.memo(({
           </div>
           {stock > 0 && maxVariantStock > 1 ? (
             <div className="pdx-stockBarWrap">
-              <div className="pdx-stockBar" role="progressbar" aria-valuenow={stock} aria-valuemin={0} aria-valuemax={maxVariantStock}>
+              <div className="pdx-stockBar" role="progressbar" aria-valuemin={0} aria-valuemax={maxVariantStock}>
                 <span className="pdx-stockBarFill" style={{ width: `${(stock / maxVariantStock) * 100}%` }} />
               </div>
-              {stock <= 3 ? (
-                <span className="pdx-stockUrgency">Hanya sisa {stock}!</span>
-              ) : null}
             </div>
           ) : null}
         </div>
@@ -342,7 +378,7 @@ const VariantCard = React.memo(({
         </div>
       </div>
 
-      <VariantBenefitList rawText={descriptionBody} />
+      <VariantBenefitList rawText={descriptionBody} variant={variant} />
 
       <div className="pdx-packActions">
         <button
@@ -485,6 +521,46 @@ export default function ProductDetail() {
     ogImage: product?.icon_url || undefined,
   });
 
+  // JSON-LD structured data for Google rich results
+  useEffect(() => {
+    if (!product) return;
+    const existing = document.getElementById("jsonld-product");
+    if (existing) existing.remove();
+
+    const activeVariants = (product.product_variants || []).filter((v) => v?.is_active);
+    const prices = activeVariants.map((v) => Number(v.price_idr || 0)).filter((n) => n > 0);
+    const minPrice = prices.length ? Math.min(...prices) : 0;
+    const maxPrice = prices.length ? Math.max(...prices) : 0;
+    const totalStock = activeVariants.reduce((s, v) => s + Number(v.stock || 0), 0);
+
+    const jsonld = {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "name": product.name,
+      "description": product.description || "",
+      "image": product.icon_url || "",
+      "brand": { "@type": "Brand", "name": "Imzaqi Store" },
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "IDR",
+        "lowPrice": minPrice,
+        "highPrice": maxPrice,
+        "offerCount": activeVariants.length,
+        "availability": totalStock > 0
+          ? "https://schema.org/InStock"
+          : "https://schema.org/OutOfStock",
+      },
+    };
+
+    const script = document.createElement("script");
+    script.id = "jsonld-product";
+    script.type = "application/ld+json";
+    script.textContent = JSON.stringify(jsonld);
+    document.head.appendChild(script);
+
+    return () => { document.getElementById("jsonld-product")?.remove(); };
+  }, [product]);
+
   useEffect(() => {
     let alive = true;
 
@@ -503,6 +579,12 @@ export default function ProductDetail() {
         const fsMap = new Map();
         (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
         setFlashSaleMap(fsMap);
+        // Track recently viewed
+        if (data) {
+          const activeVariants = (data.product_variants || []).filter((v) => v?.is_active);
+          const prices = activeVariants.map((v) => Number(v.price_idr || 0)).filter((n) => n > 0);
+          addRecentlyViewed({ ...data, _minPrice: prices.length ? Math.min(...prices) : null });
+        }
       } catch (fetchError) {
         warn(fetchError);
         if (!alive) return;
@@ -580,6 +662,54 @@ export default function ProductDetail() {
     () => variants.reduce((sum, variant) => sum + Math.max(0, Number(variant?.sold_count || 0)), 0),
     [variants]
   );
+
+  const liveViewers = null; // removed fake data
+  const [emojiFloats, setEmojiFloats] = useState([]);
+  const emojiCountsRef = useRef({});
+
+  // Idle Tease
+  useEffect(() => {
+    if (!product) return;
+    let timer;
+    const reset = () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => {
+        const el = document.createElement("div");
+        el.className = "idle-tease-toast";
+        el.setAttribute("role", "status");
+        el.innerHTML = `<span>👀</span><span>Masih mikir? Stok tinggal dikit loh!</span>`;
+        document.body.appendChild(el);
+        setTimeout(() => el.remove(), 3500);
+        // Re-arm after dismiss
+        timer = setTimeout(reset, 60000);
+      }, 60000);
+    };
+    const events = ["mousemove", "keydown", "scroll", "touchstart", "click"];
+    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
+    reset();
+    return () => {
+      clearTimeout(timer);
+      events.forEach((e) => window.removeEventListener(e, reset));
+    };
+  }, [product]);
+
+  const EMOJI_REACTIONS = ["\u2764\ufe0f","\ud83d\udd25","\ud83d\ude2e","\ud83d\udcaf"];
+  const EMOJI_STORAGE_KEY = product?.id ? `imzaqi_reactions_${product.id}` : null;
+
+  function handleEmojiReact(emoji) {
+    // Save count to localStorage
+    if (EMOJI_STORAGE_KEY) {
+      try {
+        const stored = JSON.parse(localStorage.getItem(EMOJI_STORAGE_KEY) || "{}");
+        stored[emoji] = (stored[emoji] || 0) + 1;
+        localStorage.setItem(EMOJI_STORAGE_KEY, JSON.stringify(stored));
+      } catch {}
+    }
+    // Spawn float
+    const id = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
+    setEmojiFloats((prev) => [...prev.slice(-12), { id, emoji }]);
+    setTimeout(() => setEmojiFloats((prev) => prev.filter((f) => f.id !== id)), 1200);
+  }
 
   const maxVariantStock = useMemo(
     () => Math.max(1, ...variants.map((v) => Number(v.stock || 0))),
@@ -930,6 +1060,27 @@ export default function ProductDetail() {
                   </div>
                 </section>
               </div>
+            </div>
+
+            {/* Recently Viewed Strip */}
+            <RecentlyViewed currentProductId={product?.id} />
+
+            {/* Floating Emoji Reactions */}
+            <div className="pdx-emojiReactions" aria-label="Reaksi produk">
+              {EMOJI_REACTIONS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  className="pdx-emojiBtn"
+                  onClick={() => handleEmojiReact(emoji)}
+                  aria-label={`Reaksi ${emoji}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+              {emojiFloats.map((f) => (
+                <span key={f.id} className="pdx-emojiFloat" aria-hidden="true">{f.emoji}</span>
+              ))}
             </div>
 
             {recommendations.length > 0 ? (

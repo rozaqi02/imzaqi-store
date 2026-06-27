@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import { fireConfetti } from "../components/Confetti";
 import {
   Activity,
   AlertCircle,
@@ -155,6 +156,35 @@ function FlowStep({ step }) {
   );
 }
 
+// ── Micro Celebration on Done ───────────────────────────────────────────────
+function DoneCelebration({ show, onDismiss }) {
+  useEffect(() => {
+    if (!show) return;
+    // Fire confetti from center of screen
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 3;
+    fireConfetti(cx, cy);
+    setTimeout(() => fireConfetti(cx - 80, cy + 20), 200);
+    setTimeout(() => fireConfetti(cx + 80, cy + 20), 400);
+    const t = setTimeout(onDismiss, 3200);
+    return () => clearTimeout(t);
+  }, [show, onDismiss]);
+
+  if (!show) return null;
+
+  return (
+    <div className="st-doneCelebration" role="status" aria-live="assertive">
+      <div className="st-doneCelebration-inner">
+        <span className="st-doneCelebration-icon">🎉</span>
+        <div className="st-doneCelebration-text">
+          <strong>Pesananmu sudah selesai!</strong>
+          <span>Terima kasih sudah belanja di Imzaqi Store 🤩</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function InfoCard({ label, value, hint, tone = "", icon: Icon }) {
   return (
     <article className={`st-infoCard${tone ? ` is-${tone}` : ""}`}>
@@ -181,6 +211,8 @@ function TabCekStatus({ settings }) {
   const [order, setOrder] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
+  const prevStatusRef = useRef(null);
 
   const waNumber = settings?.whatsapp?.number || "6283136049987";
   const pollTimerRef = useRef(null);
@@ -250,6 +282,17 @@ function TabCekStatus({ settings }) {
     setInput(normalized);
     lookup(normalized);
   }, [initialParam, lookup]);
+
+  // Trigger celebration when status becomes "done"
+  useEffect(() => {
+    if (!order) return;
+    const prev = prevStatusRef.current;
+    const curr = order.status;
+    if (curr === "done" && prev && prev !== "done") {
+      setShowCelebration(true);
+    }
+    prevStatusRef.current = curr;
+  }, [order]);
 
   // Auto-refresh disabled
 
@@ -348,6 +391,10 @@ function TabCekStatus({ settings }) {
 
   return (
     <>
+      <DoneCelebration
+        show={showCelebration}
+        onDismiss={() => setShowCelebration(false)}
+      />
       {order ? (
         <div className="st-statePillRow" aria-live="polite" aria-atomic="true">
           <div className={`st-statePill is-${statusMeta.tone}`}>
@@ -719,6 +766,46 @@ function TabCekStatus({ settings }) {
 
 // ─── Tab: Riwayat ────────────────────────────────────────────────────────────
 
+function calcStreak(entries) {
+  if (!entries || entries.length === 0) return 0;
+  const months = [...new Set(
+    entries
+      .filter((e) => e.status === "done")
+      .map((e) => {
+        const d = new Date(e.created_at || 0);
+        return `${d.getFullYear()}-${d.getMonth()}`;
+      })
+  )].sort().reverse();
+  if (months.length === 0) return 0;
+  let streak = 1;
+  for (let i = 0; i < months.length - 1; i++) {
+    const [y1, m1] = months[i].split("-").map(Number);
+    const [y2, m2] = months[i + 1].split("-").map(Number);
+    if ((y1 * 12 + m1) - (y2 * 12 + m2) === 1) streak++;
+    else break;
+  }
+  return streak;
+}
+
+function StreakBadge({ streak }) {
+  if (streak < 2) return null;
+  const emoji = streak >= 6 ? "🔥" : streak >= 3 ? "⚡" : "👍";
+  const label = streak >= 6
+    ? `${streak} bulan berturut-turut! Pelanggan setia!`
+    : streak >= 3
+    ? `${streak} bulan berturut-turut! Keep it up!`
+    : `${streak} bulan berturut-turut!`;
+  return (
+    <div className="st-streakBadge">
+      <span className="st-streakEmoji" aria-hidden="true">{emoji}</span>
+      <div className="st-streakText">
+        <strong>Streak {streak} Bulan</strong>
+        <span>{label}</span>
+      </div>
+    </div>
+  );
+}
+
 function TabRiwayat() {
   const [entries, setEntries] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -817,8 +904,11 @@ function TabRiwayat() {
     );
   }
 
+  const streak = calcStreak(entries);
+
   return (
     <div className="oh-list">
+      <StreakBadge streak={streak} />
       {/* Toolbar: refresh + clear all */}
       <div className="oh-listToolbar">
         <button

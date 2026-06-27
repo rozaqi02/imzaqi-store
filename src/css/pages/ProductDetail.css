@@ -91,6 +91,8 @@
   display: grid;
   gap: 18px;
   color: var(--pdx-text);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .pdx-heroGrid {
@@ -582,6 +584,63 @@
 .pdx-benefitList {
   display: grid;
   gap: 4px;
+}
+
+/* ── Info Rows (structured variant DB fields) ── */
+.pdx-infoRows {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  border-radius: 10px;
+  overflow: hidden;
+  margin-bottom: 6px;
+  border: 1px solid var(--pdx-line, rgba(255,255,255,0.08));
+}
+
+.pdx-infoRow {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  font-size: 12px;
+  border-bottom: 1px solid var(--pdx-line, rgba(255,255,255,0.06));
+}
+
+.pdx-infoRow:last-child { border-bottom: none; }
+
+.pdx-infoRow:nth-child(odd) {
+  background: rgba(255,255,255,0.025);
+}
+
+.pdx-infoRow-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--accent, #00d6b4);
+  opacity: 0.8;
+}
+
+.pdx-infoRow-label {
+  color: var(--pdx-muted);
+  font-weight: 600;
+}
+
+.pdx-infoRow-value {
+  color: var(--pdx-text);
+  font-weight: 700;
+  text-align: right;
+  font-size: 11px;
+}
+
+:root[data-theme="light"] .pdx-infoRow:nth-child(odd) {
+  background: rgba(0,0,0,0.025);
+}
+:root[data-theme="light"] .pdx-infoRows {
+  border-color: rgba(0,0,0,0.08);
+}
+:root[data-theme="light"] .pdx-infoRow {
+  border-bottom-color: rgba(0,0,0,0.05);
 }
 
 .pdx-benefitSection {
@@ -1246,6 +1305,11 @@
   border-radius: 28px !important;
   background: var(--pdx-panel);
   box-shadow: var(--pdx-panel-shadow);
+  box-sizing: border-box;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
+  width: 100%;
 }
 
 .detail-page-v3 .pdx-packCard {
@@ -1360,6 +1424,8 @@
   font-size: clamp(13px, 1.6vw, 14px);
   line-height: 1.6;
   overflow-wrap: anywhere;
+  word-break: break-word;
+  max-width: 100%;
   white-space: pre-line !important;
 }
 
@@ -1459,6 +1525,51 @@
   font-size: 11px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.detail-page-v3 .pdx-liveViewers {
+  color: #ff6b6b !important;
+  border-color: rgba(255, 107, 107, 0.3) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-liveViewers {
+  color: #e05555 !important;
+  border-color: rgba(220, 80, 80, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-countdownStat {
+  color: #f59e0b !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.detail-page-v3 .pdx-countdownStat.is-expired {
+  color: #ef4444 !important;
+  border-color: rgba(239, 68, 68, 0.3) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-countdownStat {
+  color: #d97706 !important;
+  border-color: rgba(217, 119, 6, 0.25) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
+  color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-liveViewersDot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #ff6b6b;
+  flex-shrink: 0;
+  animation: liveViewerPulse 1.8s ease-in-out infinite;
+}
+
+@keyframes liveViewerPulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.75); }
 }
 
 .detail-page-v3 .pdx-statsChips {
@@ -1885,20 +1996,21 @@
   .detail-page-v3 .pdx-addBtn {
     width: auto !important;
     min-width: 0 !important;
-    padding: 0 12px !important;
+    padding: 0 8px !important; /* Reduced from 12px to prevent text wrapping */
+    gap: 4px !important; /* Reduced gap to save horizontal space */
     justify-content: center !important;
     color: var(--pdx-text-2) !important;
-    font-size: 12px !important;
+    font-size: 11.5px !important; /* Slightly smaller for safety */
   }
 
   .detail-page-v3 .pdx-packActions {
-    grid-template-columns: 1fr 1.2fr !important;
+    grid-template-columns: 1fr 1.1fr !important; /* Adjusted columns to give cart button more room */
     gap: 6px !important;
   }
 
   .detail-page-v3 .pdx-packActions .btn {
     min-height: 38px !important;
-    font-size: 12px !important;
+    font-size: 11.5px !important; /* Adjusted to match */
     padding: 0 8px !important;
   }
 }
@@ -2007,32 +2119,37 @@
    Detail Page Overhaul: Premium Glassmorphism & Grid Alignment
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* 1. Sleek Brand Glow on Top Card */
+/* 1. Top Card — full neumorphism 3D, no glassmorphism */
 .detail-page-v3 .pdx-topCard {
-  background: 
+  background:
     linear-gradient(166deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 255, 255, 0) 100%),
     radial-gradient(ellipse 80% 60% at 10% 20%, var(--brand-color, rgba(78, 255, 218, 0.10)), rgba(0, 0, 0, 0) 85%),
     radial-gradient(ellipse 50% 40% at 90% 80%, var(--brand-color, rgba(78, 255, 218, 0.05)), rgba(0, 0, 0, 0) 80%),
-    var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1)) !important;
-  box-shadow: 
-    0 30px 60px rgba(0, 0, 0, 0.35),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: blur(24px);
+    var(--skeu-panel-bg, linear-gradient(175deg, rgba(20, 34, 64, 1), rgba(4, 8, 22, 1))) !important;
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16)) !important;
+  box-shadow:
+    0 2px 4px rgba(0, 0, 0, 0.72),
+    24px 30px 56px rgba(0, 4, 14, 0.62),
+    12px 16px 30px rgba(0, 3, 10, 0.44),
+    -14px -14px 32px rgba(255, 255, 255, 0.08),
+    inset 0 3px 0 rgba(255, 255, 255, 0.10),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.48) !important;
   position: relative;
-  overflow: hidden;
+  overflow: clip;
 }
 
-/* Light mode support for Top Card */
+/* Light mode top card */
 :root[data-theme="light"] .detail-page-v3 .pdx-topCard {
-  background: 
+  background:
     radial-gradient(ellipse 85% 65% at 10% 20%, var(--brand-color, rgba(126, 194, 224, 0.18)), rgba(0, 0, 0, 0) 85%),
     radial-gradient(ellipse 55% 45% at 90% 80%, var(--brand-color, rgba(126, 194, 224, 0.10)), rgba(0, 0, 0, 0) 80%),
-    linear-gradient(166deg, rgba(255, 255, 255, 0.78) 0%, rgba(247, 253, 255, 0.68) 50%, rgba(235, 246, 252, 0.74) 100%) !important;
-  border-color: rgba(0, 138, 148, 0.14) !important;
-  box-shadow: 
-    0 24px 50px rgba(97, 137, 153, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+    linear-gradient(166deg, rgba(255, 255, 255, 0.98) 0%, rgba(242, 250, 253, 0.88) 50%, rgba(232, 246, 251, 0.94) 100%) !important;
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  box-shadow:
+    12px 14px 28px rgba(97, 137, 153, 0.18),
+    -7px -7px 15px rgba(255, 255, 255, 0.9),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(166, 200, 211, 0.28) !important;
 }
 
 /* Add a beautiful radial brand glow behind icon */
@@ -2046,9 +2163,9 @@
 
 /* 2. Redesign Variant Cards for a highly polished tactile feel */
 .detail-page-v3 .pdx-packCard {
-  background: var(--pdx-inset) !important;
+  background: var(--pdx-soft) !important;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08)) !important;
-  box-shadow: var(--pdx-inset-shadow) !important;
+  box-shadow: var(--pdx-soft-shadow) !important;
   transition: transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.22s ease, box-shadow 0.22s ease;
   cursor: pointer;
 }
@@ -2319,6 +2436,50 @@
   color: rgba(62, 91, 103, 0.78) !important;
 }
 
+/* Fix hovered back-face overflow and clipping inside recommendations grid */
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back {
+  padding: 10px 8px !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back-inner {
+  gap: 4px !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back-icon {
+  width: 36px !important;
+  height: 36px !important;
+  border-radius: 10px !important;
+  margin-bottom: 0 !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back-icon img {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back-name {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  line-height: 1.15 !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back-price {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back-stats {
+  font-size: 10px !important;
+  gap: 6px !important;
+}
+
+.detail-page-v3 .pdx-recommendationsGrid .product-tile-back-cta {
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  padding: 4px 10px !important;
+  border-radius: 8px !important;
+}
+
 /* Mobile variant swipe */
 @media (max-width: 720px) {
   .detail-page-v3 .pdx-packList {
@@ -2326,6 +2487,8 @@
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
     scroll-snap-type: x mandatory !important;
     gap: 10px !important;
     padding: 4px 4px 12px !important;
@@ -2338,33 +2501,39 @@
     display: none !important;
   }
 
-/* ── Stock Bar + Urgency ── */
-.detail-page-v3 .pdx-stockBarWrap {
-  display: flex;
+  .detail-page-v3 .pdx-packCard {
+    flex: 0 0 min(280px, 80vw) !important;
+    scroll-snap-align: start !important;
+    min-width: 220px !important;
+  }
+}
+
+/* Hide stock bar on mobile */
+@media (max-width: 720px) {
+  .detail-page-v3 .pdx-stockBarWrap {
+    display: none;
+  }
+}
+
+/* ── Guarantee chip in variant card ── */
+.detail-page-v3 .pdx-packMetaItem--guarantee {
+  color: #6ee7b7;
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.2);
+  border-radius: 999px;
+  padding: 0 8px;
+  min-height: 22px;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  margin-top: 4px;
+  gap: 4px;
+  font-size: 11px;
+  font-weight: 700;
 }
 
-.detail-page-v3 .pdx-stockBar {
-  flex: 1;
-  height: 5px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  overflow: hidden;
-  max-width: 120px;
-}
-
-.detail-page-v3 .pdx-stockBarFill {
-  display: block;
-  height: 100%;
-  border-radius: 999px;
-  background: var(--accent, #00d6b4);
-  transition: width 0.3s ease;
-}
-
-html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
-  background: rgba(0, 0, 0, 0.08);
+html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
+  color: #047857;
+  background: rgba(167, 243, 208, 0.45);
+  border-color: rgba(16, 185, 129, 0.25);
 }
 
 .detail-page-v3 .pdx-stockUrgency {
@@ -2380,13 +2549,6 @@ html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
   50% { opacity: 0.5; }
 }
 
-.detail-page-v3 .pdx-packCard {
-    flex: 0 0 min(280px, 75vw) !important;
-    scroll-snap-align: start !important;
-    min-width: 200px !important;
-  }
-}
-
 /* Mobile & Tablet Slider (Sebaris & Bisa Slide) */
 @media (max-width: 768px) {
   .detail-page-v3 .pdx-recommendationsGrid {
@@ -2394,9 +2556,11 @@ html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
     flex-direction: row !important;
     flex-wrap: nowrap !important;
     overflow-x: auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
     scroll-snap-type: x mandatory !important;
     gap: 14px !important;
-    padding-bottom: 20px !important;
+    padding-bottom: 32px !important; /* Increased padding to prevent mobile clipping of shadows */
     padding-inline: 16px !important;
     margin-inline: -16px !important;
     scrollbar-width: none !important;
@@ -2413,6 +2577,11 @@ html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
     scroll-snap-align: start !important;
     height: auto !important;
   }
+
+  /* Clip horizontal slider overflow on mobile to prevent page scrollbars */
+  .detail-page-v3 .pdx-recommendations {
+    overflow: hidden !important;
+  }
 }
 
 /* Spacing and visual adjustments for Recommendations section */
@@ -2420,6 +2589,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
   margin-top: clamp(24px, 4vw, 40px) !important; /* Distance from variants section above */
   display: grid !important;
   gap: 20px !important; /* Distance between text title and the recommended cards */
+  /* overflow: hidden is moved to mobile media query to prevent clipping shadows on desktop */
 }
 
 .detail-page-v3 .pdx-recommendationsHead {
@@ -2443,6 +2613,10 @@ html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
   display: grid;
   grid-template-columns: 1.5fr 1fr;
   gap: 18px;
+}
+
+.pdx-mainGrid > * {
+  min-width: 0;
 }
 
 @media (min-width: 1024px) {
@@ -2486,7 +2660,8 @@ html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
   background: transparent;
   color: var(--pdx-text-2, rgba(255, 255, 255, 0.7));
   cursor: pointer;
-  white-space: nowrap;
+  white-space: normal;
+  line-height: 1.3;
   transition: color 0.22s ease, background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
   position: relative;
   z-index: 1;
@@ -2653,33 +2828,68 @@ html[data-theme="light"] .detail-page-v3 .pdx-stockBar {
 .detail-page-v3 .pdx-compareBtn {
   display: inline-flex;
   align-items: center;
-  height: 28px;
-  padding: 0 10px;
+  gap: 5px;
+  height: 30px;
+  padding: 0 14px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(79, 255, 200, 0.32);
+  background:
+    linear-gradient(175deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.68),
+    inset 0 -3px 0 rgba(0, 60, 52, 0.5),
+    inset 0 2px 8px rgba(0, 80, 68, 0.18),
+    0 10px 20px rgba(0, 8, 18, 0.32),
+    0 4px 12px rgba(0, 180, 150, 0.22);
+  color: #032235;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: box-shadow 0.18s ease, transform 0.15s ease;
   white-space: nowrap;
 }
 
 .detail-page-v3 .pdx-compareBtn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.76),
+    inset 0 -3px 0 rgba(0, 60, 52, 0.6),
+    inset 0 2px 8px rgba(0, 80, 68, 0.22),
+    0 14px 28px rgba(0, 8, 18, 0.4),
+    0 6px 16px rgba(0, 180, 150, 0.32);
+  transform: translateY(-1px);
+}
+
+.detail-page-v3 .pdx-compareBtn:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 rgba(0, 60, 52, 0.4),
+    inset 0 4px 12px rgba(0, 80, 68, 0.3),
+    0 4px 8px rgba(0, 8, 18, 0.24);
 }
 
 html[data-theme="light"] .detail-page-v3 .pdx-compareBtn {
-  border-color: rgba(0, 0, 0, 0.1);
-  background: rgba(0, 0, 0, 0.04);
-  color: rgba(0, 0, 0, 0.6);
+  border-color: rgba(0, 138, 148, 0.4);
+  background:
+    linear-gradient(175deg, rgba(255, 255, 255, 0.52), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(135deg, #2de8c8 0%, #00d6b4 50%, #00a896 100%);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.8),
+    inset 0 -3px 0 rgba(0, 80, 70, 0.42),
+    0 8px 18px rgba(0, 138, 148, 0.28),
+    0 3px 8px rgba(0, 100, 90, 0.18);
+  color: #012428;
 }
 
 html[data-theme="light"] .detail-page-v3 .pdx-compareBtn:hover {
-  background: rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.18);
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -3px 0 rgba(0, 80, 70, 0.5),
+    0 12px 24px rgba(0, 138, 148, 0.36),
+    0 5px 12px rgba(0, 100, 90, 0.24);
+  transform: translateY(-1px);
 }
 
 /* ── Variant Compare Modal ── */
@@ -2834,4 +3044,61 @@ html[data-theme="light"] .vcm-hint {
     max-height: 90vh;
     border-radius: 18px;
   }
+}
+
+/* ── Floating Emoji Reactions ─────────────────────────────────────── */
+.pdx-emojiReactions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 0 4px;
+  position: relative;
+}
+
+.pdx-emojiBtn {
+  background: none;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 20px;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+  line-height: 1;
+}
+
+.pdx-emojiBtn:hover {
+  transform: scale(1.25);
+  background: rgba(255,255,255,0.07);
+}
+
+.pdx-emojiBtn:active {
+  transform: scale(0.9);
+}
+
+html[data-theme="light"] .pdx-emojiBtn {
+  border-color: rgba(0,0,0,0.1);
+}
+
+html[data-theme="light"] .pdx-emojiBtn:hover {
+  background: rgba(0,0,0,0.04);
+}
+
+.pdx-emojiFloat {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  font-size: 24px;
+  pointer-events: none;
+  animation: emojiFloat 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  z-index: 10;
+}
+
+@keyframes emojiFloat {
+  0%   { transform: translate(-50%, 0) scale(0.6); opacity: 1; }
+  60%  { transform: translate(-50%, -60px) scale(1.2); opacity: 1; }
+  100% { transform: translate(-50%, -100px) scale(0.8); opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdx-emojiFloat { animation: none; }
 }

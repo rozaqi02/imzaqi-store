@@ -199,38 +199,38 @@ html[data-theme="light"] .hero-search-shell:focus-within {
      compete for narrow space and squish the title to one char per line. */
   .product-tile--list {
     grid-template-columns: 1fr;
-    gap: 12px;
-    padding: 14px;
-    border-radius: 22px;
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 18px;
   }
 
   .product-tile--list .product-tile-top {
     grid-template-columns: auto minmax(0, 1fr) auto;
-    gap: 12px;
+    gap: 10px;
     align-items: center;
   }
 
   .product-tile--list .product-tile-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 14px;
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
   }
 
   .product-tile--list .product-tile-name {
-    font-size: 16px;
+    font-size: 14px;
     line-height: 1.18;
   }
 
   .product-tile--list .product-tile-desc {
-    font-size: 12px;
-    line-height: 1.45;
+    font-size: 11px;
+    line-height: 1.35;
     -webkit-line-clamp: 2;
   }
 
   .product-tile--list .product-tile-arrow {
-    width: 32px;
-    height: 32px;
-    border-radius: 10px;
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
   }
 
   .product-tile--list .product-tile-bottom {
@@ -238,30 +238,30 @@ html[data-theme="light"] .hero-search-shell:focus-within {
     align-items: center;
     justify-content: space-between;
     min-width: 0;
-    gap: 10px;
+    gap: 8px;
     flex-wrap: wrap;
   }
 
   .product-tile--list .product-tile-pills {
     justify-content: flex-start;
-    gap: 6px;
+    gap: 5px;
     flex-wrap: wrap;
   }
 
   .product-tile--list .product-tile-pill {
-    height: 26px;
-    padding: 0 9px;
-    font-size: 11px;
-    gap: 5px;
+    height: 22px;
+    padding: 0 8px;
+    font-size: 10px;
+    gap: 4px;
   }
 
   .product-tile--list .product-tile-pill svg {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
   }
 
   .product-tile--list .product-tile-price {
-    font-size: 16px;
+    font-size: 15px;
     margin-left: auto;
   }
 }
@@ -555,7 +555,6 @@ html[data-theme="light"] .hx-grid-overlay {
   letter-spacing: 0.02em;
   color: var(--accent, #00d6b4);
   backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
 }
 
 html[data-theme="light"] .hx-live-badge {

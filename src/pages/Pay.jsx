@@ -18,6 +18,7 @@ import { useDialogA11y } from "../hooks/useDialogA11y";
 import { addOrderToHistory } from "../lib/orderHistory";
 import { copyToClipboard } from "../utils/clipboard";
 import { warn } from "../lib/log";
+import { saveBuyerName } from "../lib/greeting";
 import "../css/pages/Pay.css";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
@@ -25,6 +26,8 @@ const BUYER_EMAIL_REQUIREMENT_REGEX =
   /(akun\s*buyer|buyer\s*akun|email\s*(buyer|pembeli)|wajib\s*email|butuh\s*email|email\s*aktivasi|aktivasi\s*akun|account\s*activation|send\s*email)/i;
 const COPY_TIMEOUT_MS = 1800;
 const QRIS_UNLOCK_TIMEOUT_MS = 700;
+const STORAGE_KEY_BUYER_EMAIL = "imzaqi_last_buyer_email";
+const STORAGE_KEY_NOTES = "imzaqi_last_notes";
 const PRODUCT_NAME_MAX_LEN = 24;
 const PRODUCT_NAME_TRIM_LEN = 21;
 
@@ -539,8 +542,12 @@ export default function Pay() {
 
   const [customerWhatsApp, setCustomerWhatsApp] = useState("");
   const [isWaValid, setIsWaValid] = useState(false);
-  const [buyerEmail, setBuyerEmail] = useState("");
-  const [notes, setNotes] = useState("");
+  const [buyerEmail, setBuyerEmail] = useState(() => {
+    try { return localStorage.getItem(STORAGE_KEY_BUYER_EMAIL) || ""; } catch { return ""; }
+  });
+  const [notes, setNotes] = useState(() => {
+    try { return localStorage.getItem(STORAGE_KEY_NOTES) || ""; } catch { return ""; }
+  });
   const [busy, setBusy] = useState(false);
   const [errorText, setErrorText] = useState("");
   const [ok, setOk] = useState(false);
@@ -551,6 +558,14 @@ export default function Pay() {
   const [isZoomed, setIsZoomed] = useState(false);
   const [qrisJustUnlocked, setQrisJustUnlocked] = useState(false);
   const prevCanShowQrisRef = useRef(false);
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY_BUYER_EMAIL, buyerEmail); } catch {}
+  }, [buyerEmail]);
+
+  useEffect(() => {
+    try { localStorage.setItem(STORAGE_KEY_NOTES, notes); } catch {}
+  }, [notes]);
 
   useEffect(() => {
     fetchSettings()
@@ -916,6 +931,13 @@ export default function Pay() {
       setOk(true);
       setSnapshot(canonicalOrder.items);
       cart.clear();
+      // Save buyer name from WA number prefix for greeting
+      if (customerWhatsApp) {
+        try {
+          const waLabel = localStorage.getItem("imzaqi_last_whatsapp_name") || "";
+          if (!waLabel) saveBuyerName(customerWhatsApp.replace(/^62/, "0"));
+        } catch {}
+      }
       addOrderToHistory({
         order_code: generatedCode,
         created_at: new Date().toISOString(),
@@ -1309,7 +1331,7 @@ export default function Pay() {
         onClose={() => setIsZoomed(false)}
       />
 
-      {!ok && !orderCode && items.length > 0 ? (
+      {!ok && !orderCode && items.length > 0 && canShowQris ? (
         <div className="pay-stickyCta">
           <div className="pay-stickyCtaInner">
             <div className="pay-stickyCtaInfo">

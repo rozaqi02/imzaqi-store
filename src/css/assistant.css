@@ -168,7 +168,6 @@ html {
 
 .ai-panel--glass {
   backdrop-filter: blur(18px) saturate(1.2);
-  -webkit-backdrop-filter: blur(18px) saturate(1.2);
 }
 
 .ai-panelAmbient {
@@ -280,7 +279,6 @@ html[data-theme="dark"] .ai-panel::before {
     linear-gradient(180deg, rgba(123, 184, 255, 0.12) 0%, rgba(79, 255, 218, 0.06) 38%, rgba(79, 255, 218, 0) 78%),
     transparent;
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
 }
 
 .ai-head--premium::after {
@@ -564,7 +562,6 @@ html[data-theme="dark"] .ai-scroll {
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 36%),
     var(--uni-neo-panel);
   backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
 }
 
 html[data-theme="light"] .ai-bubbleMsg--glass {
@@ -1100,7 +1097,6 @@ html[data-theme="light"] .ai-tooltipArrow {
   inset: 0;
   background: rgba(3, 10, 18, 0.45);
   backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
   z-index: 9990;
   pointer-events: auto;
 }

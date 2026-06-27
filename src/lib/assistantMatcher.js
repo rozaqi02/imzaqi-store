@@ -469,19 +469,15 @@ async function callLLM(query, history, context, intent) {
   let key = (import.meta.env.VITE_AI_KEY || "").replace(/^"|"$/g, "").trim();
   const model = (import.meta.env.VITE_AI_MODEL || "gemini-2.5-flash").replace(/^"|"$/g, "").trim();
 
-  // Log config once for debugging in production
   if (!_llmConfigLogged) {
     _llmConfigLogged = true;
     info("[Imzaqi AI] Config:", {
       endpoint: endpoint ? `${endpoint.slice(0, 30)}...` : "(empty)",
       keyPresent: key.length > 0,
-      keyLength: key.length,
-      keyStart: key.slice(0, 4),
       model,
     });
   }
-  
-  // Fail fast if endpoint is missing or malformed
+
   if (!endpoint || !endpoint.startsWith("http")) {
     warn("[Imzaqi AI] No valid endpoint configured:", endpoint || "(empty)");
     return null;
@@ -501,7 +497,6 @@ async function callLLM(query, history, context, intent) {
   try {
     const ctrl = new AbortController();
     const timer = window.setTimeout(() => ctrl.abort(), 8000);
-    // OpenAI-compatible endpoint requires Bearer token in header
     const res = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -512,20 +507,20 @@ async function callLLM(query, history, context, intent) {
       signal: ctrl.signal,
     });
     window.clearTimeout(timer);
-    
+
     if (!res.ok) {
       const errBody = await res.text().catch(() => "");
       warn("[Imzaqi AI] LLM API error:", res.status, errBody.slice(0, 200));
       return null;
     }
-    
+
     const data = await res.json();
-    const reply = 
-      data?.choices?.[0]?.message?.content || 
-      data?.reply || 
-      data?.message || 
+    const reply =
+      data?.choices?.[0]?.message?.content ||
+      data?.reply ||
+      data?.message ||
       data?.text;
-      
+
     if (typeof reply !== "string" || !reply.trim()) {
       warn("[Imzaqi AI] LLM returned empty reply:", JSON.stringify(data).slice(0, 200));
       return null;

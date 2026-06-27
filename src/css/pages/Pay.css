@@ -21,7 +21,7 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-shell-steps{margin-bottom:16px;}
 .pay-shell-grid{display:grid;grid-template-columns:minmax(0,1.2fr) 340px;gap:16px;align-items:start;}
 .pay-mainStack{display:flex;flex-direction:column;gap:14px;}
-.pay-card{background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.028));border-color:rgba(255,255,255,.10);box-shadow:0 30px 80px rgba(0,0,0,.22);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
+.pay-card{background:linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.028));border-color:rgba(255,255,255,.10);box-shadow:0 30px 80px rgba(0,0,0,.22);backdrop-filter:blur(18px);}
 
 .pay-cardHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;min-width:0;}
 .pay-cardKicker{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.46);}
@@ -130,7 +130,6 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
   padding:16px;
   background:rgba(4,9,20,.56);
   backdrop-filter:blur(10px);
-  -webkit-backdrop-filter:blur(10px);
 }
 .pay-successModal{
   width:min(580px,100%);
@@ -467,7 +466,6 @@ html[data-theme="light"] .pay-stickyCta{background:linear-gradient(180deg, rgba(
   border-radius:28px;
   box-shadow:var(--skeu-panel-shadow);
   backdrop-filter:blur(24px);
-  -webkit-backdrop-filter:blur(24px);
   overflow:hidden;
   padding:0;
   color:var(--brand-text);
@@ -782,7 +780,7 @@ html[data-theme="light"] .pay-stickyCta{background:linear-gradient(180deg, rgba(
 
 @media (max-width: 980px){
   .pay-confirmModal{backdrop-filter:none;-webkit-backdrop-filter:none;}
-  .pay-confirmOverlay{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);}
+  .pay-confirmOverlay{backdrop-filter:blur(6px);}
 }
 @media (max-width: 680px){
   .pay-confirmOverlay{
@@ -992,7 +990,6 @@ html[data-theme="light"] .pay-confirmProgressTrack{
   z-index: 2000;
   background: rgba(4, 9, 20, 0.88);
   backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
   display: grid;
   place-items: center;
   padding: 24px;

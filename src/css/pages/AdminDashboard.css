@@ -2590,7 +2590,6 @@
     background: var(--skeu-panel-bg, rgba(255, 255, 255, 0.98)) !important;
     box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.08) !important;
     backdrop-filter: blur(16px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(140%) !important;
   }
 
   html[data-theme="dark"] .admin-mobileTabs {

@@ -72,7 +72,10 @@ export function usePageView() {
       // itu log level browser bukan JS. Fix permanen ada di RLS Supabase.
       supabase
         .from("page_views")
-        .insert({ visitor_id: visitorId, path, referrer: currentReferrer || null })
+        .insert(
+          { visitor_id: visitorId, path, referrer: currentReferrer || null },
+          { returning: "minimal" }
+        )
         .then(({ error }) => {
           // Abaikan error permission/network saat tracking — bukan error kritis
           if (error && error.code !== '42501' && error.status !== 403) {

@@ -19,10 +19,10 @@ import NumberCounter from "./NumberCounter";
 import { supabase } from "../lib/supabaseClient";
 import TypewriterSearchInput from "./TypewriterSearchInput";
 import { useDeviceCapability } from "../hooks/useIsMobile";
+import { getBuyerName } from "../lib/greeting";
 
 /* ── Data ── */
 const TRUST_ITEMS = [
-  { icon: ShieldCheck, label: "Garansi Replace" },
   { icon: Zap, label: "Instan 5 Menit" },
   { icon: Star, label: "Budget Pelajar" },
 ];
@@ -282,6 +282,30 @@ function HeroStatsRow({ activeProductCount }) {
 
 const VISITED_KEY = "imzaqi_visited_v1";
 
+function GreetingBanner() {
+  const [name, setName] = useState("");
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const n = getBuyerName();
+    if (n) {
+      setName(n);
+      setVisible(true);
+      const t = setTimeout(() => setVisible(false), 6000);
+      return () => clearTimeout(t);
+    }
+  }, []);
+
+  if (!visible || !name) return null;
+
+  return (
+    <div className="hx-greeting" role="status" aria-live="polite">
+      <span className="hx-greeting-wave" aria-hidden="true">👋</span>
+      <span>Selamat datang lagi, <strong>{name}</strong>!</span>
+    </div>
+  );
+}
+
 function OnboardingBanner() {
   const [show, setShow] = useState(() => {
     try {
@@ -364,9 +388,7 @@ export default function Hero({ products = [] }) {
 
           {/* 3. Subtitle */}
           <MotionP className="hx-subtitle" {...stagger(0.2)}>
-            {activeProductCount > 0
-              ? `${activeProductCount}+ produk digital, bayar QRIS, auto aktif dalam hitungan menit!`
-              : "Netflix, Spotify, Canva, dan lainnya, bayar QRIS, auto aktif dalam hitungan menit!"}
+            20+ produk digital, bayar QRIS, auto aktif dalam hitungan menit!
           </MotionP>
 
           {/* 4. Search Console */}
@@ -374,7 +396,8 @@ export default function Hero({ products = [] }) {
             <HeroSearch products={products} />
           </MotionTag>
 
-          {/* 4b. Onboarding banner */}
+          {/* 4b. Onboarding banner / returning user greeting */}
+          <GreetingBanner />
           <OnboardingBanner />
 
           {/* 5. Trust Badges */}

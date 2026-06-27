@@ -292,6 +292,31 @@ a.btn:active {
 }
 
 
+/* ─── Cursor Trail (desktop only, teal dots) ────────────────────────── */
+.cursor-trail-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 99999;
+  overflow: hidden;
+}
+
+.cursor-trail-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #4effda, #00d6b4);
+  box-shadow: 0 0 6px rgba(0, 214, 180, 0.5);
+  pointer-events: none;
+  will-change: transform, opacity;
+  transition: opacity 0.52s ease-out, transform 0.52s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce), (pointer: coarse), (max-width: 920px) {
+  .cursor-trail-container { display: none !important; }
+}
+
 /* ═══════════════════════════════════════════════════════════════════════
    POLISH PASS 2 — 10 more lightweight non-functional effects
    All disabled on coarse pointer / reduced motion where appropriate.

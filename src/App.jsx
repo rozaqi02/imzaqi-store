@@ -7,12 +7,14 @@ import NetworkBridge from "./components/NetworkBridge";
 import PolishEffects from "./components/PolishEffects";
 import Confetti from "./components/Confetti";
 import AssistantBubble from "./components/AssistantBubble";
+import FlashSalePopup from "./components/FlashSalePopup";
 import { usePageView } from "./hooks/usePageView";
-import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
+import { useGlobalShortcuts, useTitleTicker } from "./hooks/useGlobalShortcuts";
 import { useLongTaskMonitor } from "./hooks/usePerformanceMonitor";
 import { useDeviceCapability } from "./hooks/useIsMobile";
 import { rafThrottle } from "./utils/throttle";
 import { ArrowRight, ChevronUp, X } from "lucide-react";
+import AchievementToast from "./components/AchievementToast";
 import { hasSavedScrollY } from "./hooks/useScrollMemory";
 
 // ── Eager-loaded pages (critical path) ──
@@ -30,8 +32,34 @@ const Pay = React.lazy(() => import("./pages/Pay"));
 const AdminLogin = React.lazy(() => import("./pages/admin/AdminLogin"));
 const AdminDashboard = React.lazy(() => import("./pages/admin/AdminDashboard"));
 
+const LOADER_QUOTES = [
+  "Nyiapin yang terbaik buat kamu...",
+  "Stok fresh, harga pelajar 💎",
+  "Sebentar ya, lagi ngambil dari gudang...",
+  "Premium terjangkau, bukan mimpi ✨",
+  "Muat sebentar, worth the wait!",
+  "Loading... tapi cepet kok 😄",
+  "Akun ready, tinggal checkout 🚀",
+];
+
 // ── Branded page loading fallback ──
 function PageLoader() {
+  const [text, setText] = React.useState("");
+  const [quoteIdx] = React.useState(() => Math.floor(Math.random() * LOADER_QUOTES.length));
+  const quote = LOADER_QUOTES[quoteIdx];
+  const charRef = React.useRef(0);
+
+  React.useEffect(() => {
+    charRef.current = 0;
+    setText("");
+    const interval = setInterval(() => {
+      charRef.current += 1;
+      setText(quote.slice(0, charRef.current));
+      if (charRef.current >= quote.length) clearInterval(interval);
+    }, 38);
+    return () => clearInterval(interval);
+  }, [quote]);
+
   return (
     <div className="page-loader" aria-label="Memuat halaman" role="status">
       <div className="page-loader-inner">
@@ -41,6 +69,7 @@ function PageLoader() {
           <span />
           <span />
         </div>
+        <p className="page-loader-quote" aria-live="polite">{text}<span className="page-loader-cursor" aria-hidden="true">|</span></p>
       </div>
     </div>
   );
@@ -123,6 +152,18 @@ function ScrollToTopButton() {
 }
 
 // ── Smooth scroll to top on route change ──
+function SuspenseReadyNotifier({ onReady, routeKey }) {
+  React.useEffect(() => {
+    // Double rAF ensures browser has painted before showing footer
+    let id1 = requestAnimationFrame(() => {
+      let id2 = requestAnimationFrame(() => onReady());
+      return () => cancelAnimationFrame(id2);
+    });
+    return () => cancelAnimationFrame(id1);
+  }, [routeKey]);
+  return null;
+}
+
 function ScrollToTop() {
   const location = useLocation();
   const displayLocation = location.state?.backgroundLocation || location;
@@ -196,6 +237,37 @@ function AppRoutes() {
 export default function App() {
   const caps = useDeviceCapability();
   useLongTaskMonitor();
+  useTitleTicker();
+
+  // Rage Click Detector
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const RAGE_SELECTOR = "button:disabled, button[disabled], .btn-disabled, [disabled]"
+    const clicks = [];
+    let toastShown = false;
+
+    function handleRageClick(e) {
+      const target = e.target.closest(RAGE_SELECTOR);
+      if (!target) return;
+      const now = Date.now();
+      clicks.push(now);
+      // Keep only clicks within last 2 seconds
+      while (clicks.length > 0 && now - clicks[0] > 2000) clicks.shift();
+      if (clicks.length >= 3 && !toastShown) {
+        toastShown = true;
+        // Show a fun toast via custom event (ToastContext not available here)
+        const el = document.createElement("div");
+        el.className = "rage-toast";
+        el.setAttribute("role", "status");
+        el.innerHTML = `<span class="rage-toast-char">😅</span><span>Sabar ya, lagi diproses...</span>`;
+        document.body.appendChild(el);
+        setTimeout(() => { el.remove(); toastShown = false; clicks.length = 0; }, 2800);
+      }
+    }
+
+    document.addEventListener("click", handleRageClick, { passive: true });
+    return () => document.removeEventListener("click", handleRageClick);
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined" || !navigator.vibrate) return;
@@ -222,7 +294,9 @@ export default function App() {
       <NetworkBridge />
       <PolishEffects />
       <Confetti />
+      <AchievementToast />
       <AssistantBubble />
+      <FlashSalePopup />
       <ScrollToTop />
       <RouteProgress />
       <FloatingOrderStatus />

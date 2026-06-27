@@ -7,6 +7,20 @@ import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useRouteDirection } from "../hooks/useRouteDirection";
 import { rafThrottle } from "../utils/throttle";
 
+// Separate Footer wrapper that starts hidden and reveals after 800ms
+function DelayedFooter() {
+  const [visible, setVisible] = React.useState(false);
+
+  React.useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 800);
+    return () => clearTimeout(timer);
+  }, []); // empty deps — remount on key change handles reset
+
+  // Render an invisible placeholder matching footer height so no layout jump
+  if (!visible) return null;
+  return <Footer />;
+}
+
 export default function Layout({ children, routeKey }) {
   const location = useLocation();
   const revealKey = routeKey || location.pathname;
@@ -15,8 +29,7 @@ export default function Layout({ children, routeKey }) {
   const isCatalogRoute =
     location.pathname === "/produk" || location.pathname.startsWith("/produk/");
 
-  // Check if viewport is mobile (width <= 720px)
-  const [isMobile, setIsMobile] = React.useState(() => 
+  const [isMobile, setIsMobile] = React.useState(() =>
     typeof window !== "undefined" ? window.innerWidth <= 720 : false
   );
 
@@ -47,7 +60,6 @@ export default function Layout({ children, routeKey }) {
       );
 
       if (el) {
-        // Reset old hovered element style if we switched to a new card
         if (lastEl && lastEl !== el) {
           lastEl.style.setProperty("--light-x", "1");
           lastEl.style.setProperty("--light-y", "1");
@@ -60,19 +72,15 @@ export default function Layout({ children, routeKey }) {
         const dx = e.clientX - centerX;
         const dy = e.clientY - centerY;
 
-        // Shadow is cast in the opposite direction of the cursor (light source)
-        // Normalize light position relative to element size
         const lx = -dx / (rect.width / 2);
         const ly = -dy / (rect.height / 2);
 
-        // Limit range between -1.3 and 1.3 for styling sanity
         const boundedLx = Math.max(-1.3, Math.min(1.3, lx));
         const boundedLy = Math.max(-1.3, Math.min(1.3, ly));
 
         el.style.setProperty("--light-x", boundedLx.toFixed(3));
         el.style.setProperty("--light-y", boundedLy.toFixed(3));
       } else if (lastEl) {
-        // Clean up last hovered card back to default top-left lighting
         lastEl.style.setProperty("--light-x", "1");
         lastEl.style.setProperty("--light-y", "1");
         lastEl = null;
@@ -91,15 +99,12 @@ export default function Layout({ children, routeKey }) {
 
   useAdaptiveMotion();
   const routeDirection = useRouteDirection(revealKey);
-  // Re-attach reveal observer whenever route changes.
   useRevealOnScroll(revealKey);
 
-  // Footer hidden on mobile checkout only; header always visible
-  const hideFooter = isCheckoutRoute && isMobile;
+  const hideFooter = isAdminDashboardRoute || (isCheckoutRoute && isMobile);
 
   return (
     <div className="app-shell">
-      {/* Global background layers (fixed, paint-isolated) */}
       <div className="global-bg" aria-hidden="true" />
       <div className="global-noise" aria-hidden="true" />
 
@@ -107,14 +112,11 @@ export default function Layout({ children, routeKey }) {
       <main
         className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}${isCatalogRoute ? " app-main-catalog" : ""}${isCheckoutRoute ? " app-main-checkout" : ""}`}
       >
-        {/* key forces remount on route change for enter animation.
-            contain:layout prevents this subtree from triggering full-page repaints. */}
         <div key={revealKey} className={`route-transition route-transition--${routeDirection}`}>
           {children}
         </div>
       </main>
-      {isAdminDashboardRoute || hideFooter ? null : <Footer />}
+      {hideFooter ? null : <DelayedFooter key={revealKey} />}
     </div>
   );
 }
-

@@ -18,108 +18,133 @@ html[data-theme="dark"] {
   --card: rgba(255, 255, 255, 0.06);
   --card2: rgba(255, 255, 255, 0.09);
   --line: rgba(0, 194, 208, 0.16);
-  --text: #f4fff9;
-  --muted: #9fd1c5;
+  --text: #f0f4f8;
+  --muted: #8ba8b8;
   --accent: #00d6b4;
   --accent2: #00c2d0;
   --danger: #ff4f72;
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.42);
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
 
   /* ── Neumorphic Skeuomorphic Tokens (Dark Mode) ── */
-  --brand-bg-start: #020611;
-  --brand-bg-end: #040714;
-  --brand-bg-mid: #081229;
-  --brand-aurora-a: rgba(0, 214, 180, 0.16);
-  --brand-aurora-b: rgba(0, 138, 148, 0.2);
+  --brand-bg-start: #070709;
+  --brand-bg-end: #0a0a0f;
+  --brand-bg-mid: #111320;
+  --brand-aurora-a: rgba(0, 214, 180, 0.14);
+  --brand-aurora-b: rgba(0, 138, 148, 0.18);
   --brand-card-top: rgba(255, 255, 255, 0.055);
   --brand-card-bottom: rgba(255, 255, 255, 0.025);
-  --brand-card-spot: rgba(0, 214, 180, 0.12);
-  --brand-surface: rgba(7, 12, 27, 0.78);
-  --brand-surface-strong: rgba(8, 12, 28, 0.92);
+  --brand-card-spot: rgba(0, 214, 180, 0.1);
+  --brand-surface: rgba(12, 12, 18, 0.82);
+  --brand-surface-strong: rgba(14, 14, 22, 0.94);
   --brand-line: rgba(0, 194, 208, 0.16);
-  --brand-text: #f4fff9;
-  --brand-muted: #9fd1c5;
-  --brand-subtle: #d9fff1;
-  --brand-icon: #9fffe5;
-  --brand-shadow: 0 22px 68px rgba(0, 0, 0, 0.32);
-  --brand-shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.18);
-  --brand-overlay: rgba(0, 0, 0, 0.56);
+  --brand-text: #f0f4f8;
+  --brand-muted: #8ba8b8;
+  --brand-subtle: #c8e0ea;
+  --brand-icon: #7ee8d8;
+  --brand-shadow: 0 22px 68px rgba(0, 0, 0, 0.48);
+  --brand-shadow-soft: 0 14px 34px rgba(0, 0, 0, 0.28);
+  --brand-overlay: rgba(0, 0, 0, 0.62);
   --brand-header-bg: linear-gradient(180deg, rgba(4, 7, 20, 0.94), rgba(4, 7, 20, 0.78));
   --brand-menu-bg:
     radial-gradient(620px 420px at 78% 16%, rgba(0, 214, 180, 0.1) 0%, rgba(0, 214, 180, 0) 72%),
     linear-gradient(180deg, rgba(8, 12, 28, 0.98), rgba(4, 7, 20, 0.98));
 
-  /* Liquid Glass Panels (Tactile Neumorphism) */
-  --skeu-panel-bg: linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96) 55%, rgba(4, 8, 21, 0.98) 100%);
+  /* Liquid Glass Panels (Tactile Neumorphism — Deep 3D) */
+  --skeu-panel-bg: linear-gradient(175deg, rgba(20, 34, 64, 1), rgba(9, 16, 36, 1) 52%, rgba(4, 8, 22, 1) 100%);
   --skeu-panel-shadow:
-    16px 18px 36px rgba(0, 0, 0, 0.45),
-    -10px -10px 22px rgba(255, 255, 255, 0.06),
-    inset 0 2px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -4px 0 rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(0, 194, 208, 0.15);
-  --skeu-control-bg: linear-gradient(180deg, rgba(28, 43, 80, 0.98), rgba(12, 19, 41, 0.96));
-  --skeu-control-shadow:
-    /* top inset highlight */
-    inset 0 2px 0 rgba(255, 255, 255, 0.35),
-    /* bottom press depth */
-    inset 0 -3px 0 rgba(0, 0, 0, 0.48),
-    /* directional shadow */
-    0 12px 24px rgba(0, 5, 15, 0.48),
+    /* contact edge — sangat tajam */
+    0 2px 4px rgba(0, 0, 0, 0.72),
+    /* primary lift — dalam & jauh */
+    36px 44px 80px rgba(0, 4, 14, 0.72),
+    /* secondary ambient lift */
+    18px 22px 40px rgba(0, 3, 10, 0.52),
+    /* top-left specular — terang, kontras */
+    -20px -20px 44px rgba(255, 255, 255, 0.16),
+    /* top inset bevel — rim tebal */
+    inset 0 4px 0 rgba(255, 255, 255, 0.32),
+    inset 1px 0 0 rgba(255, 255, 255, 0.1),
+    /* bottom press depth — sangat dalam */
+    inset 0 -6px 0 rgba(0, 0, 0, 0.72),
+    /* inner AO — kedalaman dalam panel */
+    inset 0 4px 20px rgba(0, 0, 0, 0.38),
     /* border accent */
-    0 0 0 1px rgba(0, 194, 208, 0.18),
-    /* counter shadow kiri-atas */
-    -3px -3px 8px rgba(255, 255, 255, 0.08);
-  --skeu-inset-bg: linear-gradient(180deg, rgba(3, 8, 18, 0.94), rgba(9, 15, 33, 0.82));
+    0 0 0 1px rgba(0, 194, 208, 0.22);
+  --skeu-control-bg: linear-gradient(170deg, rgba(30, 48, 88, 1), rgba(14, 22, 50, 1));
+  --skeu-control-shadow:
+    /* top inset highlight — terang */
+    inset 0 3px 0 rgba(255, 255, 255, 0.44),
+    inset 1px 0 0 rgba(255, 255, 255, 0.12),
+    /* bottom press depth — dalam */
+    inset 0 -5px 0 rgba(0, 0, 0, 0.68),
+    /* inner AO */
+    inset 0 2px 14px rgba(0, 0, 0, 0.36),
+    /* primary directional */
+    0 20px 40px rgba(0, 3, 12, 0.68),
+    /* secondary ambient */
+    0 8px 18px rgba(0, 2, 8, 0.44),
+    /* border accent */
+    0 0 0 1px rgba(0, 194, 208, 0.24),
+    /* counter light kiri-atas */
+    -5px -5px 14px rgba(255, 255, 255, 0.12);
+  --skeu-inset-bg: linear-gradient(180deg, rgba(1, 4, 12, 0.98), rgba(6, 11, 26, 0.92));
   --skeu-inset-shadow:
-    inset 10px 12px 22px rgba(0, 0, 0, 0.46),
-    inset -5px -5px 12px rgba(255, 255, 255, 0.04),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 1px 0 rgba(255, 255, 255, 0.03);
-  --skeu-pill-bg: linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9));
+    inset 18px 20px 40px rgba(0, 0, 0, 0.78),
+    inset -8px -8px 20px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.56),
+    inset 4px 0 12px rgba(0, 0, 0, 0.3),
+    0 1px 0 rgba(255, 255, 255, 0.05);
+  --skeu-pill-bg: linear-gradient(170deg, rgba(20, 36, 66, 0.98), rgba(10, 20, 42, 0.96));
   --skeu-accent-shadow:
-    0 20px 34px rgba(0, 214, 180, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42),
-    inset 0 -3px 0 rgba(3, 66, 74, 0.36);
+    0 28px 50px rgba(0, 214, 180, 0.38),
+    0 10px 20px rgba(0, 180, 150, 0.22),
+    inset 0 2px 0 rgba(255, 255, 255, 0.56),
+    inset 0 -4px 0 rgba(3, 66, 74, 0.54);
 
-  /* Primary Button Facet (Emerald Gradient) — Neumorphism 3D */
+  /* Primary Button Facet (Emerald Gradient) — Neumorphism 3D Deep */
   --imzaqi-btn-face:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 26%),
+    linear-gradient(175deg, rgba(255, 255, 255, 0.44), rgba(255, 255, 255, 0) 28%),
     linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
-  --imzaqi-btn-border: rgba(79, 255, 200, 0.28);
+  --imzaqi-btn-border: rgba(79, 255, 200, 0.32);
   --imzaqi-btn-text: #032235;
   --imzaqi-btn-shadow:
-    /* top inset highlight — efek permukaan mengkilap */
-    inset 0 2px 0 rgba(255, 255, 255, 0.55),
-    /* bottom inset press shadow — kedalaman tombol */
-    inset 0 -3px 0 rgba(0, 95, 82, 0.42),
-    /* outer glow — setara dengan skeu-control-shadow, tidak lebih besar */
-    0 10px 18px rgba(0, 10, 22, 0.26),
-    /* color tint di atas base shadow */
-    0 4px 10px rgba(0, 180, 150, 0.12),
-    /* counter shadow kiri-atas — kesan relief 3D */
-    -2px -2px 6px rgba(255, 255, 255, 0.04);
+    /* top inset bevel — rim terang */
+    inset 0 3px 0 rgba(255, 255, 255, 0.68),
+    inset 1px 0 0 rgba(255, 255, 255, 0.2),
+    /* bottom press depth — dalam */
+    inset 0 -4px 0 rgba(0, 60, 52, 0.58),
+    /* inner AO */
+    inset 0 2px 10px rgba(0, 80, 68, 0.2),
+    /* primary outer shadow */
+    0 14px 28px rgba(0, 8, 18, 0.38),
+    /* accent glow */
+    0 6px 16px rgba(0, 180, 150, 0.2),
+    /* counter light kiri-atas */
+    -3px -3px 8px rgba(255, 255, 255, 0.08);
   --imzaqi-btn-shadow-hover:
-    inset 0 2px 0 rgba(255, 255, 255, 0.62),
-    inset 0 -3px 0 rgba(0, 95, 82, 0.5),
-    0 14px 24px rgba(0, 10, 22, 0.3),
-    0 6px 14px rgba(0, 180, 150, 0.18),
-    -2px -2px 6px rgba(255, 255, 255, 0.04);
+    inset 0 3px 0 rgba(255, 255, 255, 0.76),
+    inset 1px 0 0 rgba(255, 255, 255, 0.24),
+    inset 0 -4px 0 rgba(0, 60, 52, 0.66),
+    inset 0 2px 10px rgba(0, 80, 68, 0.24),
+    0 18px 36px rgba(0, 8, 18, 0.44),
+    0 8px 20px rgba(0, 180, 150, 0.28),
+    -3px -3px 8px rgba(255, 255, 255, 0.08);
 
   /* ── Unified Layout Design Tokens (Dark Mode) ── */
   --uni-panel:
-    linear-gradient(172deg, rgba(12, 24, 44, 0.96) 0%, rgba(10, 20, 38, 0.95) 52%, rgba(9, 18, 34, 0.97) 100%);
-  --uni-panel-soft: linear-gradient(180deg, rgba(16, 33, 60, 0.9), rgba(11, 22, 42, 0.92));
-  --uni-inset: linear-gradient(180deg, rgba(8, 15, 31, 0.95), rgba(13, 25, 46, 0.92));
-  --uni-line: rgba(123, 184, 255, 0.22);
-  --uni-line-strong: rgba(90, 170, 255, 0.36);
-  --uni-text: #ebf8ff;
-  --uni-muted: rgba(214, 235, 255, 0.72);
+    linear-gradient(172deg, rgba(18, 18, 26, 0.97) 0%, rgba(14, 14, 20, 0.96) 52%, rgba(12, 12, 18, 0.98) 100%);
+  --uni-panel-soft: linear-gradient(180deg, rgba(22, 22, 32, 0.92), rgba(16, 16, 24, 0.94));
+  --uni-inset: linear-gradient(180deg, rgba(6, 6, 10, 0.96), rgba(12, 12, 18, 0.92));
+  --uni-line: rgba(0, 194, 208, 0.18);
+  --uni-line-strong: rgba(0, 214, 180, 0.28);
+  --uni-text: #f0f4f8;
+  --uni-muted: rgba(180, 210, 225, 0.72);
   --uni-shadow:
-    0 26px 64px rgba(1, 8, 20, 0.5),
+    0 26px 64px rgba(0, 0, 0, 0.62),
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 0 1px rgba(78, 149, 255, 0.08);
+    0 0 0 1px rgba(0, 194, 208, 0.1);
   --uni-soft-shadow:
-    0 16px 36px rgba(1, 8, 20, 0.32),
+    0 16px 36px rgba(0, 0, 0, 0.42),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
   --uni-inset-shadow:
     inset 0 4px 12px rgba(0, 0, 0, 0.36),
@@ -151,106 +176,136 @@ html[data-theme="light"] {
   --bg0: #d8fff5;
   --bg1: #d5eaff;
   --bg2: #eefaf8;
-  --card: rgba(255, 255, 255, 0.8);
-  --card2: rgba(229, 245, 255, 0.64);
-  --line: rgba(0, 138, 148, 0.16);
-  --text: #0d2d39;
-  --muted: #395863;
+  --card: rgba(255, 255, 255, 0.88);
+  --card2: rgba(255, 255, 255, 0.72);
+  --line: rgba(0, 123, 136, 0.14);
+  --text: #0f1f2e;
+  --muted: #4a6070;
   --accent: #067b88;
   --accent2: #00a8b5;
   --danger: #ff5a7a;
-  --shadow: 0 18px 44px rgba(37, 88, 110, 0.14);
+  --shadow: 0 18px 44px rgba(20, 50, 70, 0.12);
 
   /* ── Neumorphic Skeuomorphic Tokens (Light Mode) ── */
-  --brand-bg-start: #d8fff5;
-  --brand-bg-end: #d5eaff;
-  --brand-bg-mid: #eefaf8;
-  --brand-aurora-a: rgba(0, 214, 180, 0.18);
-  --brand-aurora-b: rgba(0, 138, 148, 0.16);
-  --brand-card-top: rgba(255, 255, 255, 0.8);
-  --brand-card-bottom: rgba(229, 245, 255, 0.64);
-  --brand-card-spot: rgba(0, 214, 180, 0.14);
-  --brand-surface: rgba(247, 252, 255, 0.92);
-  --brand-surface-strong: rgba(250, 253, 255, 0.98);
-  --brand-line: rgba(0, 138, 148, 0.16);
-  --brand-text: #0d2d39;
-  --brand-muted: #395863;
-  --brand-subtle: #123846;
+  --brand-bg-start: #f4f6f9;
+  --brand-bg-end: #eef1f5;
+  --brand-bg-mid: #e8ecf2;
+  --brand-aurora-a: rgba(0, 214, 180, 0.12);
+  --brand-aurora-b: rgba(0, 123, 136, 0.1);
+  --brand-card-top: rgba(255, 255, 255, 0.92);
+  --brand-card-bottom: rgba(240, 245, 250, 0.8);
+  --brand-card-spot: rgba(0, 214, 180, 0.1);
+  --brand-surface: rgba(248, 250, 252, 0.94);
+  --brand-surface-strong: rgba(252, 253, 255, 0.99);
+  --brand-line: rgba(0, 123, 136, 0.14);
+  --brand-text: #0f1f2e;
+  --brand-muted: #4a6070;
+  --brand-subtle: #1a3548;
   --brand-icon: #067b88;
-  --brand-shadow: 0 18px 44px rgba(37, 88, 110, 0.14);
-  --brand-shadow-soft: 0 10px 24px rgba(37, 88, 110, 0.1);
-  --brand-overlay: rgba(9, 26, 40, 0.18);
+  --brand-shadow: 0 18px 44px rgba(20, 50, 70, 0.12);
+  --brand-shadow-soft: 0 10px 24px rgba(20, 50, 70, 0.08);
+  --brand-overlay: rgba(10, 25, 38, 0.14);
   --brand-header-bg: linear-gradient(180deg, rgba(244, 252, 255, 0.9), rgba(223, 241, 248, 0.78));
   --brand-menu-bg:
     radial-gradient(620px 420px at 78% 16%, rgba(0, 214, 180, 0.12) 0%, rgba(0, 214, 180, 0) 72%),
     linear-gradient(180deg, rgba(239, 249, 255, 0.98), rgba(214, 234, 245, 0.96));
 
-  /* Liquid Glass Panels (Tactile Neumorphism) */
-  --skeu-panel-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(236, 247, 251, 0.95) 56%, rgba(221, 240, 246, 0.98) 100%);
+  /* Liquid Glass Panels (Tactile Neumorphism — Deep 3D, Neutral Light) */
+  --skeu-panel-bg: linear-gradient(170deg, #ffffff 0%, #edf0f5 54%, #dde2ea 100%);
   --skeu-panel-shadow:
-    14px 16px 32px rgba(67, 111, 129, 0.2),
-    -10px -10px 20px rgba(255, 255, 255, 0.92),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -4px 0 rgba(154, 191, 203, 0.26),
-    0 0 0 1px rgba(0, 138, 148, 0.1);
-  --skeu-control-bg: linear-gradient(180deg, #ffffff, #f0f7fa);
+    /* contact edge — tajam */
+    0 2px 4px rgba(30, 50, 70, 0.18),
+    /* primary lift — dalam & jauh */
+    32px 38px 68px rgba(30, 50, 75, 0.26),
+    /* secondary ambient lift */
+    14px 18px 32px rgba(40, 65, 90, 0.16),
+    /* top-left specular — putih keras */
+    -22px -22px 48px rgba(255, 255, 255, 1),
+    /* top inset bevel — rim putih tebal */
+    inset 0 4px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.9),
+    /* bottom press depth */
+    inset 0 -6px 0 rgba(80, 110, 140, 0.36),
+    /* inner AO */
+    inset 0 4px 18px rgba(50, 75, 100, 0.1),
+    /* border accent */
+    0 0 0 1px rgba(0, 123, 136, 0.12);
+  --skeu-control-bg: linear-gradient(170deg, #ffffff 0%, #eaecf2 100%);
   --skeu-control-shadow:
-    6px 8px 16px rgba(50, 85, 100, 0.2),
-    -6px -6px 14px rgba(255, 255, 255, 1),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(135, 175, 190, 0.35),
-    0 0 0 1px rgba(0, 138, 148, 0.12);
-  --skeu-inset-bg: linear-gradient(180deg, rgba(231, 243, 248, 0.98), rgba(247, 252, 255, 0.92));
+    /* top inset highlight — putih keras */
+    inset 0 3px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.9),
+    /* bottom press depth */
+    inset 0 -5px 0 rgba(80, 110, 140, 0.32),
+    /* inner AO */
+    inset 0 2px 12px rgba(50, 75, 100, 0.1),
+    /* primary directional */
+    14px 18px 32px rgba(30, 55, 80, 0.22),
+    /* secondary ambient */
+    6px 8px 16px rgba(40, 65, 90, 0.14),
+    /* counter light kiri-atas — putih keras */
+    -14px -14px 28px rgba(255, 255, 255, 1),
+    /* border accent */
+    0 0 0 1px rgba(0, 123, 136, 0.12);
+  --skeu-inset-bg: linear-gradient(180deg, #d8dce6 0%, #eceef4 100%);
   --skeu-inset-shadow:
-    inset 8px 10px 18px rgba(124, 158, 171, 0.24),
-    inset -5px -5px 12px rgba(255, 255, 255, 0.88),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 1px 0 rgba(255, 255, 255, 0.62);
-  --skeu-pill-bg: linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(232, 245, 249, 0.8));
+    inset 16px 18px 36px rgba(60, 85, 115, 0.32),
+    inset -10px -10px 22px rgba(255, 255, 255, 0.96),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(70, 100, 130, 0.22),
+    inset 4px 0 14px rgba(50, 78, 105, 0.12),
+    0 1px 0 rgba(255, 255, 255, 1);
+  --skeu-pill-bg: linear-gradient(170deg, #ffffff 0%, #e4e8f0 100%);
   --skeu-accent-shadow:
-    0 18px 28px rgba(0, 214, 180, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.56),
-    inset 0 -3px 0 rgba(0, 122, 130, 0.18);
+    0 26px 44px rgba(0, 214, 180, 0.28),
+    0 10px 20px rgba(0, 180, 150, 0.16),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -4px 0 rgba(0, 100, 112, 0.28);
 
-  /* Primary Button Facet (Emerald Gradient - Light Mode) — Neumorphism 3D */
+  /* Primary Button Facet (Emerald Gradient - Light Mode) — Neumorphism 3D Deep */
   --imzaqi-btn-face:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(170deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 30%),
     linear-gradient(135deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%);
-  --imzaqi-btn-border: rgba(0, 138, 148, 0.3);
+  --imzaqi-btn-border: rgba(0, 138, 148, 0.36);
   --imzaqi-btn-text: #032235;
   --imzaqi-btn-shadow:
-    /* top inset highlight — kuat di light mode */
-    inset 0 2px 0 rgba(255, 255, 255, 0.78),
-    /* bottom press depth */
-    inset 0 -3px 0 rgba(0, 95, 82, 0.28),
-    /* outer glow */
-    0 4px 14px rgba(0, 138, 148, 0.22),
-    /* directional shadow kanan-bawah */
-    3px 5px 12px rgba(0, 100, 90, 0.16),
-    /* counter shadow kiri-atas */
-    -1px -1px 5px rgba(255, 255, 255, 0.75);
+    /* top inset bevel — putih keras */
+    inset 0 3px 0 rgba(255, 255, 255, 0.92),
+    inset 1px 0 0 rgba(255, 255, 255, 0.6),
+    /* bottom press depth — keras */
+    inset 0 -4px 0 rgba(0, 80, 68, 0.38),
+    /* inner AO */
+    inset 0 2px 10px rgba(0, 100, 85, 0.14),
+    /* primary outer shadow */
+    8px 12px 22px rgba(0, 100, 90, 0.28),
+    /* accent glow */
+    0 4px 16px rgba(0, 138, 148, 0.22),
+    /* counter light kiri-atas */
+    -4px -4px 10px rgba(255, 255, 255, 0.9);
   --imzaqi-btn-shadow-hover:
-    inset 0 2px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -3px 0 rgba(0, 95, 82, 0.34),
-    0 6px 20px rgba(0, 138, 148, 0.3),
-    4px 7px 16px rgba(0, 100, 90, 0.2),
-    -1px -1px 5px rgba(255, 255, 255, 0.8);
+    inset 0 3px 0 rgba(255, 255, 255, 1),
+    inset 1px 0 0 rgba(255, 255, 255, 0.7),
+    inset 0 -4px 0 rgba(0, 80, 68, 0.46),
+    inset 0 2px 10px rgba(0, 100, 85, 0.18),
+    10px 14px 28px rgba(0, 100, 90, 0.34),
+    0 6px 22px rgba(0, 138, 148, 0.3),
+    -4px -4px 10px rgba(255, 255, 255, 1);
 
   /* ── Unified Layout Design Tokens (Light Mode) ── */
   --uni-panel:
-    linear-gradient(176deg, rgba(255, 255, 255, 0.98) 0%, rgba(239, 249, 253, 0.96) 52%, rgba(228, 244, 250, 0.98) 100%);
-  --uni-panel-soft: linear-gradient(180deg, rgba(250, 254, 255, 0.96), rgba(236, 248, 252, 0.96));
-  --uni-inset: linear-gradient(180deg, rgba(233, 246, 251, 0.98), rgba(248, 253, 255, 0.93));
-  --uni-line: rgba(13, 124, 144, 0.2);
-  --uni-line-strong: rgba(13, 124, 144, 0.3);
-  --uni-text: #123744;
-  --uni-muted: rgba(50, 79, 89, 0.84);
+    linear-gradient(176deg, rgba(255, 255, 255, 0.98) 0%, rgba(242, 244, 248, 0.96) 52%, rgba(232, 236, 243, 0.98) 100%);
+  --uni-panel-soft: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(240, 243, 248, 0.96));
+  --uni-inset: linear-gradient(180deg, rgba(218, 222, 232, 0.98), rgba(240, 243, 248, 0.93));
+  --uni-line: rgba(0, 123, 136, 0.16);
+  --uni-line-strong: rgba(0, 123, 136, 0.28);
+  --uni-text: #0f1f2e;
+  --uni-muted: rgba(45, 65, 82, 0.84);
   --uni-shadow:
-    0 18px 42px rgba(60, 105, 120, 0.16),
+    0 18px 42px rgba(20, 40, 60, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 0 0 1px rgba(13, 124, 144, 0.08);
+    0 0 0 1px rgba(0, 123, 136, 0.08);
   --uni-soft-shadow:
-    0 12px 26px rgba(60, 105, 120, 0.13),
+    0 12px 26px rgba(20, 40, 60, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 1);
   --uni-inset-shadow:
     inset 0 2px 6px rgba(124, 158, 171, 0.16),
@@ -265,11 +320,11 @@ html[data-theme="light"] {
   --home-neo-inset-shadow: var(--uni-neo-inset-shadow);
 
   /* Neumorphic Light Tracking Colors (Light Mode) */
-  --shadow-color-dark: rgba(67, 111, 129, 0.2);
-  --shadow-color-light: rgba(255, 255, 255, 0.92);
+  --shadow-color-dark: rgba(30, 50, 75, 0.22);
+  --shadow-color-light: rgba(255, 255, 255, 1);
   --shadow-panel-inset-top: rgba(255, 255, 255, 1);
-  --shadow-panel-inset-bottom: rgba(154, 191, 203, 0.26);
-  --shadow-panel-border: rgba(0, 138, 148, 0.12);
+  --shadow-panel-inset-bottom: rgba(80, 110, 140, 0.3);
+  --shadow-panel-border: rgba(0, 123, 136, 0.12);
 }
 
 /* ── Radius Tokens ── */

@@ -752,9 +752,10 @@ export default function Products() {
         key: "new",
         label: freshnessCounts.newProducts ? `Baru rilis ${freshnessCounts.newProducts}` : "Baru rilis",
         active: newOnly,
-        action: () => setNewOnly((p) => !p),
+        onClick: () => setNewOnly((p) => !p),
       },
       {
+        key: "restock",
         label: freshnessCounts.restocked ? `Restock ${freshnessCounts.restocked}` : "Restock",
         active: restockOnly,
         onClick: () => setRestockOnly((prev) => !prev),

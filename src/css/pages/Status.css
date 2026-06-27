@@ -1802,3 +1802,59 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
     width: 2px;
   }
 }
+
+/* ─── Streak Badge ───────────────────────────────────────────────── */
+
+.st-streakBadge {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.12), rgba(0, 194, 208, 0.08));
+  border: 1px solid rgba(0, 214, 180, 0.24);
+  box-shadow: 0 4px 16px rgba(0, 214, 180, 0.08);
+  animation: streakSlideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes streakSlideIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.st-streakEmoji {
+  font-size: 32px;
+  line-height: 1;
+  flex-shrink: 0;
+  animation: streakBounce 1.2s ease-in-out infinite alternate;
+}
+
+@keyframes streakBounce {
+  from { transform: scale(1); }
+  to { transform: scale(1.15) rotate(8deg); }
+}
+
+.st-streakText {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.st-streakText strong {
+  font-size: 15px;
+  font-weight: 800;
+  color: var(--accent);
+  letter-spacing: -0.02em;
+}
+
+.st-streakText span {
+  font-size: 12px;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+html[data-theme="light"] .st-streakBadge {
+  background: linear-gradient(135deg, rgba(0, 180, 150, 0.1), rgba(0, 160, 175, 0.06));
+  border-color: rgba(0, 123, 136, 0.2);
+}
