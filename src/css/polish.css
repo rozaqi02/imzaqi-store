@@ -306,7 +306,7 @@ a.btn:active {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #4effda, #00d6b4);
+  background: radial-gradient(circle at 35% 35%, #3fe8c8, #00a88c);
   box-shadow: 0 0 6px rgba(0, 214, 180, 0.5);
   pointer-events: none;
   will-change: transform, opacity;
@@ -434,7 +434,7 @@ a.btn:active {
 .brand,
 .admin-brand-title,
 .admin-mobileCopy strong {
-  background-image: linear-gradient(135deg, #4effda 0%, #00d6b4 50%, #008a94 100%);
+  background-image: linear-gradient(135deg, #3fe8c8 0%, #00a88c 50%, #006b75 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -444,7 +444,7 @@ a.btn:active {
 }
 
 html[data-theme="dark"] .brand {
-  background-image: linear-gradient(135deg, #87ffe5 0%, #4effda 50%, #25ebc8 100%);
+  background-image: linear-gradient(135deg, #5cf0d5 0%, #3fe8c8 50%, #22d0a8 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -545,7 +545,7 @@ textarea,
 
 html[data-theme="dark"] input,
 html[data-theme="dark"] textarea {
-  caret-color: #4effda;
+  caret-color: #3fe8c8;
 }
 
 /* Scroll progress bar */
@@ -554,7 +554,7 @@ html[data-theme="dark"] textarea {
   top: 0;
   left: 0;
   height: 3.5px;
-  background: linear-gradient(90deg, #4effda, #00d6b4, #008a94);
+  background: linear-gradient(90deg, #3fe8c8, #00a88c, #006b75);
   z-index: 9999;
   width: 0%;
   pointer-events: none;
@@ -627,7 +627,7 @@ html[data-theme="dark"] textarea {
     width: 32px;
     height: 3px;
     border-radius: 999px;
-    background: linear-gradient(90deg, #4effda, #00d6b4);
+    background: linear-gradient(90deg, #3fe8c8, #00a88c);
     animation: polishUnderlineGrow 0.4s var(--ease-out) both;
   }
 }

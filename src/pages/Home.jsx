@@ -3,7 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, ChevronDown, Search, X, Zap } from "lucide-react";
 
 import Hero from "../components/Hero";
-import HomeStickyBar from "../components/HomeStickyBar";
+
+import SectionHead from "../components/SectionHead";
 import "../css/pages/Home.css";
 import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingIds, fetchPromoCodes, fetchSettings } from "../lib/api";
@@ -67,14 +68,8 @@ const HOW_IT_WORKS = [
   },
 ];
 
-function HomeSectionHead({ kicker, title, sub }) {
-  return (
-    <header className="home-sectionHead">
-      {kicker ? <span className="home-kicker">{kicker}</span> : null}
-      <h2 className="h2 home-sectionTitle">{title}</h2>
-      {sub ? <p className="home-sectionSub">{sub}</p> : null}
-    </header>
-  );
+function HomeSectionHead(props) {
+  return <SectionHead {...props} />;
 }
 
 function HomeFaqItem({ item, open, onToggle }) {
@@ -167,7 +162,7 @@ export default function Home() {
   useRevealOnScroll();
 
   usePageMeta({
-    title: "Home",
+    title: "Beranda",
     description: "Langganan premium budget pelajar \u2014 cepet, gampang, anti ribet.",
   });
 
@@ -244,7 +239,6 @@ export default function Home() {
       <ScrollProgressBar />
 
       <Hero products={products} />
-      <HomeStickyBar />
 
       <div className="home-body">
         {/* ── Produk Favorit ── */}
@@ -419,7 +413,7 @@ export default function Home() {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (faqQuery.trim()) {
-                  nav(`/tentang?q=${encodeURIComponent(faqQuery.trim())}`);
+                  nav(`/faq?q=${encodeURIComponent(faqQuery.trim())}`);
                 }
               }}
               className="home-faqSearchWrap reveal reveal-scale"
@@ -461,7 +455,7 @@ export default function Home() {
             </div>
 
             <div className="home-sectionCta reveal" style={{ transitionDelay: `${120 + HOME_FAQ.length * 80}ms` }}>
-              <Link className="btn btn-ghost" to="/tentang">
+              <Link className="btn btn-ghost" to="/faq">
                 Baca FAQ Lengkap
                 <ArrowRight size={16} aria-hidden="true" />
               </Link>

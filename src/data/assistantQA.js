@@ -422,6 +422,7 @@ const ROUTE_STARTER_TAGS = {
   "/checkout": ["bayar", "promo"],
   "/status": ["status"],
   "/produk": ["produk"],
+  "/faq": ["toko", "bayar"],
   "/tentang": ["toko", "bayar"],
   "/testimoni": ["toko"],
 };

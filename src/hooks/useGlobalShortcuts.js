@@ -137,7 +137,7 @@ export function useGlobalShortcuts() {
 
       const lastG = window.__lastGKey || 0;
       if (Date.now() - lastG < 800 && !isTyping) {
-        const map = { h: "/", p: "/produk", s: "/status", r: "/riwayat", f: "/tentang" };
+        const map = { h: "/", p: "/produk", s: "/status", r: "/riwayat", f: "/faq" };
         if (map[e.key]) {
           e.preventDefault();
           navigate(map[e.key]);

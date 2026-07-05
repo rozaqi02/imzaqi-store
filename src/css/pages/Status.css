@@ -6,23 +6,23 @@
   position: relative;
   overflow: hidden;
   --st-bg-main:
-    radial-gradient(1200px 540px at 10% -8%, rgba(44, 120, 255, 0.2), rgba(44, 120, 255, 0) 64%),
-    radial-gradient(980px 480px at 92% -10%, rgba(28, 187, 201, 0.2), rgba(28, 187, 201, 0) 62%);
+    radial-gradient(1200px 540px at 10% -8%, rgba(0, 214, 180, 0.18), rgba(0, 214, 180, 0) 64%),
+    radial-gradient(980px 480px at 92% -10%, rgba(0, 194, 208, 0.2), rgba(0, 194, 208, 0) 62%);
   --st-panel:
     linear-gradient(172deg, rgba(12, 25, 46, 0.96) 0%, rgba(11, 23, 42, 0.95) 52%, rgba(9, 20, 39, 0.97) 100%);
   --st-panel-soft:
     linear-gradient(180deg, rgba(17, 33, 60, 0.92), rgba(11, 21, 41, 0.94));
   --st-inset:
     linear-gradient(180deg, rgba(8, 16, 33, 0.96), rgba(13, 25, 46, 0.92));
-  --st-line: rgba(129, 182, 255, 0.2);
-  --st-line-strong: rgba(92, 167, 255, 0.34);
+  --st-line: rgba(0, 194, 208, 0.2);
+  --st-line-strong: rgba(0, 214, 180, 0.34);
   --st-text: #ecf8ff;
   --st-muted: rgba(214, 235, 255, 0.72);
   --st-subtle: rgba(214, 235, 255, 0.56);
   --st-shadow:
     0 26px 62px rgba(1, 8, 20, 0.48),
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 0 0 1px rgba(78, 149, 255, 0.08);
+    0 0 0 1px rgba(0, 194, 208, 0.1);
   --st-shadow-soft:
     0 18px 40px rgba(1, 8, 20, 0.32),
     inset 0 1px 0 rgba(255, 255, 255, 0.05);
@@ -1857,4 +1857,18 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
 html[data-theme="light"] .st-streakBadge {
   background: linear-gradient(135deg, rgba(0, 180, 150, 0.1), rgba(0, 160, 175, 0.06));
   border-color: rgba(0, 123, 136, 0.2);
+}
+
+.st-etaBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 214, 180, 0.24);
+  background: rgba(29, 131, 255, 0.1);
+  color: var(--st-text);
+  font-size: 13px;
+  font-weight: 600;
 }

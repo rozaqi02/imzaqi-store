@@ -2,22 +2,13 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import Header from "./Header";
 import Footer from "./Footer";
+import { isFunnelPath } from "../hooks/useFunnelRoute";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useRouteDirection } from "../hooks/useRouteDirection";
 import { rafThrottle } from "../utils/throttle";
 
-// Separate Footer wrapper that starts hidden and reveals after 800ms
 function DelayedFooter() {
-  const [visible, setVisible] = React.useState(false);
-
-  React.useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 800);
-    return () => clearTimeout(timer);
-  }, []); // empty deps — remount on key change handles reset
-
-  // Render an invisible placeholder matching footer height so no layout jump
-  if (!visible) return null;
   return <Footer />;
 }
 
@@ -102,6 +93,15 @@ export default function Layout({ children, routeKey }) {
   useRevealOnScroll(revealKey);
 
   const hideFooter = isAdminDashboardRoute || (isCheckoutRoute && isMobile);
+  const isFunnel = isFunnelPath(location.pathname);
+
+  React.useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.toggle("is-funnel", isFunnel);
+    return () => {
+      document.body.classList.remove("is-funnel");
+    };
+  }, [isFunnel]);
 
   return (
     <div className="app-shell">

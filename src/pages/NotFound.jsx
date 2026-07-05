@@ -1,20 +1,45 @@
-import React from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Activity, ArrowRight, Compass, Grid2x2, History, Home } from "lucide-react";
 import { usePageMeta } from "../hooks/usePageMeta";
+import { fetchProducts } from "../lib/api";
+import ProductTile from "../components/ProductTile";
 
 const QUICK_LINKS = [
-  { to: "/", label: "Home", icon: Home, desc: "Balik ke beranda" },
+  { to: "/", label: "Beranda", icon: Home, desc: "Balik ke beranda" },
   { to: "/produk", label: "Produk", icon: Grid2x2, desc: "Lihat semua katalog" },
   { to: "/status", label: "Status Order", icon: Activity, desc: "Cek progress order kamu" },
   { to: "/status?tab=riwayat", label: "Riwayat", icon: History, desc: "Order dari browser ini" },
 ];
 
 export default function NotFound() {
+  const [products, setProducts] = useState([]);
+
   usePageMeta({
     title: "404 — Halaman Tidak Ditemukan",
     description: "Halaman ini nggak ada. Coba pilih halaman lain ya.",
   });
+
+  useEffect(() => {
+    let alive = true;
+    fetchProducts({ useCache: true })
+      .then((rows) => { if (alive) setProducts(rows || []); })
+      .catch(() => { if (alive) setProducts([]); });
+    return () => { alive = false; };
+  }, []);
+
+  const popularProducts = useMemo(() => {
+    if (!products.length) return [];
+    const scored = [...products].map((product) => {
+      const sold = (product?.product_variants || []).reduce(
+        (sum, variant) => sum + Number(variant?.sold_count || 0),
+        0
+      );
+      return { product, sold };
+    });
+    scored.sort((a, b) => b.sold - a.sold || (a.product.sort_order || 0) - (b.product.sort_order || 0));
+    return scored.slice(0, 4).map((row) => row.product);
+  }, [products]);
 
   return (
     <div className="page nf-page">
@@ -50,6 +75,17 @@ export default function NotFound() {
                 );
               })}
             </div>
+
+            {popularProducts.length > 0 ? (
+              <div className="nf-popular">
+                <h2 className="h3">Produk populer</h2>
+                <div className="product-grid-container grid-mode" role="list">
+                  {popularProducts.map((product, idx) => (
+                    <ProductTile key={product.id} product={product} layout="grid" rank={idx + 1} disableTilt />
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
       </section>

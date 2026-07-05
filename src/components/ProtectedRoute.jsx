@@ -1,31 +1,32 @@
 import React from "react";
 import { Navigate } from "react-router-dom";
 import { supabase } from "../lib/supabaseClient";
+import { checkAdminAccess } from "../lib/adminAuth";
 
 /**
- * Simple auth guard for admin pages.
- * Checks Supabase session before rendering.
+ * Admin route guard — session + admin_users row or app_metadata.role === "admin".
  */
 export default function ProtectedRoute({ children, fallback = null }) {
-  const [state, setState] = React.useState({ checking: true, ok: false });
+  const [state, setState] = React.useState({ checking: true, ok: false, reason: null });
 
   React.useEffect(() => {
     let alive = true;
 
-    (async () => {
+    async function verify() {
       try {
-        const { data } = await supabase.auth.getSession();
+        const result = await checkAdminAccess();
         if (!alive) return;
-        setState({ checking: false, ok: Boolean(data?.session) });
+        setState({ checking: false, ok: result.ok, reason: result.reason });
       } catch {
         if (!alive) return;
-        setState({ checking: false, ok: false });
+        setState({ checking: false, ok: false, reason: "error" });
       }
-    })();
+    }
 
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, session) => {
-      if (!alive) return;
-      setState({ checking: false, ok: Boolean(session) });
+    verify();
+
+    const { data: sub } = supabase.auth.onAuthStateChange(() => {
+      verify();
     });
 
     return () => {
@@ -43,6 +44,7 @@ export default function ProtectedRoute({ children, fallback = null }) {
               <div className="card pad">
                 <div className="hint subtle">Memeriksa akses admin...</div>
                 <div className="skeleton" style={{ height: 14, marginTop: 12 }} />
+                <div className="skeleton" style={{ height: 120, marginTop: 12 }} />
               </div>
             </div>
           </section>
@@ -51,8 +53,12 @@ export default function ProtectedRoute({ children, fallback = null }) {
     );
   }
 
-  if (!state.ok) return <Navigate to="/admin" replace />;
+  if (!state.ok) {
+    if (state.reason === "not_admin") {
+      return <Navigate to="/admin?error=not_admin" replace />;
+    }
+    return <Navigate to="/admin" replace />;
+  }
 
   return children;
 }
-

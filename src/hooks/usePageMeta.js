@@ -3,6 +3,14 @@ import { useEffect } from "react";
 const SITE_URL = "https://imzaqistore.my.id";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/imzaqistore_logo.png`;
 
+function resolveAbsoluteUrl(url) {
+  if (!url) return DEFAULT_OG_IMAGE;
+  if (/^https?:\/\//i.test(url)) return url;
+  if (url.startsWith("//")) return `https:${url}`;
+  const path = url.startsWith("/") ? url : `/${url}`;
+  return `${SITE_URL}${path}`;
+}
+
 function upsertMeta(selector, attrs) {
   let el = document.head.querySelector(selector);
   if (!el) {
@@ -41,8 +49,10 @@ export function usePageMeta({ title, description, ogImage } = {}) {
     const base = "Imzaqi Store";
     const nextTitle = title ? `${title} - ${base}` : `${base} - Langganan Premium, Harga Pelajar`;
     const nextDesc = description || "Jual akun premium Netflix, Spotify, Canva, ChatGPT dan lainnya. Bayar QRIS, langsung aktif. Bergaransi.";
-    const nextImage = ogImage || DEFAULT_OG_IMAGE;
-    const nextUrl = typeof window !== "undefined" ? window.location.href : SITE_URL;
+    const nextImage = resolveAbsoluteUrl(ogImage);
+    const nextUrl = typeof window !== "undefined"
+      ? `${SITE_URL}${window.location.pathname}${window.location.search}`
+      : SITE_URL;
     const canonicalUrl = typeof window !== "undefined"
       ? `${SITE_URL}${window.location.pathname}`
       : SITE_URL;

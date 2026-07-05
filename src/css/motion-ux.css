@@ -105,7 +105,7 @@
     display: block;
     height: 100%;
     transform-origin: left center;
-    background: linear-gradient(90deg, #4effda, #00d6b4);
+    background: linear-gradient(90deg, #3fe8c8, #00a88c);
     animation: uxLoadMoreProgress 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
@@ -267,7 +267,7 @@
 
   .pay-successStep.is-done > span {
     background: rgba(0, 214, 180, 0.2);
-    color: #4effda;
+    color: #3fe8c8;
   }
 
   .pay-successStep.is-active {
@@ -277,7 +277,7 @@
   }
 
   .pay-successStep.is-active > span {
-    background: linear-gradient(135deg, #4effda, #00d6b4);
+    background: linear-gradient(135deg, #3fe8c8, #00a88c);
     color: #032235;
   }
 
@@ -309,7 +309,7 @@
   }
 
   html[data-theme="light"] .pay-successStep.is-active > span {
-    background: linear-gradient(135deg, #00d6b4, #4effda);
+    background: linear-gradient(135deg, #00a88c, #3fe8c8);
     color: #032235;
   }
 

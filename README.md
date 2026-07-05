@@ -1,86 +1,69 @@
 # Imzaqi Store
 
-Dokumen implementasi terbaru:
+Toko digital subscription (Netflix, Spotify, Canva, ChatGPT, dll.) dengan checkout QRIS, status order, dan admin dashboard.
 
-- Backend hardening order RPC: [docs/backend-order-hardening.md](docs/backend-order-hardening.md)
-- Rencana migrasi CRA ke Vite: [docs/cra-to-vite-migration-plan.md](docs/cra-to-vite-migration-plan.md)
-- Unique daily visits (visitor dedupe): [supabase/migrations/20260420164500_add_increment_unique_visit.sql](supabase/migrations/20260420164500_add_increment_unique_visit.sql)
+- **Frontend:** React 19 + Vite 8
+- **Backend:** Supabase (Postgres, Auth, Storage, Realtime)
+- **Deploy:** Netlify
 
-Apply hardening SQL ke Supabase:
+## Menjalankan lokal
 
-1. Buka Supabase Dashboard -> SQL Editor.
-2. Copy isi file [supabase/migrations/20260408122000_harden_create_order_with_stock_check.sql](supabase/migrations/20260408122000_harden_create_order_with_stock_check.sql).
-3. Jalankan query, lalu test flow checkout/pay.
+```bash
+npm install
+cp .env.example .env   # isi VITE_SUPABASE_URL dan VITE_SUPABASE_ANON_KEY
+npm start              # http://localhost:5173
+```
 
----
+## Scripts
 
-# Getting Started with Create React App
+| Perintah | Keterangan |
+|----------|------------|
+| `npm start` | Dev server (Vite) |
+| `npm run build` | Build production ke `dist/` |
+| `npm run preview` | Preview build lokal |
+| `npm test` | Jalankan test Vitest |
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Environment
 
-## Available Scripts
+Buat file `.env` di root:
 
-In the project directory, you can run:
+```env
+VITE_SUPABASE_URL=https://xxxx.supabase.co
+VITE_SUPABASE_ANON_KEY=eyJ...
+```
 
-### `npm start`
+## Supabase migrations
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Dokumen & SQL terkait:
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+- [docs/backend-order-hardening.md](docs/backend-order-hardening.md)
+- [supabase/migrations/20260408122000_harden_create_order_with_stock_check.sql](supabase/migrations/20260408122000_harden_create_order_with_stock_check.sql)
+- [supabase/migrations/20260420164500_add_increment_unique_visit.sql](supabase/migrations/20260420164500_add_increment_unique_visit.sql)
 
-### `npm test`
+Cara apply:
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+1. Buka Supabase Dashboard → SQL Editor
+2. Copy isi file migration
+3. Jalankan query, lalu uji flow checkout/pay
 
-### `npm run build`
+## Fitur utama
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+- Katalog produk & detail varian
+- Keranjang + checkout drawer + pembayaran QRIS
+- Lacak status order (`/status`)
+- Admin dashboard (kelola produk, order, promo, testimoni)
+- Export CSV order, notifikasi realtime order baru, salin link status
+- PWA (manifest + service worker di production)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Struktur folder
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```
+src/
+  pages/        # Home, Products, ProductDetail, Checkout, Pay, Status, Admin
+  components/   # UI reusable
+  hooks/        # usePageMeta, usePromo, analytics, dll.
+  lib/          # api.js, supabaseClient, format
+public/         # manifest, sw.js, assets statis
+supabase/       # SQL migrations
+netlify/        # serverless functions
+```

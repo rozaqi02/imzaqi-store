@@ -1,3 +1,12 @@
+export function asVariantList(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+export function normalizeProductRecord(product) {
+  if (!product || typeof product !== "object") return product;
+  return { ...product, product_variants: asVariantList(product.product_variants) };
+}
+
 export function formatIDR(n) {
   const value = Number(n || 0);
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(value);

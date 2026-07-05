@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -20,6 +20,7 @@ import { supabase } from "../lib/supabaseClient";
 import TypewriterSearchInput from "./TypewriterSearchInput";
 import { useDeviceCapability } from "../hooks/useIsMobile";
 import { getBuyerName } from "../lib/greeting";
+import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
 
 /* ── Data ── */
 const TRUST_ITEMS = [
@@ -54,9 +55,13 @@ function HeroSearch({ products = [] }) {
   const [q, setQ] = useState("");
   const [open, setOpen] = useState(false);
   const [activeIdx, setActiveIdx] = useState(-1);
+  const [historyTick, setHistoryTick] = useState(0);
 
   const suggestions = useMemo(() => {
-    if (!q.trim()) return [];
+    if (!q.trim()) {
+      void historyTick;
+      return open ? getSearchHistory() : [];
+    }
     const s = q.trim().toLowerCase();
     const words = [];
     (products || []).forEach((p) => {
@@ -68,7 +73,7 @@ function HeroSearch({ products = [] }) {
     return Array.from(new Set(words.filter(Boolean)))
       .filter((x) => x.toLowerCase().includes(s))
       .slice(0, 5);
-  }, [q, products]);
+  }, [q, products, open, historyTick]);
 
   useEffect(() => {
     if (activeIdx >= suggestions.length) setActiveIdx(-1);
@@ -85,13 +90,14 @@ function HeroSearch({ products = [] }) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  function goSearch(value) {
+  const goSearch = useCallback((value) => {
     const term = String(value || q || "").trim();
     if (!term) return;
+    pushSearchHistory(term);
     setOpen(false);
     setActiveIdx(-1);
     nav(`/produk?q=${encodeURIComponent(term)}`);
-  }
+  }, [nav, q]);
 
   return (
     <div className="search-dropdown-anchor hx-search-wrap" ref={wrapRef}>
@@ -173,6 +179,22 @@ function HeroSearch({ products = [] }) {
 
       {open && suggestions.length > 0 ? (
         <div className="suggestions suggestions--animate" role="listbox" id={listboxId}>
+          {!q.trim() ? (
+            <div className="catalog-searchHistoryHead">
+              <span className="catalog-searchHistoryLabel">Pencarian terakhir</span>
+              <button
+                type="button"
+                className="catalog-searchHistoryClear"
+                onClick={() => {
+                  clearSearchHistory();
+                  setHistoryTick((tick) => tick + 1);
+                  setActiveIdx(-1);
+                }}
+              >
+                Hapus
+              </button>
+            </div>
+          ) : null}
           {suggestions.map((sug, idx) => (
             <button
               key={sug}

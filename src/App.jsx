@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useState } from "react";
+import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Layout from "./components/Layout";
 import RouteProgress from "./components/RouteProgress";
@@ -15,7 +15,14 @@ import { useDeviceCapability } from "./hooks/useIsMobile";
 import { rafThrottle } from "./utils/throttle";
 import { ArrowRight, ChevronUp, X } from "lucide-react";
 import AchievementToast from "./components/AchievementToast";
-import { hasSavedScrollY } from "./hooks/useScrollMemory";
+import AbandonedCartBanner from "./components/AbandonedCartBanner";
+import SwUpdateToast from "./components/SwUpdateToast";
+import PageErrorBoundary from "./components/PageErrorBoundary";
+import { shouldSkipCatalogScrollToTop } from "./hooks/useScrollMemory";
+import { getOrderHistory } from "./lib/orderHistory";
+import { captureReferralFromUrl } from "./lib/referral";
+import { useFunnelRoute } from "./hooks/useFunnelRoute";
+import CartSheetPortal from "./components/CartSheetPortal";
 
 // ── Eager-loaded pages (critical path) ──
 import Home from "./pages/Home";
@@ -26,6 +33,7 @@ import ProductDetail from "./pages/ProductDetail";
 const Status = React.lazy(() => import("./pages/Status"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const About = React.lazy(() => import("./pages/About"));
+const Faq = React.lazy(() => import("./pages/Faq"));
 const Testimonials = React.lazy(() => import("./pages/Testimonials"));
 const Checkout = React.lazy(() => import("./pages/Checkout"));
 const Pay = React.lazy(() => import("./pages/Pay"));
@@ -77,6 +85,7 @@ function PageLoader() {
 
 // ── Floating recent order button ──
 function FloatingOrderStatus() {
+  const isFunnel = useFunnelRoute();
   const [order, setOrder] = useState(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -91,7 +100,14 @@ function FloatingOrderStatus() {
     } catch {}
   }, []);
 
-  if (!order || dismissed) return null;
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    const active = Boolean(order && !dismissed);
+    document.body.classList.toggle("has-floating-order", active);
+    return () => document.body.classList.remove("has-floating-order");
+  }, [order, dismissed]);
+
+  if (isFunnel || !order || dismissed) return null;
 
   return (
     <div className="floating-order-status">
@@ -120,6 +136,7 @@ function FloatingOrderStatus() {
 
 // ── Scroll-to-top floating button ──
 function ScrollToTopButton() {
+  const isFunnel = useFunnelRoute();
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {
@@ -137,6 +154,8 @@ function ScrollToTopButton() {
   function scrollUp() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
+
+  if (isFunnel) return null;
 
   return (
     <button
@@ -164,14 +183,35 @@ function SuspenseReadyNotifier({ onReady, routeKey }) {
   return null;
 }
 
+function ReferralCapture() {
+  const location = useLocation();
+
+  useEffect(() => {
+    captureReferralFromUrl(location.search);
+  }, [location.search]);
+
+  return null;
+}
+
+function BoundedRoute({ pageName, children }) {
+  return <PageErrorBoundary pageName={pageName}>{children}</PageErrorBoundary>;
+}
+
 function ScrollToTop() {
   const location = useLocation();
   const displayLocation = location.state?.backgroundLocation || location;
   const pathname = displayLocation.pathname;
+  const prevPathRef = useRef(pathname);
 
-  useEffect(() => {
-    // When navigating back to /produk with saved scroll, let Products restore it
-    if (pathname === "/produk" && hasSavedScrollY()) return;
+  useLayoutEffect(() => {
+    const prevPath = prevPathRef.current;
+    prevPathRef.current = pathname;
+
+    if (pathname === "/produk") {
+      // URL filter sync can re-run this effect — never scroll-to-top for that.
+      if (prevPath === "/produk") return;
+      if (shouldSkipCatalogScrollToTop()) return;
+    }
 
     const reduce =
       typeof window !== "undefined" &&
@@ -181,10 +221,8 @@ function ScrollToTop() {
       typeof window !== "undefined" &&
       window.matchMedia &&
       window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
-    requestAnimationFrame(() => {
-      window.scrollTo({ top: 0, behavior: reduce || coarse ? "auto" : "smooth" });
-    });
-  }, [pathname]);
+    window.scrollTo({ top: 0, behavior: reduce || coarse ? "auto" : "smooth" });
+  }, [pathname, location.key]);
 
   return null;
 }
@@ -201,25 +239,28 @@ function AppRoutes() {
     <Layout routeKey={displayLocation.pathname}>
       <Suspense fallback={<PageLoader />}>
         <Routes location={displayLocation}>
-          <Route path="/" element={<Home />} />
-          <Route path="/produk/:slug" element={<ProductDetail />} />
-          <Route path="/produk" element={<Products />} />
-          <Route path="/tentang" element={<About />} />
-          <Route path="/testimoni" element={<Testimonials />} />
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/bayar" element={<Pay />} />
-          <Route path="/status" element={<Status />} />
+          <Route path="/" element={<BoundedRoute pageName="Home"><Home /></BoundedRoute>} />
+          <Route path="/produk/:slug" element={<BoundedRoute pageName="Detail Produk"><ProductDetail /></BoundedRoute>} />
+          <Route path="/produk" element={<BoundedRoute pageName="Katalog"><Products /></BoundedRoute>} />
+          <Route path="/tentang" element={<BoundedRoute pageName="Tentang"><About /></BoundedRoute>} />
+          <Route path="/faq" element={<BoundedRoute pageName="FAQ"><Faq /></BoundedRoute>} />
+          <Route path="/testimoni" element={<BoundedRoute pageName="Testimoni"><Testimonials /></BoundedRoute>} />
+          <Route path="/checkout" element={<BoundedRoute pageName="Checkout"><Checkout /></BoundedRoute>} />
+          <Route path="/bayar" element={<BoundedRoute pageName="Bayar"><Pay /></BoundedRoute>} />
+          <Route path="/status" element={<BoundedRoute pageName="Status Order"><Status /></BoundedRoute>} />
           <Route path="/riwayat" element={<Navigate to="/status?tab=riwayat" replace />} />
-          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin" element={<BoundedRoute pageName="Admin Login"><AdminLogin /></BoundedRoute>} />
           <Route
             path="/admin/dashboard"
             element={
               <ProtectedRoute>
-                <AdminDashboard />
+                <BoundedRoute pageName="Admin Dashboard">
+                  <AdminDashboard />
+                </BoundedRoute>
               </ProtectedRoute>
             }
           />
-          <Route path="*" element={<NotFound />} />
+          <Route path="*" element={<BoundedRoute pageName="404"><NotFound /></BoundedRoute>} />
         </Routes>
       </Suspense>
 
@@ -291,12 +332,16 @@ export default function App() {
 
   return (
     <BrowserRouter>
+      <CartSheetPortal />
+      <ReferralCapture />
       <NetworkBridge />
       <PolishEffects />
       <Confetti />
       <AchievementToast />
       <AssistantBubble />
       <FlashSalePopup />
+      <AbandonedCartBanner />
+      <SwUpdateToast />
       <ScrollToTop />
       <RouteProgress />
       <FloatingOrderStatus />

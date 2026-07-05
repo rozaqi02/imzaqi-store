@@ -329,6 +329,26 @@ function TabCekStatus({ settings }) {
     return "Status aktif";
   }, [order?.status]);
 
+  const orderProgress = useMemo(() => {
+    const val = order?.status;
+    if (val === "done") return 100;
+    if (val === "processing") return 72;
+    if (val === "paid_reported") return 48;
+    if (val === "pending") return 24;
+    if (val === "cancelled") return 0;
+    return 12;
+  }, [order?.status]);
+
+  const etaHint = useMemo(() => {
+    const val = order?.status;
+    if (val === "pending") return "Estimasi: bayar dalam 30 menit agar tidak expired";
+    if (val === "paid_reported") return "Estimasi: konfirmasi admin ~15 menit";
+    if (val === "processing") return "Estimasi: akun dikirim ~5 menit";
+    if (val === "done") return "Order selesai — akun sudah dikirim";
+    if (val === "cancelled") return null;
+    return null;
+  }, [order?.status]);
+
   const statusIcon = useMemo(() => {
     const val = order?.status;
     if (val === "done") return CheckCircle2;
@@ -359,9 +379,20 @@ function TabCekStatus({ settings }) {
 
   const waUrl = useMemo(() => {
     const code = order?.order_code || input || "";
-    const text = encodeURIComponent(`Halo admin, saya ingin cek order.\n\nID Order: ${code}`);
+    const itemLines = (order?.items || [])
+      .map((item) => `• ${item.product_name || "-"} / ${item.variant_name || "-"} x${item.qty || 1}`)
+      .join("\n");
+    const lines = [
+      "Halo admin, saya ingin cek order.",
+      "",
+      `ID Order: ${code}`,
+      order?.status ? `Status: ${prettyStatus(order.status)}` : null,
+      order?.total_idr ? `Total: ${formatIDR(order.total_idr)}` : null,
+      itemLines ? `\nItem:\n${itemLines}` : null,
+    ].filter(Boolean);
+    const text = encodeURIComponent(lines.join("\n"));
     return `https://wa.me/${waNumber}?text=${text}`;
-  }, [input, order?.order_code, waNumber]);
+  }, [input, order?.order_code, order?.items, order?.status, order?.total_idr, waNumber]);
 
   async function copyOrderCode() {
     try {
@@ -564,6 +595,25 @@ function TabCekStatus({ settings }) {
                 icon={Calendar}
               />
             </section>
+
+            {order?.status && order.status !== "cancelled" ? (
+              <div className="st-progressBar" role="progressbar" aria-valuenow={orderProgress} aria-valuemin={0} aria-valuemax={100}>
+                <div className="st-progressBar-label">
+                  <span>Progress order</span>
+                  <span>{orderProgress}%</span>
+                </div>
+                <div className="st-progressBar-track">
+                  <div className="st-progressBar-fill" style={{ width: `${orderProgress}%` }} />
+                </div>
+              </div>
+            ) : null}
+
+            {etaHint ? (
+              <div className="st-etaBanner" role="status">
+                <Clock3 size={14} />
+                <span>{etaHint}</span>
+              </div>
+            ) : null}
 
             <article className="st-card st-flow">
               <div className="st-cardHead">

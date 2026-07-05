@@ -24,9 +24,20 @@ import {
 } from "lucide-react";
 
 import Modal from "../../components/Modal";
+import ConfirmDialog from "../../components/ConfirmDialog";
 import EmptyState from "../../components/EmptyState";
 import FlowAssist from "../../components/FlowAssist";
+import { checkAdminAccess } from "../../lib/adminAuth";
+import {
+  ORDER_STATUS_OPTIONS,
+  LIVE_ORDER_STATUSES,
+  prettyOrderStatus,
+} from "../../lib/orderStatus";
 import "../../css/pages/AdminDashboard.css";
+import "../../css/pages/AdminDashboard.light.css";
+import "../../css/pages/AdminDashboard.fixes.css";
+import "../../css/pages/AdminNav.css";
+import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -51,24 +62,33 @@ import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
 import { copyToClipboard } from "../../utils/clipboard";
 import { warn } from "../../lib/log";
+import {
+  notifyAdminNewOrder,
+  requestAdminNotificationPermission,
+  buildAdminOrderAlertUrl,
+} from "../../lib/adminNotify";
+
+import {
+  CATEGORY_OPTIONS,
+  StatusBadge,
+  buildWhatsAppLink,
+  formatAdminDate,
+  formatAdminDateTime,
+  formatCompactIDR,
+  formatCompactNumber,
+  formatDayLabel,
+  formatPercent,
+  getOrderDiscountAmount,
+  getOrderItemCount,
+  getSafeOrderItems,
+  normalizeWhatsApp,
+  prettyCategory,
+  toDateKeyWIB,
+} from "./adminUtils";
 
 const BUCKET_ICONS = "product-icons"; // public
 const BUCKET_TESTIMONIALS = "testimonials"; // public
-const CATEGORY_OPTIONS = [
-  { value: "streaming", label: "Streaming" },
-  { value: "music", label: "Music" },
-  { value: "tools", label: "Tools" },
-  { value: "learning", label: "Belajar" },
-  { value: "other", label: "Lainnya" },
-];
-const ORDER_STATUS_OPTIONS = [
-  { value: "pending", label: "Pending" },
-  { value: "paid_reported", label: "Lapor Bayar" },
-  { value: "processing", label: "Diproses" },
-  { value: "done", label: "Sukses" },
-  { value: "cancelled", label: "Dibatalkan" },
-];
-const LIVE_ORDER_STATUSES = new Set(["pending", "paid_reported", "processing"]);
+const ORDERS_PAGE_SIZE = 500;
 const ANALYTICS_WINDOWS = [
   { value: "7d", label: "7 hari" },
   { value: "30d", label: "30 hari" },
@@ -77,40 +97,6 @@ const ORDER_SELECT_FULL =
   "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp,notes,admin_note";
 const ORDER_SELECT_FALLBACK =
   "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp";
-const CATEGORY_LABELS = CATEGORY_OPTIONS.reduce((acc, option) => {
-  acc[option.value] = option.label;
-  return acc;
-}, {});
-
-function getSafeOrderItems(order) {
-  return Array.isArray(order?.items) ? order.items : [];
-}
-
-function prettyStatus(status) {
-  const s = String(status || "pending");
-  const map = {
-    pending: "Pending",
-    processing: "Diproses",
-    done: "Sukses",
-    paid_reported: "Lapor Bayar",
-    cancelled: "Dibatalkan",
-  };
-  return map[s] || s;
-}
-
-function getStatusTone(status) {
-  const s = String(status || "pending");
-  if (s === "done") return "done";
-  if (s === "processing") return "processing";
-  if (s === "paid_reported") return "reported";
-  if (s === "cancelled") return "cancelled";
-  return "pending";
-}
-
-function StatusBadge({ status }) {
-  return <span className={"admin-status " + getStatusTone(status)}>{prettyStatus(status)}</span>;
-}
-
 const TAB_ICONS = {
   overview: LayoutDashboard,
   products: Box,
@@ -120,86 +106,6 @@ const TAB_ICONS = {
   testimonials: Star,
   settings: Settings2,
 };
-
-function getOrderItemCount(order) {
-  return getSafeOrderItems(order).reduce((sum, item) => sum + Number(item?.qty || 0), 0);
-}
-
-function getOrderDiscountAmount(order) {
-  const subtotal = Number(order?.subtotal_idr || 0);
-  const total = Number(order?.total_idr || 0);
-  return Math.max(0, subtotal - total);
-}
-
-function prettyCategory(category) {
-  return CATEGORY_LABELS[String(category || "other").toLowerCase()] || CATEGORY_LABELS.other;
-}
-
-function formatCompactNumber(value) {
-  return new Intl.NumberFormat("id-ID", {
-    notation: "compact",
-    maximumFractionDigits: 1,
-  }).format(Number(value || 0));
-}
-
-function formatCompactIDR(value) {
-  const amount = Number(value || 0);
-  if (Math.abs(amount) >= 1000000) {
-    return `Rp${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(amount / 1000000)} jt`;
-  }
-  if (Math.abs(amount) >= 1000) {
-    return `Rp${new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1 }).format(amount / 1000)} rb`;
-  }
-  return formatIDR(amount);
-}
-
-function formatPercent(value, digits = 0) {
-  return `${Number(value || 0).toFixed(digits)}%`;
-}
-
-function formatAdminDate(value) {
-  if (!value) return "-";
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return new Intl.DateTimeFormat("id-ID", {
-    timeZone: "Asia/Jakarta",
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-}
-
-function formatDayLabel(value) {
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return "-";
-  return new Intl.DateTimeFormat("id-ID", {
-    timeZone: "Asia/Jakarta",
-    day: "2-digit",
-    month: "short",
-  }).format(date);
-}
-
-function toDateKeyWIB(value) {
-  const date = value instanceof Date ? value : new Date(value);
-  if (Number.isNaN(date.getTime())) return "";
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Jakarta",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
-}
-
-function normalizeWhatsApp(value) {
-  return String(value || "").replace(/[^\d]/g, "");
-}
-
-function buildWhatsAppLink(value) {
-  const digits = normalizeWhatsApp(value);
-  return digits ? `https://wa.me/${digits}` : "";
-}
 
 function clampPercent(value) {
   return Math.max(0, Math.min(100, Number(value || 0)));
@@ -297,6 +203,13 @@ export default function AdminDashboard() {
   const [settingsQrisBase, setSettingsQrisBase] = useState("");
   const [settingsQrisImageUrl, setSettingsQrisImageUrl] = useState("");
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [exportDateFrom, setExportDateFrom] = useState("");
+  const [exportDateTo, setExportDateTo] = useState("");
+  const [stockBannerDismissed, setStockBannerDismissed] = useState(false);
+  const [ordersHasMore, setOrdersHasMore] = useState(false);
+  const [ordersLoadingMore, setOrdersLoadingMore] = useState(false);
+  const [confirmDialog, setConfirmDialog] = useState(null);
+  const [msgIsError, setMsgIsError] = useState(false);
   const deferredProductQuery = useDeferredValue(productQuery);
   const deferredOrderQuery = useDeferredValue(orderQuery);
   const waNumber = settings?.whatsapp?.number || "";
@@ -309,12 +222,54 @@ export default function AdminDashboard() {
       ? "Base QR masih ikut env build."
       : "Base QR kosong. Checkout akan pakai QR statis.";
 
-  // ===== Auth guard =====
+  // ===== Auth guard + admin-only body class =====
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (!data?.session) nav("/admin");
+    checkAdminAccess().then((result) => {
+      if (!result.ok) nav(result.reason === "not_admin" ? "/admin?error=not_admin" : "/admin");
     });
   }, [nav]);
+
+  useEffect(() => {
+    document.body.classList.add("is-admin");
+    return () => document.body.classList.remove("is-admin");
+  }, []);
+
+  function openConfirm({
+    title,
+    message,
+    confirmLabel,
+    danger,
+    prompt = false,
+    promptDefault = "",
+    promptLabel = "Nilai",
+    onConfirm,
+  }) {
+    setConfirmDialog({
+      title,
+      message,
+      confirmLabel,
+      danger,
+      prompt,
+      promptDefault,
+      promptLabel,
+      onConfirm: (value) => {
+        setConfirmDialog(null);
+        onConfirm(value);
+      },
+      onCancel: () => setConfirmDialog(null),
+    });
+  }
+
+  function requestOrderStatusChange(orderId, nextStatus, currentStatus) {
+    if (String(nextStatus) === String(currentStatus || "pending")) return;
+    openConfirm({
+      title: "Ubah status order",
+      message: `Ubah status ke "${prettyOrderStatus(nextStatus)}"?`,
+      confirmLabel: "Ya, ubah",
+      danger: nextStatus === "cancelled",
+      onConfirm: () => updateOrderStatus(orderId, nextStatus),
+    });
+  }
 
   async function logout() {
     await supabase.auth.signOut();
@@ -332,8 +287,13 @@ export default function AdminDashboard() {
     setSettingsQrisImageUrl(String(qris.image_url || ""));
   }, [settings]);
 
-  async function fetchOrdersData() {
-    let query = supabase.from("orders").select(ORDER_SELECT_FULL).order("created_at", { ascending: false }).limit(1000);
+  async function fetchOrdersPage(offset = 0) {
+    const end = offset + ORDERS_PAGE_SIZE - 1;
+    let query = supabase
+      .from("orders")
+      .select(ORDER_SELECT_FULL)
+      .order("created_at", { ascending: false })
+      .range(offset, end);
     let { data, error } = await query;
 
     if (error && /(notes|admin_note)/i.test(String(error?.message || ""))) {
@@ -341,11 +301,12 @@ export default function AdminDashboard() {
         .from("orders")
         .select(ORDER_SELECT_FALLBACK)
         .order("created_at", { ascending: false })
-        .limit(1000));
+        .range(offset, end));
     }
 
     if (error) throw error;
-    return data || [];
+    const rows = data || [];
+    return { rows, hasMore: rows.length === ORDERS_PAGE_SIZE };
   }
 
   async function fetchPromoClaimsData() {
@@ -402,12 +363,32 @@ export default function AdminDashboard() {
     };
   }
 
-  async function loadOrdersAndPulse() {
-    const [nextOrders, nextPulse] = await Promise.all([fetchOrdersData(), fetchStorePulse()]);
-    setOrders(nextOrders);
+  async function loadOrdersAndPulse({ append = false } = {}) {
+    const offset = append ? (orders?.length || 0) : 0;
+    const [{ rows, hasMore }, nextPulse] = await Promise.all([
+      fetchOrdersPage(offset),
+      fetchStorePulse(),
+    ]);
+    setOrders((prev) => (append ? [...(prev || []), ...rows] : rows));
+    setOrdersHasMore(hasMore);
     setStorePulse(nextPulse);
     setLastSyncedAt(new Date().toISOString());
-    return nextOrders;
+    return append ? [...(orders || []), ...rows] : rows;
+  }
+
+  async function loadMoreOrders() {
+    if (ordersLoadingMore || !ordersHasMore) return;
+    setOrdersLoadingMore(true);
+    try {
+      await loadOrdersAndPulse({ append: true });
+      toast.success("Order lama dimuat", { duration: 1400 });
+    } catch (e) {
+      toast.error("Gagal memuat order lama");
+      setMsg(e?.message || String(e));
+      setMsgIsError(true);
+    } finally {
+      setOrdersLoadingMore(false);
+    }
   }
 
   async function refreshProducts() {
@@ -424,6 +405,7 @@ export default function AdminDashboard() {
 
   async function refreshAll() {
     setMsg("");
+    setMsgIsError(false);
     const tid = toast.loading("Memuat dashboard");
 
     try {
@@ -450,6 +432,7 @@ export default function AdminDashboard() {
       toast.remove(tid);
       toast.error("Gagal memuat data admin");
       setMsg(e?.message || String(e));
+      setMsgIsError(true);
     } finally {
       setLoading(false);
     }
@@ -516,11 +499,19 @@ export default function AdminDashboard() {
   }, [products, selectedProductId]);
 
   useEffect(() => {
-    const next = {};
-    (orders || []).forEach((order) => {
-      next[order.id] = String(order.admin_note || "");
+    setAdminNoteDrafts((prev) => {
+      const next = { ...(prev || {}) };
+      (orders || []).forEach((order) => {
+        const serverNote = String(order.admin_note || "");
+        const draft = prev?.[order.id];
+        if (draft === undefined || draft === serverNote) {
+          next[order.id] = serverNote;
+        } else {
+          next[order.id] = draft;
+        }
+      });
+      return next;
     });
-    setAdminNoteDrafts(next);
   }, [orders]);
 
   const filteredProducts = useMemo(() => {
@@ -804,7 +795,11 @@ export default function AdminDashboard() {
     });
   }, [selectedProduct]);
 
-  // ===== Realtime subscription for new orders =====
+  useEffect(() => {
+    requestAdminNotificationPermission().catch(() => {});
+  }, []);
+
+  // ===== Realtime subscription for orders =====
   useEffect(() => {
     const channel = supabase
       .channel("admin-orders-realtime")
@@ -813,9 +808,24 @@ export default function AdminDashboard() {
         { event: "INSERT", schema: "public", table: "orders" },
         (payload) => {
           const newOrder = payload.new;
-          setOrders((prev) => [newOrder, ...prev]);
+          setOrders((prev) => {
+            if ((prev || []).some((o) => o.id === newOrder.id)) return prev;
+            return [newOrder, ...(prev || [])];
+          });
+          notifyAdminNewOrder(newOrder, waNumber);
           toast.success(`Order baru: ${newOrder.order_code || "—"}`, { duration: 5000 });
           setNewOrderCount((prev) => prev + 1);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "UPDATE", schema: "public", table: "orders" },
+        (payload) => {
+          const updated = payload.new;
+          if (!updated?.id) return;
+          setOrders((prev) =>
+            (prev || []).map((o) => (o.id === updated.id ? { ...o, ...updated } : o))
+          );
         }
       )
       .subscribe();
@@ -824,7 +834,7 @@ export default function AdminDashboard() {
       supabase.removeChannel(channel);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [waNumber]);
 
   // ===== Helpers =====
   async function uploadToBucket(bucket, file, folder) {
@@ -934,10 +944,18 @@ export default function AdminDashboard() {
     }
   }
 
-  async function deleteProduct(id) {
+  function deleteProduct(id) {
     if (!id) return;
-    if (!window.confirm("Hapus produk ini beserta variannya?")) return;
+    openConfirm({
+      title: "Hapus produk",
+      message: "Hapus produk ini beserta variannya?",
+      confirmLabel: "Ya, hapus",
+      danger: true,
+      onConfirm: () => runDeleteProduct(id),
+    });
+  }
 
+  async function runDeleteProduct(id) {
     const tid = toast.loading("Menghapus produk");
     setMsg("");
 
@@ -1097,8 +1115,16 @@ export default function AdminDashboard() {
 
   async function deleteVariant(id) {
     if (!id) return;
-    if (!window.confirm("Hapus varian ini?")) return;
+    openConfirm({
+      title: "Hapus varian",
+      message: "Hapus varian ini?",
+      confirmLabel: "Ya, hapus",
+      danger: true,
+      onConfirm: () => runDeleteVariant(id),
+    });
+  }
 
+  async function runDeleteVariant(id) {
     const tid = toast.loading("Menghapus varian");
     setMsg("");
 
@@ -1118,33 +1144,56 @@ export default function AdminDashboard() {
 
   // ===== Orders actions =====
 
+  function getOrdersForExport() {
+    let list = filteredOrders;
+    if (exportDateFrom) {
+      const from = new Date(`${exportDateFrom}T00:00:00`).getTime();
+      list = list.filter((order) => new Date(order.created_at).getTime() >= from);
+    }
+    if (exportDateTo) {
+      const to = new Date(`${exportDateTo}T23:59:59`).getTime();
+      list = list.filter((order) => new Date(order.created_at).getTime() <= to);
+    }
+    return list;
+  }
+
   function handleExportCSV() {
-    if (!filteredOrders.length) {
+    const exportList = getOrdersForExport();
+    if (!exportList.length) {
       toast.error("Tidak ada order untuk diekspor");
       return;
     }
     const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
-    const csv = buildOrdersCSV(filteredOrders);
-    downloadCSV(csv, `orders-${today}.csv`);
-    toast.success(`${filteredOrders.length} order diekspor`);
+    const csv = buildOrdersCSV(exportList);
+    const rangeSuffix = exportDateFrom || exportDateTo ? `-${exportDateFrom || "start"}_${exportDateTo || "end"}` : "";
+    downloadCSV(csv, `orders-${today}${rangeSuffix}.csv`);
+    toast.success(`${exportList.length} order diekspor`);
   }
 
   function buildCustomerWaUrl(order) {
     const digits = normalizeWhatsApp(order?.customer_whatsapp || "");
     if (!digits) return "";
-    const statusLabel = prettyStatus(order?.status);
+    const statusLabel = prettyOrderStatus(order?.status);
     const text = encodeURIComponent(
       `Halo ${order?.customer_whatsapp || ""},\n\nUpdate order kamu:\n\nID Order: ${order?.order_code || "-"}\nStatus: ${statusLabel}\nTotal: ${formatIDR(order?.total_idr || 0)}\n\nTerima kasih sudah berbelanja di Imzaqi Store.`
     );
     return `https://wa.me/${digits}?text=${text}`;
   }
 
-  async function bulkUpdateStatus(newStatus) {
+  function bulkUpdateStatus(newStatus) {
     const ids = Array.from(selectedOrderIds);
     if (!ids.length) return;
     const label = newStatus === "done" ? "selesai" : "dibatalkan";
-    if (!window.confirm(`Tandai ${ids.length} order sebagai ${label}?`)) return;
+    openConfirm({
+      title: "Konfirmasi bulk",
+      message: `Tandai ${ids.length} order sebagai ${label}?`,
+      confirmLabel: "Ya, lanjutkan",
+      danger: newStatus === "cancelled",
+      onConfirm: () => runBulkUpdateStatus(newStatus, ids),
+    });
+  }
 
+  async function runBulkUpdateStatus(newStatus, ids) {
     const tid = toast.loading(`Memperbarui ${ids.length} order...`);
     
     let succeededIds = [];
@@ -1204,6 +1253,20 @@ export default function AdminDashboard() {
     }
   }
 
+  async function copyCustomerPhone(phone) {
+    const raw = String(phone || "").trim();
+    if (!raw) {
+      toast.error("Nomor WA kosong");
+      return;
+    }
+    try {
+      await copyToClipboard(raw);
+      toast.success("Nomor WA disalin");
+    } catch {
+      toast.error("Gagal menyalin nomor");
+    }
+  }
+
   async function updateOrderStatus(orderId, status) {
     const tid = toast.loading("Update status");
     setMsg("");
@@ -1251,7 +1314,7 @@ export default function AdminDashboard() {
         await refreshOrders();
         toast.remove(tid);
 
-        const statusLabel = prettyStatus(status);
+        const statusLabel = prettyOrderStatus(status);
         // Toast with WA redirect button for status updates
         if (customerWa) {
           const waDigits = normalizeWhatsApp(customerWa);
@@ -1538,8 +1601,18 @@ export default function AdminDashboard() {
     }
   }
 
-  async function deleteTestimonial(id) {
-    if (!window.confirm("Hapus testimoni ini?")) return;
+  function deleteTestimonial(id) {
+    if (!id) return;
+    openConfirm({
+      title: "Hapus testimoni",
+      message: "Hapus testimoni ini?",
+      confirmLabel: "Ya, hapus",
+      danger: true,
+      onConfirm: () => runDeleteTestimonial(id),
+    });
+  }
+
+  async function runDeleteTestimonial(id) {
 
     const tid = toast.loading("Menghapus");
     try {
@@ -1628,126 +1701,85 @@ export default function AdminDashboard() {
     ? "Kondisi toko hari ini. Semua yang perlu kamu tahu, satu layar."
     : activeTab.hint;
   const activeOrderWhatsApp = activeOrder ? buildWhatsAppLink(activeOrder.customer_whatsapp) : "";
+  const flashSaleEndingSoon = flashSales.some((fs) => {
+    const now = new Date();
+    const end = new Date(fs.ends_at);
+    const diff = end - now;
+    return fs.is_active && diff > 0 && diff < 2 * 60 * 60 * 1000;
+  });
+
+  function handleSelectTab(id) {
+    startTransition(() => setTab(id));
+    if (id === "orders") setNewOrderCount(0);
+  }
 
   return (
     <div className="page admin-page">
       <section className="section">
         <div className="container admin-shell">
-          <aside className="admin-sidebar">
-            <div className="admin-brand">
-              <div className="admin-logo">IM</div>
-              <div>
-                <div className="admin-brand-title">Ruang Admin</div>
-                <div className="admin-brand-sub">operasional imzaqi.store</div>
-              </div>
-            </div>
-
-            <div className="admin-sidebarPulseGrid">
-              <div className="admin-sidebarPulse">
-                <span>Hari ini</span>
-                <strong>{analyticsSummary.todayOrders}</strong>
-                <small>order masuk</small>
-              </div>
-              <div className="admin-sidebarPulse">
-                <span>Omzet</span>
-                <strong>{formatCompactIDR(analyticsSummary.todayRevenue)}</strong>
-                <small>update harian</small>
-              </div>
-            </div>
-
-            <nav className="admin-nav">
-              {tabs.map((t) => (
-                <button
-                  key={t.id}
-                  className={"admin-nav-btn " + (tab === t.id ? "active" : "")}
-                  onClick={() => {
-                    startTransition(() => setTab(t.id));
-                    if (t.id === "orders") setNewOrderCount(0);
-                  }}
-                >
-                  <span className="admin-nav-icon">
-                    {React.createElement(TAB_ICONS[t.id] || Box, { size: 16 })}
-                  </span>
-                  <span className="admin-nav-copy">
-                    <strong>{t.label}</strong>
-                    <small>{t.hint}</small>
-                  </span>
-                  <span className="admin-nav-badge">{tabMeta[t.id]}</span>
-                  {t.id === "orders" && newOrderCount > 0 ? (
-                    <span className="admin-nav-newBadge">{newOrderCount}</span>
-                  ) : null}
-                  {t.id === "flashsale" && tab !== "flashsale" && flashSales.some(fs => {
-                    const now = new Date();
-                    const end = new Date(fs.ends_at);
-                    const diff = end - now;
-                    return fs.is_active && diff > 0 && diff < 2 * 60 * 60 * 1000;
-                  }) ? <span className="admin-nav-newBadge" style={{ background: '#ff8c00' }}>!</span> : null}
-                </button>
-              ))}
-            </nav>
-
-            <div className="admin-sidebar-actions">
-              <button className="btn btn-ghost" type="button" onClick={refreshAll}>
-                Muat ulang
-              </button>
-              <button className="btn btn-danger" type="button" onClick={logout}>
-                Keluar
-              </button>
-            </div>
-          </aside>
+          <AdminSidebar
+            tabs={tabs}
+            activeTabId={tab}
+            onSelectTab={handleSelectTab}
+            icons={TAB_ICONS}
+            todayOrders={analyticsSummary.todayOrders}
+            todayRevenue={formatCompactIDR(analyticsSummary.todayRevenue)}
+            newOrderCount={newOrderCount}
+            stockAlertCount={analyticsSummary.stockAlerts.length}
+            flashSaleEndingSoon={flashSaleEndingSoon}
+            onRefresh={refreshAll}
+            onLogout={logout}
+          />
 
           <main className="admin-main">
-            <div className="admin-mobileControls">
-              <div className="admin-mobileBar">
-                <div className="admin-mobileBrand">
-                  <div className="admin-logo">IM</div>
-                  <div className="admin-mobileCopy">
-                    <strong>Ruang Admin</strong>
-                    <span>{syncCopy}</span>
-                  </div>
+            <div className="admin-mobileControls adm-mobileHead">
+              <div className="adm-mobileHeadInner">
+                <div className="adm-mobileHeadIcon">
+                  {React.createElement(ActiveTabIcon, { size: 18, strokeWidth: 2.1 })}
                 </div>
-
-                <div className="admin-mobileActions">
-                  <button className="btn btn-ghost btn-sm" type="button" onClick={refreshAll}>
-                    Muat ulang
-                  </button>
-                  <button className="btn btn-danger btn-sm" type="button" onClick={logout}>
-                    Keluar
-                  </button>
+                <div className="adm-mobileHeadCopy">
+                  <strong>{activeTab.label}</strong>
+                  <span>{syncCopy}</span>
                 </div>
               </div>
             </div>
 
-            {typeof document !== "undefined"
-              ? createPortal(
-                  <nav className="admin-mobileTabs" aria-label="Navigasi admin mobile">
-                    {tabs.map((t) => {
-                      const MobileTabIcon = TAB_ICONS[t.id] || Box;
-                      return (
-                        <button
-                          key={t.id}
-                          type="button"
-                          className={`admin-mobileTab ${tab === t.id ? "active" : ""}`}
-                          onClick={() => {
-                            startTransition(() => setTab(t.id));
-                            if (t.id === "orders") setNewOrderCount(0);
-                          }}
-                        >
-                          <span className="admin-mobileTabIcon">
-                            <MobileTabIcon size={15} />
-                          </span>
-                          <span className="admin-mobileTabLabel">{t.label}</span>
-                          <span className="admin-mobileTabMeta">{tabMeta[t.id]}</span>
-                          {t.id === "orders" && newOrderCount > 0 ? (
-                            <span className="admin-nav-newBadge">{newOrderCount}</span>
-                          ) : null}
-                        </button>
-                      );
-                    })}
-                  </nav>,
-                  document.body
-                )
-              : null}
+            <AdminMobileNav
+              tabs={tabs}
+              activeTabId={tab}
+              onSelectTab={handleSelectTab}
+              icons={TAB_ICONS}
+              newOrderCount={newOrderCount}
+              stockAlertCount={analyticsSummary.stockAlerts.length}
+              flashSaleEndingSoon={flashSaleEndingSoon}
+              onRefresh={refreshAll}
+              onLogout={logout}
+            />
+
+            {!stockBannerDismissed && analyticsSummary.stockAlerts.length > 0 ? (
+              <div className="admin-stockAlertBanner" role="status">
+                <AlertTriangle size={16} />
+                <div>
+                  <strong>{analyticsSummary.stockAlerts.length} varian stok menipis</strong>
+                  <span>Buka tab Produk untuk restock sebelum habis.</span>
+                </div>
+                <button
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  onClick={() => startTransition(() => setTab("products"))}
+                >
+                  Cek stok
+                </button>
+                <button
+                  type="button"
+                  className="admin-stockAlertDismiss"
+                  aria-label="Tutup"
+                  onClick={() => setStockBannerDismissed(true)}
+                >
+                  <X size={14} />
+                </button>
+              </div>
+            ) : null}
 
             <div className="admin-topbar">
               <div className="admin-topbarCopy">
@@ -1838,8 +1870,16 @@ export default function AdminDashboard() {
             )}
 
             {msg ? (
-              <div className="admin-alert">
-                <b>Info:</b> {msg}
+              <div className="admin-alert" role="alert">
+                <b>{msgIsError ? "Error:" : "Info:"}</b> {msg}
+              </div>
+            ) : null}
+
+            {loading && !lastSyncedAt ? (
+              <div className="admin-initialLoad" role="status" aria-label="Memuat dashboard">
+                <div className="skeleton" style={{ height: 48, borderRadius: 12 }} />
+                <div className="skeleton" style={{ height: 120, marginTop: 12, borderRadius: 12 }} />
+                <div className="skeleton" style={{ height: 200, marginTop: 12, borderRadius: 12 }} />
               </div>
             ) : null}
 
@@ -2075,18 +2115,35 @@ export default function AdminDashboard() {
                                 className="btn btn-ghost btn-sm"
                                 type="button"
                                 onClick={() => {
-                                  const newStock = window.prompt(`Stok baru untuk "${variant.name}":`, String(variant.stock || 0));
-                                  if (newStock === null) return;
-                                  const n = Number(newStock);
-                                  if (!Number.isFinite(n) || n < 0) { toast.error("Stok tidak valid"); return; }
-                                  const tid = toast.loading("Update stok");
-                                  supabase.from("product_variants").update({ stock: n, updated_at: new Date().toISOString() }).eq("id", variant.id)
-                                    .then(({ error }) => {
-                                      toast.remove(tid);
-                                      if (error) { toast.error("Gagal update stok"); return; }
-                                      toast.success(`Stok ${variant.name} → ${n}`);
-                                      refreshProducts();
-                                    });
+                                  openConfirm({
+                                    title: "Update stok",
+                                    message: `Stok baru untuk "${variant.name}":`,
+                                    prompt: true,
+                                    promptDefault: String(variant.stock || 0),
+                                    promptLabel: "Stok",
+                                    confirmLabel: "Simpan",
+                                    onConfirm: (newStock) => {
+                                      const n = Number(newStock);
+                                      if (!Number.isFinite(n) || n < 0) {
+                                        toast.error("Stok tidak valid");
+                                        return;
+                                      }
+                                      const tid = toast.loading("Update stok");
+                                      supabase
+                                        .from("product_variants")
+                                        .update({ stock: n, updated_at: new Date().toISOString() })
+                                        .eq("id", variant.id)
+                                        .then(({ error }) => {
+                                          toast.remove(tid);
+                                          if (error) {
+                                            toast.error("Gagal update stok");
+                                            return;
+                                          }
+                                          toast.success(`Stok ${variant.name} → ${n}`);
+                                          refreshProducts();
+                                        });
+                                    },
+                                  });
                                 }}
                               >
                                 Restock
@@ -2537,6 +2594,18 @@ export default function AdminDashboard() {
                             />
                           </label>
 
+                          <label className="admin-field">
+                            <span>Urutan tampil</span>
+                            <input
+                              className="input"
+                              type="number"
+                              value={productForm.sort_order}
+                              onChange={(e) =>
+                                setProductForm((p) => ({ ...p, sort_order: Number(e.target.value) }))
+                              }
+                            />
+                          </label>
+
                           <label className="admin-field admin-field-switch">
                             <span>Aktif</span>
                             <input
@@ -2670,6 +2739,27 @@ export default function AdminDashboard() {
                       />
                     </div>
 
+                    <div className="admin-exportDates">
+                      <label>
+                        <span>Dari</span>
+                        <input
+                          className="input"
+                          type="date"
+                          value={exportDateFrom}
+                          onChange={(e) => setExportDateFrom(e.target.value)}
+                        />
+                      </label>
+                      <label>
+                        <span>Sampai</span>
+                        <input
+                          className="input"
+                          type="date"
+                          value={exportDateTo}
+                          onChange={(e) => setExportDateTo(e.target.value)}
+                        />
+                      </label>
+                    </div>
+
                     <div className="admin-chipRow">
                       <button type="button" className={`admin-chip ${orderBucket === "all" ? "active" : ""}`} onClick={() => setOrderBucket("all")}>
                         Semua
@@ -2771,6 +2861,7 @@ export default function AdminDashboard() {
                                 <input
                                   type="checkbox"
                                   checked={isSelected}
+                                  aria-label={`Pilih order ${o.order_code || o.id}`}
                                   onChange={(e) => {
                                     setSelectedOrderIds((prev) => {
                                       const next = new Set(prev);
@@ -2803,7 +2894,10 @@ export default function AdminDashboard() {
                                   <select
                                     className="input admin-select admin-orderInlineSelect"
                                     value={String(o.status || "pending")}
-                                    onChange={(e) => updateOrderStatus(o.id, e.target.value)}
+                                    aria-label={`Ubah status order ${o.order_code || o.id}`}
+                                    onChange={(e) =>
+                                      requestOrderStatusChange(o.id, e.target.value, o.status)
+                                    }
                                   >
                                     {ORDER_STATUS_OPTIONS.map((option) => (
                                       <option key={option.value} value={option.value}>
@@ -2827,6 +2921,25 @@ export default function AdminDashboard() {
                             </article>
                           );
                         })}
+                      </div>
+
+                      {ordersHasMore ? (
+                        <div className="admin-capBanner" role="status">
+                          Menampilkan {orders.length} order terbaru. Masih ada order lebih lama di database.
+                        </div>
+                      ) : null}
+
+                      <div className="admin-loadMore">
+                        {ordersHasMore ? (
+                          <button
+                            className="btn btn-ghost"
+                            type="button"
+                            disabled={ordersLoadingMore}
+                            onClick={loadMoreOrders}
+                          >
+                            {ordersLoadingMore ? "Memuat..." : `Muat ${ORDERS_PAGE_SIZE} order lama`}
+                          </button>
+                        ) : null}
                       </div>
                     </>
                   )}
@@ -3234,7 +3347,7 @@ export default function AdminDashboard() {
                             <span className="admin-promo-previewLabel">Preview harga</span>
                             <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
                               <span style={{ textDecoration: 'line-through', color: 'var(--brand-muted)', fontSize: 13 }}>{formatIDR(v.price_idr)}</span>
-                              <span style={{ color: '#ff3c64', fontWeight: 900, fontSize: 16 }}>{formatIDR(discounted)}</span>
+                              <span className="admin-promo-previewPrice">{formatIDR(discounted)}</span>
                               <span style={{ fontSize: 11, color: 'var(--brand-muted)' }}>(-{flashForm.discount_percent}%)</span>
                             </div>
                           </div>
@@ -3350,18 +3463,25 @@ export default function AdminDashboard() {
                               <button
                                 className="btn btn-sm btn-danger"
                                 type="button"
-                                onClick={async () => {
-                                  if (!window.confirm("Hapus flash sale ini?")) return;
-                                  const tid = toast.loading("Menghapus");
-                                  try {
-                                    await deleteFlashSale(fs.id);
-                                    setFlashSales(await fetchAllFlashSales());
-                                    toast.remove(tid);
-                                    toast.success("Dihapus");
-                                  } catch (e) {
-                                    toast.remove(tid);
-                                    toast.error("Gagal hapus");
-                                  }
+                                onClick={() => {
+                                  openConfirm({
+                                    title: "Hapus flash sale",
+                                    message: "Hapus flash sale ini?",
+                                    confirmLabel: "Ya, hapus",
+                                    danger: true,
+                                    onConfirm: async () => {
+                                      const tid = toast.loading("Menghapus");
+                                      try {
+                                        await deleteFlashSale(fs.id);
+                                        setFlashSales(await fetchAllFlashSales());
+                                        toast.remove(tid);
+                                        toast.success("Dihapus");
+                                      } catch (e) {
+                                        toast.remove(tid);
+                                        toast.error("Gagal hapus");
+                                      }
+                                    },
+                                  });
                                 }}
                               >
                                 Hapus
@@ -3429,8 +3549,15 @@ export default function AdminDashboard() {
                             className="btn btn-ghost btn-sm"
                             type="button"
                             onClick={() => {
-                              const newCaption = window.prompt("Edit caption:", t.caption || "");
-                              if (newCaption !== null) updateTestimonial(t.id, { caption: newCaption });
+                              openConfirm({
+                                title: "Edit caption",
+                                prompt: true,
+                                promptDefault: t.caption || "",
+                                promptLabel: "Caption",
+                                confirmLabel: "Simpan",
+                                onConfirm: (newCaption) =>
+                                  updateTestimonial(t.id, { caption: String(newCaption || "") }),
+                              });
                             }}
                           >
                             Caption
@@ -3606,6 +3733,16 @@ export default function AdminDashboard() {
             />
           </label>
 
+          <label className="admin-field">
+            <span>Urutan tampil</span>
+            <input
+              className="input"
+              type="number"
+              value={newProduct.sort_order}
+              onChange={(e) => setNewProduct((p) => ({ ...p, sort_order: Number(e.target.value) }))}
+            />
+          </label>
+
           <label className="admin-field admin-field-switch">
             <span>Aktif</span>
             <input
@@ -3699,6 +3836,16 @@ export default function AdminDashboard() {
             />
           </label>
 
+          <label className="admin-field">
+            <span>Urutan tampil</span>
+            <input
+              className="input"
+              type="number"
+              value={variantForm.sort_order}
+              onChange={(e) => setVariantForm((p) => ({ ...p, sort_order: Number(e.target.value) }))}
+            />
+          </label>
+
           <label className="admin-field admin-field-switch">
             <span>Aktif</span>
             <input
@@ -3709,6 +3856,19 @@ export default function AdminDashboard() {
           </label>
         </div>
       </Modal>
+
+      <ConfirmDialog
+        open={!!confirmDialog}
+        title={confirmDialog?.title}
+        message={confirmDialog?.message}
+        confirmLabel={confirmDialog?.confirmLabel}
+        danger={confirmDialog?.danger}
+        prompt={confirmDialog?.prompt}
+        promptDefault={confirmDialog?.promptDefault}
+        promptLabel={confirmDialog?.promptLabel}
+        onConfirm={confirmDialog?.onConfirm}
+        onCancel={confirmDialog?.onCancel}
+      />
 
       <Modal
         open={!!activeOrder}
@@ -3779,12 +3939,50 @@ export default function AdminDashboard() {
                   Kirim Notif WA
                 </button>
               )}
+              <button
+                className="btn btn-ghost"
+                type="button"
+                onClick={() => copyStatusLink(activeOrder.order_code)}
+              >
+                Salin link status
+              </button>
+              {buildAdminOrderAlertUrl(waNumber, activeOrder) ? (
+                <a
+                  className="btn btn-ghost"
+                  href={buildAdminOrderAlertUrl(waNumber, activeOrder)}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Template alert WA
+                </a>
+              ) : null}
+            </div>
+
+            <div className="admin-orderDetailFacts admin-orderDetailFacts--solo">
+              <div className="admin-orderDetailFact">
+                <span>Waktu order</span>
+                <strong>{formatAdminDateTime(activeOrder.created_at)}</strong>
+                <small>Waktu Indonesia (WIB)</small>
+              </div>
             </div>
 
             <div className="admin-orderMetaGrid">
               <div className="admin-orderMetaCard">
                 <span>Kontak customer</span>
-                <strong>{activeOrder.customer_whatsapp || "-"}</strong>
+                <div className="admin-orderMetaValueRow">
+                  <strong>{activeOrder.customer_whatsapp || "-"}</strong>
+                  {activeOrder.customer_whatsapp ? (
+                    <button
+                      className="btn btn-ghost btn-sm admin-copyPhoneBtn"
+                      type="button"
+                      onClick={() => copyCustomerPhone(activeOrder.customer_whatsapp)}
+                      title="Salin nomor WhatsApp"
+                    >
+                      <Copy size={14} />
+                      Salin
+                    </button>
+                  ) : null}
+                </div>
                 {activeOrderWhatsApp ? (
                   <a href={activeOrderWhatsApp} target="_blank" rel="noreferrer">
                     Chat WhatsApp
@@ -3795,7 +3993,7 @@ export default function AdminDashboard() {
               </div>
               <div className="admin-orderMetaCard">
                 <span>Status sekarang</span>
-                <strong>{prettyStatus(activeOrder.status)}</strong>
+                <strong>{prettyOrderStatus(activeOrder.status)}</strong>
                 <small>{activeOrder.promo_code ? `Promo ${activeOrder.promo_code}` : "Tanpa promo"}</small>
               </div>
               <div className="admin-orderMetaCard">
@@ -3803,7 +4001,9 @@ export default function AdminDashboard() {
                 <select
                   className="input admin-select"
                   value={String(activeOrder.status || "pending")}
-                  onChange={(e) => updateOrderStatus(activeOrder.id, e.target.value)}
+                  onChange={(e) =>
+                    requestOrderStatusChange(activeOrder.id, e.target.value, activeOrder.status)
+                  }
                 >
                   {ORDER_STATUS_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
@@ -3814,21 +4014,27 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            <div className="admin-order-items">
-              {getSafeOrderItems(activeOrder).map((it, idx) => (
-                <div key={`${activeOrder.id}-${idx}`} className="admin-order-item">
-                  <div>
-                    <b>{it.product_name}</b>
-                    <div className="muted" style={{ fontSize: 12 }}>
-                      {it.variant_name} | {it.duration_label}
+            <div className="admin-orderItemsSection">
+              <div className="admin-orderItemsHead">
+                <strong>Produk dipesan</strong>
+                <span>{getOrderItemCount(activeOrder)} item</span>
+              </div>
+              <div className="admin-order-items">
+                {getSafeOrderItems(activeOrder).map((it, idx) => (
+                  <div key={`${activeOrder.id}-${idx}`} className="admin-order-item">
+                    <div>
+                      <b>{it.product_name || "Produk"}</b>
+                      <div className="admin-order-itemMeta">
+                        {[it.variant_name, it.duration_label].filter(Boolean).join(" · ") || "Tanpa varian"}
+                      </div>
+                    </div>
+                    <div className="admin-order-itemPrice">
+                      <strong>{it.qty || 1}×</strong>
+                      <span>{formatIDR(it.price_idr)}</span>
                     </div>
                   </div>
-                  <div className="admin-order-itemPrice">
-                    <strong>{it.qty}x</strong>
-                    <span>{formatIDR(it.price_idr)}</span>
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             <div className="admin-order-pricing">

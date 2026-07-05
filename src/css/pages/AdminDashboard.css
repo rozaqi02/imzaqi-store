@@ -26,7 +26,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
     linear-gradient(180deg, rgba(16, 18, 36, 0.96), rgba(11, 17, 26, 0.94)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.14), rgba(29, 131, 255, 0) 50%);
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.14), rgba(0, 214, 180, 0) 50%);
   box-shadow: 0 26px 90px rgba(0, 0, 0, 0.28);
 }
 
@@ -70,8 +70,8 @@
   place-items: center;
   font-weight: 1000;
   color: #d9fff6;
-  background: linear-gradient(135deg, rgba(29, 131, 255, 0.24), rgba(29, 131, 255, 0.1));
-  border: 1px solid rgba(29, 131, 255, 0.28);
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.24), rgba(0, 214, 180, 0.1));
+  border: 1px solid rgba(0, 214, 180, 0.28);
 }
 
 .admin-brand-title {
@@ -117,11 +117,11 @@
 }
 
 .admin-nav-btn.active {
-  border-color: rgba(29, 131, 255, 0.28);
+  border-color: rgba(0, 214, 180, 0.28);
   background:
-    linear-gradient(180deg, rgba(29, 131, 255, 0.17), rgba(29, 131, 255, 0.1)),
+    linear-gradient(180deg, rgba(0, 214, 180, 0.17), rgba(0, 214, 180, 0.1)),
     rgba(255, 255, 255, 0.04);
-  box-shadow: 0 18px 44px rgba(29, 131, 255, 0.16);
+  box-shadow: 0 18px 44px rgba(0, 214, 180, 0.16);
 }
 
 .admin-nav-icon {
@@ -136,7 +136,7 @@
 }
 
 .admin-nav-btn.active .admin-nav-icon {
-  background: rgba(29, 131, 255, 0.18);
+  background: rgba(0, 214, 180, 0.18);
   color: #e8fffb;
 }
 
@@ -205,7 +205,7 @@
   display: grid;
   place-items: center;
   border-radius: 14px;
-  background: rgba(29, 131, 255, 0.16);
+  background: rgba(0, 214, 180, 0.16);
   color: #b5e9ff;
 }
 
@@ -237,7 +237,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0) 56%);
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%);
   box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
 }
 
@@ -293,7 +293,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top, rgba(29, 131, 255, 0.08), rgba(29, 131, 255, 0) 48%);
+    radial-gradient(circle at top, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 48%);
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
   overflow: hidden;
 }
@@ -356,8 +356,8 @@
 }
 
 .admin-product-row.active {
-  border-color: rgba(29, 131, 255, 0.24);
-  background: rgba(29, 131, 255, 0.1);
+  border-color: rgba(0, 214, 180, 0.24);
+  background: rgba(0, 214, 180, 0.1);
 }
 
 .admin-product-row-left {
@@ -432,8 +432,8 @@
 
 .admin-product-pill.on,
 .admin-status.pending {
-  background: rgba(29, 131, 255, 0.12);
-  border-color: rgba(29, 131, 255, 0.24);
+  background: rgba(0, 214, 180, 0.12);
+  border-color: rgba(0, 214, 180, 0.24);
 }
 
 .admin-product-pill.off,
@@ -650,8 +650,8 @@
 }
 
 .admin-order-notes {
-  border: 1px solid rgba(29, 131, 255, 0.18);
-  background: rgba(29, 131, 255, 0.08);
+  border: 1px solid rgba(0, 214, 180, 0.18);
+  background: rgba(0, 214, 180, 0.08);
   color: rgba(255, 255, 255, 0.86);
 }
 
@@ -677,8 +677,8 @@
   min-height: 40px;
   padding: 0 14px;
   border-radius: 14px;
-  border: 1px solid rgba(29, 131, 255, 0.24);
-  background: rgba(29, 131, 255, 0.12);
+  border: 1px solid rgba(0, 214, 180, 0.24);
+  background: rgba(0, 214, 180, 0.12);
   color: #fff;
   font-weight: 900;
 }
@@ -729,7 +729,7 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
     linear-gradient(180deg, rgba(13, 16, 28, 0.98), rgba(9, 12, 24, 0.98)),
-    radial-gradient(circle at top, rgba(29, 131, 255, 0.08), rgba(29, 131, 255, 0) 44%);
+    radial-gradient(circle at top, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 44%);
   box-shadow: 0 34px 120px rgba(0, 0, 0, 0.56);
   overflow: hidden;
 }
@@ -881,8 +881,8 @@
 }
 
 .admin-chip.active {
-  border-color: rgba(29, 131, 255, 0.3);
-  background: rgba(29, 131, 255, 0.14);
+  border-color: rgba(0, 214, 180, 0.3);
+  background: rgba(0, 214, 180, 0.14);
   color: #fff;
 }
 
@@ -903,7 +903,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.12), rgba(29, 131, 255, 0) 55%);
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.12), rgba(0, 214, 180, 0) 55%);
 }
 
 .admin-miniCard span,
@@ -996,7 +996,7 @@
 
 .admin-chartBar.orders,
 .admin-progress span {
-  background: linear-gradient(90deg, rgba(29, 131, 255, 0.9), rgba(103, 214, 255, 0.86));
+  background: linear-gradient(90deg, rgba(0, 214, 180, 0.9), rgba(103, 214, 255, 0.86));
 }
 
 .admin-chartBar.revenue {
@@ -1042,7 +1042,7 @@
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: rgba(29, 131, 255, 0.14);
+  background: rgba(0, 214, 180, 0.14);
   color: #a4fff0;
   font-weight: 1000;
 }
@@ -1128,13 +1128,13 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.08), rgba(29, 131, 255, 0) 56%);
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 56%);
   overflow: hidden;
   box-shadow: 0 18px 46px rgba(0, 0, 0, 0.16);
 }
 
 .admin-orderCardModern.open {
-  border-color: rgba(29, 131, 255, 0.22);
+  border-color: rgba(0, 214, 180, 0.22);
 }
 
 .admin-orderSummary {
@@ -1395,7 +1395,7 @@
     border-radius: 26px;
     background:
       linear-gradient(180deg, rgba(14, 18, 32, 0.98), rgba(9, 12, 24, 0.98)),
-      radial-gradient(circle at top left, rgba(29, 131, 255, 0.18), rgba(29, 131, 255, 0) 52%);
+      radial-gradient(circle at top left, rgba(0, 214, 180, 0.18), rgba(0, 214, 180, 0) 52%);
   }
 
   .admin-brand {
@@ -1472,7 +1472,7 @@
     border-radius: 22px;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025)),
-      radial-gradient(circle at top left, rgba(29, 131, 255, 0.12), rgba(29, 131, 255, 0) 56%);
+      radial-gradient(circle at top left, rgba(0, 214, 180, 0.12), rgba(0, 214, 180, 0) 56%);
   }
 
   .admin-stats {
@@ -1793,7 +1793,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0) 56%);
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%);
 }
 
 .admin-mobileCopy {
@@ -1843,15 +1843,15 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0) 56%);
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%);
   color: rgba(234, 255, 245, 0.9);
   cursor: pointer;
 }
 
 .admin-mobileTab.active {
-  border-color: rgba(29, 131, 255, 0.24);
+  border-color: rgba(0, 214, 180, 0.24);
   background:
-    linear-gradient(180deg, rgba(29, 131, 255, 0.16), rgba(29, 131, 255, 0.08)),
+    linear-gradient(180deg, rgba(0, 214, 180, 0.16), rgba(0, 214, 180, 0.08)),
     rgba(255, 255, 255, 0.04);
 }
 
@@ -2280,7 +2280,7 @@
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.018)),
-    radial-gradient(circle at top left, rgba(29, 131, 255, 0.08), rgba(29, 131, 255, 0) 56%);
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 56%);
   box-shadow: 0 14px 36px rgba(0, 0, 0, 0.14);
 }
 
@@ -2317,8 +2317,8 @@
   min-height: 24px;
   padding: 0 9px;
   border-radius: 999px;
-  border: 1px solid rgba(29, 131, 255, 0.26);
-  background: rgba(29, 131, 255, 0.12);
+  border: 1px solid rgba(0, 214, 180, 0.26);
+  background: rgba(0, 214, 180, 0.12);
   color: rgba(190, 232, 255, 0.96);
   font-size: 10px;
   font-weight: 900;
@@ -3226,8 +3226,8 @@
 }
 
 .admin-timelineDot.is-active {
-  border-color: rgba(29, 131, 255, 0.5);
-  background: rgba(29, 131, 255, 0.16);
+  border-color: rgba(0, 214, 180, 0.5);
+  background: rgba(0, 214, 180, 0.16);
   color: #9fe0ff;
 }
 
@@ -3280,8 +3280,8 @@
   gap: 14px;
   padding: 12px 16px;
   border-radius: 18px;
-  border: 1px solid rgba(29, 131, 255, 0.24);
-  background: rgba(29, 131, 255, 0.1);
+  border: 1px solid rgba(0, 214, 180, 0.24);
+  background: rgba(0, 214, 180, 0.1);
   margin-bottom: 12px;
   flex-wrap: wrap;
 }
@@ -3318,8 +3318,8 @@
 }
 
 .admin-orderListItem.is-selected {
-  border-color: rgba(29, 131, 255, 0.3);
-  background: rgba(29, 131, 255, 0.07);
+  border-color: rgba(0, 214, 180, 0.3);
+  background: rgba(0, 214, 180, 0.07);
 }
 
 /* ── Promo badges ── */
@@ -3741,7 +3741,7 @@ html[data-theme="light"] .admin-promo-bulkNote {
 .admin-promo-quotaBar {
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, rgba(29, 131, 255, 0.9), rgba(103, 214, 255, 0.86));
+  background: linear-gradient(90deg, rgba(0, 214, 180, 0.9), rgba(103, 214, 255, 0.86));
   transition: width 0.3s ease;
 }
 
@@ -3971,4 +3971,54 @@ html[data-theme="light"] .admin-promo-deleteHint {
    we clip horizontal overflow at the page level instead. */
 .admin-page {
   overflow-x: clip;
+}
+
+.admin-stockAlertBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 180, 60, 0.28);
+  background: linear-gradient(135deg, rgba(255, 180, 60, 0.14), rgba(255, 120, 40, 0.06));
+}
+
+.admin-stockAlertBanner strong {
+  display: block;
+  font-size: 14px;
+}
+
+.admin-stockAlertBanner span {
+  display: block;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.admin-stockAlertDismiss {
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 4px;
+}
+
+.admin-exportDates {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.admin-exportDates label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.62);
+}
+
+.admin-exportDates .input {
+  min-width: 150px;
 }

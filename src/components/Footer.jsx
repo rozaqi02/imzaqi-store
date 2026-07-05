@@ -5,17 +5,17 @@ const footerColumns = [
   {
     label: "Navigasi",
     links: [
-      { label: "Home", to: "/" },
+      { label: "Beranda", to: "/" },
       { label: "Produk", to: "/produk" },
       { label: "Testimoni", to: "/testimoni" },
-      { label: "FAQ", to: "/tentang" },
+      { label: "FAQ", to: "/faq" },
     ],
   },
   {
     label: "Order",
     links: [
       { label: "Checkout", to: "/checkout" },
-      { label: "Status Order", to: "/status" },
+      { label: "Lacak Order", to: "/status" },
       { label: "Riwayat Order", to: "/status?tab=riwayat" },
     ],
   },
@@ -88,10 +88,10 @@ export default function Footer() {
                 >
                   0831-3604-9987
                 </a>
-                <Link className="site-footerGoLink" to="/tentang">
+                <Link className="site-footerGoLink" to="/faq">
                   Cara Pesan
                 </Link>
-                <Link className="site-footerGoLink" to="/tentang">
+                <Link className="site-footerGoLink" to="/faq">
                   Cara Bayar QRIS
                 </Link>
               </div>

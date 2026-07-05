@@ -584,6 +584,8 @@
 .pdx-benefitList {
   display: grid;
   gap: 4px;
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 /* ── Info Rows (structured variant DB fields) ── */
@@ -599,12 +601,15 @@
 
 .pdx-infoRow {
   display: grid;
-  grid-template-columns: 20px 1fr auto;
-  align-items: center;
+  /* Label pakai lebar natural; value yang wrap — hindari 1fr auto yang menjepit label */
+  grid-template-columns: 20px auto minmax(0, 1fr);
+  align-items: start;
   gap: 8px;
   padding: 7px 10px;
   font-size: 12px;
   border-bottom: 1px solid var(--pdx-line, rgba(255,255,255,0.06));
+  overflow-wrap: normal;
+  word-break: normal;
 }
 
 .pdx-infoRow:last-child { border-bottom: none; }
@@ -624,6 +629,9 @@
 .pdx-infoRow-label {
   color: var(--pdx-muted);
   font-weight: 600;
+  white-space: nowrap;
+  overflow-wrap: normal;
+  word-break: keep-all;
 }
 
 .pdx-infoRow-value {
@@ -631,6 +639,10 @@
   font-weight: 700;
   text-align: right;
   font-size: 11px;
+  min-width: 0;
+  line-height: 1.45;
+  overflow-wrap: break-word;
+  word-break: normal;
 }
 
 :root[data-theme="light"] .pdx-infoRow:nth-child(odd) {
@@ -716,7 +728,8 @@
   color: var(--pdx-muted);
   font-size: 12.5px;
   line-height: 1.5;
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
+  word-break: normal;
   transition:
     background-color 0.2s ease,
     max-height 0.3s ease,
@@ -1103,8 +1116,10 @@
 
 /* Prevent horizontal overflow on mobile product detail */
 @media (max-width: 720px) {
-  .detail-page .container {
-    overflow-x: visible;
+  .detail-page.detail-page-v3 .container {
+    overflow-x: clip;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .detail-page .pdx-heroPanel,
@@ -1113,9 +1128,9 @@
     min-width: 0;
     max-width: 100%;
   }
-  
-  .detail-page .pdx-variantsSection {
-    overflow: visible;
+
+  .detail-page-v3 .pdx-variantsSection {
+    overflow-x: clip;
   }
 
   .detail-page .pdx-summaryActionsMain {
@@ -1127,11 +1142,11 @@
     min-width: 0;
     flex: 1 1 auto;
   }
-  
+
   .detail-page .pdx-toolbar {
     flex-wrap: wrap !important;
   }
-  
+
   .detail-page .pdx-toolbar .pdx-segmentControl {
     min-width: 0;
     flex: 1 1 auto;
@@ -1279,6 +1294,8 @@
   --pdx-text-accent: var(--brand-icon, #4effda);
   color: var(--pdx-text-2);
   contain: layout style;
+  min-width: 0;
+  max-width: 100%;
 }
 
 :root[data-theme="light"] .detail-page-v3 {
@@ -1339,6 +1356,10 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  cursor: pointer;
+  text-decoration: none;
+  appearance: none;
+  -webkit-appearance: none;
   width: fit-content;
   min-height: 36px;
   padding: 0 14px;
@@ -1681,7 +1702,10 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
   width: 100%;
+  min-width: 0;
 }
 
 .detail-page-v3 .pdx-filters {
@@ -1690,7 +1714,9 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   overflow-x: auto;
   /* padding prevents filter chips from being clipped by the overflow */
   padding: 6px 2px 24px;
-  margin: 0 -2px;
+  margin: 0;
+  min-width: 0;
+  max-width: 100%;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -2489,10 +2515,11 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
     overflow-x: auto !important;
     max-width: 100% !important;
     width: 100% !important;
+    min-width: 0 !important;
     scroll-snap-type: x mandatory !important;
     gap: 10px !important;
-    padding: 4px 4px 12px !important;
-    margin: 0 -4px !important;
+    padding: 4px 0 12px !important;
+    margin: 0 !important;
     scrollbar-width: none !important;
     -webkit-overflow-scrolling: touch;
   }
@@ -2558,11 +2585,12 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
     overflow-x: auto !important;
     max-width: 100% !important;
     width: 100% !important;
+    min-width: 0 !important;
     scroll-snap-type: x mandatory !important;
     gap: 14px !important;
     padding-bottom: 32px !important; /* Increased padding to prevent mobile clipping of shadows */
-    padding-inline: 16px !important;
-    margin-inline: -16px !important;
+    padding-inline: 0 !important;
+    margin-inline: 0 !important;
     scrollbar-width: none !important;
     -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%) !important;
     mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%) !important;
@@ -2595,6 +2623,13 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
 .detail-page-v3 .pdx-recommendationsHead {
   display: grid !important;
   gap: 6px !important;
+}
+
+.detail-page-v3 .pdx-recommendationsEmpty {
+  margin: 0;
+  color: var(--pdx-text-3);
+  font-size: 13px;
+  line-height: 1.5;
 }
 
 /* Prevent floating action buttons (FABs) from overlapping/covering price text on mobile/tablet */
@@ -2723,6 +2758,64 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   color: var(--pdx-text-2);
 }
 
+/* ── Account type strip (Sharing / Private) ── */
+.pdx-accountStrip {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--uni-line, rgba(0, 194, 208, 0.16));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0)),
+    var(--uni-panel-soft, rgba(8, 14, 28, 0.5));
+}
+
+.pdx-accountStrip-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdx-accountStrip-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 30px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--chip-color) 40%, transparent);
+  background: color-mix(in srgb, var(--chip-color) 14%, transparent);
+  color: var(--chip-color);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.pdx-accountStrip-tip {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--muted);
+}
+
+.pdx-packMetaItem--emailRequired {
+  border-color: rgba(255, 159, 67, 0.42) !important;
+  background: rgba(255, 159, 67, 0.14) !important;
+  color: #ffb347 !important;
+  font-weight: 800;
+}
+
+:root[data-theme="light"] .pdx-accountStrip {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: rgba(0, 138, 148, 0.14);
+}
+
+:root[data-theme="light"] .pdx-packMetaItem--emailRequired {
+  color: #c2410c !important;
+  border-color: rgba(234, 88, 12, 0.28) !important;
+  background: rgba(255, 237, 213, 0.92) !important;
+}
+
 /* ── Low Stock & Out of Stock Badges ── */
 .product-lowStockBadge {
   display: inline-flex;
@@ -2756,6 +2849,39 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
 }
 
 @media (max-width: 920px) {
+  /* app-main-catalog uses overflow:visible — clip at page level instead */
+  .detail-page.detail-page-v3 {
+    overflow-x: clip;
+    max-width: 100%;
+    contain: none;
+  }
+
+  .detail-page-v3 .pdx-layout,
+  .detail-page-v3 .pdx-recommendations,
+  .detail-page-v3 .rv-strip {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detail-page-v3 .pdx-filters,
+  .detail-page-v3 .pdx-packList,
+  .detail-page-v3 .pdx-recommendationsGrid,
+  .detail-page-v3 .rv-list {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detail-page-v3 .pdx-packPrice {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .detail-page-v3 .pdx-variantsHeadRight {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    min-width: 0;
+  }
+
   /* Ensure section title still visible on mobile */
   .detail-page-v3 .pdx-sectionTitle {
     font-size: clamp(16px, 4vw, 20px) !important;
@@ -2783,6 +2909,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
     max-width: 100% !important;
     width: 100% !important;
     box-sizing: border-box !important;
+    overflow-x: clip;
   }
 
   /* Simplify multi-layered shadows to tight, high-performance card shadows on mobile */

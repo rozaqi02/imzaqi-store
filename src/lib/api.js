@@ -1,4 +1,6 @@
 import { supabase } from "./supabaseClient";
+import { orderStatusCsvLabel } from "./orderStatus";
+import { normalizeProductRecord } from "./format";
 
 const PUBLIC_CACHE_PREFIX = "imzaqi-public-cache:";
 const publicCacheMemory = new Map();
@@ -94,10 +96,14 @@ function buildProductsSelect({ includeCategory = true, includeTimestamps = true 
   return `${productFields},product_variants(${variantFields})`;
 }
 
+function normalizeProductsList(list) {
+  return (Array.isArray(list) ? list : []).map((item) => normalizeProductRecord(item));
+}
+
 export async function fetchProducts({ includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
-  const cacheKey = `products:v2:${includeInactive ? "all" : "active"}`;
+  const cacheKey = `products:v3:${includeInactive ? "all" : "active"}`;
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
-  if (cached) return cached;
+  if (cached) return normalizeProductsList(cached);
 
   const attempts = [
     { includeCategory: true, includeTimestamps: true },
@@ -137,15 +143,15 @@ export async function fetchProducts({ includeInactive = false, useCache = !inclu
   }
 
   if (error) throw error;
-  const result = data || [];
+  const result = normalizeProductsList(data || []);
   if (useCache) writePublicCache(cacheKey, result);
   return result;
 }
 
 export async function fetchProductBySlug(slug, { includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
-  const cacheKey = `product:v2:${includeInactive ? "all" : "active"}:${slug}`;
+  const cacheKey = `product:v3:${includeInactive ? "all" : "active"}:${slug}`;
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
-  if (cached) return cached;
+  if (cached) return normalizeProductRecord(cached);
 
   const attempts = [
     { includeCategory: true, includeTimestamps: true },
@@ -186,8 +192,9 @@ export async function fetchProductBySlug(slug, { includeInactive = false, useCac
   }
 
   if (error) throw error;
-  if (useCache && data) writePublicCache(cacheKey, data);
-  return data;
+  const normalized = normalizeProductRecord(data);
+  if (useCache && normalized) writePublicCache(cacheKey, normalized);
+  return normalized;
 }
 
 export async function fetchTestimonials({ includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
@@ -398,13 +405,6 @@ export function buildOrdersCSV(orders) {
     "Catatan Admin"
   ];
   
-  const statusMap = {
-    pending: "Menunggu Pembayaran",
-    processing: "Diproses",
-    success: "Selesai",
-    cancelled: "Dibatalkan"
-  };
-
   const rows = (orders || []).map((o) => {
     const itemsSummary = Array.isArray(o.items)
       ? o.items.map((it) => {
@@ -415,7 +415,7 @@ export function buildOrdersCSV(orders) {
         }).join(" | ")
       : "";
 
-    const statusLabel = statusMap[o.status] || o.status;
+    const statusLabel = orderStatusCsvLabel(o.status);
     const formattedDate = formatCSVDate(o.created_at);
     
     const formattedWhatsapp = o.customer_whatsapp 

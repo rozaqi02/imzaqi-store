@@ -8,6 +8,8 @@ import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
 import { checkStockAvailability } from "../lib/api";
 import CheckoutSteps from "../components/CheckoutSteps";
+import CheckoutExtrasPanel from "../components/CheckoutExtrasPanel";
+import { markCheckoutVisited } from "../lib/cartReminder";
 import EmptyState from "../components/EmptyState";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -108,6 +110,7 @@ export default function Checkout() {
 
   useEffect(() => {
     document.body.classList.add("checkout-open");
+    markCheckoutVisited();
     return () => document.body.classList.remove("checkout-open");
   }, []);
 
@@ -181,7 +184,7 @@ export default function Checkout() {
     if (!closing) return undefined;
 
     const timer = window.setTimeout(() => {
-      if (backgroundLocation) {
+      if (backgroundLocation || (typeof window !== "undefined" && window.history.length > 1)) {
         nav(-1);
         return;
       }
@@ -240,7 +243,57 @@ export default function Checkout() {
       return;
     }
 
-    nav("/bayar");
+    nav("/bayar", { replace: true });
+  }
+
+  function renderPromoCard() {
+    return (
+      <div className="checkout-promo-card">
+        <div className="checkout-promo-head">
+          <div className="checkout-promo-title">
+            <TicketPercent size={15} />
+            <span>Kode promo</span>
+          </div>
+          {promoPercent ? (
+            <button
+              className="btn btn-ghost btn-sm"
+              type="button"
+              onClick={() => {
+                clear();
+                setCode("");
+                setMsg("");
+                toast.info("Promo direset.");
+              }}
+            >
+              Reset
+            </button>
+          ) : null}
+        </div>
+
+        <div className={`checkout-promo-controls ${promoStatus ? `promo-${promoStatus}` : ""}`}>
+          <input
+            className="input"
+            placeholder="Kode promo"
+            value={code}
+            onChange={(e) => setCode(e.target.value.toUpperCase())}
+            disabled={isVerifying}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                if (!isVerifying) onApplyPromo();
+              }
+            }}
+          />
+          <button className="btn btn-sm" type="button" onClick={onApplyPromo} disabled={isVerifying}>
+            {isVerifying ? "..." : "Pakai"}
+          </button>
+        </div>
+
+        {msg ? (
+          <div className={`checkout-promo-message ${promoPercent ? "ok" : ""}`}>{msg}</div>
+        ) : null}
+      </div>
+    );
   }
 
   function renderSummary(extraClass = "") {
@@ -284,7 +337,7 @@ export default function Checkout() {
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
             <h1 className="h1 checkout-drawerTitle">Checkout.</h1>
-            <p className="checkout-drawerSub">Review order sebelum lanjut bayar.</p>
+            <p className="checkout-drawerSub">Periksa order sebelum lanjut bayar.</p>
           </div>
 
           <button
@@ -303,7 +356,7 @@ export default function Checkout() {
             <CheckoutSteps current="checkout" />
           </div>
 
-          {cart.items.length > 0 ? (
+          {cart.items.length > 0 && !isMobileSheet ? (
             <div className="checkout-summary-mobileWrap">{renderSummary("checkout-summary-mobile")}</div>
           ) : null}
 
@@ -341,51 +394,10 @@ export default function Checkout() {
                     ))}
                   </div>
 
-                  <div className="checkout-promo-card">
-                    <div className="checkout-promo-head">
-                      <div className="checkout-promo-title">
-                        <TicketPercent size={15} />
-                        <span>Kode promo</span>
-                      </div>
-                      {promoPercent ? (
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          type="button"
-                          onClick={() => {
-                            clear();
-                            setCode("");
-                            setMsg("");
-                            toast.info("Promo direset.");
-                          }}
-                        >
-                          Reset
-                        </button>
-                      ) : null}
-                    </div>
-
-                    <div className={`checkout-promo-controls ${promoStatus ? `promo-${promoStatus}` : ""}`}>
-                      <input
-                        className="input"
-                        placeholder="Kode promo"
-                        value={code}
-                        onChange={(e) => setCode(e.target.value.toUpperCase())}
-                        disabled={isVerifying}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter") {
-                            e.preventDefault();
-                            if (!isVerifying) onApplyPromo();
-                          }
-                        }}
-                      />
-                      <button className="btn btn-sm" type="button" onClick={onApplyPromo} disabled={isVerifying}>
-                        {isVerifying ? "..." : "Pakai"}
-                      </button>
-                    </div>
-
-                    {msg ? (
-                      <div className={`checkout-promo-message ${promoPercent ? "ok" : ""}`}>{msg}</div>
-                    ) : null}
-                  </div>
+                  <CheckoutExtrasPanel
+                    collapsed={isMobileSheet}
+                    promoSection={renderPromoCard()}
+                  />
                 </>
               )}
             </section>
@@ -393,6 +405,24 @@ export default function Checkout() {
             {cart.items.length > 0 ? renderSummary("checkout-summary-desktop") : null}
           </div>
         </div>
+
+        {cart.items.length > 0 && isMobileSheet ? (
+          <div className="checkout-mobile-floating-bar checkout-mobile-floating-bar--drawer">
+            <div className="checkout-floating-bar-info">
+              <span className="checkout-floating-bar-label">Total</span>
+              <span className="checkout-floating-bar-price">{formatIDR(total)}</span>
+            </div>
+            <button
+              className="btn btn-primary checkout-floating-bar-btn"
+              type="button"
+              onClick={goPay}
+              disabled={hasStockIssue}
+            >
+              <span>Lanjut bayar</span>
+              <ArrowRight size={16} />
+            </button>
+          </div>
+        ) : null}
       </>
     );
   }
@@ -421,7 +451,7 @@ export default function Checkout() {
             </button>
             <div className="checkout-full-title-wrap">
               <h1 className="h1 checkout-full-title">Checkout</h1>
-              <p className="checkout-full-sub">Review order sebelum lanjut bayar.</p>
+              <p className="checkout-full-sub">Periksa order sebelum lanjut bayar.</p>
             </div>
           </div>
 
@@ -466,51 +496,10 @@ export default function Checkout() {
                   </section>
 
                   <section className="card pad checkout-panel checkout-full-promo-panel">
-                    <div className="checkout-promo-card">
-                      <div className="checkout-promo-head">
-                        <div className="checkout-promo-title">
-                          <TicketPercent size={15} />
-                          <span>Kode promo</span>
-                        </div>
-                        {promoPercent ? (
-                          <button
-                            className="btn btn-ghost btn-sm"
-                            type="button"
-                            onClick={() => {
-                              clear();
-                              setCode("");
-                              setMsg("");
-                              toast.info("Promo direset.");
-                            }}
-                          >
-                            Reset
-                          </button>
-                        ) : null}
-                      </div>
-
-                      <div className={`checkout-promo-controls ${promoStatus ? `promo-${promoStatus}` : ""}`}>
-                        <input
-                          className="input"
-                          placeholder="Kode promo"
-                          value={code}
-                          onChange={(e) => setCode(e.target.value.toUpperCase())}
-                          disabled={isVerifying}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              if (!isVerifying) onApplyPromo();
-                            }
-                          }}
-                        />
-                        <button className="btn btn-sm" type="button" onClick={onApplyPromo} disabled={isVerifying}>
-                          {isVerifying ? "..." : "Pakai"}
-                        </button>
-                      </div>
-
-                      {msg ? (
-                        <div className={`checkout-promo-message ${promoPercent ? "ok" : ""}`}>{msg}</div>
-                      ) : null}
-                    </div>
+                    <CheckoutExtrasPanel
+                      collapsed={isMobileSheet}
+                      promoSection={renderPromoCard()}
+                    />
                   </section>
                 </div>
               )}

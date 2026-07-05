@@ -70,23 +70,24 @@ jest.mock("../hooks/useDialogA11y", () => ({
 
 jest.mock("../lib/api", () => ({
   checkStockAvailability: () => Promise.resolve({ outOfStock: [], insufficient: [] }),
+  fetchTestimonials: () => Promise.resolve([]),
 }));
 
 jest.mock("../lib/supabaseClient", () => ({
   supabase: {},
 }));
 
-jest.mock("../components/CheckoutSteps", () => {
-  return function MockCheckoutSteps() {
+jest.mock("../components/CheckoutSteps", () => ({
+  default: function MockCheckoutSteps() {
     return <div data-testid="checkout-steps" />;
-  };
-});
+  },
+}));
 
-jest.mock("../components/EmptyState", () => {
-  return function MockEmptyState() {
+jest.mock("../components/EmptyState", () => ({
+  default: function MockEmptyState() {
     return <div data-testid="empty-state" />;
-  };
-});
+  },
+}));
 
 // ── Cart mock factory ──
 
@@ -181,7 +182,7 @@ describe("Checkout Page - Property 2: Checkout item controls contained within ca
         async (cartItems) => {
           mockCartItems.current = cartItems;
 
-          const Checkout = require("./Checkout").default;
+          const { default: Checkout } = await import("./Checkout.jsx");
 
           let unmount;
           await act(async () => {
@@ -286,7 +287,7 @@ describe("Checkout Page - Property 2: Checkout item controls contained within ca
         async (cartItems) => {
           mockCartItems.current = cartItems;
 
-          const Checkout = require("./Checkout").default;
+          const { default: Checkout } = await import("./Checkout.jsx");
 
           let unmount;
           await act(async () => {

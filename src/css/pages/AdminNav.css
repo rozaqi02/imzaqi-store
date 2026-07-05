@@ -1,0 +1,626 @@
+/* Admin navigation — clean sidebar + 4-tab mobile dock */
+
+.admin-shell {
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 20px;
+}
+
+/* ── Desktop sidebar ── */
+.adm-sidebar {
+  position: sticky;
+  top: calc(var(--site-header-offset, 86px) + 12px);
+  align-self: start;
+  max-height: calc(100vh - var(--site-header-offset, 86px) - 24px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(165deg, rgba(14, 20, 28, 0.98), rgba(10, 16, 24, 0.96));
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+  overflow: hidden;
+}
+
+.adm-sidebarHead {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 4px 6px 2px;
+}
+
+.adm-sidebarLogo {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-weight: 900;
+  font-size: 14px;
+  color: #d9fff6;
+  background: linear-gradient(145deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.08));
+  border: 1px solid rgba(0, 214, 180, 0.22);
+  flex-shrink: 0;
+}
+
+.adm-sidebarBrand {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.adm-sidebarBrand strong {
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+}
+
+.adm-sidebarBrand span {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.52);
+}
+
+.adm-sidebarStats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.adm-statPill {
+  padding: 10px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adm-statPill span {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.adm-statPill strong {
+  display: block;
+  margin-top: 4px;
+  font-size: 15px;
+  font-weight: 800;
+  color: #eafff8;
+}
+
+.adm-sidebarNav {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-right: 2px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+
+.adm-navGroup + .adm-navGroup {
+  margin-top: 10px;
+}
+
+.adm-navGroupLabel {
+  padding: 6px 10px 4px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.38);
+}
+
+.adm-navGroupItems {
+  display: grid;
+  gap: 3px;
+}
+
+.adm-navItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 10px;
+  border: none;
+  border-radius: 11px;
+  background: transparent;
+  color: rgba(234, 255, 245, 0.82);
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.16s ease, color 0.16s ease;
+}
+
+.adm-navItem:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+}
+
+.adm-navItem.is-active {
+  background: rgba(0, 214, 180, 0.12);
+  color: #ecfffa;
+}
+
+.adm-navItem.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 18px;
+  border-radius: 0 4px 4px 0;
+  background: linear-gradient(180deg, #4effda, #00d6b4);
+}
+
+.adm-navItemIcon {
+  position: relative;
+  width: 34px;
+  height: 34px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  color: rgba(180, 240, 230, 0.9);
+}
+
+.adm-navItem.is-active .adm-navItemIcon {
+  background: rgba(0, 214, 180, 0.16);
+  color: #b8fff0;
+}
+
+.adm-navItemLabel {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.adm-navDot {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  border: 2px solid rgba(12, 18, 26, 0.95);
+}
+
+.adm-navDot--accent {
+  background: #00d6b4;
+  color: #053228;
+}
+
+.adm-navDot--warn {
+  background: #ff8c00;
+  color: #fff;
+}
+
+.adm-navDot--urgent {
+  background: #ff3c64;
+  color: #fff;
+}
+
+.adm-sidebarFoot {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.adm-footBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 38px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s ease, border-color 0.16s ease;
+}
+
+.adm-footBtn:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.14);
+}
+
+.adm-footBtn--danger {
+  color: #ffb4c8;
+  border-color: rgba(255, 73, 126, 0.22);
+  background: rgba(255, 73, 126, 0.08);
+}
+
+/* ── Mobile dock + sheet ── */
+.adm-dock,
+.adm-moreSheet,
+.adm-sheetBackdrop {
+  display: none;
+}
+
+/* Mobile page head — replaces cluttered top bar */
+.adm-mobileHead {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .adm-mobileHead {
+    display: block;
+    position: sticky;
+    top: calc(var(--site-header-offset, 60px) + 8px);
+    z-index: 20;
+    margin-bottom: 4px;
+  }
+
+  .adm-mobileHeadInner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(14, 20, 28, 0.92);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  }
+
+  .adm-mobileHeadIcon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    border-radius: 12px;
+    background: rgba(0, 214, 180, 0.12);
+    color: #b8fff0;
+  }
+
+  .adm-mobileHeadCopy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .adm-mobileHeadCopy strong {
+    font-size: 16px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .adm-mobileHeadCopy span {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .admin-mobileBar {
+    display: none !important;
+  }
+
+  .adm-sidebar {
+    display: none !important;
+  }
+
+  .admin-shell {
+    grid-template-columns: 1fr !important;
+  }
+
+  .admin-page .container.admin-shell {
+    padding-bottom: calc(72px + env(safe-area-inset-bottom)) !important;
+  }
+
+  .adm-sheetBackdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 88;
+    border: 0;
+    background: rgba(4, 10, 16, 0.45);
+    cursor: pointer;
+    animation: admFadeIn 0.2s ease;
+  }
+
+  .adm-moreSheet {
+    display: block;
+    position: fixed;
+    left: 10px;
+    right: 10px;
+    bottom: calc(68px + env(safe-area-inset-bottom));
+    z-index: 89;
+    max-height: min(62vh, 420px);
+    padding: 14px;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: linear-gradient(180deg, rgba(18, 24, 32, 0.98), rgba(12, 18, 26, 0.98));
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.38);
+    transform: translateY(12px) scale(0.98);
+    opacity: 0;
+    pointer-events: none;
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.22s ease;
+    overflow: hidden;
+  }
+
+  .adm-moreSheet.is-open {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .adm-moreSheetHead {
+    display: grid;
+    gap: 2px;
+    margin-bottom: 10px;
+  }
+
+  .adm-moreSheetHead strong {
+    font-size: 15px;
+    font-weight: 800;
+  }
+
+  .adm-moreSheetHead span {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.55);
+  }
+
+  .adm-moreSheetList {
+    display: grid;
+    gap: 6px;
+    max-height: 220px;
+    overflow-y: auto;
+    padding-right: 2px;
+  }
+
+  .adm-moreSheetItem {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.03);
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .adm-moreSheetItem.is-active {
+    border-color: rgba(0, 214, 180, 0.28);
+    background: rgba(0, 214, 180, 0.1);
+  }
+
+  .adm-moreSheetIcon {
+    position: relative;
+    width: 36px;
+    height: 36px;
+    display: grid;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    flex-shrink: 0;
+  }
+
+  .adm-moreSheetCopy {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .adm-moreSheetCopy strong {
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .adm-moreSheetCopy small {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.52);
+    line-height: 1.35;
+  }
+
+  .adm-moreSheetActions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .adm-moreAction {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 40px;
+    border-radius: 11px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.82);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .adm-moreAction--danger {
+    color: #ffb4c8;
+    border-color: rgba(255, 73, 126, 0.24);
+    background: rgba(255, 73, 126, 0.1);
+  }
+
+  .adm-dock {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 90;
+    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(12, 18, 26, 0.96);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.28);
+    backdrop-filter: blur(12px);
+  }
+
+  .adm-dockBtn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    min-height: 52px;
+    padding: 4px 6px;
+    border: 0;
+    border-radius: 12px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.55);
+    cursor: pointer;
+    transition: color 0.16s ease, background 0.16s ease;
+  }
+
+  .adm-dockBtn.is-active {
+    color: #b8fff0;
+    background: rgba(0, 214, 180, 0.1);
+  }
+
+  .adm-dockIcon {
+    position: relative;
+    display: grid;
+    place-items: center;
+  }
+
+  .adm-dockLabel {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+  }
+
+  /* Hide legacy 7-tab bar */
+  .admin-mobileTabs {
+    display: none !important;
+  }
+}
+
+@keyframes admFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* ── Light mode ── */
+html[data-theme="light"] .adm-sidebar {
+  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(247, 253, 255, 0.96));
+  border-color: rgba(0, 138, 148, 0.14);
+  box-shadow: 0 16px 40px rgba(67, 111, 129, 0.12);
+}
+
+html[data-theme="light"] .adm-sidebarBrand span,
+html[data-theme="light"] .adm-navGroupLabel,
+html[data-theme="light"] .adm-statPill span {
+  color: rgba(50, 82, 91, 0.62);
+}
+
+html[data-theme="light"] .adm-sidebarBrand strong,
+html[data-theme="light"] .adm-statPill strong,
+html[data-theme="light"] .adm-navItemLabel {
+  color: #123744;
+}
+
+html[data-theme="light"] .adm-statPill,
+html[data-theme="light"] .adm-navItemIcon,
+html[data-theme="light"] .adm-footBtn {
+  background: rgba(0, 138, 148, 0.05);
+  border-color: rgba(0, 138, 148, 0.1);
+}
+
+html[data-theme="light"] .adm-navItem {
+  color: rgba(18, 55, 68, 0.88);
+}
+
+html[data-theme="light"] .adm-navItem.is-active {
+  background: rgba(0, 214, 180, 0.14);
+  color: #0c4050;
+}
+
+html[data-theme="light"] .adm-navItem.is-active .adm-navItemIcon {
+  background: rgba(0, 214, 180, 0.18);
+  color: #067b88;
+}
+
+html[data-theme="light"] .adm-navDot {
+  border-color: rgba(255, 255, 255, 0.95);
+}
+
+@media (max-width: 720px) {
+  html[data-theme="light"] .adm-dock {
+    background: rgba(255, 255, 255, 0.96);
+    border-top-color: rgba(0, 138, 148, 0.12);
+    box-shadow: 0 -8px 24px rgba(67, 111, 129, 0.1);
+  }
+
+  html[data-theme="light"] .adm-dockBtn {
+    color: rgba(50, 82, 91, 0.68);
+  }
+
+  html[data-theme="light"] .adm-dockBtn.is-active {
+    color: #067b88;
+    background: rgba(0, 214, 180, 0.12);
+  }
+
+  html[data-theme="light"] .adm-moreSheet {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99), rgba(247, 253, 255, 0.98));
+    border-color: rgba(0, 138, 148, 0.14);
+  }
+
+  html[data-theme="light"] .adm-moreSheetHead span,
+  html[data-theme="light"] .adm-moreSheetCopy small {
+    color: rgba(50, 82, 91, 0.62);
+  }
+
+  html[data-theme="light"] .adm-moreSheetItem {
+    background: rgba(0, 138, 148, 0.04);
+    border-color: rgba(0, 138, 148, 0.1);
+  }
+
+  html[data-theme="light"] .adm-moreSheetItem.is-active {
+    background: rgba(0, 214, 180, 0.12);
+    border-color: rgba(0, 138, 148, 0.22);
+  }
+
+  html[data-theme="light"] .adm-mobileHeadInner {
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(0, 138, 148, 0.12);
+    box-shadow: 0 8px 22px rgba(67, 111, 129, 0.1);
+  }
+
+  html[data-theme="light"] .adm-mobileHeadCopy strong {
+    color: #123744;
+  }
+
+  html[data-theme="light"] .adm-mobileHeadCopy span {
+    color: rgba(50, 82, 91, 0.62);
+  }
+
+  html[data-theme="light"] .adm-mobileHeadIcon {
+    background: rgba(0, 214, 180, 0.14);
+    color: #067b88;
+  }
+}

@@ -1,8 +1,27 @@
-const CACHE_NAME = 'imzaqi-cache-v2';
+const CACHE_NAME = 'imzaqi-cache-v5';
+const PRECACHE_URLS = [
+  '/',
+  '/index.html',
+  '/manifest.json',
+  '/icon.png',
+  '/imzaqistore_logo.png',
+  '/favicon.ico',
+];
 
-// Install: skip waiting to activate immediately
+function isAppAsset(url) {
+  return (
+    url.pathname.startsWith('/assets/') &&
+    /\.(js|css|mjs|woff2?)$/i.test(url.pathname)
+  );
+}
+
+// Install: precache shell assets, then activate immediately
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  event.waitUntil(
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(PRECACHE_URLS))
+      .then(() => self.skipWaiting())
+  );
 });
 
 // Activate: clean up old caches and claim clients
@@ -16,6 +35,12 @@ self.addEventListener('activate', (event) => {
       )
     ).then(() => self.clients.claim())
   );
+});
+
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
+  }
 });
 
 // Fetch handler
@@ -44,7 +69,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Cache First for static assets (JS, CSS, images, fonts)
+  // Network First for hashed Vite bundles — avoids serving broken stale JS/CSS
+  if (isAppAsset(url)) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response && response.status === 200) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Cache First for images, fonts, and other static files
   event.respondWith(
     caches.match(event.request).then((cached) => {
       if (cached) return cached;

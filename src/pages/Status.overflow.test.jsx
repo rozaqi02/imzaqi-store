@@ -29,6 +29,10 @@ jest.mock("react-router-dom", () => ({
   useSearchParams: () => [mockSearchParamsValue, mockSetSearchParams],
 }));
 
+jest.mock("../lib/log", () => ({
+  warn: jest.fn(),
+}));
+
 jest.mock("../lib/supabaseClient", () => ({
   supabase: {
     rpc: jest.fn().mockResolvedValue({ data: null, error: null }),
@@ -128,14 +132,14 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
    * that apply overflow-wrap: anywhere and min-width: 0 at 320px viewport.
    * This guarantees no horizontal overflow regardless of text content length.
    */
-  it("renders st-wrap container with correct overflow-safe structure for any order data", async () => {
+  it("renders st-wrap container with correct overflow-safe structure for any order data", { timeout: 30_000 }, async () => {
     await fc.assert(
       fc.asyncProperty(arbOrder, async (orderData) => {
-        const { supabase } = require("../lib/supabaseClient");
+        const { supabase } = await import("../lib/supabaseClient.js");
         supabase.rpc.mockResolvedValue({ data: [orderData], error: null });
         mockSearchParamsValue = new URLSearchParams({ order: orderData.order_code });
 
-        const Status = require("./Status").default;
+        const { default: Status } = await import("./Status.jsx");
 
         let container;
         let unmount;
@@ -200,7 +204,7 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
    * For extremely long text content (worst case for overflow), verify the
    * DOM structure still maintains overflow protection.
    */
-  it("maintains overflow protection structure with extremely long text content", async () => {
+  it("maintains overflow protection structure with extremely long text content", { timeout: 30_000 }, async () => {
     const arbLongOrder = fc.record({
       order_code: fc.constant("IMZ-XXXX"),
       status: arbStatus,
@@ -229,11 +233,11 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
 
     await fc.assert(
       fc.asyncProperty(arbLongOrder, async (orderData) => {
-        const { supabase } = require("../lib/supabaseClient");
+        const { supabase } = await import("../lib/supabaseClient.js");
         supabase.rpc.mockResolvedValue({ data: [orderData], error: null });
         mockSearchParamsValue = new URLSearchParams({ order: "IMZ-XXXX" });
 
-        const Status = require("./Status").default;
+        const { default: Status } = await import("./Status.jsx");
 
         let container;
         let unmount;

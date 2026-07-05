@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useMemo, useRef, useState, memo } from "react";
+import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
@@ -13,6 +13,7 @@ import {
   List,
   Music4,
   PackageCheck,
+  PackageSearch,
   Search,
   ShoppingBag,
   SlidersHorizontal,
@@ -32,9 +33,27 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useCart } from "../context/CartContext";
 import { formatIDR, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
+import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useDebounce } from "../hooks/useDebounce";
-import { saveScrollY, consumeSavedScrollY } from "../hooks/useScrollMemory";
+import {
+  peekSavedScroll,
+  hasSavedScrollY,
+  clearSavedScroll,
+  restoreCatalogScroll,
+  saveScrollY,
+  touchCatalogScrollY,
+  isCatalogProductLink,
+  slugFromCatalogProductLink,
+  beginCatalogRestoreLock,
+  endCatalogRestoreLock,
+  isCatalogRestoreLocked,
+} from "../hooks/useScrollMemory";
+import {
+  getCatalogProductsCache,
+  hasCatalogProductsCache,
+  setCatalogProductsCache,
+} from "../lib/catalogCache";
 import TypewriterSearchInput from "../components/TypewriterSearchInput";
 import "../css/pages/Products.css";
 
@@ -343,6 +362,12 @@ export default function Products() {
   const [isFiltering, setIsFiltering] = useState(false);
   const prevFilterSigRef = useRef("");
   const pendingScrollRef = useRef(null);
+  const restoreCleanupRef = useRef(null);
+  const restoredScrollYRef = useRef(null);
+  const skipGridEntryAnimationRef = useRef(hasSavedScrollY() || isCatalogRestoreLocked());
+  const [isRestoringScroll, setIsRestoringScroll] = useState(
+    () => hasSavedScrollY() || isCatalogRestoreLocked()
+  );
 
   const qParam = params.get("q") || "";
   const [query, setQuery] = useState(qParam);
@@ -361,30 +386,76 @@ export default function Products() {
   const prevViewRef = useRef(view);
   const openFilters = useCallback(() => setFiltersOpen(true), []);
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
-
-  // Scroll memory: capture position immediately on product link click (before navigation).
-  // Click fires synchronously, so scrollY is guaranteed correct at the moment of interaction.
-  // Also saves on scroll as fallback for non-click navigation (e.g., browser back into Products).
-  useEffect(() => {
-    const onClick = (e) => {
-      if (e.target.closest('a[href^="/produk/"]')) saveScrollY();
-    };
-    window.addEventListener("click", onClick, { capture: true, passive: true });
-    return () => window.removeEventListener("click", onClick, { capture: true });
+  const rememberCatalogScroll = useCallback((slug) => {
+    saveScrollY({ slug });
   }, []);
 
-  // Deferred scroll restoration: wait for products + DOM to fully settle
+  // Scroll memory: capture before route change (pointerdown is earlier than click on touch).
   useEffect(() => {
-    if (pendingScrollRef.current === null) return;
-    if (loading || isFiltering) return;
-    const y = pendingScrollRef.current;
-    pendingScrollRef.current = null;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        window.scrollTo({ top: y, behavior: "auto" });
-      });
-    });
-  }, [loading, isFiltering]);
+    const capture = (e) => {
+      const anchor = e.target.closest("a[href]");
+      if (!anchor) return;
+      const href = anchor.getAttribute("href") || "";
+      if (!isCatalogProductLink(href)) return;
+      saveScrollY({ slug: slugFromCatalogProductLink(href) });
+    };
+    window.addEventListener("pointerdown", capture, { capture: true, passive: true });
+    window.addEventListener("click", capture, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener("pointerdown", capture, { capture: true });
+      window.removeEventListener("click", capture, { capture: true });
+    };
+  }, []);
+
+  // Keep saved Y in sync while browsing the catalog (covers browser back without click).
+  useEffect(() => {
+    if (isRestoringScroll) return undefined;
+    let frame = 0;
+    const onScroll = () => {
+      if (!hasSavedScrollY()) return;
+      if (frame) cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => touchCatalogScrollY(window.scrollY));
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [isRestoringScroll]);
+
+  // Peek saved scroll on mount — do not consume until restore succeeds (Strict Mode safe).
+  useLayoutEffect(() => {
+    const saved = peekSavedScroll();
+    if (!saved) return;
+    pendingScrollRef.current = saved;
+    setIsRestoringScroll(true);
+  }, []);
+
+  useEffect(() => () => restoreCleanupRef.current?.(), []);
+
+  // Guard against late scroll-to-top / layout shifts stealing restored position.
+  useEffect(() => {
+    if (!isRestoringScroll && !isCatalogRestoreLocked()) return undefined;
+
+    let frame = 0;
+    let ticks = 0;
+    const maxTicks = 120;
+
+    const guard = () => {
+      ticks += 1;
+      const targetY = restoredScrollYRef.current;
+      if (ticks > maxTicks || (!isRestoringScroll && !isCatalogRestoreLocked())) return;
+      if (targetY != null && targetY > 120 && window.scrollY < targetY - 80) {
+        window.scrollTo({ top: targetY, left: 0, behavior: "auto" });
+      }
+      frame = requestAnimationFrame(guard);
+    };
+
+    frame = requestAnimationFrame(guard);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+    };
+  }, [isRestoringScroll]);
 
   useEffect(() => {
     if (filtersOpen) {
@@ -423,22 +494,27 @@ export default function Products() {
 
   useEffect(() => {
     let alive = true;
+    const shouldRestore = Boolean(peekSavedScroll());
+    const cached = shouldRestore && hasCatalogProductsCache() ? getCatalogProductsCache() : null;
+
+    if (cached) {
+      setProducts(cached);
+      setLoading(false);
+    }
+
     (async () => {
       try {
-        setLoading(true);
+        if (!cached) setLoading(true);
         const data = await fetchProducts();
         if (!alive) return;
         setProducts(data);
+        setCatalogProductsCache(data);
       } catch (e) {
         warn(e);
         if (!alive) return;
-        setError("Gagal load produk.");
+        if (!cached) setError("Gagal load produk.");
       } finally {
-        if (alive) {
-          setLoading(false);
-          const savedY = consumeSavedScrollY();
-          if (savedY !== null) pendingScrollRef.current = savedY;
-        }
+        if (alive) setLoading(false);
       }
     })();
 
@@ -449,9 +525,18 @@ export default function Products() {
 
   // URL Sync Effect moved below priceBounds
 
+  const applySearchTerm = useCallback((term) => {
+    const value = String(term || "").trim();
+    if (!value) return;
+    setQuery(value);
+    pushSearchHistory(value);
+    setSearchOpen(false);
+    setActiveSuggestionIndex(-1);
+  }, []);
+
   useEffect(() => {
     if (!query.trim()) {
-      setSearchSuggestions([]);
+      setSearchSuggestions(searchOpen ? getSearchHistory() : []);
       return;
     }
     const term = query.trim().toLowerCase();
@@ -464,7 +549,7 @@ export default function Products() {
     });
     const unique = Array.from(new Set(words.map((w) => String(w).trim()).filter(Boolean)));
     setSearchSuggestions(unique.filter((x) => x.toLowerCase().includes(term)).slice(0, 5));
-  }, [query, products]);
+  }, [query, products, searchOpen]);
 
   useEffect(() => {
     if (activeSuggestionIndex >= searchSuggestions.length) setActiveSuggestionIndex(-1);
@@ -713,6 +798,37 @@ export default function Products() {
     return sorted;
   }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, debouncedQuery, restockOnly, sort]);
 
+  const catalogGridKey = loading ? "catalog-loading" : "catalog-grid";
+  const showCatalogSkeleton = loading || (isFiltering && !isRestoringScroll);
+  const allowGridEntryAnimation = !skipGridEntryAnimationRef.current && !showCatalogSkeleton && !isRestoringScroll;
+
+  // Restore scroll after catalog grid is rendered and filters settled.
+  useLayoutEffect(() => {
+    const saved = pendingScrollRef.current;
+    if (!saved) return;
+    if (loading || error || !priceReady) return;
+    if (isFiltering && !isRestoringScroll) return;
+    if (!filtered.length) return;
+
+    pendingScrollRef.current = null;
+    restoreCleanupRef.current?.();
+    restoredScrollYRef.current = saved.y;
+    restoreCleanupRef.current = restoreCatalogScroll(saved, () => {
+      clearSavedScroll();
+      beginCatalogRestoreLock(1400);
+      window.setTimeout(() => {
+        if (restoredScrollYRef.current != null) {
+          window.scrollTo({ top: restoredScrollYRef.current, left: 0, behavior: "auto" });
+        }
+        setIsRestoringScroll(false);
+      }, 700);
+      window.setTimeout(() => {
+        restoredScrollYRef.current = null;
+        endCatalogRestoreLock();
+      }, 1200);
+    });
+  }, [loading, isFiltering, error, filtered.length, filterSignature, priceReady, isRestoringScroll]);
+
   const activeFiltersCount =
     (query ? 1 : 0) +
     (cats.length ? 1 : 0) +
@@ -924,13 +1040,16 @@ export default function Products() {
                       setActiveSuggestionIndex((p) => (p <= 0 ? searchSuggestions.length - 1 : p - 1));
                       return;
                     }
-                    if (e.key === "Enter" && searchOpen && activeSuggestionIndex >= 0) {
-                      const pick = searchSuggestions[activeSuggestionIndex];
-                      if (pick) {
+                    if (e.key === "Enter") {
+                      if (searchOpen && activeSuggestionIndex >= 0) {
+                        const pick = searchSuggestions[activeSuggestionIndex];
+                        if (pick) {
+                          e.preventDefault();
+                          applySearchTerm(pick);
+                        }
+                      } else if (query.trim()) {
                         e.preventDefault();
-                        setQuery(pick);
-                        setSearchOpen(false);
-                        setActiveSuggestionIndex(-1);
+                        applySearchTerm(query);
                       }
                     }
                     if (e.key === "Escape") {
@@ -970,6 +1089,21 @@ export default function Products() {
                   role="listbox"
                   id={catalogListboxId}
                 >
+                  {!query.trim() ? (
+                    <div className="catalog-searchHistoryHead">
+                      <span className="catalog-searchHistoryLabel">Pencarian terakhir</span>
+                      <button
+                        type="button"
+                        className="catalog-searchHistoryClear"
+                        onClick={() => {
+                          clearSearchHistory();
+                          setSearchSuggestions([]);
+                        }}
+                      >
+                        Hapus
+                      </button>
+                    </div>
+                  ) : null}
                   {searchSuggestions.map((sug, idx) => (
                     <button
                       key={sug}
@@ -980,11 +1114,7 @@ export default function Products() {
                       className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
                       style={{ "--suggest-i": idx }}
                       onMouseEnter={() => setActiveSuggestionIndex(idx)}
-                      onClick={() => {
-                        setQuery(sug);
-                        setSearchOpen(false);
-                        setActiveSuggestionIndex(-1);
-                      }}
+                      onClick={() => applySearchTerm(sug)}
                     >
                       <Search size={13} />
                       <span>{sug}</span>
@@ -1118,11 +1248,11 @@ export default function Products() {
 
             <div className="catalog-gridWrap">
             <div
-              className={`catalog-grid ${view === "list" ? "list" : "grid"}${!loading && !isFiltering ? " catalog-grid--animate" : ""}${isFiltering ? " is-filtering" : ""}${viewMorph ? " is-view-morph" : ""}`}
+              className={`catalog-grid ${view === "list" ? "list" : "grid"}${allowGridEntryAnimation ? " catalog-grid--animate" : ""}${isFiltering && !isRestoringScroll ? " is-filtering" : ""}${viewMorph && !isRestoringScroll ? " is-view-morph" : ""}`}
               role="list"
-              key={loading ? "catalog-loading" : filterSignature}
+              key={catalogGridKey}
             >
-              {loading || isFiltering ? (
+              {showCatalogSkeleton ? (
                 Array.from({ length: skeletonCount }).map((_, idx) => (
                   <CatalogCardSkeleton key={idx} view={view} />
                 ))
@@ -1141,7 +1271,7 @@ export default function Products() {
               ) : filtered.length === 0 ? (
                 <div className="card pad catalog-emptyResult" style={{ gridColumn: "1 / -1" }}>
                   <EmptyState
-                    icon="-"
+                    icon={<PackageSearch size={32} strokeWidth={2} />}
                     title={query ? `Hasil untuk "${query}"` : "Tidak ditemukan"}
                     description={
                       query
@@ -1163,6 +1293,7 @@ export default function Products() {
                       view={view}
                       location={location}
                       revealIndex={idx}
+                      onBeforeNavigate={rememberCatalogScroll}
                     />
                   ))}
                 </>
@@ -1265,7 +1396,7 @@ export default function Products() {
   );
 }
 
-const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0 }) {
+const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0, onBeforeNavigate }) {
   const stock = Number(product._stock || 0);
   const sold = Number(product._sold || 0);
   const soldOut = stock <= 0;
@@ -1281,10 +1412,14 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
   return (
     <Link
       to={`/produk/${product.slug}`}
+      state={{ fromCatalog: true, catalogSearch: location.search }}
+      id={`catalog-card-${product.slug}`}
+      data-catalog-slug={product.slug}
       className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}`}
       role="listitem"
       aria-label={`Buka detail ${product.name}`}
       style={{ "--reveal-i": revealIndex }}
+      onPointerDown={() => onBeforeNavigate?.(product.slug)}
     >
       <div className="catalog-cardTop">
         <div className="catalog-cardBrand">

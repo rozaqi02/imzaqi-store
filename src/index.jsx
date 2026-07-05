@@ -3,10 +3,13 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App";
 import { CartProvider } from "./context/CartContext";
+
+
 import { ThemeProvider } from "./context/ThemeContext";
 import { ToastProvider } from "./context/ToastContext";
 import AppErrorBoundary from "./components/AppErrorBoundary";
 import { warn } from "./lib/log";
+import { initWebVitals } from "./lib/webVitalsReporter";
 
 // Measure scrollbar width to prevent layout shift when body overflow toggles
 if (typeof document !== "undefined") {
@@ -28,10 +31,12 @@ root.render(
   </AppErrorBoundary>
 );
 
+initWebVitals();
+
 // Service worker: hanya register di production
 if ('serviceWorker' in navigator && import.meta.env.PROD) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch((err) => {
+    navigator.serviceWorker.register('/sw.js?v=5').catch((err) => {
       warn('Service worker registration failed:', err);
     });
   });

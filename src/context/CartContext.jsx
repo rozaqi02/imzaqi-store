@@ -1,6 +1,7 @@
-import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
+import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { clamp } from "../lib/format";
 import { supabase } from "../lib/supabaseClient";
+import { touchCartActivity } from "../lib/cartReminder";
 
 const CartContext = createContext(null);
 
@@ -32,6 +33,16 @@ export function CartProvider({ children }) {
     if (!storage) return [];
     return safeParse(storage.getItem(STORAGE_KEY), []);
   });
+  const [cartSheetOpen, setCartSheetOpen] = useState(false);
+
+  const openCartSheet = useCallback(() => setCartSheetOpen(true), []);
+  const closeCartSheet = useCallback(() => setCartSheetOpen(false), []);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    document.body.classList.toggle("cart-sheet-open", cartSheetOpen);
+    return () => document.body.classList.remove("cart-sheet-open");
+  }, [cartSheetOpen]);
 
   useEffect(() => {
     const storage = safeStorage();
@@ -39,6 +50,7 @@ export function CartProvider({ children }) {
     try {
       storage.setItem(STORAGE_KEY, JSON.stringify(items));
     } catch {}
+    if (items.length > 0) touchCartActivity();
   }, [items]);
 
   const api = useMemo(() => ({
@@ -131,7 +143,10 @@ export function CartProvider({ children }) {
       }
     },
 
-  }), [items, bumpToken, lastAddedVariantId]);
+    isCartSheetOpen: cartSheetOpen,
+    openCartSheet,
+    closeCartSheet,
+  }), [items, bumpToken, lastAddedVariantId, cartSheetOpen, openCartSheet, closeCartSheet]);
 
   return <CartContext.Provider value={api}>{children}</CartContext.Provider>;
 }

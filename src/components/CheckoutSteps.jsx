@@ -7,9 +7,9 @@ import { Check } from "lucide-react";
  */
 export default function CheckoutSteps({ current = "checkout" }) {
   const steps = [
-    { key: "checkout", title: "Review", subtitle: "Item" },
+    { key: "checkout", title: "Keranjang", subtitle: "Item" },
     { key: "pay", title: "Bayar", subtitle: "QRIS" },
-    { key: "status", title: "Status", subtitle: "Order" },
+    { key: "status", title: "Lacak", subtitle: "Order" },
   ];
 
   const currentIndex = steps.findIndex((s) => s.key === current);

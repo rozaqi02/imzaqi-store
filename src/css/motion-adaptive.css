@@ -332,8 +332,8 @@
   scroll-behavior: auto !important;
 }
 
-/* ─── Mobile navbar: solid bg, no backdrop blur (mobile only) ─────────────── */
-@media (max-width: 768px) {
+/* ─── Mobile navbar: solid bg, no backdrop blur (phone only) ─────────────── */
+@media (max-width: 720px) {
   /* Header mobile dark mode — neumorphic solid + gradasi hijau */
   html .header,
   html .site-header,
@@ -396,6 +396,17 @@
     border-color: var(--brand-line) !important;
     box-shadow: var(--skeu-control-shadow) !important;
     color: var(--brand-text) !important;
+  }
+
+  html[data-theme="light"] body .header .header-iconAction.active {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 28%),
+      linear-gradient(180deg, rgba(0, 214, 180, 0.26), rgba(0, 194, 208, 0.12)) !important;
+    border-color: rgba(0, 138, 148, 0.32) !important;
+    color: #067b88 !important;
+    box-shadow:
+      0 10px 22px rgba(0, 138, 148, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
   }
 
   /* Header bottom shimmer line — same as desktop */
@@ -491,10 +502,11 @@
     contain: layout style;
   }
 
-  .checkout-backdrop {
+  .checkout-backdrop,
+  .checkout-backdrop-mobile {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    background: rgba(3, 8, 18, 0.5) !important;
+    background: var(--brand-overlay, rgba(3, 8, 18, 0.5)) !important;
     will-change: opacity;
     contain: paint;
   }
@@ -669,5 +681,48 @@
   }
   .kicker, .oh-kicker, .faq-kicker, .st-kicker, .caption, small {
     font-size: clamp(10px, 3.2vw, 12px) !important;
+  }
+}
+
+/* ─── iPad / tablet: restore frosted-glass overlays (721–1024px) ─────────── */
+@media (min-width: 721px) and (max-width: 1024px) {
+  .header,
+  .site-header {
+    backdrop-filter: blur(16px) saturate(130%) !important;
+    -webkit-backdrop-filter: blur(16px) saturate(130%) !important;
+  }
+
+  .mobile-backdrop-lite.is-open,
+  .mobile-backdrop-lite.is-closing,
+  body.nav-open .mobile-backdrop-lite {
+    backdrop-filter: blur(18px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+    background: var(--brand-overlay, rgba(10, 25, 38, 0.28)) !important;
+  }
+
+  html[data-theme="light"] .mobile-backdrop-lite.is-open,
+  html[data-theme="light"] .mobile-backdrop-lite.is-closing,
+  html[data-theme="light"] body.nav-open .mobile-backdrop-lite {
+    background: rgba(10, 25, 38, 0.22) !important;
+  }
+
+  .mobile-menu-lite.is-open,
+  .mobile-menu-lite.is-closing,
+  body.nav-open .mobile-menu-lite {
+    backdrop-filter: blur(20px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
+  }
+
+  .checkout-backdrop,
+  .checkout-backdrop-mobile,
+  .mini-cart-sheet-backdrop,
+  .catalog-sheetBackdrop.is-open {
+    backdrop-filter: blur(18px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
+  }
+
+  .catalog-filterShell {
+    backdrop-filter: blur(20px) saturate(145%) !important;
+    -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
   }
 }

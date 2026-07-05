@@ -18,7 +18,7 @@ import {
 import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-import { formatIDR } from "../lib/format";
+import { asVariantList, formatIDR, normalizeProductRecord } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
@@ -31,8 +31,10 @@ import { fireConfetti } from "../components/Confetti";
 // ── Live viewer & countdown removed (fake data — hurts trust) ──────────────
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { addRecentlyViewed } from "../lib/recentlyViewed";
+import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
 import RecentlyViewed from "../components/RecentlyViewed";
 import ProductTile from "../components/ProductTile";
+import AccountTypeStrip from "../components/AccountTypeStrip";
 import "../css/pages/ProductDetail.css";
 
 function normalizeInlineText(text) {
@@ -104,7 +106,7 @@ const SECTION_ICONS = {
 };
 
 function VariantBenefitList({ rawText, variant }) {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(() => Boolean(variant?.requires_buyer_email));
   const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
 
   // Build structured info rows from variant DB fields
@@ -347,7 +349,7 @@ const VariantCard = React.memo(({
               </span>
             ) : null}
             {variant.requires_buyer_email ? (
-              <span className="pdx-packMetaItem">
+              <span className="pdx-packMetaItem pdx-packMetaItem--emailRequired">
                 <Mail size={12} />
                 Butuh email
               </span>
@@ -491,6 +493,15 @@ function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
 export default function ProductDetail() {
   const nav = useNavigate();
   const location = useLocation();
+  const catalogBackTo = getCatalogReturnPath();
+  const goBackToCatalog = useCallback(() => {
+    const cameFromCatalog = Boolean(location.state?.fromCatalog) || hasSavedScrollY();
+    if (cameFromCatalog && window.history.length > 1) {
+      nav(-1);
+      return;
+    }
+    nav(catalogBackTo);
+  }, [catalogBackTo, location.state, nav]);
   const { slug } = useParams();
   const toast = useToast();
   const cart = useCart();
@@ -507,6 +518,8 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
   const [allProducts, setAllProducts] = useState([]);
+  const [recommendationsReady, setRecommendationsReady] = useState(false);
+  const recommendationsRef = useRef(null);
   const [error, setError] = useState("");
   const [flashSaleMap, setFlashSaleMap] = useState(new Map());
   const [activeTab, setActiveTab] = useState("semua");
@@ -527,7 +540,7 @@ export default function ProductDetail() {
     const existing = document.getElementById("jsonld-product");
     if (existing) existing.remove();
 
-    const activeVariants = (product.product_variants || []).filter((v) => v?.is_active);
+    const activeVariants = asVariantList(product.product_variants).filter((v) => v?.is_active);
     const prices = activeVariants.map((v) => Number(v.price_idr || 0)).filter((n) => n > 0);
     const minPrice = prices.length ? Math.min(...prices) : 0;
     const maxPrice = prices.length ? Math.max(...prices) : 0;
@@ -568,20 +581,18 @@ export default function ProductDetail() {
       try {
         setLoading(true);
         setError("");
-        const [data, flashSales, productsData] = await Promise.all([
+        const [data, flashSales] = await Promise.all([
           fetchProductBySlug(slug),
           fetchActiveFlashSales().catch(() => []),
-          fetchProducts().catch(() => []),
         ]);
         if (!alive) return;
-        setProduct(data);
-        setAllProducts(productsData || []);
+        setProduct(normalizeProductRecord(data));
         const fsMap = new Map();
         (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
         setFlashSaleMap(fsMap);
         // Track recently viewed
         if (data) {
-          const activeVariants = (data.product_variants || []).filter((v) => v?.is_active);
+          const activeVariants = asVariantList(data.product_variants).filter((v) => v?.is_active);
           const prices = activeVariants.map((v) => Number(v.price_idr || 0)).filter((n) => n > 0);
           addRecentlyViewed({ ...data, _minPrice: prices.length ? Math.min(...prices) : null });
         }
@@ -599,9 +610,39 @@ export default function ProductDetail() {
     };
   }, [slug]);
 
+  useEffect(() => {
+    if (!product || recommendationsReady) return;
+    const node = recommendationsRef.current;
+    if (!node) return;
+
+    const loadRecommendations = () => {
+      setRecommendationsReady(true);
+      fetchProducts()
+        .then((productsData) => setAllProducts(productsData || []))
+        .catch(() => setAllProducts([]));
+    };
+
+    if (typeof IntersectionObserver === "undefined") {
+      loadRecommendations();
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          loadRecommendations();
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "240px 0px" }
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [product, recommendationsReady]);
+
   const variants = useMemo(
     () =>
-      (product?.product_variants || [])
+      asVariantList(product?.product_variants)
         .slice()
         .filter((variant) => variant?.is_active)
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)),
@@ -666,32 +707,6 @@ export default function ProductDetail() {
   const liveViewers = null; // removed fake data
   const [emojiFloats, setEmojiFloats] = useState([]);
   const emojiCountsRef = useRef({});
-
-  // Idle Tease
-  useEffect(() => {
-    if (!product) return;
-    let timer;
-    const reset = () => {
-      clearTimeout(timer);
-      timer = setTimeout(() => {
-        const el = document.createElement("div");
-        el.className = "idle-tease-toast";
-        el.setAttribute("role", "status");
-        el.innerHTML = `<span>👀</span><span>Masih mikir? Stok tinggal dikit loh!</span>`;
-        document.body.appendChild(el);
-        setTimeout(() => el.remove(), 3500);
-        // Re-arm after dismiss
-        timer = setTimeout(reset, 60000);
-      }, 60000);
-    };
-    const events = ["mousemove", "keydown", "scroll", "touchstart", "click"];
-    events.forEach((e) => window.addEventListener(e, reset, { passive: true }));
-    reset();
-    return () => {
-      clearTimeout(timer);
-      events.forEach((e) => window.removeEventListener(e, reset));
-    };
-  }, [product]);
 
   const EMOJI_REACTIONS = ["\u2764\ufe0f","\ud83d\udd25","\ud83d\ude2e","\ud83d\udcaf"];
   const EMOJI_STORAGE_KEY = product?.id ? `imzaqi_reactions_${product.id}` : null;
@@ -764,7 +779,7 @@ export default function ProductDetail() {
         }
         
         // Sub-variant count / stock factor (favor active products with stock)
-        const variantsList = p.product_variants || [];
+        const variantsList = asVariantList(p.product_variants);
         const activeVariants = variantsList.filter((v) => v.is_active);
         const totalStock = activeVariants.reduce((sum, v) => sum + Number(v.stock || 0), 0);
         const totalSold = activeVariants.reduce((sum, v) => sum + Number(v.sold_count || 0), 0);
@@ -888,7 +903,7 @@ export default function ProductDetail() {
                 icon="?"
                 title="Produk tidak ditemukan"
                 description={error || "Produk gak tersedia."}
-                primaryAction={{ label: "Balik ke katalog", onClick: () => nav("/produk") }}
+                primaryAction={{ label: "Balik ke katalog", onClick: goBackToCatalog }}
               />
             </div>
           </div>
@@ -910,10 +925,10 @@ export default function ProductDetail() {
               <div className="pdx-leftCol">
                 <header className="pdx-topCard" style={{ "--brand-color": brandColor }}>
                   <div className="pdx-toolbar">
-                    <Link to="/produk" className="pdx-backLink">
+                    <button type="button" className="pdx-backLink" onClick={goBackToCatalog}>
                       <ArrowLeft size={15} />
                       <span>Katalog</span>
-                    </Link>
+                    </button>
 
                     <div className="pdx-topActions">
                       <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan">
@@ -967,6 +982,8 @@ export default function ProductDetail() {
 
               <div className="pdx-rightCol">
                 <section id="paket-tersedia" className="pdx-variantsSection">
+                  <AccountTypeStrip variants={variants} />
+
                   <div className="pdx-variantsHead">
                     <div className="pdx-variantsHeadTop">
                       <div className="pdx-eyebrow">Pilih paket</div>
@@ -1011,7 +1028,7 @@ export default function ProductDetail() {
                           primaryAction={
                             variants.length > 0
                               ? { label: "Intip semua", onClick: () => setActiveTab("semua") }
-                              : { label: "Balik ke katalog", onClick: () => nav("/produk") }
+                              : { label: "Balik ke katalog", onClick: goBackToCatalog }
                           }
                         />
                       </div>
@@ -1065,37 +1082,40 @@ export default function ProductDetail() {
             {/* Recently Viewed Strip */}
             <RecentlyViewed currentProductId={product?.id} />
 
-            {/* Floating Emoji Reactions */}
-            <div className="pdx-emojiReactions" aria-label="Reaksi produk">
-              {EMOJI_REACTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  className="pdx-emojiBtn"
-                  onClick={() => handleEmojiReact(emoji)}
-                  aria-label={`Reaksi ${emoji}`}
-                >
-                  {emoji}
-                </button>
-              ))}
-              {emojiFloats.map((f) => (
-                <span key={f.id} className="pdx-emojiFloat" aria-hidden="true">{f.emoji}</span>
-              ))}
-            </div>
+            {!caps.isMobile ? (
+              <div className="pdx-emojiReactions" aria-label="Reaksi produk">
+                {EMOJI_REACTIONS.map((emoji) => (
+                  <button
+                    key={emoji}
+                    type="button"
+                    className="pdx-emojiBtn"
+                    onClick={() => handleEmojiReact(emoji)}
+                    aria-label={`Reaksi ${emoji}`}
+                  >
+                    {emoji}
+                  </button>
+                ))}
+                {emojiFloats.map((f) => (
+                  <span key={f.id} className="pdx-emojiFloat" aria-hidden="true">{f.emoji}</span>
+                ))}
+              </div>
+            ) : null}
 
-            {recommendations.length > 0 ? (
-              <section className="pdx-recommendations">
-                <div className="pdx-recommendationsHead">
-                  <div className="pdx-eyebrow">Mungkin kamu butuh</div>
-                  <h2 className="pdx-sectionTitle">Rekomendasi lainnya</h2>
-                </div>
+            <section className="pdx-recommendations" ref={recommendationsRef} aria-label="Rekomendasi produk">
+              <div className="pdx-recommendationsHead">
+                <div className="pdx-eyebrow">Mungkin kamu butuh</div>
+                <h2 className="pdx-sectionTitle">Rekomendasi lainnya</h2>
+              </div>
+              {recommendations.length > 0 ? (
                 <div className="product-grid-container grid-mode pdx-recommendationsGrid" role="list">
                   {recommendations.map((p) => (
                     <ProductTile key={p.id} product={p} layout="grid" disableTilt={true} />
                   ))}
                 </div>
-              </section>
-            ) : null}
+              ) : recommendationsReady ? (
+                <p className="pdx-recommendationsEmpty">Belum ada rekomendasi lain untuk produk ini.</p>
+              ) : null}
+            </section>
           </div>
         </div>
       </section>

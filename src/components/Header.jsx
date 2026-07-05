@@ -15,22 +15,26 @@ import {
   X,
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
+import { checkAdminAccess } from "../lib/adminAuth";
+import { supabase } from "../lib/supabaseClient";
+
 import { useTheme } from "../context/ThemeContext";
 import { useToast } from "../context/ToastContext";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useHeaderShrink } from "../hooks/useHeaderShrink";
 import { useIsMobile } from "../hooks/useIsMobile";
+import { COMPACT_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
 import { rafThrottle } from "../utils/throttle";
 
 const MOBILE_MENU_ANIMATION_MS = 250;
 const HEADER_SHRINK_MS = 280;
 const NAV_PILL_EASE = [0.22, 1, 0.36, 1];
 const NAV_LINKS = [
-  { to: "/", label: "Home" },
+  { to: "/", label: "Beranda" },
   { to: "/produk", label: "Katalog" },
-  { to: "/tentang", label: "FAQ" },
+  { to: "/faq", label: "FAQ" },
   { to: "/testimoni", label: "Testimoni" },
-  { to: "/status", label: "Status Order" },
+  { to: "/status", label: "Lacak Order" },
 ];
 
 function CartIcon() {
@@ -52,14 +56,14 @@ function CartIcon() {
 }
 
 const primaryItems = [
-  { to: "/", label: "Home", icon: House },
+  { to: "/", label: "Beranda", icon: House },
   { to: "/produk", label: "Katalog", icon: Grid2x2 },
-  { to: "/tentang", label: "FAQ", icon: CircleHelp },
+  { to: "/faq", label: "FAQ", icon: CircleHelp },
   { to: "/testimoni", label: "Testimoni", icon: MessageSquareQuote },
 ];
 
 const utilityItems = [
-  { to: "/status", label: "Status & Riwayat", icon: Activity },
+  { to: "/status", label: "Lacak Order", icon: Activity },
   { to: "/admin", label: "Admin", icon: Shield },
 ];
 
@@ -104,7 +108,7 @@ function MenuLink({ item, index }) {
   );
 }
 
-function MobileMenu({ open, onClose, isDark, toggleTheme }) {
+function MobileMenu({ open, onClose, isDark, toggleTheme, utilityLinks = utilityItems }) {
   const menuRef = useRef(null);
   const location = useLocation();
   const previousPathRef = useRef(location.pathname);
@@ -212,7 +216,7 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
         <div className="mobile-menu-divider" />
 
         <div className="mobile-menu-stack">
-          {utilityItems.map((item, idx) => (
+          {utilityLinks.map((item, idx) => (
             <MenuLink key={item.to} item={item} index={primaryItems.length + 1 + idx} />
           ))}
         </div>
@@ -228,17 +232,24 @@ function MobileMenu({ open, onClose, isDark, toggleTheme }) {
 }
 
 export default function Header() {
-  const { items, remove, bumpToken, lastAddedVariantId } = useCart();
+  const { items, remove, bumpToken, lastAddedVariantId, openCartSheet } = useCart();
   const isHeaderShrunk = useHeaderShrink();
   const { isDark, toggleTheme } = useTheme();
   const toast = useToast();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
   const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.price_idr * item.qty, 0), [items]);
   const [open, setOpen] = useState(false);
-  const isMobileViewport = useIsMobile("(max-width: 1024px)");
+  const isCompactNav = useIsMobile(COMPACT_NAV_MEDIA);
+  const isPhoneLayout = useIsMobile(PHONE_LAYOUT_MEDIA);
   const headerRef = useRef(null);
   const navRef = useRef(null);
   const location = useLocation();
+  const [canAccessAdmin, setCanAccessAdmin] = useState(false);
+
+  const visibleUtilityItems = useMemo(
+    () => (canAccessAdmin ? utilityItems : utilityItems.filter((item) => item.to !== "/admin")),
+    [canAccessAdmin]
+  );
 
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
 
@@ -257,6 +268,21 @@ export default function Header() {
     } else {
       setPillStyle((prev) => ({ ...prev, opacity: 0 }));
     }
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    const syncAdmin = () => {
+      checkAdminAccess().then((result) => {
+        if (alive) setCanAccessAdmin(result.ok);
+      });
+    };
+    syncAdmin();
+    const { data: sub } = supabase.auth.onAuthStateChange(syncAdmin);
+    return () => {
+      alive = false;
+      sub?.subscription?.unsubscribe?.();
+    };
   }, []);
 
   useLayoutEffect(() => {
@@ -278,6 +304,7 @@ export default function Header() {
   const handleClose = useCallback(() => setOpen(false), []);
 
   const [showMiniCart, setShowMiniCart] = useState(false);
+
   const [pillBump, setPillBump] = useState(false);
   const [cartShake, setCartShake] = useState(false);
   const miniCartTimerRef = useRef(null);
@@ -292,13 +319,13 @@ export default function Header() {
   }, [bumpToken]);
 
   const handleCartMouseEnter = () => {
-    if (isMobileViewport) return;
+    if (isCompactNav) return;
     window.clearTimeout(miniCartTimerRef.current);
     setShowMiniCart(true);
   };
 
   const handleCartMouseLeave = () => {
-    if (isMobileViewport) return;
+    if (isCompactNav) return;
     miniCartTimerRef.current = window.setTimeout(() => {
       setShowMiniCart(false);
     }, 240);
@@ -320,13 +347,13 @@ export default function Header() {
   }, []);
 
   useEffect(() => {
-    document.body.classList.toggle("nav-open", open && isMobileViewport);
+    document.body.classList.toggle("nav-open", open && isCompactNav);
     return () => document.body.classList.remove("nav-open");
-  }, [isMobileViewport, open]);
+  }, [isCompactNav, open]);
 
   useEffect(() => {
-    if (!isMobileViewport && open) setOpen(false);
-  }, [isMobileViewport, open]);
+    if (!isCompactNav && open) setOpen(false);
+  }, [isCompactNav, open]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -394,21 +421,37 @@ export default function Header() {
               onMouseLeave={handleCartMouseLeave}
               style={{ position: "relative" }}
             >
-              <Link
-                to="/checkout"
-                state={{ backgroundLocation: location }}
-                className={`header-cart${cartShake ? " is-shaking" : ""}`}
-              >
-                <CartIcon />
-                {cartCount > 0 ? (
-                  <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
-                    {cartCount}
-                  </span>
-                ) : null}
-              </Link>
+              {isPhoneLayout ? (
+                <button
+                  type="button"
+                  className={`header-cart${cartShake ? " is-shaking" : ""}`}
+                  aria-label="Buka keranjang"
+                  onClick={openCartSheet}
+                >
+                  <CartIcon />
+                  {cartCount > 0 ? (
+                    <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
+                      {cartCount}
+                    </span>
+                  ) : null}
+                </button>
+              ) : (
+                <Link
+                  to="/checkout"
+                  state={{ backgroundLocation: location }}
+                  className={`header-cart${cartShake ? " is-shaking" : ""}`}
+                >
+                  <CartIcon />
+                  {cartCount > 0 ? (
+                    <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
+                      {cartCount}
+                    </span>
+                  ) : null}
+                </Link>
+              )}
 
               <AnimatePresence>
-                {showMiniCart && !isMobileViewport && (
+                {showMiniCart && !isPhoneLayout && (
                   <motion.div
                     className="mini-cart-popover"
                     initial={{ opacity: 0, y: 12, scale: 0.95 }}
@@ -488,9 +531,9 @@ export default function Header() {
               <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
             </div>
 
-            {!isMobileViewport ? (
+            {!isCompactNav && canAccessAdmin ? (
               <NavLink
-                to="/admin"
+                to="/admin/dashboard"
                 className={`header-iconAction${location.pathname.startsWith("/admin") ? " active" : ""}`}
                 aria-label="Admin"
                 title="Admin"
@@ -499,7 +542,7 @@ export default function Header() {
               </NavLink>
             ) : null}
 
-            {isMobileViewport ? (
+            {isCompactNav ? (
               <button
                 className="nav-toggle"
                 onClick={handleOpen}
@@ -514,7 +557,16 @@ export default function Header() {
         </div>
       </header>
 
-      {isMobileViewport ? <MobileMenu open={open} onClose={handleClose} isDark={isDark} toggleTheme={toggleTheme} /> : null}
+      {isCompactNav ? (
+        <MobileMenu
+          open={open}
+          onClose={handleClose}
+          isDark={isDark}
+          toggleTheme={toggleTheme}
+          utilityLinks={visibleUtilityItems}
+        />
+      ) : null}
+
     </>
   );
 }

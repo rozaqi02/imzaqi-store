@@ -1,0 +1,188 @@
+/* ── Visual UI sprint: floating priority, thumb zone, funnel mode ── */
+
+body.is-funnel .abandoned-cart-banner,
+body.is-funnel .fsp-backdrop,
+body.is-funnel .achievement-toast,
+body.is-funnel .ai-bubble {
+  display: none !important;
+}
+
+body.has-floating-order .scroll-to-top {
+  bottom: calc(88px + env(safe-area-inset-bottom));
+}
+
+/* Thumb-friendly CTAs in funnel */
+.checkout-floating-bar-btn,
+.checkout-summaryBtn,
+.pay-stickyCtaBtn,
+.st-checkBtn {
+  min-height: 48px;
+}
+
+.btn-wide,
+.pay-successActions .btn {
+  min-height: 48px;
+}
+
+/* Status order progress */
+.st-progressBar {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(92, 167, 255, 0.2);
+  background: rgba(29, 131, 255, 0.08);
+}
+
+.st-progressBar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.st-progressBar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent, #00d6b4), #5ce0ff);
+  transition: width 0.4s ease;
+}
+
+.st-progressBar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-text, #ecf8ff);
+}
+
+html[data-theme="light"] .st-progressBar {
+  background: rgba(0, 214, 180, 0.08);
+  border-color: rgba(0, 138, 148, 0.16);
+}
+
+html[data-theme="light"] .st-progressBar-label {
+  color: #234652;
+}
+
+/* Pay QRIS hero on mobile */
+@media (max-width: 720px) {
+  .pay-stageGrid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pay-stageVisual {
+    order: -1;
+  }
+
+  .pay-qrisFrame {
+    max-width: min(100%, 320px);
+    margin: 0 auto;
+  }
+
+  .qris-img {
+    max-width: 100%;
+  }
+}
+
+/* Admin mobile order cards */
+@media (max-width: 720px) {
+  .admin-orderListItem {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "check main"
+      "check meta"
+      "actions actions";
+    gap: 10px 12px;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .admin-orderListCheckbox {
+    grid-area: check;
+  }
+
+  .admin-orderListMain {
+    grid-area: main;
+  }
+
+  .admin-orderListRight {
+    grid-area: actions;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .admin-orderRowActions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .admin-orderInlineSelect {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.admin-nav-stockBadge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: #ff6b4a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
+/* Mini cart sheet moved to css/cart-sheet.css */
+
+.pay-trustStripWrap {
+  padding: 0 16px 8px;
+  max-width: 920px;
+  margin: 0 auto;
+}
+
+@media (max-width: 720px) {
+  .pay-trustStripWrap {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom));
+  }
+}
+
+.checkout-drawer .checkout-mobile-floating-bar--drawer {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12px 0 0 !important;
+  border-top: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  z-index: 2;
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+.checkout-drawer .checkout-mobile-floating-bar--drawer .checkout-floating-bar-btn {
+  min-height: 48px;
+}
+
+button.header-cart {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}
+

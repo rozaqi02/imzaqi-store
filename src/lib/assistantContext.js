@@ -24,6 +24,11 @@ const ROUTE_HINTS = {
     tags: ["status"],
     tip: "Masukkan ID order format IMZ-XXXX untuk lacak progres.",
   },
+  "/faq": {
+    label: "FAQ",
+    tags: ["toko", "bayar"],
+    tip: "Halaman FAQ punya jawaban lengkap soal order, bayar, dan garansi.",
+  },
   "/tentang": {
     label: "FAQ",
     tags: ["toko", "bayar"],

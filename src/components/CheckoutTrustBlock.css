@@ -1,0 +1,37 @@
+.checkout-trust-block {
+  display: grid;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.checkout-trust-block .social-proof-strip {
+  margin-top: 0;
+}
+
+.checkout-trust-loyalty {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(29, 131, 255, 0.22);
+  background: linear-gradient(135deg, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0.03));
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.checkout-trust-loyalty p {
+  margin: 0;
+}
+
+.checkout-trust-loyalty code {
+  font-weight: 800;
+  color: #9fe0ff;
+}
+
+html[data-theme="light"] .checkout-trust-loyalty {
+  border-color: rgba(0, 138, 148, 0.2);
+  background: rgba(0, 214, 180, 0.08);
+  color: #234652;
+}
+
+html[data-theme="light"] .checkout-trust-loyalty code {
+  color: #007b88;
+}

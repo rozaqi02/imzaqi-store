@@ -1,15 +1,18 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
+import { useFunnelRoute } from "../hooks/useFunnelRoute";
 import { Clock, Flame, X } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { formatIDR } from "../lib/format";
+import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import "./FlashSalePopup.css";
 
 const POPUP_STORAGE_KEY = "imzaqi_flash_sale_popup_shown_v2";
 
 export default function FlashSalePopup() {
   const navigate = useNavigate();
+  const isFunnel = useFunnelRoute();
   const [isOpen, setIsOpen] = useState(false);
   const [salesItems, setSalesItems] = useState([]);
   const [closestEndTime, setClosestEndTime] = useState(null);
@@ -18,6 +21,7 @@ export default function FlashSalePopup() {
   // 1. Fetch active flash sales and enrich with product/variant info
   useEffect(() => {
     let active = true;
+    let openTimer = null;
 
     async function loadPromoData() {
       try {
@@ -76,8 +80,11 @@ export default function FlashSalePopup() {
         if (enriched.length > 0) {
           setSalesItems(enriched);
           setClosestEndTime(minEndTime);
-          setIsOpen(true);
-          sessionStorage.setItem(POPUP_STORAGE_KEY, "1");
+          openTimer = window.setTimeout(() => {
+            if (!active) return;
+            setIsOpen(true);
+            sessionStorage.setItem(POPUP_STORAGE_KEY, "1");
+          }, OVERLAY_TIMING.flashSaleMs);
         }
       } catch (err) {
         console.warn("[FlashSalePopup] Gagal memuat data flash sale:", err);
@@ -88,6 +95,7 @@ export default function FlashSalePopup() {
 
     return () => {
       active = false;
+      if (openTimer) window.clearTimeout(openTimer);
     };
   }, []);
 
@@ -117,7 +125,7 @@ export default function FlashSalePopup() {
     return () => clearInterval(interval);
   }, [isOpen, closestEndTime]);
 
-  if (!isOpen || salesItems.length === 0) return null;
+  if (isFunnel || !isOpen || salesItems.length === 0) return null;
 
   return createPortal(
     <div

@@ -22,3 +22,11 @@
 
 /* Overrides v3 (Mobile blur, footer redesign, genZ accents) */
 @import "./css/overrides-v3.css";
+
+/* Visual UI sprint layer */
+@import "./css/visual-ui.css";
+
+/* Extracted layout modules */
+@import "./css/cart-sheet.css";
+@import "./css/fab-stack.css";
+@import "./css/light-mode-cards.css";

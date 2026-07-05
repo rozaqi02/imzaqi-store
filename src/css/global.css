@@ -143,14 +143,6 @@ html[data-theme="light"] body {
   overflow: visible !important;
 }
 
-/* Light mode: replace dark body gradient with light */
-html[data-theme="light"] body {
-  background:
-    radial-gradient(800px 400px at 20% -20%, rgba(0, 214, 180, 0.10) 0%, transparent 60%),
-    radial-gradient(600px 300px at 90% 10%, rgba(0, 138, 148, 0.08) 0%, transparent 50%),
-    var(--bg1);
-}
-
 ::selection {
   background: rgba(29, 131, 255, .28);
   color: #fff;
@@ -377,7 +369,7 @@ body.checkout-open {
   transform: translateY(-50%);
   width: 3px;
   height: 20px;
-  background: linear-gradient(180deg, #4effda, rgba(0, 214, 180, 0.88));
+  background: linear-gradient(180deg, #3fe8c8, rgba(0, 180, 150, 0.88));
   border-radius: 0 4px 4px 0;
   box-shadow: 0 0 10px rgba(0, 214, 180, 0.5);
   opacity: 0;
@@ -587,9 +579,10 @@ body.checkout-open {
 
 .app-shell {
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
-  background: inherit;
+  background: transparent;
 }
 
 .app-main {
@@ -607,6 +600,19 @@ body.checkout-open {
   flex: 1;
   display: flex;
   flex-direction: column;
+  background: transparent;
+}
+
+.app-main > .route-transition {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: transparent;
+}
+
+.app-main > .route-transition > .page {
+  flex: 1;
+  background: transparent;
 }
 
 .app-main-admin {
@@ -992,7 +998,7 @@ body.checkout-open {
 
 .page {
   padding-bottom: 90px;
-  background: var(--bg1);
+  background: transparent;
 }
 
 .section {
@@ -2617,9 +2623,25 @@ html[data-theme="light"] .mobile-menu a .menu-icon {
 }
 
 html[data-theme="light"] .mobile-menu a.active .menu-icon {
-  background: rgba(0, 214, 180, 0.14) !important;
-  border-color: rgba(0, 138, 148, 0.2) !important;
-  color: #0b7b89 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(180deg, rgba(0, 214, 180, 0.3), rgba(0, 194, 208, 0.14)) !important;
+  border-color: rgba(0, 138, 148, 0.34) !important;
+  color: #067b88 !important;
+  box-shadow:
+    0 4px 14px rgba(0, 138, 148, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+}
+
+html[data-theme="light"] .header-iconAction.active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(180deg, rgba(0, 214, 180, 0.26), rgba(0, 194, 208, 0.12));
+  border-color: rgba(0, 138, 148, 0.32);
+  color: #067b88;
+  box-shadow:
+    0 10px 22px rgba(0, 138, 148, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 html[data-theme="light"] .mobile-menu-close {
@@ -4049,7 +4071,7 @@ body.nav-open {
 
 html,
 body {
-  background: #d8fff5 !important;
+  background: transparent;
 }
 
 .global-bg,
@@ -4099,13 +4121,12 @@ body {
 
 @media (max-width: 768px) {
   .global-bg::after {
-    content: none !important;
-    display: none !important;
+    opacity: 0.06 !important;
   }
 
   .global-noise {
-    mix-blend-mode: normal !important;
-    filter: none !important;
+    mix-blend-mode: overlay !important;
+    filter: contrast(110%) brightness(100%) !important;
     opacity: 0.03 !important;
   }
 
@@ -4147,20 +4168,31 @@ body {
 
 @media (max-width: 720px) {
   body {
-    background: var(--brand-bg-start, #d8fff5) !important;
+    background:
+      radial-gradient(820px 420px at 18% -6%, var(--brand-aurora-a), rgba(0, 214, 180, 0) 58%),
+      radial-gradient(700px 380px at 86% 4%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 56%),
+      linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-end) 100%) !important;
   }
 
   .global-bg {
     background:
-      radial-gradient(700px 380px at 20% 0%, rgba(0, 255, 209, 0.10), rgba(0, 0, 0, 0) 65%),
-      radial-gradient(640px 420px at 88% 8%, rgba(120, 112, 255, 0.09), rgba(0, 0, 0, 0) 60%),
-      linear-gradient(180deg, #05070f 0%, #0b1220 100%) !important;
+      radial-gradient(820px 420px at 18% -4%, var(--brand-aurora-a), rgba(0, 214, 180, 0) 62%),
+      radial-gradient(700px 400px at 86% 6%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
+      radial-gradient(560px 320px at 50% 108%, rgba(0, 194, 208, 0.09), rgba(0, 0, 0, 0) 60%),
+      linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-mid, var(--brand-bg-end)) 42%, var(--brand-bg-end) 100%) !important;
   }
 
-  .global-bg::after,
+  .global-bg::after {
+    content: "" !important;
+    display: block !important;
+    opacity: 0.07;
+  }
+
   .global-noise {
-    content: none !important;
-    display: none !important;
+    content: auto !important;
+    display: block !important;
+    opacity: 0.028 !important;
+    mix-blend-mode: overlay !important;
   }
 
   .toast,
@@ -4480,6 +4512,19 @@ body {
 
 .nf-linkCard:hover .nf-linkArrow {
   color: rgba(29, 131, 255, 0.7);
+}
+
+.nf-popular {
+  margin-top: 36px;
+  text-align: left;
+}
+
+.nf-popular .h3 {
+  margin-bottom: 14px;
+}
+
+.nf-shell:has(.nf-popular) {
+  max-width: 920px;
 }
 
 .site-header {
@@ -4824,7 +4869,7 @@ html[data-theme="light"] .site-header {
 
 .site-footer {
   padding: 28px 0 40px;
-  background: var(--bg1);
+  background: transparent;
 }
 
 .site-footerPanel {
@@ -5667,199 +5712,7 @@ html[data-theme="light"] .input:focus-visible {
   }
 }
 
-/* ── Floating action stack (assistant + scroll-to-top) ── */
-html {
-  --fab-edge-x: max(18px, calc(18px + env(safe-area-inset-right)));
-  --fab-base-bottom: 18px;
-  --fab-lift: 0px;
-  --fab-assistant-size: 56px;
-  --fab-scroll-size: 44px;
-  --fab-gap: 12px;
-}
-
-@media (max-width: 720px) {
-  html {
-    --fab-edge-x: max(14px, calc(14px + env(safe-area-inset-right)));
-    --fab-base-bottom: 14px;
-    --fab-assistant-size: 52px;
-    --fab-scroll-size: 40px;
-    --fab-gap: 10px;
-  }
-}
-
-@media (max-width: 720px) {
-  body:has(.with-sticky-cta) {
-    --fab-lift: 78px;
-  }
-}
-
-/* ── Scroll-to-top button (item 8 CSS) ── */
-.scroll-to-top {
-  position: fixed;
-  right: var(--fab-edge-x);
-  bottom: calc(var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift) + var(--fab-assistant-size) + var(--fab-gap));
-  z-index: 9997;
-  width: var(--fab-scroll-size);
-  height: var(--fab-scroll-size);
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 26%),
-    rgba(8, 14, 31, 0.88);
-  color: rgba(234, 255, 245, 0.9);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
-  transition:
-    opacity 0.24s ease,
-    transform 0.24s ease,
-    visibility 0.24s ease;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(8px);
-}
-
-.scroll-to-top.is-visible {
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-}
-
-.scroll-to-top:hover {
-  transform: translateY(-2px);
-  border-color: rgba(79, 255, 200, 0.28);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 26%),
-    rgba(8, 14, 31, 0.92);
-}
-
-body:has(.ai-bubble.is-open) .scroll-to-top {
-  opacity: 0 !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
-}
-
-@media (max-width: 720px) {
-  .scroll-to-top {
-    border-radius: 12px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .scroll-to-top {
-    transition: opacity 0.1s ease, visibility 0.1s ease;
-    transform: none !important;
-  }
-}
-
-/* ── Floating Order Status Button ── */
-.floating-order-status {
-  position: fixed;
-  bottom: calc(var(--fab-base-bottom) + var(--fab-scroll-size) + var(--fab-gap) + 24px);
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 9998;
-  display: flex;
-  align-items: center;
-  gap: 0;
-}
-
-.floating-order-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 40px;
-  padding: 0 16px 0 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(0, 214, 180, 0.3);
-  background: rgba(8, 14, 31, 0.95);
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  cursor: pointer;
-  white-space: nowrap;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
-  transition: transform 0.18s ease, box-shadow 0.18s ease;
-  backdrop-filter: blur(8px);
-}
-
-.floating-order-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
-}
-
-.floating-order-btn:active {
-  transform: scale(0.97);
-}
-
-.floating-order-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00d6b4;
-  animation: floatingOrderPulse 2s ease-in-out infinite;
-}
-
-@keyframes floatingOrderPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.85); }
-}
-
-.floating-order-code {
-  letter-spacing: 0.04em;
-}
-
-.floating-order-dismiss {
-  display: grid;
-  place-items: center;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  border: none;
-  background: rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.5);
-  cursor: pointer;
-  margin-left: 6px;
-  flex-shrink: 0;
-  transition: background 0.15s;
-}
-
-.floating-order-dismiss:hover {
-  background: rgba(255, 255, 255, 0.2);
-  color: #fff;
-}
-
-html[data-theme="light"] .floating-order-btn {
-  background: rgba(255, 255, 255, 0.96);
-  border-color: rgba(0, 138, 148, 0.25);
-  color: #0d2d39;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
-}
-
-html[data-theme="light"] .floating-order-dismiss {
-  background: rgba(0, 0, 0, 0.06);
-  color: rgba(0, 0, 0, 0.35);
-}
-
-html[data-theme="light"] .floating-order-dismiss:hover {
-  background: rgba(0, 0, 0, 0.12);
-  color: rgba(0, 0, 0, 0.6);
-}
-
-@media (max-width: 720px) {
-  .floating-order-status {
-    bottom: calc(var(--fab-base-bottom) + 4px);
-    left: 50%;
-    transform: translateX(-50%);
-  }
-
-  .floating-order-btn {
-    height: 36px;
-    padding: 0 12px 0 10px;
-    font-size: 12px;
-  }
-}
+/* FAB stack moved to css/fab-stack.css */
 
 /* ── Item 10: Better Error Boundary ── */
 .aeb-page {

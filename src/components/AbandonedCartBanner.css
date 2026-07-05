@@ -1,0 +1,56 @@
+.abandoned-cart-banner {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 1200;
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(79, 255, 200, 0.24);
+  background: rgba(11, 18, 32, 0.92);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+}
+
+html[data-theme="light"] .abandoned-cart-banner {
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(0, 138, 148, 0.2);
+}
+
+.abandoned-cart-copy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.abandoned-cart-copy strong {
+  font-size: 12px;
+}
+
+.abandoned-cart-copy span {
+  font-size: 11px;
+  color: var(--brand-muted);
+}
+
+.abandoned-cart-dismiss {
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: inherit;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+
+@media (min-width: 721px) {
+  .abandoned-cart-banner {
+    left: auto;
+    right: 20px;
+    width: min(420px, calc(100vw - 40px));
+  }
+}

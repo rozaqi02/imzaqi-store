@@ -1104,3 +1104,22 @@ html[data-theme="light"] .pay-zoomTip {
   color: #5f7781;
 }
 
+/* Horizontal overflow guard — app-main-catalog uses overflow:visible */
+@media (max-width: 920px) {
+  .pay-page.pay-shell {
+    overflow-x: clip;
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .pay-page .container,
+  .pay-page .pay-shell-grid,
+  .pay-page .pay-mainStack,
+  .pay-page .pay-card,
+  .pay-page .pay-orderMobileCard,
+  .pay-page .qris-wrap {
+    min-width: 0;
+    max-width: 100%;
+  }
+}
+

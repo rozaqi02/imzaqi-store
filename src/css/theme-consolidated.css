@@ -33,9 +33,12 @@ code{
 
 .global-bg{
   background:
-    radial-gradient(1150px 560px at 12% -2%, rgba(0,214,180,.14), rgba(0,214,180,0) 56%),
-    radial-gradient(980px 540px at 84% 8%, rgba(0,138,148,.18), rgba(0,138,148,0) 58%),
-    linear-gradient(180deg, #030611, #040714) !important;
+    radial-gradient(1200px 700px at 18% 10%, rgba(0, 255, 209, 0.16), rgba(0, 0, 0, 0) 62%),
+    radial-gradient(980px 650px at 84% 22%, rgba(120, 112, 255, 0.14), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(900px 620px at 50% 105%, rgba(0, 194, 208, 0.10), rgba(0, 0, 0, 0) 58%),
+    radial-gradient(1150px 560px at 12% -2%, var(--brand-aurora-a), rgba(0, 214, 180, 0) 56%),
+    radial-gradient(980px 540px at 84% 8%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
+    linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-mid, var(--brand-bg-end)) 40%, var(--brand-bg-end) 100%) !important;
 }
 
 .global-noise{
@@ -129,15 +132,15 @@ code{
 .btn,
 .checkout-drawer .btn:not(.btn-ghost),
 .pay-shell .btn:not(.btn-ghost){
-  background:linear-gradient(135deg, #29f5d0 0%, #00d6b4 52%, #008a94 100%) !important;
-  border-color:rgba(79,255,200,.22) !important;
-  color:#032235 !important;
-  box-shadow:0 18px 44px rgba(0,214,180,.22) !important;
+  background:var(--imzaqi-btn-face) !important;
+  border-color:var(--imzaqi-btn-border) !important;
+  color:var(--imzaqi-btn-text) !important;
+  box-shadow:var(--imzaqi-btn-shadow) !important;
 }
 
 .btn:hover{
   filter:brightness(1.04) !important;
-  box-shadow:0 22px 56px rgba(0,214,180,.28) !important;
+  box-shadow:var(--imzaqi-btn-shadow-hover, var(--imzaqi-btn-shadow)) !important;
 }
 
 .btn:focus-visible{
@@ -624,9 +627,12 @@ body,
 
 .global-bg {
   background:
+    radial-gradient(1200px 700px at 18% 10%, rgba(0, 255, 209, 0.14), rgba(0, 0, 0, 0) 62%),
+    radial-gradient(980px 650px at 84% 22%, rgba(120, 112, 255, 0.12), rgba(0, 0, 0, 0) 60%),
+    radial-gradient(900px 620px at 50% 105%, rgba(0, 194, 208, 0.09), rgba(0, 0, 0, 0) 58%),
     radial-gradient(1150px 560px at 12% -2%, var(--brand-aurora-a), rgba(0, 214, 180, 0) 56%),
     radial-gradient(980px 540px at 84% 8%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
-    linear-gradient(180deg, var(--brand-bg-start), var(--brand-bg-end)) !important;
+    linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-mid, var(--brand-bg-end)) 40%, var(--brand-bg-end) 100%) !important;
 }
 
 .global-bg::after {
@@ -853,7 +859,7 @@ select.input {
 .hm-title-accent,
 .hm-title-glow {
   display: inline-block;
-  background: linear-gradient(135deg, #7dffe8 0%, #4effda 34%, #00c2b0 66%, #007a85 100%) !important;
+  background: linear-gradient(135deg, #5cf0d5 0%, #3fe8c8 34%, #00a88c 66%, #006b75 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -1481,6 +1487,17 @@ html[data-theme="light"] .nav-toggle {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
+html[data-theme="light"] .header-iconAction.active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(180deg, rgba(0, 214, 180, 0.26), rgba(0, 194, 208, 0.12)) !important;
+  border-color: rgba(0, 138, 148, 0.32) !important;
+  color: #067b88 !important;
+  box-shadow:
+    0 10px 22px rgba(0, 138, 148, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
 html[data-theme="light"] .nav-toggle span {
   background: rgba(15, 49, 64, 0.88) !important;
 }
@@ -2005,6 +2022,11 @@ html[data-theme="light"] .header-iconAction:hover {
     linear-gradient(180deg, rgba(0, 214, 180, 0.2), rgba(0, 138, 148, 0.14)) !important;
   border-color: rgba(79, 255, 200, 0.22) !important;
   color: var(--brand-icon) !important;
+}
+
+html[data-theme="light"] .header-iconAction.active svg {
+  color: #067b88 !important;
+  stroke: #067b88 !important;
 }
 
 .nav-toggle svg {
@@ -5182,8 +5204,8 @@ html[data-theme="light"] {
 
 .catalog-page .catalog-grid {
   overflow: visible !important;
-  padding: 6px 12px 14px !important;
-  margin: 0 -12px !important;
+  padding: 6px 4px 14px !important;
+  margin: 0 !important;
 }
 
 .home-page .flow-assist {
@@ -5233,8 +5255,8 @@ html[data-theme="light"] {
   }
 
   .catalog-page .catalog-grid {
-    padding: 4px 10px 10px !important;
-    margin: 0 -10px !important;
+    padding: 4px 2px 10px !important;
+    margin: 0 !important;
   }
 }
 
@@ -5397,7 +5419,7 @@ html[data-theme="light"] {
   min-width: 0 !important;
   overflow: visible !important;
   margin: -8px 0 -6px !important;
-  padding: 10px 8px 22px 4px !important;
+  padding: 10px 0 22px !important;
 }
 
 .catalog-page .catalog-quickChip {
@@ -5467,7 +5489,8 @@ html[data-theme="light"] {
     overflow-y: visible !important;
     gap: 8px !important;
     margin: -8px 0 -2px !important;
-    padding: 10px 4px 22px 2px !important;
+    padding: 10px 0 22px !important;
+    scroll-padding-inline: 0;
     scrollbar-width: none;
   }
 

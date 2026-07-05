@@ -1,0 +1,351 @@
+/* Admin Dashboard — comprehensive light mode (desktop + mobile) */
+
+html[data-theme="light"] .admin-page {
+  --adm-text: #123744;
+  --adm-muted: rgba(50, 82, 91, 0.82);
+  --adm-subtle: rgba(50, 82, 91, 0.62);
+  --adm-faint: rgba(50, 82, 91, 0.48);
+  --adm-surface: rgba(255, 255, 255, 0.96);
+  --adm-surface-soft: rgba(247, 253, 255, 0.92);
+  --adm-surface-muted: rgba(236, 248, 252, 0.9);
+  --adm-border: rgba(0, 138, 148, 0.14);
+  --adm-border-strong: rgba(0, 138, 148, 0.22);
+  --adm-accent: #067b88;
+  --adm-accent-soft: rgba(0, 214, 180, 0.14);
+  --adm-accent-mid: rgba(0, 194, 208, 0.12);
+  --adm-shadow: 0 12px 32px rgba(67, 111, 129, 0.1);
+  color: var(--adm-text);
+}
+
+/* ── Surfaces ── */
+html[data-theme="light"] .admin-page .admin-sidebar,
+html[data-theme="light"] .admin-page .admin-panel,
+html[data-theme="light"] .admin-page .admin-statCard,
+html[data-theme="light"] .admin-page .admin-miniCard,
+html[data-theme="light"] .admin-page .admin-overviewHero,
+html[data-theme="light"] .admin-page .admin-pulseCard,
+html[data-theme="light"] .admin-page .admin-storyCard,
+html[data-theme="light"] .admin-page .admin-trendCard,
+html[data-theme="light"] .admin-page .admin-kpiStrip,
+html[data-theme="light"] .admin-page .admin-mobileBar {
+  background: var(--adm-surface) !important;
+  border-color: var(--adm-border) !important;
+  box-shadow: var(--adm-shadow) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-product-row,
+html[data-theme="light"] .admin-page .admin-promo-row,
+html[data-theme="light"] .admin-page .admin-variant-row,
+html[data-theme="light"] .admin-page .admin-order-card,
+html[data-theme="light"] .admin-page .admin-thumb,
+html[data-theme="light"] .admin-page .admin-nav-btn,
+html[data-theme="light"] .admin-page .admin-brand,
+html[data-theme="light"] .admin-page .admin-topbar-current,
+html[data-theme="light"] .admin-page .admin-chip,
+html[data-theme="light"] .admin-page .admin-field-switch,
+html[data-theme="light"] .admin-page .admin-searchRow,
+html[data-theme="light"] .admin-page .admin-sidebarPulse,
+html[data-theme="light"] .admin-page .admin-order-notes,
+html[data-theme="light"] .admin-page .admin-order-adminNote,
+html[data-theme="light"] .admin-page .admin-proof,
+html[data-theme="light"] .admin-page .admin-testimonial-form,
+html[data-theme="light"] .admin-page .admin-flashForm,
+html[data-theme="light"] .admin-page .admin-order-item {
+  background: var(--adm-surface-soft) !important;
+  border-color: var(--adm-border) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] .admin-page .admin-product-row:hover,
+html[data-theme="light"] .admin-page .admin-promo-row:hover,
+html[data-theme="light"] .admin-page .admin-nav-btn:hover {
+  background: rgba(0, 138, 148, 0.06) !important;
+  border-color: var(--adm-border-strong) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-product-row.active {
+  background: var(--adm-accent-soft) !important;
+  border-color: rgba(0, 138, 148, 0.28) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-nav-btn {
+  color: var(--adm-text) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-nav-btn.active {
+  color: #0c4050 !important;
+  background:
+    linear-gradient(180deg, rgba(0, 214, 180, 0.18), rgba(0, 194, 208, 0.08)),
+    rgba(255, 255, 255, 0.88) !important;
+  border-color: rgba(0, 138, 148, 0.28) !important;
+  box-shadow: 0 12px 28px rgba(0, 138, 148, 0.12) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-nav-icon,
+html[data-theme="light"] .admin-page .admin-statIcon,
+html[data-theme="light"] .admin-page .admin-topbar-currentIcon {
+  background: var(--adm-accent-soft) !important;
+  border: 1px solid var(--adm-border) !important;
+  color: var(--adm-accent) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-nav-btn.active .admin-nav-icon {
+  background: rgba(0, 214, 180, 0.22) !important;
+  color: #056b74 !important;
+}
+
+html[data-theme="light"] .admin-page .admin-logo {
+  color: #056b74 !important;
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.1)) !important;
+  border-color: rgba(0, 138, 148, 0.24) !important;
+}
+
+/* ── Typography / muted copy ── */
+html[data-theme="light"] .admin-page .admin-brand-sub,
+html[data-theme="light"] .admin-page .admin-nav-copy small,
+html[data-theme="light"] .admin-page .admin-topbar-eyebrow,
+html[data-theme="light"] .admin-page .admin-topbar-current span:not(.admin-topbar-currentIcon),
+html[data-theme="light"] .admin-page .admin-statLabel,
+html[data-theme="light"] .admin-page .admin-panel-sub,
+html[data-theme="light"] .admin-page .admin-product-sub,
+html[data-theme="light"] .admin-page .admin-field > span,
+html[data-theme="light"] .admin-page .admin-variant-sub,
+html[data-theme="light"] .admin-page .admin-variant-desc,
+html[data-theme="light"] .admin-page .admin-order-sub,
+html[data-theme="light"] .admin-page .admin-promo-sub,
+html[data-theme="light"] .admin-page .admin-statHelper,
+html[data-theme="light"] .admin-page .admin-emptyInline,
+html[data-theme="light"] .admin-page .admin-miniMeta,
+html[data-theme="light"] .admin-page .admin-storyMeta,
+html[data-theme="light"] .admin-page .admin-trendMeta,
+html[data-theme="light"] .admin-page .admin-pulseMeta,
+html[data-theme="light"] .admin-page .admin-overviewSub,
+html[data-theme="light"] .admin-page .admin-order-itemPrice,
+html[data-theme="light"] .admin-page .admin-order-notesTitle,
+html[data-theme="light"] .admin-page .admin-exportDates label,
+html[data-theme="light"] .admin-page .admin-stockAlertBanner span,
+html[data-theme="light"] .admin-page .admin-mobileCopy span,
+html[data-theme="light"] .admin-page .admin-mobileTabMeta,
+html[data-theme="light"] .admin-page .hint,
+html[data-theme="light"] .admin-page .muted {
+  color: var(--adm-muted) !important;
+}
+
+html[data-theme="light"] .admin-page .h2,
+html[data-theme="light"] .admin-page .h3,
+html[data-theme="light"] .admin-page .admin-panel-title,
+html[data-theme="light"] .admin-page .admin-brand-title,
+html[data-theme="light"] .admin-page .admin-product-name,
+html[data-theme="light"] .admin-page .admin-variant-title,
+html[data-theme="light"] .admin-page .admin-order-code,
+html[data-theme="light"] .admin-page .admin-promo-code,
+html[data-theme="light"] .admin-page .admin-statValue,
+html[data-theme="light"] .admin-page .admin-topbar-current strong,
+html[data-theme="light"] .admin-page .admin-order-priceRow.total strong {
+  color: var(--adm-text) !important;
+}
+
+/* ── Forms ── */
+html[data-theme="light"] .admin-page .input,
+html[data-theme="light"] .admin-page .admin-textarea,
+html[data-theme="light"] .admin-page select,
+html[data-theme="light"] .admin-page textarea {
+  color: var(--adm-text) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-color: var(--adm-border) !important;
+}
+
+html[data-theme="light"] .admin-page .input::placeholder,
+html[data-theme="light"] .admin-page textarea::placeholder {
+  color: var(--adm-faint) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-searchInput {
+  color: var(--adm-text) !important;
+}
+
+/* ── Status & pills ── */
+html[data-theme="light"] .admin-page .admin-status,
+html[data-theme="light"] .admin-page .admin-product-pill {
+  color: var(--adm-text) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-status.pending,
+html[data-theme="light"] .admin-page .admin-product-pill.on {
+  color: #0b5cad !important;
+  background: rgba(0, 138, 148, 0.12) !important;
+  border-color: rgba(0, 138, 148, 0.24) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-status.processing {
+  color: #9a6700 !important;
+  background: rgba(255, 191, 74, 0.16) !important;
+  border-color: rgba(180, 120, 0, 0.24) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-status.done {
+  color: #0d7a45 !important;
+  background: rgba(80, 220, 146, 0.14) !important;
+  border-color: rgba(34, 150, 90, 0.24) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-status.cancelled,
+html[data-theme="light"] .admin-page .admin-product-pill.off {
+  color: #b4234a !important;
+  background: rgba(255, 73, 126, 0.1) !important;
+  border-color: rgba(255, 73, 126, 0.22) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-categoryTag {
+  color: var(--adm-accent) !important;
+  background: var(--adm-accent-soft) !important;
+  border-color: var(--adm-border) !important;
+}
+
+/* ── Alerts & banners ── */
+html[data-theme="light"] .admin-page .admin-alert {
+  color: #9f1239 !important;
+  background: rgba(255, 73, 126, 0.08) !important;
+  border-color: rgba(255, 73, 126, 0.22) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-stockAlertBanner {
+  background: linear-gradient(135deg, rgba(255, 180, 60, 0.12), rgba(255, 120, 40, 0.05)) !important;
+  border-color: rgba(180, 120, 0, 0.24) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-stockAlertBanner strong {
+  color: #9a6700 !important;
+}
+
+html[data-theme="light"] .admin-page .admin-stockAlertDismiss {
+  color: var(--adm-muted) !important;
+}
+
+/* ── Mobile tabs ── */
+html[data-theme="light"] .admin-page .admin-mobileTab {
+  color: var(--adm-muted) !important;
+  background: var(--adm-surface-soft) !important;
+  border-color: var(--adm-border) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-mobileTab.active {
+  color: #0c4050 !important;
+  background: var(--adm-accent-soft) !important;
+  border-color: rgba(0, 138, 148, 0.24) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-mobileTabIcon {
+  color: var(--adm-accent) !important;
+}
+
+/* ── Scrollbar ── */
+html[data-theme="light"] .admin-page .admin-sidebar {
+  scrollbar-color: rgba(0, 138, 148, 0.22) transparent;
+}
+
+html[data-theme="light"] .admin-page .admin-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 138, 148, 0.22);
+}
+
+/* ── Decorative pseudo-elements off in light ── */
+html[data-theme="light"] .admin-page .admin-overviewHero::before,
+html[data-theme="light"] .admin-page .admin-overviewHero::after {
+  display: none !important;
+}
+
+/* ── Order pricing rows ── */
+html[data-theme="light"] .admin-page .admin-order-priceRow,
+html[data-theme="light"] .admin-page .admin-order-promo,
+html[data-theme="light"] .admin-page .admin-order-notes.empty {
+  color: var(--adm-muted) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-order-priceRow.total {
+  color: var(--adm-text) !important;
+}
+
+/* ── Icon preview fallback ── */
+html[data-theme="light"] .admin-page .admin-icon-fallback,
+html[data-theme="light"] .admin-page .admin-product-icon-fallback {
+  color: var(--adm-accent) !important;
+  background: var(--adm-accent-soft) !important;
+}
+
+/* ── Light gaps: orders, charts, bulk, timeline, promo ── */
+html[data-theme="light"] .admin-page .admin-orderListItem {
+  background: var(--adm-surface-soft) !important;
+  border-color: var(--adm-border) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-orderListItem.is-selected {
+  background: var(--adm-accent-soft) !important;
+  border-color: rgba(0, 138, 148, 0.28) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-chartBar.orders,
+html[data-theme="light"] .admin-page .admin-progress span.orders {
+  background: linear-gradient(90deg, var(--adm-accent), rgba(0, 214, 180, 0.5)) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-rankIndex {
+  color: var(--adm-accent) !important;
+  background: var(--adm-accent-soft) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-chip.active {
+  color: #0c4050 !important;
+  background: var(--adm-accent-soft) !important;
+  border-color: rgba(0, 138, 148, 0.24) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-bulkBar {
+  background: var(--adm-accent-soft) !important;
+  border-color: var(--adm-border-strong) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-bulkCount {
+  color: var(--adm-text) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-orderTimeline,
+html[data-theme="light"] .admin-page .admin-timelineLabel {
+  color: var(--adm-muted) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-timelineDot.is-active,
+html[data-theme="light"] .admin-page .admin-timelineDot.is-done {
+  background: var(--adm-accent) !important;
+  border-color: var(--adm-accent) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-promo-searchIcon {
+  color: var(--adm-faint) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-status.reported {
+  color: #9a6700 !important;
+  background: rgba(255, 191, 74, 0.16) !important;
+  border-color: rgba(180, 120, 0, 0.24) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-capBanner {
+  color: var(--adm-muted) !important;
+  background: var(--adm-accent-soft) !important;
+  border-color: var(--adm-border) !important;
+}
+
+html[data-theme="light"] .admin-page .admin-promo-previewPrice {
+  color: #b4234a !important;
+}
+
+html[data-theme="light"] .admin-page .admin-nav-newBadge--warn {
+  background: #e67e00 !important;
+  color: #fff !important;
+}
+
+html[data-theme="light"] .admin-page .admin-brand-title {
+  background: none !important;
+  -webkit-text-fill-color: var(--adm-text) !important;
+  color: var(--adm-text) !important;
+}

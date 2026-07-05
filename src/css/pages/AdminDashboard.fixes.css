@@ -1,0 +1,372 @@
+/* Admin audit fixes — tokens, utilities, mobile guards */
+
+.admin-page {
+  --adm-accent: var(--accent, #00d6b4);
+  --adm-accent-soft: rgba(0, 214, 180, 0.14);
+  --adm-accent-mid: rgba(0, 194, 208, 0.12);
+  --adm-warn: #ff8c00;
+  --adm-danger: #ff3c64;
+  --adm-surface: rgba(255, 255, 255, 0.04);
+  --adm-surface-soft: rgba(255, 255, 255, 0.03);
+  --adm-border: rgba(255, 255, 255, 0.1);
+}
+
+.confirm-dialog-message {
+  margin: 0;
+  color: var(--brand-muted, rgba(255, 255, 255, 0.72));
+  line-height: 1.5;
+}
+
+.confirm-dialog-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.admin-initialLoad {
+  display: grid;
+  gap: 0;
+  margin-bottom: 14px;
+}
+
+.admin-capBanner {
+  margin-top: 14px;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.78);
+  background: rgba(0, 214, 180, 0.08);
+  border: 1px solid rgba(0, 214, 180, 0.18);
+}
+
+.admin-loadMore {
+  display: flex;
+  justify-content: center;
+  margin-top: 14px;
+  padding-bottom: 8px;
+}
+
+.admin-nav-newBadge--warn {
+  background: var(--adm-warn) !important;
+}
+
+.admin-promo-previewPrice {
+  color: var(--adm-danger);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+/* Order detail modal — waktu, produk, salin WA */
+.admin-orderDetailFacts {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-orderDetailFacts--solo {
+  grid-template-columns: 1fr;
+}
+
+.admin-orderDetailFact {
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--adm-border);
+  background: var(--adm-surface-soft);
+}
+
+.admin-orderDetailFact span {
+  display: block;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-orderDetailFact strong {
+  display: block;
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #eafff8;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-orderDetailFact small {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.48);
+}
+
+.admin-orderProductSummary {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+
+.admin-orderProductSummary li {
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: rgba(234, 255, 245, 0.9);
+  padding: 6px 8px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.admin-orderMetaValueRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 8px;
+}
+
+.admin-orderMetaValueRow strong {
+  margin-top: 0 !important;
+  font-variant-numeric: tabular-nums;
+}
+
+.admin-copyPhoneBtn {
+  display: inline-flex !important;
+  align-items: center;
+  gap: 4px;
+  min-height: 30px;
+  padding: 0 8px !important;
+  font-size: 11px !important;
+}
+
+.admin-orderItemsSection {
+  margin-bottom: 14px;
+}
+
+.admin-orderItemsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.admin-orderItemsHead strong {
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-orderItemsHead span {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.admin-order-itemMeta {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+@media (max-width: 560px) {
+  .admin-orderDetailFacts {
+    grid-template-columns: 1fr;
+  }
+}
+
+html[data-theme="light"] .admin-orderDetailFact,
+html[data-theme="light"] .modal .admin-orderDetailFact {
+  background: rgba(0, 138, 148, 0.06);
+  border-color: rgba(0, 138, 148, 0.18);
+}
+
+html[data-theme="light"] .admin-orderDetailFact strong,
+html[data-theme="light"] .modal .admin-orderDetailFact strong {
+  color: #123744;
+}
+
+html[data-theme="light"] .admin-orderDetailFact span,
+html[data-theme="light"] .admin-orderDetailFact small,
+html[data-theme="light"] .admin-orderItemsHead span,
+html[data-theme="light"] .admin-order-itemMeta,
+html[data-theme="light"] .modal .admin-orderDetailFact span,
+html[data-theme="light"] .modal .admin-orderDetailFact small,
+html[data-theme="light"] .modal .admin-orderItemsHead span,
+html[data-theme="light"] .modal .admin-order-itemMeta {
+  color: rgba(50, 82, 91, 0.72);
+}
+
+/* Modal portal di luar .admin-page — timeline & kartu order detail */
+html[data-theme="light"] .modal .admin-orderTimeline {
+  background: rgba(0, 138, 148, 0.06) !important;
+  border-color: rgba(0, 138, 148, 0.2) !important;
+}
+
+html[data-theme="light"] .modal .admin-timelineDot {
+  border: 2px solid rgba(0, 138, 148, 0.45) !important;
+  background: #fff !important;
+  color: rgba(50, 82, 91, 0.55) !important;
+  box-shadow: 0 2px 6px rgba(67, 111, 129, 0.08);
+}
+
+html[data-theme="light"] .modal .admin-timelineDot.is-active {
+  border-color: #067b88 !important;
+  background: rgba(0, 214, 180, 0.22) !important;
+  color: #045a62 !important;
+  box-shadow: 0 0 0 3px rgba(0, 214, 180, 0.18);
+}
+
+html[data-theme="light"] .modal .admin-timelineDot.is-done {
+  border-color: #0d7a45 !important;
+  background: rgba(80, 220, 146, 0.22) !important;
+  color: #0a5c34 !important;
+}
+
+html[data-theme="light"] .modal .admin-timelineLabel strong {
+  color: #123744 !important;
+  font-weight: 800;
+}
+
+html[data-theme="light"] .modal .admin-timelineLabel small {
+  color: rgba(50, 82, 91, 0.7) !important;
+}
+
+html[data-theme="light"] .modal .admin-timelineLine {
+  background: rgba(0, 138, 148, 0.28) !important;
+}
+
+html[data-theme="light"] .modal .admin-orderMetaCard {
+  background: rgba(0, 138, 148, 0.05) !important;
+  border-color: rgba(0, 138, 148, 0.16) !important;
+}
+
+html[data-theme="light"] .modal .admin-orderMetaCard span {
+  color: rgba(50, 82, 91, 0.65) !important;
+}
+
+html[data-theme="light"] .modal .admin-orderMetaCard strong {
+  color: #123744 !important;
+}
+
+html[data-theme="light"] .modal .admin-orderMetaCard small,
+html[data-theme="light"] .modal .admin-orderMetaCard a {
+  color: #067b88 !important;
+}
+
+html[data-theme="light"] .modal .admin-order-item {
+  background: rgba(0, 138, 148, 0.04) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+}
+
+html[data-theme="light"] .modal .admin-order-item b {
+  color: #123744 !important;
+}
+
+html[data-theme="light"] .modal .admin-orderItemsHead strong {
+  color: #123744 !important;
+}
+
+html[data-theme="light"] .modal .admin-order-notes,
+html[data-theme="light"] .modal .admin-order-adminNote {
+  background: rgba(0, 138, 148, 0.04) !important;
+  border-color: rgba(0, 138, 148, 0.12) !important;
+  color: #123744 !important;
+}
+
+/* Timeline dots above connector line */
+.admin-timelineDot {
+  position: relative;
+  z-index: 1;
+}
+
+.admin-flowAssist {
+  margin-top: 12px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid var(--adm-border);
+  background: var(--adm-surface-soft);
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Charts & data viz — emerald tokens */
+.admin-page .admin-chartBar.orders,
+.admin-page .admin-progress span.orders {
+  background: linear-gradient(90deg, var(--adm-accent), rgba(0, 214, 180, 0.55)) !important;
+}
+
+.admin-page .admin-rankIndex {
+  background: var(--adm-accent-soft) !important;
+  color: var(--adm-accent) !important;
+  border-color: rgba(0, 214, 180, 0.22) !important;
+}
+
+.admin-page .admin-chip.active {
+  background: var(--adm-accent-soft) !important;
+  border-color: rgba(0, 214, 180, 0.28) !important;
+  color: #d9fff6 !important;
+}
+
+.admin-page .admin-bulkBar {
+  background: linear-gradient(90deg, rgba(0, 214, 180, 0.12), rgba(0, 194, 208, 0.06)) !important;
+  border-color: rgba(0, 214, 180, 0.2) !important;
+}
+
+.admin-page .admin-bulkCount {
+  color: #a4fff0 !important;
+}
+
+.admin-page .admin-orderListItem.is-selected {
+  background: rgba(0, 214, 180, 0.08) !important;
+  border-color: rgba(0, 214, 180, 0.24) !important;
+}
+
+.admin-page .admin-promo-searchIcon {
+  color: rgba(255, 255, 255, 0.45);
+}
+
+.admin-page .admin-status.reported {
+  color: #f5c842;
+  background: rgba(255, 191, 74, 0.12);
+  border-color: rgba(255, 191, 74, 0.24);
+}
+
+/* Hide store distractions on admin */
+body.is-admin .fsp-backdrop,
+body.is-admin .ai-bubble,
+body.is-admin .ai-backdrop,
+body.is-admin .ai-panel,
+body.is-admin .abandoned-cart-banner {
+  display: none !important;
+}
+
+/* Mobile: hide inline status select — use detail modal */
+@media (max-width: 720px) {
+  /* Detail pesanan & modal admin: tanpa backdrop blur (lebih ringan di HP) */
+  body.is-admin .modal-backdrop {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.58) !important;
+  }
+
+  html[data-theme="light"] body.is-admin .modal-backdrop {
+    background: rgba(12, 32, 42, 0.42) !important;
+  }
+
+  .admin-page .admin-orderInlineSelect {
+    display: none !important;
+  }
+
+  .admin-page .admin-mobileControls {
+    display: contents !important;
+  }
+
+  .admin-page .admin-sidebar {
+    display: none !important;
+  }
+
+  .admin-page .admin-mobileTabs {
+    backdrop-filter: none !important;
+  }
+}

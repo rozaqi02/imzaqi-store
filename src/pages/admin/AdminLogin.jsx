@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
 import { KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
 import { supabase } from "../../lib/supabaseClient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
 import { warn } from "../../lib/log";
+import { checkAdminAccess, checkIsAdmin } from "../../lib/adminAuth";
 import "../../css/pages/AdminLogin.css";
 
 export default function AdminLogin() {
   const nav = useNavigate();
+  const [searchParams] = useSearchParams();
   const toast = useToast();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -16,8 +18,14 @@ export default function AdminLogin() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
-      if (data?.session) nav("/admin/dashboard");
+    if (searchParams.get("error") === "not_admin") {
+      setMsg("Akun ini tidak punya akses admin. Hubungi pemilik toko.");
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
+    checkAdminAccess().then((result) => {
+      if (result.ok) nav("/admin/dashboard");
     });
   }, [nav]);
 
@@ -45,6 +53,16 @@ export default function AdminLogin() {
     }
 
     if (data?.session) {
+      const isAdmin = await checkIsAdmin(data.session.user);
+      if (!isAdmin) {
+        await supabase.auth.signOut();
+        setMsg(
+          "Akun ini tidak terdaftar di admin_users. Pastikan email kamu sudah ditambahkan di database Supabase."
+        );
+        toast.error("Akses ditolak");
+        setSubmitting(false);
+        return;
+      }
       nav("/admin/dashboard");
       return;
     }
@@ -78,31 +96,42 @@ export default function AdminLogin() {
             </div>
 
             <div className="admin-loginFormWrap">
-              <form onSubmit={onLogin} className="form admin-loginForm">
-                <label className="label">Email</label>
+              <form onSubmit={onLogin} className="form admin-loginForm" noValidate>
+                <label className="label" htmlFor="admin-login-email">Email</label>
                 <input
+                  id="admin-login-email"
                   className="input"
+                  type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@email.com"
                   autoComplete="username"
+                  required
+                  aria-invalid={msg ? "true" : undefined}
+                  aria-describedby={msg ? "admin-login-error" : undefined}
                 />
 
-                <label className="label">Password</label>
+                <label className="label" htmlFor="admin-login-password">Password</label>
                 <input
+                  id="admin-login-password"
                   className="input"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password"
                   autoComplete="current-password"
+                  required
                 />
 
                 <button className="btn btn-wide" type="submit" disabled={submitting}>
                   {submitting ? "Masuk..." : "Masuk admin"}
                 </button>
 
-                {msg ? <div className="hint">{msg}</div> : null}
+                {msg ? (
+                  <div id="admin-login-error" className="hint" role="alert">
+                    {msg}
+                  </div>
+                ) : null}
               </form>
             </div>
           </div>

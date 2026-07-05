@@ -11,6 +11,7 @@ import {
 import { getRouteContext } from "../lib/assistantContext";
 import { answerQuery } from "../lib/assistantMatcher";
 import AssistantMark from "./AssistantMark";
+import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 
 const ROUTES_HIDDEN = ["/checkout", "/bayar", "/admin"];
 
@@ -76,18 +77,43 @@ export default function AssistantBubble() {
   );
 
   useEffect(() => {
-    if (hidden) return;
+    if (hidden) return undefined;
     try {
-      const closedBefore = localStorage.getItem("imzaqi_assistant_opened") === "true";
-      if (!closedBefore) {
-        const timer = setTimeout(() => {
-          setShowTooltip(true);
-        }, 4000);
-        return () => clearTimeout(timer);
-      }
-    } catch (e) {
-      // LocalStorage fallback for private browsers
+      if (localStorage.getItem("imzaqi_assistant_opened") === "true") return undefined;
+    } catch {
+      return undefined;
     }
+
+    let shown = false;
+    let scrolledEnough = typeof window !== "undefined" && window.scrollY >= OVERLAY_TIMING.assistantMinScrollY;
+    let elapsed = false;
+
+    function maybeShow() {
+      if (!shown && scrolledEnough && elapsed) {
+        shown = true;
+        setShowTooltip(true);
+      }
+    }
+
+    const elapsedTimer = window.setTimeout(() => {
+      elapsed = true;
+      maybeShow();
+    }, OVERLAY_TIMING.assistantMs);
+
+    const onScroll = () => {
+      if (window.scrollY >= OVERLAY_TIMING.assistantMinScrollY) {
+        scrolledEnough = true;
+        maybeShow();
+      }
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    maybeShow();
+
+    return () => {
+      window.clearTimeout(elapsedTimer);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [hidden]);
 
   function handleOpen() {

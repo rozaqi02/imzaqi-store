@@ -1,0 +1,78 @@
+/* Light mode: flatter, more readable product surfaces */
+html[data-theme="light"] .product-tile {
+  box-shadow:
+    0 10px 28px rgba(40, 90, 105, 0.1),
+    0 0 0 1px rgba(0, 138, 148, 0.08);
+}
+
+html[data-theme="light"] .product-tile:hover {
+  box-shadow:
+    0 14px 32px rgba(40, 90, 105, 0.14),
+    0 0 0 1px rgba(0, 138, 148, 0.12);
+}
+
+html[data-theme="light"] .card.pad,
+html[data-theme="light"] .catalog-emptyResult {
+  box-shadow: var(--uni-shadow);
+}
+
+html[data-theme="light"] .product-tile-pill {
+  box-shadow: none;
+  border: 1px solid rgba(0, 138, 148, 0.1);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+html[data-theme="light"] h1,
+html[data-theme="light"] h2,
+html[data-theme="light"] h3,
+html[data-theme="light"] h4,
+html[data-theme="light"] h5,
+html[data-theme="light"] h6 {
+  text-shadow: none;
+}
+
+html[data-theme="light"] .product-tile-face {
+  box-shadow: none;
+}
+
+.catalog-emptyResult {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.catalog-emptyResult .empty {
+  width: 100%;
+}
+
+.catalog-emptyResult .empty-icon-component {
+  color: var(--accent, #00d6b4);
+}
+
+.catalog-searchHistoryHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.catalog-searchHistoryLabel {
+  padding: 8px 12px 4px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.catalog-searchHistoryClear {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px 12px 4px;
+}

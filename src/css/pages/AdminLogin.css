@@ -117,6 +117,19 @@ html[data-theme="light"] .admin-loginForm .hint {
   color: rgba(26, 72, 86, 0.84);
 }
 
+html[data-theme="light"] .admin-loginFormWrap,
+html[data-theme="light"] .admin-loginAside .h2,
+html[data-theme="light"] .admin-loginForm .label,
+html[data-theme="light"] .admin-loginForm .input {
+  color: #123744;
+}
+
+html[data-theme="light"] .admin-loginBadge {
+  color: #067b88;
+  background: rgba(0, 214, 180, 0.12);
+  border-color: rgba(0, 138, 148, 0.18);
+}
+
 @media (max-width: 760px) {
   .admin-loginShell {
     grid-template-columns: 1fr;

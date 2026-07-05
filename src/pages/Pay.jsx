@@ -16,9 +16,12 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { addOrderToHistory } from "../lib/orderHistory";
+import { getReferralCode } from "../lib/referral";
+import { recordCompletedOrder, LOYALTY_PROMO_CODE } from "../lib/loyalty";
 import { copyToClipboard } from "../utils/clipboard";
 import { warn } from "../lib/log";
 import { saveBuyerName } from "../lib/greeting";
+import TrustStrip from "../components/TrustStrip";
 import "../css/pages/Pay.css";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
@@ -256,8 +259,8 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
 
         <div className="modal-head pay-successHead">
           <div>
-            <div className="modal-title">Order dibuat 🎉</div>
-            <div className="modal-sub">Simpen ID ini, nanti buka halaman status kalo perlu.</div>
+            <div className="modal-title">Pembayaran siap 🎉</div>
+            <div className="modal-sub">Salin ID order di bawah, lalu lacak progresnya kapan saja.</div>
           </div>
           <button className="icon-btn" type="button" onClick={onClose} aria-label="Tutup">
             <X size={18} />
@@ -272,11 +275,11 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
             </div>
             <div className="pay-successStep is-active">
               <span>2</span>
-              Simpen ID
+              Salin ID
             </div>
             <div className="pay-successStep">
               <span>3</span>
-              Cek status
+              Lacak order
             </div>
           </div>
 
@@ -290,15 +293,15 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode pay-successCode--animate">{orderCode}</div>
-            <p className="pay-successLead">ID ini bakal dipake tiap kali kamu ngecek progres order.</p>
+            <p className="pay-successLead">Simpan ID ini — dipakai setiap kali kamu cek status order.</p>
           </div>
 
           <div className="pay-successActions">
-            <Link className="btn btn-wide" to={statusUrl}>
-              Cek Status
+            <Link className="btn btn-wide btn-primary" to={statusUrl}>
+              Lacak Order
             </Link>
             <button className="btn btn-ghost" type="button" onClick={copyCode}>
-              {copied ? "✓ Tersalin" : "Salin ID"}
+              {copied ? "✓ ID tersalin" : "Salin ID"}
             </button>
             <a className="btn btn-ghost" href={adminWaUrl} target="_blank" rel="noreferrer">
               Chat Admin
@@ -647,6 +650,8 @@ export default function Pay() {
     const parts = [];
     if (buyerEmail.trim()) parts.push(`Email buyer: ${buyerEmail.trim()}`);
     if (notes.trim()) parts.push(notes.trim());
+    const ref = getReferralCode();
+    if (ref) parts.push(`Ref: ${ref}`);
     return parts.join("\n");
   }, [buyerEmail, notes]);
   const hasValidWhatsApp = Boolean(customerWhatsApp && isWaValid);
@@ -915,14 +920,18 @@ export default function Pay() {
       if (hasPricingMismatch && !isFreeOrder) {
         // Log mismatch details in the database and mark as paid_reported for manual review
         const mismatchNotes = `[PERINGATAN: Selisih Harga! Bayar: ${formatIDR(total)}, DB: ${formatIDR(canonicalOrder.total)}]\n` + (noteText || "");
-        await supabase
-          .from("orders")
-          .update({
-            status: "paid_reported",
-            notes: mismatchNotes
-          })
-          .eq("id", createdOrder.id);
-        
+        const { error: rpcError } = await supabase.rpc("report_order_payment_mismatch", {
+          p_order_id: createdOrder.id,
+          p_notes: mismatchNotes,
+        });
+        if (rpcError) {
+          const { error: updateError } = await supabase
+            .from("orders")
+            .update({ status: "paid_reported", notes: mismatchNotes })
+            .eq("id", createdOrder.id);
+          if (updateError) throw updateError;
+        }
+
         createdOrder.status = "paid_reported";
         createdOrder.notes = mismatchNotes;
       }
@@ -944,6 +953,10 @@ export default function Pay() {
         total_idr: canonicalOrder.total,
         status: "pending",
       });
+      const loyaltyResult = recordCompletedOrder();
+      if (loyaltyResult.unlocked) {
+        toast.success(`Promo ${LOYALTY_PROMO_CODE} terbuka! Pakai di checkout berikutnya.`, { duration: 5000 });
+      }
       if (loadingId) toast.remove(loadingId);
       toast.success("ID order berhasil dibuat.");
     } catch (error) {
@@ -1330,6 +1343,12 @@ export default function Pay() {
         qrisUrl={qris.url}
         onClose={() => setIsZoomed(false)}
       />
+
+      {!ok && !orderCode && items.length > 0 ? (
+        <div className="pay-trustStripWrap">
+          <TrustStrip compact />
+        </div>
+      ) : null}
 
       {!ok && !orderCode && items.length > 0 && canShowQris ? (
         <div className="pay-stickyCta">

@@ -2,6 +2,7 @@ import { useMemo, useState, useCallback, useRef } from "react";
 import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
+import { useIsMobile } from "../hooks/useIsMobile";
 import { formatIDR, classifyStock, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
 import "./ProductTile.css";
 
@@ -21,9 +22,18 @@ function toggleFavorite(id) {
 export default function ProductTile({ product, rank, layout = "list", disableTilt = false }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
+  const isMobileViewport = useIsMobile("(max-width: 720px)");
+  const useFlipCard = isGrid && !isMobileViewport;
   const [isFav, setIsFav] = useState(() => getFavorites().includes(product?.id));
   const [heartFloats, setHeartFloats] = useState([]);
   const lastTapRef = useRef(0);
+  const prefetchedRef = useRef(false);
+
+  const prefetchDetail = useCallback(() => {
+    if (prefetchedRef.current || !product?.slug) return;
+    prefetchedRef.current = true;
+    import("../pages/ProductDetail").catch(() => {});
+  }, [product?.slug]);
 
   const handleDoubleTap = useCallback((e) => {
     const now = Date.now();
@@ -143,7 +153,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
             <span>5 Menit</span>
           </span>
           {classifyStock(stock) === "low" ? (
-            <span className="product-lowStockBadge">Hampir habis</span>
+            <span className="product-lowStockBadge">Sisa {stock}</span>
           ) : classifyStock(stock) === "out" ? (
             <span className="product-lowStockBadge out">Habis</span>
           ) : null}
@@ -159,10 +169,12 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
   return (
     <Link
       to={`/produk/${product.slug}`}
-      className={`product-tile product-tile--${isGrid ? "grid" : "list"}${isGrid ? " product-tile--flippable" : ""}${isFav ? " is-fav" : ""}`}
+      className={`product-tile product-tile--${isGrid ? "grid" : "list"}${useFlipCard ? " product-tile--flippable" : ""}${isFav ? " is-fav" : ""}`}
       role="listitem"
       aria-label={`Buka detail ${product?.name || "produk"}`}
       onClick={handleDoubleTap}
+      onMouseEnter={prefetchDetail}
+      onFocus={prefetchDetail}
       style={{ position: "relative" }}
     >
       {heartFloats.map((f) => (
@@ -170,7 +182,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
       ))}
       {isFav ? <span className="product-tile-favBadge" aria-label="Favorit" aria-hidden="true">❤️</span> : null}
       <div ref={disableTilt ? null : tiltRef} className="product-tile-tiltWrap">
-        {isGrid ? (
+        {useFlipCard ? (
           <>
             {/* Front face */}
             <div className="product-tile-face product-tile-front">
