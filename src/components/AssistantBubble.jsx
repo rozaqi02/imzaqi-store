@@ -10,8 +10,14 @@ import {
 } from "../data/assistantQA";
 import { getRouteContext } from "../lib/assistantContext";
 import { answerQuery } from "../lib/assistantMatcher";
+import { warn } from "../lib/log";
 import AssistantMark from "./AssistantMark";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
+import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
+
+const TOOLTIP_AUTO_HIDE_MS = 10_000;
+const FOCUSABLE_SELECTOR =
+  'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
 const ROUTES_HIDDEN = ["/checkout", "/bayar", "/admin"];
 
@@ -29,6 +35,30 @@ function getGreeting(pathname) {
     return `Hai 👋 Aku **Imzaqi AI**. Kamu lagi di halaman **${route.label}** — ${route.tip} Pilih topik atau ketik langsung.`;
   }
   return "Hai 👋 Aku **Imzaqi AI**, asisten pintar toko ini. Pilih topik di bawah atau ketik pertanyaanmu — aku pahami konteks halaman & obrolan sebelumnya.";
+}
+
+function getTooltipText(pathname) {
+  const route = getRouteContext(pathname);
+  if (route) {
+    return `Butuh bantuan di halaman ${route.label}? Tanya Imzaqi AI`;
+  }
+  return "Butuh bantuan? Tanya Imzaqi AI";
+}
+
+function hasAssistantOpened() {
+  try {
+    return localStorage.getItem("imzaqi_assistant_opened") === "true";
+  } catch {
+    return false;
+  }
+}
+
+function isTooltipDismissed() {
+  try {
+    return localStorage.getItem("imzaqi_assistant_tooltip_dismissed") === "true";
+  } catch {
+    return false;
+  }
 }
 
 /** Renders a paragraph with simple bold (**text**), code (`text`), and (url) links */
@@ -59,8 +89,159 @@ function FormattedLine({ text }) {
   );
 }
 
+function tooltipKeyHandlers(handleOpen) {
+  return {
+    onKeyDown: (e) => {
+      if (e.key === "Enter" || e.key === " ") {
+        e.preventDefault();
+        handleOpen();
+      }
+    },
+  };
+}
+
+function AssistantPanelBody({
+  panelRef,
+  inputRef,
+  scrollRef,
+  greeting,
+  history,
+  typing,
+  draft,
+  setDraft,
+  setOpen,
+  suggestions,
+  reset,
+  ask,
+  askCustom,
+}) {
+  return (
+    <>
+      <div className="ai-panelAmbient" aria-hidden="true">
+        <div className="ai-panelOrb ai-panelOrb--1" />
+        <div className="ai-panelOrb ai-panelOrb--2" />
+        <div className="ai-panelGrid" />
+      </div>
+      <header className="ai-head ai-head--premium">
+        <div className="ai-headIcon" aria-hidden="true">
+          <AssistantMark size={18} className="ai-markHead" variant="header" />
+        </div>
+        <div className="ai-headCopy">
+          <div className="ai-headTitleRow">
+            <strong>Imzaqi AI</strong>
+            <span className="ai-statusBadge">
+              <span className="ai-statusDot" />
+              Online
+            </span>
+          </div>
+          <span>Paham konteks halaman & obrolan</span>
+        </div>
+        <button
+          type="button"
+          className="ai-headClose"
+          onClick={() => setOpen(false)}
+          aria-label="Tutup"
+        >
+          <X size={16} />
+        </button>
+      </header>
+
+      <div className="ai-scroll" ref={scrollRef}>
+        <div className="ai-msg ai-msg--assistant">
+          <div className="ai-avatar" aria-hidden="true">
+            <AssistantMark size={14} className="ai-markAvatar" variant="avatar" />
+          </div>
+          <div className="ai-bubbleMsg ai-bubbleMsg--glass">
+            <FormattedLine text={greeting} />
+          </div>
+        </div>
+
+        {history.map((item, idx) => (
+          <React.Fragment key={`h-${idx}-${item.id}`}>
+            <div className="ai-msg ai-msg--user">
+              <div className="ai-bubbleMsg">
+                <p className="ai-bubbleText">{item.q}</p>
+              </div>
+            </div>
+            <div className="ai-msg ai-msg--assistant">
+              <div className="ai-avatar" aria-hidden="true">
+                <AssistantMark size={14} className="ai-markAvatar" variant="avatar" />
+              </div>
+              <div className="ai-bubbleMsg ai-bubbleMsg--glass">
+                {(idx === history.length - 1 && (typing || item._pending)) || (item._pending && !item.a.length) ? (
+                  <div className="ai-typing">
+                    <span /><span /><span />
+                  </div>
+                ) : (
+                  item.a.map((line, li) => <FormattedLine key={li} text={line} />)
+                )}
+              </div>
+            </div>
+          </React.Fragment>
+        ))}
+      </div>
+
+      <div className="ai-suggest">
+        {history.length > 0 && (
+          <div className="ai-suggestHead" style={{ justifyContent: "flex-end", paddingBottom: "4px" }}>
+            <button type="button" className="ai-resetBtn" onClick={reset}>
+              Mulai ulang
+            </button>
+          </div>
+        )}
+
+        {!typing && suggestions.length > 0 ? (
+          <div className="ai-suggestList">
+            {suggestions.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className="ai-chip"
+                onClick={() => ask(item.id)}
+                disabled={typing}
+              >
+                {item.q}
+              </button>
+            ))}
+          </div>
+        ) : null}
+
+        <form
+          className="ai-inputBar"
+          onSubmit={(e) => {
+            e.preventDefault();
+            askCustom();
+          }}
+        >
+          <input
+            ref={inputRef}
+            className="ai-input"
+            type="text"
+            placeholder="Tanya apa saja…"
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            maxLength={300}
+            disabled={typing}
+            aria-label="Pertanyaan kamu"
+          />
+          <button
+            type="submit"
+            className="ai-sendBtn"
+            disabled={!draft.trim() || typing}
+            aria-label="Kirim"
+          >
+            <Send size={15} strokeWidth={2.4} />
+          </button>
+        </form>
+      </div>
+    </>
+  );
+}
+
 export default function AssistantBubble() {
   const location = useLocation();
+  const motionMode = useAdaptiveMotion();
+  const motionFull = motionMode === "full";
   const hidden = shouldHide(location.pathname);
 
   const [open, setOpen] = useState(false);
@@ -68,21 +249,35 @@ export default function AssistantBubble() {
   const [typing, setTyping] = useState(false);
   const [draft, setDraft] = useState("");
   const [showTooltip, setShowTooltip] = useState(false);
+  const [fabOpened, setFabOpened] = useState(hasAssistantOpened);
   const scrollRef = useRef(null);
   const inputRef = useRef(null);
+  const panelRef = useRef(null);
 
   const greeting = useMemo(
     () => getGreeting(location.pathname),
     [location.pathname]
   );
 
+  const tooltipText = useMemo(
+    () => getTooltipText(location.pathname),
+    [location.pathname]
+  );
+
+  function dismissTooltip(persist = true) {
+    setShowTooltip(false);
+    if (persist) {
+      try {
+        localStorage.setItem("imzaqi_assistant_tooltip_dismissed", "true");
+      } catch {
+        // Ignore write restriction
+      }
+    }
+  }
+
   useEffect(() => {
     if (hidden) return undefined;
-    try {
-      if (localStorage.getItem("imzaqi_assistant_opened") === "true") return undefined;
-    } catch {
-      return undefined;
-    }
+    if (hasAssistantOpened() || isTooltipDismissed()) return undefined;
 
     let shown = false;
     let scrolledEnough = typeof window !== "undefined" && window.scrollY >= OVERLAY_TIMING.assistantMinScrollY;
@@ -116,20 +311,67 @@ export default function AssistantBubble() {
     };
   }, [hidden]);
 
+  useEffect(() => {
+    if (!showTooltip || open) return undefined;
+    const autoHideTimer = window.setTimeout(() => dismissTooltip(false), TOOLTIP_AUTO_HIDE_MS);
+    return () => window.clearTimeout(autoHideTimer);
+  }, [showTooltip, open, location.pathname]);
+
   function handleOpen() {
     setOpen((v) => {
       const next = !v;
       if (next) {
-        setShowTooltip(false);
+        dismissTooltip(false);
+        setFabOpened(true);
         try {
           localStorage.setItem("imzaqi_assistant_opened", "true");
-        } catch (e) {
+        } catch {
           // Ignore write restriction
         }
       }
       return next;
     });
   }
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 80);
+    return () => window.clearTimeout(focusTimer);
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return undefined;
+
+    function onKeyDown(e) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setOpen(false);
+        return;
+      }
+
+      if (e.key !== "Tab" || !panelRef.current) return;
+
+      const focusable = Array.from(
+        panelRef.current.querySelectorAll(FOCUSABLE_SELECTOR)
+      ).filter((el) => el.offsetParent !== null);
+
+      if (!focusable.length) return;
+
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   const lastItem = history.length ? history[history.length - 1] : null;
   const suggestions = useMemo(() => {
@@ -198,184 +440,167 @@ export default function AssistantBubble() {
 
   if (hidden || typeof document === "undefined") return null;
 
+  const bubbleClassName = `ai-bubble ${open ? "is-open" : ""} ${showTooltip && !open ? "ai-bubble--pulse" : ""}${
+    !motionFull && motionMode === "lite" ? " ai-bubble--cssEnter" : ""
+  }`;
+
+  const tooltipInner = (
+    <>
+      <div className="ai-tooltipContent">
+        <AssistantMark size={16} className="ai-tooltipMark" />
+        <span className="ai-tooltipText">{tooltipText}</span>
+        <button
+          type="button"
+          className="ai-tooltipDismiss"
+          aria-label="Tutup tips"
+          onClick={(e) => {
+            e.stopPropagation();
+            dismissTooltip(true);
+          }}
+        >
+          <X size={14} strokeWidth={2.4} />
+        </button>
+      </div>
+      <div className="ai-tooltipArrow" />
+    </>
+  );
+
+  const bubbleIcon = (
+    <>
+      <span className="ai-bubbleHalo" aria-hidden="true" />
+      <span className="ai-bubbleIcon">
+        {open ? (
+          <X size={20} strokeWidth={2.4} />
+        ) : (
+          <AssistantMark size={24} className="ai-markFab" variant="fab" />
+        )}
+      </span>
+      {!open && !fabOpened ? <span className="ai-bubbleDot" aria-hidden="true" /> : null}
+    </>
+  );
+
+  const panelProps = {
+    panelRef,
+    inputRef,
+    scrollRef,
+    greeting,
+    history,
+    typing,
+    draft,
+    setDraft,
+    setOpen,
+    suggestions,
+    reset,
+    ask,
+    askCustom,
+  };
+
   return createPortal(
     <>
-      <AnimatePresence>
-        {showTooltip && !open ? (
-          <motion.div
-            className="ai-tooltip"
-            initial={{ opacity: 0, y: 8, scale: 0.92 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 4, scale: 0.94 }}
-            transition={{ duration: 0.25, ease: "easeOut" }}
-            onClick={handleOpen}
-            role="button"
-            tabIndex={0}
-            aria-label="Tanya Imzaqi AI"
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                handleOpen();
-              }
-            }}
-          >
-            <div className="ai-tooltipContent">
-              <AssistantMark size={16} className="ai-tooltipMark" />
-              <span>Butuh bantuan? Tanya Imzaqi AI</span>
-            </div>
-            <div className="ai-tooltipArrow" />
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
-      <motion.button
-        type="button"
-        className={`ai-bubble ${open ? "is-open" : ""} ${showTooltip && !open ? "ai-bubble--pulse" : ""}`}
-        onClick={handleOpen}
-        aria-label={open ? "Tutup Imzaqi AI" : "Buka Imzaqi AI"}
-        initial={{ opacity: 0, y: 16, scale: 0.8 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ delay: 0.6, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-        whileHover={{ scale: 1.06 }}
-        whileTap={{ scale: 0.94 }}
-      >
-        <span className="ai-bubbleHalo" aria-hidden="true" />
-        <span className="ai-bubbleIcon">
-          {open ? (
-            <X size={20} strokeWidth={2.4} />
-          ) : (
-            <AssistantMark size={24} className="ai-markFab" variant="fab" />
-          )}
-        </span>
-        {!open ? <span className="ai-bubbleDot" aria-hidden="true" /> : null}
-      </motion.button>
-
-      <AnimatePresence>
-        {open ? (
-          <>
+      {motionFull ? (
+        <AnimatePresence>
+          {showTooltip && !open ? (
             <motion.div
-              className="ai-backdrop"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.24 }}
-              onClick={() => setOpen(false)}
-              aria-hidden="true"
-            />
-            <motion.aside
-              className="ai-panel ai-panel--glass"
-              initial={{ opacity: 0, y: 24, scale: 0.96 }}
+              className="ai-tooltip"
+              initial={{ opacity: 0, y: 8, scale: 0.92 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: 16, scale: 0.97 }}
-              transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-              role="dialog"
-              aria-label="Imzaqi AI"
+              exit={{ opacity: 0, y: 4, scale: 0.94 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              onClick={handleOpen}
+              role="button"
+              tabIndex={0}
+              aria-label={tooltipText}
+              {...tooltipKeyHandlers(handleOpen)}
             >
-              <div className="ai-panelAmbient" aria-hidden="true">
-                <div className="ai-panelOrb ai-panelOrb--1" />
-                <div className="ai-panelOrb ai-panelOrb--2" />
-                <div className="ai-panelGrid" />
-              </div>
-              <header className="ai-head ai-head--premium">
-                <div className="ai-headIcon" aria-hidden="true">
-                  <AssistantMark size={18} className="ai-markHead" variant="header" />
-                </div>
-                <div className="ai-headCopy">
-                  <div className="ai-headTitleRow">
-                    <strong>Imzaqi AI</strong>
-                    <span className="ai-statusBadge">
-                      <span className="ai-statusDot" />
-                      Online
-                    </span>
-                  </div>
-                  <span>Paham konteks halaman & obrolan</span>
-                </div>
-                <button
-                  type="button"
-                  className="ai-headClose"
-                  onClick={() => setOpen(false)}
-                  aria-label="Tutup"
-                >
-                  <X size={16} />
-                </button>
-              </header>
+              {tooltipInner}
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+      ) : showTooltip && !open ? (
+        <div
+          className={`ai-tooltip${motionMode === "lite" ? " ai-tooltip--cssEnter" : ""}`}
+          onClick={handleOpen}
+          role="button"
+          tabIndex={0}
+          aria-label={tooltipText}
+          {...tooltipKeyHandlers(handleOpen)}
+        >
+          {tooltipInner}
+        </div>
+      ) : null}
 
-              <div className="ai-scroll" ref={scrollRef}>
-                <div className="ai-msg ai-msg--assistant">
-                  <div className="ai-avatar" aria-hidden="true">
-                    <AssistantMark size={14} className="ai-markAvatar" variant="avatar" />
-                  </div>
-                  <div className="ai-bubbleMsg ai-bubbleMsg--glass">
-                    <FormattedLine text={greeting} />
-                  </div>
-                </div>
+      {motionFull ? (
+        <motion.button
+          type="button"
+          className={bubbleClassName}
+          onClick={handleOpen}
+          aria-label={open ? "Tutup Imzaqi AI" : "Buka Imzaqi AI"}
+          initial={{ opacity: 0, y: 16, scale: 0.8 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ delay: 0.6, duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          whileHover={{ scale: 1.06 }}
+          whileTap={{ scale: 0.94 }}
+        >
+          {bubbleIcon}
+        </motion.button>
+      ) : (
+        <button
+          type="button"
+          className={bubbleClassName}
+          onClick={handleOpen}
+          aria-label={open ? "Tutup Imzaqi AI" : "Buka Imzaqi AI"}
+        >
+          {bubbleIcon}
+        </button>
+      )}
 
-                {history.map((item, idx) => (
-                  <React.Fragment key={`h-${idx}-${item.id}`}>
-                    <div className="ai-msg ai-msg--user">
-                      <div className="ai-bubbleMsg">
-                        <p className="ai-bubbleText">{item.q}</p>
-                      </div>
-                    </div>
-                    <div className="ai-msg ai-msg--assistant">
-                      <div className="ai-avatar" aria-hidden="true">
-                        <AssistantMark size={14} className="ai-markAvatar" variant="avatar" />
-                      </div>
-                      <div className="ai-bubbleMsg ai-bubbleMsg--glass">
-                        {(idx === history.length - 1 && (typing || item._pending)) || (item._pending && !item.a.length) ? (
-                          <div className="ai-typing">
-                            <span /><span /><span />
-                          </div>
-                        ) : (
-                          item.a.map((line, li) => <FormattedLine key={li} text={line} />)
-                        )}
-                      </div>
-                    </div>
-                  </React.Fragment>
-                ))}
-              </div>
-
-              <div className="ai-suggest">
-                {history.length > 0 && (
-                  <div className="ai-suggestHead" style={{ justifyContent: "flex-end", paddingBottom: "4px" }}>
-                    <button type="button" className="ai-resetBtn" onClick={reset}>
-                      Mulai ulang
-                    </button>
-                  </div>
-                )}
-
-                <form
-                  className="ai-inputBar"
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    askCustom();
-                  }}
-                >
-                  <input
-                    ref={inputRef}
-                    className="ai-input"
-                    type="text"
-                    placeholder="Tanya apa saja…"
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    maxLength={300}
-                    disabled={typing}
-                    aria-label="Pertanyaan kamu"
-                  />
-                  <button
-                    type="submit"
-                    className="ai-sendBtn"
-                    disabled={!draft.trim() || typing}
-                    aria-label="Kirim"
-                  >
-                    <Send size={15} strokeWidth={2.4} />
-                  </button>
-                </form>
-              </div>
-            </motion.aside>
-          </>
-        ) : null}
-      </AnimatePresence>
+      {motionFull ? (
+        <AnimatePresence>
+          {open ? (
+            <>
+              <motion.div
+                className="ai-backdrop"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.24 }}
+                onClick={() => setOpen(false)}
+                aria-hidden="true"
+              />
+              <motion.aside
+                ref={panelRef}
+                className="ai-panel ai-panel--glass"
+                initial={{ opacity: 0, y: 24, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 16, scale: 0.97 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                role="dialog"
+                aria-modal="true"
+                aria-label="Imzaqi AI"
+              >
+                <AssistantPanelBody {...panelProps} />
+              </motion.aside>
+            </>
+          ) : null}
+        </AnimatePresence>
+      ) : open ? (
+        <>
+          <div
+            className={`ai-backdrop${motionMode === "lite" ? " ai-backdrop--cssEnter" : ""}`}
+            onClick={() => setOpen(false)}
+            aria-hidden="true"
+          />
+          <aside
+            ref={panelRef}
+            className={`ai-panel ai-panel--glass${motionMode === "lite" ? " ai-panel--cssEnter" : ""}`}
+            role="dialog"
+            aria-modal="true"
+            aria-label="Imzaqi AI"
+          >
+            <AssistantPanelBody {...panelProps} />
+          </aside>
+        </>
+      ) : null}
     </>,
     document.body
   );

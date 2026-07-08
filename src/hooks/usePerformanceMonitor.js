@@ -61,6 +61,7 @@ export function usePerformanceMonitor(options = {}) {
 
 export function useLongTaskMonitor() {
   useEffect(() => {
+    if (import.meta.env.PROD) return;
     if (typeof window === "undefined" || !PerformanceObserver) return;
 
     try {

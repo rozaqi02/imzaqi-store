@@ -8,12 +8,40 @@ import PolishEffects from "./components/PolishEffects";
 import Confetti from "./components/Confetti";
 import AssistantBubble from "./components/AssistantBubble";
 import FlashSalePopup from "./components/FlashSalePopup";
+
+const DEFER_POLISH_MS = 2000;
+
+function useDeferredPolishMount(delayMs = DEFER_POLISH_MS) {
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const mount = () => {
+      if (!cancelled) setReady(true);
+    };
+
+    if (typeof window !== "undefined" && typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(mount, { timeout: delayMs });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback(idleId);
+      };
+    }
+
+    const timerId = window.setTimeout(mount, delayMs);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timerId);
+    };
+  }, [delayMs]);
+
+  return ready;
+}
 import { usePageView } from "./hooks/usePageView";
 import { useGlobalShortcuts, useTitleTicker } from "./hooks/useGlobalShortcuts";
 import { useLongTaskMonitor } from "./hooks/usePerformanceMonitor";
 import { useDeviceCapability } from "./hooks/useIsMobile";
-import { rafThrottle } from "./utils/throttle";
-import { ArrowRight, ChevronUp, X } from "lucide-react";
+import { ArrowRight, X } from "lucide-react";
 import AchievementToast from "./components/AchievementToast";
 import AbandonedCartBanner from "./components/AbandonedCartBanner";
 import SwUpdateToast from "./components/SwUpdateToast";
@@ -22,18 +50,17 @@ import { shouldSkipCatalogScrollToTop } from "./hooks/useScrollMemory";
 import { getOrderHistory } from "./lib/orderHistory";
 import { captureReferralFromUrl } from "./lib/referral";
 import { useFunnelRoute } from "./hooks/useFunnelRoute";
-import CartSheetPortal from "./components/CartSheetPortal";
 
 // ── Eager-loaded pages (critical path) ──
 import Home from "./pages/Home";
-import Products from "./pages/Products";
-import ProductDetail from "./pages/ProductDetail";
+import Faq from "./pages/Faq";
 
 // ── Lazy-loaded pages (non-critical, reduces initial bundle) ──
+const Products = React.lazy(() => import("./pages/Products"));
+const ProductDetail = React.lazy(() => import("./pages/ProductDetail"));
 const Status = React.lazy(() => import("./pages/Status"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const About = React.lazy(() => import("./pages/About"));
-const Faq = React.lazy(() => import("./pages/Faq"));
 const Testimonials = React.lazy(() => import("./pages/Testimonials"));
 const Checkout = React.lazy(() => import("./pages/Checkout"));
 const Pay = React.lazy(() => import("./pages/Pay"));
@@ -134,42 +161,6 @@ function FloatingOrderStatus() {
   );
 }
 
-// ── Scroll-to-top floating button ──
-function ScrollToTopButton() {
-  const isFunnel = useFunnelRoute();
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const throttledScroll = rafThrottle(() => {
-      setVisible(window.scrollY > 400);
-    });
-
-    window.addEventListener("scroll", throttledScroll, { passive: true });
-    return () => {
-      throttledScroll.cancel();
-      window.removeEventListener("scroll", throttledScroll);
-    };
-  }, []);
-
-  function scrollUp() {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
-  if (isFunnel) return null;
-
-  return (
-    <button
-      type="button"
-      className={`scroll-to-top${visible ? " is-visible" : ""}`}
-      onClick={scrollUp}
-      aria-label="Kembali ke atas"
-      title="Kembali ke atas"
-    >
-      <ChevronUp size={20} strokeWidth={2.4} />
-    </button>
-  );
-}
-
 // ── Smooth scroll to top on route change ──
 function SuspenseReadyNotifier({ onReady, routeKey }) {
   React.useEffect(() => {
@@ -197,9 +188,18 @@ function BoundedRoute({ pageName, children }) {
   return <PageErrorBoundary pageName={pageName}>{children}</PageErrorBoundary>;
 }
 
+function useCheckoutOverlayLocation(location) {
+  const backgroundLocation = location.state?.backgroundLocation || null;
+  const useOverlay = Boolean(backgroundLocation);
+  return {
+    displayLocation: useOverlay ? backgroundLocation : location,
+    showCheckoutOverlay: useOverlay,
+  };
+}
+
 function ScrollToTop() {
   const location = useLocation();
-  const displayLocation = location.state?.backgroundLocation || location;
+  const { displayLocation } = useCheckoutOverlayLocation(location);
   const pathname = displayLocation.pathname;
   const prevPathRef = useRef(pathname);
 
@@ -229,8 +229,7 @@ function ScrollToTop() {
 
 function AppRoutes() {
   const location = useLocation();
-  const backgroundLocation = location.state?.backgroundLocation || null;
-  const displayLocation = backgroundLocation || location;
+  const { displayLocation, showCheckoutOverlay } = useCheckoutOverlayLocation(location);
 
   usePageView();
   useGlobalShortcuts();
@@ -264,7 +263,7 @@ function AppRoutes() {
         </Routes>
       </Suspense>
 
-      {backgroundLocation ? (
+      {showCheckoutOverlay ? (
         <Suspense fallback={null}>
           <Routes>
             <Route path="/checkout" element={<Checkout />} />
@@ -277,6 +276,7 @@ function AppRoutes() {
 
 export default function App() {
   const caps = useDeviceCapability();
+  const polishReady = useDeferredPolishMount();
   useLongTaskMonitor();
   useTitleTicker();
 
@@ -332,20 +332,22 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <CartSheetPortal />
       <ReferralCapture />
       <NetworkBridge />
       <PolishEffects />
-      <Confetti />
+      {polishReady ? (
+        <>
+          <Confetti />
+          <AssistantBubble />
+          <FlashSalePopup />
+        </>
+      ) : null}
       <AchievementToast />
-      <AssistantBubble />
-      <FlashSalePopup />
       <AbandonedCartBanner />
       <SwUpdateToast />
       <ScrollToTop />
       <RouteProgress />
       <FloatingOrderStatus />
-      <ScrollToTopButton />
       <AppRoutes />
     </BrowserRouter>
   );

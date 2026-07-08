@@ -304,7 +304,7 @@ export default function FaqPageContent() {
     <div className="page">
       <section className="section faq-shell">
         <div className="container faq-wrap">
-          <header className="faq-hero reveal">
+          <header className="faq-hero reveal is-visible">
             <div className="faq-heroCopy">
               <div className="faq-kicker">Pusat bantuan</div>
               <h1 className="h1 faq-title">Ada yang bingung?</h1>
@@ -318,7 +318,7 @@ export default function FaqPageContent() {
             </div>
           </header>
 
-          <section className="faq-howto reveal" aria-label="Cara pesan">
+          <section className="faq-howto reveal is-visible" aria-label="Cara pesan">
             <div className="faq-howtoHead">
               <div className="faq-kicker">Cara pesan</div>
               <h2 className="faq-howtoTitle">4 langkah, gas!</h2>
@@ -342,7 +342,7 @@ export default function FaqPageContent() {
             </div>
           </section>
 
-          <section className="faq-command reveal">
+          <section className="faq-command reveal is-visible">
             <div className="faq-searchWrap">
               <Search size={16} />
               <input
@@ -423,7 +423,7 @@ export default function FaqPageContent() {
             </main>
 
             <aside className="faq-side">
-              <article className="faq-sideCard reveal">
+              <article className="faq-sideCard reveal is-visible">
                 <div className="faq-sideHead">
                   <Sparkles size={16} />
                   <h3>Akses cepet</h3>
@@ -441,7 +441,7 @@ export default function FaqPageContent() {
                 </div>
               </article>
 
-              <article className="faq-sideCard faq-sideCardAccent reveal">
+              <article className="faq-sideCard faq-sideCardAccent reveal is-visible">
                 <div className="faq-sideHead">
                   <ShieldCheck size={16} />
                   <h3>Butuh bantuan?</h3>

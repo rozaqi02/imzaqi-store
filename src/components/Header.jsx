@@ -1,41 +1,19 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
-import { createPortal } from "react-dom";
-import { AnimatePresence, motion } from "framer-motion";
-import {
-  Activity,
-  CircleHelp,
-  Grid2x2,
-  House,
-  Menu,
-  MessageSquareQuote,
-  Moon,
-  Shield,
-  SunMedium,
-  X,
-} from "lucide-react";
+import { Moon, Shield, SunMedium } from "lucide-react";
+import { getAdminNavTarget, isNavItemActive, SITE_DESKTOP_NAV } from "../lib/siteNav";
 import { useCart } from "../context/CartContext";
 import { checkAdminAccess } from "../lib/adminAuth";
 import { supabase } from "../lib/supabaseClient";
 
 import { useTheme } from "../context/ThemeContext";
-import { useToast } from "../context/ToastContext";
-import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useHeaderShrink } from "../hooks/useHeaderShrink";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { COMPACT_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
 import { rafThrottle } from "../utils/throttle";
 
-const MOBILE_MENU_ANIMATION_MS = 250;
 const HEADER_SHRINK_MS = 280;
-const NAV_PILL_EASE = [0.22, 1, 0.36, 1];
-const NAV_LINKS = [
-  { to: "/", label: "Beranda" },
-  { to: "/produk", label: "Katalog" },
-  { to: "/faq", label: "FAQ" },
-  { to: "/testimoni", label: "Testimoni" },
-  { to: "/status", label: "Lacak Order" },
-];
+const NAV_LINKS = SITE_DESKTOP_NAV;
 
 function CartIcon() {
   return (
@@ -55,17 +33,18 @@ function CartIcon() {
   );
 }
 
-const primaryItems = [
-  { to: "/", label: "Beranda", icon: House },
-  { to: "/produk", label: "Katalog", icon: Grid2x2 },
-  { to: "/faq", label: "FAQ", icon: CircleHelp },
-  { to: "/testimoni", label: "Testimoni", icon: MessageSquareQuote },
-];
-
-const utilityItems = [
-  { to: "/status", label: "Lacak Order", icon: Activity },
-  { to: "/admin", label: "Admin", icon: Shield },
-];
+function AdminHeaderLink({ to, isActive, title }) {
+  return (
+    <NavLink
+      to={to}
+      className={`header-iconAction${isActive ? " active" : ""}`}
+      aria-label={title}
+      title={title}
+    >
+      <Shield size={18} strokeWidth={2.1} />
+    </NavLink>
+  );
+}
 
 function ThemeToggleButton({ onToggle, isDark }) {
   return (
@@ -90,166 +69,20 @@ function ThemeToggleButton({ onToggle, isDark }) {
   );
 }
 
-function MenuLink({ item, index }) {
-  const Icon = item.icon;
-
-  return (
-    <NavLink
-      to={item.to}
-      className={({ isActive }) => (isActive ? "active" : "")}
-      style={{ "--menu-i": index }}
-    >
-      <span className="menu-icon">
-        <Icon size={18} strokeWidth={2.1} />
-      </span>
-      <span className="menu-label">{item.label}</span>
-      <span className="active-indicator" aria-hidden="true" />
-    </NavLink>
-  );
-}
-
-function MobileMenu({ open, onClose, isDark, toggleTheme, utilityLinks = utilityItems }) {
-  const menuRef = useRef(null);
-  const location = useLocation();
-  const previousPathRef = useRef(location.pathname);
-  const closeTimerRef = useRef(null);
-  const openFrameRef = useRef(null);
-  const [phase, setPhase] = useState("closed");
-
-  const requestClose = useCallback(() => {
-    if (!open || phase === "closing") return;
-    setPhase("closing");
-    window.clearTimeout(closeTimerRef.current);
-    closeTimerRef.current = window.setTimeout(() => {
-      onClose();
-      setPhase("closed");
-    }, MOBILE_MENU_ANIMATION_MS);
-  }, [onClose, open, phase]);
-
-  useEffect(() => {
-    window.clearTimeout(closeTimerRef.current);
-    window.cancelAnimationFrame(openFrameRef.current);
-
-    if (open) {
-      openFrameRef.current = window.requestAnimationFrame(() => {
-        openFrameRef.current = window.requestAnimationFrame(() => {
-          setPhase("open");
-        });
-      });
-
-      return () => window.cancelAnimationFrame(openFrameRef.current);
-    }
-
-    setPhase("closed");
-    return undefined;
-  }, [open]);
-
-  useEffect(
-    () => () => {
-      window.clearTimeout(closeTimerRef.current);
-      window.cancelAnimationFrame(openFrameRef.current);
-    },
-    []
-  );
-
-  useEffect(() => {
-    if (!open) return undefined;
-
-    const onKeyDown = (event) => {
-      if (event.key === "Escape") requestClose();
-    };
-
-    window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
-  }, [open, requestClose]);
-
-  useEffect(() => {
-    if (!open) {
-      previousPathRef.current = location.pathname;
-      return undefined;
-    }
-
-    if (previousPathRef.current !== location.pathname) {
-      // Close immediately on navigation — route transition handles visual continuity
-      window.clearTimeout(closeTimerRef.current);
-      onClose();
-      setPhase("closed");
-    }
-
-    previousPathRef.current = location.pathname;
-    return undefined;
-  }, [location.pathname, open, requestClose]);
-
-  useDialogA11y({
-    open: open && phase !== "closed",
-    containerRef: menuRef,
-    onClose: requestClose,
-    initialFocusSelector: ".mobile-menu-close",
-  });
-
-  if (typeof document === "undefined" || (!open && phase === "closed")) return null;
-
-  const stateClass = phase === "closing" ? "is-closing" : phase === "open" ? "is-open" : "";
-  const backdropClass = `mobile-backdrop mobile-backdrop-lite ${stateClass}`.trim();
-  const menuClass = `mobile-menu mobile-menu-lite ${stateClass}`.trim();
-
-  return createPortal(
-    <>
-      <div className={backdropClass} onClick={requestClose} aria-hidden="true" />
-
-      <aside ref={menuRef} className={menuClass} role="dialog" aria-modal="true" aria-label="Navigasi mobile">
-        <button className="mobile-menu-close" type="button" onClick={requestClose} aria-label="Tutup menu">
-          <X size={18} strokeWidth={2.2} />
-        </button>
-
-        <div className="mobile-menu-header">
-          <h3>Menu</h3>
-          <p>Mau ke mana nih?</p>
-        </div>
-
-        <div className="mobile-menu-stack">
-          {primaryItems.map((item, idx) => (
-            <MenuLink key={item.to} item={item} index={idx} />
-          ))}
-        </div>
-
-        <div className="mobile-menu-divider" />
-
-        <div className="mobile-menu-stack">
-          {utilityLinks.map((item, idx) => (
-            <MenuLink key={item.to} item={item} index={primaryItems.length + 1 + idx} />
-          ))}
-        </div>
-
-        <div className="mobile-menu-footer">
-          <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-          <p className="menu-footer-text">Imzaqi Store App V.5.0</p>
-        </div>
-      </aside>
-    </>,
-    document.body
-  );
-}
-
 export default function Header() {
-  const { items, remove, bumpToken, lastAddedVariantId, openCartSheet } = useCart();
+  const { items, bumpToken } = useCart();
   const isHeaderShrunk = useHeaderShrink();
   const { isDark, toggleTheme } = useTheme();
-  const toast = useToast();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
-  const totalPrice = useMemo(() => items.reduce((sum, item) => sum + item.price_idr * item.qty, 0), [items]);
-  const [open, setOpen] = useState(false);
   const isCompactNav = useIsMobile(COMPACT_NAV_MEDIA);
   const isPhoneLayout = useIsMobile(PHONE_LAYOUT_MEDIA);
   const headerRef = useRef(null);
   const navRef = useRef(null);
   const location = useLocation();
   const [canAccessAdmin, setCanAccessAdmin] = useState(false);
-
-  const visibleUtilityItems = useMemo(
-    () => (canAccessAdmin ? utilityItems : utilityItems.filter((item) => item.to !== "/admin")),
-    [canAccessAdmin]
-  );
+  const isOnAdminRoute = location.pathname.startsWith("/admin");
+  const adminNavTarget = getAdminNavTarget(canAccessAdmin);
+  const adminNavTitle = canAccessAdmin ? "Admin Dashboard" : "Login Admin";
 
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
 
@@ -300,14 +133,7 @@ export default function Header() {
     const timer = window.setTimeout(updatePill, HEADER_SHRINK_MS + 20);
     return () => window.clearTimeout(timer);
   }, [isHeaderShrunk, updatePill]);
-  const handleOpen = useCallback(() => setOpen(true), []);
-  const handleClose = useCallback(() => setOpen(false), []);
-
-  const [showMiniCart, setShowMiniCart] = useState(false);
-
   const [pillBump, setPillBump] = useState(false);
-  const [cartShake, setCartShake] = useState(false);
-  const miniCartTimerRef = useRef(null);
   const pillBumpTimerRef = useRef(null);
 
   useEffect(() => {
@@ -317,43 +143,6 @@ export default function Header() {
     pillBumpTimerRef.current = window.setTimeout(() => setPillBump(false), 450);
     return () => window.clearTimeout(pillBumpTimerRef.current);
   }, [bumpToken]);
-
-  const handleCartMouseEnter = () => {
-    if (isCompactNav) return;
-    window.clearTimeout(miniCartTimerRef.current);
-    setShowMiniCart(true);
-  };
-
-  const handleCartMouseLeave = () => {
-    if (isCompactNav) return;
-    miniCartTimerRef.current = window.setTimeout(() => {
-      setShowMiniCart(false);
-    }, 240);
-  };
-
-  const formatPrice = useCallback((price) => {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(price).replace("Rp", "Rp ");
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      window.clearTimeout(miniCartTimerRef.current);
-    };
-  }, []);
-
-  useEffect(() => {
-    document.body.classList.toggle("nav-open", open && isCompactNav);
-    return () => document.body.classList.remove("nav-open");
-  }, [isCompactNav, open]);
-
-  useEffect(() => {
-    if (!isCompactNav && open) setOpen(false);
-  }, [isCompactNav, open]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -390,7 +179,7 @@ export default function Header() {
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
           </Link>
 
-          <nav ref={navRef} className="nav desktop-only">
+          <nav ref={navRef} className="nav desktop-only" aria-label="Navigasi utama">
             <div
               className="nav-active-pill"
               style={{
@@ -401,12 +190,13 @@ export default function Header() {
               }}
             />
             {NAV_LINKS.map((link) => {
-              const isActive = location.pathname === link.to || (link.to !== "/" && location.pathname.startsWith(link.to));
+              const isActive = isNavItemActive(location.pathname, link.to);
               return (
                 <Link
                   key={link.to}
                   to={link.to}
                   className={isActive ? "active" : ""}
+                  aria-current={isActive ? "page" : undefined}
                 >
                   {link.label}
                 </Link>
@@ -415,157 +205,52 @@ export default function Header() {
           </nav>
 
           <div className="header-actions">
-            <div
-              className="header-cart-container"
-              onMouseEnter={handleCartMouseEnter}
-              onMouseLeave={handleCartMouseLeave}
-              style={{ position: "relative" }}
-            >
-              {isPhoneLayout ? (
-                <button
-                  type="button"
-                  className={`header-cart${cartShake ? " is-shaking" : ""}`}
-                  aria-label="Buka keranjang"
-                  onClick={openCartSheet}
-                >
-                  <CartIcon />
-                  {cartCount > 0 ? (
-                    <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
-                      {cartCount}
-                    </span>
-                  ) : null}
-                </button>
-              ) : (
-                <Link
-                  to="/checkout"
-                  state={{ backgroundLocation: location }}
-                  className={`header-cart${cartShake ? " is-shaking" : ""}`}
-                >
-                  <CartIcon />
-                  {cartCount > 0 ? (
-                    <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
-                      {cartCount}
-                    </span>
-                  ) : null}
-                </Link>
-              )}
-
-              <AnimatePresence>
-                {showMiniCart && !isPhoneLayout && (
-                  <motion.div
-                    className="mini-cart-popover"
-                    initial={{ opacity: 0, y: 12, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: 8, scale: 0.95 }}
-                    transition={{ duration: 0.18, ease: "easeOut" }}
-                  >
-                    <div className="mini-cart-header">
-                      <h4>Keranjang</h4>
-                      <span className="mini-cart-count">{cartCount} Item</span>
-                    </div>
-
-                    <div className="mini-cart-divider" />
-
-                    {items.length === 0 ? (
-                      <div className="mini-cart-empty">
-                        <p>Keranjang kosong</p>
-                      </div>
-                    ) : (
-                      <>
-                        <div className="mini-cart-items">
-                          {items.map((item) => (
-                            <div
-                              key={item.variant_id}
-                              className={`mini-cart-item${item.variant_id === lastAddedVariantId ? " is-new" : ""}`}
-                            >
-                              {item.product_icon_url ? (
-                                <img src={item.product_icon_url} alt={item.product_name} className="mini-cart-item-icon" />
-                              ) : (
-                                <div className="mini-cart-item-fallback">
-                                  {item.product_name?.charAt(0) || "P"}
-                                </div>
-                              )}
-                              <div className="mini-cart-item-details">
-                                <div className="mini-cart-item-title">{item.product_name}</div>
-                                <div className="mini-cart-item-subtitle">{item.variant_name}</div>
-                                <div className="mini-cart-item-price">
-                                  {item.qty} × {formatPrice(item.price_idr)}
-                                </div>
-                              </div>
-                              <button
-                                type="button"
-                                className="mini-cart-item-remove"
-                                onClick={() => remove(item.variant_id)}
-                                title="Hapus item"
-                              >
-                                <X size={14} />
-                              </button>
-                            </div>
-                          ))}
-                        </div>
-
-                        <div className="mini-cart-divider" />
-
-                        <div className="mini-cart-footer">
-                          <div className="mini-cart-total">
-                            <span>Subtotal</span>
-                            <strong>{formatPrice(totalPrice)}</strong>
-                          </div>
-                          <Link
-                            to="/checkout"
-                            state={{ backgroundLocation: location }}
-                            className="btn btn-sm btn-wide"
-                            onClick={() => setShowMiniCart(false)}
-                          >
-                            Buka Checkout
-                          </Link>
-                        </div>
-                      </>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="desktop-only">
-              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-            </div>
-
-            {!isCompactNav && canAccessAdmin ? (
-              <NavLink
-                to="/admin/dashboard"
-                className={`header-iconAction${location.pathname.startsWith("/admin") ? " active" : ""}`}
-                aria-label="Admin"
-                title="Admin"
+            <div className="header-cart-container">
+              <Link
+                to="/checkout"
+                state={{ backgroundLocation: location }}
+                className="header-cart"
+                aria-label={
+                  cartCount > 0
+                    ? `Buka checkout, ${cartCount} item di keranjang`
+                    : "Buka checkout, keranjang kosong"
+                }
               >
-                <Shield size={18} strokeWidth={2.1} />
-              </NavLink>
-            ) : null}
+                <CartIcon />
+                {cartCount > 0 ? (
+                  <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
+                    {cartCount}
+                  </span>
+                ) : null}
+              </Link>
+            </div>
 
             {isCompactNav ? (
-              <button
-                className="nav-toggle"
-                onClick={handleOpen}
-                aria-label="Buka menu"
-                aria-expanded={open}
-                type="button"
-              >
-                <Menu size={18} strokeWidth={2.4} />
-              </button>
-            ) : null}
+              <>
+                <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+                <AdminHeaderLink
+                  to={adminNavTarget}
+                  isActive={isOnAdminRoute}
+                  title={adminNavTitle}
+                />
+              </>
+            ) : (
+              <>
+                <div className="desktop-only">
+                  <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+                </div>
+                {canAccessAdmin ? (
+                  <AdminHeaderLink
+                    to="/admin/dashboard"
+                    isActive={isOnAdminRoute}
+                    title="Admin Dashboard"
+                  />
+                ) : null}
+              </>
+            )}
           </div>
         </div>
       </header>
-
-      {isCompactNav ? (
-        <MobileMenu
-          open={open}
-          onClose={handleClose}
-          isDark={isDark}
-          toggleTheme={toggleTheme}
-          utilityLinks={visibleUtilityItems}
-        />
-      ) : null}
 
     </>
   );

@@ -45,8 +45,6 @@
   The AI panel (.ai-panel--glass), checkout backdrop overlay, and lightbox keep their
   blur because they are fixed/modal overlays that do NOT scroll with the page.
 */
-[data-motion="lite"] .mobile-backdrop,
-[data-motion="lite"] .mobile-menu,
 [data-motion="lite"] .pay-card,
 [data-motion="lite"] .pay-orderDesktop,
 [data-motion="lite"] .pay-orderMobileCard,
@@ -57,7 +55,9 @@
 [data-motion="lite"] .st-search,
 [data-motion="lite"] .st-card,
 [data-motion="lite"] .st-infoCard,
-[data-motion="lite"] .toast {
+[data-motion="lite"] .toast,
+[data-motion="lite"] .bottom-nav,
+[data-motion="off"] .bottom-nav {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
@@ -111,7 +111,6 @@
 }
 
 [data-motion="lite"] .btn::before,
-[data-motion="lite"] .mobile-menu a::before,
 [data-motion="lite"] .skeleton::after,
 [data-motion="lite"] .catalog-cardSkeleton::after,
 [data-motion="lite"] .testi-skel::after,
@@ -190,8 +189,9 @@
   transition-duration: 140ms !important;
 }
 
-[data-motion="lite"] .catalog-page .catalog-grid--animate .catalog-card {
-  animation-delay: calc(min(var(--reveal-i, 0), 8) * 28ms) !important;
+[data-motion="lite"] .catalog-page .catalog-grid--animate .catalog-card,
+[data-motion="off"] .catalog-page .catalog-grid--animate .catalog-card {
+  animation: none !important;
 }
 
 [data-motion="lite"] .catalog-hero::before,
@@ -247,82 +247,6 @@
   transform: none !important;
 }
 
-/* Hard override: mobile sidebar backdrop must dim only (no blur) in all themes */
-@media (max-width: 720px) {
-  .mobile-backdrop,
-  .mobile-backdrop-lite,
-  .mobile-backdrop.mobile-backdrop-lite,
-  .mobile-backdrop.is-open,
-  .mobile-backdrop-lite.is-open,
-  .mobile-backdrop.is-closing,
-  .mobile-backdrop-lite.is-closing,
-  .mobile-sheetBackdrop,
-  body.nav-open .mobile-backdrop,
-  body.nav-open .mobile-backdrop-lite,
-  body.nav-open .mobile-backdrop.mobile-backdrop-lite {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    filter: none !important;
-    -webkit-filter: none !important;
-    background-image: none !important;
-  }
-
-  .mobile-menu,
-  .mobile-menu-lite,
-  .mobile-menu.mobile-menu-lite,
-  .mobile-sheet,
-  body.nav-open .mobile-menu,
-  body.nav-open .mobile-menu-lite,
-  body.nav-open .mobile-menu.mobile-menu-lite {
-    backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
-    filter: none !important;
-    -webkit-filter: none !important;
-  }
-
-  html[data-theme="light"] .mobile-backdrop,
-  html[data-theme="light"] .mobile-backdrop-lite,
-  html[data-theme="light"] .mobile-backdrop.mobile-backdrop-lite,
-  html[data-theme="light"] .mobile-sheetBackdrop,
-  html[data-theme="light"] body.nav-open .mobile-backdrop,
-  html[data-theme="light"] body.nav-open .mobile-backdrop-lite,
-  html[data-theme="light"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
-    background: rgba(6, 17, 28, 0.68) !important;
-  }
-
-  html[data-theme="dark"] .mobile-backdrop,
-  html[data-theme="dark"] .mobile-backdrop-lite,
-  html[data-theme="dark"] .mobile-backdrop.mobile-backdrop-lite,
-  html[data-theme="dark"] .mobile-sheetBackdrop,
-  html[data-theme="dark"] body.nav-open .mobile-backdrop,
-  html[data-theme="dark"] body.nav-open .mobile-backdrop-lite,
-  html[data-theme="dark"] body.nav-open .mobile-backdrop.mobile-backdrop-lite {
-    background: rgba(2, 9, 18, 0.56) !important;
-  }
-
-  html[data-theme="light"] .mobile-menu,
-  html[data-theme="light"] .mobile-menu-lite,
-  html[data-theme="light"] .mobile-menu.mobile-menu-lite {
-    background:
-      linear-gradient(180deg, rgba(251, 254, 255, 1), rgba(238, 247, 251, 1) 58%, rgba(228, 241, 247, 1) 100%) !important;
-    border-left: 1px solid rgba(0, 138, 148, 0.2) !important;
-    box-shadow:
-      -10px 0 18px rgba(9, 26, 40, 0.12),
-      inset 1px 0 0 rgba(255, 255, 255, 0.6) !important;
-  }
-
-  html[data-theme="dark"] .mobile-menu,
-  html[data-theme="dark"] .mobile-menu-lite,
-  html[data-theme="dark"] .mobile-menu.mobile-menu-lite {
-    background:
-      linear-gradient(180deg, rgba(17, 29, 58, 1), rgba(8, 14, 31, 1) 55%, rgba(4, 8, 21, 1) 100%) !important;
-    border-left: 1px solid rgba(0, 194, 208, 0.15) !important;
-    box-shadow:
-      -10px 0 30px rgba(0, 0, 0, 0.5),
-      inset 1px 0 0 rgba(255, 255, 255, 0.05) !important;
-  }
-}
-
 [data-motion="off"] *,
 [data-motion="off"] *::before,
 [data-motion="off"] *::after {
@@ -345,16 +269,9 @@
   html[data-theme="dark"] .site-header,
   html[data-theme="dark"][data-motion="lite"] .header,
   html[data-theme="dark"][data-motion="lite"] .site-header {
-    background:
-      linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 138, 148, 0.08) 40%, rgba(0, 0, 0, 0) 70%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0) 44%),
-      linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
-    border-bottom: 1px solid rgba(0, 194, 208, 0.14) !important;
-    box-shadow:
-      0 16px 36px rgba(0, 0, 0, 0.46),
-      0 4px 14px rgba(0, 10, 28, 0.32),
-      inset 0 1px 0 rgba(255, 255, 255, 0.14),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.34) !important;
+    background: var(--nav-shell-surface) !important;
+    border-bottom: 1px solid var(--nav-shell-edge) !important;
+    box-shadow: var(--nav-shell-shadow-header) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     transform: translateZ(0);
@@ -366,16 +283,9 @@
   html[data-theme="light"] .site-header,
   html[data-theme="light"][data-motion="lite"] .header,
   html[data-theme="light"][data-motion="lite"] .site-header {
-    background:
-      linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.08) 40%, rgba(255, 255, 255, 0) 70%),
-      linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
-    border-bottom: 1px solid rgba(0, 138, 148, 0.16) !important;
-    box-shadow:
-      0 12px 30px rgba(67, 111, 129, 0.18),
-      0 4px 12px rgba(80, 115, 130, 0.1),
-      -8px -8px 18px rgba(255, 255, 255, 0.94),
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
+    background: var(--nav-shell-surface) !important;
+    border-bottom: 1px solid var(--nav-shell-edge) !important;
+    box-shadow: var(--nav-shell-shadow-header) !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -383,13 +293,10 @@
   /* Header buttons — same neumorphism as desktop */
   html body .header .header-cart,
   html body .header .header-iconAction,
-  html body .header .nav-toggle,
   html[data-theme="light"] body .header .header-cart,
   html[data-theme="light"] body .header .header-iconAction,
-  html[data-theme="light"] body .header .nav-toggle,
   html[data-theme="dark"] body .header .header-cart,
-  html[data-theme="dark"] body .header .header-iconAction,
-  html[data-theme="dark"] body .header .nav-toggle {
+  html[data-theme="dark"] body .header .header-iconAction {
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
       var(--skeu-control-bg) !important;
@@ -690,27 +597,6 @@
   .site-header {
     backdrop-filter: blur(16px) saturate(130%) !important;
     -webkit-backdrop-filter: blur(16px) saturate(130%) !important;
-  }
-
-  .mobile-backdrop-lite.is-open,
-  .mobile-backdrop-lite.is-closing,
-  body.nav-open .mobile-backdrop-lite {
-    backdrop-filter: blur(18px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
-    background: var(--brand-overlay, rgba(10, 25, 38, 0.28)) !important;
-  }
-
-  html[data-theme="light"] .mobile-backdrop-lite.is-open,
-  html[data-theme="light"] .mobile-backdrop-lite.is-closing,
-  html[data-theme="light"] body.nav-open .mobile-backdrop-lite {
-    background: rgba(10, 25, 38, 0.22) !important;
-  }
-
-  .mobile-menu-lite.is-open,
-  .mobile-menu-lite.is-closing,
-  body.nav-open .mobile-menu-lite {
-    backdrop-filter: blur(20px) saturate(145%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
   }
 
   .checkout-backdrop,

@@ -31,6 +31,7 @@ import {
   removeOrderFromHistory,
   clearOrderHistory,
 } from "../lib/orderHistory";
+import CheckoutSteps from "../components/CheckoutSteps";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { warn } from "../lib/log";
@@ -51,7 +52,7 @@ function prettyStatus(status) {
     pending: "Pending",
     processing: "Diproses",
     done: "Selesai",
-    paid_reported: "Pending",
+    paid_reported: "Menunggu verifikasi",
     cancelled: "Dibatalkan",
   };
   return map[value] || value;
@@ -62,6 +63,7 @@ function getStatusMeta(status) {
   if (value === "done") return { tone: "done", icon: CheckCircle2 };
   if (value === "processing") return { tone: "processing", icon: Sparkles };
   if (value === "cancelled") return { tone: "cancelled", icon: XCircle };
+  if (value === "paid_reported") return { tone: "reported", icon: ShieldCheck };
   return { tone: "pending", icon: Clock3 };
 }
 
@@ -111,7 +113,7 @@ function toFriendlyStatusError() {
 function statusTone(status) {
   const map = {
     pending: "pending",
-    paid_reported: "pending",
+    paid_reported: "reported",
     processing: "processing",
     done: "done",
     cancelled: "cancelled",
@@ -294,7 +296,28 @@ function TabCekStatus({ settings }) {
     prevStatusRef.current = curr;
   }, [order]);
 
-  // Auto-refresh disabled
+  const isLiveStatus = order ? !TERMINAL_STATUSES.has(order.status) : false;
+
+  useEffect(() => {
+    if (!order?.order_code || TERMINAL_STATUSES.has(order.status)) {
+      if (pollTimerRef.current) {
+        clearInterval(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+      return undefined;
+    }
+
+    pollTimerRef.current = setInterval(() => {
+      silentRefresh(order.order_code);
+    }, POLL_INTERVAL_MS);
+
+    return () => {
+      if (pollTimerRef.current) {
+        clearInterval(pollTimerRef.current);
+        pollTimerRef.current = null;
+      }
+    };
+  }, [order?.order_code, order?.status, silentRefresh]);
 
   const recentOrders = useMemo(() => {
     const all = getOrderHistory();
@@ -448,6 +471,9 @@ function TabCekStatus({ settings }) {
               </button>
             ) : null}
           </div>
+          {isLiveStatus ? (
+            <p className="st-autoRefreshNote">Status diperbarui otomatis setiap 30 detik</p>
+          ) : null}
         </div>
       ) : null}
 
@@ -1082,7 +1108,7 @@ export default function Status() {
 
   return (
     <div className="page status-page">
-      <section className="section reveal status-shell">
+      <section className="section status-shell">
         <div className="container st-wrap">
           <header className="st-hero">
             <div className="st-heroCopy">
@@ -1097,6 +1123,12 @@ export default function Status() {
               </p>
             </div>
           </header>
+
+          {activeTab === "cek" ? (
+            <div className="st-checkoutSteps">
+              <CheckoutSteps current="status" />
+            </div>
+          ) : null}
 
           {/* Tab switcher */}
           <div className="st-tabs" role="tablist" aria-label="Pilih tampilan">

@@ -15,7 +15,6 @@ import {
   PackageCheck,
   PackageSearch,
   Search,
-  ShoppingBag,
   SlidersHorizontal,
   Sparkles,
   X,
@@ -30,8 +29,8 @@ import FlashSaleBanner from "../components/FlashSaleBanner";
 import NumberCounter from "../components/NumberCounter";
 
 import { usePageMeta } from "../hooks/usePageMeta";
-import { useCart } from "../context/CartContext";
-import { formatIDR, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
+import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
+import { formatIDR, summarizeCatalogCopy, detectAccountTypes, classifyStock } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
 import { useDialogA11y } from "../hooks/useDialogA11y";
@@ -339,6 +338,7 @@ function FilterPanel({
 }
 
 export default function Products() {
+  const motionMode = useAdaptiveMotion();
   const location = useLocation();
   const [params, setParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
@@ -380,8 +380,7 @@ export default function Products() {
   const [activeSuggestionIndex, setActiveSuggestionIndex] = useState(-1);
   const catalogListboxId = "catalog-search-listbox";
 
-  const { items, subtotal } = useCart();
-  const cartItemCount = items?.reduce((sum, item) => sum + (item.qty || 0), 0) || 0;
+
   const [viewMorph, setViewMorph] = useState(false);
   const prevViewRef = useRef(view);
   const openFilters = useCallback(() => setFiltersOpen(true), []);
@@ -800,7 +799,11 @@ export default function Products() {
 
   const catalogGridKey = loading ? "catalog-loading" : "catalog-grid";
   const showCatalogSkeleton = loading || (isFiltering && !isRestoringScroll);
-  const allowGridEntryAnimation = !skipGridEntryAnimationRef.current && !showCatalogSkeleton && !isRestoringScroll;
+  const allowGridEntryAnimation =
+    motionMode === "full" &&
+    !skipGridEntryAnimationRef.current &&
+    !showCatalogSkeleton &&
+    !isRestoringScroll;
 
   // Restore scroll after catalog grid is rendered and filters settled.
   useLayoutEffect(() => {
@@ -1000,8 +1003,8 @@ export default function Products() {
   }, [cats.length, inStockOnly, insights.topProduct, query, sort]);
 
   return (
-    <div className={cartItemCount > 0 ? "page with-sticky-cta catalog-page" : "page catalog-page"}>
-      <section className="section catalog-hero reveal">
+    <div className="page catalog-page">
+      <section className="section catalog-hero">
         <div className="container">
           <div className="catalog-heroGrid">
             <div className="catalog-eyebrow">Katalog</div>
@@ -1338,7 +1341,7 @@ export default function Products() {
                   <FilterPanel
                     idPrefix="catalog-sheet"
                     variant="sheet"
-                    showViewToggle={false}
+                    showViewToggle={true}
                     showReset={false}
                     cats={cats}
                     toggleCat={toggleCat}
@@ -1365,7 +1368,7 @@ export default function Products() {
                     Reset
                   </button>
                   <button type="button" className="btn catalog-sheetApply" onClick={closeFilters}>
-                    {loading ? "Memuat..." : `Tampilkan ${filtered.length} produk`}
+                    {loading ? "Memuat..." : `Selesai (${filtered.length} produk)`}
                   </button>
                 </div>
               </div>
@@ -1374,24 +1377,6 @@ export default function Products() {
           )
         : null}
 
-      {cartItemCount > 0 && typeof document !== "undefined"
-        ? createPortal(
-            <div className="sticky-cta">
-              <div className="sticky-cta-left">
-                <div className="sticky-cta-title">Keranjang</div>
-                <div className="sticky-cta-value">
-                  <span>{cartItemCount} item</span>
-                  <span className="sticky-cta-sep" aria-hidden="true" />
-                  <span>{formatIDR(subtotal())}</span>
-                </div>
-              </div>
-              <Link className="btn" to="/checkout" state={{ backgroundLocation: location }}>
-                Checkout
-              </Link>
-            </div>,
-            document.body
-          )
-        : null}
     </div>
   );
 }
@@ -1399,8 +1384,7 @@ export default function Products() {
 const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0, onBeforeNavigate }) {
   const stock = Number(product._stock || 0);
   const sold = Number(product._sold || 0);
-  const soldOut = stock <= 0;
-  const low = stock > 0 && stock <= 5;
+  const stockState = classifyStock(stock);
   const hot = sold >= 10;
   const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
   const category = CATEGORIES.find((item) => item.key === product._category);
@@ -1433,7 +1417,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
 
           <div className="catalog-cardCopy">
             <div className="catalog-cardKicker">
-              <CategoryIcon size={13} />
+              <CategoryIcon size={11} />
               <span>{categoryLabel}</span>
             </div>
             <div className="catalog-cardTitle">{product.name}</div>
@@ -1453,10 +1437,15 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
             <span>Hot</span>
           </span>
         ) : null}
-        {soldOut ? (
+        {stockState === "out" ? (
           <span className="catalog-status soldout">
             <CircleAlert size={13} />
             <span>Habis</span>
+          </span>
+        ) : stockState === "low" ? (
+          <span className="catalog-status warn">
+            <CircleAlert size={13} />
+            <span>Stok menipis</span>
           </span>
         ) : (
           <span className="catalog-status ok">
@@ -1480,14 +1469,6 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
         <span>
           <Layers3 size={13} />
           <span>{product._vars?.length || 0} varian</span>
-        </span>
-        <span>
-          <PackageCheck size={13} />
-          <span>Stok: {stock}</span>
-        </span>
-        <span>
-          <ShoppingBag size={13} />
-          <span>{sold} terjual</span>
         </span>
       </div>
 

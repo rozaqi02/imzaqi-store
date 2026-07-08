@@ -26,19 +26,48 @@ function mockMatchMedia({ viewportWidth, pointerCoarse, prefersReducedMotion }) 
   };
 }
 
-function expectedMotionMode({ viewportWidth, pointerCoarse, prefersReducedMotion }) {
+function expectedMotionMode({ viewportWidth, pointerCoarse, prefersReducedMotion, saveData, lowMemory }) {
   if (prefersReducedMotion) return "off";
+  if (saveData || lowMemory) return "off";
   if (viewportWidth >= 721 && viewportWidth <= 1024) return "full";
   if (viewportWidth <= 720) return "lite";
   if (pointerCoarse || viewportWidth <= 920) return "lite";
   return "full";
 }
 
+function mockNavigator({ saveData = false, deviceMemory = 8 } = {}) {
+  const originalConnection = navigator.connection;
+  const originalDeviceMemory = navigator.deviceMemory;
+
+  Object.defineProperty(navigator, "connection", {
+    configurable: true,
+    value: { saveData },
+  });
+  Object.defineProperty(navigator, "deviceMemory", {
+    configurable: true,
+    value: deviceMemory,
+  });
+
+  return () => {
+    Object.defineProperty(navigator, "connection", {
+      configurable: true,
+      value: originalConnection,
+    });
+    Object.defineProperty(navigator, "deviceMemory", {
+      configurable: true,
+      value: originalDeviceMemory,
+    });
+  };
+}
+
 describe("detectMotionMode - Property 3: Motion mode detection correctness", () => {
   const originalMatchMedia = window.matchMedia;
+  let restoreNavigator = () => {};
 
   afterEach(() => {
     window.matchMedia = originalMatchMedia;
+    restoreNavigator();
+    restoreNavigator = () => {};
   });
 
   it("returns the correct motion mode for any combination of viewport width, pointer type, and prefers-reduced-motion", () => {
@@ -48,11 +77,17 @@ describe("detectMotionMode - Property 3: Motion mode detection correctness", () 
           viewportWidth: fc.integer({ min: 200, max: 3840 }),
           pointerCoarse: fc.boolean(),
           prefersReducedMotion: fc.boolean(),
+          saveData: fc.boolean(),
+          lowMemory: fc.boolean(),
         }),
-        ({ viewportWidth, pointerCoarse, prefersReducedMotion }) => {
+        ({ viewportWidth, pointerCoarse, prefersReducedMotion, saveData, lowMemory }) => {
+          restoreNavigator = mockNavigator({
+            saveData,
+            deviceMemory: lowMemory ? 2 : 8,
+          });
           window.matchMedia = mockMatchMedia({ viewportWidth, pointerCoarse, prefersReducedMotion });
           expect(detectMotionMode()).toBe(
-            expectedMotionMode({ viewportWidth, pointerCoarse, prefersReducedMotion })
+            expectedMotionMode({ viewportWidth, pointerCoarse, prefersReducedMotion, saveData, lowMemory })
           );
         }
       ),
@@ -68,6 +103,7 @@ describe("detectMotionMode - Property 3: Motion mode detection correctness", () 
           pointerCoarse: fc.boolean(),
         }),
         ({ viewportWidth, pointerCoarse }) => {
+          restoreNavigator = mockNavigator();
           window.matchMedia = mockMatchMedia({
             viewportWidth,
             pointerCoarse,
@@ -87,6 +123,7 @@ describe("detectMotionMode - Property 3: Motion mode detection correctness", () 
         fc.integer({ min: 721, max: 1024 }),
         fc.boolean(),
         (viewportWidth, pointerCoarse) => {
+          restoreNavigator = mockNavigator();
           window.matchMedia = mockMatchMedia({
             viewportWidth,
             pointerCoarse,
@@ -106,6 +143,7 @@ describe("detectMotionMode - Property 3: Motion mode detection correctness", () 
         fc.integer({ min: 200, max: 720 }),
         fc.boolean(),
         (viewportWidth, pointerCoarse) => {
+          restoreNavigator = mockNavigator();
           window.matchMedia = mockMatchMedia({
             viewportWidth,
             pointerCoarse,
@@ -124,6 +162,7 @@ describe("detectMotionMode - Property 3: Motion mode detection correctness", () 
       fc.property(
         fc.integer({ min: 1025, max: 3840 }),
         (viewportWidth) => {
+          restoreNavigator = mockNavigator();
           window.matchMedia = mockMatchMedia({
             viewportWidth,
             pointerCoarse: false,
@@ -135,5 +174,27 @@ describe("detectMotionMode - Property 3: Motion mode detection correctness", () 
       ),
       { numRuns: 100 }
     );
+  });
+
+  it("returns 'off' when saveData is enabled", () => {
+    restoreNavigator = mockNavigator({ saveData: true });
+    window.matchMedia = mockMatchMedia({
+      viewportWidth: 1440,
+      pointerCoarse: false,
+      prefersReducedMotion: false,
+    });
+
+    expect(detectMotionMode()).toBe("off");
+  });
+
+  it("returns 'off' when deviceMemory is 2 or less", () => {
+    restoreNavigator = mockNavigator({ deviceMemory: 2 });
+    window.matchMedia = mockMatchMedia({
+      viewportWidth: 1440,
+      pointerCoarse: false,
+      prefersReducedMotion: false,
+    });
+
+    expect(detectMotionMode()).toBe("off");
   });
 });

@@ -1,4 +1,4 @@
-const CACHE_NAME = 'imzaqi-cache-v5';
+const CACHE_NAME = 'imzaqi-cache-v7';
 const PRECACHE_URLS = [
   '/',
   '/index.html',

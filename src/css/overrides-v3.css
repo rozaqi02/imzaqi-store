@@ -101,20 +101,6 @@ html body .site-header::after{
   .header-inner{padding:12px 0;}
 }
 
-/* 2) Sidebar backdrop: glass blur — desktop only to preserve mobile perf optimisations */
-@media (min-width: 721px) {
-  .mobile-backdrop{
-    background:rgba(0,0,0,.46) !important;
-    backdrop-filter:blur(18px) saturate(140%) !important;
-  }
-
-  /* Also make the mobile menu itself feel more like glass */
-  .mobile-menu{
-    background:rgba(10,14,28,.88) !important;
-    backdrop-filter:blur(18px) saturate(150%) !important;
-  }
-}
-
 /* Steps: more premium */
 .steps{border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.045);backdrop-filter:blur(12px);}
 .step.active{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.07);} 

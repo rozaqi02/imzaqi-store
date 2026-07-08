@@ -600,6 +600,21 @@ html[data-theme="light"] .hx-live-dot {
   color: var(--text);
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="full"] .hx-headline {
+    animation: hxHeadlineIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+  }
+}
+
+@keyframes hxHeadlineIn {
+  from {
+    transform: translateY(20px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
 .hx-headline-gradient {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
   -webkit-background-clip: text;
@@ -630,17 +645,16 @@ html[data-theme="light"] .hx-live-dot {
 }
 
 .hx-search-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
   background: var(--imzaqi-btn-face) !important;
   box-shadow: var(--imzaqi-btn-shadow) !important;
   color: var(--imzaqi-btn-text) !important;
   border: none !important;
   border-radius: 14px !important;
-  padding: 10px 20px !important;
-  font-weight: 800 !important;
-  font-size: 13.5px !important;
+  padding: 0 !important;
   cursor: pointer !important;
   transition: all 0.2s ease !important;
   flex-shrink: 0;
@@ -677,33 +691,95 @@ html[data-theme="light"] .hx-live-dot {
   box-shadow: var(--skeu-control-shadow);
   border: none;
   border-radius: 99px;
-  padding: 6px 14px;
+  padding: 6px 12px 6px 8px;
   font-size: 12px;
   font-weight: 800;
   color: var(--text);
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  justify-content: center;
+  gap: 8px;
+  max-width: min(100%, 220px);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.hx-brand-pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--brand-clr);
-  box-shadow: 0 0 6px var(--brand-clr-alpha);
-  transition: all 0.2s ease;
+.hx-brand-pill-rank {
+  display: inline-grid;
+  place-items: center;
+  min-width: 28px;
+  height: 22px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 1000;
+  letter-spacing: 0.03em;
+  flex-shrink: 0;
+}
+
+.hx-brand-pill-rank--1 {
+  border: 1px solid rgba(255, 215, 0, 0.44);
+  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 165, 0, 0.12));
+  color: #ffd700;
+}
+
+.hx-brand-pill-rank--2 {
+  border: 1px solid rgba(192, 192, 192, 0.38);
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.14), rgba(120, 120, 120, 0.08));
+  color: #e2e8f0;
+}
+
+.hx-brand-pill-rank--3 {
+  border: 1px solid rgba(205, 127, 50, 0.36);
+  background: linear-gradient(135deg, rgba(205, 127, 50, 0.16), rgba(139, 69, 19, 0.08));
+  color: #f6ad55;
+}
+
+.hx-brand-pill-rank--4 {
+  border: 1px solid rgba(0, 214, 180, 0.38);
+  background: linear-gradient(135deg, rgba(0, 214, 180, 0.14), rgba(0, 138, 148, 0.08));
+  color: #4effda;
+}
+
+.hx-brand-pill-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-align: left;
+}
+
+html[data-theme="light"] .hx-brand-pill-rank--1 {
+  border-color: rgba(212, 160, 23, 0.44);
+  background: linear-gradient(135deg, rgba(255, 223, 118, 0.32), rgba(255, 203, 73, 0.22));
+  color: #8b6200;
+}
+
+html[data-theme="light"] .hx-brand-pill-rank--2 {
+  border-color: rgba(90, 115, 125, 0.24);
+  background: linear-gradient(135deg, rgba(230, 240, 245, 0.8), rgba(200, 215, 222, 0.6));
+  color: #4a626e;
+}
+
+html[data-theme="light"] .hx-brand-pill-rank--3 {
+  border-color: rgba(175, 96, 26, 0.28);
+  background: linear-gradient(135deg, rgba(252, 235, 222, 0.8), rgba(240, 210, 185, 0.6));
+  color: #804310;
+}
+
+html[data-theme="light"] .hx-brand-pill-rank--4 {
+  border-color: rgba(0, 138, 148, 0.32);
+  background: linear-gradient(135deg, rgba(220, 246, 248, 0.8), rgba(188, 235, 238, 0.6));
+  color: #006b74;
 }
 
 .hx-brand-pill:hover,
 .hx-brand-pill:active,
 .hx-brand-pill.is-active {
   background: var(--skeu-inset-bg);
-  box-shadow: var(--skeu-inset-shadow), 0 0 10px var(--brand-clr-alpha);
+  box-shadow: var(--skeu-inset-shadow), 0 0 10px rgba(0, 214, 180, 0.2);
   transform: translateY(1px);
-  color: var(--brand-clr);
+  color: var(--accent);
 }
 
 /* === Action CTAs Section === */
@@ -768,23 +844,41 @@ html[data-theme="light"] .hx-live-dot {
 
 /* === Stats Counter Section === */
 .hx-stats-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: clamp(16px, 4vw, 36px);
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 20px;
   width: 100%;
-  margin-top: 12px;
+  max-width: 340px;
+  margin: 12px auto 0;
   border-top: 1px dashed rgba(0, 194, 208, 0.1);
   padding-top: 20px;
+}
+
+@media (min-width: 721px) {
+  .hx-stats-row {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+    gap: clamp(20px, 4vw, 48px);
+    max-width: 100%;
+    padding-top: 24px;
+  }
+
+  .hx-stat-item {
+    flex: 0 1 auto;
+    min-width: 100px;
+  }
 }
 
 .hx-stat-item {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   gap: 4px;
-  min-width: 100px;
+  min-width: 0;
+  text-align: center;
 }
 
 .hx-stat-val {
@@ -823,7 +917,9 @@ html[data-theme="light"] .hx-live-dot {
 /* === Responsive === */
 @media (max-width: 768px) {
   .hx-hero {
-    padding: 36px 0;
+    min-height: auto;
+    padding-top: calc(var(--site-header-offset) + 28px) !important;
+    padding-bottom: 28px;
   }
 
   .hx-hero-container {
@@ -848,14 +944,6 @@ html[data-theme="light"] .hx-live-dot {
   .hx-btn-secondary {
     width: 100%;
     justify-content: center;
-  }
-
-  .hx-stats-row {
-    gap: 16px 24px;
-  }
-
-  .hx-stat-item {
-    min-width: 40%;
   }
 }
 
@@ -994,6 +1082,7 @@ html[data-theme="light"] .home-howGrid::before {
 .home-howCard {
   position: relative;
   z-index: 2;
+  width: 100%;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -1001,6 +1090,12 @@ html[data-theme="light"] .home-howGrid::before {
   padding: 16px 20px;
   border-radius: 20px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03)),
     radial-gradient(circle at top right, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0) 52%);
@@ -1027,6 +1122,31 @@ html[data-theme="light"] .home-howGrid::before {
 
 .home-howCard-step {
   display: none;
+}
+
+@media (min-width: 721px) {
+  .home-howCard-step {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--uni-neo-icon, #9cddff);
+    border: 1px solid rgba(0, 214, 180, 0.28);
+    background: rgba(0, 214, 180, 0.08);
+    box-shadow: 0 4px 12px rgba(0, 214, 180, 0.12);
+  }
+
+  html[data-theme="light"] .home-howCard-step {
+    color: #007a85;
+    border-color: rgba(0, 138, 148, 0.24);
+    background: rgba(0, 138, 148, 0.06);
+    box-shadow: 0 4px 10px rgba(0, 138, 148, 0.1);
+  }
 }
 
 .home-howCard-icon {
@@ -1254,7 +1374,7 @@ html[data-theme="light"] .home-promoCard-stub {
   font-size: 26px;
   font-weight: 1000;
   color: var(--uni-neo-icon, #4effda);
-  font-family: "Outfit", "Inter", sans-serif;
+  font-family: "Outfit", "Plus Jakarta Sans", sans-serif;
   line-height: 1;
   letter-spacing: -0.04em;
   text-shadow: 0 0 12px rgba(0, 214, 180, 0.25);
@@ -1334,7 +1454,7 @@ html[data-theme="light"] .home-promoCard-punch {
   font-size: 16px;
   font-weight: 900;
   color: var(--uni-text, #ebf8ff);
-  font-family: "Outfit", "Inter", sans-serif;
+  font-family: "Outfit", "Plus Jakarta Sans", sans-serif;
   letter-spacing: 0.05em;
   text-transform: uppercase;
   overflow: hidden;
@@ -1391,6 +1511,15 @@ html[data-theme="light"] .home-promoCard-action {
   }
 }
 
+/* Snappier reveal on home sections (popular + FAQ) */
+@media (prefers-reduced-motion: no-preference) {
+  .home-page .home-popularList .reveal,
+  .home-page .home-popularList .reveal-scale,
+  .home-page .home-faqSection .reveal {
+    transition-duration: 0.36s, 0.36s, 0.36s;
+  }
+}
+
 /* â”€â”€ Popular products: grid on desktop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .home-page .home-popularList {
   overflow: visible !important;
@@ -1410,11 +1539,47 @@ html[data-theme="light"] .home-promoCard-action {
   margin-bottom: 2px;
 }
 
-@media (min-width: 721px) {
-  .home-page .home-popularList.grid-mode {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 18px;
+/* Popular section: subtle hover feedback (no flip card) */
+@media (hover: hover) {
+  .home-page .home-popularList .product-tile {
+    transition:
+      transform 0.22s var(--ease-out, ease-out),
+      border-color 0.22s ease,
+      box-shadow 0.22s ease;
   }
+
+  .home-page .home-popularList .product-tile:hover {
+    transform: translateY(-3px);
+    border-color: rgba(0, 214, 180, 0.32);
+  }
+
+  .home-page .home-popularList .product-tile:hover::after {
+    opacity: 0.5;
+  }
+
+  .home-page .home-popularList .product-tile:hover .product-tile-arrow {
+    transform: translate(2px, -2px);
+    color: var(--accent, #4effda);
+    background: rgba(0, 214, 180, 0.1);
+  }
+
+  .home-page .home-popularList .product-tile:hover .product-tile-icon {
+    box-shadow: 0 10px 26px var(--brand-color, rgba(0, 214, 180, 0.18));
+  }
+}
+
+html[data-theme="light"] .home-page .home-popularList .product-tile:hover {
+  border-color: rgba(0, 138, 148, 0.28);
+}
+
+html[data-theme="light"] .home-page .home-popularList .product-tile:hover .product-tile-arrow {
+  color: #008a94;
+  background: rgba(0, 138, 148, 0.08);
+}
+
+.home-page .home-popularList.list-mode {
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
 /* â”€â”€ Home FAQ section â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
@@ -1607,80 +1772,33 @@ html[data-theme="light"] .home-howCard.is-expanded {
   box-shadow: 0 12px 24px rgba(0, 138, 148, 0.12) !important;
 }
 
-/* FAQ Search and Filter */
+/* FAQ search — reuse shared faq-searchWrap system (same as /faq page) */
 .home-faqSearchWrap {
   width: 100%;
-  max-width: 500px;
-  margin: 0 auto 20px auto;
+  max-width: 560px;
+  margin: 0 auto 20px;
 }
 
-.home-faqSearchShell {
+.home-faqSection .faq-searchWrap {
   display: flex;
   align-items: center;
-  position: relative;
-  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
-  border-radius: 99px;
-  padding: 8px 16px;
-  transition: all 0.22s var(--ease-out);
-}
-
-.home-faqSearchShell:focus-within {
-  border-color: rgba(0, 214, 180, 0.4);
-  box-shadow: 0 0 0 3px rgba(0, 214, 180, 0.15);
-}
-
-.home-faqSearchIcon {
-  color: var(--uni-muted, rgba(234, 255, 245, 0.5));
-  margin-right: 10px;
-  flex-shrink: 0;
-}
-
-.home-faqSearchInput {
-  background: transparent;
-  border: 0;
-  color: var(--text, #fff);
-  font-size: 13.5px;
+  gap: 10px;
   width: 100%;
-  outline: none;
-  font-weight: 500;
 }
 
-.home-faqSearchInput::placeholder {
-  color: var(--uni-muted, rgba(234, 255, 245, 0.4));
+.home-faqSection .faq-searchInput {
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.home-faqSearchClear {
-  background: transparent;
-  border: 0;
-  color: var(--uni-muted, rgba(234, 255, 245, 0.5));
+.home-faqSection .faq-searchClear {
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
   cursor: pointer;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  transition: all 0.15s ease;
-}
-
-.home-faqSearchClear:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-}
-
-html[data-theme="light"] .home-faqSearchShell {
-  background: rgba(255, 255, 255, 0.9);
-  border-color: rgba(0, 138, 148, 0.15);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-}
-
-html[data-theme="light"] .home-faqSearchShell:focus-within {
-  border-color: rgba(0, 138, 148, 0.5);
-  box-shadow: 0 0 0 3px rgba(0, 194, 208, 0.12);
-}
-
-html[data-theme="light"] .home-faqSearchInput {
-  color: #0d2d39;
 }
 
 @media (max-width: 720px) {

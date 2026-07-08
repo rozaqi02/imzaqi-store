@@ -1311,26 +1311,16 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   transform: translate3d(0, 0, 0);
 }
 
-/* Handle bar — lebih visible, brand teal, tap area diperbesar */
+/* Handle bar — decorative only, no swipe interaction */
 .catalog-sheetHandle {
   width: 56px;
   height: 5px;
   border-radius: 999px;
   background: rgba(0, 214, 180, 0.4);
-  margin: 0 auto;
+  margin: 8px auto 0;
   flex: 0 0 auto;
-  /* Tap area diperbesar dengan padding invisible */
-  padding: 10px 20px;
-  background-clip: content-box;
-  cursor: grab;
-  transition: background 0.18s ease, transform 0.18s ease;
-}
-
-.catalog-sheetHandle:active {
-  cursor: grabbing;
-  background: rgba(0, 214, 180, 0.6);
-  background-clip: content-box;
-  transform: scaleX(0.88);
+  cursor: default;
+  pointer-events: none;
 }
 
 .catalog-sheetHead {
@@ -1439,6 +1429,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   min-height: 48px;
   border-radius: 16px;
   font-size: 14px;
+  cursor: pointer;
 }
 
 .catalog-sheetReset {
@@ -1466,19 +1457,6 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   animation-delay: calc(var(--section-i, 0) * 50ms + 120ms);
 }
 
-/* ── Handle bounce hint saat sheet pertama terbuka ── */
-@keyframes sheetHandleBounce {
-  0%   { transform: scaleX(1); }
-  30%  { transform: scaleX(1.18); }
-  60%  { transform: scaleX(0.92); }
-  80%  { transform: scaleX(1.06); }
-  100% { transform: scaleX(1); }
-}
-
-.catalog-sheet.is-open .catalog-sheetHandle {
-  animation: sheetHandleBounce 0.56s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
-}
-
 /* ── Light mode overrides ── */
 html[data-theme="light"] .catalog-sheetBackdrop {
   background: rgba(9, 26, 40, 0.28);
@@ -1499,11 +1477,6 @@ html[data-theme="light"] .catalog-sheet {
 
 html[data-theme="light"] .catalog-sheetHandle {
   background: rgba(0, 138, 148, 0.5);
-  background-clip: content-box;
-}
-
-html[data-theme="light"] .catalog-sheetHandle:active {
-  background: rgba(0, 138, 148, 0.72);
   background-clip: content-box;
 }
 
@@ -1724,7 +1697,8 @@ html[data-theme="light"] .catalog-sheetFoot {
     z-index: 110;
   }
 
-  /* kill all .reveal effects on hero to prevent stacking context interference on Android Chrome */
+  /* Hero is always above the fold — never hide behind reveal animations */
+  .catalog-hero,
   .catalog-hero.reveal,
   .catalog-hero.reveal.is-visible {
     transform: none !important;
@@ -2129,13 +2103,16 @@ html[data-theme="light"] .catalog-sheetFoot {
   gap: 5px;
   margin: 0;
   color: rgba(234, 255, 245, 0.62);
-  font-size: 9px;
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   line-height: 1.25;
 }
 
 .catalog-card.catalog-cardV2 .catalog-cardKicker svg {
-  width: 11px;
-  height: 11px;
+  width: 9px;
+  height: 9px;
   flex-shrink: 0;
 }
 
@@ -2344,7 +2321,7 @@ html[data-theme="light"] .catalog-sheetFoot {
   .catalog-card.catalog-cardV2 .catalog-status {
     min-height: 24px;
     padding: 0 8px;
-    font-size: 10px;
+    font-size: 11px;
   }
 
   .catalog-card.catalog-cardV2 .catalog-cardMeta > span {
@@ -2366,11 +2343,12 @@ html[data-theme="light"] .catalog-sheetFoot {
     display: none;
   }
 
-  .catalog-card.catalog-cardV2 .catalog-cardMeta > span {
-    width: 100%;
-    min-width: 0;
-    min-height: 22px;
-    font-size: 8px;
+  .catalog-card.catalog-cardV2 .catalog-cardMeta {
+    display: none;
+  }
+
+  .catalog-card.catalog-cardV2 .catalog-status {
+    font-size: 11px;
   }
 
   .catalog-card.catalog-cardV2 .catalog-cardPrice {
@@ -2570,11 +2548,6 @@ html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardFoot {
     -webkit-line-clamp: 1;
   }
 
-  .catalog-card.catalog-cardV2 .catalog-cardMeta > span {
-    min-height: 25px;
-    font-size: 10px;
-  }
-
   .catalog-card.catalog-cardV2 .catalog-cardFoot {
     font-size: 11px;
   }
@@ -2697,13 +2670,6 @@ html[data-theme="light"] .catalog-page .catalog-viewBtn.active {
 
 .catalog-loadMore .btn:active {
   transform: scale(0.97);
-}
-
-@media (max-width: 860px) {
-  /* Extra bottom clearance so load-more button clears the sticky cart bar */
-  .with-sticky-cta .catalog-loadMore {
-    padding-bottom: 24px;
-  }
 }
 
 /* ─── Catalog command: hero-style search box with tactile press ───────── */

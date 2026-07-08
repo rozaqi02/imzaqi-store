@@ -4,6 +4,10 @@ import { flushSync } from "react-dom";
 const ThemeContext = createContext(null);
 const STORAGE_KEY = "imzaqi-theme-v2";
 const THEME_FADE_MS = 1000;
+const THEME_COLORS = {
+  light: "#f4f6f9",
+  dark: "#0a0a0f",
+};
 
 function shouldAnimateTheme() {
   if (typeof window === "undefined") return false;
@@ -37,6 +41,14 @@ export function ThemeProvider({ children }) {
     root.classList.add("no-theme-transition");
     root.dataset.theme = theme;
     root.style.colorScheme = theme;
+
+    let themeColorMeta = document.querySelector('meta[name="theme-color"]');
+    if (!themeColorMeta) {
+      themeColorMeta = document.createElement("meta");
+      themeColorMeta.setAttribute("name", "theme-color");
+      document.head.appendChild(themeColorMeta);
+    }
+    themeColorMeta.setAttribute("content", THEME_COLORS[theme]);
 
     const frame = requestAnimationFrame(() => {
       if (!root.classList.contains("theme-fade-active")) {

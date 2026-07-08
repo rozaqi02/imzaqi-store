@@ -19,11 +19,11 @@ function toggleFavorite(id) {
   return idx < 0; // returns true if added
 }
 
-export default function ProductTile({ product, rank, layout = "list", disableTilt = false }) {
+export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
   const isMobileViewport = useIsMobile("(max-width: 720px)");
-  const useFlipCard = isGrid && !isMobileViewport;
+  const useFlipCard = isGrid && !isMobileViewport && !disableFlip;
   const [isFav, setIsFav] = useState(() => getFavorites().includes(product?.id));
   const [heartFloats, setHeartFloats] = useState([]);
   const lastTapRef = useRef(0);
@@ -140,7 +140,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
             <PackageCheck size={14} />
             <span>{stock} stok</span>
           </span>
-          <span className="product-tile-pill home-popularSold" title={`${sold} terjual`}>
+          <span className="product-tile-pill home-popularSold" title={`${sold} item terjual`}>
             <ShoppingBag size={14} />
             <span>{sold} terjual</span>
           </span>

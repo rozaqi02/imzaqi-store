@@ -36,7 +36,7 @@ export default function SwUpdateToast() {
       <RefreshCw size={16} />
       <span>Versi baru tersedia</span>
       <button type="button" className="btn btn-sm" onClick={() => waitingWorker.postMessage({ type: "SKIP_WAITING" })}>
-        Update
+        Perbarui
       </button>
     </div>
   );

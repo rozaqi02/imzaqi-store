@@ -9,6 +9,7 @@ import { formatIDR } from "../lib/format";
 import { checkStockAvailability } from "../lib/api";
 import CheckoutSteps from "../components/CheckoutSteps";
 import CheckoutExtrasPanel from "../components/CheckoutExtrasPanel";
+import CheckoutTrustBlock from "../components/CheckoutTrustBlock";
 import { markCheckoutVisited } from "../lib/cartReminder";
 import EmptyState from "../components/EmptyState";
 import { useToast } from "../context/ToastContext";
@@ -156,7 +157,9 @@ export default function Checkout() {
 
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
   const hasStockIssue = useMemo(() => cart.items.some((item) => stockWarnings[item.variant_id]), [cart.items, stockWarnings]);
+  const stockDisabledReason = hasStockIssue ? "Ada item yang stoknya abis atau kurang" : null;
   const backgroundLocation = location.state?.backgroundLocation;
+  const isDrawerCheckout = Boolean(backgroundLocation);
 
   const requestClose = useCallback(() => {
     setClosing((prev) => (prev ? prev : true));
@@ -198,7 +201,7 @@ export default function Checkout() {
   async function onApplyPromo() {
     const raw = String(code || "").trim();
     if (!raw) {
-      const text = "Kode promo kosong.";
+      const text = "Isi kode promonya dulu.";
       setMsg(text);
       toast.error(text);
       setPromoStatus("error");
@@ -219,7 +222,7 @@ export default function Checkout() {
         setPromoStatus("error");
       }
     } catch (e) {
-      toast.error("Gagal verifikasi kode promo.");
+      toast.error("Gagal cek kode promo. Coba lagi ya.");
     } finally {
       setIsVerifying(false);
       setTimeout(() => setPromoStatus(null), 1500);
@@ -243,7 +246,7 @@ export default function Checkout() {
       return;
     }
 
-    nav("/bayar", { replace: true });
+    nav("/bayar");
   }
 
   function renderPromoCard() {
@@ -262,7 +265,7 @@ export default function Checkout() {
                 clear();
                 setCode("");
                 setMsg("");
-                toast.info("Promo direset.");
+                toast.info("Promo di-reset.");
               }}
             >
               Reset
@@ -271,12 +274,17 @@ export default function Checkout() {
         </div>
 
         <div className={`checkout-promo-controls ${promoStatus ? `promo-${promoStatus}` : ""}`}>
+          <label htmlFor="checkout-promo-code" className="sr-only">
+            Kode promo
+          </label>
           <input
+            id="checkout-promo-code"
             className="input"
             placeholder="Kode promo"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             disabled={isVerifying}
+            aria-describedby={msg ? "checkout-promo-message" : undefined}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -290,7 +298,14 @@ export default function Checkout() {
         </div>
 
         {msg ? (
-          <div className={`checkout-promo-message ${promoPercent ? "ok" : ""}`}>{msg}</div>
+          <div
+            id="checkout-promo-message"
+            className={`checkout-promo-message ${promoPercent ? "ok" : ""}`}
+            aria-live="polite"
+            role="status"
+          >
+            {msg}
+          </div>
         ) : null}
       </div>
     );
@@ -337,7 +352,7 @@ export default function Checkout() {
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
             <h1 className="h1 checkout-drawerTitle">Checkout.</h1>
-            <p className="checkout-drawerSub">Periksa order sebelum lanjut bayar.</p>
+            <p className="checkout-drawerSub">Cek order dulu sebelum bayar.</p>
           </div>
 
           <button
@@ -398,6 +413,8 @@ export default function Checkout() {
                     collapsed={isMobileSheet}
                     promoSection={renderPromoCard()}
                   />
+
+                  <CheckoutTrustBlock />
                 </>
               )}
             </section>
@@ -411,16 +428,27 @@ export default function Checkout() {
             <div className="checkout-floating-bar-info">
               <span className="checkout-floating-bar-label">Total</span>
               <span className="checkout-floating-bar-price">{formatIDR(total)}</span>
+              {stockDisabledReason ? (
+                <span className="checkout-floating-bar-reason" role="status">
+                  {stockDisabledReason}
+                </span>
+              ) : null}
             </div>
             <button
               className="btn btn-primary checkout-floating-bar-btn"
               type="button"
               onClick={goPay}
               disabled={hasStockIssue}
+              aria-describedby={stockDisabledReason ? "checkout-drawer-stock-reason" : undefined}
             >
-              <span>Lanjut bayar</span>
+              <span>Lanjut ke bayar</span>
               <ArrowRight size={16} />
             </button>
+            {stockDisabledReason ? (
+              <span id="checkout-drawer-stock-reason" className="sr-only">
+                {stockDisabledReason}
+              </span>
+            ) : null}
           </div>
         ) : null}
       </>
@@ -429,8 +457,8 @@ export default function Checkout() {
 
   if (typeof document === "undefined") return null;
 
-  if (!backgroundLocation) {
-    // ── DEDICATED FULL-PAGE MODE (For Mobile and Direct Visits) ──
+  if (!isDrawerCheckout) {
+    // ── FULL-PAGE MODE (mobile + direct visits; desktop without overlay state) ──
     return (
       <div className="page checkout-page-full">
         <div className="container checkout-full-container">
@@ -451,7 +479,7 @@ export default function Checkout() {
             </button>
             <div className="checkout-full-title-wrap">
               <h1 className="h1 checkout-full-title">Checkout</h1>
-              <p className="checkout-full-sub">Periksa order sebelum lanjut bayar.</p>
+              <p className="checkout-full-sub">Cek order dulu sebelum bayar.</p>
             </div>
           </div>
 
@@ -501,6 +529,10 @@ export default function Checkout() {
                       promoSection={renderPromoCard()}
                     />
                   </section>
+
+                  <section className="card pad checkout-panel checkout-full-trust-panel">
+                    <CheckoutTrustBlock />
+                  </section>
                 </div>
               )}
             </main>
@@ -519,15 +551,26 @@ export default function Checkout() {
             <div className="checkout-floating-bar-info">
               <span className="checkout-floating-bar-label">Total Pembayaran</span>
               <span className="checkout-floating-bar-price">{formatIDR(total)}</span>
+              {stockDisabledReason ? (
+                <span className="checkout-floating-bar-reason" role="status">
+                  {stockDisabledReason}
+                </span>
+              ) : null}
             </div>
             <button
               className="btn btn-primary checkout-floating-bar-btn"
               onClick={goPay}
               disabled={hasStockIssue}
+              aria-describedby={stockDisabledReason ? "checkout-full-stock-reason" : undefined}
             >
-              <span>Bayar</span>
+              <span>Lanjut ke bayar</span>
               <ArrowRight size={16} />
             </button>
+            {stockDisabledReason ? (
+              <span id="checkout-full-stock-reason" className="sr-only">
+                {stockDisabledReason}
+              </span>
+            ) : null}
           </div>
         )}
       </div>
@@ -620,7 +663,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
       setPulseKind(null);
       toast.info(`${item.product_name} dihapus`, {
         title: "Keranjang",
-        actionLabel: "Undo",
+        actionLabel: "Batalin",
         duration: 6000,
         onAction: () =>
           cart.add(
@@ -674,7 +717,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
               cart.setQty(item.variant_id, item.qty - 1);
               triggerQtyPulse();
             }}
-            aria-label="Kurangi"
+            aria-label={`Kurangi jumlah ${item.product_name}`}
             disabled={item.qty <= 1}
           >
             -
@@ -695,7 +738,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
                 triggerQtyPulse();
               }
             }}
-            aria-label="Jumlah"
+            aria-label={`Jumlah ${item.product_name}`}
             aria-invalid={item.qty < 1 || item.qty > 99}
           />
           <button
@@ -704,7 +747,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
               cart.setQty(item.variant_id, item.qty + 1);
               triggerQtyPulse();
             }}
-            aria-label="Tambah"
+            aria-label={`Tambah jumlah ${item.product_name}`}
             disabled={item.qty >= 99}
           >
             +
@@ -724,10 +767,37 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
         </button>
       </div>
       {stockWarnings[item.variant_id] ? (
-        <div className={`checkout-stockWarn ${stockWarnings[item.variant_id].type}`}>
-          {stockWarnings[item.variant_id].type === "out"
-            ? "⚠ Stok habis — pertimbangkan untuk menghapus item ini"
-            : `⚠ Stok tersisa ${stockWarnings[item.variant_id].available}, kamu pesan ${item.qty}`}
+        <div
+          role="alert"
+          className={`checkout-stockWarn ${stockWarnings[item.variant_id].type}`}
+        >
+          <span className="checkout-stockWarn-text">
+            {stockWarnings[item.variant_id].type === "out"
+              ? "Stok abis nih — hapus dulu biar lanjut"
+              : `Stok cuma ${stockWarnings[item.variant_id].available}, kamu pesan ${item.qty}`}
+          </span>
+          <div className="checkout-stockWarn-actions">
+            {stockWarnings[item.variant_id].type === "insufficient" ? (
+              <button
+                type="button"
+                className="btn btn-sm btn-ghost checkout-stockWarn-btn"
+                onClick={() => {
+                  cart.setQty(item.variant_id, stockWarnings[item.variant_id].available);
+                  triggerQtyPulse();
+                  toast.info(`Jumlah ${item.product_name} disesuaikan ke stok yang ada`);
+                }}
+              >
+                Kurangi ke {stockWarnings[item.variant_id].available}
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className="btn btn-sm btn-ghost checkout-stockWarn-btn"
+              onClick={handleRemove}
+            >
+              Hapus item
+            </button>
+          </div>
         </div>
       ) : null}
     </div>

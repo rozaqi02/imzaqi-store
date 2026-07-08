@@ -13,11 +13,6 @@ export function hasAdminRoleMetadata(user) {
   return String(role || "").toLowerCase() === "admin";
 }
 
-/** @deprecated Use checkIsAdmin() — sync metadata check only */
-export function isAdminUser(user) {
-  return hasAdminRoleMetadata(user);
-}
-
 async function isUserInAdminTable(userId) {
   const { data, error } = await supabase
     .from("admin_users")

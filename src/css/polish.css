@@ -184,18 +184,18 @@ a.btn:active {
   }
 }
 
-/* ─── 8. Card glow on hover (desktop) ──────────────────────────────────── */
+/* ─── 8. Card glow on hover (desktop, full motion only) ───────────────── */
 @media (hover: hover) and (pointer: fine) {
 
-  .product-tile,
-  .catalog-card,
-  .pdx-variantCard {
+  html[data-motion="full"] .product-tile,
+  html[data-motion="full"] .catalog-card,
+  html[data-motion="full"] .pdx-variantCard {
     position: relative;
   }
 
-  .product-tile::after,
-  .catalog-card::after,
-  .pdx-variantCard::after {
+  html[data-motion="full"] .product-tile::after,
+  html[data-motion="full"] .catalog-card::after,
+  html[data-motion="full"] .pdx-variantCard::after {
     content: "";
     position: absolute;
     inset: -1px;
@@ -209,23 +209,23 @@ a.btn:active {
     z-index: 0;
   }
 
-  .product-tile:hover::after,
-  .catalog-card:hover::after,
-  .pdx-variantCard:hover::after {
+  html[data-motion="full"] .product-tile:hover::after,
+  html[data-motion="full"] .catalog-card:hover::after,
+  html[data-motion="full"] .pdx-variantCard:hover::after {
     opacity: 1;
   }
 
-  .product-tile>*,
-  .catalog-card>*,
-  .pdx-variantCard>* {
+  html[data-motion="full"] .product-tile>*,
+  html[data-motion="full"] .catalog-card>*,
+  html[data-motion="full"] .pdx-variantCard>* {
     position: relative;
     z-index: 1;
   }
 }
 
-/* ─── 9. Spotlight cursor follower (desktop only, via CSS variables) ───── */
+/* ─── 9. Spotlight cursor follower (desktop only, full motion) ─────────── */
 @media (hover: hover) and (pointer: fine) {
-  body {
+  html[data-motion="full"] body {
     background-image:
       radial-gradient(500px 350px at var(--cursor-x, -100px) var(--cursor-y, -100px),
         rgba(0, 214, 180, 0.05),
@@ -289,32 +289,6 @@ a.btn:active {
   .pdx-variantCard::after {
     display: none;
   }
-}
-
-
-/* ─── Cursor Trail (desktop only, teal dots) ────────────────────────── */
-.cursor-trail-container {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 99999;
-  overflow: hidden;
-}
-
-.cursor-trail-dot {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, #3fe8c8, #00a88c);
-  box-shadow: 0 0 6px rgba(0, 214, 180, 0.5);
-  pointer-events: none;
-  will-change: transform, opacity;
-  transition: opacity 0.52s ease-out, transform 0.52s ease-out;
-}
-
-@media (prefers-reduced-motion: reduce), (pointer: coarse), (max-width: 920px) {
-  .cursor-trail-container { display: none !important; }
 }
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -579,22 +553,22 @@ html[data-theme="dark"] textarea {
       filter 0.6s ease-out;
   }
 
-  .reveal:not(.is-visible) {
+  html.js-ready .reveal:not(.is-visible) {
     opacity: 0;
     transform: translateY(16px);
   }
 
-  .reveal-left:not(.is-visible) {
+  html.js-ready .reveal-left:not(.is-visible) {
     opacity: 0;
     transform: translateX(-24px);
   }
 
-  .reveal-scale:not(.is-visible) {
+  html.js-ready .reveal-scale:not(.is-visible) {
     opacity: 0;
     transform: scale(0.95);
   }
 
-  .reveal-blur:not(.is-visible) {
+  html.js-ready .reveal-blur:not(.is-visible) {
     opacity: 0;
     filter: blur(8px);
     transform: translateY(12px);
@@ -706,9 +680,9 @@ select,
 
 /* Unified focus ring on inputs to match button focus.
    Exclude inputs that are inside a search shell wrapper (handled separately). */
-input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
-select:focus,
-textarea:focus {
+input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus-visible,
+select:focus-visible,
+textarea:focus-visible {
   outline: none;
   border-color: rgba(0, 138, 148, 0.4) !important;
   box-shadow:
@@ -716,9 +690,9 @@ textarea:focus {
     inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
 }
 
-html[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
-html[data-theme="light"] select:focus,
-html[data-theme="light"] textarea:focus {
+html[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus-visible,
+html[data-theme="light"] select:focus-visible,
+html[data-theme="light"] textarea:focus-visible {
   border-color: rgba(0, 138, 148, 0.5) !important;
   box-shadow:
     0 0 0 3px rgba(0, 194, 208, 0.16),
@@ -769,27 +743,6 @@ html {
   html {
     scroll-behavior: auto;
   }
-}
-
-/* Light mode specific overrides for mobile menu panel background and shadows to isolate them from global cards */
-html[data-theme="light"] .mobile-menu-lite {
-  background: linear-gradient(180deg, #e4eff4, #cee0ea 56%, #bfd4e1 100%) !important;
-  box-shadow:
-    -18px 0 48px rgba(50, 85, 100, 0.28),
-    inset 1px 0 0 rgba(255, 255, 255, 0.9),
-    inset 0 2px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -4px 0 rgba(135, 175, 190, 0.35) !important;
-  border-left: 1px solid rgba(0, 138, 148, 0.14) !important;
-}
-
-html[data-theme="light"] .mobile-menu {
-  background: linear-gradient(180deg, #e4eff4, #cee0ea 56%, #bfd4e1 100%) !important;
-  box-shadow:
-    -18px 0 48px rgba(50, 85, 100, 0.28),
-    inset 1px 0 0 rgba(255, 255, 255, 0.9),
-    inset 0 2px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -4px 0 rgba(135, 175, 190, 0.35) !important;
-  border-left: 1px solid rgba(0, 138, 148, 0.14) !important;
 }
 
 /* ─── Unified card hover elevation ─────────────────────────── */

@@ -425,16 +425,15 @@
   }
 }
 
-[data-motion="lite"] .catalog-grid--animate .catalog-card {
-  animation: motionCatalogCardIn 0.32s ease both;
-  animation-delay: calc(var(--reveal-i, 0) * 28ms);
+[data-motion="lite"] .catalog-grid--animate .catalog-card,
+[data-motion="off"] .catalog-grid--animate .catalog-card {
+  animation: none !important;
 }
 
 [data-motion="lite"] .suggestions--animate {
   animation: motionSuggestIn 0.2s ease both;
 }
 
-[data-motion="off"] .catalog-grid--animate .catalog-card,
 [data-motion="off"] .empty--animated .empty-icon,
 [data-motion="off"] .flash-countdown-num--sec,
 [data-motion="off"] .catalog-hero::before {
@@ -443,19 +442,19 @@
 
 /* ── Neumorphism Depth Effects & Interactions ── */
 
-/* Opsi 1: Tactile Click Inset Transition (Efek Tekan Cekung) */
-.btn:active,
-.catalog-chip:active,
-.pdx-filterChip:active,
-.home-promoCard:active,
-.home-howCard:active,
-.faq-item:has(.faq-itemHead:active),
-.product-card-modern:active,
-.product-tile:active,
-.card:active,
-.st-infoCard:active,
-.st-card:active,
-.pay-card:active {
+/* Opsi 1: Tactile Click Inset Transition (Efek Tekan Cekung) — full motion only */
+[data-motion="full"] .btn:active,
+[data-motion="full"] .catalog-chip:active,
+[data-motion="full"] .pdx-filterChip:active,
+[data-motion="full"] .home-promoCard:active,
+[data-motion="full"] .home-howCard:active,
+[data-motion="full"] .faq-item:has(.faq-itemHead:active),
+[data-motion="full"] .product-card-modern:active,
+[data-motion="full"] .product-tile:active,
+[data-motion="full"] .card:active,
+[data-motion="full"] .st-infoCard:active,
+[data-motion="full"] .st-card:active,
+[data-motion="full"] .pay-card:active {
   box-shadow:
     inset 8px 10px 18px rgba(0, 0, 0, 0.42),
     inset -5px -5px 12px rgba(255, 255, 255, 0.04) !important;
@@ -463,18 +462,18 @@
   transition: box-shadow 0.1s cubic-bezier(0.22, 1, 0.36, 1), transform 0.1s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
-html[data-theme="light"] .btn:active,
-html[data-theme="light"] .catalog-chip:active,
-html[data-theme="light"] .pdx-filterChip:active,
-html[data-theme="light"] .home-promoCard:active,
-html[data-theme="light"] .home-howCard:active,
-html[data-theme="light"] .faq-item:has(.faq-itemHead:active),
-html[data-theme="light"] .product-card-modern:active,
-html[data-theme="light"] .product-tile:active,
-html[data-theme="light"] .card:active,
-html[data-theme="light"] .st-infoCard:active,
-html[data-theme="light"] .st-card:active,
-html[data-theme="light"] .pay-card:active {
+html[data-theme="light"][data-motion="full"] .btn:active,
+html[data-theme="light"][data-motion="full"] .catalog-chip:active,
+html[data-theme="light"][data-motion="full"] .pdx-filterChip:active,
+html[data-theme="light"][data-motion="full"] .home-promoCard:active,
+html[data-theme="light"][data-motion="full"] .home-howCard:active,
+html[data-theme="light"][data-motion="full"] .faq-item:has(.faq-itemHead:active),
+html[data-theme="light"][data-motion="full"] .product-card-modern:active,
+html[data-theme="light"][data-motion="full"] .product-tile:active,
+html[data-theme="light"][data-motion="full"] .card:active,
+html[data-theme="light"][data-motion="full"] .st-infoCard:active,
+html[data-theme="light"][data-motion="full"] .st-card:active,
+html[data-theme="light"][data-motion="full"] .pay-card:active {
   box-shadow:
     inset 6px 8px 14px rgba(124, 158, 171, 0.28),
     inset -5px -5px 10px rgba(255, 255, 255, 0.8) !important;
@@ -483,35 +482,6 @@ html[data-theme="light"] .pay-card:active {
 /* Reset child button scale on FAQ items to prevent double shrink mismatch */
 .faq-itemHead:active {
   transform: none !important;
-}
-
-/* Opsi 2: Dynamic Light-Source Tracking (Bayangan Mengikuti Kursor) */
-.product-tile,
-.home-promoCard,
-.home-howCard,
-.st-infoCard,
-.st-card,
-.pay-card,
-.card {
-  --light-x: 1;
-  --light-y: 1;
-  box-shadow:
-    calc(var(--light-x, 1) * 15px) calc(var(--light-y, 1) * 16px) 32px var(--shadow-color-dark),
-    calc(var(--light-x, 1) * -9px) calc(var(--light-y, 1) * -9px) 20px var(--shadow-color-light),
-    inset 0 2px 0 var(--shadow-panel-inset-top),
-    inset 0 -4px 0 var(--shadow-panel-inset-bottom),
-    0 0 0 1px var(--shadow-panel-border) !important;
-  transition: box-shadow 0.24s cubic-bezier(0.22, 1, 0.36, 1), transform 0.24s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.product-tile:hover,
-.home-promoCard:hover,
-.home-howCard:hover,
-.st-infoCard:hover,
-.st-card:hover,
-.pay-card:hover,
-.card:hover {
-  transform: translateY(-2px);
 }
 
 /* Opsi 3: Deep Inset Focus on Inputs (Kotak Pencarian & Form Cekung Dinamis) */

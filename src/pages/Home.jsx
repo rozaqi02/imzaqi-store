@@ -11,6 +11,7 @@ import { fetchProducts, fetchTopSellingIds, fetchPromoCodes, fetchSettings } fro
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
+
 import { useToast } from "../context/ToastContext";
 import { copyToClipboard } from "../utils/clipboard";
 import { fireConfetti } from "../components/Confetti";
@@ -38,7 +39,7 @@ const HOME_FAQ = [
   {
     id: "home-support",
     category: "Bantuan",
-    question: "Error/error, hubungi ke mana?",
+    question: "Ada error, hubungi ke mana?",
     answer: [
       "Pencet tombol Hubungi Admin di halaman bayar atau status.",
       "Sertain ID order biar ceknya cepet diproses.",
@@ -158,8 +159,7 @@ export default function Home() {
 
   const toast = useToast();
   const nav = useNavigate();
-
-  useRevealOnScroll();
+  useRevealOnScroll(loading);
 
   usePageMeta({
     title: "Beranda",
@@ -238,7 +238,7 @@ export default function Home() {
       {/* Scroll Progress Bar */}
       <ScrollProgressBar />
 
-      <Hero products={products} />
+      <Hero products={products} topIds={topIds} />
 
       <div className="home-body">
         {/* ── Produk Favorit ── */}
@@ -277,15 +277,15 @@ export default function Home() {
                 </div>
               ) : (
                 popularProducts.map((p, idx) => (
-                  <div key={p.id} className="reveal reveal-scale" style={{ transitionDelay: `${120 + idx * 80}ms` }}>
+                  <div key={p.id} className="reveal reveal-scale" style={{ transitionDelay: `${40 + idx * 35}ms` }}>
                     {/* 3D Tilt disabled with disableTilt={true} */}
-                    <ProductTile product={p} rank={idx + 1} layout="list" disableTilt={true} />
+                    <ProductTile product={p} rank={idx + 1} layout="list" disableTilt={true} disableFlip={true} />
                   </div>
                 ))
               )}
             </div>
 
-            <div className="home-sectionCta reveal" style={{ transitionDelay: `${120 + popularProducts.length * 80}ms` }}>
+            <div className="home-sectionCta reveal" style={{ transitionDelay: `${40 + popularProducts.length * 35}ms` }}>
               <Link className="btn" to="/produk">
                 {!loading && totalActiveProducts > 4
                   ? `Intip ${totalActiveProducts - 4} produk lainnya`
@@ -360,14 +360,20 @@ export default function Home() {
               {HOW_IT_WORKS.map((step, i) => {
                 const isOpen = activeStep === i;
                 return (
-                  <div
+                  <button
+                    type="button"
                     key={step.step}
                     className={`home-howCard reveal reveal-scale${isOpen ? " is-expanded" : ""}`}
-                    style={{ "--how-i": i, transitionDelay: `${120 + i * 80}ms`, cursor: "pointer" }}
+                    style={{ "--how-i": i, transitionDelay: `${120 + i * 80}ms` }}
                     onClick={() => setActiveStep(isOpen ? null : i)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => e.key === "Enter" && setActiveStep(isOpen ? null : i)}
+                    aria-expanded={isOpen}
+                    aria-label={`Langkah ${step.step}: ${step.title}. ${isOpen ? "Tutup" : "Buka"} detail tambahan.`}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setActiveStep(isOpen ? null : i);
+                      }
+                    }}
                   >
                     <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
                     <div className="home-howCard-icon" aria-hidden="true">
@@ -387,7 +393,7 @@ export default function Home() {
                     {i < HOW_IT_WORKS.length - 1 ? (
                       <div className="home-howCard-connector" aria-hidden="true" />
                     ) : null}
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -416,25 +422,25 @@ export default function Home() {
                   nav(`/faq?q=${encodeURIComponent(faqQuery.trim())}`);
                 }
               }}
-              className="home-faqSearchWrap reveal reveal-scale"
-              style={{ transitionDelay: "80ms" }}
+              className="home-faqSearchWrap reveal"
+              style={{ transitionDelay: "40ms" }}
             >
-              <div className="home-faqSearchShell">
-                <Search size={16} className="home-faqSearchIcon" />
+              <div className="faq-searchWrap">
+                <Search size={16} aria-hidden="true" />
                 <input
-                  type="text"
-                  placeholder="Cari pertanyaan di sini... (Enter)"
+                  type="search"
+                  className="input faq-searchInput"
+                  placeholder="Cari: QRIS, ID order, promo..."
                   value={faqQuery}
                   onChange={(e) => setFaqQuery(e.target.value)}
-                  className="home-faqSearchInput"
                   aria-label="Cari FAQ"
                 />
                 {faqQuery ? (
                   <button
                     type="button"
-                    className="home-faqSearchClear"
+                    className="faq-searchClear"
                     onClick={() => setFaqQuery("")}
-                    aria-label="Hapus pencarian FAQ"
+                    aria-label="Hapus pencarian"
                   >
                     <X size={14} />
                   </button>
@@ -444,7 +450,7 @@ export default function Home() {
 
             <div className="home-faqList">
               {HOME_FAQ.map((item, idx) => (
-                <div key={item.id} className="reveal reveal-blur" style={{ transitionDelay: `${120 + idx * 80}ms` }}>
+                <div key={item.id} className="reveal" style={{ transitionDelay: `${40 + idx * 35}ms` }}>
                   <HomeFaqItem
                     item={item}
                     open={openFaqId === item.id}
@@ -454,7 +460,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="home-sectionCta reveal" style={{ transitionDelay: `${120 + HOME_FAQ.length * 80}ms` }}>
+            <div className="home-sectionCta reveal" style={{ transitionDelay: `${40 + HOME_FAQ.length * 35}ms` }}>
               <Link className="btn btn-ghost" to="/faq">
                 Baca FAQ Lengkap
                 <ArrowRight size={16} aria-hidden="true" />

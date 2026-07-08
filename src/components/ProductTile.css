@@ -456,9 +456,26 @@ html[data-theme="light"] .product-tile-rankBadge--4 {
   flex-wrap: wrap;
 }
 
-/* Hide pills on home page for a cleaner look */
+/* Home popular: show sold count only (hide other meta pills) */
 .home-popularList .product-tile-pills {
+  display: flex !important;
+  gap: 6px;
+}
+
+.home-popularList .product-tile-pill:not(.home-popularSold),
+.home-popularList .product-typeBadge,
+.home-popularList .product-lowStockBadge,
+.home-popularList .home-deliveryPill {
   display: none !important;
+}
+
+.home-popularList .home-popularSold {
+  height: 28px;
+  padding: 0 10px;
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
 }
 
 .product-tile--grid .product-tile-pills {

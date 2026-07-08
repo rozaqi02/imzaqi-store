@@ -50,7 +50,7 @@ export default function AchievementToast() {
       <div className="achievement-toast-inner">
         <span className="achievement-toast-icon">{current.icon}</span>
         <div className="achievement-toast-body">
-          <div className="achievement-toast-title">Achievement Unlocked!</div>
+          <div className="achievement-toast-title">Pencapaian baru!</div>
           <div className="achievement-toast-name">{current.title}</div>
           <div className="achievement-toast-desc">{current.desc}</div>
         </div>

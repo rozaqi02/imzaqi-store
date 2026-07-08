@@ -4,13 +4,9 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   Eye,
-  Flame,
   Package,
   Search,
-  ShieldCheck,
   ShoppingBag,
-  Sparkles,
-  Star,
   X,
   Zap,
 } from "lucide-react";
@@ -23,10 +19,37 @@ import { getBuyerName } from "../lib/greeting";
 import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
 
 /* ── Data ── */
-const TRUST_ITEMS = [
-  { icon: Zap, label: "Instan 5 Menit" },
-  { icon: Star, label: "Budget Pelajar" },
+const BRAND_SHORTCUTS = [
+  "Netflix Premium",
+  "Spotify Family",
+  "YouTube Premium",
+  "Canva Pro",
 ];
+
+function getProductSoldCount(product) {
+  return (product?.product_variants || [])
+    .filter((variant) => variant?.is_active)
+    .reduce((sum, variant) => sum + Number(variant?.sold_count || 0), 0);
+}
+
+function pickTopHeroProducts(products = [], topIds = [], limit = 4) {
+  const active = (products || []).filter((product) =>
+    (product?.product_variants || []).some((variant) => variant?.is_active)
+  );
+
+  if (!active.length) return [];
+
+  const sorted = [...active].sort((a, b) => {
+    const rankA = topIds.indexOf(a.id);
+    const rankB = topIds.indexOf(b.id);
+    if (rankA !== -1 && rankB === -1) return -1;
+    if (rankA === -1 && rankB !== -1) return 1;
+    if (rankA !== -1 && rankB !== -1) return rankA - rankB;
+    return getProductSoldCount(b) - getProductSoldCount(a) || (a.sort_order || 0) - (b.sort_order || 0);
+  });
+
+  return sorted.slice(0, limit);
+}
 
 const SEARCH_QUERIES = [
   "Netflix Premium",
@@ -35,15 +58,6 @@ const SEARCH_QUERIES = [
   "Canva Pro",
   "ChatGPT Plus",
   "Disney+ Hotstar",
-];
-
-const BRAND_CARDS = [
-  { name: "Netflix", color: "#E50914", colorAlpha: "rgba(229, 9, 20, 0.15)" },
-  { name: "Spotify", color: "#1DB954", colorAlpha: "rgba(29, 185, 84, 0.15)" },
-  { name: "YouTube", color: "#FF0000", colorAlpha: "rgba(255, 0, 0, 0.15)" },
-  { name: "Canva", color: "#00C4CC", colorAlpha: "rgba(0, 196, 204, 0.15)" },
-  { name: "ChatGPT", color: "#10A37F", colorAlpha: "rgba(16, 163, 127, 0.15)" },
-  { name: "Disney+", color: "#113CCF", colorAlpha: "rgba(17, 60, 207, 0.15)" },
 ];
 
 /* ── Search component (Matches Products.jsx Search Box) ── */
@@ -170,10 +184,9 @@ function HeroSearch({ products = [] }) {
           className="hx-search-btn"
           onClick={() => goSearch()}
           type="button"
-          aria-label="Cari"
+          aria-label="Cari produk"
         >
-          <span>Cari</span>
-          <ArrowRight size={14} />
+          <ArrowRight size={16} aria-hidden="true" />
         </button>
       </div>
 
@@ -249,7 +262,7 @@ function ActiveShoppersBadge() {
   return (
     <span className="hx-live-badge">
       <span className="hx-live-dot" />
-      <span>Live Traffic: {activeShoppers} pembeli aktif</span>
+      <span>Sedang online: {activeShoppers} pembeli</span>
     </span>
   );
 }
@@ -313,7 +326,7 @@ function GreetingBanner() {
     if (n) {
       setName(n);
       setVisible(true);
-      const t = setTimeout(() => setVisible(false), 6000);
+      const t = setTimeout(() => setVisible(false), 8000);
       return () => clearTimeout(t);
     }
   }, []);
@@ -359,10 +372,40 @@ function OnboardingBanner() {
 }
 
 /* ── Main Hero Export ── */
-export default function Hero({ products = [] }) {
+export default function Hero({ products = [], topIds = [] }) {
   const nav = useNavigate();
   const caps = useDeviceCapability();
   const isMotionReduced = caps.isReducedMotion || caps.saveData || caps.lowMemory || caps.isMobile;
+
+  const topHeroProducts = useMemo(
+    () => pickTopHeroProducts(products, topIds, 4),
+    [products, topIds]
+  );
+
+  const heroShortcuts = useMemo(() => {
+    if (topHeroProducts.length) {
+      return topHeroProducts.map((product, index) => ({
+        key: product.id,
+        rank: index + 1,
+        label: product.name,
+        sold: getProductSoldCount(product),
+      }));
+    }
+
+    return BRAND_SHORTCUTS.map((label, index) => ({
+      key: label,
+      rank: index + 1,
+      label,
+      sold: null,
+    }));
+  }, [topHeroProducts]);
+
+  const goSearch = useCallback((term) => {
+    const value = String(term || "").trim();
+    if (!value) return;
+    pushSearchHistory(value);
+    nav(`/produk?q=${encodeURIComponent(value)}`);
+  }, [nav]);
 
   const activeProductCount = useMemo(
     () =>
@@ -382,7 +425,6 @@ export default function Hero({ products = [] }) {
         };
 
   const MotionTag = isMotionReduced ? "div" : motion.div;
-  const MotionH1 = isMotionReduced ? "h1" : motion.h1;
   const MotionP = isMotionReduced ? "p" : motion.p;
 
   return (
@@ -401,16 +443,16 @@ export default function Hero({ products = [] }) {
             <ActiveShoppersBadge />
           </MotionTag>
 
-          {/* 2. Headline */}
-          <MotionH1 className="hx-headline" {...stagger(0.12)}>
+          {/* 2. Headline — visible by default; CSS enhances motion when full */}
+          <h1 className="hx-headline">
             Akses <span className="hx-headline-gradient">Premium</span>
             <br />
             Budget <span className="hx-headline-gradient">Pelajar</span>
-          </MotionH1>
+          </h1>
 
           {/* 3. Subtitle */}
           <MotionP className="hx-subtitle" {...stagger(0.2)}>
-            20+ produk digital, bayar QRIS, auto aktif dalam hitungan menit!
+            Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
           </MotionP>
 
           {/* 4. Search Console */}
@@ -422,22 +464,27 @@ export default function Hero({ products = [] }) {
           <GreetingBanner />
           <OnboardingBanner />
 
-          {/* 5. Trust Badges */}
+          {/* 5. Brand search shortcuts */}
           <MotionTag className="hx-brands-section" style={{ marginTop: "-8px" }} {...stagger(0.32)}>
             <div className="hx-brands-row">
-              {TRUST_ITEMS.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <div
-                    key={item.label}
-                    className="hx-brand-pill"
-                    style={{ pointerEvents: "none", opacity: 0.85, fontSize: "11px", padding: "5px 12px" }}
-                  >
-                    <Icon size={11} className="hx-brand-pill-dot" style={{ color: "var(--accent)" }} />
-                    <span>{item.label}</span>
-                  </div>
-                );
-              })}
+              {heroShortcuts.map((item) => (
+                <button
+                  key={item.key}
+                  type="button"
+                  className={`hx-brand-pill hx-brand-pill--rank-${item.rank}`}
+                  onClick={() => goSearch(item.label)}
+                  aria-label={
+                    item.sold != null
+                      ? `#${item.rank} paling laris: ${item.label}, ${item.sold} terjual`
+                      : `Cari ${item.label}`
+                  }
+                >
+                  <span className={`hx-brand-pill-rank hx-brand-pill-rank--${item.rank}`}>
+                    #{item.rank}
+                  </span>
+                  <span className="hx-brand-pill-label">{item.label}</span>
+                </button>
+              ))}
             </div>
           </MotionTag>
 

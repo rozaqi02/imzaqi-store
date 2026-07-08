@@ -298,7 +298,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
 
           <div className="pay-successActions">
             <Link className="btn btn-wide btn-primary" to={statusUrl}>
-              Lacak Order
+              Cek Status Order
             </Link>
             <button className="btn btn-ghost" type="button" onClick={copyCode}>
               {copied ? "✓ ID tersalin" : "Salin ID"}
@@ -501,7 +501,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
                     : `Centang ${remainingCount} lagi`}
               </button>
               <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
-                Cek Ulang Dulu
+                Belum, cek lagi
               </button>
             </div>
           </div>
@@ -561,6 +561,9 @@ export default function Pay() {
   const [isZoomed, setIsZoomed] = useState(false);
   const [qrisJustUnlocked, setQrisJustUnlocked] = useState(false);
   const prevCanShowQrisRef = useRef(false);
+  const contactCardRef = useRef(null);
+  const buyerEmailRef = useRef(null);
+  const showStickyCta = !ok && !orderCode && items.length > 0;
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY_BUYER_EMAIL, buyerEmail); } catch {}
@@ -643,8 +646,14 @@ export default function Pay() {
   }, [fallbackQrisUrl, qrisBase, total]);
 
   useEffect(() => {
-    if (!ok && !orderCode && items.length === 0) nav("/checkout", { replace: true });
-  }, [items.length, nav, ok, orderCode]);
+    if (!ok && !orderCode && items.length === 0) {
+      const backgroundLocation = location.state?.backgroundLocation;
+      nav("/checkout", {
+        replace: true,
+        ...(backgroundLocation ? { state: { backgroundLocation } } : {}),
+      });
+    }
+  }, [items.length, location.state, nav, ok, orderCode]);
 
   const noteText = useMemo(() => {
     const parts = [];
@@ -900,7 +909,7 @@ export default function Pay() {
         return;
       }
 
-      loadingId = toast.loading("Membuat ID order...");
+      loadingId = toast.loading("Bikin ID order...");
       let createdOrder = null;
       let generatedCode = "";
 
@@ -1027,6 +1036,37 @@ export default function Pay() {
 
   const canSubmit = !busy && (isFreeOrder ? hasValidWhatsApp && !missingBuyerEmailNote : canShowQris);
 
+  const stickyCtaHint = !hasValidWhatsApp
+    ? "Isi WhatsApp dulu"
+    : missingBuyerEmailNote
+      ? "Lengkapi email buyer"
+      : null;
+
+  function focusBlockingField() {
+    if (!hasValidWhatsApp) {
+      contactCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(() => {
+        document.getElementById("whatsapp-input")?.focus({ preventScroll: true });
+      }, 280);
+      return;
+    }
+
+    if (missingBuyerEmailNote) {
+      buyerEmailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+      window.setTimeout(() => {
+        buyerEmailRef.current?.focus({ preventScroll: true });
+      }, 280);
+    }
+  }
+
+  function handleStickyCtaClick() {
+    if (canSubmit) {
+      setShowConfirmModal(true);
+      return;
+    }
+    focusBlockingField();
+  }
+
   function resolveItemIconUrl(item) {
     const direct = String(item?.product_icon_url || "").trim();
     if (direct) return direct;
@@ -1071,12 +1111,12 @@ export default function Pay() {
   }
 
   return (
-    <div className="page pay-shell pay-page">
+    <div className={`page pay-shell pay-page${showStickyCta ? " has-stickyCta" : ""}`}>
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
           <div className="pay-shell-copy">
             <h1 className="h1 pay-shell-title">Bayar.</h1>
-            <p className="pay-shell-sub">Scan, konfirmasi, simpan ID. Done.</p>
+            <p className="pay-shell-sub">Scan QRIS, konfirmasi, simpan ID — selesai.</p>
           </div>
         </div>
 
@@ -1101,14 +1141,14 @@ export default function Pay() {
 
         <div className="container pay-shell-grid">
           <div className="pay-mainStack">
-            <section className="card pad pay-card pay-contactCard reveal" style={{ transitionDelay: "60ms" }}>
+            <section ref={contactCardRef} className="card pad pay-card pay-contactCard reveal" style={{ transitionDelay: "60ms" }}>
               <div className="pay-cardHead">
                 <div>
                   <div className="pay-cardKicker">Kontak order</div>
                   <h2 className="h3 pay-cardTitle">WhatsApp</h2>
                 </div>
                 <span className={`pay-statePill ${isFreeOrder ? "free" : canShowQris ? "live" : "locked"}`}>
-                  {isFreeOrder ? "Free" : canShowQris ? "Ready" : "Locked"}
+                  {isFreeOrder ? "Gratis" : canShowQris ? "Siap" : "Terkunci"}
                 </span>
               </div>
 
@@ -1121,7 +1161,7 @@ export default function Pay() {
                 rememberLast
                 compact
                 label="WhatsApp"
-                helperText="Dipakai untuk order ini."
+                helperText="Nomor buat notifikasi order ini ya."
                 placeholder="08xxxxxxxxxx"
                 className="pay-waField"
               />
@@ -1130,8 +1170,10 @@ export default function Pay() {
                 <div className="pay-emailPanel required">
                   <div className="pay-emailHead">
                     <div className="pay-emailLabelWrap">
-                      <Mail size={14} />
-                      <span className="pay-emailLabel">Email buyer</span>
+                      <Mail size={14} aria-hidden="true" />
+                      <label className="pay-emailLabel" htmlFor="pay-buyer-email">
+                        Email pembeli
+                      </label>
                     </div>
                     <span className={`pay-emailState ${missingBuyerEmailNote ? "warn" : "ok"}`}>
                       {missingBuyerEmailNote ? "Wajib diisi" : "Terisi"}
@@ -1139,19 +1181,21 @@ export default function Pay() {
                   </div>
 
                   <input
+                    ref={buyerEmailRef}
+                    id="pay-buyer-email"
                     type="email"
                     className="input pay-emailInput"
                     value={buyerEmail}
                     onChange={(e) => setBuyerEmail(e.target.value)}
-                    placeholder="buyer@mail.com"
+                    placeholder="pembeli@email.com"
                     aria-invalid={missingBuyerEmailNote || undefined}
                     aria-describedby="pay-email-hint"
                   />
 
                   <div id="pay-email-hint" className="pay-emailHintText">
                     {missingBuyerEmailNote
-                      ? `Item ${requiredEmailProductsText} memerlukan email buyer untuk aktivasi akun.`
-                      : "Email buyer sudah terisi. Akun akan dikirim ke email ini."}
+                      ? `${requiredEmailProductsText} butuh email pembeli buat aktivasi akun.`
+                      : "Email pembeli sudah terisi — akun bakal dikirim ke sini."}
                   </div>
                 </div>
               )}
@@ -1159,13 +1203,16 @@ export default function Pay() {
               <div className="pay-notePanel">
                 <div className="pay-noteHead">
                   <div className="pay-noteLabelWrap">
-                    <FileText size={14} />
-                    <span className="pay-noteLabel">Catatan tambahan</span>
+                    <FileText size={14} aria-hidden="true" />
+                    <label className="pay-noteLabel" htmlFor="pay-notes">
+                      Catatan tambahan
+                    </label>
                   </div>
                   <span className="pay-noteState">Opsional</span>
                 </div>
 
                 <textarea
+                  id="pay-notes"
                   className="input pay-noteInput"
                   rows={2}
                   maxLength={400}
@@ -1176,7 +1223,7 @@ export default function Pay() {
 
                 <div className="pay-noteMetaRow">
                   <div className="pay-noteHintText">
-                    Tambahkan catatan jika ada request khusus untuk admin.
+                    Ada request khusus? Tulis di sini, admin bakal baca.
                   </div>
                   <div className="pay-noteMeta">{notes.length}/400</div>
                 </div>
@@ -1255,18 +1302,30 @@ export default function Pay() {
                         {!qris.loaded && !qris.failed ? <QRISSkeleton /> : null}
                         {qris.url ? (
                           <div style={{ width: '100%' }}>
-                            <img
-                              src={qris.url}
-                              alt="QRIS pembayaran"
-                              className="qris-img"
-                              onLoad={() => dispatchQris({ type: "LOADED" })}
-                              onError={(event) => {
-                                event.target.style.display = "none";
-                                dispatchQris({ type: "FAILED" });
-                              }}
+                            <button
+                              type="button"
+                              className="pay-qrisZoomBtn"
+                              aria-label="Perbesar QRIS pembayaran"
                               onClick={() => setIsZoomed(true)}
-                              style={{ display: qris.loaded && !qris.failed ? "block" : "none", cursor: 'zoom-in' }}
-                            />
+                              onKeyDown={(event) => {
+                                if (event.key === "Enter" || event.key === " ") {
+                                  event.preventDefault();
+                                  setIsZoomed(true);
+                                }
+                              }}
+                              style={{ display: qris.loaded && !qris.failed ? "block" : "none" }}
+                            >
+                              <img
+                                src={qris.url}
+                                alt=""
+                                className="qris-img"
+                                onLoad={() => dispatchQris({ type: "LOADED" })}
+                                onError={(event) => {
+                                  event.target.style.display = "none";
+                                  dispatchQris({ type: "FAILED" });
+                                }}
+                              />
+                            </button>
                             {qris.loaded && !qris.failed && (
                               <a
                                 href={qris.url}
@@ -1350,18 +1409,20 @@ export default function Pay() {
         </div>
       ) : null}
 
-      {!ok && !orderCode && items.length > 0 && canShowQris ? (
+      {showStickyCta ? (
         <div className="pay-stickyCta">
           <div className="pay-stickyCtaInner">
             <div className="pay-stickyCtaInfo">
               <div className="pay-stickyCtaLabel">Total bayar</div>
               <div className="pay-stickyCtaTotal">{isFreeOrder ? "Gratis 🎉" : formatIDR(total)}</div>
+              {stickyCtaHint ? <div className="pay-stickyCtaHint">{stickyCtaHint}</div> : null}
             </div>
             <button
-              className="btn pay-stickyCtaBtn"
-              disabled={!canSubmit}
-              onClick={() => setShowConfirmModal(true)}
+              className={`btn pay-stickyCtaBtn${!canSubmit ? " is-locked" : ""}`}
+              disabled={busy}
+              onClick={handleStickyCtaClick}
               type="button"
+              aria-disabled={!canSubmit || undefined}
             >
               {busy ? (
                 <><Loader className="spinner" size={16} /> Menyimpan</>

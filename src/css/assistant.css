@@ -29,15 +29,11 @@ html {
   display: grid;
   place-items: center;
   background:
-    radial-gradient(circle at 32% 28%, rgba(232, 255, 251, 0.55), rgba(255, 255, 255, 0) 48%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 42%),
-    linear-gradient(135deg, #5cf0d5 0%, #2ed9b5 28%, #00b89a 58%, #007a85 100%);
+    radial-gradient(circle at 30% 24%, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 52%),
+    linear-gradient(145deg, #4aefd4 0%, #22d4b3 42%, #00a88c 72%, #008a94 100%);
   box-shadow:
-    0 14px 34px rgba(0, 138, 148, 0.28),
-    6px 8px 20px rgba(0, 100, 90, 0.22),
-    -4px -4px 12px rgba(79, 255, 218, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.62),
-    inset 0 -2px 0 rgba(0, 80, 70, 0.26);
+    0 6px 20px rgba(0, 138, 148, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.42);
   isolation: isolate;
   -webkit-tap-highlight-color: transparent;
   transition: box-shadow 0.24s ease, transform 0.24s ease, border-color 0.24s ease;
@@ -46,22 +42,18 @@ html {
 @media (hover: hover) {
   .ai-bubble:hover {
     box-shadow:
-      8px 10px 28px rgba(0, 100, 90, 0.44),
-      -4px -4px 14px rgba(79, 255, 218, 0.18),
-      inset 0 1px 0 rgba(255, 255, 255, 0.6),
-      inset 0 -2px 0 rgba(0, 80, 70, 0.34);
+      0 8px 24px rgba(0, 138, 148, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.48);
   }
 }
 
 .ai-bubble.is-open {
   background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(145deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 40%),
     linear-gradient(135deg, #008a94 0%, #036a72 100%);
   box-shadow:
-    4px 6px 16px rgba(0, 80, 70, 0.38),
-    -3px -3px 10px rgba(79, 255, 218, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -1px 0 rgba(0, 40, 35, 0.3);
+    0 4px 14px rgba(0, 80, 70, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
 }
 
 .ai-bubbleIcon {
@@ -69,19 +61,45 @@ html {
   z-index: 2;
   display: grid;
   place-items: center;
+  width: 100%;
+  height: 100%;
   color: #fff;
-  filter: drop-shadow(0 1px 2px rgba(0, 60, 65, 0.28));
 }
 
+.ai-mark {
+  display: block;
+  flex-shrink: 0;
+}
+
+.ai-mark--fill,
+.ai-mark--fab,
 .ai-markFab {
-  animation: aiMarkFloat 4.5s ease-in-out infinite;
-  border-radius: 22%;
-  filter: drop-shadow(0 2px 4px rgba(0, 60, 65, 0.35));
+  width: 62%;
+  height: 62%;
+}
+
+.ai-mark--fab,
+.ai-markFab {
+  color: #fff;
+  filter: drop-shadow(0 1px 3px rgba(0, 48, 56, 0.22));
+  animation: aiMarkFloat 5.5s ease-in-out infinite;
+}
+
+.ai-markHead {
+  color: #fff;
+}
+
+.ai-markAvatar {
+  color: #fff;
+}
+
+.ai-tooltipMark {
+  color: var(--uni-neo-icon, #008a94);
 }
 
 @keyframes aiMarkFloat {
   0%, 100% { transform: rotate(0deg) scale(1); }
-  50% { transform: rotate(6deg) scale(1.04); }
+  50% { transform: rotate(3deg) scale(1.02); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -102,20 +120,20 @@ html {
 .ai-bubble:not(.is-open)::before {
   content: "";
   position: absolute;
-  inset: -3px;
+  inset: -2px;
   border-radius: 50%;
   background: conic-gradient(
     from 0deg,
-    rgba(79, 255, 218, 0.5),
-    rgba(37, 235, 200, 0.3),
-    rgba(0, 214, 180, 0.2),
-    rgba(0, 138, 148, 0.1),
-    rgba(79, 255, 218, 0.5)
+    rgba(79, 255, 218, 0.28),
+    rgba(37, 235, 200, 0.16),
+    rgba(0, 214, 180, 0.1),
+    rgba(0, 138, 148, 0.06),
+    rgba(79, 255, 218, 0.28)
   );
-  filter: blur(10px);
-  opacity: 0.6;
+  filter: blur(5px);
+  opacity: 0.32;
   z-index: 0;
-  animation: aiHaloRotate 8s linear infinite;
+  animation: aiHaloRotate 10s linear infinite;
 }
 
 @keyframes aiHaloRotate {
@@ -311,35 +329,15 @@ html[data-theme="dark"] .ai-head--premium {
     radial-gradient(circle at 30% 25%, rgba(232, 255, 251, 0.7), rgba(255, 255, 255, 0) 52%),
     linear-gradient(145deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 36%),
     linear-gradient(135deg, #5cf0d5 0%, #2ed9b5 32%, #00b89a 62%, #007a85 100%);
-  color: #046b72;
   border: 1px solid rgba(123, 184, 255, 0.24);
   box-shadow:
     0 8px 18px rgba(0, 138, 148, 0.22),
-    4px 5px 12px rgba(0, 138, 148, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.58),
-    inset 0 -1px 0 rgba(0, 80, 70, 0.2);
+    inset 0 1px 0 rgba(255, 255, 255, 0.58);
   position: relative;
   overflow: hidden;
 }
 
-.ai-headIcon::before {
-  content: "";
-  position: absolute;
-  inset: -40%;
-  background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, 0.35), transparent);
-  animation: aiHeadShine 6s linear infinite;
-}
 
-@keyframes aiHeadShine {
-  to { transform: rotate(360deg); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .ai-headIcon::before {
-    animation: none;
-    opacity: 0;
-  }
-}
 
 .ai-markHead,
 .ai-markAvatar {
@@ -548,14 +546,11 @@ html[data-theme="dark"] .ai-scroll {
   flex-shrink: 0;
   background:
     radial-gradient(circle at 35% 30%, rgba(232, 255, 251, 0.55), rgba(255, 255, 255, 0) 55%),
-    linear-gradient(145deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 36%),
     linear-gradient(135deg, #5cf0d5 0%, #2ed9b5 35%, #00b89a 68%, #007a85 100%);
-  color: #046b72;
   border: 1px solid rgba(255, 255, 255, 0.35);
   box-shadow:
     0 6px 14px rgba(0, 138, 148, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.48),
-    inset 0 -1px 0 rgba(0, 80, 70, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.48);
   margin-top: 2px;
 }
 
@@ -747,6 +742,7 @@ html[data-theme="dark"] .ai-suggest {
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-bottom: 8px;
 }
 
 .ai-chip {
@@ -834,6 +830,12 @@ html[data-theme="dark"] .ai-chip:active {
     --ai-panel-height: min(74dvh, calc(100dvh - 96px));
   }
 
+  body.has-bottom-nav {
+    --ai-panel-height: min(68dvh, calc(100dvh - 96px - var(--site-bottom-nav-offset, 62px)));
+  }
+}
+
+@media (max-width: 720px) {
   .ai-panel {
     right: 10px;
     left: 10px;
@@ -844,6 +846,17 @@ html[data-theme="dark"] .ai-chip:active {
 
   .ai-msg--user {
     max-width: 90%;
+  }
+}
+
+@media (min-width: 721px) and (max-width: 1024px) {
+  html {
+    --ai-panel-width: min(460px, calc(100vw - 32px));
+    --ai-panel-height: min(58dvh, calc(100dvh - 120px));
+  }
+
+  body.has-bottom-nav {
+    --ai-panel-height: min(56dvh, calc(100dvh - 120px - var(--site-bottom-nav-offset, 68px)));
   }
 }
 
@@ -1012,23 +1025,29 @@ html[data-theme="dark"] .ai-inputBar:focus-within {
 @keyframes aiHaloRotatePulse {
   0% {
     transform: rotate(0deg) scale(1);
-    opacity: 0.55;
-    filter: blur(10px);
+    opacity: 0.28;
+    filter: blur(4px);
   }
   50% {
-    transform: rotate(180deg) scale(1.18);
-    opacity: 0.85;
-    filter: blur(14px);
+    transform: rotate(180deg) scale(1.06);
+    opacity: 0.42;
+    filter: blur(6px);
   }
   100% {
     transform: rotate(360deg) scale(1);
-    opacity: 0.55;
-    filter: blur(10px);
+    opacity: 0.28;
+    filter: blur(4px);
   }
 }
 
 .ai-bubble.ai-bubble--pulse:not(.is-open)::before {
-  animation: aiHaloRotatePulse 4s linear infinite !important;
+  animation: aiHaloRotatePulse 5s linear infinite !important;
+}
+
+@media (max-width: 720px) {
+  .ai-bubble:not(.is-open)::before {
+    display: none;
+  }
 }
 
 /* ─── Welcome Tooltip ─── */
@@ -1062,11 +1081,41 @@ html[data-theme="dark"] .ai-inputBar:focus-within {
   border-color: rgba(79, 255, 200, 0.24);
 }
 
-.ai-tooltipMark {
-  color: var(--uni-neo-icon, #008a94);
-  flex-shrink: 0;
-  filter: drop-shadow(0 2px 4px rgba(0, 138, 148, 0.18));
+.ai-tooltipText {
+  flex: 1;
+  min-width: 0;
 }
+
+.ai-tooltipDismiss {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  margin: -4px -6px -4px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--uni-muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease, background 0.15s ease;
+}
+
+@media (hover: hover) {
+  .ai-tooltipDismiss:hover {
+    color: var(--uni-text);
+    background: rgba(119, 175, 194, 0.12);
+  }
+}
+
+.ai-tooltipDismiss:active {
+  transform: scale(0.94);
+}
+
+
 
 html[data-theme="light"] .ai-tooltipContent {
   border-color: rgba(0, 138, 148, 0.18);
@@ -1093,6 +1142,23 @@ html[data-theme="light"] .ai-tooltipArrow {
   border-color: rgba(0, 138, 148, 0.18);
 }
 
+@media (max-width: 720px) {
+  .ai-tooltip {
+    right: calc(var(--fab-edge-x, 18px) + 4px);
+    max-width: min(280px, calc(100vw - 32px));
+  }
+
+  .ai-tooltipContent {
+    white-space: normal;
+    line-height: 1.35;
+    align-items: flex-start;
+  }
+
+  .ai-tooltipDismiss {
+    margin-top: -2px;
+  }
+}
+
 /* ─── Backdrop Blur Overlay ─── */
 .ai-backdrop {
   position: fixed;
@@ -1105,4 +1171,76 @@ html[data-theme="light"] .ai-tooltipArrow {
 
 html[data-theme="light"] .ai-backdrop {
   background: rgba(13, 29, 36, 0.26);
+}
+
+/* ─── CSS motion (lite mode — replaces framer-motion) ─── */
+@keyframes aiBubbleCssEnter {
+  from {
+    opacity: 0;
+    transform: translateY(16px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes aiTooltipCssEnter {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.92);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes aiBackdropCssEnter {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes aiPanelCssEnter {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html[data-motion="lite"] .ai-bubble--cssEnter {
+    animation: aiBubbleCssEnter 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.6s both;
+  }
+
+  html[data-motion="lite"] .ai-tooltip--cssEnter {
+    animation: aiTooltipCssEnter 0.25s ease-out both;
+  }
+
+  html[data-motion="lite"] .ai-backdrop--cssEnter {
+    animation: aiBackdropCssEnter 0.24s ease both;
+  }
+
+  html[data-motion="lite"] .ai-panel--cssEnter {
+    animation: aiPanelCssEnter 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+html[data-motion="lite"] .ai-bubble:not(.is-open):hover {
+  transform: scale(1.06);
+}
+
+html[data-motion="lite"] .ai-bubble:not(.is-open):active {
+  transform: scale(0.94);
+}
+
+html[data-motion="off"] .ai-bubble--cssEnter,
+html[data-motion="off"] .ai-tooltip--cssEnter,
+html[data-motion="off"] .ai-backdrop--cssEnter,
+html[data-motion="off"] .ai-panel--cssEnter {
+  animation: none !important;
 }

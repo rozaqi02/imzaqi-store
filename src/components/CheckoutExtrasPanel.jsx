@@ -1,27 +1,18 @@
-import { ChevronDown, ShieldCheck } from "lucide-react";
-import CheckoutTrustBlock from "./CheckoutTrustBlock";
+import { ChevronDown, TicketPercent } from "lucide-react";
 
 export default function CheckoutExtrasPanel({ collapsed, promoSection }) {
   if (!collapsed) {
-    return (
-      <>
-        {promoSection}
-        <CheckoutTrustBlock />
-      </>
-    );
+    return promoSection;
   }
 
   return (
     <details className="checkout-extras-collapsible">
       <summary className="checkout-extras-summary">
-        <ShieldCheck size={16} aria-hidden="true" />
-        <span>Keamanan & promo</span>
+        <TicketPercent size={16} aria-hidden="true" />
+        <span>Kode promo</span>
         <ChevronDown size={16} className="checkout-extras-chevron" aria-hidden="true" />
       </summary>
-      <div className="checkout-extras-body">
-        {promoSection}
-        <CheckoutTrustBlock />
-      </div>
+      <div className="checkout-extras-body">{promoSection}</div>
     </details>
   );
 }

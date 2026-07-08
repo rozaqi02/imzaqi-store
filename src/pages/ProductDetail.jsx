@@ -508,6 +508,10 @@ export default function ProductDetail() {
   const { add } = cart;
   const caps = useDeviceCapability();
 
+  const goCheckout = useCallback(() => {
+    nav("/checkout", { state: { backgroundLocation: location } });
+  }, [nav, location]);
+
   useLongTaskMonitor();
 
   const reduceMotion = caps.isReducedMotion;
@@ -694,11 +698,6 @@ export default function ProductDetail() {
     };
   }, [variants, flashSaleMap]);
 
-  const cartItemCount = useMemo(
-    () => (cart?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0),
-    [cart?.items]
-  );
-
   const soldTotal = useMemo(
     () => variants.reduce((sum, variant) => sum + Math.max(0, Number(variant?.sold_count || 0)), 0),
     [variants]
@@ -732,6 +731,20 @@ export default function ProductDetail() {
   );
 
   const recommendedVariantId = useMemo(() => pickRecommendedVariant(variants), [variants]);
+
+  const selectedVariant = useMemo(
+    () => variants.find((variant) => variant.id === selectedVariantId) ?? null,
+    [variants, selectedVariantId]
+  );
+
+  const selectedVariantPrice = useMemo(() => {
+    if (!selectedVariant) return 0;
+    const flashDiscount = flashSaleMap.get(selectedVariant.id);
+    if (flashDiscount && flashDiscount > 0) {
+      return Math.round(selectedVariant.price_idr * (1 - flashDiscount / 100));
+    }
+    return Number(selectedVariant.price_idr || 0);
+  }, [selectedVariant, flashSaleMap]);
 
   useEffect(() => {
     if (!displayedVariants.length) {
@@ -828,7 +841,7 @@ export default function ProductDetail() {
       title: "Masuk keranjang",
       duration: 3200,
       actionLabel: "Intip keranjang",
-      onAction: () => nav("/checkout", { state: { backgroundLocation: location } }),
+      onAction: goCheckout,
     });
 
     setSelectedVariantId(variant.id);
@@ -915,7 +928,7 @@ export default function ProductDetail() {
   const icon = product.icon_url;
 
   return (
-    <div className={`page detail-page detail-page-v3${cartItemCount > 0 ? " with-sticky-cta" : ""}`}>
+    <div className="page detail-page detail-page-v3">
       <section className="section">
         <div className="container">
           {/* On mobile, a plain div is used (no Framer Motion) to reduce JS overhead.
@@ -1068,7 +1081,7 @@ export default function ProductDetail() {
                             onAdd={handleAdd}
                             onBuy={(v, q, e) => {
                               handleAdd(v, q, e);
-                              nav("/checkout", { state: { backgroundLocation: location } });
+                              goCheckout();
                             }}
                           />
                         );
@@ -1120,23 +1133,46 @@ export default function ProductDetail() {
         </div>
       </section>
 
-      {cartItemCount > 0 ? (
-        <div className="pdx-mobileStickyCart">
-          <div className="pdx-stickyCartInner">
+      {selectedVariant ? (
+        <div className="pdx-mobileStickyCart is-buy" role="region" aria-label="Beli cepat">
+          <div className="pdx-stickyCartInner pdx-stickyCartInner--buy">
             <div className="pdx-stickyCartInfo">
-              <ShoppingCart size={18} />
+              <ShoppingCart size={18} aria-hidden="true" />
               <div className="pdx-stickyCartText">
-                <span className="pdx-stickyQty">{cartItemCount} item</span>
-                <span className="pdx-stickyLabel">di keranjang</span>
+                <span className="pdx-stickyQty">{selectedVariant.name}</span>
+                <span className="pdx-stickyLabel">
+                  {selectedVariant.duration_label || "Paket dipilih"}
+                </span>
+                <span className="pdx-stickyPrice">{formatIDR(selectedVariantPrice)}</span>
               </div>
             </div>
-            <button
-              className="btn pdx-stickyCheckoutBtn"
-              type="button"
-              onClick={() => nav("/checkout", { state: { backgroundLocation: location } })}
-            >
-              Checkout
-            </button>
+            <div className="pdx-stickyBuyActions">
+              <button
+                type="button"
+                className={`btn btn-sm btn-ghost pdx-stickyAddBtn ${
+                  Number(selectedVariant.stock ?? 0) <= 0 ? "btn-disabled" : ""
+                }`}
+                disabled={Number(selectedVariant.stock ?? 0) <= 0}
+                onClick={(e) => handleAdd(selectedVariant, 1, e)}
+                aria-label="Tambah ke keranjang"
+              >
+                <ShoppingCart size={14} />
+                <span>Keranjang</span>
+              </button>
+              <button
+                type="button"
+                className={`btn btn-sm pdx-stickyCheckoutBtn ${
+                  Number(selectedVariant.stock ?? 0) <= 0 ? "btn-disabled" : ""
+                }`}
+                disabled={Number(selectedVariant.stock ?? 0) <= 0}
+                onClick={(e) => {
+                  handleAdd(selectedVariant, 1, e);
+                  goCheckout();
+                }}
+              >
+                {Number(selectedVariant.stock ?? 0) <= 0 ? "Abis" : "Checkout"}
+              </button>
+            </div>
           </div>
         </div>
       ) : null}

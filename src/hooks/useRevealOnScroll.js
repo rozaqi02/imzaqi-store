@@ -1,9 +1,39 @@
-import { useEffect } from "react";
+import { useLayoutEffect } from "react";
 
 // Adds subtle reveal animations when elements scroll into view.
 // Automatically tracks new elements using MutationObserver so no race conditions occur.
+const REVEAL_SELECTOR = ".reveal, .reveal-left, .reveal-scale, .reveal-blur";
+
+function markInViewportReveals() {
+  const viewportBottom = window.innerHeight * 0.88;
+  document.querySelectorAll(`${REVEAL_SELECTOR}:not(.is-visible)`).forEach((el) => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < viewportBottom && rect.bottom > 0) {
+      el.classList.add("is-visible");
+    }
+  });
+}
+
+function enableRevealAnimations() {
+  markInViewportReveals();
+  document.documentElement.classList.add("js-ready");
+}
+
+function markUtilityPageReveals() {
+  document
+    .querySelectorAll(
+      ".status-shell.reveal, .faq-shell .reveal, .catalog-hero.reveal, .page > .section.reveal, .page > .reveal"
+    )
+    .forEach((el) => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add("is-visible");
+      }
+    });
+}
+
 export function useRevealOnScroll(dependency) {
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (typeof window === "undefined") return undefined;
 
     const prefersReduced =
@@ -13,9 +43,10 @@ export function useRevealOnScroll(dependency) {
 
     if (prefersReduced || saveData || lowMemory) {
       // Respect accessibility and performance constraints by making all elements visible immediately.
-      document.querySelectorAll(".reveal:not(.is-visible)").forEach((el) =>
+      document.querySelectorAll(`${REVEAL_SELECTOR}:not(.is-visible)`).forEach((el) =>
         el.classList.add("is-visible")
       );
+      enableRevealAnimations();
       return undefined;
     }
 
@@ -37,15 +68,18 @@ export function useRevealOnScroll(dependency) {
 
     // Keep track of observed elements using a class to prevent duplicate observations
     const observeNewElements = () => {
-      const els = document.querySelectorAll(".reveal:not(.is-observed)");
+      const els = document.querySelectorAll(`${REVEAL_SELECTOR}:not(.is-observed)`);
       els.forEach((el) => {
         el.classList.add("is-observed");
         io.observe(el);
       });
+      markInViewportReveals();
     };
 
-    // Run once on mount
+    // Run before paint so utility pages (FAQ/Status) never flash blank.
+    markUtilityPageReveals();
     observeNewElements();
+    enableRevealAnimations();
 
     // Monitor the DOM to automatically detect and observe dynamically rendered elements
     // Throttled via requestAnimationFrame to avoid triggering layout/style recalculation storms

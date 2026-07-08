@@ -59,8 +59,9 @@ export const ASSISTANT_QA = [
     starter: true,
     tags: ["bayar"],
     a: [
-      "Pembayaran 100% via **QRIS** — bisa scan dari semua e-wallet & m-banking (GoPay, OVO, DANA, ShopeePay, BCA Mobile, dll).",
-      "Setelah checkout, kamu akan diarahkan ke halaman QRIS dengan nominal yang sudah disesuaikan otomatis.",
+      "Gampang kok 💳",
+      "Semua bayar lewat **QRIS** — tinggal scan pakai GoPay, OVO, DANA, ShopeePay, BCA Mobile, atau e-wallet & m-banking lain.",
+      "Abis checkout, langsung dibawa ke halaman QRIS. Nominalnya udah otomatis sesuai total pesanan kamu, tinggal scan aja.",
     ],
   },
   {
@@ -87,9 +88,9 @@ export const ASSISTANT_QA = [
     q: "Aku sudah bayar tapi statusnya masih pending",
     tags: ["bayar", "status"],
     a: [
-      "Tenang, biasanya konfirmasi otomatis dalam 1–5 menit.",
-      "Buka halaman **Status Order** dan masukkan ID order kamu.",
-      "Kalau sudah > 15 menit dan masih pending, kirim bukti bayar + ID order ke admin.",
+      "Santai dulu ya — biasanya status langsung ke-update otomatis dalam **1–5 menit** setelah bayar.",
+      "Cek di tab **Status Order**, masukin ID order kamu (format `IMZ-XXXX`).",
+      "Kalau udah lewat **15 menit** masih pending, kirim bukti bayar + ID order ke admin di **WA: 0831-3604-9987** biar dicek manual.",
     ],
   },
   {
@@ -109,8 +110,8 @@ export const ASSISTANT_QA = [
     starter: true,
     tags: ["status"],
     a: [
-      "Buka tab **Status Order** di header → masukkan ID order kamu → tap Cek.",
-      "Format ID: `IMZ-XXXX` (4 karakter setelah IMZ-). Otomatis di-format kalau cuma kasih 4 karakternya.",
+      "Mau lacak pesanan? Buka tab **Status Order** (atau **Lacak** di menu bawah) → ketik ID order kamu → tap Cek.",
+      "Format ID-nya `IMZ-XXXX` — cuma 4 huruf/angka setelah IMZ- juga oke, nanti otomatis diformat.",
     ],
   },
   {

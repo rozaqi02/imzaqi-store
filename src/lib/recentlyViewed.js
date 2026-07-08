@@ -25,7 +25,3 @@ export function addRecentlyViewed(product) {
 export function getRecentlyViewed() {
   return safeGet();
 }
-
-export function clearRecentlyViewed() {
-  try { localStorage.removeItem(KEY); } catch {}
-}

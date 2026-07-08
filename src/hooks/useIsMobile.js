@@ -1,5 +1,28 @@
 import { useEffect, useState } from "react";
 
+export function useMediaQuery(query) {
+  const [matches, setMatches] = useState(() =>
+    typeof window !== "undefined" ? window.matchMedia(query).matches : false
+  );
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+
+    const mq = window.matchMedia(query);
+    const handler = (e) => setMatches(e.matches);
+
+    if (typeof mq.addEventListener === "function") {
+      mq.addEventListener("change", handler);
+      return () => mq.removeEventListener("change", handler);
+    }
+
+    mq.addListener(handler);
+    return () => mq.removeListener(handler);
+  }, [query]);
+
+  return matches;
+}
+
 export function useIsMobile(breakpoint = "(max-width: 720px), (pointer: coarse)") {
   const [isMobile, setIsMobile] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia(breakpoint).matches : false

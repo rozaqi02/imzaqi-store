@@ -7,6 +7,12 @@ export function detectMotionMode() {
   const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   if (prefersReduced) return "off";
 
+  const connection = typeof navigator !== "undefined" ? navigator.connection : null;
+  if (connection?.saveData) return "off";
+
+  const deviceMemory = typeof navigator !== "undefined" ? navigator.deviceMemory : undefined;
+  if (typeof deviceMemory === "number" && deviceMemory <= 2) return "off";
+
   // iPad Pro / Air / Mini: keep full visual profile (backdrop blur, glass panels).
   if (window.matchMedia(TABLET_LAYOUT_MEDIA).matches) return "full";
 

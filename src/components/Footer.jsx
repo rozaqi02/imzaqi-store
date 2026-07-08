@@ -14,8 +14,8 @@ const footerColumns = [
   {
     label: "Order",
     links: [
-      { label: "Checkout", to: "/checkout" },
-      { label: "Lacak Order", to: "/status" },
+      { label: "Bayar", to: "/checkout" },
+      { label: "Cek Status", to: "/status" },
       { label: "Riwayat Order", to: "/status?tab=riwayat" },
     ],
   },
@@ -45,14 +45,14 @@ export default function Footer() {
       <div className="container">
         <div className="site-footerPanel site-footerGo reveal">
           <div className="site-footerGoIntro">
-            <Link className="site-footerGoBrand" to="/produk" aria-label="Buka katalog produk">
+            <Link className="site-footerGoBrand" to="/" aria-label="Kembali ke beranda">
               <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
               <span>imzaqi.store</span>
             </Link>
 
             <div className="site-footerGoContact">
               <a href="https://wa.me/6283136049987" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
-                Contact Admin: 0831-3604-9987
+                Chat Admin: 0831-3604-9987
               </a>
             </div>
           </div>
@@ -70,29 +70,16 @@ export default function Footer() {
             ))}
 
             <div className="site-footerGoCol">
-              <h3 className="site-footerGoTitle">Kontak</h3>
+              <h3 className="site-footerGoTitle">Bantuan</h3>
               <div className="site-footerGoList">
-                <a
-                  className="site-footerGoLink"
-                  href="https://wa.me/6283136049987"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  WhatsApp Admin
-                </a>
-                <a
-                  className="site-footerGoLink"
-                  href="https://wa.me/6283136049987"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  0831-3604-9987
-                </a>
                 <Link className="site-footerGoLink" to="/faq">
                   Cara Pesan
                 </Link>
                 <Link className="site-footerGoLink" to="/faq">
                   Cara Bayar QRIS
+                </Link>
+                <Link className="site-footerGoLink" to="/faq">
+                  FAQ Lengkap
                 </Link>
               </div>
             </div>
@@ -100,7 +87,7 @@ export default function Footer() {
 
           <div className="site-footerGoLegal">
             <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
-            <p>(c) {year} imzaqi.store. All Rights Reserved. • imzaqi store app v.5.0</p>
+            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.1</p>
           </div>
         </div>
       </div>
