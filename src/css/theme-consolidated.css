@@ -432,7 +432,6 @@ code{
       linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 138, 148, 0.08) 40%, rgba(0, 0, 0, 0) 70%),
       linear-gradient(180deg, rgba(8, 12, 28, 0.96) 0%, rgba(4, 7, 20, 0.94) 100%) !important;
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   /* Light mode mobile header */
@@ -442,7 +441,6 @@ code{
       linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.08) 40%, rgba(255, 255, 255, 0) 70%),
       linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 252, 255, 1) 100%) !important;
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -790,7 +788,6 @@ html[data-theme="light"] .hm-title-glow {
 .catalog-sheetBackdrop {
   background: rgba(2, 8, 18, 0.62) !important;
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 .route-progress-bar {
@@ -1458,7 +1455,6 @@ html[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
   .testi-overlayPill,
   .testi-captionPill {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   .global-noise,
@@ -1993,7 +1989,6 @@ html[data-theme="light"] .modal-close:hover {
   .product-detail,
   .variant-tile {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -2234,7 +2229,6 @@ html[data-theme="light"] .sticky-cta {
     0 18px 38px rgba(82, 127, 144, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 html[data-theme="light"] .sticky-cta-title {
@@ -3971,7 +3965,6 @@ html[data-theme="light"] .home-page .hero-search-shell:focus-within {
       linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0) 44%),
       var(--skeu-panel-bg) !important;
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   /* Light mode mobile — neumorphic + gradasi hijau */
@@ -3982,7 +3975,6 @@ html[data-theme="light"] .home-page .hero-search-shell:focus-within {
       linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.55) 22%, rgba(255, 255, 255, 0) 48%),
       var(--skeu-panel-bg) !important;
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   .catalog-page .catalog-layout {
@@ -4966,7 +4958,6 @@ html[data-theme="light"] .status-page .st-noteBody.is-empty {
     rgba(255, 255, 255, 0.02)
   ) !important;
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
   border: none !important;
   border-radius: var(--uni-neo-radius-lg, 28px) !important;
   box-shadow: 

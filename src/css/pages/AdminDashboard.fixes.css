@@ -346,7 +346,6 @@ body.is-admin .abandoned-cart-banner {
   /* Detail pesanan & modal admin: tanpa backdrop blur (lebih ringan di HP) */
   body.is-admin .modal-backdrop {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     background: rgba(0, 0, 0, 0.58) !important;
   }
 

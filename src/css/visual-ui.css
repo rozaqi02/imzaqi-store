@@ -11,7 +11,7 @@ body.is-funnel .bottom-nav {
 /* Thumb-friendly CTAs in funnel */
 .checkout-floating-bar-btn,
 .checkout-summaryBtn,
-.pay-stickyCtaBtn,
+.pay-stageActionsMobile .pay-confirmBtn,
 .st-checkBtn {
   min-height: 48px;
 }
@@ -142,18 +142,6 @@ html[data-theme="light"] .st-progressBar-label {
 }
 
 /* Mini cart sheet moved to css/cart-sheet.css */
-
-.pay-trustStripWrap {
-  padding: 0 16px 8px;
-  max-width: 920px;
-  margin: 0 auto;
-}
-
-@media (max-width: 720px) {
-  .pay-trustStripWrap {
-    padding-bottom: calc(88px + env(safe-area-inset-bottom));
-  }
-}
 
 .checkout-drawer .checkout-mobile-floating-bar--drawer {
   position: relative !important;

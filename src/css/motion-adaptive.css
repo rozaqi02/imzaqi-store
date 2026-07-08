@@ -59,7 +59,6 @@
 [data-motion="lite"] .bottom-nav,
 [data-motion="off"] .bottom-nav {
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 [data-motion="lite"] .card,
@@ -176,7 +175,6 @@
 
 [data-motion="lite"] .catalog-page .catalog-sheetBackdrop {
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 [data-motion="lite"] .catalog-page .catalog-card {
@@ -221,7 +219,6 @@
 [data-motion="lite"] .home-page .hero-search-shell,
 [data-motion="lite"] .home-page .suggestions {
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 [data-motion="lite"] .home-page .flow-assist,
@@ -273,7 +270,6 @@
     border-bottom: 1px solid var(--nav-shell-edge) !important;
     box-shadow: var(--nav-shell-shadow-header) !important;
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     transform: translateZ(0);
     will-change: transform;
   }
@@ -287,7 +283,6 @@
     border-bottom: 1px solid var(--nav-shell-edge) !important;
     box-shadow: var(--nav-shell-shadow-header) !important;
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   /* Header buttons — same neumorphism as desktop */
@@ -334,7 +329,6 @@
   html:has(.app-main-admin) .header,
   html:has(.app-main-admin) .site-header {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
   
   html[data-theme="light"] html:has(.admin-page) .header,
@@ -360,7 +354,6 @@
     transition: opacity 0.28s ease;
     /* No backdrop-filter — expensive during animation */
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   .checkout-backdrop-mobile.checkout-mobile-open {
@@ -379,7 +372,6 @@
     transition: none;
     /* Strip all expensive properties during animation */
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
   }
 
@@ -387,7 +379,6 @@
     transform: translateY(0);
     transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.2) !important;
   }
 
@@ -395,13 +386,11 @@
     transform: translateY(100%);
     transition: transform 0.38s cubic-bezier(0.32, 0.72, 0, 1);
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
   }
 
   .checkout-drawer {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
     will-change: transform;
     transform: translateZ(0);
@@ -412,7 +401,6 @@
   .checkout-backdrop,
   .checkout-backdrop-mobile {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
     background: var(--brand-overlay, rgba(3, 8, 18, 0.5)) !important;
     will-change: opacity;
     contain: paint;
@@ -432,7 +420,6 @@
   .checkout-summary,
   .checkout-main {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 }
 
@@ -451,7 +438,6 @@
   }
   .hx-live-badge {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   /* Disable AI assistant floating bubble animations & filters to improve scrolling FPS */
@@ -508,7 +494,6 @@
   background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 [data-motion="lite"] .pay-page .pay-qrisFrame {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
@@ -519,13 +504,11 @@
 [data-motion="lite"] .pay-page .pay-zoomOverlay,
 [data-motion="lite"] .status-page .st-statePill {
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 [data-motion="lite"] .pay-page .pay-card {
   background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 /* Home hero: kill all expensive effects in lite mode */
@@ -542,13 +525,11 @@
 }
 [data-motion="lite"] .hx-live-badge {
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
 }
 
 /* Product Detail: strip all expensive effects in lite mode */
 [data-motion="lite"] .detail-page-v3 .pdx-topCard {
   backdrop-filter: none !important;
-  -webkit-backdrop-filter: none !important;
   background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
 }
@@ -596,7 +577,6 @@
   .header,
   .site-header {
     backdrop-filter: blur(16px) saturate(130%) !important;
-    -webkit-backdrop-filter: blur(16px) saturate(130%) !important;
   }
 
   .checkout-backdrop,
@@ -604,11 +584,9 @@
   .mini-cart-sheet-backdrop,
   .catalog-sheetBackdrop.is-open {
     backdrop-filter: blur(18px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(18px) saturate(140%) !important;
   }
 
   .catalog-filterShell {
     backdrop-filter: blur(20px) saturate(145%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(145%) !important;
   }
 }

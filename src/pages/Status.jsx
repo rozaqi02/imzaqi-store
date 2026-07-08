@@ -124,10 +124,14 @@ function statusTone(status) {
 function formatDate(isoString) {
   if (!isoString) return "-";
   try {
-    return new Date(isoString).toLocaleDateString("id-ID", {
+    return new Date(isoString).toLocaleString("id-ID", {
       day: "numeric",
       month: "short",
       year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
     });
   } catch {
     return "-";
@@ -391,14 +395,7 @@ function TabCekStatus({ settings }) {
     return "Metode QRIS Instant";
   }, [discountValue]);
 
-  const createdDateLabel = useMemo(() => {
-    if (!order?.created_at) return "-";
-    return new Date(order.created_at).toLocaleDateString("id-ID", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
-  }, [order?.created_at]);
+  const createdDateLabel = useMemo(() => formatDate(order?.created_at), [order?.created_at]);
 
   const waUrl = useMemo(() => {
     const code = order?.order_code || input || "";

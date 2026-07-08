@@ -1,15 +1,48 @@
-/* Visual checkout progress — icons + clearer state on desktop & mobile */
+/* Neumorphic funnel steps — Checkout / Pay / Status */
 
-.steps--visual {
+.steps.steps--visual {
   position: relative;
   gap: 10px;
-  padding: 10px;
+  padding: 12px;
+  border-radius: 26px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0) 34%),
+    var(--skeu-panel-bg);
+  box-shadow: var(--skeu-panel-shadow);
+  backdrop-filter: none;
+  overflow: visible;
+  isolation: isolate;
+}
+
+.steps.steps--visual::before {
+  content: "";
+  position: absolute;
+  left: 14px;
+  right: 14px;
+  top: 0;
+  height: 1px;
+  border-radius: 999px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.24),
+    transparent
+  );
+  pointer-events: none;
+  opacity: 0.75;
 }
 
 .steps--visual .step {
   gap: 12px;
   padding: 12px 14px;
   min-height: 64px;
+  border-radius: 18px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-inset-bg);
+  box-shadow: var(--skeu-inset-shadow);
   transition:
     border-color 0.2s ease,
     background 0.2s ease,
@@ -18,61 +51,77 @@
 }
 
 .steps--visual .step::after {
+  top: 50%;
+  translate: 0 -50%;
+  transform: rotate(45deg);
   right: -6px;
   width: 8px;
   height: 8px;
   border-right-width: 2px;
   border-top-width: 2px;
-  border-color: rgba(255, 255, 255, 0.16);
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 .steps--visual .step.done::after {
-  border-color: rgba(79, 255, 200, 0.34);
+  border-color: rgba(0, 214, 180, 0.38);
+}
+
+.steps--visual .step.active::after {
+  border-color: rgba(0, 214, 180, 0.52);
 }
 
 .steps--visual .step-dot {
   width: 38px;
   height: 38px;
   border-radius: 13px;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: grid;
+  place-items: center;
 }
 
 .steps--visual .step:not(.active):not(.done) .step-dot {
-  color: rgba(255, 255, 255, 0.62);
-  background: rgba(255, 255, 255, 0.03);
+  color: var(--brand-muted, rgba(255, 255, 255, 0.58));
+  background: var(--skeu-inset-bg);
+  box-shadow: var(--skeu-inset-shadow);
 }
 
 .steps--visual .step.active {
-  border-color: rgba(79, 255, 200, 0.28);
+  border-color: rgba(0, 194, 208, 0.3);
   background:
-    linear-gradient(135deg, rgba(79, 255, 200, 0.12), rgba(255, 255, 255, 0.03));
-  box-shadow:
-    0 10px 24px rgba(0, 138, 148, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg);
+  box-shadow: var(--skeu-control-shadow);
 }
 
 .steps--visual .step.active .step-dot {
-  background: linear-gradient(145deg, #4aefd4 0%, #00a88c 100%);
-  border-color: rgba(255, 255, 255, 0.42);
+  border-color: rgba(0, 214, 180, 0.38);
+  background: linear-gradient(165deg, #4aefd4 0%, #00c2d0 48%, #008a94 100%);
   color: #fff;
-  box-shadow:
-    0 8px 18px rgba(0, 138, 148, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.42);
+  box-shadow: var(--skeu-accent-shadow);
 }
 
 .steps--visual .step.done {
-  border-color: rgba(79, 255, 200, 0.18);
-  background: rgba(79, 255, 200, 0.05);
+  border-color: rgba(0, 214, 180, 0.2);
+  background:
+    linear-gradient(180deg, rgba(0, 214, 180, 0.1), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-pill-bg);
+  box-shadow: var(--skeu-control-shadow);
 }
 
 .steps--visual .step.done .step-dot {
-  background: rgba(79, 255, 200, 0.14);
-  border-color: rgba(79, 255, 200, 0.32);
-  color: #9fffe5;
+  border-color: rgba(0, 214, 180, 0.3);
+  background:
+    linear-gradient(180deg, rgba(0, 214, 180, 0.24), rgba(0, 138, 148, 0.12)),
+    var(--skeu-control-bg);
+  color: var(--brand-icon, #9fffe5);
+  box-shadow: var(--skeu-control-shadow);
 }
 
 .steps--visual .step-title {
   font-size: 14px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--brand-text, rgba(255, 255, 255, 0.92));
 }
 
 .steps--visual .step-sub {
@@ -82,6 +131,8 @@
   margin-top: 3px;
   font-size: 10px;
   letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brand-muted, rgba(255, 255, 255, 0.5));
 }
 
 .steps--visual .step-sub::before {
@@ -90,67 +141,94 @@
   height: 5px;
   border-radius: 999px;
   background: currentColor;
-  opacity: 0.45;
+  opacity: 0.42;
   flex-shrink: 0;
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.18);
 }
 
 .steps--visual .step.active .step-sub {
-  color: rgba(159, 255, 229, 0.88);
+  color: rgba(159, 255, 229, 0.9);
 }
 
 .steps--visual .step.active .step-sub::before {
-  opacity: 0.9;
+  opacity: 0.95;
   background: #4fffc8;
-  box-shadow: 0 0 8px rgba(79, 255, 200, 0.45);
+  box-shadow:
+    0 0 8px rgba(79, 255, 200, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
 }
 
-html[data-theme="light"] .steps--visual {
+.steps--visual .step.done .step-sub {
+  color: rgba(159, 255, 229, 0.72);
+}
+
+/* Light mode */
+html[data-theme="light"] .steps.steps--visual {
   border-color: rgba(0, 138, 148, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(248, 253, 255, 0.92));
-  box-shadow:
-    0 14px 28px rgba(67, 111, 129, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(248, 253, 255, 0.88)),
+    var(--skeu-panel-bg);
+  box-shadow: var(--skeu-panel-shadow);
+}
+
+html[data-theme="light"] .steps.steps--visual::before {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.95),
+    transparent
+  );
 }
 
 html[data-theme="light"] .steps--visual .step {
-  border-color: rgba(0, 138, 148, 0.1);
-  background: rgba(255, 255, 255, 0.82);
+  border-color: rgba(0, 138, 148, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-inset-bg);
+  box-shadow: var(--skeu-inset-shadow);
 }
 
 html[data-theme="light"] .steps--visual .step::after {
-  border-color: rgba(0, 138, 148, 0.18);
+  border-color: rgba(0, 138, 148, 0.2);
 }
 
 html[data-theme="light"] .steps--visual .step:not(.active):not(.done) .step-dot {
   color: #5f7781;
-  background: rgba(241, 250, 253, 0.95);
   border-color: rgba(0, 138, 148, 0.14);
+  background: var(--skeu-inset-bg);
+  box-shadow: var(--skeu-inset-shadow);
 }
 
 html[data-theme="light"] .steps--visual .step.active {
-  border-color: rgba(0, 138, 148, 0.24);
-  background: linear-gradient(135deg, rgba(186, 246, 231, 0.55), rgba(255, 255, 255, 0.9));
-  box-shadow:
-    0 10px 22px rgba(0, 138, 148, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 138, 148, 0.26);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg);
+  box-shadow: var(--skeu-control-shadow);
 }
 
 html[data-theme="light"] .steps--visual .step.active .step-dot {
-  background: linear-gradient(145deg, #2ed9b5 0%, #008a94 100%);
-  border-color: rgba(0, 138, 148, 0.22);
+  border-color: rgba(0, 138, 148, 0.24);
+  background: linear-gradient(165deg, #2ed9b5 0%, #00b8c4 50%, #008a94 100%);
   color: #fff;
+  box-shadow: var(--skeu-accent-shadow);
 }
 
 html[data-theme="light"] .steps--visual .step.done {
-  border-color: rgba(0, 138, 148, 0.16);
-  background: rgba(232, 248, 245, 0.72);
+  border-color: rgba(0, 138, 148, 0.18);
+  background:
+    linear-gradient(180deg, rgba(186, 246, 231, 0.45), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-pill-bg);
+  box-shadow: var(--skeu-control-shadow);
 }
 
 html[data-theme="light"] .steps--visual .step.done .step-dot {
-  background: rgba(186, 246, 231, 0.65);
-  border-color: rgba(0, 138, 148, 0.2);
+  border-color: rgba(0, 138, 148, 0.22);
+  background:
+    linear-gradient(180deg, rgba(186, 246, 231, 0.88), rgba(214, 244, 238, 0.72)),
+    var(--skeu-control-bg);
   color: #0e6a74;
+  box-shadow: var(--skeu-control-shadow);
 }
 
 html[data-theme="light"] .steps--visual .step-title {
@@ -167,7 +245,22 @@ html[data-theme="light"] .steps--visual .step.active .step-sub {
 
 html[data-theme="light"] .steps--visual .step.active .step-sub::before {
   background: #00a88c;
-  box-shadow: 0 0 6px rgba(0, 138, 148, 0.28);
+  box-shadow:
+    0 0 6px rgba(0, 138, 148, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
+html[data-theme="light"] .steps--visual .step.done .step-sub {
+  color: #3d6a74;
+}
+
+/* Context wrappers — beat page-level legacy overrides */
+.pay-shell .steps.steps--visual,
+.checkout-drawer .steps.steps--visual,
+.checkout-full .steps.steps--visual,
+.st-checkoutSteps .steps.steps--visual,
+.status-shell .steps.steps--visual {
+  backdrop-filter: none;
 }
 
 @media (max-width: 720px) {
@@ -175,21 +268,35 @@ html[data-theme="light"] .steps--visual .step.active .step-sub::before {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 8px;
-    padding: 8px;
+    padding: 10px;
+    overflow: visible;
   }
 
   .steps--visual .step {
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
+    align-self: stretch;
     text-align: center;
     gap: 8px;
     padding: 10px 6px;
     min-height: 0;
+    height: 100%;
   }
 
-  .steps--visual .step::after {
-    display: none;
+  .steps--visual .step:not(:last-child)::after {
+    display: block;
+    top: 0;
+    bottom: 0;
+    right: auto;
+    left: calc(100% + 0.5px);
+    margin-top: auto;
+    margin-bottom: auto;
+    translate: none;
+    transform: rotate(45deg);
+    width: 7px;
+    height: 7px;
+    z-index: 2;
   }
 
   .steps--visual .step-dot {
@@ -218,6 +325,7 @@ html[data-theme="light"] .steps--visual .step.active .step-sub::before {
 
   .steps--visual .step.active {
     transform: translateY(-1px);
+    box-shadow: var(--skeu-control-shadow);
   }
 }
 
@@ -229,4 +337,10 @@ html[data-theme="light"] .steps--visual .step.active .step-sub::before {
   .steps--visual .step-sub {
     font-size: 8px;
   }
+}
+
+[data-motion="lite"] .steps.steps--visual,
+[data-motion="lite"] .steps--visual .step,
+[data-motion="lite"] .steps--visual .step-dot {
+  backdrop-filter: none !important;
 }

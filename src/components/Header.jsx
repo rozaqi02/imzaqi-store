@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Moon, Shield, SunMedium } from "lucide-react";
-import { getAdminNavTarget, isNavItemActive, SITE_DESKTOP_NAV } from "../lib/siteNav";
+import { isNavItemActive, SITE_DESKTOP_NAV } from "../lib/siteNav";
 import { useCart } from "../context/CartContext";
 import { checkAdminAccess } from "../lib/adminAuth";
 import { supabase } from "../lib/supabaseClient";
@@ -9,7 +9,7 @@ import { supabase } from "../lib/supabaseClient";
 import { useTheme } from "../context/ThemeContext";
 import { useHeaderShrink } from "../hooks/useHeaderShrink";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { COMPACT_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
+import { COMPACT_NAV_MEDIA } from "../lib/breakpoints";
 import { rafThrottle } from "../utils/throttle";
 
 const HEADER_SHRINK_MS = 280;
@@ -75,15 +75,11 @@ export default function Header() {
   const { isDark, toggleTheme } = useTheme();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
   const isCompactNav = useIsMobile(COMPACT_NAV_MEDIA);
-  const isPhoneLayout = useIsMobile(PHONE_LAYOUT_MEDIA);
   const headerRef = useRef(null);
   const navRef = useRef(null);
   const location = useLocation();
   const [canAccessAdmin, setCanAccessAdmin] = useState(false);
   const isOnAdminRoute = location.pathname.startsWith("/admin");
-  const adminNavTarget = getAdminNavTarget(canAccessAdmin);
-  const adminNavTitle = canAccessAdmin ? "Admin Dashboard" : "Login Admin";
-
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
 
   const updatePill = useCallback(() => {
@@ -228,11 +224,13 @@ export default function Header() {
             {isCompactNav ? (
               <>
                 <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-                <AdminHeaderLink
-                  to={adminNavTarget}
-                  isActive={isOnAdminRoute}
-                  title={adminNavTitle}
-                />
+                {canAccessAdmin ? (
+                  <AdminHeaderLink
+                    to="/admin/dashboard"
+                    isActive={isOnAdminRoute}
+                    title="Admin Dashboard"
+                  />
+                ) : null}
               </>
             ) : (
               <>

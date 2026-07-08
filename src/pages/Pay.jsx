@@ -21,7 +21,6 @@ import { recordCompletedOrder, LOYALTY_PROMO_CODE } from "../lib/loyalty";
 import { copyToClipboard } from "../utils/clipboard";
 import { warn } from "../lib/log";
 import { saveBuyerName } from "../lib/greeting";
-import TrustStrip from "../components/TrustStrip";
 import "../css/pages/Pay.css";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
@@ -563,7 +562,7 @@ export default function Pay() {
   const prevCanShowQrisRef = useRef(false);
   const contactCardRef = useRef(null);
   const buyerEmailRef = useRef(null);
-  const showStickyCta = !ok && !orderCode && items.length > 0;
+  const showPayCta = !ok && !orderCode && items.length > 0;
 
   useEffect(() => {
     try { localStorage.setItem(STORAGE_KEY_BUYER_EMAIL, buyerEmail); } catch {}
@@ -1036,7 +1035,7 @@ export default function Pay() {
 
   const canSubmit = !busy && (isFreeOrder ? hasValidWhatsApp && !missingBuyerEmailNote : canShowQris);
 
-  const stickyCtaHint = !hasValidWhatsApp
+  const payCtaHint = !hasValidWhatsApp
     ? "Isi WhatsApp dulu"
     : missingBuyerEmailNote
       ? "Lengkapi email buyer"
@@ -1059,7 +1058,7 @@ export default function Pay() {
     }
   }
 
-  function handleStickyCtaClick() {
+  function handlePayCtaClick() {
     if (canSubmit) {
       setShowConfirmModal(true);
       return;
@@ -1085,33 +1084,42 @@ export default function Pay() {
     return "";
   }
 
-  function renderStageActions(extraClass = "") {
-    const klass = `pay-stageActions ${extraClass}`.trim();
+  function renderPayConfirmButton(extraClass = "") {
+    const klass = `btn btn-wide pay-confirmBtn${!canSubmit ? " is-locked" : ""}${extraClass ? ` ${extraClass}` : ""}`.trim();
 
     return (
-      <div className={klass}>
-        <button className="btn btn-wide" disabled={!canSubmit} onClick={() => setShowConfirmModal(true)} type="button">
-          {busy ? (
-            <>
-              <Loader className="spinner" size={16} /> Menyimpan
-            </>
-          ) : isFreeOrder ? (
-            <>
-              <Check size={16} /> Konfirmasi Order Gratis
-            </>
-          ) : (
-            <>
-              <Check size={16} /> Saya sudah bayar
-            </>
-          )}
-        </button>
-
-      </div>
+      <button
+        className={klass}
+        disabled={busy}
+        onClick={handlePayCtaClick}
+        type="button"
+        aria-disabled={!canSubmit || undefined}
+      >
+        {busy ? (
+          <>
+            <Loader className="spinner" size={16} /> Menyimpan
+          </>
+        ) : isFreeOrder ? (
+          <>
+            <Check size={16} /> Konfirmasi Order Gratis
+          </>
+        ) : (
+          <>
+            <Check size={16} /> Saya sudah bayar
+          </>
+        )}
+      </button>
     );
   }
 
+  function renderStageActions(extraClass = "") {
+    const klass = `pay-stageActions ${extraClass}`.trim();
+
+    return <div className={klass}>{renderPayConfirmButton()}</div>;
+  }
+
   return (
-    <div className={`page pay-shell pay-page${showStickyCta ? " has-stickyCta" : ""}`}>
+    <div className="page pay-shell pay-page">
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
           <div className="pay-shell-copy">
@@ -1264,6 +1272,9 @@ export default function Pay() {
                     </div>
                   ) : null}
 
+                  {payCtaHint ? <div className="pay-stageMobileHint">{payCtaHint}</div> : null}
+
+                  {showPayCta ? renderStageActions("pay-stageActionsMobile") : null}
                   {renderStageActions("pay-stageActionsDesktop")}
                 </div>
 
@@ -1355,8 +1366,6 @@ export default function Pay() {
                     <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qris.notice}</div>
                   ) : null}
                 </div>
-
-                {renderStageActions("pay-stageActionsMobile")}
               </div>
             </section>
           </div>
@@ -1403,38 +1412,6 @@ export default function Pay() {
         onClose={() => setIsZoomed(false)}
       />
 
-      {!ok && !orderCode && items.length > 0 ? (
-        <div className="pay-trustStripWrap">
-          <TrustStrip compact />
-        </div>
-      ) : null}
-
-      {showStickyCta ? (
-        <div className="pay-stickyCta">
-          <div className="pay-stickyCtaInner">
-            <div className="pay-stickyCtaInfo">
-              <div className="pay-stickyCtaLabel">Total bayar</div>
-              <div className="pay-stickyCtaTotal">{isFreeOrder ? "Gratis 🎉" : formatIDR(total)}</div>
-              {stickyCtaHint ? <div className="pay-stickyCtaHint">{stickyCtaHint}</div> : null}
-            </div>
-            <button
-              className={`btn pay-stickyCtaBtn${!canSubmit ? " is-locked" : ""}`}
-              disabled={busy}
-              onClick={handleStickyCtaClick}
-              type="button"
-              aria-disabled={!canSubmit || undefined}
-            >
-              {busy ? (
-                <><Loader className="spinner" size={16} /> Menyimpan</>
-              ) : isFreeOrder ? (
-                <>Konfirmasi Order Gratis</>
-              ) : (
-                <>Saya sudah bayar</>
-              )}
-            </button>
-          </div>
-        </div>
-      ) : null}
     </div>
   );
 }

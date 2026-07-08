@@ -105,8 +105,8 @@ const SECTION_ICONS = {
   catatan: Info,
 };
 
-function VariantBenefitList({ rawText, variant }) {
-  const [expanded, setExpanded] = useState(() => Boolean(variant?.requires_buyer_email));
+function VariantBenefitList({ rawText, variant, isSelected = false }) {
+  const [expanded, setExpanded] = useState(false);
   const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
 
   // Build structured info rows from variant DB fields
@@ -121,6 +121,14 @@ function VariantBenefitList({ rawText, variant }) {
   }, [variant]);
 
   const hasContent = infoRows.length > 0 || sections.length > 0;
+
+  useEffect(() => {
+    if (!hasContent) return;
+    if (variant?.requires_buyer_email && isSelected) {
+      setExpanded(true);
+    }
+  }, [hasContent, isSelected, variant?.requires_buyer_email, variant?.id]);
+
   if (!hasContent) return null;
 
   return (
@@ -128,7 +136,10 @@ function VariantBenefitList({ rawText, variant }) {
       <button
         type="button"
         className={`pdx-benefitToggle-modern ${expanded ? "is-expanded" : ""}`}
-        onClick={() => setExpanded((p) => !p)}
+        onClick={(event) => {
+          event.stopPropagation();
+          setExpanded((current) => !current);
+        }}
       >
         <span>Info paket</span>
         <ChevronDown size={15} className="pdx-benefitChevron" />
@@ -380,7 +391,11 @@ const VariantCard = React.memo(({
         </div>
       </div>
 
-      <VariantBenefitList rawText={descriptionBody} variant={variant} />
+      <VariantBenefitList
+        rawText={descriptionBody}
+        variant={variant}
+        isSelected={isSelected}
+      />
 
       <div className="pdx-packActions">
         <button

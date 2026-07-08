@@ -773,10 +773,12 @@
 }
 
 .pdx-benefitToggle-modern {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
   padding: 10px 14px;
   border-radius: 14px;
   border: 1px solid var(--pdx-line);
@@ -2518,6 +2520,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
+    align-items: flex-start !important;
     overflow-x: auto !important;
     max-width: 100% !important;
     width: 100% !important;
@@ -2536,8 +2539,40 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
 
   .detail-page-v3 .pdx-packCard {
     flex: 0 0 min(280px, 80vw) !important;
+    width: min(280px, 80vw) !important;
+    max-width: min(280px, 80vw) !important;
+    align-self: flex-start !important;
+    height: auto !important;
     scroll-snap-align: start !important;
-    min-width: 220px !important;
+    min-width: 0 !important;
+    overflow: hidden;
+  }
+
+  .detail-page-v3 .pdx-packCard .pdx-benefitList {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .detail-page-v3 .pdx-packCard .pdx-benefitToggle-modern {
+    display: inline-flex;
+    width: fit-content;
+    max-width: 100%;
+    align-self: flex-start;
+    justify-content: flex-start;
+    gap: 8px;
+    box-sizing: border-box;
+  }
+
+  .detail-page-v3 .pdx-packCard .pdx-infoRows,
+  .detail-page-v3 .pdx-packCard .pdx-benefitSection,
+  .detail-page-v3 .pdx-packCard .pdx-benefitItems {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
   }
 }
 
@@ -2905,7 +2940,6 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   /* Disable backdrop filter on mobile for top card */
   .detail-page-v3 .pdx-topCard {
     backdrop-filter: none !important;
-    -webkit-backdrop-filter: none !important;
   }
 
   /* Prevent horizontal overflow and force correct widths on mobile */

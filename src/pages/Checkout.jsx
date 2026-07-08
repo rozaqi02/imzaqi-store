@@ -9,7 +9,7 @@ import { formatIDR } from "../lib/format";
 import { checkStockAvailability } from "../lib/api";
 import CheckoutSteps from "../components/CheckoutSteps";
 import CheckoutExtrasPanel from "../components/CheckoutExtrasPanel";
-import CheckoutTrustBlock from "../components/CheckoutTrustBlock";
+
 import { markCheckoutVisited } from "../lib/cartReminder";
 import EmptyState from "../components/EmptyState";
 import { useToast } from "../context/ToastContext";
@@ -413,8 +413,6 @@ export default function Checkout() {
                     collapsed={isMobileSheet}
                     promoSection={renderPromoCard()}
                   />
-
-                  <CheckoutTrustBlock />
                 </>
               )}
             </section>
@@ -528,10 +526,6 @@ export default function Checkout() {
                       collapsed={isMobileSheet}
                       promoSection={renderPromoCard()}
                     />
-                  </section>
-
-                  <section className="card pad checkout-panel checkout-full-trust-panel">
-                    <CheckoutTrustBlock />
                   </section>
                 </div>
               )}
