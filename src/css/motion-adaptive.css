@@ -178,13 +178,35 @@
 }
 
 [data-motion="lite"] .catalog-page .catalog-card {
-  content-visibility: visible !important;
-  contain-intrinsic-size: auto !important;
+  /* Keep content-visibility so off-screen cards skip paint while scrolling */
+  content-visibility: auto;
   contain: layout paint style;
-  transform: translateZ(0);
+  transform: none;
+  will-change: auto;
   backface-visibility: hidden;
-  transition-property: transform, border-color, opacity !important;
+  transition-property: transform, box-shadow, border-color, opacity !important;
   transition-duration: 140ms !important;
+}
+
+/* Allow press-in feedback on touch even in lite mode */
+[data-motion="lite"] .catalog-page .catalog-card:active,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2:active {
+  transform: scale(0.97) translateY(1px) !important;
+  box-shadow:
+    inset 6px 8px 16px rgba(0, 0, 0, 0.28),
+    inset -3px -3px 10px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardIcon,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardPrice,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta > span,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardFoot,
+[data-motion="lite"] .catalog-page .catalog-status {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 [data-motion="lite"] .catalog-page .catalog-grid--animate .catalog-card,
@@ -224,24 +246,41 @@
 [data-motion="lite"] .home-page .flow-assist,
 [data-motion="lite"] .home-page .home-popularList .product-tile,
 [data-motion="lite"] .home-page .home-popularList .product-tile-pill {
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 
 [data-motion="lite"] .home-page .home-popularList {
-  contain: none;
+  contain: layout;
   overflow: visible !important;
 }
 
 [data-motion="lite"] .home-page .home-popularList .product-tile {
-  content-visibility: visible !important;
-  contain-intrinsic-size: auto !important;
-  contain: none !important;
+  /* Skip paint for off-screen tiles while scrolling (same win as catalog) */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+  contain: layout paint style;
   overflow: visible !important;
   transition-duration: 120ms !important;
+  will-change: auto !important;
 }
 
 [data-motion="lite"] .home-page .home-popularList .product-tile:hover {
   transform: none !important;
+}
+
+[data-motion="lite"] .home-page .home-howCard,
+[data-motion="lite"] .home-page .home-promoCard,
+[data-motion="lite"] .home-page .home-faqItem.faq-item,
+[data-motion="lite"] .home-page .hx-stat-item {
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-motion="lite"] .home-page .hx-live-eye-icon {
+  animation: none !important;
 }
 
 [data-motion="off"] *,
@@ -270,8 +309,8 @@
     border-bottom: 1px solid var(--nav-shell-edge) !important;
     box-shadow: var(--nav-shell-shadow-header) !important;
     backdrop-filter: none !important;
-    transform: translateZ(0);
-    will-change: transform;
+    transform: none;
+    will-change: auto;
   }
 
   /* Header mobile light mode — neumorphic + gradasi hijau */
@@ -440,12 +479,10 @@
     backdrop-filter: none !important;
   }
 
-  /* Disable AI assistant floating bubble animations & filters to improve scrolling FPS */
+  /* AI FAB: keep neo square, kill leftover motion cost */
   .ai-bubble:not(.is-open)::before {
-    animation: none !important;
-    filter: none !important;
-    background: rgba(0, 214, 180, 0.2) !important;
-    box-shadow: none !important;
+    content: none !important;
+    display: none !important;
   }
   .ai-markFab {
     animation: none !important;
@@ -454,6 +491,7 @@
   .ai-bubble {
     animation: none !important;
     will-change: auto !important;
+    border-radius: 16px !important;
   }
 
   /* Isolate Hero repaint boundaries */
@@ -511,38 +549,47 @@
   backdrop-filter: none !important;
 }
 
-/* Home hero: kill all expensive effects in lite mode */
-[data-motion="lite"] .hx-mesh {
-  animation: none !important;
-  will-change: auto !important;
-}
-[data-motion="lite"] .hx-grid-overlay {
-  animation: none !important;
-  will-change: auto !important;
-}
-[data-motion="lite"] .hx-noise {
-  display: none !important;
-}
+/* Home hero: keep lite mode cheap */
 [data-motion="lite"] .hx-live-badge {
   backdrop-filter: none !important;
+}
+[data-motion="lite"] .hx-stat-item {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
 }
 
 /* Product Detail: strip all expensive effects in lite mode */
 [data-motion="lite"] .detail-page-v3 .pdx-topCard {
   backdrop-filter: none !important;
   background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
 }
 [data-motion="lite"] .detail-page-v3 .pdx-heroPanel,
 [data-motion="lite"] .detail-page-v3 .pdx-summaryPanel,
 [data-motion="lite"] .detail-page-v3 .pdx-variantsSection,
 [data-motion="lite"] .detail-page-v3 .pdx-packCard,
-[data-motion="lite"] .detail-page-v3 .pdx-variantCard {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
-  transition: transform 0.15s ease !important;
+[data-motion="lite"] .detail-page-v3 .pdx-variantCard,
+[data-motion="lite"] .detail-page-v3 .pdx-infoTabsCard,
+[data-motion="lite"] .detail-page-v3 .pdx-flowCard {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: border-color 0.15s ease !important;
+  will-change: auto !important;
 }
-[data-motion="lite"] .detail-page-v3 .pdx-productIcon {
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+[data-motion="lite"] .detail-page-v3 .pdx-productIcon,
+[data-motion="lite"] .detail-page-v3 .pdx-chip,
+[data-motion="lite"] .detail-page-v3 .pdx-stockPill,
+[data-motion="lite"] .detail-page-v3 .pdx-qtyBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-benefitToggle,
+[data-motion="lite"] .detail-page-v3 .pdx-benefitToggle-modern,
+[data-motion="lite"] .detail-page-v3 .pdx-compareBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-iconBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-variantBadge {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
   background: var(--skeu-control-bg) !important;
 }
 [data-motion="lite"] .detail-page-v3 {
@@ -550,7 +597,43 @@
 }
 [data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid {
   content-visibility: auto;
-  contain-intrinsic-size: auto 400px;
+  contain-intrinsic-size: auto 220px;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  will-change: auto !important;
+  transform: none !important;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 160px;
+  contain: layout paint style;
+  perspective: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile::after,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile::before {
+  display: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-pill,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-typeBadge,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-arrow,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-favBtn {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-liveViewersDot,
+[data-motion="lite"] .detail-page-v3 .pdx-stockUrgency,
+[data-motion="off"] .detail-page-v3 .pdx-liveViewersDot,
+[data-motion="off"] .detail-page-v3 .pdx-stockUrgency {
+  animation: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-tiltWrap {
+  will-change: auto !important;
+  transform: none !important;
+  transform-style: flat !important;
 }
 
 /* Mobile typography hierarchy */

@@ -695,6 +695,14 @@ select.input {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
+/* Cart count must stay alert-red over generic .pill tokens above */
+.header-cart .pill {
+  background: #ff4d6d !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.35) !important;
+}
+
 .hero-accent,
 .hero-highlight,
 .hm-title-accent,
@@ -802,8 +810,8 @@ html[data-theme="light"] .hm-title-glow {
 
 .theme-toggle {
   position: relative;
-  width: 58px;
-  height: 32px;
+  width: var(--hdr-toggle-w, 58px);
+  height: var(--hdr-toggle-h, 32px);
   padding: 0 7px;
   border-radius: 999px;
   display: inline-flex;
@@ -817,6 +825,8 @@ html[data-theme="light"] .hm-title-glow {
   box-shadow: var(--skeu-control-shadow) !important;
   cursor: pointer;
   transition:
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
     transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     border-color var(--dur-med) var(--ease-out),
     background var(--dur-med) var(--ease-out) !important;
@@ -861,8 +871,8 @@ html[data-theme="light"] .theme-toggle:hover {
   position: absolute;
   top: 3px;
   left: 3px;
-  width: 24px;
-  height: 24px;
+  width: var(--hdr-toggle-thumb, 24px);
+  height: var(--hdr-toggle-thumb, 24px);
   border-radius: 999px;
   display: grid;
   place-items: center;
@@ -871,16 +881,26 @@ html[data-theme="light"] .theme-toggle:hover {
     linear-gradient(135deg, #4effda 0%, #25ebc8 34%, #00d6b4 56%, #008a94 100%);
   color: #032235;
   box-shadow: 0 10px 22px rgba(0, 214, 180, 0.24), 0 1px 0 rgba(255, 255, 255, 0.28) inset, 0 -2px 0 rgba(3, 66, 74, 0.22) inset;
-  transition: transform var(--dur-med) var(--ease-out);
+  transition:
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    transform var(--dur-med) var(--ease-out);
 }
 
 .theme-toggle.is-dark .theme-toggleThumb {
-  transform: translateX(26px);
+  transform: translateX(var(--hdr-toggle-shift, 26px));
 }
 
 .theme-toggleThumb svg {
   width: 13px;
   height: 13px;
+}
+
+.header-cart svg,
+.header-iconAction svg {
+  width: var(--hdr-action-icon, 18px);
+  height: var(--hdr-action-icon, 18px);
+  transition: width 0.28s ease, height 0.28s ease;
 }
 
 .flow-assist-eyebrow,
@@ -1299,7 +1319,6 @@ html[data-theme="light"] .header-iconAction.active {
 
 html[data-theme="light"] .toggle-btn,
 html[data-theme="light"] .catalog-viewBtn,
-html[data-theme="light"] .catalog-status,
 html[data-theme="light"] .catalog-rangeValues,
 html[data-theme="light"] .catalog-sheetTitle,
 html[data-theme="light"] .catalog-sheetClose,
@@ -1358,12 +1377,40 @@ html[data-theme="light"] .lightbox-nav svg {
   color: #0b7b89 !important;
 }
 
-html[data-theme="light"] .catalog-status,
 html[data-theme="light"] .status-orderCode,
 html[data-theme="light"] .status-min-node,
 html[data-theme="light"] .status-metricCard,
 html[data-theme="light"] .lightbox-close,
 html[data-theme="light"] .lightbox-nav {
+  border-color: rgba(0, 138, 148, 0.14) !important;
+}
+
+/* Catalog stock pill uses brand teal — not generic slate text/border */
+html[data-theme="light"] .catalog-status.ok {
+  color: var(--accent, #067b88) !important;
+  border-color: rgba(0, 138, 148, 0.32) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.12)) !important;
+}
+
+html[data-theme="light"] .catalog-status.hot {
+  color: #b05500 !important;
+  border-color: rgba(255, 120, 30, 0.3) !important;
+}
+
+html[data-theme="light"] .catalog-status.warn {
+  color: #8a6200 !important;
+  border-color: rgba(212, 160, 23, 0.34) !important;
+}
+
+html[data-theme="light"] .catalog-status.soldout {
+  color: #a12d48 !important;
+  border-color: rgba(202, 74, 97, 0.32) !important;
+}
+
+html[data-theme="light"] .catalog-status.muted {
+  color: #5a7580 !important;
   border-color: rgba(0, 138, 148, 0.14) !important;
 }
 
@@ -1705,18 +1752,25 @@ html[data-theme="light"] {
 
 .header-cart,
 .header-iconAction {
-  width: 44px !important;
-  height: 44px !important;
-  min-width: 44px !important;
-  min-height: 44px !important;
+  /* Use shrink tokens so desktop header shrink scales these icons too */
+  width: var(--hdr-action, 44px) !important;
+  height: var(--hdr-action, 44px) !important;
+  min-width: var(--hdr-action, 44px) !important;
+  min-height: var(--hdr-action, 44px) !important;
   padding: 0 !important;
   display: grid !important;
   place-items: center !important;
-  flex: 0 0 44px;
-  border-radius: 16px !important;
+  flex: 0 0 var(--hdr-action, 44px);
+  border-radius: var(--hdr-action-radius, 16px) !important;
   overflow: hidden;
   text-decoration: none !important;
   transition:
+    width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    min-width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    min-height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    flex-basis 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+    border-radius 0.28s ease,
     transform 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275),
     border-color 0.22s var(--ease-out),
     box-shadow 0.22s var(--ease-out),
@@ -3710,24 +3764,24 @@ html[data-theme="light"] .home-page .hero-search-shell:focus-within {
   box-shadow: var(--home-neo-panel-shadow, var(--uni-neo-panel-shadow)) !important;
 }
 
-/* Hx live badge: control depth with backdrop-filter preserved */
+/* Hx live badge: raised neo control (hero v2) */
 .home-page .hx-live-badge {
-  border: 1px solid var(--brand-line) !important;
-  background: var(--home-neo-control) !important;
-  box-shadow: var(--home-neo-control-shadow) !important;
-  backdrop-filter: blur(4px) !important;
+  border: none !important;
+  background: var(--home-neo-control, var(--skeu-control-bg)) !important;
+  box-shadow: var(--home-neo-control-shadow, var(--skeu-control-shadow)) !important;
+  backdrop-filter: none !important;
 }
 
-/* Home popular list: keep parity with Produk page cards */
+/* Home popular sold badge — raised neumorphic control (project tokens) */
 .home-page .home-popularList .home-popularSold {
-  border-color: rgba(79, 255, 200, 0.24) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
-    linear-gradient(180deg, #4effda 0%, #25ebc8 36%, #00d6b4 58%, #008a94 100%) !important;
-  color: #032235 !important;
-  box-shadow:
-    0 16px 34px rgba(0, 214, 180, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.55) !important;
+  border: none !important;
+  background: var(--skeu-control-bg, var(--home-neo-control, var(--uni-neo-control))) !important;
+  box-shadow: var(--skeu-control-shadow, var(--home-neo-control-shadow, var(--uni-neo-control-shadow))) !important;
+  color: var(--text, #f0f4f8) !important;
+}
+
+html[data-theme="light"] .home-page .home-popularList .home-popularSold {
+  color: var(--text, #0f1f2e) !important;
 }
 
 @media (max-width: 460px) {
@@ -4728,23 +4782,28 @@ html[data-theme="light"] {
 }
 
 .home-page .home-popularList .product-tile--list {
-  padding: 20px 20px 20px 22px !important;
-  gap: 16px !important;
+  padding: 14px 16px !important;
+  gap: 12px 14px !important;
 }
 
 .home-page .home-popularList .product-tile-main {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0;
 }
 
 .home-page .home-popularList .product-tile-bottom {
   gap: 10px !important;
 }
 
+.home-page .home-popularList .product-tile-desc {
+  display: none !important;
+}
+
 @media (max-width: 720px) {
   .home-page .home-popularList .product-tile--list {
-    padding: 16px 15px 16px 16px !important;
-    gap: 12px !important;
+    padding: 12px 14px !important;
+    gap: 10px 12px !important;
   }
 }
 
@@ -5493,10 +5552,6 @@ html[data-theme="dark"] .detail-page .pdx-addBtn {
 }
 
 @media (max-width: 768px) {
-  .detail-page {
-    padding-bottom: 96px;
-  }
-
   .detail-page .pdx-mobileStickyCart {
     display: block;
     position: fixed;
@@ -5654,16 +5709,19 @@ html[data-theme="dark"] .detail-page .pdx-addBtn {
   }
 }
 
-/* --- Cart Notification Badge --- */
+/* --- Cart Notification Badge (solid red alert; not generic neo pill) --- */
 .header-cart .pill {
-  background: linear-gradient(135deg, #ff4d6d 0%, #ff204e 100%) !important;
-  color: white !important;
-  border: 1px solid rgba(255, 77, 109, 0.5) !important;
-  box-shadow: 0 4px 12px rgba(255, 77, 109, 0.4), inset 0 1px 1px rgba(255, 255, 255, 0.3) !important;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  background: #ff4d6d !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.35) !important;
+  text-shadow: none !important;
 }
 html[data-theme="light"] .header-cart .pill {
-  box-shadow: 0 4px 12px rgba(255, 77, 109, 0.25), inset 0 1px 1px rgba(255, 255, 255, 0.4) !important;
+  background: #ff4d6d !important;
+  color: #fff !important;
+  border: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.28) !important;
 }
 
 @keyframes slideUpCart {

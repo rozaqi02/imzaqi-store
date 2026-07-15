@@ -34,8 +34,11 @@
   height: 34px;
   padding: 0 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: 0.04em;
@@ -68,6 +71,7 @@
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
     var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
   color: var(--brand-text, rgba(234, 255, 245, 0.84));
   font-size: 13px;
   font-weight: 800;

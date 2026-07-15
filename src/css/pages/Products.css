@@ -56,9 +56,11 @@ html[data-theme="light"] .catalog-hero::before {
   right: 0;
   z-index: 100;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(7, 10, 18, 0.97);
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.42);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
+    var(--skeu-panel-bg, rgba(7, 10, 18, 0.97));
+  box-shadow: var(--skeu-panel-shadow, 0 24px 60px rgba(0, 0, 0, 0.42));
   overflow-x: hidden;
   overflow-y: auto;
   max-height: min(320px, 48vh);
@@ -102,8 +104,11 @@ html[data-theme="light"] .catalog-sub {
 .catalog-metric {
   padding: 16px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .catalog-metric strong,
@@ -136,20 +141,20 @@ html[data-theme="light"] .catalog-sub {
   margin-top: 18px;
   padding: 12px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03));
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.22);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.03)));
+  box-shadow: var(--skeu-panel-shadow, 0 24px 70px rgba(0, 0, 0, 0.22));
   min-width: 0;
 }
 
 html[data-theme="light"] .catalog-command {
   border: 1px solid rgba(0, 138, 148, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(236, 247, 251, 0.92));
-  box-shadow:
-    0 18px 44px rgba(37, 88, 110, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(236, 247, 251, 0.92)));
+  box-shadow: var(--skeu-panel-shadow);
 }
 
 .catalog-command:focus-within {
@@ -162,8 +167,7 @@ html[data-theme="light"] .catalog-command {
 html[data-theme="light"] .catalog-command:focus-within {
   border-color: rgba(0, 138, 148, 0.25);
   box-shadow:
-    0 18px 44px rgba(37, 88, 110, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
+    var(--skeu-panel-shadow),
     0 0 0 3px rgba(0, 138, 148, 0.1);
 }
 
@@ -199,8 +203,11 @@ html[data-theme="light"] .catalog-command:focus-within {
   display: grid;
   place-items: center;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(234, 255, 245, 0.86);
   cursor: pointer;
 }
@@ -231,8 +238,15 @@ html[data-theme="light"] .catalog-command:focus-within {
   display: grid;
   place-items: center;
   border-radius: 999px;
-  background: rgba(0, 214, 180, 0.22);
-  color: var(--uni-neo-icon, #4effda);
+  border: 1px solid rgba(0, 214, 180, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.32), rgba(0, 80, 90, 0.4));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 3px 8px rgba(0, 180, 150, 0.16);
+  color: var(--brand-icon, var(--uni-neo-icon, #4effda));
   font-size: 11px;
   font-weight: 1000;
 }
@@ -303,7 +317,7 @@ html[data-theme="light"] .catalog-command:focus-within {
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border-radius: 28px;
+  border-radius: 32px;
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
@@ -311,7 +325,7 @@ html[data-theme="light"] .catalog-command:focus-within {
     radial-gradient(circle at top right, var(--brand-card-spot, rgba(0, 214, 180, 0.12)), rgba(0, 214, 180, 0) 52%),
     var(--skeu-panel-bg);
   box-shadow: var(--skeu-panel-shadow);
-  backdrop-filter: blur(20px) saturate(145%);
+  backdrop-filter: none;
   overflow: hidden;
   isolation: isolate;
 }
@@ -322,9 +336,13 @@ html[data-theme="light"] .catalog-command:focus-within {
   justify-content: space-between;
   gap: 12px;
   padding: 16px 16px 14px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
   flex: 0 0 auto;
+  /* Match shell top curve so head fill doesn't look square under overflow:hidden */
+  border-radius: 32px 32px 0 0;
 }
 
 .catalog-filterHeadMain {
@@ -339,9 +357,12 @@ html[data-theme="light"] .catalog-command:focus-within {
   height: 40px;
   display: grid;
   place-items: center;
-  border-radius: 14px;
-  border: 1px solid rgba(79, 255, 218, 0.22);
-  background: rgba(0, 214, 180, 0.12);
+  border-radius: 16px;
+  border: 1px solid rgba(79, 255, 218, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 80, 0.4));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #4effda;
   flex: 0 0 auto;
 }
@@ -365,18 +386,21 @@ html[data-theme="light"] .catalog-command:focus-within {
   flex: 0 0 auto;
   min-height: 34px;
   padding: 0 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(234, 255, 245, 0.86);
   font-size: 12px;
   font-weight: 900;
   cursor: pointer;
-  transition: background 0.18s ease, border-color 0.18s ease;
+  transition: background 0.18s ease, border-color 0.18s ease, filter 0.18s ease;
 }
 
 .catalog-filterHeadReset:hover {
-  background: rgba(255, 255, 255, 0.08);
+  filter: brightness(1.08);
   border-color: rgba(79, 255, 218, 0.24);
 }
 
@@ -430,9 +454,12 @@ html[data-theme="light"] .catalog-command:focus-within {
 
 .catalog-filter.is-sheet .catalog-filterSection {
   padding: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .catalog-filterSection:last-of-type,
@@ -468,8 +495,9 @@ html[data-theme="light"] .catalog-command:focus-within {
   margin-top: 10px;
   padding: 0 12px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-inset-shadow, none);
 }
 
 .catalog-filterInput {
@@ -487,10 +515,13 @@ html[data-theme="light"] .catalog-command:focus-within {
   height: 30px;
   display: grid;
   place-items: center;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(234, 255, 245, 0.9);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
+  color: var(--brand-text, rgba(234, 255, 245, 0.9));
   cursor: pointer;
 }
 
@@ -505,16 +536,19 @@ html[data-theme="light"] .catalog-command:focus-within {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 34px;
-  padding: 0 11px;
+  min-height: 36px;
+  padding: 0 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(234, 255, 245, 0.84);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
+  color: var(--brand-muted, rgba(234, 255, 245, 0.84));
   cursor: pointer;
   font-size: 12px;
   font-weight: 800;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
 .catalog-chip.active {
@@ -535,9 +569,14 @@ html[data-theme="light"] .catalog-command:focus-within {
   height: 18px;
   padding: 0 4px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  color: rgba(234, 255, 245, 0.64);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.08));
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.15));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22);
+  color: var(--brand-muted, rgba(234, 255, 245, 0.64));
   margin-left: 4px;
   transition: all 0.18s ease;
 }
@@ -585,10 +624,13 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   margin-top: 0;
   display: grid;
   gap: 4px;
-  padding: 6px;
-  border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  padding: 8px;
+  border-radius: 22px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-inset-bg, rgba(255, 255, 255, 0.03));
+  box-shadow: var(--skeu-inset-shadow, none);
 }
 
 .catalog-toggleItem {
@@ -597,8 +639,8 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   justify-content: space-between;
   gap: 12px;
   min-height: 46px;
-  padding: 8px 10px;
-  border-radius: 13px;
+  padding: 8px 12px;
+  border-radius: 16px;
   cursor: pointer;
   user-select: none;
   transition: background 0.18s var(--ease-out, ease);
@@ -651,8 +693,9 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   display: block;
   position: relative;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-inset-shadow, none);
   cursor: pointer;
 }
 
@@ -664,13 +707,22 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   width: 21px;
   height: 21px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0.85));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 2px 6px rgba(0, 0, 0, 0.25);
   transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
 .catalog-toggle input:checked + .catalog-toggleUi {
-  background: rgba(0, 214, 180, 0.28);
-  border-color: rgba(0, 214, 180, 0.4);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.4), rgba(0, 100, 100, 0.45));
+  border-color: rgba(0, 214, 180, 0.45);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25);
   transition: background 0.25s ease, border-color 0.25s ease;
 }
 
@@ -692,6 +744,9 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
 .catalog-rangeTrack {
   height: 10px;
   border-radius: 999px;
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--skeu-inset-shadow, none);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
 }
 
 .catalog-rangeInput {
@@ -721,8 +776,14 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  background: rgba(22, 199, 166, 1);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(165deg, #4effda, #00a88c);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 60, 50, 0.35),
+    0 3px 8px rgba(0, 180, 150, 0.3);
   cursor: pointer;
   pointer-events: auto;
 }
@@ -731,8 +792,14 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   width: 18px;
   height: 18px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.24);
-  background: rgba(22, 199, 166, 1);
+  border: 1px solid rgba(255, 255, 255, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(165deg, #4effda, #00a88c);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -1px 0 rgba(0, 60, 50, 0.35),
+    0 3px 8px rgba(0, 180, 150, 0.3);
   cursor: pointer;
   pointer-events: auto;
 }
@@ -766,12 +833,15 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   min-height: 40px;
   padding: 0 14px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(234, 255, 245, 0.84);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
+  color: var(--brand-muted, rgba(234, 255, 245, 0.84));
   cursor: pointer;
   font-weight: 800;
-  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease;
+  transition: background 0.18s ease, border-color 0.18s ease, color 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
 }
 
 .catalog-viewBtn.active {
@@ -789,9 +859,12 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
   gap: 12px;
   margin-bottom: 12px;
   padding: 8px 12px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.06));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.02));
+  box-shadow: var(--skeu-control-shadow, none);
   min-width: 0;
 }
 
@@ -872,22 +945,32 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 
 .catalog-contentMeta {
   display: inline-flex;
-  align-items: baseline;
-  gap: 8px;
+  align-items: center;
+  gap: 6px;
   flex-wrap: wrap;
   min-width: 0;
+  line-height: 1;
 }
 
 .catalog-contentMeta strong {
+  display: inline-flex;
+  align-items: center;
   font-size: 24px;
   font-weight: 1000;
+  line-height: 1;
+}
+
+.catalog-contentMeta strong span {
+  line-height: 1;
 }
 
 .catalog-contentMeta span {
   color: rgba(234, 255, 245, 0.62);
   font-size: 12px;
   font-weight: 800;
+  line-height: 1;
   text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .catalog-contentMeta em {
@@ -912,10 +995,14 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   min-height: 30px;
   padding: 0 11px;
   border-radius: 999px;
-  border: 1px solid rgba(0, 214, 180, 0.2);
+  border: 1px solid rgba(0, 214, 180, 0.32);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 30%),
-    rgba(0, 214, 180, 0.12);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 80, 90, 0.4));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 4px 10px rgba(0, 180, 150, 0.14);
   color: rgba(234, 255, 245, 0.94);
   font-size: 11px;
   font-weight: 800;
@@ -927,8 +1014,14 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   min-height: 30px;
   padding: 0 11px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 91, 122, 0.34);
-  background: rgba(255, 91, 122, 0.12);
+  border: 1px solid rgba(255, 91, 122, 0.4);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 91, 122, 0.24), rgba(70, 12, 28, 0.5));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 70, 100, 0.14);
   color: #ffd7df;
   font-size: 11px;
   font-weight: 900;
@@ -955,11 +1048,12 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   gap: 14px;
   padding: 16px;
   border-radius: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)),
-    radial-gradient(circle at top right, rgba(75, 98, 255, 0.12), rgba(75, 98, 255, 0) 44%);
-  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.2);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    radial-gradient(circle at top right, rgba(75, 98, 255, 0.1), rgba(75, 98, 255, 0) 44%),
+    var(--skeu-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)));
+  box-shadow: var(--skeu-panel-shadow, 0 24px 70px rgba(0, 0, 0, 0.2));
   color: var(--text);
   contain: layout paint style;
   content-visibility: auto;
@@ -989,8 +1083,10 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 @media (hover: hover) {
   .catalog-card:hover {
     transform: translateY(-5px);
-    border-color: rgba(29, 131, 255, 0.22);
-    box-shadow: 0 34px 80px rgba(0, 0, 0, 0.26);
+    border-color: rgba(79, 255, 200, 0.28);
+    box-shadow:
+      var(--skeu-panel-shadow, 0 34px 80px rgba(0, 0, 0, 0.26)),
+      0 0 0 1px rgba(79, 255, 200, 0.1);
   }
 }
 
@@ -1017,13 +1113,13 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   align-content: start;
   padding: 10px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 62%);
-  box-shadow:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, transparent);
+  box-shadow: var(--skeu-control-shadow,
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+    inset 0 -2px 0 rgba(0, 0, 0, 0.12));
 }
 
 .catalog-cardIcon {
@@ -1033,13 +1129,13 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   place-items: center;
   overflow: hidden;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 28%),
-    rgba(255, 255, 255, 0.06);
-  box-shadow:
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-control-shadow,
     0 14px 28px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+    inset 0 1px 0 rgba(255, 255, 255, 0.18));
 }
 
 .catalog-cardIcon img {
@@ -1072,27 +1168,51 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 }
 
 .catalog-status.hot {
-  background: rgba(255, 140, 50, 0.14);
-  border: 1px solid rgba(255, 140, 50, 0.3);
+  border: 1px solid rgba(255, 140, 50, 0.38);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 140, 50, 0.28), rgba(80, 35, 0, 0.5));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 120, 30, 0.16);
   color: #ffb060;
 }
 
 .catalog-status.warn {
-  background: rgba(255, 180, 50, 0.12);
-  border: 1px solid rgba(255, 180, 50, 0.26);
+  border: 1px solid rgba(255, 180, 50, 0.36);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 180, 50, 0.26), rgba(70, 40, 0, 0.5));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 160, 40, 0.14);
   color: #ffc860;
 }
 
 .catalog-status.soldout {
-  background: rgba(255, 91, 122, 0.12);
-  border: 1px solid rgba(255, 91, 122, 0.24);
+  border: 1px solid rgba(255, 91, 122, 0.36);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 91, 122, 0.24), rgba(70, 12, 28, 0.5));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 70, 100, 0.14);
   color: #ff9ab1;
 }
 
 .catalog-status.ok {
-  background: rgba(41, 212, 156, 0.14);
-  border: 1px solid rgba(41, 212, 156, 0.28);
-  color: #5fffb8;
+  border: 1px solid color-mix(in srgb, var(--accent, #00d6b4) 42%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 90, 0.45));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(0, 214, 180, 0.16);
+  color: var(--brand-icon, #4effda);
 }
 
 .catalog-cardBody {
@@ -1155,13 +1275,13 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   align-self: flex-start;
   padding: 10px 12px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
-    rgba(255, 255, 255, 0.04);
-  box-shadow:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow,
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 12px 28px rgba(0, 0, 0, 0.12);
+    0 12px 28px rgba(0, 0, 0, 0.12));
   font-size: 15px;
   font-weight: 1000;
   letter-spacing: -0.04em;
@@ -1183,16 +1303,16 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   min-height: 30px;
   padding: 0 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
-    rgba(255, 255, 255, 0.05);
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
   color: rgba(234, 255, 245, 0.84);
   font-size: 12px;
   font-weight: 900;
-  box-shadow:
+  box-shadow: var(--skeu-control-shadow,
     inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 10px 18px rgba(0, 0, 0, 0.1);
+    0 10px 18px rgba(0, 0, 0, 0.1));
 }
 
 .catalog-cardMeta > span svg {
@@ -1222,13 +1342,13 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   margin-top: auto;
   padding: 0 12px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
-    rgba(255, 255, 255, 0.04);
-  box-shadow:
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow,
     inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 10px 22px rgba(0, 0, 0, 0.1);
+    0 10px 22px rgba(0, 0, 0, 0.1));
   color: rgba(234, 255, 245, 0.82);
   font-weight: 900;
   min-width: 0;
@@ -1242,8 +1362,11 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 .catalog-cardSkeleton {
   min-height: 230px;
   border-radius: 26px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-panel-shadow, none);
   position: relative;
   overflow: hidden;
 }
@@ -1315,7 +1438,14 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   width: 56px;
   height: 5px;
   border-radius: 999px;
-  background: rgba(0, 214, 180, 0.4);
+  border: 1px solid rgba(0, 214, 180, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.55), rgba(0, 100, 100, 0.45));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 40, 40, 0.35),
+    0 2px 6px rgba(0, 180, 150, 0.18);
   margin: 8px auto 0;
   flex: 0 0 auto;
   cursor: default;
@@ -1475,8 +1605,14 @@ html[data-theme="light"] .catalog-sheet {
 }
 
 html[data-theme="light"] .catalog-sheetHandle {
-  background: rgba(0, 138, 148, 0.5);
-  background-clip: content-box;
+  border-color: rgba(0, 138, 148, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 42%),
+    linear-gradient(165deg, rgba(0, 194, 208, 0.55), rgba(0, 138, 148, 0.42));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(0, 80, 90, 0.18),
+    0 2px 6px rgba(0, 138, 148, 0.16);
 }
 
 html[data-theme="light"] .catalog-sheetHead {
@@ -1588,10 +1724,16 @@ html[data-theme="light"] .catalog-sheetFoot {
 }
 
 @media (max-width: 900px) and (min-width: 721px) {
-  /* Simplify card rendering for tablets to prevent scroll frame drops */
+  /* Tablet: keep neumorphic face, lighter composite shadow for scroll perf */
   .catalog-card {
-    background: var(--card, rgba(255, 255, 255, 0.04)) !important;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18) !important;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+      var(--skeu-panel-bg, var(--card, rgba(255, 255, 255, 0.04))) !important;
+    box-shadow:
+      0 10px 24px rgba(0, 0, 0, 0.22),
+      inset 0 2px 0 rgba(255, 255, 255, 0.16),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.28),
+      0 0 0 1px rgba(0, 194, 208, 0.12) !important;
   }
   .catalog-card::before {
     display: none !important;
@@ -1630,11 +1772,12 @@ html[data-theme="light"] .catalog-sheetFoot {
   }
 
   .catalog-filterShell {
-    border-radius: 24px;
+    border-radius: 28px;
   }
 
   .catalog-filterHead {
     padding: 14px 14px 12px;
+    border-radius: 28px 28px 0 0;
   }
 
   .catalog-chipGrid {
@@ -1813,14 +1956,18 @@ html[data-theme="light"] .catalog-sheetFoot {
     font-size: 12px;
   }
 
-  /* simplify card rendering on mobile — skip expensive gradients + large shadow */
+  /* Mobile: lighter neumorphic paint — no will-change mass promotion */
   .catalog-card {
-    background: var(--card, rgba(255, 255, 255, 0.04)) !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18) !important;
-    /* GPU layer promotion for silky smooth scrolling on mobile */
-    will-change: transform;
-    transform: translate3d(0, 0, 0);
-    /* Mobile-appropriate height estimates to solve scrollbar jumping and layout reflows */
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
+      var(--skeu-panel-bg, var(--card, rgba(255, 255, 255, 0.04))) !important;
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    will-change: auto;
+    transform: none;
+    content-visibility: auto;
+    /* Mobile-appropriate height estimates for content-visibility */
     contain-intrinsic-size: auto 195px !important;
   }
 
@@ -1830,6 +1977,17 @@ html[data-theme="light"] .catalog-sheetFoot {
 
   .catalog-card::before {
     display: none !important;
+  }
+
+  /* Sub-chrome: single outer + inset instead of full 8-layer control shadow */
+  .catalog-cardIcon,
+  .catalog-cardPrice,
+  .catalog-cardMeta > span,
+  .catalog-cardFoot,
+  .catalog-status {
+    box-shadow:
+      0 3px 8px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
   }
 }
 
@@ -2044,9 +2202,34 @@ html[data-theme="light"] .catalog-sheetFoot {
     box-shadow 0.25s ease;
 }
 
+/* Press-in: slight sink + inset depth (touch + mouse) */
 .catalog-card.catalog-cardV2:active {
-  transform: scale(0.98);
-  border-color: rgba(0, 214, 180, 0.2);
+  transform: scale(0.97) translateY(1px);
+  border-color: rgba(0, 214, 180, 0.28);
+  box-shadow:
+    inset 6px 8px 16px rgba(0, 0, 0, 0.28),
+    inset -3px -3px 10px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.12);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease;
+}
+
+html[data-theme="light"] .catalog-card.catalog-cardV2:active {
+  border-color: rgba(0, 138, 148, 0.28);
+  box-shadow:
+    inset 5px 7px 14px rgba(40, 90, 110, 0.16),
+    inset -2px -2px 8px rgba(255, 255, 255, 0.85),
+    inset 0 2px 0 rgba(24, 96, 122, 0.08),
+    0 1px 2px rgba(40, 94, 117, 0.08);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-card.catalog-cardV2:active {
+    transform: none;
+  }
 }
 
 .catalog-card.catalog-cardV2 .catalog-cardTop {
@@ -2182,13 +2365,23 @@ html[data-theme="light"] .catalog-sheetFoot {
 }
 
 .catalog-card.catalog-cardV2 .catalog-status.ok {
-  background: rgba(41, 212, 156, 0.14);
-  border: 1px solid rgba(41, 212, 156, 0.28);
+  border: 1px solid color-mix(in srgb, var(--accent, #00d6b4) 42%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 90, 0.45));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(0, 214, 180, 0.16);
+  color: var(--brand-icon, #4effda);
 }
 
 .catalog-card.catalog-cardV2 .catalog-status.muted {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(255, 255, 255, 0.55);
   font-weight: 600;
 }
@@ -2202,8 +2395,14 @@ html[data-theme="light"] .catalog-sheetFoot {
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.02em;
-  border: 1px solid var(--type-color, var(--accent));
-  background: color-mix(in srgb, var(--type-color, var(--accent)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--type-color, var(--accent)) 45%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    color-mix(in srgb, var(--type-color, var(--accent)) 16%, var(--skeu-control-bg, transparent));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.22),
+    0 4px 10px color-mix(in srgb, var(--type-color, var(--accent)) 14%, transparent);
   color: var(--type-color, var(--accent));
   flex: 0 0 auto;
   line-height: 1;
@@ -2377,7 +2576,10 @@ html[data-theme="light"] .catalog-filterShell {
 
 html[data-theme="light"] .catalog-filterHead {
   border-bottom-color: rgba(0, 138, 148, 0.1);
-  background: rgba(255, 255, 255, 0.42);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 42%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.55));
+  box-shadow: inset 0 -1px 0 rgba(0, 138, 148, 0.06);
 }
 
 html[data-theme="light"] .catalog-filterHeadTitle {
@@ -2386,50 +2588,64 @@ html[data-theme="light"] .catalog-filterHeadTitle {
 
 html[data-theme="light"] .catalog-filterHeadIcon {
   border-color: rgba(0, 138, 148, 0.18);
-  background: rgba(0, 194, 208, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 194, 208, 0.22), rgba(0, 138, 148, 0.12));
+  box-shadow: var(--skeu-control-shadow);
   color: #008a94;
 }
 
 html[data-theme="light"] .catalog-filterHeadReset {
   border-color: rgba(0, 138, 148, 0.14);
-  background: rgba(255, 255, 255, 0.72);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg, #ffffff);
+  box-shadow: var(--skeu-control-shadow);
   color: #2b4e5a;
 }
 
 html[data-theme="light"] .catalog-filter.is-sheet .catalog-filterSection {
   border-color: rgba(0, 138, 148, 0.12);
-  background: rgba(255, 255, 255, 0.56);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.72));
+  box-shadow: var(--skeu-control-shadow);
 }
 
 html[data-theme="light"] .catalog-sheet {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.9) 28%),
-    #f3fafc;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(255, 255, 255, 0.6) 28%),
+    var(--skeu-panel-bg, #f3fafc);
   border-color: rgba(0, 138, 148, 0.14);
+  box-shadow: var(--skeu-panel-shadow);
 }
 
 html[data-theme="light"] .catalog-sheetFoot {
-  background: rgba(255, 255, 255, 0.98);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.98));
   border-top-color: rgba(0, 138, 148, 0.1);
+  box-shadow:
+    0 -8px 20px rgba(67, 111, 129, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 html[data-theme="light"] .catalog-card.catalog-cardV2 {
   border-color: rgba(24, 96, 122, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0.42) 48%, rgba(235, 247, 252, 0.78)),
-    radial-gradient(circle at top right, rgba(16, 152, 200, 0.12), rgba(16, 152, 200, 0) 44%);
-  box-shadow: 0 22px 60px rgba(40, 94, 117, 0.16);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 32%),
+    radial-gradient(circle at top right, rgba(16, 152, 200, 0.12), rgba(16, 152, 200, 0) 44%),
+    var(--skeu-panel-bg);
+  box-shadow: var(--skeu-panel-shadow);
   color: #113847;
 }
 
 html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardIcon {
   border-color: rgba(24, 96, 122, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72)),
-    rgba(239, 248, 252, 0.94);
-  box-shadow:
-    0 12px 26px rgba(40, 94, 117, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.96);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg, rgba(239, 248, 252, 0.94));
+  box-shadow: var(--skeu-control-shadow);
 }
 
 html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardKicker,
@@ -2442,32 +2658,77 @@ html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardPrice {
   color: #0a7289;
   border-color: rgba(24, 96, 122, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.6)),
-    rgba(234, 248, 252, 0.9);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
+    var(--skeu-control-bg, rgba(234, 248, 252, 0.9));
+  box-shadow: var(--skeu-control-shadow);
 }
 
-html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-status {
-  color: #204855;
-}
+/* Don't blanket-color all status pills — each variant owns its hue */
 
 html[data-theme="light"] .catalog-status.hot {
-  background: rgba(255, 120, 30, 0.1);
-  border-color: rgba(255, 120, 30, 0.24);
+  border-color: rgba(255, 120, 30, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(255, 180, 80, 0.35), rgba(255, 140, 50, 0.14));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(140, 60, 0, 0.12),
+    0 3px 8px rgba(255, 120, 30, 0.12);
   color: #b05500;
 }
 
+html[data-theme="light"] .catalog-status.warn {
+  border-color: rgba(212, 160, 23, 0.34);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(255, 220, 120, 0.4), rgba(255, 190, 60, 0.14));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(140, 100, 0, 0.12),
+    0 3px 8px rgba(212, 160, 23, 0.12);
+  color: #8a6200;
+}
+
+html[data-theme="light"] .catalog-status.soldout {
+  border-color: rgba(202, 74, 97, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(255, 200, 210, 0.55), rgba(255, 140, 160, 0.16));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(140, 30, 50, 0.12),
+    0 3px 8px rgba(200, 40, 70, 0.1);
+  color: #a12d48;
+}
+
 html[data-theme="light"] .catalog-status.ok {
-  background: rgba(0, 168, 120, 0.1);
-  border-color: rgba(0, 168, 120, 0.24);
-  color: #006e50;
+  border-color: rgba(0, 138, 148, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.12));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 100, 110, 0.12),
+    0 3px 8px rgba(0, 138, 148, 0.14);
+  color: var(--accent, #067b88);
+}
+
+html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-status.muted {
+  border-color: rgba(24, 96, 122, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg);
+  box-shadow: var(--skeu-control-shadow);
+  color: #5a7580;
 }
 
 html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardMeta > span,
 html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardFoot {
   border-color: rgba(24, 96, 122, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.62)),
-    rgba(236, 248, 252, 0.9);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
+    var(--skeu-control-bg, rgba(236, 248, 252, 0.9));
+  box-shadow: var(--skeu-control-shadow);
   color: #2a4e5c;
 }
 
@@ -2578,16 +2839,26 @@ html[data-theme="light"] .catalog-contentMeta em {
 }
 
 html[data-theme="light"] .catalog-activeTag {
-  border-color: rgba(24, 122, 157, 0.24);
+  border-color: rgba(24, 122, 157, 0.28);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.94), rgba(255, 255, 255, 0.72)),
-    rgba(220, 244, 252, 0.96);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #dcf4fc, #b8e8f4);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(24, 122, 157, 0.12),
+    4px 6px 12px rgba(24, 122, 157, 0.1);
   color: #1f4a5a;
 }
 
 html[data-theme="light"] .catalog-activeReset {
-  border-color: rgba(202, 74, 97, 0.3);
-  background: rgba(255, 237, 242, 0.9);
+  border-color: rgba(202, 74, 97, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #ffe4ea, #ffd0d8);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(180, 40, 70, 0.12),
+    4px 6px 12px rgba(200, 40, 70, 0.1);
   color: #8f2c42;
 }
 
@@ -2620,15 +2891,23 @@ html[data-theme="light"] .catalog-filterRow--toggle .catalog-filterLabel {
 /* Light mode: grouped status toggles */
 html[data-theme="light"] .catalog-toggleGroup {
   border-color: rgba(41, 98, 121, 0.16);
-  background: rgba(255, 255, 255, 0.6);
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.6));
+  box-shadow: var(--skeu-inset-shadow);
 }
 
 html[data-theme="light"] .catalog-toggleItem:hover {
-  background: rgba(0, 138, 148, 0.06);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 40%),
+    rgba(0, 138, 148, 0.06);
 }
 
 html[data-theme="light"] .catalog-toggleItem:has(input:checked) {
-  background: rgba(0, 138, 148, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0) 40%),
+    rgba(0, 138, 148, 0.12);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.6),
+    inset 0 -1px 0 rgba(0, 80, 90, 0.08);
 }
 
 html[data-theme="light"] .catalog-toggleItemTitle {

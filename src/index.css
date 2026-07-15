@@ -28,3 +28,6 @@
 @import "./css/fab-stack.css";
 @import "./css/bottom-nav.css";
 @import "./css/light-mode-cards.css";
+
+/* Final neumorphic depth pass for badges / chips / icon buttons / qty */
+@import "./css/neumorphic-depth.css";

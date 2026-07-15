@@ -77,7 +77,6 @@ vi.mock("../hooks/useIsMobile", () => ({
 
 vi.mock("../components/Confetti", () => ({ fireConfetti: vi.fn() }));
 vi.mock("../lib/cartFlyParticle", () => ({ spawnCartFlyParticle: vi.fn() }));
-vi.mock("../lib/recentlyViewed", () => ({ addRecentlyViewed: vi.fn(), getRecentlyViewed: () => [] }));
 
 function renderDetail() {
   return render(

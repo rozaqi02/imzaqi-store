@@ -6,6 +6,8 @@ export const CATEGORY_OPTIONS = [
   { value: "streaming", label: "Streaming" },
   { value: "music", label: "Music" },
   { value: "tools", label: "Tools" },
+  { value: "ai", label: "AI" },
+  { value: "design", label: "Design" },
   { value: "learning", label: "Belajar" },
   { value: "other", label: "Lainnya" },
 ];

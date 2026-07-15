@@ -31,9 +31,12 @@
   flex: 0 0 140px;
   margin: 0;
   padding: 10px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.04));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, var(--skeu-inset-bg, rgba(255, 255, 255, 0.04)));
+  box-shadow: var(--skeu-control-shadow, none);
   display: grid;
   gap: 8px;
 }
@@ -42,7 +45,9 @@
   width: 100%;
   height: 72px;
   object-fit: cover;
-  border-radius: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .social-proof-card figcaption {
@@ -61,7 +66,10 @@ html[data-theme="light"] .social-proof-head {
 
 html[data-theme="light"] .social-proof-card {
   border-color: rgba(0, 138, 148, 0.14);
-  background: rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.82));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 html[data-theme="light"] .social-proof-card figcaption {

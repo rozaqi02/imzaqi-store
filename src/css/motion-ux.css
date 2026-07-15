@@ -135,7 +135,11 @@
     width: 58px;
     height: 58px;
     border-radius: 18px;
-    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 34%),
+      var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+    box-shadow: var(--skeu-control-shadow, none);
     flex: 0 0 auto;
   }
 
@@ -152,7 +156,9 @@
   .catalog-cardSkeletonMeta span,
   .catalog-cardSkeletonFoot {
     border-radius: 999px;
-    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.06));
+    background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.06));
+    box-shadow: var(--skeu-inset-shadow, none);
   }
 
   .catalog-cardSkeletonLine.is-short { width: 38%; height: 10px; }
@@ -177,18 +183,21 @@
     min-height: 34px;
     padding: 0 12px;
     border-radius: 999px;
-    border: 1px solid rgba(79, 255, 218, 0.22);
-    background: rgba(0, 214, 180, 0.08);
-    color: rgba(234, 255, 245, 0.9);
+    border: 1px solid var(--brand-line, rgba(79, 255, 218, 0.22));
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+      var(--skeu-control-bg, rgba(0, 214, 180, 0.08));
+    box-shadow: var(--skeu-control-shadow, none);
+    color: var(--brand-text, rgba(234, 255, 245, 0.9));
     font-size: 12px;
     font-weight: 800;
     cursor: pointer;
-    transition: transform 0.16s ease, background 0.16s ease;
+    transition: transform 0.16s ease, background 0.16s ease, filter 0.16s ease;
   }
 
   .empty-suggestionChip:hover {
     transform: translateY(-1px);
-    background: rgba(0, 214, 180, 0.14);
+    filter: brightness(1.06);
   }
 
   .mini-cart-item.is-new {

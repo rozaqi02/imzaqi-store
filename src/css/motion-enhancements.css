@@ -358,42 +358,57 @@
     html[data-motion="lite"] .header .header-cart,
     html[data-motion="full"] .header .header-iconAction,
     html[data-motion="lite"] .header .header-iconAction {
-      width: var(--hdr-action);
-      height: var(--hdr-action);
-      border-radius: var(--hdr-action-radius);
+      width: var(--hdr-action) !important;
+      height: var(--hdr-action) !important;
+      min-width: var(--hdr-action) !important;
+      min-height: var(--hdr-action) !important;
+      flex: 0 0 var(--hdr-action) !important;
+      border-radius: var(--hdr-action-radius) !important;
       transition:
-        width 0.28s ease,
-        height 0.28s ease,
-        border-radius 0.28s ease;
+        width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        min-width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        min-height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        border-radius 0.28s ease !important;
     }
 
     html[data-motion="full"] .header .header-cart svg,
     html[data-motion="lite"] .header .header-cart svg,
     html[data-motion="full"] .header .header-iconAction svg,
     html[data-motion="lite"] .header .header-iconAction svg {
-      width: var(--hdr-action-icon);
-      height: var(--hdr-action-icon);
-      transition: width 0.28s ease, height 0.28s ease;
+      width: var(--hdr-action-icon) !important;
+      height: var(--hdr-action-icon) !important;
+      transition: width 0.28s ease, height 0.28s ease !important;
     }
 
     html[data-motion="full"] .header .theme-toggle,
     html[data-motion="lite"] .header .theme-toggle {
-      width: var(--hdr-toggle-w);
-      height: var(--hdr-toggle-h);
+      width: var(--hdr-toggle-w) !important;
+      height: var(--hdr-toggle-h) !important;
       transition:
-        width 0.28s ease,
-        height 0.28s ease,
-        transform 0.28s ease;
+        width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.28s ease !important;
     }
 
     html[data-motion="full"] .header .theme-toggleThumb,
     html[data-motion="lite"] .header .theme-toggleThumb {
-      width: var(--hdr-toggle-thumb);
-      height: var(--hdr-toggle-thumb);
+      width: var(--hdr-toggle-thumb) !important;
+      height: var(--hdr-toggle-thumb) !important;
       transition:
-        width 0.28s ease,
-        height 0.28s ease,
-        transform 0.28s ease;
+        width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        transform 0.28s ease !important;
+    }
+
+    /* Shrink cart badge with the icon button */
+    html[data-motion="full"] .header.is-shrunk .header-cart .pill,
+    html[data-motion="lite"] .header.is-shrunk .header-cart .pill {
+      min-width: 14px;
+      height: 14px;
+      font-size: 8px;
+      top: 2px;
+      right: 2px;
     }
 
     html[data-motion="full"] .header .theme-toggle.is-dark .theme-toggleThumb,

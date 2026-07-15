@@ -9,15 +9,19 @@
   align-items: center;
   gap: 10px;
   padding: 10px 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(79, 255, 200, 0.24);
-  background: rgba(11, 18, 32, 0.92);
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+  border-radius: 18px;
+  border: 1px solid var(--brand-line, rgba(79, 255, 200, 0.24));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg, rgba(11, 18, 32, 0.92));
+  box-shadow: var(--skeu-panel-shadow, 0 12px 32px rgba(0, 0, 0, 0.35));
 }
 
 html[data-theme="light"] .abandoned-cart-banner {
-  background: rgba(255, 255, 255, 0.94);
-  border-color: rgba(0, 138, 148, 0.2);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.94));
+  border-color: rgba(0, 138, 148, 0.16);
 }
 
 .abandoned-cart-copy {
@@ -36,11 +40,14 @@ html[data-theme="light"] .abandoned-cart-banner {
 }
 
 .abandoned-cart-dismiss {
-  width: 28px;
-  height: 28px;
-  border: none;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--skeu-control-shadow, none);
   color: inherit;
   display: grid;
   place-items: center;

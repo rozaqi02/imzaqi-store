@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, ChevronDown, Search, X, Zap } from "lucide-react";
+import { ArrowRight, ChevronDown, Search, X } from "lucide-react";
 
 import Hero from "../components/Hero";
 
@@ -238,7 +238,9 @@ export default function Home() {
       {/* Scroll Progress Bar */}
       <ScrollProgressBar />
 
-      <Hero products={products} topIds={topIds} />
+      <div className="hx-heroZone">
+        <Hero products={products} topIds={topIds} />
+      </div>
 
       <div className="home-body">
         {/* ── Produk Favorit ── */}
@@ -247,7 +249,7 @@ export default function Home() {
           aria-label="Produk favorit"
         >
           <div className="container home-sectionInner">
-            <div className="reveal" style={{ transitionDelay: "40ms" }}>
+            <div className="reveal" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
                 kicker="Produk favorit"
                 title="Yang lagi viral"
@@ -277,7 +279,7 @@ export default function Home() {
                 </div>
               ) : (
                 popularProducts.map((p, idx) => (
-                  <div key={p.id} className="reveal reveal-scale" style={{ transitionDelay: `${40 + idx * 35}ms` }}>
+                  <div key={p.id} className="reveal reveal-scale" style={{ transitionDelay: `${80 + idx * 70}ms` }}>
                     {/* 3D Tilt disabled with disableTilt={true} */}
                     <ProductTile product={p} rank={idx + 1} layout="list" disableTilt={true} disableFlip={true} />
                   </div>
@@ -285,7 +287,7 @@ export default function Home() {
               )}
             </div>
 
-            <div className="home-sectionCta reveal" style={{ transitionDelay: `${40 + popularProducts.length * 35}ms` }}>
+            <div className="home-sectionCta reveal" style={{ transitionDelay: `${80 + popularProducts.length * 70}ms` }}>
               <Link className="btn" to="/produk">
                 {!loading && totalActiveProducts > 4
                   ? `Intip ${totalActiveProducts - 4} produk lainnya`
@@ -303,7 +305,7 @@ export default function Home() {
             aria-label="Kupon Promo"
           >
             <div className="container home-sectionInner">
-              <div className="reveal" style={{ transitionDelay: "40ms" }}>
+              <div className="reveal" style={{ transitionDelay: "60ms" }}>
                 <HomeSectionHead
                   kicker="Promo aktif"
                   title="Diskon, gas!"
@@ -316,7 +318,7 @@ export default function Home() {
                   <div
                     key={promo.code}
                     className="home-promoCard reveal reveal-scale"
-                    style={{ transitionDelay: `${120 + idx * 80}ms` }}
+                    style={{ transitionDelay: `${100 + idx * 100}ms` }}
                     onClick={(e) => handleCopyPromo(promo.code, e)}
                     role="button"
                     tabIndex={0}
@@ -349,7 +351,7 @@ export default function Home() {
           aria-label="Cara kerja"
         >
           <div className="container home-sectionInner">
-            <div className="reveal reveal-left" style={{ transitionDelay: "40ms" }}>
+            <div className="reveal reveal-left" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
                 kicker="Gampang"
                 title="3 langkah doang, gas!"
@@ -364,7 +366,7 @@ export default function Home() {
                     type="button"
                     key={step.step}
                     className={`home-howCard reveal reveal-scale${isOpen ? " is-expanded" : ""}`}
-                    style={{ "--how-i": i, transitionDelay: `${120 + i * 80}ms` }}
+                    style={{ "--how-i": i, transitionDelay: `${100 + i * 110}ms` }}
                     onClick={() => setActiveStep(isOpen ? null : i)}
                     aria-expanded={isOpen}
                     aria-label={`Langkah ${step.step}: ${step.title}. ${isOpen ? "Tutup" : "Buka"} detail tambahan.`}
@@ -376,9 +378,6 @@ export default function Home() {
                     }}
                   >
                     <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
-                    <div className="home-howCard-icon" aria-hidden="true">
-                      <Zap size={20} />
-                    </div>
                     <div className="home-howCard-content">
                       <h3 className="home-howCard-title">{step.title}</h3>
                       <p className="home-howCard-desc">{step.desc}</p>
@@ -406,7 +405,7 @@ export default function Home() {
           aria-label="FAQ singkat"
         >
           <div className="container home-sectionInner">
-            <div className="reveal" style={{ transitionDelay: "40ms" }}>
+            <div className="reveal" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
                 kicker="FAQ"
                 title="Yang sering ditanyakan"
@@ -423,7 +422,7 @@ export default function Home() {
                 }
               }}
               className="home-faqSearchWrap reveal"
-              style={{ transitionDelay: "40ms" }}
+              style={{ transitionDelay: "80ms" }}
             >
               <div className="faq-searchWrap">
                 <Search size={16} aria-hidden="true" />
@@ -450,7 +449,7 @@ export default function Home() {
 
             <div className="home-faqList">
               {HOME_FAQ.map((item, idx) => (
-                <div key={item.id} className="reveal" style={{ transitionDelay: `${40 + idx * 35}ms` }}>
+                <div key={item.id} className="reveal" style={{ transitionDelay: `${90 + idx * 70}ms` }}>
                   <HomeFaqItem
                     item={item}
                     open={openFaqId === item.id}
@@ -460,7 +459,7 @@ export default function Home() {
               ))}
             </div>
 
-            <div className="home-sectionCta reveal" style={{ transitionDelay: `${40 + HOME_FAQ.length * 35}ms` }}>
+            <div className="home-sectionCta reveal" style={{ transitionDelay: `${90 + HOME_FAQ.length * 70}ms` }}>
               <Link className="btn btn-ghost" to="/faq">
                 Baca FAQ Lengkap
                 <ArrowRight size={16} aria-hidden="true" />

@@ -290,18 +290,21 @@ html[data-theme="light"] .st-recentHead {
   height: 34px;
   padding: 0 12px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
-  color: rgba(255, 255, 255, 0.8);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
+  color: var(--brand-text, rgba(255, 255, 255, 0.8));
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
+  transition: background 0.15s, border-color 0.15s, filter 0.15s;
   white-space: nowrap;
 }
 
 .st-recentChip:hover {
-  background: rgba(255, 255, 255, 0.1);
+  filter: brightness(1.08);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
@@ -315,14 +318,17 @@ html[data-theme="light"] .st-recentHead {
 }
 
 html[data-theme="light"] .st-recentChip {
-  border-color: rgba(0, 0, 0, 0.08);
-  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(13, 124, 144, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(0, 0, 0, 0.03));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(0, 0, 0, 0.75);
 }
 
 html[data-theme="light"] .st-recentChip:hover {
-  background: rgba(0, 0, 0, 0.07);
-  border-color: rgba(0, 0, 0, 0.16);
+  filter: brightness(1.03);
+  border-color: rgba(0, 138, 148, 0.22);
 }
 
 html[data-theme="light"] .st-recentPrice {
@@ -1498,16 +1504,17 @@ html[data-theme="light"] .st-itemDesc {
 
 .st-tab:hover {
   color: var(--st-text);
-  background: rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .st-tab.is-active {
-  border-color: var(--st-line-strong);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
-    var(--st-panel);
-  box-shadow: var(--st-shadow-soft);
-  color: var(--st-text);
+  border-color: var(--imzaqi-btn-border, var(--st-line-strong));
+  background: var(--imzaqi-btn-face);
+  box-shadow: var(--imzaqi-btn-shadow, var(--st-shadow-soft));
+  color: var(--imzaqi-btn-text, #032235);
 }
 
 html[data-theme="light"] .st-tab.is-active {

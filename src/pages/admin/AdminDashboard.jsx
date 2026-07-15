@@ -42,6 +42,7 @@ import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
 import { supabase } from "../../lib/supabaseClient";
 import {
   fetchProducts,
+  invalidateProductCaches,
   fetchPromoCodes,
   fetchSettings,
   fetchTestimonials,
@@ -166,16 +167,16 @@ export default function AdminDashboard() {
   const [productModalOpen, setProductModalOpen] = useState(false);
   const [newProduct, setNewProduct] = useState({
     name: "",
-    slug: "",
     category: "other",
     description: "",
-    sort_order: 100,
+    icon_url: "",
     is_active: true,
   });
 
   // Variant modal
   const [variantModalOpen, setVariantModalOpen] = useState(false);
   const [variantMode, setVariantMode] = useState("create"); // create | edit
+  const [variantAdvancedOpen, setVariantAdvancedOpen] = useState(false);
   const [variantForm, setVariantForm] = useState({
     id: "",
     product_id: "",
@@ -183,8 +184,8 @@ export default function AdminDashboard() {
     duration_label: "",
     description: "",
     price_idr: 0,
-    guarantee_text: "",
-    stock: 0,
+    guarantee_text: "All full garansi",
+    stock: 10,
     is_active: true,
     requires_buyer_email: false,
     sort_order: 100,
@@ -205,7 +206,6 @@ export default function AdminDashboard() {
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [exportDateFrom, setExportDateFrom] = useState("");
   const [exportDateTo, setExportDateTo] = useState("");
-  const [stockBannerDismissed, setStockBannerDismissed] = useState(false);
   const [ordersHasMore, setOrdersHasMore] = useState(false);
   const [ordersLoadingMore, setOrdersLoadingMore] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState(null);
@@ -853,16 +853,39 @@ export default function AdminDashboard() {
   }
 
   // ===== Products actions =====
+  function makeUniqueProductSlug(name) {
+    const base = slugify(name) || `produk-${Date.now().toString(36)}`;
+    const taken = new Set((products || []).map((p) => String(p?.slug || "").toLowerCase()));
+    if (!taken.has(base)) return base;
+    let n = 2;
+    while (taken.has(`${base}-${n}`)) n += 1;
+    return `${base}-${n}`;
+  }
+
   function openCreateProduct() {
     setNewProduct({
       name: "",
-      slug: "",
-      category: "other",
+      category: "streaming",
       description: "",
-      sort_order: nextProductSortOrder,
+      icon_url: "",
       is_active: true,
     });
     setProductModalOpen(true);
+  }
+
+  async function uploadNewProductIcon(file) {
+    if (!file) return;
+    const tid = toast.loading("Mengupload ikon...");
+    try {
+      const url = await uploadToBucket(BUCKET_ICONS, file, "icons");
+      setNewProduct((p) => ({ ...p, icon_url: url }));
+      toast.remove(tid);
+      toast.success("Ikon siap", { duration: 1200 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal upload ikon");
+      setMsg("Upload ikon gagal. Pastikan bucket Storage public. Detail: " + (e?.message || e));
+    }
   }
 
   async function createProduct() {
@@ -872,47 +895,57 @@ export default function AdminDashboard() {
       return;
     }
 
-    const slug = String(newProduct.slug || "").trim() || slugify(name);
+    const slug = makeUniqueProductSlug(name);
+    const category = String(newProduct.category || "other").trim().toLowerCase() || "other";
+    const iconUrl = String(newProduct.icon_url || "").trim() || null;
 
     const tid = toast.loading("Membuat produk");
     setMsg("");
 
     try {
-      const { data, error } = await supabase
-        .from("products")
-        .insert({
-          name,
-          slug,
-          category: String(newProduct.category || "other"),
-          description: String(newProduct.description || ""),
-          icon_url: null,
-          is_active: !!newProduct.is_active,
-          sort_order: Number.isFinite(Number(newProduct.sort_order)) ? Number(newProduct.sort_order) : nextProductSortOrder,
-        })
-        .select("id")
-        .single();
+      const insertPayload = {
+        name,
+        slug,
+        category,
+        description: String(newProduct.description || "").trim(),
+        icon_url: iconUrl,
+        is_active: newProduct.is_active !== false,
+        sort_order: nextProductSortOrder,
+      };
 
+      let { data, error } = await supabase.from("products").insert(insertPayload).select("id,category,name").single();
+
+      // Older DBs may not have category yet — surface a clear fix path
+      if (error && /category/i.test(String(error.message || ""))) {
+        throw new Error(
+          "Kolom products.category belum ada di database. Jalankan migrasi supabase/migrations/003_products_category.sql di Supabase SQL Editor."
+        );
+      }
       if (error) throw error;
+      if (!data?.id) throw new Error("Insert produk gagal (tidak ada data kembali). Cek RLS admin.");
 
+      invalidateProductCaches();
       await refreshProducts();
-      setSelectedProductId(data?.id || "");
+      setSelectedProductId(data.id);
       setProductModalOpen(false);
       toast.remove(tid);
-      toast.success("Produk dibuat", { duration: 1600 });
+      toast.success(`Produk "${name}" dibuat. Lanjut tambah paket/variannya ya.`, { duration: 2200 });
     } catch (e) {
       toast.remove(tid);
-      toast.error("Gagal membuat produk");
-      setMsg(e?.message || String(e));
+      const message = e?.message || String(e);
+      toast.error(message.includes("category") ? "Gagal: kolom category" : "Gagal membuat produk");
+      setMsg(message);
     }
   }
 
   async function saveProduct() {
     if (!productForm?.id) return;
 
+    const category = String(productForm.category || "other").trim().toLowerCase() || "other";
     const payload = {
       name: String(productForm.name || "").trim(),
       slug: String(productForm.slug || "").trim() || slugify(productForm.name),
-      category: String(productForm.category || "other"),
+      category,
       description: String(productForm.description || ""),
       icon_url: productForm.icon_url ? String(productForm.icon_url) : null,
       is_active: !!productForm.is_active,
@@ -931,16 +964,73 @@ export default function AdminDashboard() {
     setMsg("");
 
     try {
-      const { error } = await supabase.from("products").update(payload).eq("id", productForm.id);
-      if (error) throw error;
+      const runUpdate = async (body) =>
+        supabase
+          .from("products")
+          .update(body)
+          .eq("id", productForm.id)
+          .select("id,category,name,slug")
+          .maybeSingle();
 
+      const formatPgError = (err) => {
+        if (!err) return "Unknown error";
+        const parts = [
+          err.message,
+          err.details ? `detail: ${err.details}` : null,
+          err.hint ? `hint: ${err.hint}` : null,
+          err.code ? `code: ${err.code}` : null,
+        ].filter(Boolean);
+        return parts.join(" · ");
+      };
+
+      let { data, error } = await runUpdate(payload);
+
+      // Retry without updated_at if column missing
+      if (error && /updated_at|PGRST204|42703/i.test(`${error.message || ""} ${error.code || ""} ${error.details || ""}`)) {
+        const { updated_at: _drop, ...withoutTs } = payload;
+        ({ data, error } = await runUpdate(withoutTs));
+      }
+
+      if (error) {
+        const raw = `${error.message || ""} ${error.details || ""} ${error.hint || ""} ${error.code || ""}`;
+        // Enum / CHECK still missing ai|design
+        if (/invalid input value for enum|check constraint|category/i.test(raw)) {
+          throw new Error(
+            `Kategori ditolak database (${category}). ` +
+              `Biasanya ENUM/CHECK lama belum mengizinkan "ai"/"design". ` +
+              `Jalankan script supabase/migrations/003_products_category.sql di Supabase SQL Editor, ` +
+              `lalu reload schema (Settings → API → Reload schema) dan coba lagi. ` +
+              `PG: ${formatPgError(error)}`
+          );
+        }
+        throw new Error(formatPgError(error));
+      }
+
+      // RLS can return 200 with 0 rows — treat as failure
+      if (!data?.id) {
+        throw new Error(
+          "Update tidak diterapkan (0 baris). Pastikan login admin valid dan policy products mengizinkan UPDATE."
+        );
+      }
+
+      if (String(data.category || "").toLowerCase() !== category) {
+        throw new Error(
+          `Kategori tidak tersimpan (DB: "${data.category || "null"}", diminta: "${category}"). Cek kolom category & RLS.`
+        );
+      }
+
+      invalidateProductCaches();
       await refreshProducts();
+      // Keep editor form in sync with confirmed DB category
+      setProductForm((prev) => (prev ? { ...prev, category: data.category || category } : prev));
       toast.remove(tid);
-      toast.success("Produk disimpan", { duration: 1400 });
+      toast.success(`Produk disimpan · ${prettyCategory(data.category)}`, { duration: 1600 });
     } catch (e) {
       toast.remove(tid);
+      const message = e?.message || String(e);
       toast.error("Gagal menyimpan produk");
-      setMsg(e?.message || String(e));
+      setMsg(message);
+      warn("[admin] saveProduct failed", e);
     }
   }
 
@@ -1009,15 +1099,16 @@ export default function AdminDashboard() {
     if (!selectedProduct) return;
 
     setVariantMode("create");
+    setVariantAdvancedOpen(false);
     setVariantForm({
       id: "",
       product_id: selectedProduct.id,
       name: "",
-      duration_label: "",
+      duration_label: "1 bulan",
       description: "",
-      price_idr: 0,
-      guarantee_text: "",
-      stock: 0,
+      price_idr: "",
+      guarantee_text: "All full garansi",
+      stock: 10,
       is_active: true,
       requires_buyer_email: false,
       sort_order: nextVariantSortOrder,
@@ -1027,6 +1118,7 @@ export default function AdminDashboard() {
 
   function openEditVariant(v) {
     setVariantMode("edit");
+    setVariantAdvancedOpen(false);
     setVariantForm({
       id: v.id,
       product_id: v.product_id,
@@ -1048,23 +1140,36 @@ export default function AdminDashboard() {
 
     const activeVariantSort = Number(variantForm.sort_order);
     const fallbackSortOrder = variantMode === "create" ? nextVariantSortOrder : 100;
+    const name = String(variantForm.name || "").trim();
+    // Durasi optional in UI: default from name or "1 bulan"
+    const duration =
+      String(variantForm.duration_label || "").trim() ||
+      (name ? name : "1 bulan");
 
     const payload = {
       product_id: variantForm.product_id,
-      name: String(variantForm.name || "").trim(),
-      duration_label: String(variantForm.duration_label || "").trim(),
+      name: name || duration,
+      duration_label: duration,
       description: String(variantForm.description || ""),
       price_idr: Number(variantForm.price_idr || 0),
-      guarantee_text: String(variantForm.guarantee_text || ""),
+      guarantee_text: String(variantForm.guarantee_text || "All full garansi"),
       stock: Number(variantForm.stock || 0),
-      is_active: !!variantForm.is_active,
+      is_active: variantForm.is_active !== false,
       requires_buyer_email: !!variantForm.requires_buyer_email,
       sort_order: Number.isFinite(activeVariantSort) ? activeVariantSort : fallbackSortOrder,
       updated_at: new Date().toISOString(),
     };
 
-    if (!payload.name || !payload.duration_label) {
-      toast.error("Nama & durasi wajib diisi");
+    if (!payload.name) {
+      toast.error("Nama paket wajib diisi");
+      return;
+    }
+    if (variantForm.price_idr === "" || variantForm.price_idr == null || Number.isNaN(Number(variantForm.price_idr))) {
+      toast.error("Harga wajib diisi");
+      return;
+    }
+    if (payload.price_idr < 0) {
+      toast.error("Harga tidak boleh negatif");
       return;
     }
 
@@ -1094,10 +1199,11 @@ export default function AdminDashboard() {
         if (!data?.id) throw new Error("Varian gagal ditambahkan.");
       }
 
+      invalidateProductCaches();
       await refreshProducts();
       setVariantModalOpen(false);
       toast.remove(tid);
-      toast.success("Varian tersimpan", { duration: 1400 });
+      toast.success(variantMode === "edit" ? "Paket diperbarui" : "Paket ditambahkan", { duration: 1400 });
     } catch (e) {
       toast.remove(tid);
       const rawMessage = String(e?.message || e || "");
@@ -1715,7 +1821,7 @@ export default function AdminDashboard() {
 
   return (
     <div className="page admin-page">
-      <section className="section">
+      <section className="section admin-section">
         <div className="container admin-shell">
           <AdminSidebar
             tabs={tabs}
@@ -1756,36 +1862,22 @@ export default function AdminDashboard() {
               onLogout={logout}
             />
 
-            {!stockBannerDismissed && analyticsSummary.stockAlerts.length > 0 ? (
-              <div className="admin-stockAlertBanner" role="status">
-                <AlertTriangle size={16} />
-                <div>
-                  <strong>{analyticsSummary.stockAlerts.length} varian stok menipis</strong>
-                  <span>Buka tab Produk untuk restock sebelum habis.</span>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm"
-                  onClick={() => startTransition(() => setTab("products"))}
-                >
-                  Cek stok
-                </button>
-                <button
-                  type="button"
-                  className="admin-stockAlertDismiss"
-                  aria-label="Tutup"
-                  onClick={() => setStockBannerDismissed(true)}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ) : null}
-
-            <div className="admin-topbar">
+            {/* Compact chrome on work tabs (products/orders) so panels get more height */}
+            <div
+              className={`admin-topbar${
+                ["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab)
+                  ? " admin-topbar--compact"
+                  : ""
+              }`}
+            >
               <div className="admin-topbarCopy">
-                <div className="admin-topbar-eyebrow">{topbarEyebrow}</div>
+                {["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab) ? null : (
+                  <div className="admin-topbar-eyebrow">{topbarEyebrow}</div>
+                )}
                 <h1 className="h2">{topbarTitle}</h1>
-                <div className="muted">{topbarLead}</div>
+                {["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab) ? null : (
+                  <div className="muted">{topbarLead}</div>
+                )}
               </div>
 
               <div className="admin-topbar-current">
@@ -1799,65 +1891,9 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {isOverviewTab ? (
-              <FlowAssist
-                eyebrow="Konteks kerja"
-                title={`Fokus: ${activeTab.label}.`}
-                description="Ringkasan inti tetap dekat."
-                badges={[
-                  { label: tabMeta[activeTab.id], tone: "emphasis", icon: <ActiveTabIcon size={13} /> },
-                  `${orderStats.live} order aktif`,
-                  `${analyticsSummary.stockAlerts.length} stok menipis`,
-                  testimonialsWithoutCaption ? `${testimonialsWithoutCaption} testimoni polos` : "Testimoni rapi",
-                ]}
-                actions={[
-                  tab !== "orders"
-                    ? {
-                        label: "Buka pesanan",
-                        onClick: () => startTransition(() => setTab("orders")),
-                        icon: <ClipboardList size={14} />,
-                      }
-                    : null,
-                  tab !== "products"
-                    ? {
-                        label: "Cek produk",
-                        onClick: () => startTransition(() => setTab("products")),
-                        ghost: true,
-                        icon: <Box size={14} />,
-                      }
-                    : null,
-                  tab !== "testimonials" && testimonialsWithoutCaption
-                    ? {
-                        label: "Rapikan testimoni",
-                        onClick: () => startTransition(() => setTab("testimonials")),
-                        ghost: true,
-                        icon: <Star size={14} />,
-                      }
-                    : null,
-                  { label: "Muat ulang", onClick: refreshAll, ghost: true, icon: <Eye size={14} /> },
-                ].filter(Boolean)}
-                className="admin-flowAssist"
-                dense
-              />
-            ) : null}
-
-            {isOverviewTab ? (
-              <div className="admin-stats">
-                {dashboardStats.map((stat) => {
-                  const StatIcon = stat.icon || TAB_ICONS[stat.key] || Box;
-                  return (
-                    <div key={stat.key} className="admin-statCard">
-                      <span className="admin-statIcon">
-                        <StatIcon size={16} />
-                      </span>
-                      <span className="admin-statLabel">{stat.label}</span>
-                      <strong className="admin-statValue">{stat.value}</strong>
-                      <span className="admin-statHelper">{stat.helper}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
+            {/* KPI strip off on work tabs — frees height for list panels */}
+            {!isOverviewTab &&
+            !["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab) ? (
               <div className="admin-kpiStrip" aria-label="Ringkasan cepat operasional">
                 {dashboardStats.map((stat) => (
                   <article key={stat.key} className="admin-kpiChip">
@@ -1867,7 +1903,7 @@ export default function AdminDashboard() {
                   </article>
                 ))}
               </div>
-            )}
+            ) : null}
 
             {msg ? (
               <div className="admin-alert" role="alert">
@@ -1884,7 +1920,60 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "overview" ? (
-              <div className="admin-overview">
+              <div className="admin-overview admin-workspaceScroll">
+                {/* Inside scrollport so Ringkasan is never clipped by the locked shell */}
+                <FlowAssist
+                  eyebrow="Konteks kerja"
+                  title={`Fokus: ${activeTab.label}.`}
+                  description="Ringkasan inti tetap dekat."
+                  badges={[
+                    { label: tabMeta[activeTab.id], tone: "emphasis", icon: <ActiveTabIcon size={13} /> },
+                    `${orderStats.live} order aktif`,
+                    `${analyticsSummary.stockAlerts.length} stok menipis`,
+                    testimonialsWithoutCaption ? `${testimonialsWithoutCaption} testimoni polos` : "Testimoni rapi",
+                  ]}
+                  actions={[
+                    {
+                      label: "Buka pesanan",
+                      onClick: () => startTransition(() => setTab("orders")),
+                      icon: <ClipboardList size={14} />,
+                    },
+                    {
+                      label: "Cek produk",
+                      onClick: () => startTransition(() => setTab("products")),
+                      ghost: true,
+                      icon: <Box size={14} />,
+                    },
+                    testimonialsWithoutCaption
+                      ? {
+                          label: "Rapikan testimoni",
+                          onClick: () => startTransition(() => setTab("testimonials")),
+                          ghost: true,
+                          icon: <Star size={14} />,
+                        }
+                      : null,
+                    { label: "Muat ulang", onClick: refreshAll, ghost: true, icon: <Eye size={14} /> },
+                  ].filter(Boolean)}
+                  className="admin-flowAssist"
+                  dense
+                />
+
+                <div className="admin-stats">
+                  {dashboardStats.map((stat) => {
+                    const StatIcon = stat.icon || TAB_ICONS[stat.key] || Box;
+                    return (
+                      <div key={stat.key} className="admin-statCard">
+                        <span className="admin-statIcon">
+                          <StatIcon size={16} />
+                        </span>
+                        <span className="admin-statLabel">{stat.label}</span>
+                        <strong className="admin-statValue">{stat.value}</strong>
+                        <span className="admin-statHelper">{stat.helper}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+
                 <div className="admin-panel admin-overviewHero">
                   <div className="admin-panel-body">
                     <div className="admin-overviewHeroTop">
@@ -2437,7 +2526,7 @@ export default function AdminDashboard() {
 
             {tab === "products" ? (
               <div className="admin-products">
-                <div className="admin-panel">
+                <div className="admin-panel admin-products-list">
                   <div className="admin-panel-head">
                     <div>
                       <div className="admin-panel-title">Daftar produk</div>
@@ -2448,7 +2537,7 @@ export default function AdminDashboard() {
                     </button>
                   </div>
 
-                  <div className="admin-panel-body">
+                  <div className="admin-panel-body admin-panel-body--scroll">
                     <input
                       className="input"
                       placeholder="Cari produk"
@@ -2521,9 +2610,9 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="admin-panel">
+                <div className="admin-panel admin-products-editor">
                   {!selectedProduct || !productForm ? (
-                    <div className="admin-panel-body">
+                    <div className="admin-panel-body admin-panel-body--scroll">
                       <EmptyState
                         icon="?"
                         title="Pilih produk"
@@ -2548,7 +2637,7 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
-                      <div className="admin-panel-body">
+                      <div className="admin-panel-body admin-panel-body--scroll">
                         <div className="admin-form-grid">
                           <label className="admin-field">
                             <span>Nama</span>
@@ -2664,21 +2753,21 @@ export default function AdminDashboard() {
 
                         <div className="admin-panel-head" style={{ padding: 0, marginBottom: 10 }}>
                           <div>
-                            <div className="admin-panel-title">Varian / Paket</div>
+                            <div className="admin-panel-title">Paket harga</div>
                             <div className="admin-panel-sub">
-                              Atur harga, deskripsi varian, garansi, stok, dan kebutuhan email buyer.
+                              Tambah paket (nama, harga, stok). Opsi lanjutan ada di form paket.
                             </div>
                           </div>
 
                           <button className="btn btn-sm" onClick={openCreateVariant}>
-                            + Varian
+                            + Paket
                           </button>
                         </div>
 
                         <div className="admin-variants">
                           {selectedVariants.length === 0 ? (
                             <div className="card pad">
-                              <EmptyState icon="?" title="Belum ada varian" description="Klik +Varian untuk menambahkan paket." />
+                              <EmptyState icon="?" title="Belum ada paket" description="Klik + Paket untuk menambahkan harga." />
                             </div>
                           ) : (
                             selectedVariants.map((v) => (
@@ -2713,7 +2802,7 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "orders" ? (
-              <div className="admin-panel">
+              <div className="admin-panel admin-panel--fill admin-ordersPanel">
                 <div className="admin-panel-head">
                   <div>
                     <div className="admin-panel-title">Queue order</div>
@@ -2727,7 +2816,7 @@ export default function AdminDashboard() {
                   </button>
                 </div>
 
-                <div className="admin-panel-body">
+                <div className="admin-panel-body admin-panel-body--scroll">
                   <div className="admin-orderToolbar">
                     <div className="admin-searchRow">
                       <Search size={16} />
@@ -2948,7 +3037,7 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "promos" ? (
-              <div className="admin-panel">
+              <div className="admin-panel admin-panel--fill admin-promosPanel">
                 {/* Header */}
                 <div className="admin-panel-head">
                   <div>
@@ -2961,7 +3050,7 @@ export default function AdminDashboard() {
                   </button>
                 </div>
 
-                <div className="admin-panel-body">
+                <div className="admin-panel-body admin-panel-body--scroll">
                   {/* Search */}
                   {promos.length > 3 && (
                     <div className="admin-promo-search">
@@ -3272,7 +3361,7 @@ export default function AdminDashboard() {
             )}
 
             {tab === "flashsale" ? (
-              <div className="admin-panel">
+              <div className="admin-panel admin-panel--fill admin-flashsalePanel">
                 <div className="admin-panel-head">
                   <div>
                     <div className="admin-panel-title">Flash Sale</div>
@@ -3283,7 +3372,7 @@ export default function AdminDashboard() {
                   </button>
                 </div>
 
-                <div className="admin-panel-body">
+                <div className="admin-panel-body admin-panel-body--scroll">
                   {flashFormOpen ? (
                     <div className="admin-promo-card" style={{ marginBottom: 16, padding: 16 }}>
                       <div className="admin-panel-title" style={{ fontSize: 14, marginBottom: 12 }}>
@@ -3514,7 +3603,7 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "testimonials" ? (
-              <div className="admin-panel">
+              <div className="admin-panel admin-panel--fill admin-testimonialsPanel">
                 <div className="admin-panel-head">
                   <div>
                     <div className="admin-panel-title">Testimoni</div>
@@ -3522,7 +3611,7 @@ export default function AdminDashboard() {
                   </div>
                 </div>
 
-                <div className="admin-panel-body">
+                <div className="admin-panel-body admin-panel-body--scroll">
                   <form className="admin-testimonial-form" onSubmit={addTestimonials}>
                     <input name="files" type="file" accept="image/*" multiple />
                     <input name="caption" className="input" placeholder="Caption (opsional)" />
@@ -3574,7 +3663,7 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "settings" ? (
-              <div className="admin-overviewGrid">
+              <div className="admin-overviewGrid admin-workspaceScroll">
                 <div className="admin-panel admin-panelWide">
                   <div className="admin-panel-head">
                     <div>
@@ -3663,51 +3752,69 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* Create Product Modal */}
+      {/* Create Product Modal — simplified for daily ops */}
       <Modal
         open={productModalOpen}
         title="Tambah Produk"
         onClose={() => setProductModalOpen(false)}
         footer={
           <div className="modal-actions">
-            <button className="btn btn-ghost" onClick={() => setProductModalOpen(false)}>
+            <button className="btn btn-ghost" type="button" onClick={() => setProductModalOpen(false)}>
               Batal
             </button>
-            <button className="btn" onClick={createProduct}>
-              Simpan
+            <button className="btn" type="button" onClick={createProduct}>
+              Simpan Produk
             </button>
           </div>
         }
       >
-        <div className="admin-form-grid">
-          <label className="admin-field">
-            <span>Nama</span>
+        <div className="admin-form-grid admin-form-grid--simple">
+          <div className="admin-field admin-field-full">
+            <span>Ikon produk</span>
+            <div className="admin-icon-row">
+              {newProduct.icon_url ? (
+                <img className="admin-icon-preview" src={newProduct.icon_url} alt="preview" />
+              ) : (
+                <div className="admin-icon-preview admin-icon-fallback">
+                  {String(newProduct.name || "?").trim().slice(0, 1).toUpperCase() || "?"}
+                </div>
+              )}
+              <div className="admin-icon-actions">
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    uploadNewProductIcon(file);
+                    e.target.value = "";
+                  }}
+                />
+                <div className="hint subtle">Upload logo .jpg / .png / .webp</div>
+                {newProduct.icon_url ? (
+                  <button
+                    type="button"
+                    className="btn btn-ghost btn-sm"
+                    onClick={() => setNewProduct((p) => ({ ...p, icon_url: "" }))}
+                  >
+                    Hapus ikon
+                  </button>
+                ) : null}
+              </div>
+            </div>
+          </div>
+
+          <label className="admin-field admin-field-full">
+            <span>Nama produk</span>
             <input
               className="input"
               value={newProduct.name}
-              onChange={(e) => {
-                const name = e.target.value;
-                setNewProduct((p) => ({
-                  ...p,
-                  name,
-                  slug: p.slug ? p.slug : slugify(name),
-                }));
-              }}
-              placeholder="Netflix"
+              onChange={(e) => setNewProduct((p) => ({ ...p, name: e.target.value }))}
+              placeholder="Contoh: Netflix Premium"
+              autoFocus
             />
           </label>
 
-          <label className="admin-field">
-            <span>Slug</span>
-            <input
-              className="input"
-              value={newProduct.slug}
-              onChange={(e) => setNewProduct((p) => ({ ...p, slug: e.target.value }))}
-              placeholder="netflix"
-            />
-          </label>
-
-          <label className="admin-field">
+          <label className="admin-field admin-field-full">
             <span>Kategori</span>
             <select
               className="input"
@@ -3723,87 +3830,69 @@ export default function AdminDashboard() {
           </label>
 
           <label className="admin-field admin-field-full">
-            <span>Deskripsi</span>
+            <span>Deskripsi singkat <em className="admin-fieldOptional">(opsional)</em></span>
             <textarea
-              className="input admin-textarea"
+              className="input admin-textarea admin-textarea--short"
               value={newProduct.description}
               onChange={(e) => setNewProduct((p) => ({ ...p, description: e.target.value }))}
-              rows={4}
-              placeholder="Deskripsi singkat"
+              rows={3}
+              placeholder="Contoh: Akun ready, garansi replace full"
             />
           </label>
 
-          <label className="admin-field">
-            <span>Urutan tampil</span>
-            <input
-              className="input"
-              type="number"
-              value={newProduct.sort_order}
-              onChange={(e) => setNewProduct((p) => ({ ...p, sort_order: Number(e.target.value) }))}
-            />
-          </label>
-
-          <label className="admin-field admin-field-switch">
-            <span>Aktif</span>
+          <label className="admin-field admin-field-switch admin-field-full">
+            <span>Langsung aktif di katalog</span>
             <input
               type="checkbox"
-              checked={newProduct.is_active}
+              checked={newProduct.is_active !== false}
               onChange={(e) => setNewProduct((p) => ({ ...p, is_active: e.target.checked }))}
             />
           </label>
+
+          <p className="admin-formHint admin-field-full">
+            Link produk (slug) & urutan tampil diisi otomatis. Setelah simpan, tambah paket harga di bagian Varian.
+          </p>
         </div>
       </Modal>
 
-      {/* Variant Modal */}
+      {/* Variant Modal — core fields first, advanced collapsed */}
       <Modal
         open={variantModalOpen}
-        title={variantMode === "edit" ? "Edit Varian" : "Tambah Varian"}
+        title={variantMode === "edit" ? "Edit Paket" : "Tambah Paket"}
         onClose={() => setVariantModalOpen(false)}
         footer={
           <div className="modal-actions">
-            <button className="btn btn-ghost" onClick={() => setVariantModalOpen(false)}>
+            <button className="btn btn-ghost" type="button" onClick={() => setVariantModalOpen(false)}>
               Batal
             </button>
-            <button className="btn" onClick={saveVariant}>
-              Simpan
+            <button className="btn" type="button" onClick={saveVariant}>
+              Simpan Paket
             </button>
           </div>
         }
       >
-        <div className="admin-form-grid">
-          <label className="admin-field">
-            <span>Nama</span>
-            <input className="input" value={variantForm.name} onChange={(e) => setVariantForm((p) => ({ ...p, name: e.target.value }))} />
-          </label>
-
-          <label className="admin-field">
-            <span>Durasi</span>
+        <div className="admin-form-grid admin-form-grid--simple">
+          <label className="admin-field admin-field-full">
+            <span>Nama paket</span>
             <input
               className="input"
-              value={variantForm.duration_label}
-              onChange={(e) => setVariantForm((p) => ({ ...p, duration_label: e.target.value }))}
-              placeholder="1 bulan"
-            />
-          </label>
-
-          <label className="admin-field admin-field-full">
-            <span>Deskripsi Varian</span>
-            <textarea
-              className="input admin-textarea"
-              value={variantForm.description}
-              onChange={(e) => setVariantForm((p) => ({ ...p, description: e.target.value }))}
-              rows={4}
-              placeholder="Jelaskan detail paket/aturan"
+              value={variantForm.name}
+              onChange={(e) => setVariantForm((p) => ({ ...p, name: e.target.value }))}
+              placeholder="Contoh: 1 Bulan · Private"
+              autoFocus
             />
           </label>
 
           <label className="admin-field">
-            <span>Harga (IDR)</span>
+            <span>Harga (Rp)</span>
             <input
               className="input"
               type="number"
+              min={0}
+              step={1000}
               value={variantForm.price_idr}
-              onChange={(e) => setVariantForm((p) => ({ ...p, price_idr: Number(e.target.value) }))}
+              onChange={(e) => setVariantForm((p) => ({ ...p, price_idr: e.target.value }))}
+              placeholder="35000"
             />
           </label>
 
@@ -3812,48 +3901,75 @@ export default function AdminDashboard() {
             <input
               className="input"
               type="number"
+              min={0}
               value={variantForm.stock}
               onChange={(e) => setVariantForm((p) => ({ ...p, stock: Number(e.target.value) }))}
             />
           </label>
 
           <label className="admin-field admin-field-full">
-            <span>Garansi</span>
+            <span>Durasi <em className="admin-fieldOptional">(opsional)</em></span>
             <input
               className="input"
-              value={variantForm.guarantee_text}
-              onChange={(e) => setVariantForm((p) => ({ ...p, guarantee_text: e.target.value }))}
-              placeholder="All full garansi"
+              value={variantForm.duration_label}
+              onChange={(e) => setVariantForm((p) => ({ ...p, duration_label: e.target.value }))}
+              placeholder="1 bulan"
             />
           </label>
 
           <label className="admin-field admin-field-switch admin-field-full">
-            <span>Wajib Email Buyer (untuk buka QRIS)</span>
+            <span>Paket aktif</span>
             <input
               type="checkbox"
-              checked={!!variantForm.requires_buyer_email}
-              onChange={(e) => setVariantForm((p) => ({ ...p, requires_buyer_email: e.target.checked }))}
-            />
-          </label>
-
-          <label className="admin-field">
-            <span>Urutan tampil</span>
-            <input
-              className="input"
-              type="number"
-              value={variantForm.sort_order}
-              onChange={(e) => setVariantForm((p) => ({ ...p, sort_order: Number(e.target.value) }))}
-            />
-          </label>
-
-          <label className="admin-field admin-field-switch">
-            <span>Aktif</span>
-            <input
-              type="checkbox"
-              checked={variantForm.is_active}
+              checked={variantForm.is_active !== false}
               onChange={(e) => setVariantForm((p) => ({ ...p, is_active: e.target.checked }))}
             />
           </label>
+
+          <div className="admin-field admin-field-full">
+            <button
+              type="button"
+              className="admin-advancedToggle"
+              onClick={() => setVariantAdvancedOpen((v) => !v)}
+              aria-expanded={variantAdvancedOpen}
+            >
+              {variantAdvancedOpen ? "Sembunyikan opsi lanjutan" : "Opsi lanjutan"}
+            </button>
+          </div>
+
+          {variantAdvancedOpen ? (
+            <>
+              <label className="admin-field admin-field-full">
+                <span>Deskripsi paket</span>
+                <textarea
+                  className="input admin-textarea admin-textarea--short"
+                  value={variantForm.description}
+                  onChange={(e) => setVariantForm((p) => ({ ...p, description: e.target.value }))}
+                  rows={3}
+                  placeholder="Detail paket / aturan (opsional)"
+                />
+              </label>
+
+              <label className="admin-field admin-field-full">
+                <span>Teks garansi</span>
+                <input
+                  className="input"
+                  value={variantForm.guarantee_text}
+                  onChange={(e) => setVariantForm((p) => ({ ...p, guarantee_text: e.target.value }))}
+                  placeholder="All full garansi"
+                />
+              </label>
+
+              <label className="admin-field admin-field-switch admin-field-full">
+                <span>Wajib email buyer (sebelum QRIS)</span>
+                <input
+                  type="checkbox"
+                  checked={!!variantForm.requires_buyer_email}
+                  onChange={(e) => setVariantForm((p) => ({ ...p, requires_buyer_email: e.target.checked }))}
+                />
+              </label>
+            </>
+          ) : null}
         </div>
       </Modal>
 

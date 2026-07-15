@@ -15,7 +15,7 @@ Toko digital subscription (Netflix, Spotify, Canva, ChatGPT, dll.) dengan checko
 | Backend | Supabase (Postgres, Auth, Storage, Realtime) |
 | Hosting | Netlify |
 
-**Versi rilis saat ini:** v5.2.1
+**Versi rilis saat ini:** v5.3.0
 
 ## Catatan pengembangan (internal)
 

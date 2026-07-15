@@ -11,6 +11,372 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   Viewport-locked admin shell (desktop ≥1101px)
+   Independent column scroll inside products / panels; document scroll
+   remains for mobile (≤1100px) — see reset block below.
+   Modals (.modal-backdrop / .modal) are intentionally untouched.
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (min-width: 1101px) {
+  .admin-page {
+    padding-bottom: 0;
+  }
+
+  /* Section fills remaining viewport under fixed header */
+  .admin-page > .section.admin-section,
+  .admin-page > .section {
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    height: calc(100dvh - var(--site-header-offset, 80px));
+    max-height: calc(100dvh - var(--site-header-offset, 80px));
+    margin-top: var(--site-header-offset, 80px);
+    /* Override global first-section header padding (header handled via margin) */
+    padding-top: 12px !important;
+    padding-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .app-main-admin > .route-transition > .page.admin-page > .section.admin-section,
+  .app-main-admin > .route-transition > .page.admin-page > .section,
+  .app-main-admin > .route-transition > .page.admin-page > section.admin-section,
+  .app-main-admin > .route-transition > .page.admin-page > section:first-child {
+    padding-top: 12px !important;
+  }
+
+  .admin-page > .section.admin-section > .admin-shell,
+  .admin-page > .section > .admin-shell,
+  .admin-page .container.admin-shell,
+  .admin-page .admin-shell {
+    flex: 1 1 auto;
+    min-height: 0;
+    height: 100%;
+    align-items: stretch;
+    overflow: hidden;
+    /* keep ~260–300px | 1fr (AdminNav may set 260px) */
+    grid-template-columns: minmax(260px, 300px) minmax(0, 1fr);
+  }
+
+  /* Sidebar fills shell height; nav list scrolls internally */
+  .admin-page .adm-sidebar {
+    position: relative;
+    top: auto;
+    align-self: stretch;
+    height: 100%;
+    max-height: none;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .admin-page .adm-sidebarNav {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+
+  .admin-page .adm-sidebarHead,
+  .admin-page .adm-sidebarStats,
+  .admin-page .adm-sidebarFoot {
+    flex-shrink: 0;
+  }
+
+  /* Legacy sticky sidebar (if still present) */
+  .admin-page .admin-sidebar {
+    position: relative;
+    top: auto;
+    align-self: stretch;
+    height: 100%;
+    max-height: none;
+    overflow: hidden;
+  }
+
+  .admin-page .admin-main {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    min-height: 0;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  .admin-page .admin-main > .admin-topbar,
+  .admin-page .admin-main > .admin-mobileControls,
+  .admin-page .admin-main > .admin-stockAlertBanner,
+  .admin-page .admin-main > .admin-alert,
+  .admin-page .admin-main > .admin-initialLoad,
+  .admin-page .admin-main > .admin-flowAssist,
+  .admin-page .admin-main > .admin-stats,
+  .admin-page .admin-main > .admin-kpiStrip,
+  .admin-page .admin-main > .admin-flowAssist.flow-assist {
+    flex-shrink: 0;
+  }
+
+  /* Products: two independent columns (list | editor) — each scrolls alone */
+  .admin-page .admin-products {
+    flex: 1 1 auto;
+    min-height: 0;
+    align-items: stretch;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    overflow: hidden;
+    /* reclaim space under compact chrome */
+    margin-top: 4px;
+  }
+
+  .admin-page .admin-products > .admin-panel,
+  .admin-page .admin-products-list,
+  .admin-page .admin-products-editor {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .admin-page .admin-products .admin-panel-head {
+    flex-shrink: 0;
+    padding: 12px 14px 0;
+  }
+
+  .admin-page .admin-products .admin-panel-title {
+    font-size: 15px;
+  }
+
+  .admin-page .admin-products .admin-panel-sub {
+    font-size: 11px;
+    margin-top: 2px;
+  }
+
+  .admin-page .admin-products .admin-panel-body--scroll,
+  .admin-page .admin-products .admin-panel-body {
+    padding: 12px 14px 14px;
+  }
+
+  /* Compact title row on work tabs */
+  .admin-page .admin-topbar--compact {
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 10px;
+  }
+
+  .admin-page .admin-topbar--compact .h2 {
+    margin: 0;
+    font-size: clamp(20px, 2.2vw, 26px);
+    line-height: 1.15;
+  }
+
+  .admin-page .admin-topbar--compact .admin-topbar-current {
+    min-width: 0;
+    padding: 8px 12px;
+  }
+
+  .admin-page .admin-panel-body--scroll,
+  .admin-page .admin-products .admin-panel-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+
+  /* Overview + other tab workspaces: one scroll area under chrome */
+  .admin-page .admin-overview,
+  .admin-page .admin-workspaceScroll,
+  .admin-page .admin-main > .admin-stack:not(.admin-panel-body) {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Stack overview children with gap so FlowAssist + stats + panels scroll as one */
+  .admin-page .admin-overview.admin-workspaceScroll {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding-bottom: 24px;
+  }
+
+  .admin-page .admin-overview > .admin-flowAssist,
+  .admin-page .admin-overview > .admin-stats {
+    flex-shrink: 0;
+  }
+
+  /* Work tabs: main stays locked; panels scroll inside */
+  .admin-page .admin-main:has(> .admin-products),
+  .admin-page .admin-main:has(> .admin-ordersPanel),
+  .admin-page .admin-main:has(> .admin-panel--fill) {
+    overflow: hidden;
+  }
+
+  /* Overview: if flex child fails, main itself can scroll as backup */
+  .admin-page .admin-main:has(> .admin-overview) {
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+
+  .admin-page .admin-main:has(> .admin-overview) > .admin-overview {
+    /* grow with content; main is the scrollport for ringkasan */
+    flex: 0 0 auto;
+    min-height: min-content;
+    overflow: visible;
+  }
+
+  /* Single-column tab panels (orders, promos, flash, testimonials) */
+  .admin-page .admin-main > .admin-panel,
+  .admin-page .admin-main > .admin-panel--fill,
+  .admin-page .admin-main > .admin-promosPanel,
+  .admin-page .admin-main > .admin-flashsalePanel,
+  .admin-page .admin-main > .admin-testimonialsPanel,
+  .admin-page .admin-main > .admin-ordersPanel {
+    flex: 1 1 auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* Multi-panel tab hosts (settings grid, etc.) */
+  .admin-page .admin-main > .admin-grid,
+  .admin-page .admin-main > .admin-overviewGrid {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .admin-page .admin-main > .admin-panel > .admin-panel-head {
+    flex-shrink: 0;
+  }
+
+  .admin-page .admin-main > .admin-panel > .admin-panel-body,
+  .admin-page .admin-main > .admin-panel > .admin-panel-body--scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto !important;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 28px;
+  }
+
+  /* Promo grid must not clip — live inside scroll body */
+  .admin-page .admin-promo-grid {
+    max-height: none;
+    overflow: visible;
+  }
+
+  /* Work tabs without dual columns: lock main; body scrolls */
+  .admin-page .admin-main:has(> .admin-promosPanel),
+  .admin-page .admin-main:has(> .admin-flashsalePanel),
+  .admin-page .admin-main:has(> .admin-testimonialsPanel),
+  .admin-page .admin-main:has(> .admin-ordersPanel) {
+    overflow: hidden;
+  }
+}
+
+/* Mobile / tablet ≤1100: reset locked shell → normal document scroll */
+@media (max-width: 1100px) {
+  .admin-page {
+    padding-bottom: 90px;
+  }
+
+  .admin-page > .section.admin-section,
+  .admin-page > .section {
+    height: auto;
+    max-height: none;
+    margin-top: 0;
+    overflow: visible;
+    display: block;
+  }
+
+  .admin-page .container.admin-shell,
+  .admin-page .admin-shell {
+    flex: none;
+    min-height: 0;
+    height: auto;
+    max-height: none;
+    align-items: start;
+    overflow: visible;
+  }
+
+  .admin-page .adm-sidebar {
+    height: auto;
+    max-height: none;
+  }
+
+  .admin-page .adm-sidebarNav {
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .admin-page .admin-main {
+    display: block;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .admin-page .admin-products {
+    flex: none;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    align-items: start;
+    overflow: visible;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-page .admin-products > .admin-panel,
+  .admin-page .admin-products-list,
+  .admin-page .admin-products-editor {
+    display: block;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    /* keep panel overflow:hidden for radius clip; height:auto lets content grow */
+  }
+
+  .admin-page .admin-panel-body--scroll,
+  .admin-page .admin-products .admin-panel-body {
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+
+  .admin-page .admin-overview,
+  .admin-page .admin-stack:not(.admin-panel-body) {
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+
+  .admin-page .admin-main > .admin-panel {
+    flex: none;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+    display: block;
+  }
+
+  .admin-page .admin-main > .admin-panel > .admin-panel-body,
+  .admin-page .admin-main > .admin-panel > .admin-panel-body--scroll {
+    flex: none;
+    min-height: 0;
+    overflow: visible;
+    overscroll-behavior: auto;
+  }
+}
+
 .admin-sidebar {
   position: sticky;
   top: calc(var(--site-header-offset, 86px) + 12px);
@@ -58,8 +424,11 @@
   align-items: center;
   padding: 14px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-logo {
@@ -70,8 +439,12 @@
   place-items: center;
   font-weight: 1000;
   color: #d9fff6;
-  background: linear-gradient(135deg, rgba(0, 214, 180, 0.24), rgba(0, 214, 180, 0.1));
-  border: 1px solid rgba(0, 214, 180, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(135deg, rgba(0, 214, 180, 0.28), rgba(0, 214, 180, 0.12)),
+    var(--skeu-control-bg, transparent);
+  border: 1px solid rgba(0, 214, 180, 0.3);
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-brand-title {
@@ -100,8 +473,11 @@
   text-align: left;
   color: rgba(234, 255, 245, 0.88);
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.035));
+  box-shadow: var(--skeu-control-shadow, none);
   cursor: pointer;
   transition:
     transform 0.22s ease,
@@ -113,15 +489,15 @@
 .admin-nav-btn:hover {
   transform: translateY(-1px);
   border-color: rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.055);
+  filter: brightness(1.06);
 }
 
 .admin-nav-btn.active {
-  border-color: rgba(0, 214, 180, 0.28);
+  border-color: rgba(0, 214, 180, 0.3);
   background:
-    linear-gradient(180deg, rgba(0, 214, 180, 0.17), rgba(0, 214, 180, 0.1)),
-    rgba(255, 255, 255, 0.04);
-  box-shadow: 0 18px 44px rgba(0, 214, 180, 0.16);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 80, 80, 0.4));
+  box-shadow: var(--skeu-control-shadow, 0 18px 44px rgba(0, 214, 180, 0.16));
 }
 
 .admin-nav-icon {
@@ -131,12 +507,19 @@
   display: grid;
   place-items: center;
   border-radius: 15px;
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #9fe0ff;
 }
 
 .admin-nav-btn.active .admin-nav-icon {
-  background: rgba(0, 214, 180, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 80, 0.4));
+  border-color: rgba(0, 214, 180, 0.3);
   color: #e8fffb;
 }
 
@@ -194,8 +577,11 @@
   gap: 12px;
   padding: 12px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-topbar-currentIcon {
@@ -205,7 +591,11 @@
   display: grid;
   place-items: center;
   border-radius: 14px;
-  background: rgba(0, 214, 180, 0.16);
+  border: 1px solid rgba(0, 214, 180, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 80, 0.4));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #b5e9ff;
 }
 
@@ -234,11 +624,12 @@
 .admin-statCard {
   padding: 14px 16px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.045), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%);
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.18);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%),
+    var(--skeu-panel-bg, transparent);
+  box-shadow: var(--skeu-panel-shadow, 0 18px 50px rgba(0, 0, 0, 0.18));
 }
 
 .admin-statIcon {
@@ -247,7 +638,11 @@
   display: grid;
   place-items: center;
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #9fe0ff;
 }
 
@@ -290,11 +685,12 @@
 
 .admin-panel {
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 48%);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.2);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at top, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 48%),
+    var(--skeu-panel-bg, transparent);
+  box-shadow: var(--skeu-panel-shadow, 0 24px 80px rgba(0, 0, 0, 0.2));
   overflow: hidden;
 }
 
@@ -339,25 +735,32 @@
   gap: 12px;
   padding: 12px 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.035));
+  box-shadow: var(--skeu-control-shadow, none);
   cursor: pointer;
   transition:
     transform 0.2s ease,
     border-color 0.2s ease,
-    background 0.2s ease;
+    background 0.2s ease,
+    filter 0.2s ease;
 }
 
 .admin-product-row:hover,
 .admin-promo-row:hover {
   transform: translateY(-1px);
-  border-color: rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.16);
+  filter: brightness(1.06);
 }
 
 .admin-product-row.active {
-  border-color: rgba(0, 214, 180, 0.24);
-  background: rgba(0, 214, 180, 0.1);
+  border-color: rgba(0, 214, 180, 0.3);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.2), rgba(0, 80, 80, 0.35));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-product-row-left {
@@ -373,8 +776,11 @@
   height: 42px;
   border-radius: 14px;
   object-fit: cover;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-product-icon-fallback {
@@ -409,7 +815,11 @@
   min-height: 24px;
   padding: 0 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(234, 255, 245, 0.8);
   font-size: 11px;
   font-weight: 900;
@@ -421,7 +831,11 @@
   min-height: 26px;
   padding: 0 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -432,24 +846,45 @@
 
 .admin-product-pill.on,
 .admin-status.pending {
-  background: rgba(0, 214, 180, 0.12);
-  border-color: rgba(0, 214, 180, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 80, 80, 0.4));
+  border-color: rgba(0, 214, 180, 0.32);
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-product-pill.off,
 .admin-status.cancelled {
-  background: rgba(255, 73, 126, 0.12);
-  border-color: rgba(255, 73, 126, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 73, 126, 0.22), rgba(70, 12, 28, 0.5));
+  border-color: rgba(255, 73, 126, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 73, 126, 0.14);
 }
 
 .admin-status.processing {
-  background: rgba(255, 191, 74, 0.12);
-  border-color: rgba(255, 191, 74, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 191, 74, 0.24), rgba(70, 40, 0, 0.5));
+  border-color: rgba(255, 191, 74, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 180, 40, 0.14);
 }
 
 .admin-status.done {
-  background: rgba(80, 220, 146, 0.12);
-  border-color: rgba(80, 220, 146, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(80, 220, 146, 0.24), rgba(10, 50, 35, 0.5));
+  border-color: rgba(80, 220, 146, 0.34);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(80, 220, 146, 0.14);
 }
 
 .admin-head-actions,
@@ -492,9 +927,64 @@
   grid-column: 1 / -1;
 }
 
+.admin-form-grid--simple {
+  grid-template-columns: 1fr 1fr;
+}
+
+.admin-fieldOptional {
+  font-style: normal;
+  font-weight: 600;
+  opacity: 0.55;
+  font-size: 11px;
+}
+
+.admin-formHint {
+  margin: 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px dashed var(--brand-line, rgba(0, 194, 208, 0.2));
+  background: rgba(0, 214, 180, 0.06);
+  color: var(--brand-muted, rgba(234, 255, 245, 0.7));
+  font-size: 12px;
+  line-height: 1.45;
+  font-weight: 600;
+}
+
+html[data-theme="light"] .admin-formHint {
+  background: rgba(0, 138, 148, 0.06);
+  color: rgba(30, 70, 82, 0.78);
+}
+
+.admin-advancedToggle {
+  width: 100%;
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  color: var(--brand-text, rgba(234, 255, 245, 0.9));
+  font-size: 12px;
+  font-weight: 800;
+  cursor: pointer;
+  text-align: left;
+}
+
+html[data-theme="light"] .admin-advancedToggle {
+  color: #1a4554;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
+    #eef7fa;
+}
+
 .admin-textarea {
   min-height: 116px;
   resize: vertical;
+}
+
+.admin-textarea--short {
+  min-height: 84px;
 }
 
 .admin-field-switch {
@@ -502,8 +992,11 @@
   justify-content: space-between;
   padding: 12px 14px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-icon-row {
@@ -517,8 +1010,11 @@
   width: 78px;
   height: 78px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   object-fit: cover;
 }
 
@@ -538,8 +1034,11 @@
 .admin-order-card,
 .admin-thumb {
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-variant-row {
@@ -726,11 +1225,13 @@
   display: flex;
   flex-direction: column;
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
     linear-gradient(180deg, rgba(13, 16, 28, 0.98), rgba(9, 12, 24, 0.98)),
-    radial-gradient(circle at top, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 44%);
-  box-shadow: 0 34px 120px rgba(0, 0, 0, 0.56);
+    radial-gradient(circle at top, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 44%),
+    var(--skeu-panel-bg, transparent);
+  box-shadow: var(--skeu-panel-shadow, 0 34px 120px rgba(0, 0, 0, 0.56));
   overflow: hidden;
 }
 
@@ -740,7 +1241,7 @@
   justify-content: space-between;
   gap: 10px;
   padding: 16px 18px 12px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
 }
 
 .modal-close {
@@ -749,8 +1250,11 @@
   display: grid;
   place-items: center;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(255, 255, 255, 0.92);
   cursor: pointer;
 }
@@ -868,22 +1372,27 @@
   min-height: 42px;
   padding: 0 16px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(235, 255, 246, 0.88);
   font-weight: 900;
   cursor: pointer;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
 }
 
 .admin-chip:hover {
   transform: translateY(-1px);
+  filter: brightness(1.06);
 }
 
 .admin-chip.active {
-  border-color: rgba(0, 214, 180, 0.3);
-  background: rgba(0, 214, 180, 0.14);
-  color: #fff;
+  border-color: var(--imzaqi-btn-border, rgba(0, 214, 180, 0.3));
+  background: var(--imzaqi-btn-face);
+  box-shadow: var(--imzaqi-btn-shadow);
+  color: var(--imzaqi-btn-text, #032235);
 }
 
 .admin-miniGrid {
@@ -900,10 +1409,12 @@
 .admin-miniCard {
   padding: 16px;
   border-radius: 22px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.12), rgba(0, 214, 180, 0) 55%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.12), rgba(0, 214, 180, 0) 55%),
+    var(--skeu-panel-bg, transparent);
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-miniCard span,
@@ -983,7 +1494,9 @@
 .admin-progress {
   height: 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.06);
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-inset-shadow, none);
+  border: 1px solid rgba(0, 0, 0, 0.15);
   overflow: hidden;
 }
 
@@ -1025,8 +1538,11 @@
   gap: 14px;
   padding: 14px 16px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-rankItem.compact,
@@ -1042,7 +1558,11 @@
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: rgba(0, 214, 180, 0.14);
+  border: 1px solid rgba(0, 214, 180, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 80, 0.4));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #a4fff0;
   font-weight: 1000;
 }
@@ -1084,8 +1604,9 @@
   padding: 0 14px;
   min-height: 52px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-inset-shadow, none);
 }
 
 .admin-searchInput {
@@ -1125,12 +1646,13 @@
 
 .admin-orderCardModern {
   border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 56%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 22%),
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0) 56%),
+    var(--skeu-panel-bg, transparent);
   overflow: hidden;
-  box-shadow: 0 18px 46px rgba(0, 0, 0, 0.16);
+  box-shadow: var(--skeu-panel-shadow, 0 18px 46px rgba(0, 0, 0, 0.16));
 }
 
 .admin-orderCardModern.open {
@@ -1790,10 +2312,12 @@
   gap: 12px;
   padding: 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.025)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%),
+    var(--skeu-panel-bg, transparent);
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-mobileCopy {
@@ -1840,19 +2364,22 @@
   padding: 12px;
   text-align: left;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    radial-gradient(circle at top left, rgba(0, 214, 180, 0.1), rgba(0, 214, 180, 0) 56%),
+    var(--skeu-control-bg, transparent);
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(234, 255, 245, 0.9);
   cursor: pointer;
 }
 
 .admin-mobileTab.active {
-  border-color: rgba(0, 214, 180, 0.24);
+  border-color: rgba(0, 214, 180, 0.3);
   background:
-    linear-gradient(180deg, rgba(0, 214, 180, 0.16), rgba(0, 214, 180, 0.08)),
-    rgba(255, 255, 255, 0.04);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 80, 80, 0.4));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-mobileTabIcon {
@@ -1861,7 +2388,11 @@
   display: grid;
   place-items: center;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #9fe0ff;
 }
 
@@ -2193,8 +2724,11 @@
 .admin-kpiChip {
   padding: 10px 12px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-kpiChip span,
@@ -3041,7 +3575,14 @@
   height: 20px;
   padding: 0 6px;
   border-radius: 999px;
-  background: linear-gradient(135deg, rgba(255, 73, 126, 0.9), rgba(255, 120, 80, 0.9));
+  border: 1px solid rgba(255, 140, 160, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(135deg, #ff5a7a, #ff7850);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -1px 0 rgba(100, 0, 20, 0.3),
+    0 4px 10px rgba(255, 70, 100, 0.28);
   color: #fff;
   font-size: 11px;
   font-weight: 900;
@@ -3075,8 +3616,11 @@
 .admin-orderStat {
   padding: 12px 14px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-orderStat span,
@@ -3119,8 +3663,11 @@
   gap: 14px;
   padding: 14px 16px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .admin-orderListMain {
@@ -3152,8 +3699,14 @@
 .admin-orderTag {
   padding: 3px 8px;
   border-radius: 999px;
-  background: rgba(255, 191, 74, 0.12);
-  border: 1px solid rgba(255, 191, 74, 0.24);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 191, 74, 0.28), rgba(70, 40, 0, 0.5));
+  border: 1px solid rgba(255, 191, 74, 0.36);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 180, 40, 0.14);
   color: rgba(255, 220, 120, 0.9);
   font-size: 11px;
   font-weight: 900;
@@ -3199,8 +3752,11 @@
   margin-bottom: 16px;
   padding: 14px 16px;
   border-radius: 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-inset-bg, rgba(255, 255, 255, 0.03));
+  box-shadow: var(--skeu-inset-shadow, none);
 }
 
 .admin-timelineRow {
@@ -3215,8 +3771,11 @@
   width: 28px;
   height: 28px;
   border-radius: 999px;
-  border: 2px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.14));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   display: grid;
   place-items: center;
   font-size: 12px;

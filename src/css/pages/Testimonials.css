@@ -553,9 +553,11 @@ html[data-theme="light"] .testi-shell,
   position: relative;
   width: min(1080px, 100%);
   border-radius: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(7, 10, 18, 0.84);
-  box-shadow: 0 40px 140px rgba(0, 0, 0, 0.56);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
+    var(--skeu-panel-bg, rgba(7, 10, 18, 0.84));
+  box-shadow: var(--skeu-panel-shadow, 0 40px 140px rgba(0, 0, 0, 0.56));
   overflow: hidden;
 }
 
@@ -568,8 +570,11 @@ html[data-theme="light"] .testi-shell,
   display: grid;
   place-items: center;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.07);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.07));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(234, 255, 245, 0.92);
   cursor: pointer;
 }

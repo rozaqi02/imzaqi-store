@@ -473,13 +473,26 @@ html[data-theme="dark"] .brand {
   }
 }
 
+/* No infinite Hot pulse on mobile / lite / reduced motion — saves compositor work while scrolling */
 @media (prefers-reduced-motion: reduce) {
-
   .header-cart .pill::after,
   .catalog-status.hot::after {
     animation: none;
     display: none;
   }
+}
+
+@media (max-width: 720px) {
+  .catalog-status.hot::after {
+    animation: none !important;
+    display: none !important;
+  }
+}
+
+[data-motion="lite"] .catalog-status.hot::after,
+[data-motion="off"] .catalog-status.hot::after {
+  animation: none !important;
+  display: none !important;
 }
 
 /* ─── 16. Toast slide-in with bounce ───────────────────────────────────── */
@@ -541,37 +554,32 @@ html[data-theme="dark"] textarea {
   .reveal,
   .reveal-left,
   .reveal-scale,
-  .reveal-blur,
-  .section,
-  .catalog-card,
-  .product-tile,
-  .pdx-variantCard,
-  .admin-panel {
+  .reveal-blur {
     transition:
-      transform 0.6s cubic-bezier(0.16, 1, 0.3, 1),
-      opacity 0.6s ease-out,
-      filter 0.6s ease-out;
+      transform var(--reveal-dur, 0.95s) var(--reveal-ease, cubic-bezier(0.16, 1, 0.3, 1)),
+      opacity var(--reveal-dur, 0.95s) ease-out,
+      filter var(--reveal-dur, 0.95s) ease-out;
   }
 
   html.js-ready .reveal:not(.is-visible) {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(18px);
   }
 
   html.js-ready .reveal-left:not(.is-visible) {
     opacity: 0;
-    transform: translateX(-24px);
+    transform: translateX(-28px);
   }
 
   html.js-ready .reveal-scale:not(.is-visible) {
     opacity: 0;
-    transform: scale(0.95);
+    transform: scale(0.94);
   }
 
   html.js-ready .reveal-blur:not(.is-visible) {
     opacity: 0;
     filter: blur(8px);
-    transform: translateY(12px);
+    transform: translateY(14px);
   }
 
   .reveal.is-visible,

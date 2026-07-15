@@ -20,11 +20,13 @@
   border-radius: 28px;
   
   /* Neumorphic Raised Panel (shadow adjusted for dark overlay) */
-  background: var(--skeu-panel-bg, linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96)));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 22%),
+    var(--skeu-panel-bg, linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96)));
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
-  box-shadow: 
-    0 24px 60px rgba(0, 0, 0, 0.65), 
-    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  box-shadow: var(--skeu-panel-shadow,
+    0 24px 60px rgba(0, 0, 0, 0.65),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1));
   
   overflow: hidden;
   position: relative;
@@ -84,12 +86,14 @@ html[data-theme="light"] .fsp-title {
 
 .fsp-closeBtn {
   /* Neumorphic Raised Circle Button */
-  background: var(--skeu-pill-bg, linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9)));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, var(--skeu-pill-bg, linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9))));
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   color: var(--brand-muted, rgba(234, 255, 245, 0.5));
-  box-shadow: 
-    0 4px 10px rgba(0, 0, 0, 0.2), 
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  box-shadow: var(--skeu-control-shadow,
+    0 4px 10px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05));
   
   width: 32px;
   height: 32px;

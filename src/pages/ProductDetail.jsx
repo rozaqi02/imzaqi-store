@@ -30,9 +30,8 @@ import { fireConfetti } from "../components/Confetti";
 
 // ── Live viewer & countdown removed (fake data — hurts trust) ──────────────
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
-import { addRecentlyViewed } from "../lib/recentlyViewed";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
-import RecentlyViewed from "../components/RecentlyViewed";
+import { resolveProductCategory } from "../lib/productCategories";
 import ProductTile from "../components/ProductTile";
 import AccountTypeStrip from "../components/AccountTypeStrip";
 import "../css/pages/ProductDetail.css";
@@ -609,12 +608,6 @@ export default function ProductDetail() {
         const fsMap = new Map();
         (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
         setFlashSaleMap(fsMap);
-        // Track recently viewed
-        if (data) {
-          const activeVariants = asVariantList(data.product_variants).filter((v) => v?.is_active);
-          const prices = activeVariants.map((v) => Number(v.price_idr || 0)).filter((n) => n > 0);
-          addRecentlyViewed({ ...data, _minPrice: prices.length ? Math.min(...prices) : null });
-        }
       } catch (fetchError) {
         warn(fetchError);
         if (!alive) return;
@@ -747,20 +740,6 @@ export default function ProductDetail() {
 
   const recommendedVariantId = useMemo(() => pickRecommendedVariant(variants), [variants]);
 
-  const selectedVariant = useMemo(
-    () => variants.find((variant) => variant.id === selectedVariantId) ?? null,
-    [variants, selectedVariantId]
-  );
-
-  const selectedVariantPrice = useMemo(() => {
-    if (!selectedVariant) return 0;
-    const flashDiscount = flashSaleMap.get(selectedVariant.id);
-    if (flashDiscount && flashDiscount > 0) {
-      return Math.round(selectedVariant.price_idr * (1 - flashDiscount / 100));
-    }
-    return Number(selectedVariant.price_idr || 0);
-  }, [selectedVariant, flashSaleMap]);
-
   useEffect(() => {
     if (!displayedVariants.length) {
       setSelectedVariantId(null);
@@ -790,6 +769,9 @@ export default function ProductDetail() {
     if (name.includes("prime")) return "rgba(0, 168, 225, 0.45)";
     return "rgba(255, 255, 255, 0.15)";
   }, [product?.name]);
+
+  const productCategory = useMemo(() => resolveProductCategory(product), [product]);
+  const CategoryIcon = productCategory.icon;
 
   const recommendations = useMemo(() => {
     if (!product || !allProducts.length) return [];
@@ -978,6 +960,15 @@ export default function ProductDetail() {
                     </div>
 
                     <div className="pdx-heroContent">
+                      <Link
+                        to={`/produk?cats=${productCategory.key}`}
+                        className="pdx-categoryPill"
+                        data-category={productCategory.key}
+                        aria-label={`Lihat produk kategori ${productCategory.label}`}
+                      >
+                        <CategoryIcon size={12} aria-hidden="true" />
+                        <span>{productCategory.label}</span>
+                      </Link>
                       <h1 className="pdx-title">{product.name}</h1>
                     </div>
                   </div>
@@ -1107,9 +1098,6 @@ export default function ProductDetail() {
               </div>
             </div>
 
-            {/* Recently Viewed Strip */}
-            <RecentlyViewed currentProductId={product?.id} />
-
             {!caps.isMobile ? (
               <div className="pdx-emojiReactions" aria-label="Reaksi produk">
                 {EMOJI_REACTIONS.map((emoji) => (
@@ -1148,53 +1136,9 @@ export default function ProductDetail() {
         </div>
       </section>
 
-      {selectedVariant ? (
-        <div className="pdx-mobileStickyCart is-buy" role="region" aria-label="Beli cepat">
-          <div className="pdx-stickyCartInner pdx-stickyCartInner--buy">
-            <div className="pdx-stickyCartInfo">
-              <ShoppingCart size={18} aria-hidden="true" />
-              <div className="pdx-stickyCartText">
-                <span className="pdx-stickyQty">{selectedVariant.name}</span>
-                <span className="pdx-stickyLabel">
-                  {selectedVariant.duration_label || "Paket dipilih"}
-                </span>
-                <span className="pdx-stickyPrice">{formatIDR(selectedVariantPrice)}</span>
-              </div>
-            </div>
-            <div className="pdx-stickyBuyActions">
-              <button
-                type="button"
-                className={`btn btn-sm btn-ghost pdx-stickyAddBtn ${
-                  Number(selectedVariant.stock ?? 0) <= 0 ? "btn-disabled" : ""
-                }`}
-                disabled={Number(selectedVariant.stock ?? 0) <= 0}
-                onClick={(e) => handleAdd(selectedVariant, 1, e)}
-                aria-label="Tambah ke keranjang"
-              >
-                <ShoppingCart size={14} />
-                <span>Keranjang</span>
-              </button>
-              <button
-                type="button"
-                className={`btn btn-sm pdx-stickyCheckoutBtn ${
-                  Number(selectedVariant.stock ?? 0) <= 0 ? "btn-disabled" : ""
-                }`}
-                disabled={Number(selectedVariant.stock ?? 0) <= 0}
-                onClick={(e) => {
-                  handleAdd(selectedVariant, 1, e);
-                  goCheckout();
-                }}
-              >
-                {Number(selectedVariant.stock ?? 0) <= 0 ? "Abis" : "Checkout"}
-              </button>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
       <VariantCompareModal
         open={compareOpen}
-        variants={variants}
+        variants={displayedVariants}
         flashSaleMap={flashSaleMap}
         onClose={() => setCompareOpen(false)}
       />

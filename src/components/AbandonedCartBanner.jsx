@@ -1,4 +1,5 @@
-﻿import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { shouldShowAbandonedCartReminder, dismissAbandonedCartReminder } from "../lib/cartReminder";
@@ -9,8 +10,10 @@ export default function AbandonedCartBanner() {
   const location = useLocation();
   const isFunnel = useFunnelRoute();
   const cart = useCart();
+  const [dismissed, setDismissed] = useState(false);
   const count = (cart?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0);
-  if (isFunnel || !shouldShowAbandonedCartReminder(count)) return null;
+
+  if (dismissed || isFunnel || !shouldShowAbandonedCartReminder(count)) return null;
 
   return (
     <div className="abandoned-cart-banner" role="status">
@@ -26,7 +29,15 @@ export default function AbandonedCartBanner() {
       >
         Checkout
       </Link>
-      <button type="button" className="abandoned-cart-dismiss" aria-label="Tutup" onClick={dismissAbandonedCartReminder}>
+      <button
+        type="button"
+        className="abandoned-cart-dismiss"
+        aria-label="Tutup"
+        onClick={() => {
+          dismissAbandonedCartReminder();
+          setDismissed(true);
+        }}
+      >
         <X size={14} />
       </button>
     </div>

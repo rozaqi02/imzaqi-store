@@ -4,6 +4,7 @@ import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   Blocks,
+  Bot,
   CircleAlert,
   Film,
   Flame,
@@ -14,6 +15,7 @@ import {
   Music4,
   PackageCheck,
   PackageSearch,
+  Palette,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -60,6 +62,8 @@ const CATEGORIES = [
   { key: "streaming", label: "Streaming", icon: Film },
   { key: "music", label: "Music", icon: Music4 },
   { key: "tools", label: "Tools", icon: Blocks },
+  { key: "ai", label: "AI", icon: Bot },
+  { key: "design", label: "Design", icon: Palette },
   { key: "learning", label: "Belajar", icon: GraduationCap },
   { key: "other", label: "Lainnya", icon: Sparkles },
 ];
@@ -80,6 +84,8 @@ const SORT_LABELS = {
 };
 
 const DEFAULT_SORT = "reco";
+/** Initial catalog batch — keeps mobile DOM/paint light; expand via "Muat lagi". */
+const CATALOG_BATCH = 12;
 
 const SEARCH_QUERIES = [
   "Netflix Premium",
@@ -383,6 +389,9 @@ export default function Products() {
 
   const [viewMorph, setViewMorph] = useState(false);
   const prevViewRef = useRef(view);
+  const [visibleCount, setVisibleCount] = useState(() =>
+    hasSavedScrollY() || isCatalogRestoreLocked() ? 10_000 : CATALOG_BATCH
+  );
   const openFilters = useCallback(() => setFiltersOpen(true), []);
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
   const rememberCatalogScroll = useCallback((slug) => {
@@ -796,6 +805,39 @@ export default function Products() {
     else sorted.sort(byName);
     return sorted;
   }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, debouncedQuery, restockOnly, sort]);
+
+  // Reset batch when filters/sort/query change (not while restoring scroll).
+  useEffect(() => {
+    if (isRestoringScroll || pendingScrollRef.current) return;
+    setVisibleCount(CATALOG_BATCH);
+    // Intentionally only react to filterSignature — finishing restore must not collapse the list.
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- isRestoringScroll is a guard, not a trigger
+  }, [filterSignature]);
+
+  // Expand list far enough that restored slug / Y can land in the DOM.
+  useLayoutEffect(() => {
+    const saved = pendingScrollRef.current;
+    if (!saved || !filtered.length) return;
+    if (saved.slug) {
+      const idx = filtered.findIndex((p) => p.slug === saved.slug);
+      if (idx >= 0) {
+        setVisibleCount(Math.min(filtered.length, Math.max(CATALOG_BATCH, idx + 6)));
+      } else {
+        setVisibleCount(filtered.length);
+      }
+      return;
+    }
+    if (Number(saved.y) > 500) setVisibleCount(filtered.length);
+  }, [filtered]);
+
+  const visibleProducts = useMemo(
+    () => filtered.slice(0, Math.min(visibleCount, filtered.length)),
+    [filtered, visibleCount]
+  );
+  const hasMoreProducts = visibleProducts.length < filtered.length;
+  const loadMoreProducts = useCallback(() => {
+    setVisibleCount((n) => Math.min(filtered.length, n + CATALOG_BATCH));
+  }, [filtered.length]);
 
   const catalogGridKey = loading ? "catalog-loading" : "catalog-grid";
   const showCatalogSkeleton = loading || (isFiltering && !isRestoringScroll);
@@ -1289,7 +1331,7 @@ export default function Products() {
                 </div>
               ) : (
                 <>
-                  {filtered.map((product, idx) => (
+                  {visibleProducts.map((product, idx) => (
                     <ProductCardMemo
                       key={product.id}
                       product={product}
@@ -1299,6 +1341,13 @@ export default function Products() {
                       onBeforeNavigate={rememberCatalogScroll}
                     />
                   ))}
+                  {hasMoreProducts ? (
+                    <div className="catalog-loadMore">
+                      <button type="button" className="btn btn-ghost" onClick={loadMoreProducts}>
+                        Muat lagi ({filtered.length - visibleProducts.length} tersisa)
+                      </button>
+                    </div>
+                  ) : null}
                 </>
               )}
             </div>

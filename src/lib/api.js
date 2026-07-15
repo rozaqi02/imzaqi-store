@@ -1,6 +1,7 @@
 import { supabase } from "./supabaseClient";
 import { orderStatusCsvLabel } from "./orderStatus";
 import { normalizeProductRecord } from "./format";
+import { setCatalogProductsCache } from "./catalogCache";
 
 const PUBLIC_CACHE_PREFIX = "imzaqi-public-cache:";
 const publicCacheMemory = new Map();
@@ -55,6 +56,31 @@ function clearPublicCache(key) {
 
   try {
     storage.removeItem(`${PUBLIC_CACHE_PREFIX}${key}`);
+  } catch {}
+}
+
+/** Drop product list / detail session caches after admin catalog writes. */
+export function invalidateProductCaches() {
+  const prefixes = ["products:", "product:"];
+  for (const key of [...publicCacheMemory.keys()]) {
+    if (prefixes.some((p) => key.startsWith(p))) publicCacheMemory.delete(key);
+  }
+
+  const storage = safeStorage();
+  if (!storage) return;
+  try {
+    const toRemove = [];
+    for (let i = 0; i < storage.length; i += 1) {
+      const fullKey = storage.key(i);
+      if (!fullKey || !fullKey.startsWith(PUBLIC_CACHE_PREFIX)) continue;
+      const logical = fullKey.slice(PUBLIC_CACHE_PREFIX.length);
+      if (prefixes.some((p) => logical.startsWith(p))) toRemove.push(fullKey);
+    }
+    toRemove.forEach((k) => storage.removeItem(k));
+  } catch {}
+
+  try {
+    setCatalogProductsCache(null);
   } catch {}
 }
 
@@ -343,13 +369,26 @@ export async function fetchVisitorStats({ days = 30 } = {}) {
 }
 
 // ── Analytics: top pages ──
+// Web Vitals are stored in page_views with path `/__vitals/{metric}` (see webVitalsReporter).
+// Exclude those synthetic paths so the admin "Halaman Terpopuler" only shows real routes.
 export async function fetchTopPages({ days = 30, limit = 10 } = {}) {
-  const { data, error } = await supabase.rpc("get_top_pages", { p_days: days, p_limit: limit });
+  // Request extra rows so after filtering vitals we can still fill `limit`.
+  const fetchLimit = Math.max(limit * 3, 30);
+  const { data, error } = await supabase.rpc("get_top_pages", {
+    p_days: days,
+    p_limit: fetchLimit,
+  });
   if (error) throw error;
-  return (data || []).map((row) => ({
-    path: row.path,
-    viewCount: Number(row.view_count || 0),
-  }));
+  return (data || [])
+    .map((row) => ({
+      path: row.path,
+      viewCount: Number(row.view_count || 0),
+    }))
+    .filter((row) => {
+      const path = String(row.path || "");
+      return path && !path.startsWith("/__vitals");
+    })
+    .slice(0, limit);
 }
 
 // ── Track page view ke tabel page_views ──

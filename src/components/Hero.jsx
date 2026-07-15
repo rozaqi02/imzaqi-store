@@ -15,41 +15,8 @@ import NumberCounter from "./NumberCounter";
 import { supabase } from "../lib/supabaseClient";
 import TypewriterSearchInput from "./TypewriterSearchInput";
 import { useDeviceCapability } from "../hooks/useIsMobile";
-import { getBuyerName } from "../lib/greeting";
 import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
-
-/* ── Data ── */
-const BRAND_SHORTCUTS = [
-  "Netflix Premium",
-  "Spotify Family",
-  "YouTube Premium",
-  "Canva Pro",
-];
-
-function getProductSoldCount(product) {
-  return (product?.product_variants || [])
-    .filter((variant) => variant?.is_active)
-    .reduce((sum, variant) => sum + Number(variant?.sold_count || 0), 0);
-}
-
-function pickTopHeroProducts(products = [], topIds = [], limit = 4) {
-  const active = (products || []).filter((product) =>
-    (product?.product_variants || []).some((variant) => variant?.is_active)
-  );
-
-  if (!active.length) return [];
-
-  const sorted = [...active].sort((a, b) => {
-    const rankA = topIds.indexOf(a.id);
-    const rankB = topIds.indexOf(b.id);
-    if (rankA !== -1 && rankB === -1) return -1;
-    if (rankA === -1 && rankB !== -1) return 1;
-    if (rankA !== -1 && rankB !== -1) return rankA - rankB;
-    return getProductSoldCount(b) - getProductSoldCount(a) || (a.sort_order || 0) - (b.sort_order || 0);
-  });
-
-  return sorted.slice(0, limit);
-}
+import HeroCatalogBackdrop from "./HeroCatalogBackdrop";
 
 const SEARCH_QUERIES = [
   "Netflix Premium",
@@ -60,7 +27,7 @@ const SEARCH_QUERIES = [
   "Disney+ Hotstar",
 ];
 
-/* ── Search component (Matches Products.jsx Search Box) ── */
+/* ── Search ── */
 function HeroSearch({ products = [] }) {
   const nav = useNavigate();
   const wrapRef = useRef(null);
@@ -104,21 +71,21 @@ function HeroSearch({ products = [] }) {
     return () => document.removeEventListener("mousedown", onDoc);
   }, []);
 
-  const goSearch = useCallback((value) => {
-    const term = String(value || q || "").trim();
-    if (!term) return;
-    pushSearchHistory(term);
-    setOpen(false);
-    setActiveIdx(-1);
-    nav(`/produk?q=${encodeURIComponent(term)}`);
-  }, [nav, q]);
+  const goSearch = useCallback(
+    (value) => {
+      const term = String(value || q || "").trim();
+      if (!term) return;
+      pushSearchHistory(term);
+      setOpen(false);
+      setActiveIdx(-1);
+      nav(`/produk?q=${encodeURIComponent(term)}`);
+    },
+    [nav, q]
+  );
 
   return (
     <div className="search-dropdown-anchor hx-search-wrap" ref={wrapRef}>
       <div className="hero-search-shell">
-        <span className="hero-search-icon" aria-hidden="true">
-          <Search size={16} />
-        </span>
         <TypewriterSearchInput
           ref={searchInputRef}
           className="input hero-search-input"
@@ -186,7 +153,7 @@ function HeroSearch({ products = [] }) {
           type="button"
           aria-label="Cari produk"
         >
-          <ArrowRight size={16} aria-hidden="true" />
+          <Search size={16} aria-hidden="true" />
         </button>
       </div>
 
@@ -261,53 +228,46 @@ function ActiveShoppersBadge() {
 
   return (
     <span className="hx-live-badge">
-      <span className="hx-live-dot" />
-      <span>Sedang online: {activeShoppers} pembeli</span>
+      <span className="hx-live-eye" aria-hidden="true">
+        <Eye size={14} strokeWidth={2.4} className="hx-live-eye-icon" />
+      </span>
+      <span>
+        <strong>{activeShoppers}</strong> pembeli online
+      </span>
     </span>
   );
 }
 
 function HeroStatsRow({ activeProductCount }) {
-  const { last7DaysViews, totalOrders, todayOrders, weekOrders } = useLiveStats({
+  const { last7DaysViews, totalOrders, weekOrders } = useLiveStats({
     intervalMs: 60000,
   });
 
+  const stats = [
+    { val: totalOrders || 0, label: "Total Order", icon: ShoppingBag },
+    { val: weekOrders || 0, label: "Order 7 Hari", accent: true, icon: Zap },
+    { val: activeProductCount, label: "Produk Aktif", icon: Package },
+    { val: last7DaysViews || 0, label: "Views 7 Hari", icon: Eye },
+  ];
+
   return (
     <>
-      {[
-        {
-          val: totalOrders || 0,
-          label: "Total Order",
-          icon: ShoppingBag,
-        },
-        {
-          val: weekOrders || 0,
-          label: "Order 7 Hari",
-          accent: true,
-          icon: Zap,
-        },
-        {
-          val: activeProductCount,
-          label: "Produk Aktif",
-          icon: Package,
-        },
-        {
-          val: last7DaysViews || 0,
-          label: "Views 7 Hari",
-          icon: Eye,
-        },
-      ].map((s) => {
+      {stats.map((s) => {
         const Icon = s.icon;
         return (
           <div
             key={s.label}
             className={`hx-stat-item${s.accent ? " hx-stat-item--accent" : ""}`}
           >
-            <span className="hx-stat-val">
-              {Icon && <Icon size={16} className="hx-stat-icon" />}
-              <NumberCounter value={s.val} />
+            <span className="hx-stat-icon-wrap" aria-hidden="true">
+              <Icon size={15} className="hx-stat-icon" />
             </span>
-            <span className="hx-stat-label">{s.label}</span>
+            <div className="hx-stat-meta">
+              <span className="hx-stat-val">
+                <NumberCounter value={s.val} />
+              </span>
+              <span className="hx-stat-label">{s.label}</span>
+            </div>
           </div>
         );
       })}
@@ -317,35 +277,13 @@ function HeroStatsRow({ activeProductCount }) {
 
 const VISITED_KEY = "imzaqi_visited_v1";
 
-function GreetingBanner() {
-  const [name, setName] = useState("");
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    const n = getBuyerName();
-    if (n) {
-      setName(n);
-      setVisible(true);
-      const t = setTimeout(() => setVisible(false), 8000);
-      return () => clearTimeout(t);
-    }
-  }, []);
-
-  if (!visible || !name) return null;
-
-  return (
-    <div className="hx-greeting" role="status" aria-live="polite">
-      <span className="hx-greeting-wave" aria-hidden="true">👋</span>
-      <span>Selamat datang lagi, <strong>{name}</strong>!</span>
-    </div>
-  );
-}
-
 function OnboardingBanner() {
   const [show, setShow] = useState(() => {
     try {
       return !window.localStorage.getItem(VISITED_KEY);
-    } catch { return false; }
+    } catch {
+      return false;
+    }
   });
 
   if (!show) return null;
@@ -360,7 +298,9 @@ function OnboardingBanner() {
         className="hx-onboardClose"
         type="button"
         onClick={() => {
-          try { window.localStorage.setItem(VISITED_KEY, "1"); } catch {}
+          try {
+            window.localStorage.setItem(VISITED_KEY, "1");
+          } catch {}
           setShow(false);
         }}
         aria-label="Tutup"
@@ -371,41 +311,10 @@ function OnboardingBanner() {
   );
 }
 
-/* ── Main Hero Export ── */
-export default function Hero({ products = [], topIds = [] }) {
-  const nav = useNavigate();
+/* ── Main Hero ── */
+export default function Hero({ products = [] }) {
   const caps = useDeviceCapability();
-  const isMotionReduced = caps.isReducedMotion || caps.saveData || caps.lowMemory || caps.isMobile;
-
-  const topHeroProducts = useMemo(
-    () => pickTopHeroProducts(products, topIds, 4),
-    [products, topIds]
-  );
-
-  const heroShortcuts = useMemo(() => {
-    if (topHeroProducts.length) {
-      return topHeroProducts.map((product, index) => ({
-        key: product.id,
-        rank: index + 1,
-        label: product.name,
-        sold: getProductSoldCount(product),
-      }));
-    }
-
-    return BRAND_SHORTCUTS.map((label, index) => ({
-      key: label,
-      rank: index + 1,
-      label,
-      sold: null,
-    }));
-  }, [topHeroProducts]);
-
-  const goSearch = useCallback((term) => {
-    const value = String(term || "").trim();
-    if (!value) return;
-    pushSearchHistory(value);
-    nav(`/produk?q=${encodeURIComponent(value)}`);
-  }, [nav]);
+  const isMotionReduced = caps.isReducedMotion || caps.saveData || caps.lowMemory;
 
   const activeProductCount = useMemo(
     () =>
@@ -419,9 +328,9 @@ export default function Hero({ products = [], topIds = [] }) {
     isMotionReduced
       ? {}
       : {
-          initial: { opacity: 0, y: 24 },
+          initial: { opacity: 0, y: 16 },
           animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1], delay },
+          transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay },
         };
 
   const MotionTag = isMotionReduced ? "div" : motion.div;
@@ -429,79 +338,64 @@ export default function Hero({ products = [], topIds = [] }) {
 
   return (
     <section className="hx-hero" aria-label="Marketplace Hero">
-      <div className="hx-mesh" aria-hidden="true" />
-      <div className="hx-noise" aria-hidden="true" />
-      <div className="hx-grid-overlay-container" aria-hidden="true">
-        <div className="hx-grid-overlay" />
-      </div>
-
+      <HeroCatalogBackdrop products={products} />
+      <div className="hx-hero-scrim" aria-hidden="true" />
       <div className="container">
-        <div className="hx-hero-container">
+        <div className="hx-stage">
+          <div className="hx-main">
+            <MotionTag className="hx-eyebrow-row" {...stagger(0.04)}>
+              <ActiveShoppersBadge />
+            </MotionTag>
 
-          {/* 1. Live Traffic Badge */}
-          <MotionTag className="hx-live-badge-container" {...stagger(0.06)}>
-            <ActiveShoppersBadge />
-          </MotionTag>
-
-          {/* 2. Headline — visible by default; CSS enhances motion when full */}
-          <h1 className="hx-headline">
-            Akses <span className="hx-headline-gradient">Premium</span>
-            <br />
-            Budget <span className="hx-headline-gradient">Pelajar</span>
-          </h1>
-
-          {/* 3. Subtitle */}
-          <MotionP className="hx-subtitle" {...stagger(0.2)}>
-            Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
-          </MotionP>
-
-          {/* 4. Search Console */}
-          <MotionTag className="hx-search-section" {...stagger(0.28)}>
-            <HeroSearch products={products} />
-          </MotionTag>
-
-          {/* 4b. Onboarding banner / returning user greeting */}
-          <GreetingBanner />
-          <OnboardingBanner />
-
-          {/* 5. Brand search shortcuts */}
-          <MotionTag className="hx-brands-section" style={{ marginTop: "-8px" }} {...stagger(0.32)}>
-            <div className="hx-brands-row">
-              {heroShortcuts.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  className={`hx-brand-pill hx-brand-pill--rank-${item.rank}`}
-                  onClick={() => goSearch(item.label)}
-                  aria-label={
-                    item.sold != null
-                      ? `#${item.rank} paling laris: ${item.label}, ${item.sold} terjual`
-                      : `Cari ${item.label}`
-                  }
-                >
-                  <span className={`hx-brand-pill-rank hx-brand-pill-rank--${item.rank}`}>
-                    #{item.rank}
+            <h1
+              className={`hx-headline${isMotionReduced ? " hx-headline--static" : " hx-headline--enter"}`}
+            >
+              <span className="hx-headline-line">
+                <span className="hx-headline-mask">
+                  <span className="hx-headline-word" style={{ "--w": 0 }}>
+                    Akses
                   </span>
-                  <span className="hx-brand-pill-label">{item.label}</span>
-                </button>
-              ))}
-            </div>
-          </MotionTag>
+                </span>{" "}
+                <span className="hx-headline-mask">
+                  <span className="hx-headline-word hx-headline-gradient" style={{ "--w": 1 }}>
+                    Premium
+                  </span>
+                </span>
+              </span>
+              <span className="hx-headline-line">
+                <span className="hx-headline-mask">
+                  <span className="hx-headline-word" style={{ "--w": 2 }}>
+                    Budget
+                  </span>
+                </span>{" "}
+                <span className="hx-headline-mask">
+                  <span className="hx-headline-word hx-headline-gradient" style={{ "--w": 3 }}>
+                    Pelajar
+                  </span>
+                </span>
+              </span>
+            </h1>
 
-          {/* 6. Action CTAs */}
-          <MotionTag className="hx-ctas-row" {...stagger(0.44)}>
-            <Link className="hx-btn-primary" to="/produk">
-              <ShoppingBag size={14} aria-hidden="true" />
-              <span>Gas Lihat Katalog</span>
-              <ArrowRight size={14} aria-hidden="true" />
-            </Link>
-            <Link className="hx-btn-secondary" to="/status">
-              Cek Status Order
-            </Link>
-          </MotionTag>
+            <MotionP className="hx-subtitle" {...stagger(0.12)}>
+              Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
+            </MotionP>
 
-          {/* 7. Stats Counters Row */}
-          <MotionTag className="hx-stats-row" {...stagger(0.5)}>
+            <OnboardingBanner />
+
+            <MotionTag className="hx-search-section" {...stagger(0.18)}>
+              <HeroSearch products={products} />
+            </MotionTag>
+
+            <MotionTag className="hx-ctas-row" {...stagger(0.24)}>
+              <Link className="hx-btn-primary" to="/produk">
+                <ShoppingBag size={15} aria-hidden="true" />
+                <span>Gas Lihat Katalog</span>
+                <ArrowRight size={15} aria-hidden="true" />
+              </Link>
+            </MotionTag>
+          </div>
+
+          <MotionTag className="hx-stats-row" {...stagger(0.3)} aria-label="Statistik toko">
             <HeroStatsRow activeProductCount={activeProductCount} />
           </MotionTag>
         </div>

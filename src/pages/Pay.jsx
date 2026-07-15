@@ -1149,7 +1149,7 @@ export default function Pay() {
 
         <div className="container pay-shell-grid">
           <div className="pay-mainStack">
-            <section ref={contactCardRef} className="card pad pay-card pay-contactCard reveal" style={{ transitionDelay: "60ms" }}>
+            <section ref={contactCardRef} className="card pad pay-card pay-contactCard reveal" style={{ transitionDelay: "90ms" }}>
               <div className="pay-cardHead">
                 <div>
                   <div className="pay-cardKicker">Kontak order</div>
@@ -1238,7 +1238,7 @@ export default function Pay() {
               </div>
             </section>
 
-            <section className="card pad pay-card pay-stageCard reveal" style={{ transitionDelay: "120ms" }}>
+            <section className="card pad pay-card pay-stageCard reveal" style={{ transitionDelay: "160ms" }}>
               <div className="pay-stageGrid">
                 <div className="pay-stageMeta">
                   <div className="pay-stageLabel">Total bayar</div>
@@ -1371,7 +1371,7 @@ export default function Pay() {
           </div>
 
           {items.length > 0 ? (
-            <aside className="card pad pay-card pay-orderDesktop reveal" style={{ transitionDelay: "80ms" }}>
+            <aside className="card pad pay-card pay-orderDesktop reveal" style={{ transitionDelay: "120ms" }}>
               <div className="pay-orderHead">
                 <div>
                   <div className="pay-orderKicker">Order</div>

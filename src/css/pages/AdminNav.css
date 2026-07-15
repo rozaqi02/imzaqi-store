@@ -16,10 +16,50 @@
   gap: 14px;
   padding: 14px;
   border-radius: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: linear-gradient(165deg, rgba(14, 20, 28, 0.98), rgba(10, 16, 24, 0.96));
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.22);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 22%),
+    linear-gradient(165deg, rgba(14, 20, 28, 0.98), rgba(10, 16, 24, 0.96)),
+    var(--skeu-panel-bg, transparent);
+  box-shadow: var(--skeu-panel-shadow, 0 20px 50px rgba(0, 0, 0, 0.22));
   overflow: hidden;
+}
+
+/* Viewport-locked shell: fill grid row height; nav scrolls inside */
+@media (min-width: 1101px) {
+  .admin-page .adm-sidebar,
+  .admin-shell .adm-sidebar {
+    position: relative;
+    top: auto;
+    align-self: stretch;
+    height: 100%;
+    max-height: none;
+    overflow: hidden;
+  }
+
+  .admin-page .adm-sidebarNav,
+  .admin-shell .adm-sidebarNav {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    overscroll-behavior: contain;
+  }
+}
+
+@media (max-width: 1100px) {
+  .admin-page .adm-sidebar,
+  .admin-shell .adm-sidebar {
+    height: auto;
+    max-height: none;
+    /* keep sticky behavior on mid-width tablets if sidebar visible */
+  }
+
+  .admin-page .adm-sidebarNav,
+  .admin-shell .adm-sidebarNav {
+    flex: none;
+    overflow: visible;
+  }
 }
 
 .adm-sidebarHead {
@@ -38,8 +78,12 @@
   font-weight: 900;
   font-size: 14px;
   color: #d9fff6;
-  background: linear-gradient(145deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.08));
-  border: 1px solid rgba(0, 214, 180, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(145deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.12)),
+    var(--skeu-control-bg, transparent);
+  border: 1px solid rgba(0, 214, 180, 0.28);
+  box-shadow: var(--skeu-control-shadow, none);
   flex-shrink: 0;
 }
 
@@ -69,8 +113,11 @@
 .adm-statPill {
   padding: 10px 12px;
   border-radius: 12px;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.06));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .adm-statPill span {
@@ -135,12 +182,19 @@
 }
 
 .adm-navItem:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #fff;
 }
 
 .adm-navItem.is-active {
-  background: rgba(0, 214, 180, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.2), rgba(0, 80, 80, 0.35));
+  box-shadow: var(--skeu-control-shadow, none);
+  border: 1px solid rgba(0, 214, 180, 0.22);
   color: #ecfffa;
 }
 
@@ -164,12 +218,19 @@
   display: grid;
   place-items: center;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(180, 240, 230, 0.9);
 }
 
 .adm-navItem.is-active .adm-navItemIcon {
-  background: rgba(0, 214, 180, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 80, 0.4));
+  border-color: rgba(0, 214, 180, 0.3);
   color: #b8fff0;
 }
 
@@ -226,24 +287,33 @@
   min-height: 38px;
   padding: 0 10px;
   border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  box-shadow: var(--skeu-control-shadow, none);
   color: rgba(255, 255, 255, 0.78);
   font-size: 12px;
   font-weight: 700;
   cursor: pointer;
-  transition: background 0.16s ease, border-color 0.16s ease;
+  transition: background 0.16s ease, border-color 0.16s ease, filter 0.16s ease;
 }
 
 .adm-footBtn:hover {
-  background: rgba(255, 255, 255, 0.07);
+  filter: brightness(1.08);
   border-color: rgba(255, 255, 255, 0.14);
 }
 
 .adm-footBtn--danger {
   color: #ffb4c8;
-  border-color: rgba(255, 73, 126, 0.22);
-  background: rgba(255, 73, 126, 0.08);
+  border-color: rgba(255, 73, 126, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(165deg, rgba(255, 73, 126, 0.2), rgba(60, 12, 24, 0.55));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 5px 12px rgba(255, 73, 126, 0.14);
 }
 
 /* ── Mobile dock + sheet ── */
@@ -480,6 +550,12 @@
     backdrop-filter: blur(12px);
   }
 
+  /* Toast portals to body — lift above admin bottom dock so it doesn't cover tabs */
+  body:has(.app-main-admin) .toast-viewport,
+  body:has(.admin-page) .toast-viewport {
+    bottom: calc(72px + env(safe-area-inset-bottom, 0px) + 12px);
+  }
+
   .adm-dockBtn {
     display: flex;
     flex-direction: column;
@@ -527,46 +603,147 @@
 
 /* ── Light mode ── */
 html[data-theme="light"] .adm-sidebar {
-  background: linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(247, 253, 255, 0.96));
-  border-color: rgba(0, 138, 148, 0.14);
-  box-shadow: 0 16px 40px rgba(67, 111, 129, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(165deg, #ffffff 0%, #f0f9fc 55%, #e6f4f8 100%);
+  border-color: rgba(13, 124, 144, 0.18);
+  box-shadow:
+    0 16px 40px rgba(40, 94, 117, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    0 0 0 1px rgba(255, 255, 255, 0.6);
+}
+
+html[data-theme="light"] .adm-sidebarLogo {
+  color: #067b88;
+  border-color: rgba(0, 138, 148, 0.22);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(145deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.1));
+  box-shadow:
+    0 6px 14px rgba(0, 138, 148, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+html[data-theme="light"] .adm-sidebarBrand strong {
+  color: #0f2f3a;
 }
 
 html[data-theme="light"] .adm-sidebarBrand span,
 html[data-theme="light"] .adm-navGroupLabel,
 html[data-theme="light"] .adm-statPill span {
-  color: rgba(50, 82, 91, 0.62);
+  color: rgba(30, 70, 82, 0.72);
 }
 
-html[data-theme="light"] .adm-sidebarBrand strong,
-html[data-theme="light"] .adm-statPill strong,
-html[data-theme="light"] .adm-navItemLabel {
-  color: #123744;
+html[data-theme="light"] .adm-statPill {
+  border-color: rgba(13, 124, 144, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(165deg, #f4fbfd, #e8f5f8);
+  box-shadow:
+    0 4px 12px rgba(40, 94, 117, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
-html[data-theme="light"] .adm-statPill,
-html[data-theme="light"] .adm-navItemIcon,
-html[data-theme="light"] .adm-footBtn {
-  background: rgba(0, 138, 148, 0.05);
-  border-color: rgba(0, 138, 148, 0.1);
+html[data-theme="light"] .adm-statPill strong {
+  color: #0f3d4a;
 }
 
 html[data-theme="light"] .adm-navItem {
-  color: rgba(18, 55, 68, 0.88);
+  color: #1a4554;
+}
+
+html[data-theme="light"] .adm-navItem:hover {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 40%),
+    rgba(0, 168, 160, 0.08);
+  color: #0c3a48;
+  box-shadow: none;
+}
+
+html[data-theme="light"] .adm-navItemLabel {
+  color: inherit;
+  font-weight: 700;
+}
+
+html[data-theme="light"] .adm-navItemIcon {
+  color: #0d7a88;
+  border-color: rgba(13, 124, 144, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(165deg, #eef8fb, #e0f2f6);
+  box-shadow:
+    0 3px 8px rgba(40, 94, 117, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
 html[data-theme="light"] .adm-navItem.is-active {
-  background: rgba(0, 214, 180, 0.14);
-  color: #0c4050;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.12));
+  border: 1px solid rgba(0, 138, 148, 0.28);
+  color: #053840;
+  box-shadow:
+    0 4px 12px rgba(0, 138, 148, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 html[data-theme="light"] .adm-navItem.is-active .adm-navItemIcon {
-  background: rgba(0, 214, 180, 0.18);
-  color: #067b88;
+  color: #056b76;
+  border-color: rgba(0, 138, 148, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.14));
+  box-shadow:
+    0 3px 8px rgba(0, 138, 148, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+html[data-theme="light"] .adm-navItem.is-active::before {
+  background: linear-gradient(180deg, #00c2b0, #008a94);
 }
 
 html[data-theme="light"] .adm-navDot {
-  border-color: rgba(255, 255, 255, 0.95);
+  border-color: #ffffff;
+}
+
+html[data-theme="light"] .adm-sidebarFoot {
+  border-top-color: rgba(13, 124, 144, 0.12);
+}
+
+html[data-theme="light"] .adm-footBtn {
+  color: #1a4a58;
+  border-color: rgba(13, 124, 144, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(165deg, #f6fbfd, #eaf5f8);
+  box-shadow:
+    0 3px 8px rgba(40, 94, 117, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+html[data-theme="light"] .adm-footBtn:hover {
+  border-color: rgba(13, 124, 144, 0.28);
+  color: #0c3a48;
+  filter: none;
+  background:
+    linear-gradient(180deg, #ffffff, rgba(255, 255, 255, 0) 36%),
+    rgba(0, 194, 208, 0.08);
+}
+
+html[data-theme="light"] .adm-footBtn--danger {
+  color: #b4234a;
+  border-color: rgba(202, 74, 97, 0.32);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #fff0f3, #ffe4ea);
+  box-shadow:
+    0 3px 8px rgba(200, 40, 70, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+html[data-theme="light"] .adm-footBtn--danger:hover {
+  border-color: rgba(202, 74, 97, 0.42);
+  color: #9a1b3c;
 }
 
 @media (max-width: 720px) {

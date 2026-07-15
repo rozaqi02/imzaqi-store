@@ -465,20 +465,30 @@ function buildLLMSystemPrompt(context, intent) {
 let _llmConfigLogged = false;
 
 async function callLLM(query, history, context, intent) {
-  let endpoint = (import.meta.env.VITE_AI_ENDPOINT || "").replace(/^"|"$/g, "").trim();
-  let key = (import.meta.env.VITE_AI_KEY || "").replace(/^"|"$/g, "").trim();
+  // Prefer Netlify proxy so AI_KEY never ships in the browser bundle.
+  // Direct VITE_AI_* is only for local dev when the proxy is unavailable.
+  const PROXY = "/.netlify/functions/ai-proxy";
+  const directEndpoint = (import.meta.env.VITE_AI_ENDPOINT || "").replace(/^"|"$/g, "").trim();
+  const directKey = (import.meta.env.VITE_AI_KEY || "").replace(/^"|"$/g, "").trim();
+  const forceProxy = import.meta.env.PROD || import.meta.env.VITE_AI_USE_PROXY === "1";
+  const useProxy = forceProxy || !directEndpoint;
+  const endpoint = useProxy ? PROXY : directEndpoint;
+  const key = useProxy ? "" : directKey;
   const model = (import.meta.env.VITE_AI_MODEL || "gemini-2.5-flash").replace(/^"|"$/g, "").trim();
 
   if (!_llmConfigLogged) {
     _llmConfigLogged = true;
     info("[Imzaqi AI] Config:", {
-      endpoint: endpoint ? `${endpoint.slice(0, 30)}...` : "(empty)",
+      endpoint: endpoint ? `${endpoint.slice(0, 40)}...` : "(empty)",
+      viaProxy: useProxy,
       keyPresent: key.length > 0,
       model,
     });
   }
 
-  if (!endpoint || !endpoint.startsWith("http")) {
+  const isHttp = endpoint.startsWith("http://") || endpoint.startsWith("https://");
+  const isRelative = endpoint.startsWith("/");
+  if (!endpoint || (!isHttp && !isRelative)) {
     warn("[Imzaqi AI] No valid endpoint configured:", endpoint || "(empty)");
     return null;
   }
@@ -497,13 +507,15 @@ async function callLLM(query, history, context, intent) {
   try {
     const ctrl = new AbortController();
     const timer = window.setTimeout(() => ctrl.abort(), 8000);
+    // Proxy uses server AI_MODEL; only send model for direct endpoint
+    const body = useProxy ? { messages } : { model, messages };
     const res = await fetch(endpoint, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        ...(key ? { "Authorization": `Bearer ${key}` } : {}),
+        ...(!useProxy && key ? { Authorization: `Bearer ${key}` } : {}),
       },
-      body: JSON.stringify({ model, messages }),
+      body: JSON.stringify(body),
       signal: ctrl.signal,
     });
     window.clearTimeout(timer);

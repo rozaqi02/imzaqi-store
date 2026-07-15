@@ -1,0 +1,2256 @@
+/*
+  Neumorphic depth pass — final cascade layer.
+  Upgrades badges, chips, icon buttons, qty controls, and secondary CTAs
+  that page CSS still leaves flat (rgba fill + no inset/outset).
+*/
+
+/* ── Soft raised control (chips / pills / icon buttons) ─────────── */
+.product-tile-pill,
+.product-typeBadge,
+.product-lowStockBadge,
+.product-tile-rankBadge,
+.product-tile-arrow,
+.catalog-chip:not(.active),
+.catalog-quickChip:not(.active),
+.catalog-viewBtn:not(.active),
+.catalog-filterBtnCount,
+.faq-chip:not(.active),
+.faq-heroPill,
+.testi-filterChip:not(.active),
+.testi-count,
+.testi-miniBadge,
+.about-miniBadge,
+.about-sectionBadge,
+.admin-chip:not(.active),
+.admin-loginBadge,
+.admin-nav-badge,
+.tab-btn:not(.active),
+.toggle-btn:not(.active),
+/* .pill intentionally excluded — header cart count stays solid red */
+.badge,
+.flow-assist-badge,
+.home-deliveryPill,
+.pay-statePill,
+.pay-freePanelBadge,
+.pay-emailState,
+.pay-noteState,
+.pay-shell-kicker,
+.st-statePill,
+.st-copyNoteBtn,
+.st-pasteBtn,
+.st-refreshBtn,
+.st-checkBtn,
+.qty-btn,
+.checkout-item-remove,
+.checkout-drawerClose,
+.checkout-drawerKicker,
+.pdx-chip,
+.pdx-variantBadge:not(.recommend),
+.pdx-stockPill,
+.pdx-qtyBtn,
+.pdx-benefitToggle,
+.pdx-benefitToggle-modern,
+.abandoned-cart-dismiss,
+.recently-viewed-chip,
+.oh-statusPill,
+.nf-linkCard .nf-icon,
+.layout-toggles button:not(.active),
+.layout-toggles .tab-btn:not(.active) {
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16)) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, var(--uni-neo-control, rgba(20, 34, 64, 0.92))) !important;
+  box-shadow: var(--skeu-control-shadow, var(--uni-neo-control-shadow)) !important;
+  color: var(--brand-text, var(--text)) !important;
+}
+
+/* Pressed / active chips keep primary facet */
+.catalog-chip.active,
+.catalog-quickChip.active,
+.catalog-viewBtn.active,
+.faq-chip.active,
+.testi-filterChip.active,
+.admin-chip.active,
+.tab-btn.active,
+.toggle-btn.active,
+.layout-toggles button.active {
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+/* Ghost / secondary buttons — raised control, not flat glass */
+.btn.btn-ghost,
+.btn-ghost,
+.checkout-drawer .btn-ghost,
+.pay-shell .btn-ghost,
+.checkout-drawer .btn.btn-ghost {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  color: var(--brand-text) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.btn.btn-ghost:hover,
+.btn-ghost:hover {
+  filter: brightness(1.05);
+  box-shadow:
+    0 10px 20px rgba(0, 0, 0, 0.22),
+    var(--skeu-control-shadow) !important;
+}
+
+/* Danger — still deep, red-tinted control */
+.btn.btn-danger,
+.btn-danger,
+.checkout-item-remove:hover,
+.checkout-drawerClose:hover {
+  border-color: rgba(255, 79, 114, 0.38) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(170deg, rgba(72, 22, 36, 0.98), rgba(42, 12, 22, 0.96)) !important;
+  color: #ffb0c0 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.45),
+    0 10px 22px rgba(80, 10, 28, 0.35),
+    0 0 0 1px rgba(255, 79, 114, 0.22) !important;
+}
+
+html[data-theme="light"] .btn.btn-danger,
+html[data-theme="light"] .btn-danger {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(170deg, #ffe4ea, #ffd0da) !important;
+  color: #b91c3c !important;
+  border-color: rgba(185, 28, 60, 0.28) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -3px 0 rgba(180, 80, 100, 0.22),
+    6px 8px 16px rgba(120, 40, 60, 0.14),
+    0 0 0 1px rgba(185, 28, 60, 0.14) !important;
+}
+
+/* Inset fields (qty / search-like controls) */
+.qty,
+.checkout-min-promoRow .input,
+.promo-row .input {
+  border: 1px solid var(--brand-line) !important;
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  color: var(--brand-text) !important;
+}
+
+/* Qty buttons — compact raised */
+.qty-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 12px !important;
+}
+
+.qty-btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+}
+
+.qty-btn:active:not(:disabled) {
+  transform: translateY(1px);
+  box-shadow: var(--skeu-inset-shadow) !important;
+}
+
+/* Product tile meta pills keep readable muted text */
+.product-tile-pill {
+  color: var(--brand-muted, var(--muted)) !important;
+  font-weight: 800 !important;
+}
+
+.product-tile-pill svg {
+  color: var(--brand-icon, var(--accent)) !important;
+}
+
+/* Type badge: keep brand accent hue, add depth */
+.product-typeBadge {
+  border-color: color-mix(in srgb, var(--type-color, var(--accent)) 45%, transparent) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    color-mix(in srgb, var(--type-color, var(--accent)) 16%, var(--skeu-control-bg, #142038)) !important;
+  color: var(--type-color, var(--accent)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 6px 14px color-mix(in srgb, var(--type-color, var(--accent)) 18%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--type-color, var(--accent)) 28%, transparent) !important;
+}
+
+/* Compare button — yellow (not generic control grey/teal) */
+.detail-page-v3 .pdx-compareBtn,
+.pdx-compareBtn {
+  border: 1px solid rgba(255, 200, 40, 0.55) !important;
+  background:
+    linear-gradient(175deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(135deg, #ffe066 0%, #ffd54a 40%, #f5b800 100%) !important;
+  color: #3d2a00 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.65),
+    inset 0 -2px 0 rgba(140, 90, 0, 0.28),
+    0 8px 16px rgba(0, 8, 18, 0.22),
+    0 4px 10px rgba(245, 180, 0, 0.28) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-compareBtn,
+html[data-theme="light"] .pdx-compareBtn {
+  border-color: rgba(212, 160, 0, 0.45) !important;
+  background:
+    linear-gradient(175deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(135deg, #ffe57a 0%, #ffd54a 45%, #f0b400 100%) !important;
+  color: #5c4200 !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -2px 0 rgba(160, 110, 0, 0.2),
+    0 6px 14px rgba(212, 160, 0, 0.22),
+    0 3px 8px rgba(180, 130, 0, 0.14) !important;
+}
+
+/* Product detail account chips (Sharing / Private / Family) */
+.pdx-accountStrip-chip,
+.detail-page-v3 .pdx-accountStrip-chip {
+  border: 1px solid color-mix(in srgb, var(--chip-color, var(--accent)) 42%, transparent) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 32%),
+    color-mix(in srgb, var(--chip-color, var(--accent)) 16%, var(--skeu-control-bg, #142038)) !important;
+  color: var(--chip-color, var(--accent)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.26),
+    0 5px 12px color-mix(in srgb, var(--chip-color, var(--accent)) 16%, transparent),
+    0 0 0 1px color-mix(in srgb, var(--chip-color, var(--accent)) 14%, transparent) !important;
+}
+
+html[data-theme="light"] .pdx-accountStrip-chip,
+html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 40%),
+    color-mix(in srgb, var(--chip-color, var(--accent)) 14%, #ffffff) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(100, 130, 150, 0.16),
+    4px 6px 12px rgba(60, 100, 120, 0.1),
+    0 0 0 1px color-mix(in srgb, var(--chip-color, var(--accent)) 18%, transparent) !important;
+  color: var(--chip-color, var(--accent)) !important;
+}
+
+/* Low stock / out — tinted neo pills */
+.product-lowStockBadge {
+  border-color: rgba(255, 191, 74, 0.4) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(165deg, rgba(255, 180, 60, 0.22), rgba(120, 70, 10, 0.35)) !important;
+  color: #ffd98a !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.2),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.32),
+    0 6px 14px rgba(255, 160, 40, 0.16),
+    0 0 0 1px rgba(255, 191, 74, 0.28) !important;
+}
+
+.product-lowStockBadge.out {
+  border-color: rgba(255, 90, 122, 0.42) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(165deg, rgba(255, 90, 122, 0.22), rgba(90, 20, 36, 0.4)) !important;
+  color: #ff9ab1 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.34),
+    0 6px 14px rgba(255, 70, 100, 0.16),
+    0 0 0 1px rgba(255, 90, 122, 0.28) !important;
+}
+
+/* Rank badges — metal depth, not flat gradient chips */
+.product-tile-rankBadge--1 {
+  border-color: rgba(255, 215, 0, 0.45) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(155deg, rgba(255, 220, 80, 0.34), rgba(160, 100, 0, 0.28)) !important;
+  color: #ffe566 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(90, 50, 0, 0.4),
+    0 6px 14px rgba(255, 180, 0, 0.22),
+    0 0 0 1px rgba(255, 215, 0, 0.3) !important;
+}
+
+.product-tile-rankBadge--2 {
+  border-color: rgba(200, 210, 220, 0.4) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(155deg, rgba(230, 236, 242, 0.22), rgba(90, 100, 110, 0.28)) !important;
+  color: #e8eef4 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(0, 0, 0, 0.18),
+    0 0 0 1px rgba(200, 210, 220, 0.28) !important;
+}
+
+.product-tile-rankBadge--3 {
+  border-color: rgba(205, 127, 50, 0.42) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(155deg, rgba(230, 150, 80, 0.28), rgba(100, 50, 20, 0.32)) !important;
+  color: #f6c08a !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 0 rgba(60, 25, 5, 0.4),
+    0 6px 14px rgba(180, 90, 30, 0.18),
+    0 0 0 1px rgba(205, 127, 50, 0.3) !important;
+}
+
+.product-tile-rankBadge--4 {
+  border-color: rgba(0, 214, 180, 0.4) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(155deg, rgba(0, 214, 180, 0.26), rgba(0, 80, 90, 0.32)) !important;
+  color: #7dffd8 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -2px 0 rgba(0, 40, 45, 0.4),
+    0 6px 14px rgba(0, 180, 150, 0.18),
+    0 0 0 1px rgba(0, 214, 180, 0.28) !important;
+}
+
+/* Product tile arrow — match control depth */
+.product-tile-arrow {
+  border-radius: 12px !important;
+  color: var(--brand-icon, var(--accent)) !important;
+}
+
+/* Product detail chips — duration / guarantee keep hue + depth */
+.chip-duration,
+.chip-guarantee,
+.chip-account,
+.chip-access,
+.chip-stock,
+.pdx-chip.chip-duration,
+.pdx-chip.chip-guarantee {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
+    0 5px 12px rgba(0, 0, 0, 0.16) !important;
+}
+
+/* Status progress bar — neo inset track */
+.st-progressBar {
+  border: 1px solid var(--brand-line, var(--st-line)) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg, var(--st-panel-soft)) !important;
+  box-shadow: var(--skeu-control-shadow, var(--st-shadow-soft)) !important;
+}
+
+.st-progressBar-track {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.st-progressBar-fill {
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    0 0 12px rgba(0, 214, 180, 0.35) !important;
+}
+
+/* Status timeline nodes */
+.status-min-nodeDot,
+.st-timelineDot,
+.st-stepDot {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Catalog search suggestions panel */
+.catalog-searchSuggestions,
+.hx-search-suggestions,
+.hero-search-suggestions {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+/* Abandoned cart banner actions */
+.abandoned-cart-banner {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+/* Flash sale countdown units keep deep face */
+.fs-countdown-unit {
+  border: 1px solid rgba(255, 90, 122, 0.35) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(165deg, rgba(80, 18, 32, 0.95), rgba(40, 10, 18, 0.98)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.4),
+    0 8px 16px rgba(80, 10, 24, 0.3) !important;
+}
+
+/* Discount % badge — yellow only */
+.flash-sale-badge,
+.fs-badge {
+  border: 1px solid rgba(255, 200, 40, 0.55) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #ffd54a, #f5b800) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 rgba(140, 90, 0, 0.28),
+    0 4px 10px rgba(245, 180, 0, 0.28) !important;
+  color: #3d2a00 !important;
+}
+
+html[data-theme="light"] .flash-sale-badge,
+html[data-theme="light"] .fs-badge {
+  border-color: rgba(212, 160, 0, 0.45) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #ffe066, #f0b400) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(160, 110, 0, 0.18),
+    0 3px 8px rgba(212, 160, 0, 0.22) !important;
+  color: #5c4200 !important;
+}
+
+/* ── Light mode soft recalibration ──────────────────────────────── */
+html[data-theme="light"] .product-tile-pill,
+html[data-theme="light"] .catalog-chip:not(.active),
+html[data-theme="light"] .faq-chip:not(.active),
+html[data-theme="light"] .testi-filterChip:not(.active),
+html[data-theme="light"] .tab-btn:not(.active),
+html[data-theme="light"] .qty-btn,
+html[data-theme="light"] .product-tile-arrow,
+html[data-theme="light"] .pdx-chip,
+html[data-theme="light"] .pdx-variantBadge:not(.recommend),
+html[data-theme="light"] .st-copyNoteBtn,
+html[data-theme="light"] .st-pasteBtn,
+html[data-theme="light"] .st-refreshBtn,
+html[data-theme="light"] .checkout-item-remove,
+html[data-theme="light"] .btn-ghost {
+  color: var(--brand-text, #123744) !important;
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+html[data-theme="light"] .product-tile-pill {
+  color: var(--brand-muted, #4a6070) !important;
+}
+
+html[data-theme="light"] .product-typeBadge {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 40%),
+    color-mix(in srgb, var(--type-color, var(--accent)) 14%, #ffffff) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(120, 150, 165, 0.22),
+    4px 6px 12px rgba(60, 100, 120, 0.1),
+    0 0 0 1px color-mix(in srgb, var(--type-color, var(--accent)) 22%, transparent) !important;
+}
+
+html[data-theme="light"] .product-lowStockBadge {
+  color: #9a5b00 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(165deg, #fff3d6, #ffe8b0) !important;
+  border-color: rgba(180, 120, 20, 0.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(180, 130, 40, 0.2),
+    4px 6px 12px rgba(160, 100, 20, 0.1) !important;
+}
+
+html[data-theme="light"] .product-lowStockBadge.out {
+  color: #b91c1c !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(165deg, #ffe4e8, #ffd0d6) !important;
+  border-color: rgba(185, 28, 28, 0.28) !important;
+}
+
+html[data-theme="light"] .product-tile-rankBadge--1 {
+  color: #8b6200 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(155deg, #ffe9a0, #ffd060) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(180, 120, 20, 0.25),
+    4px 6px 12px rgba(200, 140, 20, 0.16) !important;
+}
+
+html[data-theme="light"] .product-tile-rankBadge--2 {
+  color: #4a626e !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(155deg, #f0f4f7, #d5dee4) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(120, 140, 150, 0.22),
+    4px 6px 12px rgba(80, 100, 120, 0.1) !important;
+}
+
+html[data-theme="light"] .product-tile-rankBadge--3 {
+  color: #804310 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(155deg, #fce8d6, #f0c9a0) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(160, 90, 30, 0.22),
+    4px 6px 12px rgba(160, 90, 30, 0.12) !important;
+}
+
+html[data-theme="light"] .product-tile-rankBadge--4 {
+  color: #006b74 !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(155deg, #d8f7f4, #a8ebe4) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(0, 120, 120, 0.18),
+    4px 6px 12px rgba(0, 140, 140, 0.12) !important;
+}
+
+html[data-theme="light"] .st-progressBar {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-panel-bg) !important;
+}
+
+html[data-theme="light"] .st-progressBar-track {
+  background: var(--skeu-inset-bg) !important;
+}
+
+/* Reduced motion: keep depth, drop lift bounce */
+@media (prefers-reduced-motion: reduce) {
+  .qty-btn:hover:not(:disabled),
+  .qty-btn:active:not(:disabled),
+  .btn-ghost:hover {
+    transform: none;
+    filter: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 2 — remaining flat chrome across storefront pages
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Catalog chips / counts / filter chrome */
+.catalog-chip:not(.active),
+.catalog-page .catalog-chip:not(.active) {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  color: var(--brand-muted, var(--text)) !important;
+}
+
+.catalog-chip-count,
+.faq-chipCount,
+.catalog-filterBtnCount {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 3px 8px rgba(0, 0, 0, 0.16) !important;
+  color: var(--brand-muted) !important;
+}
+
+.catalog-chip.active .catalog-chip-count,
+.faq-chip.active .faq-chipCount {
+  background: rgba(3, 34, 53, 0.2) !important;
+  border-color: rgba(3, 34, 53, 0.28) !important;
+  color: #032235 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 40, 40, 0.25) !important;
+}
+
+.catalog-filterSearch,
+.catalog-filterClear,
+.faq-searchClear,
+.catalog-commandClear,
+.catalog-commandSort,
+.catalog-filterBtn {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  color: var(--brand-text) !important;
+}
+
+.catalog-filterSearch {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+}
+
+.catalog-filter.is-sheet .catalog-filterSection,
+.catalog-toggleGroup {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-viewBtn:not(.active),
+.catalog-quickChip:not(.active) {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Recently viewed */
+.rv-card {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.rv-icon {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .rv-card {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-panel-bg) !important;
+}
+
+/* Abandoned cart */
+.abandoned-cart-banner {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.abandoned-cart-dismiss {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Mini cart sheet */
+.mini-cart-item-remove,
+.mini-cart-close,
+.cart-sheet-close {
+  border: 1px solid rgba(255, 79, 114, 0.32) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    linear-gradient(165deg, rgba(72, 22, 36, 0.9), rgba(40, 12, 20, 0.95)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.35),
+    0 6px 14px rgba(80, 10, 28, 0.25) !important;
+  color: #ff9ab1 !important;
+}
+
+.mini-cart-item {
+  border: 1px solid transparent;
+  border-radius: 14px;
+}
+
+.mini-cart-item:hover {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Order history status pills — tinted neo */
+.oh-statusPill {
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.oh-statusPill.is-pending {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(29, 131, 255, 0.28), rgba(10, 30, 70, 0.55)) !important;
+  border-color: rgba(29, 131, 255, 0.36) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 5px 12px rgba(29, 131, 255, 0.16) !important;
+}
+
+.oh-statusPill.is-processing {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 191, 74, 0.28), rgba(70, 40, 0, 0.55)) !important;
+  border-color: rgba(255, 191, 74, 0.36) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 5px 12px rgba(255, 180, 40, 0.16) !important;
+}
+
+.oh-statusPill.is-done {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(80, 220, 146, 0.28), rgba(10, 50, 35, 0.55)) !important;
+  border-color: rgba(80, 220, 146, 0.36) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 5px 12px rgba(80, 220, 146, 0.16) !important;
+}
+
+.oh-statusPill.is-cancelled {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 73, 126, 0.26), rgba(70, 15, 30, 0.55)) !important;
+  border-color: rgba(255, 73, 126, 0.36) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.3),
+    0 5px 12px rgba(255, 73, 126, 0.16) !important;
+}
+
+/* Status page: check CTA is primary, not ghost control */
+.status-page .btn.st-checkBtn,
+.status-page button.st-checkBtn.btn,
+.st-checkBtn.btn {
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+/* Flash sale countdown units */
+.flash-countdown-unit,
+.flash-sale-timer-box,
+.fs-unit,
+.flash-countdown span:not(.flash-countdown-sep) {
+  border: 1px solid rgba(255, 90, 122, 0.32) !important;
+}
+
+/* Pay pills / free badges */
+.pay-statePill,
+.pay-freePanelBadge,
+.pay-emailState,
+.pay-noteState,
+.pay-orderPromo {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Testimonials filters / count */
+.testi-filterChip:not(.active),
+.testi-count,
+.testi-miniStat,
+.testi-miniBadge {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* FAQ clear + chip count already covered; reinforce faq items if flat */
+.faq-searchClear {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Bottom nav inactive icons: soft raised hint */
+.bottom-nav-item:not(.is-active) .bottom-nav-icon {
+  border: 1px solid transparent;
+  background: transparent;
+}
+
+/* Home how-step badges */
+.home-howCard-step,
+.home-sectionBadge,
+.home-kicker {
+  /* kicker is text — only step */
+}
+
+.home-howCard-step {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Social / trust strips */
+.trust-chip,
+.social-proof-pill,
+.sp-pill,
+.hx-live-badge,
+.hx-stat-chip {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Checkout line items / promo cards extras */
+.checkout-item-card,
+.checkout-promo-card {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 22%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Achievement / toast chrome */
+.achievement-toast,
+.sw-update-toast {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+/* Admin chips inactive */
+.admin-chip:not(.active),
+.admin-product-pill:not(.on),
+.admin-status {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Light mode recalibration for new targets */
+html[data-theme="light"] .catalog-chip:not(.active),
+html[data-theme="light"] .catalog-viewBtn:not(.active),
+html[data-theme="light"] .catalog-quickChip:not(.active),
+html[data-theme="light"] .catalog-filterClear,
+html[data-theme="light"] .faq-searchClear,
+html[data-theme="light"] .rv-card,
+html[data-theme="light"] .testi-filterChip:not(.active),
+html[data-theme="light"] .home-howCard-step {
+  color: var(--brand-text, #123744) !important;
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+html[data-theme="light"] .catalog-chip-count,
+html[data-theme="light"] .faq-chipCount {
+  color: var(--brand-muted, #4a6070) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 3 — Pay / trust / toast / tile icon reinforcement
+   ═══════════════════════════════════════════════════════════════════ */
+
+.qris-wrap,
+.pay-card,
+.pay-orderDesktop,
+.pay-orderMobileCard,
+.pay-successHero,
+.pay-successModal {
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.pay-shell-kicker,
+.pay-statePill:not(.live),
+.pay-noteState:not(.warn):not(.ok),
+.pay-emailState:not(.warn):not(.ok),
+.pay-orderPromo {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.pay-statePill.live {
+  border-color: var(--imzaqi-btn-border) !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.pay-orderItem {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.pay-emailInput,
+.pay-waField .input {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  border: 1px solid var(--brand-line) !important;
+}
+
+.pay-shell .btn:not(.btn-ghost) {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.pay-shell .btn-ghost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  border-color: var(--brand-line) !important;
+  color: var(--brand-text) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.trust-strip,
+.social-proof-card,
+.checkout-trust-loyalty,
+.sw-update-toast,
+.empty-icon-component,
+.mini-cart-count,
+.mini-cart-item-fallback {
+  border-color: var(--brand-line) !important;
+}
+
+.product-tile-arrow {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .pay-shell-kicker,
+html[data-theme="light"] .pay-statePill:not(.live),
+html[data-theme="light"] .pay-orderPromo,
+html[data-theme="light"] .pay-orderItem {
+  color: var(--brand-text, #123744) !important;
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 4 — Checkout / Status / FAB / Admin status chips
+   ═══════════════════════════════════════════════════════════════════ */
+
+.checkout-item-remove,
+.checkout-back-btn,
+.checkout-drawerClose,
+.checkout-drawer .btn-ghost {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.checkout-drawer .btn:not(.btn-ghost),
+.checkout-summaryBtn.btn,
+.checkout-floating-bar-btn.btn {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.checkout-item-card,
+.checkout-promo-card,
+.checkout-full-items-panel,
+.checkout-full-trust-panel,
+.checkout-full-promo-panel,
+.checkout-summary-full,
+.checkout-summary {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 22%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.st-recentChip {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.st-tab.is-active {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.floating-order-btn {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.floating-order-dismiss {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Admin status / chip flats commonly used on dashboard */
+.admin-status.pending,
+.admin-status.processing,
+.admin-status.done,
+.admin-status.cancelled,
+.admin-status.reported,
+.admin-status.paid_reported {
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.admin-chip:not(.active),
+.admin-nav-btn:not(.active),
+.admin-searchRow,
+.admin-filterBtn,
+.admin-product-pill:not(.on) {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.admin-panel,
+.admin-statCard,
+.admin-miniCard,
+.admin-orderCardModern,
+.admin-sidebar {
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+html[data-theme="light"] .checkout-item-remove,
+html[data-theme="light"] .checkout-back-btn,
+html[data-theme="light"] .st-recentChip,
+html[data-theme="light"] .floating-order-btn {
+  color: var(--brand-text, #123744) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 5 — Catalog / Admin nav / Lightbox / Home search
+   ═══════════════════════════════════════════════════════════════════ */
+
+.catalog-metric,
+.catalog-command,
+.catalog-card,
+.catalog-filterShell,
+.catalog-sheet {
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.catalog-filterHeadIcon,
+.catalog-filterHeadReset,
+.catalog-filterClear,
+.catalog-commandClear,
+.catalog-commandSort,
+.hero-search-clear {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-toggleGroup,
+.catalog-filterSearch {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  border-color: var(--brand-line) !important;
+}
+
+.adm-sidebar {
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.adm-statPill,
+.adm-navItemIcon,
+.adm-footBtn:not(.adm-footBtn--danger),
+.adm-sidebarLogo,
+.admin-loginBadge,
+.admin-loginSignal {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.adm-navItem.is-active {
+  border: 1px solid rgba(0, 214, 180, 0.24) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.lightbox {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.lightbox-close,
+.lightbox-nav {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.suggestions,
+.catalog-searchSuggestions,
+.hx-search-suggestions {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.oh-card,
+.oh-empty,
+.oh-heroIcon,
+.oh-emptyIcon {
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.oh-heroIcon,
+.oh-emptyIcon {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .catalog-metric,
+html[data-theme="light"] .catalog-command,
+html[data-theme="light"] .catalog-card {
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+/* Admin sidebar light — readable contrast (overrides generic control wash) */
+html[data-theme="light"] .adm-sidebar {
+  border-color: rgba(13, 124, 144, 0.18) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(165deg, #ffffff 0%, #f0f9fc 55%, #e6f4f8 100%) !important;
+  box-shadow:
+    0 16px 40px rgba(40, 94, 117, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+html[data-theme="light"] .adm-statPill,
+html[data-theme="light"] .adm-navItemIcon,
+html[data-theme="light"] .adm-footBtn:not(.adm-footBtn--danger),
+html[data-theme="light"] .adm-sidebarLogo {
+  border-color: rgba(13, 124, 144, 0.18) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 34%),
+    linear-gradient(165deg, #eef8fb, #e0f2f6) !important;
+  box-shadow:
+    0 3px 8px rgba(40, 94, 117, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  color: #0d7a88 !important;
+}
+
+html[data-theme="light"] .adm-navItem {
+  color: #1a4554 !important;
+}
+
+html[data-theme="light"] .adm-navItem.is-active {
+  border-color: rgba(0, 138, 148, 0.28) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.12)) !important;
+  color: #053840 !important;
+  box-shadow:
+    0 4px 12px rgba(0, 138, 148, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+html[data-theme="light"] .adm-navItem.is-active .adm-navItemIcon {
+  color: #056b76 !important;
+  border-color: rgba(0, 138, 148, 0.28) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.14)) !important;
+}
+
+html[data-theme="light"] .adm-statPill strong {
+  color: #0f3d4a !important;
+}
+
+html[data-theme="light"] .adm-footBtn:not(.adm-footBtn--danger) {
+  color: #1a4a58 !important;
+}
+
+html[data-theme="light"] .adm-footBtn--danger {
+  color: #b4234a !important;
+  border-color: rgba(202, 74, 97, 0.32) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #fff0f3, #ffe4ea) !important;
+  box-shadow:
+    0 3px 8px rgba(200, 40, 70, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 6 — Toast / sticky CTA / modal / footer / admin dashboard
+   ═══════════════════════════════════════════════════════════════════ */
+
+.toast,
+.sticky-cta,
+.site-footerPanel,
+.achievement-toast-inner,
+.modal {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+  backdrop-filter: none !important;
+}
+
+.toast-action,
+.toast-close,
+.modal-close,
+.trust-pill,
+.nf-linkCard,
+.nf-linkIcon,
+.admin-brand,
+.admin-nav-btn,
+.admin-nav-icon,
+.admin-statCard,
+.admin-statIcon,
+.admin-panel,
+.admin-field-switch,
+.admin-icon-preview,
+.admin-variant-row,
+.admin-order-card,
+.admin-logo {
+  border-color: var(--brand-line) !important;
+}
+
+.toast-action,
+.toast-close,
+.modal-close,
+.trust-pill,
+.nf-linkIcon,
+.admin-nav-btn:not(.active),
+.admin-nav-icon,
+.admin-statIcon,
+.admin-field-switch,
+.admin-logo {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.admin-statCard,
+.admin-panel,
+.admin-brand,
+.nf-linkCard {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 22%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.admin-nav-btn.active {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 80, 80, 0.4)) !important;
+  border-color: rgba(0, 214, 180, 0.3) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.product-logo-modern,
+.variant-card-modern {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .toast,
+html[data-theme="light"] .sticky-cta,
+html[data-theme="light"] .site-footerPanel,
+html[data-theme="light"] .modal {
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 7 — Admin operational surfaces (chips, lists, timeline, KPI)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.admin-chip:not(.active),
+.admin-topbar-current,
+.admin-product-row,
+.admin-promo-row,
+.admin-miniCard,
+.admin-rankItem,
+.admin-alertItem,
+.admin-focusRow,
+.admin-kpiChip,
+.admin-orderStat,
+.admin-orderListItem,
+.admin-orderCardModern,
+.admin-searchRow,
+.admin-mobileBrand,
+.admin-mobileTab,
+.admin-mobileTabIcon,
+.admin-categoryTag,
+.admin-product-pill,
+.admin-status {
+  border-color: var(--brand-line) !important;
+}
+
+.admin-chip:not(.active),
+.admin-topbar-current,
+.admin-product-row:not(.active),
+.admin-promo-row,
+.admin-rankItem,
+.admin-alertItem,
+.admin-focusRow,
+.admin-kpiChip,
+.admin-orderStat,
+.admin-orderListItem,
+.admin-mobileTab:not(.active),
+.admin-mobileTabIcon,
+.admin-categoryTag,
+.admin-product-pill:not(.on):not(.off),
+.admin-status:not(.pending):not(.processing):not(.done):not(.cancelled):not(.reported) {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.admin-chip.active {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.admin-miniCard,
+.admin-orderCardModern,
+.admin-mobileBrand {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 22%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.admin-searchRow,
+.admin-orderTimeline,
+.admin-chartTrack,
+.admin-progress {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  border-color: var(--brand-line) !important;
+}
+
+.admin-timelineDot,
+.admin-rankIndex,
+.admin-topbar-currentIcon {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .admin-chip:not(.active),
+html[data-theme="light"] .admin-kpiChip,
+html[data-theme="light"] .admin-orderStat,
+html[data-theme="light"] .admin-orderListItem {
+  border-color: rgba(13, 124, 144, 0.14) !important;
+  color: var(--brand-text, #123744) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 8 — Home page only (how cards, promo, FAQ, hero chrome)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.home-page .home-howCard {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.home-page .home-howCard-step,
+.home-page .home-howCard-icon {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.home-page .home-promoCard {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.home-page .home-faqItem.faq-item {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.home-page .hx-stat-item {
+  border: 1px solid var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.home-page .hx-live-badge,
+.home-page .hx-onboardBanner,
+.home-page .hx-onboardClose {
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.home-page .hx-onboardClose {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+}
+
+.home-page .home-sectionCta .btn,
+.home-page .home-sectionCta .btn-ghost,
+.home-page .home-sectionCta .btn:not(.btn-ghost) {
+  border-radius: 14px !important;
+}
+
+.home-page .home-sectionCta .btn-ghost {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg) !important;
+  border: 1px solid var(--brand-line) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.home-page .home-sectionCta .btn:not(.btn-ghost) {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.home-page .suggestions {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+html[data-theme="light"] .home-page .home-howCard,
+html[data-theme="light"] .home-page .home-promoCard,
+html[data-theme="light"] .home-page .home-faqItem.faq-item,
+html[data-theme="light"] .home-page .hx-stat-item {
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 9 — Catalog page only (filter, cards, badges, search, sheet)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.catalog-page .catalog-searchSuggestions,
+.catalog-page .catalog-command,
+.catalog-page .catalog-filterShell,
+.catalog-page .catalog-card,
+.catalog-page .catalog-sheet {
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.catalog-page .catalog-filterShell {
+  border-radius: 32px !important;
+}
+
+.catalog-page .catalog-filterHead {
+  border-radius: 32px 32px 0 0 !important;
+}
+
+.catalog-page .catalog-chip,
+.catalog-page .catalog-chip:not(.active),
+.catalog-page .catalog-chip.active {
+  border-radius: 999px !important;
+}
+
+.catalog-page .catalog-toggleGroup {
+  border-radius: 22px !important;
+}
+
+.catalog-page .catalog-toggleItem {
+  border-radius: 16px !important;
+}
+
+.catalog-page .catalog-filterHeadIcon {
+  border-radius: 16px !important;
+}
+
+.catalog-page .catalog-filterHeadReset {
+  border-radius: 999px !important;
+}
+
+.catalog-page .catalog-commandClear,
+.catalog-page .catalog-filterClear,
+.catalog-page .catalog-filterHeadReset,
+.catalog-page .catalog-filterHeadIcon,
+.catalog-page .catalog-viewBtn:not(.active),
+.catalog-page .catalog-chip:not(.active),
+.catalog-page .catalog-sheetClose,
+.catalog-page .catalog-cardCover,
+.catalog-page .catalog-cardIcon,
+.catalog-page .catalog-cardPrice,
+.catalog-page .catalog-cardMeta > span,
+.catalog-page .catalog-cardFoot {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-page .catalog-chip.active,
+.catalog-page .catalog-viewBtn.active,
+.catalog-page .catalog-quickChip.active {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+.catalog-page .catalog-filterSearch,
+.catalog-page .catalog-toggleGroup,
+.catalog-page .catalog-rangeTrack {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  border-color: var(--brand-line) !important;
+}
+
+.catalog-page .catalog-metric {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-command,
+html[data-theme="light"] .catalog-page .catalog-filterShell,
+html[data-theme="light"] .catalog-page .catalog-card,
+html[data-theme="light"] .catalog-page .catalog-metric {
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Pass 10 — Catalog remaining flats (mobile cards, skeleton, sheet,
+   content bar, filter sections, history clear, empty state)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.catalog-page .catalog-card,
+.catalog-page .catalog-card.catalog-cardV2,
+.catalog-page .catalog-cardSkeleton,
+.catalog-page .catalog-emptyResult {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+  border-color: var(--brand-line) !important;
+}
+
+.catalog-page .catalog-contentBar,
+.catalog-page .catalog-filterHead,
+.catalog-page .catalog-sheetFoot {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-page .catalog-filter.is-sheet .catalog-filterSection {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-page .catalog-activeTag {
+  border-color: rgba(0, 214, 180, 0.32) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 80, 90, 0.4)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.25),
+    0 4px 10px rgba(0, 180, 150, 0.14) !important;
+}
+
+.catalog-page .catalog-activeReset {
+  border-color: rgba(255, 91, 122, 0.4) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(255, 91, 122, 0.24), rgba(70, 12, 28, 0.5)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 70, 100, 0.14) !important;
+}
+
+/* Catalog stock/status pills — brand-aligned colors (not washed slate) */
+.catalog-page .catalog-status.ok {
+  border-color: color-mix(in srgb, var(--accent, #00d6b4) 42%, transparent) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 90, 0.45)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(0, 214, 180, 0.16) !important;
+  color: var(--brand-icon, #4effda) !important;
+}
+
+.catalog-page .catalog-status.hot {
+  border-color: rgba(255, 140, 50, 0.38) !important;
+  color: #ffb060 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 120, 30, 0.16) !important;
+}
+
+.catalog-page .catalog-status.warn {
+  border-color: rgba(255, 180, 50, 0.36) !important;
+  color: #ffc860 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 160, 40, 0.14) !important;
+}
+
+.catalog-page .catalog-status.soldout {
+  border-color: rgba(255, 91, 122, 0.36) !important;
+  color: #ff9ab1 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.28),
+    0 4px 10px rgba(255, 70, 100, 0.14) !important;
+}
+
+.catalog-page .catalog-status.muted {
+  border-color: var(--brand-line) !important;
+  color: var(--brand-muted, rgba(234, 255, 245, 0.62)) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-status.ok {
+  border-color: rgba(0, 138, 148, 0.32) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.12)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(0, 100, 110, 0.12),
+    0 3px 8px rgba(0, 138, 148, 0.14) !important;
+  color: var(--accent, #067b88) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-status.hot {
+  color: #b05500 !important;
+  border-color: rgba(255, 120, 30, 0.3) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-status.warn {
+  color: #8a6200 !important;
+  border-color: rgba(212, 160, 23, 0.34) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-status.soldout {
+  color: #a12d48 !important;
+  border-color: rgba(202, 74, 97, 0.32) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-status.muted {
+  color: #5a7580 !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+}
+
+.catalog-page .catalog-searchHistoryClear,
+.catalog-page .empty-suggestionChip {
+  border: 1px solid var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-page .catalog-cardSkeletonIcon {
+  border-color: var(--brand-line) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 34%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+.catalog-page .catalog-cardSkeletonLine,
+.catalog-page .catalog-cardSkeletonPrice,
+.catalog-page .catalog-cardSkeletonSignals span,
+.catalog-page .catalog-cardSkeletonMeta span,
+.catalog-page .catalog-cardSkeletonFoot {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  border-color: var(--brand-line) !important;
+}
+
+.catalog-page .catalog-sheetHandle {
+  border: 1px solid rgba(0, 214, 180, 0.28) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 40%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.55), rgba(0, 100, 100, 0.45)) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -1px 0 rgba(0, 40, 40, 0.35),
+    0 2px 6px rgba(0, 180, 150, 0.18) !important;
+}
+
+/* Mobile/tablet: keep embossed card face (override old flat perf hacks) */
+@media (max-width: 900px) {
+  .catalog-page .catalog-card,
+  .catalog-page .catalog-card.catalog-cardV2 {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
+      var(--skeu-panel-bg) !important;
+    box-shadow:
+      0 8px 20px rgba(0, 0, 0, 0.24),
+      inset 0 2px 0 rgba(255, 255, 255, 0.14),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.3),
+      0 0 0 1px rgba(0, 194, 208, 0.1) !important;
+  }
+}
+
+html[data-theme="light"] .catalog-page .catalog-card,
+html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2,
+html[data-theme="light"] .catalog-page .catalog-cardSkeleton,
+html[data-theme="light"] .catalog-page .catalog-emptyResult,
+html[data-theme="light"] .catalog-page .catalog-contentBar,
+html[data-theme="light"] .catalog-page .catalog-filterHead,
+html[data-theme="light"] .catalog-page .catalog-sheetFoot,
+html[data-theme="light"] .catalog-page .catalog-filter.is-sheet .catalog-filterSection,
+html[data-theme="light"] .catalog-page .catalog-searchHistoryClear,
+html[data-theme="light"] .catalog-page .empty-suggestionChip {
+  border-color: rgba(13, 124, 144, 0.14) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-card,
+html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2,
+html[data-theme="light"] .catalog-page .catalog-cardSkeleton,
+html[data-theme="light"] .catalog-page .catalog-emptyResult {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-panel-bg) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-contentBar,
+html[data-theme="light"] .catalog-page .catalog-filterHead,
+html[data-theme="light"] .catalog-page .catalog-sheetFoot,
+html[data-theme="light"] .catalog-page .catalog-filter.is-sheet .catalog-filterSection,
+html[data-theme="light"] .catalog-page .catalog-searchHistoryClear,
+html[data-theme="light"] .catalog-page .empty-suggestionChip {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
+    var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-activeTag {
+  border-color: rgba(24, 122, 157, 0.28) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #dcf4fc, #b8e8f4) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(24, 122, 157, 0.12),
+    4px 6px 12px rgba(24, 122, 157, 0.1) !important;
+  color: #1f4a5a !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-activeReset {
+  border-color: rgba(202, 74, 97, 0.32) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #ffe4ea, #ffd0d8) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(180, 40, 70, 0.12),
+    4px 6px 12px rgba(200, 40, 70, 0.1) !important;
+  color: #8f2c42 !important;
+}
+
+@media (max-width: 900px) {
+  html[data-theme="light"] .catalog-page .catalog-card,
+  html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2 {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 32%),
+      var(--skeu-panel-bg) !important;
+    box-shadow:
+      0 8px 20px rgba(40, 94, 117, 0.14),
+      inset 0 2px 0 rgba(255, 255, 255, 0.9),
+      inset 0 -2px 0 rgba(24, 96, 122, 0.08),
+      0 0 0 1px rgba(13, 124, 144, 0.1) !important;
+  }
+}
+
+/* Header cart count — solid red alert (must beat generic .pill neo tokens) */
+.header-cart .pill,
+html[data-theme="light"] .header-cart .pill {
+  background: #ff4d6d !important;
+  border: 1px solid rgba(255, 255, 255, 0.35) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 8px rgba(255, 77, 109, 0.35) !important;
+  text-shadow: none !important;
+}
+
+/* Catalog card press-in — beat raised panel shadow on :active (incl. mobile) */
+.catalog-page .catalog-card:active,
+.catalog-page .catalog-card.catalog-cardV2:active {
+  transform: scale(0.97) translateY(1px) !important;
+  border-color: rgba(0, 214, 180, 0.28) !important;
+  box-shadow:
+    inset 6px 8px 16px rgba(0, 0, 0, 0.28),
+    inset -3px -3px 10px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.12) !important;
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.12s ease,
+    border-color 0.12s ease !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-card:active,
+html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
+  border-color: rgba(0, 138, 148, 0.28) !important;
+  box-shadow:
+    inset 5px 7px 14px rgba(40, 90, 110, 0.16),
+    inset -2px -2px 8px rgba(255, 255, 255, 0.85),
+    inset 0 2px 0 rgba(24, 96, 122, 0.08),
+    0 1px 2px rgba(40, 94, 117, 0.08) !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .catalog-page .catalog-card:active,
+  .catalog-page .catalog-card.catalog-cardV2:active {
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Catalog mobile scroll perf — lighter paint, no mass will-change
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 720px) {
+  .catalog-page .catalog-card,
+  .catalog-page .catalog-card.catalog-cardV2 {
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    will-change: auto !important;
+    transform: none !important;
+    content-visibility: auto;
+  }
+
+  .catalog-page .catalog-cardIcon,
+  .catalog-page .catalog-cardPrice,
+  .catalog-page .catalog-cardMeta > span,
+  .catalog-page .catalog-cardFoot,
+  .catalog-page .catalog-cardCover,
+  .catalog-page .catalog-status {
+    box-shadow:
+      0 3px 8px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .catalog-page .catalog-status.hot::after {
+    animation: none !important;
+    display: none !important;
+  }
+}
+
+[data-motion="lite"] .catalog-page .catalog-card,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2,
+[data-motion="off"] .catalog-page .catalog-card,
+[data-motion="off"] .catalog-page .catalog-card.catalog-cardV2 {
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  will-change: auto !important;
+  transform: none !important;
+}
+
+/* Press-in must win over lite/mobile transform:none */
+[data-motion="lite"] .catalog-page .catalog-card:active,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2:active,
+[data-motion="off"] .catalog-page .catalog-card:active,
+[data-motion="off"] .catalog-page .catalog-card.catalog-cardV2:active {
+  transform: scale(0.97) translateY(1px) !important;
+  box-shadow:
+    inset 6px 8px 16px rgba(0, 0, 0, 0.28),
+    inset -3px -3px 10px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+@media (max-width: 720px) {
+  .catalog-page .catalog-card:active,
+  .catalog-page .catalog-card.catalog-cardV2:active {
+    transform: scale(0.97) translateY(1px) !important;
+    box-shadow:
+      inset 6px 8px 16px rgba(0, 0, 0, 0.28),
+      inset -3px -3px 10px rgba(255, 255, 255, 0.06),
+      inset 0 2px 0 rgba(0, 0, 0, 0.2),
+      0 1px 2px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
+[data-motion="lite"] .catalog-page .catalog-cardIcon,
+[data-motion="lite"] .catalog-page .catalog-cardPrice,
+[data-motion="lite"] .catalog-page .catalog-cardMeta > span,
+[data-motion="lite"] .catalog-page .catalog-cardFoot,
+[data-motion="lite"] .catalog-page .catalog-status,
+[data-motion="off"] .catalog-page .catalog-cardIcon,
+[data-motion="off"] .catalog-page .catalog-cardPrice,
+[data-motion="off"] .catalog-page .catalog-cardMeta > span,
+[data-motion="off"] .catalog-page .catalog-cardFoot,
+[data-motion="off"] .catalog-page .catalog-status {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+@media (max-width: 720px) {
+  html[data-theme="light"] .catalog-page .catalog-card,
+  html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2 {
+    box-shadow:
+      0 6px 16px rgba(40, 94, 117, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Home mobile scroll perf — beat Pass 8 full skeu shadows on phone
+   ═══════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 720px) {
+  .home-page .home-howCard,
+  .home-page .home-promoCard,
+  .home-page .home-faqItem.faq-item,
+  .home-page .hx-stat-item,
+  .home-page .home-popularList .product-tile {
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.18),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    will-change: auto !important;
+  }
+
+  .home-page .home-howCard-step,
+  .home-page .home-howCard-icon,
+  .home-page .hx-stat-icon-wrap,
+  .home-page .hx-live-badge,
+  .home-page .hx-onboardBanner,
+  .home-page .hx-onboardClose,
+  .home-page .home-popularList .product-tile-pill,
+  .home-page .home-popularList .product-typeBadge,
+  .home-page .home-popularList .product-tile-arrow,
+  .home-page .home-popularList .product-tile-rankBadge,
+  .home-page .home-popularList .product-tile-favBtn,
+  .home-page .home-sectionCta .btn-ghost {
+    box-shadow:
+      0 3px 8px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  }
+
+  .home-page .home-popularList .product-tile {
+    content-visibility: auto;
+    contain: layout paint style;
+  }
+
+  .home-page .home-popularList .product-tile::after,
+  .home-page .home-popularList .product-tile::before {
+    display: none !important;
+  }
+
+  .home-page .hx-live-eye-icon {
+    animation: none !important;
+  }
+
+  .home-page .product-tile-favBtn {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}
+
+[data-motion="lite"] .home-page .home-howCard,
+[data-motion="lite"] .home-page .home-promoCard,
+[data-motion="lite"] .home-page .home-faqItem.faq-item,
+[data-motion="lite"] .home-page .hx-stat-item,
+[data-motion="lite"] .home-page .home-popularList .product-tile,
+[data-motion="off"] .home-page .home-howCard,
+[data-motion="off"] .home-page .home-promoCard,
+[data-motion="off"] .home-page .home-faqItem.faq-item,
+[data-motion="off"] .home-page .hx-stat-item,
+[data-motion="off"] .home-page .home-popularList .product-tile {
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  will-change: auto !important;
+}
+
+[data-motion="lite"] .home-page .home-howCard-step,
+[data-motion="lite"] .home-page .home-howCard-icon,
+[data-motion="lite"] .home-page .hx-stat-icon-wrap,
+[data-motion="lite"] .home-page .home-popularList .product-tile-pill,
+[data-motion="lite"] .home-page .home-popularList .product-typeBadge,
+[data-motion="lite"] .home-page .home-popularList .product-tile-arrow,
+[data-motion="lite"] .home-page .home-popularList .product-tile-rankBadge,
+[data-motion="off"] .home-page .home-howCard-step,
+[data-motion="off"] .home-page .home-howCard-icon,
+[data-motion="off"] .home-page .hx-stat-icon-wrap,
+[data-motion="off"] .home-page .home-popularList .product-tile-pill,
+[data-motion="off"] .home-page .home-popularList .product-typeBadge,
+[data-motion="off"] .home-page .home-popularList .product-tile-arrow,
+[data-motion="off"] .home-page .home-popularList .product-tile-rankBadge {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-motion="lite"] .home-page .hx-live-eye-icon,
+[data-motion="off"] .home-page .hx-live-eye-icon {
+  animation: none !important;
+}
+
+@media (max-width: 720px) {
+  html[data-theme="light"] .home-page .home-howCard,
+  html[data-theme="light"] .home-page .home-promoCard,
+  html[data-theme="light"] .home-page .home-faqItem.faq-item,
+  html[data-theme="light"] .home-page .hx-stat-item,
+  html[data-theme="light"] .home-page .home-popularList .product-tile {
+    box-shadow:
+      0 6px 16px rgba(40, 94, 117, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  }
+}
+
+/* -------------------------------------------------------------------
+   Product Detail mobile scroll perf � beat full skeu control shadows
+   ------------------------------------------------------------------- */
+
+@media (max-width: 720px) {
+  .detail-page-v3 .pdx-topCard,
+  .detail-page-v3 .pdx-heroPanel,
+  .detail-page-v3 .pdx-summaryPanel,
+  .detail-page-v3 .pdx-variantsSection,
+  .detail-page-v3 .pdx-packCard,
+  .detail-page-v3 .pdx-variantCard,
+  .detail-page-v3 .pdx-infoTabsCard,
+  .detail-page-v3 .pdx-flowCard {
+    box-shadow:
+      0 6px 16px rgba(0, 0, 0, 0.16),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    will-change: auto !important;
+  }
+
+  .detail-page-v3 .pdx-chip,
+  .detail-page-v3 .pdx-stockPill,
+  .detail-page-v3 .pdx-qtyBtn,
+  .detail-page-v3 .pdx-benefitToggle,
+  .detail-page-v3 .pdx-benefitToggle-modern,
+  .detail-page-v3 .pdx-compareBtn,
+  .detail-page-v3 .pdx-iconBtn,
+  .detail-page-v3 .pdx-variantBadge:not(.recommend),
+  .detail-page-v3 .pdx-productIcon,
+  .detail-page-v3 .pdx-packMetaItem {
+    box-shadow:
+      0 3px 8px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile {
+    box-shadow:
+      0 4px 12px rgba(0, 0, 0, 0.14),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    will-change: auto !important;
+    transform: none !important;
+    content-visibility: auto;
+    contain: layout paint style;
+    perspective: none !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile::after,
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile::before {
+    display: none !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile-pill,
+  .detail-page-v3 .pdx-recommendationsGrid .product-typeBadge,
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile-arrow,
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile-favBtn,
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile-rankBadge {
+    box-shadow:
+      0 2px 6px rgba(0, 0, 0, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .detail-page-v3 .pdx-liveViewersDot,
+  .detail-page-v3 .pdx-stockUrgency {
+    animation: none !important;
+  }
+
+  .detail-page-v3 .pdx-recommendationsGrid .product-tile-tiltWrap {
+    will-change: auto !important;
+    transform: none !important;
+    transform-style: flat !important;
+  }
+}
+
+[data-motion="lite"] .detail-page-v3 .pdx-topCard,
+[data-motion="lite"] .detail-page-v3 .pdx-heroPanel,
+[data-motion="lite"] .detail-page-v3 .pdx-summaryPanel,
+[data-motion="lite"] .detail-page-v3 .pdx-variantsSection,
+[data-motion="lite"] .detail-page-v3 .pdx-packCard,
+[data-motion="lite"] .detail-page-v3 .pdx-variantCard,
+[data-motion="lite"] .detail-page-v3 .pdx-infoTabsCard,
+[data-motion="off"] .detail-page-v3 .pdx-topCard,
+[data-motion="off"] .detail-page-v3 .pdx-heroPanel,
+[data-motion="off"] .detail-page-v3 .pdx-summaryPanel,
+[data-motion="off"] .detail-page-v3 .pdx-variantsSection,
+[data-motion="off"] .detail-page-v3 .pdx-packCard,
+[data-motion="off"] .detail-page-v3 .pdx-variantCard,
+[data-motion="off"] .detail-page-v3 .pdx-infoTabsCard {
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  will-change: auto !important;
+}
+
+[data-motion="lite"] .detail-page-v3 .pdx-chip,
+[data-motion="lite"] .detail-page-v3 .pdx-stockPill,
+[data-motion="lite"] .detail-page-v3 .pdx-qtyBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-benefitToggle,
+[data-motion="lite"] .detail-page-v3 .pdx-benefitToggle-modern,
+[data-motion="lite"] .detail-page-v3 .pdx-compareBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-iconBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-variantBadge:not(.recommend),
+[data-motion="off"] .detail-page-v3 .pdx-chip,
+[data-motion="off"] .detail-page-v3 .pdx-stockPill,
+[data-motion="off"] .detail-page-v3 .pdx-qtyBtn,
+[data-motion="off"] .detail-page-v3 .pdx-benefitToggle,
+[data-motion="off"] .detail-page-v3 .pdx-benefitToggle-modern,
+[data-motion="off"] .detail-page-v3 .pdx-compareBtn,
+[data-motion="off"] .detail-page-v3 .pdx-iconBtn,
+[data-motion="off"] .detail-page-v3 .pdx-variantBadge:not(.recommend) {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile,
+[data-motion="off"] .detail-page-v3 .pdx-recommendationsGrid .product-tile {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  will-change: auto !important;
+  transform: none !important;
+  perspective: none !important;
+}
+
+[data-motion="lite"] .detail-page-v3 .pdx-liveViewersDot,
+[data-motion="lite"] .detail-page-v3 .pdx-stockUrgency,
+[data-motion="off"] .detail-page-v3 .pdx-liveViewersDot,
+[data-motion="off"] .detail-page-v3 .pdx-stockUrgency {
+  animation: none !important;
+}
+
+@media (max-width: 720px) {
+  html[data-theme="light"] .detail-page-v3 .pdx-topCard,
+  html[data-theme="light"] .detail-page-v3 .pdx-heroPanel,
+  html[data-theme="light"] .detail-page-v3 .pdx-summaryPanel,
+  html[data-theme="light"] .detail-page-v3 .pdx-variantsSection,
+  html[data-theme="light"] .detail-page-v3 .pdx-packCard,
+  html[data-theme="light"] .detail-page-v3 .pdx-variantCard,
+  html[data-theme="light"] .detail-page-v3 .pdx-infoTabsCard,
+  html[data-theme="light"] .detail-page-v3 .pdx-recommendationsGrid .product-tile {
+    box-shadow:
+      0 6px 16px rgba(40, 94, 117, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+  }
+}

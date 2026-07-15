@@ -1,44 +1,28 @@
 /* Scoped ProductTile Stylesheet */
 
-/* ── Double-tap Heart & Fav Badge ──────────────────────────────── */
-.product-tile-heartFloat {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  font-size: 32px;
-  line-height: 1;
-  pointer-events: none;
-  z-index: 20;
-  animation: heartBurst 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-  transform-origin: center;
+/* Card body link fills the tile without nesting interactive controls */
+.product-tile-link {
+  display: flex;
+  flex-direction: column;
+  justify-content: inherit;
+  gap: inherit;
+  flex: 1 1 auto;
+  width: 100%;
+  min-height: 0;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+  border-radius: inherit;
 }
 
-@keyframes heartBurst {
-  0%   { transform: translate(-50%, -50%) scale(0.3); opacity: 1; }
-  50%  { transform: translate(-50%, -90%) scale(1.4); opacity: 1; }
-  100% { transform: translate(-50%, -130%) scale(0.8); opacity: 0; }
-}
-
-.product-tile-favBadge {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 15px;
-  line-height: 1;
-  z-index: 10;
-  pointer-events: none;
-  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
-  animation: favBadgePop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
-}
-
-@keyframes favBadgePop {
-  from { transform: scale(0); opacity: 0; }
-  to { transform: scale(1); opacity: 1; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .product-tile-heartFloat { animation: none; opacity: 0; }
-  .product-tile-favBadge { animation: none; }
+/*
+  List tiles use a 2-col grid on .product-tile (top | bottom).
+  Promote the link + tilt wrap out of the box tree so top/bottom
+  remain direct grid children (same as pre-fav-button structure).
+*/
+.product-tile--list .product-tile-link,
+.product-tile--list .product-tile-tiltWrap {
+  display: contents;
 }
 
 /* ── Card Flip (grid layout only, desktop hover) ─────────────────────────── */
@@ -70,9 +54,10 @@
   inset: 0;
   transform: rotateY(180deg);
   border-radius: inherit;
+  /* Neutral neo panel — no brand teal wash */
   background:
-    linear-gradient(145deg, var(--brand-color, rgba(0,214,180,0.18)) 0%, rgba(0,214,180,0.08) 40%, transparent 70%),
-    var(--uni-neo-panel, var(--card));
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, var(--uni-neo-panel, var(--card)));
   display: flex;
   align-items: center;
   justify-content: center;
@@ -95,7 +80,7 @@
   overflow: hidden;
   background: rgba(255,255,255,0.08);
   border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 8px 24px var(--brand-color, transparent);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
   display: grid;
   place-items: center;
   margin-bottom: 2px;
@@ -139,12 +124,29 @@
 .product-tile-back-cta {
   font-size: 12px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--text);
   padding: 6px 14px;
   border-radius: 999px;
-  border: 1px solid rgba(0,214,180,0.3);
-  background: rgba(0,214,180,0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.06);
   margin-top: 4px;
+}
+
+html[data-theme="light"] .product-tile-back {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 32%),
+    var(--skeu-panel-bg, var(--uni-neo-panel, #f4f8fb));
+}
+
+html[data-theme="light"] .product-tile-back-icon {
+  border-color: rgba(40, 60, 75, 0.1);
+  box-shadow: 0 8px 18px rgba(60, 90, 110, 0.12);
+}
+
+html[data-theme="light"] .product-tile-back-cta {
+  color: var(--brand-text, #123744);
+  border-color: rgba(40, 60, 75, 0.14);
+  background: rgba(255, 255, 255, 0.72);
 }
 
 @media (hover: hover) and (min-width: 901px) {
@@ -262,15 +264,21 @@
   place-items: center;
   border-radius: 18px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 8px 24px var(--brand-color, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  box-shadow:
+    var(--skeu-control-shadow, none),
+    0 8px 24px var(--brand-color, transparent);
   transition: box-shadow 0.3s var(--ease-out);
 }
 
 @media (hover: hover) {
   .product-tile:hover .product-tile-icon {
-    box-shadow: 0 12px 32px var(--brand-color, transparent);
+    box-shadow:
+      var(--skeu-control-shadow, none),
+      0 12px 32px var(--brand-color, transparent);
   }
 }
 
@@ -456,10 +464,15 @@ html[data-theme="light"] .product-tile-rankBadge--4 {
   flex-wrap: wrap;
 }
 
-/* Home popular: show sold count only (hide other meta pills) */
+/* Home popular: show sold count only (hide other meta pills + description) */
+.home-popularList .product-tile-desc {
+  display: none !important;
+}
+
 .home-popularList .product-tile-pills {
   display: flex !important;
-  gap: 6px;
+  gap: 0;
+  margin: 0;
 }
 
 .home-popularList .product-tile-pill:not(.home-popularSold),
@@ -470,12 +483,26 @@ html[data-theme="light"] .product-tile-rankBadge--4 {
 }
 
 .home-popularList .home-popularSold {
-  height: 28px;
+  height: 26px;
   padding: 0 10px;
   font-size: 11px;
-  font-weight: 900;
+  font-weight: 800;
   letter-spacing: 0.01em;
   white-space: nowrap;
+  border: none;
+  border-radius: 999px;
+  background: var(--skeu-control-bg);
+  box-shadow: var(--skeu-control-shadow);
+  color: var(--text);
+}
+
+.home-popularList .home-popularSold svg {
+  color: var(--accent, #00d6b4);
+  flex-shrink: 0;
+}
+
+html[data-theme="light"] .home-popularList .home-popularSold {
+  color: var(--text);
 }
 
 .product-tile--grid .product-tile-pills {
@@ -493,9 +520,12 @@ html[data-theme="light"] .product-tile-rankBadge--4 {
   height: 30px;
   padding: 0 10px;
   border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.05);
-  color: rgba(234, 255, 245, 0.82);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  box-shadow: var(--skeu-control-shadow, 0 4px 10px rgba(0, 0, 0, 0.14));
+  color: var(--brand-muted, rgba(234, 255, 245, 0.82));
   font-size: 12px;
   font-weight: 900;
 }
@@ -507,8 +537,14 @@ html[data-theme="light"] .product-tile-rankBadge--4 {
   height: 30px;
   padding: 0 10px;
   border-radius: 999px;
-  border: 1px solid var(--type-color, var(--accent, #00d6b4));
-  background: color-mix(in srgb, var(--type-color, var(--accent)) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--type-color, var(--accent, #00d6b4)) 45%, transparent);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    color-mix(in srgb, var(--type-color, var(--accent)) 16%, var(--skeu-control-bg, transparent));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.22),
+    0 5px 12px color-mix(in srgb, var(--type-color, var(--accent)) 14%, transparent);
   color: var(--type-color, var(--accent));
   font-size: 11px;
   font-weight: 900;
@@ -517,8 +553,14 @@ html[data-theme="light"] .product-tile-rankBadge--4 {
 }
 
 html[data-theme="light"] .product-typeBadge {
-  background: color-mix(in srgb, var(--type-color, var(--accent)) 20%, white);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 40%),
+    color-mix(in srgb, var(--type-color, var(--accent)) 14%, #ffffff);
   color: var(--type-color, var(--accent));
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(120, 150, 165, 0.18),
+    4px 6px 12px rgba(60, 100, 120, 0.1);
 }
 
 /* ── Delivery ETA Badge ── */
@@ -580,26 +622,36 @@ html[data-theme="light"] .product-lowStockBadge.out {
 }
 
 @media (hover: hover) and (min-width: 901px) {
-  .product-tile {
+  /* overflow:hidden flattens preserve-3d — only clip non-flippable tiles */
+  .product-tile:not(.product-tile--flippable) {
     position: relative;
     overflow: hidden;
   }
 
+  .product-tile--flippable {
+    position: relative;
+    overflow: visible;
+  }
 
   .product-tile:hover {
     transform: translateY(-3px);
     border-color: rgba(79, 255, 200, 0.32) !important;
   }
+
+  .product-tile--flippable:hover {
+    /* Lift handled by parent; keep overflow visible so rotateY isn't clipped */
+    overflow: visible;
+  }
 }
 
 /* ── Realistic skeleton matching ProductTile shape ── */
 .home-tileSkeleton {
-  padding: 18px;
-  border-radius: 22px;
+  padding: 12px 14px;
+  border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
   display: grid;
-  gap: 16px;
+  gap: 10px;
   position: relative;
   overflow: hidden;
 }
@@ -632,8 +684,8 @@ html[data-theme="light"] .product-lowStockBadge.out {
 }
 
 .home-tileSkeleton-icon {
-  width: 48px;
-  height: 48px;
+  width: 44px;
+  height: 44px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
   flex-shrink: 0;

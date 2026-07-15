@@ -2,6 +2,8 @@ const CATEGORY_LABELS = {
   streaming: "Streaming",
   music: "Music",
   tools: "Tools",
+  ai: "AI",
+  design: "Design",
   learning: "Belajar",
   other: "Lainnya",
 };

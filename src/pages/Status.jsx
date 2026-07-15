@@ -75,15 +75,25 @@ function getTimeline(status) {
       { key: "cancelled", label: "Dibatalkan", active: true, done: false },
     ];
   }
+  const pastPending = value !== "pending";
+  const isPaidReported = value === "paid_reported";
+  const isProcessing = value === "processing";
+  const isDone = value === "done";
   return [
-    { key: "pending", label: "Order masuk", active: true, done: value !== "pending" },
+    { key: "pending", label: "Order masuk", active: true, done: pastPending },
+    {
+      key: "paid_reported",
+      label: "Menunggu verifikasi",
+      active: isPaidReported || isProcessing || isDone,
+      done: isProcessing || isDone,
+    },
     {
       key: "processing",
       label: "Diproses",
-      active: value === "processing" || value === "done",
-      done: value === "done",
+      active: isProcessing || isDone,
+      done: isDone,
     },
-    { key: "done", label: "Selesai", active: value === "done", done: value === "done" },
+    { key: "done", label: "Selesai", active: isDone, done: isDone },
   ];
 }
 

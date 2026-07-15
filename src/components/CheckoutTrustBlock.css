@@ -9,10 +9,14 @@
 }
 
 .checkout-trust-loyalty {
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 1px solid rgba(29, 131, 255, 0.22);
-  background: linear-gradient(135deg, rgba(29, 131, 255, 0.1), rgba(29, 131, 255, 0.03));
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--brand-line, rgba(29, 131, 255, 0.22));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+    linear-gradient(165deg, rgba(29, 131, 255, 0.16), rgba(8, 24, 50, 0.45)),
+    var(--skeu-control-bg, transparent);
+  box-shadow: var(--skeu-control-shadow, none);
   font-size: 13px;
   line-height: 1.5;
 }
@@ -27,8 +31,11 @@
 }
 
 html[data-theme="light"] .checkout-trust-loyalty {
-  border-color: rgba(0, 138, 148, 0.2);
-  background: rgba(0, 214, 180, 0.08);
+  border-color: rgba(0, 138, 148, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 32%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.12), rgba(220, 245, 248, 0.9));
+  box-shadow: var(--skeu-control-shadow, none);
   color: #234652;
 }
 

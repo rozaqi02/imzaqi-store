@@ -111,9 +111,11 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
 
 .flash-sale-progress {
   width: min(220px, 42vw);
-  height: 4px;
+  height: 6px;
   border-radius: 999px;
-  background: rgba(255, 60, 100, 0.12);
+  background: var(--skeu-inset-bg, rgba(255, 60, 100, 0.12));
+  box-shadow: var(--skeu-inset-shadow, none);
+  border: 1px solid rgba(255, 60, 100, 0.18);
   overflow: hidden;
 }
 
@@ -122,6 +124,7 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
   height: 100%;
   border-radius: inherit;
   background: linear-gradient(90deg, #ff3c64, #ff7a96);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
 /* Horizontal scroll */
@@ -179,20 +182,27 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
   pointer-events: none;
 }
 
-/* Discount badge */
+/* Discount badge — solid yellow alert */
 .flash-sale-badge {
   position: absolute;
   top: 8px;
   right: 8px;
   min-width: 36px;
-  height: 20px;
+  height: 22px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0 6px;
-  border-radius: 6px;
-  background: #ff3c64;
-  color: #fff;
+  padding: 0 7px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 200, 40, 0.55);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #ffd54a, #f5b800);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -2px 0 rgba(140, 90, 0, 0.28),
+    0 4px 10px rgba(245, 180, 0, 0.28);
+  color: #3d2a00;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 0.02em;
@@ -283,7 +293,15 @@ html[data-theme="light"] .flash-sale-title svg {
 }
 
 html[data-theme="light"] .flash-sale-badge {
-  background: #dc2050;
+  border-color: rgba(212, 160, 0, 0.45);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #ffe066, #f0b400);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.85),
+    inset 0 -1px 0 rgba(160, 110, 0, 0.18),
+    0 3px 8px rgba(212, 160, 0, 0.22);
+  color: #5c4200;
 }
 
 /* ── Mobile ── */

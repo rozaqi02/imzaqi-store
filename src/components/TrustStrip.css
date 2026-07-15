@@ -3,9 +3,12 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px 10px;
   padding: 10px 12px;
-  border-radius: 14px;
+  border-radius: 16px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.04));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-panel-bg, var(--skeu-inset-bg, rgba(255, 255, 255, 0.04)));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .trust-strip--compact {
@@ -48,7 +51,10 @@
 
 html[data-theme="light"] .trust-strip {
   border-color: rgba(0, 138, 148, 0.14);
-  background: rgba(255, 255, 255, 0.82);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 30%),
+    var(--skeu-panel-bg, rgba(255, 255, 255, 0.82));
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 html[data-theme="light"] .trust-strip-item {
