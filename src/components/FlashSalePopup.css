@@ -1,5 +1,6 @@
-/* Neumorphic Flash Sale Popup Stylesheet */
+/* ── Neumorphic Flash Sale Popup ────────────────────────────────────────── */
 
+/* Overlay backdrop */
 .fsp-backdrop {
   position: fixed;
   inset: 0;
@@ -8,47 +9,58 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: rgba(3, 5, 10, 0.7); /* Solid overlay, no glassmorphism backdrop-filter blur */
-  animation: fspFadeIn 0.25s ease-out forwards;
+  background: rgba(3, 5, 10, 0.72);
+  animation: fspFadeIn 0.22s ease-out forwards;
 }
 
+/* ── Modal shell: Raised Neumorphic Panel (solid) ── */
 .fsp-modal {
   width: min(100%, 460px);
-  max-height: min(85vh, 680px);
+  max-height: min(86vh, 680px);
   display: flex;
   flex-direction: column;
   border-radius: 28px;
-  
-  /* Neumorphic Raised Panel (shadow adjusted for dark overlay) */
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 22%),
-    var(--skeu-panel-bg, linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96)));
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
-  box-shadow: var(--skeu-panel-shadow,
-    0 24px 60px rgba(0, 0, 0, 0.65),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1));
-  
+  /* Solid dark navy — no transparency */
+  background: linear-gradient(170deg, #16264a 0%, #0d1a38 45%, #080f22 100%);
+  border: 1px solid rgba(0, 194, 208, 0.22);
+  box-shadow:
+    0 32px 72px rgba(0, 0, 0, 0.78),
+    0 8px 24px rgba(0, 0, 0, 0.45),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 194, 208, 0.1);
   overflow: hidden;
   position: relative;
-  transform: scale(0.92) translateY(15px);
+  transform: scale(0.92) translateY(16px);
   opacity: 0;
-  animation: fspPopUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  animation: fspPopUp 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
 html[data-theme="light"] .fsp-modal {
-  background: var(--skeu-panel-bg, #ffffff) !important;
-  border-color: var(--brand-line, rgba(0, 138, 148, 0.16)) !important;
-  box-shadow: 
-    0 24px 60px rgba(0, 0, 0, 0.22), 
-    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
+  /* Solid white — no transparency */
+  background: linear-gradient(170deg, #ffffff 0%, #f0f8fc 54%, #e4f3f8 100%) !important;
+  border-color: rgba(0, 138, 148, 0.2) !important;
+  box-shadow:
+    0 24px 60px rgba(20, 50, 70, 0.24),
+    0 6px 18px rgba(20, 50, 70, 0.14),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(154, 191, 203, 0.32),
+    0 0 0 1px rgba(0, 138, 148, 0.1) !important;
 }
 
+/* ── Head ── */
 .fsp-head {
-  padding: 22px 24px 16px;
+  padding: 20px 22px 16px;
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.08));
+  border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
+  background: linear-gradient(180deg, rgba(0, 194, 208, 0.06), rgba(0, 194, 208, 0) 100%);
+}
+
+html[data-theme="light"] .fsp-head {
+  border-bottom-color: rgba(0, 138, 148, 0.12) !important;
+  background: linear-gradient(180deg, rgba(0, 194, 208, 0.04), rgba(0, 194, 208, 0) 100%) !important;
 }
 
 .fsp-titleBlock {
@@ -57,138 +69,197 @@ html[data-theme="light"] .fsp-modal {
   gap: 4px;
 }
 
+/* Kicker pill — raised Neumorphic badge */
 .fsp-kicker {
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--accent, #00d6b4);
   display: inline-flex;
   align-items: center;
-  gap: 4px;
-  animation: fspPulse 1.5s infinite;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #00d6b4;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+    rgba(0, 214, 180, 0.1);
+  border: 1px solid rgba(0, 214, 180, 0.28);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.16),
+    0 2px 6px rgba(0, 214, 180, 0.12);
+  animation: fspPulse 1.6s ease-in-out infinite;
 }
 
 html[data-theme="light"] .fsp-kicker {
-  color: var(--accent-light, #008a94);
+  color: #007080;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.1) 40%),
+    rgba(0, 194, 208, 0.08) !important;
+  border-color: rgba(0, 138, 148, 0.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 2px 6px rgba(0, 138, 148, 0.1) !important;
 }
 
 .fsp-title {
-  font-size: 20px;
-  font-weight: 900;
-  color: var(--brand-text, #fff);
-  letter-spacing: -0.02em;
+  font-size: 21px;
+  font-weight: 1000;
+  letter-spacing: -0.03em;
+  color: var(--brand-text, #f0f4f8);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 html[data-theme="light"] .fsp-title {
-  color: var(--brand-text-light, #0d2d39);
+  color: #0d2d39;
+  text-shadow: none;
 }
 
+/* ── Close button — raised Neumorphic circle ── */
 .fsp-closeBtn {
-  /* Neumorphic Raised Circle Button */
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
-    var(--skeu-control-bg, var(--skeu-pill-bg, linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9))));
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
-  color: var(--brand-muted, rgba(234, 255, 245, 0.5));
-  box-shadow: var(--skeu-control-shadow,
-    0 4px 10px rgba(0, 0, 0, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05));
-  
-  width: 32px;
-  height: 32px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   display: grid;
   place-items: center;
   cursor: pointer;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, linear-gradient(175deg, rgba(22, 34, 64, 0.98), rgba(12, 20, 42, 0.95)));
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.2));
+  color: var(--brand-muted, rgba(200, 240, 255, 0.55));
+  box-shadow:
+    4px 4px 10px rgba(0, 0, 0, 0.32),
+    -3px -3px 8px rgba(255, 255, 255, 0.04),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.38);
+  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .fsp-closeBtn:hover {
-  border-color: rgba(0, 194, 208, 0.3);
+  border-color: rgba(0, 214, 180, 0.4);
   color: var(--accent, #00d6b4);
-  transform: rotate(90deg);
+  transform: rotate(90deg) scale(1.06);
+  box-shadow:
+    4px 4px 12px rgba(0, 0, 0, 0.36),
+    -2px -2px 6px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.44),
+    0 0 14px rgba(0, 214, 180, 0.18);
 }
 
 .fsp-closeBtn:active {
-  box-shadow: var(--skeu-inset-shadow, inset 0 2px 5px rgba(0, 0, 0, 0.4));
+  transform: scale(0.94);
+  box-shadow:
+    inset 4px 4px 10px rgba(0, 0, 0, 0.44),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(0, 0, 0, 0.22);
 }
 
 html[data-theme="light"] .fsp-closeBtn {
-  background: var(--skeu-pill-bg, #ffffff) !important;
-  border-color: var(--brand-line, rgba(0, 138, 148, 0.16)) !important;
-  color: rgba(0, 60, 80, 0.6) !important;
-  box-shadow: 
-    0 4px 10px rgba(37, 88, 110, 0.08), 
-    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  background:
+    linear-gradient(145deg, #ffffff, #e8f4f8) !important;
+  border-color: rgba(0, 138, 148, 0.2) !important;
+  color: rgba(0, 60, 80, 0.65) !important;
+  box-shadow:
+    5px 5px 12px rgba(67, 111, 129, 0.2),
+    -4px -4px 10px rgba(255, 255, 255, 1),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
 }
 
 html[data-theme="light"] .fsp-closeBtn:hover {
   color: var(--accent-light, #008a94) !important;
 }
 
+/* ── Body: scrollable item list ── */
 .fsp-body {
-  padding: 20px;
+  padding: 18px 18px 10px;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
 }
 
+/* ── Item card: Inset Neumorphic well ── */
 .fsp-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
-  border-radius: 20px;
-  
-  /* Neumorphic Inset Panel */
-  background: rgba(0, 0, 0, 0.12);
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.08));
-  box-shadow: var(--skeu-inset-shadow, inset 0 3px 8px rgba(0, 0, 0, 0.42));
-  
+  gap: 12px;
+  padding: 14px 15px;
+  border-radius: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 30%),
+    rgba(0, 8, 22, 0.28);
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
+  box-shadow:
+    inset 3px 4px 10px rgba(0, 0, 0, 0.38),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(0, 0, 0, 0.3);
   transition: all 0.2s ease;
 }
 
 .fsp-item:hover {
-  border-color: rgba(0, 194, 208, 0.2);
+  border-color: rgba(0, 194, 208, 0.24);
   transform: translateY(-1px);
+  box-shadow:
+    inset 3px 4px 10px rgba(0, 0, 0, 0.38),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.06),
+    inset 0 1px 0 rgba(0, 0, 0, 0.3),
+    0 4px 14px rgba(0, 0, 0, 0.22);
 }
 
 html[data-theme="light"] .fsp-item {
-  background: rgba(0, 60, 80, 0.03) !important;
-  border-color: var(--brand-line, rgba(0, 138, 148, 0.12)) !important;
-  box-shadow: var(--skeu-inset-shadow, inset 0 3px 6px rgba(37, 88, 110, 0.08)) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
+    rgba(0, 60, 80, 0.04) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow:
+    inset 3px 4px 8px rgba(67, 111, 129, 0.14),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.75),
+    inset 0 1px 0 rgba(67, 111, 129, 0.08) !important;
 }
 
+/* ── Item layout helpers ── */
 .fsp-itemLeft {
   display: flex;
   align-items: center;
   gap: 14px;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
+/* ── Icon: Raised Neumorphic icon box ── */
 .fsp-itemIcon {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
-  
-  /* Neumorphic Raised icon container */
-  background: var(--skeu-pill-bg, linear-gradient(180deg, rgba(18, 31, 56, 0.94), rgba(10, 18, 37, 0.9)));
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
-  box-shadow: 0 4px 8px rgba(0,0,0,0.18);
-  
-  overflow: hidden;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 38%),
+    var(--skeu-pill-bg, linear-gradient(175deg, rgba(20, 33, 62, 0.98), rgba(12, 20, 42, 0.96)));
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.2));
+  box-shadow:
+    5px 5px 12px rgba(0, 0, 0, 0.3),
+    -3px -3px 8px rgba(255, 255, 255, 0.05),
+    inset 0 2px 0 rgba(255, 255, 255, 0.14),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.38);
 }
 
 html[data-theme="light"] .fsp-itemIcon {
-  background: var(--skeu-pill-bg, #ffffff) !important;
-  border-color: var(--brand-line, rgba(0, 138, 148, 0.16)) !important;
-  box-shadow: 0 4px 8px rgba(37, 88, 110, 0.04) !important;
+  background:
+    linear-gradient(145deg, #ffffff, #e8f4f8) !important;
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  box-shadow:
+    5px 5px 12px rgba(67, 111, 129, 0.18),
+    -4px -4px 10px rgba(255, 255, 255, 0.96),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(154, 191, 203, 0.24) !important;
 }
 
 .fsp-itemIcon img {
@@ -198,43 +269,81 @@ html[data-theme="light"] .fsp-itemIcon {
 }
 
 .fsp-fallbackText {
-  font-size: 16px;
-  font-weight: 800;
+  font-size: 17px;
+  font-weight: 900;
   color: var(--accent, #00d6b4);
+  text-shadow: 0 0 10px rgba(0, 214, 180, 0.3);
 }
 
 html[data-theme="light"] .fsp-fallbackText {
-  color: var(--accent-light, #008a94);
+  color: #007080;
+  text-shadow: none;
 }
 
+/* ── Item info column ── */
 .fsp-itemInfo {
   display: flex;
   flex-direction: column;
+  flex: 1 1 auto;
   min-width: 0;
+  gap: 3px;
+}
+
+.fsp-itemNameRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .fsp-itemName {
-  font-size: 14px;
+  font-size: 13.5px;
   font-weight: 800;
-  color: var(--brand-text, #fff);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: var(--brand-text, #f0f4f8);
+  white-space: normal;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.25;
 }
 
 html[data-theme="light"] .fsp-itemName {
-  color: var(--brand-text-light, #0d2d39);
+  color: #0d2d39;
 }
 
 .fsp-itemMeta {
-  font-size: 11px;
-  color: var(--brand-muted, rgba(234, 255, 245, 0.5));
+  font-size: 10.5px;
+  font-weight: 600;
+  color: var(--brand-muted, rgba(180, 230, 240, 0.55));
+  line-height: 1.3;
 }
 
 html[data-theme="light"] .fsp-itemMeta {
   color: rgba(0, 60, 80, 0.5);
 }
 
+/* ── Discount badge — glossy gold pill ── */
+.fsp-discountBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 900;
+  color: #3d2a00;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, #ffd54a, #f5b800);
+  border: 1px solid rgba(255, 200, 40, 0.55);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -2px 0 rgba(140, 90, 0, 0.28),
+    0 3px 8px rgba(245, 180, 0, 0.28);
+}
+
+/* ── Right column: price + CTA ── */
 .fsp-itemRight {
   display: flex;
   align-items: center;
@@ -242,137 +351,277 @@ html[data-theme="light"] .fsp-itemMeta {
   flex-shrink: 0;
 }
 
+/* ── Price column ── */
 .fsp-priceCol {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
+  gap: 1px;
 }
 
 .fsp-originalPrice {
-  font-size: 11px;
-  color: var(--brand-muted, rgba(234, 255, 245, 0.4));
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--brand-muted, rgba(200, 230, 240, 0.38));
   text-decoration: line-through;
 }
 
 html[data-theme="light"] .fsp-originalPrice {
-  color: rgba(0, 60, 80, 0.4);
+  color: rgba(0, 60, 80, 0.38);
 }
 
 .fsp-promoPrice {
-  font-size: 14px;
+  font-size: 14.5px;
   font-weight: 900;
-  color: #ff3b30; /* Red color for discounted price in dark mode */
+  letter-spacing: -0.02em;
+  color: #ffd54a !important;
+  text-shadow: 0 0 8px rgba(255, 213, 74, 0.35);
 }
 
 html[data-theme="light"] .fsp-promoPrice {
-  color: #d32f2f; /* Darker red in light mode for readability */
+  color: #d97706 !important;
+  text-shadow: none !important;
 }
 
+/* ── CTA "Beli" button — full Neumorphic raised ── */
 .fsp-actionBtn {
-  padding: 8px 14px;
-  font-size: 11px;
-  font-weight: 800;
+  padding: 9px 16px;
+  font-size: 11.5px;
+  font-weight: 900;
   border-radius: 12px;
-  
-  /* Neumorphic Raised Button */
-  background: var(--imzaqi-btn-face, var(--accent, #00d6b4));
-  border: 1px solid var(--imzaqi-btn-border, transparent);
-  box-shadow: var(--imzaqi-btn-shadow, 0 4px 12px rgba(0, 214, 180, 0.24));
-  color: #04060c; /* Black text */
-  
+  letter-spacing: 0.02em;
+  color: #03160e;
+  background: var(--imzaqi-btn-face,
+    linear-gradient(170deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda, #00d6b4 60%, #008a94)
+  );
+  border: 1px solid var(--imzaqi-btn-border, rgba(0, 138, 148, 0.38));
+  box-shadow: var(--imzaqi-btn-shadow,
+    inset 0 2px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -3px 0 rgba(0, 80, 68, 0.5),
+    0 8px 18px rgba(0, 180, 150, 0.28),
+    0 3px 8px rgba(0, 0, 0, 0.22)
+  );
   cursor: pointer;
-  transition: all 0.2s ease;
-  text-decoration: none;
+  transition: all 0.18s ease;
   display: inline-flex;
   align-items: center;
+  white-space: nowrap;
+  text-decoration: none;
 }
 
 .fsp-actionBtn:hover {
-  filter: brightness(1.15);
-  transform: translateY(-1px);
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.82),
+    inset 0 -3px 0 rgba(0, 80, 68, 0.55),
+    0 12px 24px rgba(0, 180, 150, 0.34),
+    0 4px 12px rgba(0, 0, 0, 0.28);
 }
 
 .fsp-actionBtn:active {
-  box-shadow: var(--skeu-inset-shadow, inset 0 2px 4px rgba(0,0,0,0.25));
-  transform: translateY(0);
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 3px 6px rgba(0, 80, 68, 0.5),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.2),
+    0 2px 6px rgba(0, 0, 0, 0.22);
 }
 
 html[data-theme="light"] .fsp-actionBtn {
-  color: #04060c !important; /* Black text in light mode */
-  background: var(--imzaqi-btn-face, var(--accent-light, #008a94)) !important;
-  box-shadow: var(--imzaqi-btn-shadow, 0 4px 12px rgba(0, 138, 148, 0.24)) !important;
+  color: #03160e !important;
+  background: var(--imzaqi-btn-face,
+    linear-gradient(170deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda, #25ebc8 36%, #00d6b4 58%, #008a94)
+  ) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
+/* ── Footer ── */
 .fsp-foot {
-  padding: 16px 20px 20px;
-  border-top: 1px solid var(--brand-line, rgba(0, 194, 208, 0.08));
+  padding: 14px 18px 18px;
+  border-top: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex-shrink: 0;
+  background:
+    linear-gradient(180deg, rgba(0, 194, 208, 0.05), rgba(0, 194, 208, 0) 60%),
+    rgba(0, 0, 0, 0.16);
+}
+
+html[data-theme="light"] .fsp-foot {
+  background:
+    linear-gradient(180deg, rgba(0, 138, 148, 0.04), rgba(0, 138, 148, 0) 60%),
+    rgba(0, 60, 80, 0.025) !important;
+  border-top-color: rgba(0, 138, 148, 0.12) !important;
+}
+
+.fsp-footTop {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.fsp-footBottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-shrink: 0;
-  gap: 16px;
+  gap: 10px;
+  width: 100%;
 }
 
+/* ── Countdown pill — inset Neumorphic timer (amber/yellow) ── */
 .fsp-countdownWrap {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  
-  /* Neumorphic Inset Badge */
-  background: rgba(255, 59, 48, 0.08);
-  border: 1px solid rgba(255, 59, 48, 0.2);
-  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.2);
-  
-  padding: 6px 12px;
-  border-radius: 12px;
-  color: #ff3b30;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 16px;
+  border-radius: 999px;
+  color: #ffd54a;
   font-size: 11px;
-  font-weight: 700;
+  font-weight: 800;
+  background: rgba(255, 213, 74, 0.09);
+  border: 1px solid rgba(255, 213, 74, 0.28);
+  box-shadow:
+    inset 2px 3px 7px rgba(0, 0, 0, 0.28),
+    inset -1px -1px 4px rgba(255, 220, 80, 0.06),
+    0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-html[data-theme="light"] .fsp-countdownWrap {
-  background: rgba(239, 68, 68, 0.04) !important;
-  border-color: rgba(239, 68, 68, 0.16) !important;
-  box-shadow: inset 0 2px 4px rgba(239, 68, 68, 0.04) !important;
+.fsp-countdownLabel {
+  color: rgba(255, 213, 74, 0.75);
+  font-weight: 700;
 }
 
 .fsp-countdownVal {
-  font-family: monospace;
-  font-size: 12px;
-  font-weight: 800;
+  color: #ffd54a;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-shadow: 0 0 8px rgba(255, 213, 74, 0.4);
 }
 
+html[data-theme="light"] .fsp-countdownWrap {
+  background: rgba(217, 119, 6, 0.06) !important;
+  border-color: rgba(217, 119, 6, 0.22) !important;
+  color: #b45309 !important;
+  box-shadow:
+    inset 2px 3px 6px rgba(67, 111, 129, 0.12),
+    inset -1px -1px 3px rgba(255, 255, 255, 0.85),
+    0 1px 0 rgba(255, 255, 255, 0.6) !important;
+}
+
+html[data-theme="light"] .fsp-countdownLabel {
+  color: rgba(180, 83, 9, 0.75) !important;
+}
+
+html[data-theme="light"] .fsp-countdownVal {
+  color: #b45309 !important;
+  text-shadow: none !important;
+}
+
+/* ── "Jangan Beritahu" button — raised Neumorphic pill ── */
+.fsp-dontShowBtn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 9px 14px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  color: var(--brand-muted, rgba(200, 235, 245, 0.78));
+  background:
+    linear-gradient(170deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 32%),
+    var(--skeu-control-bg,
+      linear-gradient(175deg, rgba(20, 32, 62, 0.98), rgba(12, 20, 42, 0.95))
+    );
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.2));
+  box-shadow:
+    4px 5px 12px rgba(0, 0, 0, 0.3),
+    -3px -3px 8px rgba(255, 255, 255, 0.04),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.38);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.fsp-dontShowBtn:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 214, 180, 0.4);
+  color: var(--accent, #00d6b4);
+  box-shadow:
+    5px 6px 16px rgba(0, 0, 0, 0.34),
+    -3px -3px 8px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(255, 255, 255, 0.16),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.44),
+    0 0 14px rgba(0, 214, 180, 0.14);
+}
+
+.fsp-dontShowBtn:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 3px 4px 10px rgba(0, 0, 0, 0.42),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="light"] .fsp-dontShowBtn {
+  background:
+    linear-gradient(145deg, #ffffff, #e6f4f8) !important;
+  border-color: rgba(0, 138, 148, 0.22) !important;
+  color: #0e3041 !important;
+  box-shadow:
+    5px 6px 14px rgba(67, 111, 129, 0.2),
+    -4px -4px 10px rgba(255, 255, 255, 1),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
+}
+
+html[data-theme="light"] .fsp-dontShowBtn:hover {
+  color: var(--accent-light, #008a94) !important;
+  border-color: rgba(0, 138, 148, 0.42) !important;
+}
+
+/* ── "Nanti Aja" ghost link ── */
 .fsp-closeTextLink {
+  padding: 9px 12px;
   background: none;
   border: none;
   font-size: 12px;
-  font-weight: 700;
-  color: var(--brand-muted, rgba(234, 255, 245, 0.5));
+  font-weight: 800;
+  color: var(--brand-muted, rgba(200, 235, 245, 0.48));
   cursor: pointer;
-  transition: color 0.2s ease;
+  white-space: nowrap;
+  transition: color 0.18s ease, transform 0.18s ease;
 }
 
 .fsp-closeTextLink:hover {
   color: var(--accent, #00d6b4);
+  transform: translateX(-2px);
 }
 
 html[data-theme="light"] .fsp-closeTextLink {
-  color: rgba(0, 60, 80, 0.5);
+  color: rgba(0, 60, 80, 0.52);
 }
 
 html[data-theme="light"] .fsp-closeTextLink:hover {
   color: var(--accent-light, #008a94);
 }
 
-/* Animations */
+/* ── Animations ── */
 @keyframes fspFadeIn {
   from { opacity: 0; }
-  to { opacity: 1; }
+  to   { opacity: 1; }
 }
 
 @keyframes fspPopUp {
   from {
-    transform: scale(0.92) translateY(15px);
+    transform: scale(0.92) translateY(16px);
     opacity: 0;
   }
   to {
@@ -383,5 +632,5 @@ html[data-theme="light"] .fsp-closeTextLink:hover {
 
 @keyframes fspPulse {
   0%, 100% { opacity: 1; }
-  50% { opacity: 0.65; }
+  50%       { opacity: 0.62; }
 }

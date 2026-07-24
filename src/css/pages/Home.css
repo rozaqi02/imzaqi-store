@@ -1,4 +1,4 @@
-﻿.home-page {
+.home-page {
   background: transparent;
 }
 
@@ -1353,23 +1353,17 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 
 .home-section {
   padding: clamp(22px, 3.2vw, 34px) 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.06);
-  /*
-    content-visibility: auto on each section tells the browser it can skip
-    painting and laying out sections that are fully off-screen.
-    contain-intrinsic-size provides a placeholder height so the scrollbar
-    doesn't jump when sections are painted on scroll-into-view.
-  */
+  border-top: 1px solid var(--brand-line, rgba(255, 255, 255, 0.05));
   content-visibility: auto;
   contain-intrinsic-size: auto 400px;
 }
 
 html[data-theme="light"] .home-section {
-  border-top-color: rgba(0, 138, 148, 0.1);
+  border-top-color: rgba(0, 138, 148, 0.08);
 }
 
 .home-body > .home-section:first-child {
-  border-top: 0;
+  border-top: none !important;
   padding-top: clamp(28px, 3.5vw, 40px);
 }
 

@@ -1674,6 +1674,15 @@ html[data-theme="light"] .detail-page-v3 .pdx-liveViewers {
   font-variant-numeric: tabular-nums;
 }
 
+.pdx-variantPrice--flash {
+  color: #ffd54a !important; /* Yellow color for flash sale price in product detail */
+}
+
+:root[data-theme="light"] .pdx-variantPrice--flash,
+html[data-theme="light"] .pdx-variantPrice--flash {
+  color: #d97706 !important; /* Amber-yellow color in light mode for 4.5+ contrast */
+}
+
 .detail-page-v3 .pdx-countdownStat.is-expired {
   color: #ef4444 !important;
   border-color: rgba(239, 68, 68, 0.3) !important;

@@ -6,7 +6,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { formatIDR, classifyStock, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
 import "./ProductTile.css";
 
-export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false }) {
+export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false, overrideSold = null }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
   const isMobileViewport = useIsMobile("(max-width: 720px)");
@@ -20,13 +20,15 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
   }, [product?.slug]);
 
   const summary = useMemo(() => {
-    const activeVariants = (product?.product_variants || []).filter((v) => v?.is_active);
+    const allVariants = product?.product_variants || [];
+    const activeVariants = allVariants.filter((v) => v?.is_active !== false);
     const prices = activeVariants
       .map((v) => Number(v.price_idr || 0))
       .filter((n) => Number.isFinite(n) && n > 0);
 
     const stock = activeVariants.reduce((sum, item) => sum + Number(item?.stock || 0), 0);
-    const sold = activeVariants.reduce((sum, item) => sum + Number(item?.sold_count || 0), 0);
+    const fallbackSold = allVariants.reduce((sum, item) => sum + Number(item?.sold_count || 0), 0);
+    const sold = overrideSold != null ? overrideSold : fallbackSold;
 
     return {
       minPrice: prices.length ? Math.min(...prices) : 0,
@@ -35,7 +37,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
       sold,
       summaryCopy: summarizeCatalogCopy(product?.description),
     };
-  }, [product]);
+  }, [product, overrideSold]);
 
   const brandColor = useMemo(() => {
     const name = String(product?.name || "").toLowerCase();

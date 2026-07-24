@@ -274,21 +274,53 @@ export async function fetchPromoCodes() {
   return data || [];
 }
 
-export async function fetchTopSellingIds({ useCache = true, ttlMs = 45000 } = {}) {
-  const cacheKey = "top-products";
+export async function fetchTopSellingData({ useCache = true, ttlMs = 30000 } = {}) {
+  const cacheKey = "top-products-full-v3";
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
   if (cached) return cached;
 
-  // Panggil RPC database
-  const { data, error } = await supabase.rpc("get_top_products");
-  if (error) {
-    console.error("Gagal load best seller:", error);
-    return [];
+  const salesMap = {};
+  const topIds = [];
+
+  try {
+    const { data: orderItems, error: itemsError } = await supabase
+      .from("order_items")
+      .select("product_id, qty");
+
+    if (!itemsError && Array.isArray(orderItems) && orderItems.length > 0) {
+      orderItems.forEach((item) => {
+        if (item.product_id) {
+          salesMap[item.product_id] = (salesMap[item.product_id] || 0) + Number(item.qty || 1);
+        }
+      });
+      const sortedIds = Object.keys(salesMap).sort((a, b) => salesMap[b] - salesMap[a]);
+      topIds.push(...sortedIds);
+    }
+  } catch (e) {
+    console.error("Gagal query order_items:", e);
   }
-  // Kembalikan array ID saja, urut dari yang terlaris
-  const result = (data || []).map((x) => x.product_id);
+
+  if (topIds.length === 0) {
+    try {
+      const { data: rpcData } = await supabase.rpc("get_top_products");
+      (rpcData || []).forEach((x) => {
+        const id = x.product_id || x.id;
+        if (id) {
+          topIds.push(id);
+          salesMap[id] = Number(x.total_sold || x.sold_count || 0);
+        }
+      });
+    } catch (e) {}
+  }
+
+  const result = { topIds, salesMap };
   if (useCache) writePublicCache(cacheKey, result);
   return result;
+}
+
+export async function fetchTopSellingIds(options) {
+  const { topIds } = await fetchTopSellingData(options);
+  return topIds;
 }
 
 // New: Check stock availability for cart items

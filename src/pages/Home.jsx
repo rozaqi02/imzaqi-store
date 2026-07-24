@@ -7,7 +7,7 @@ import Hero from "../components/Hero";
 import SectionHead from "../components/SectionHead";
 import "../css/pages/Home.css";
 import ProductTile from "../components/ProductTile";
-import { fetchProducts, fetchTopSellingIds, fetchPromoCodes, fetchSettings } from "../lib/api";
+import { fetchProducts, fetchTopSellingData, fetchPromoCodes, fetchSettings } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
@@ -148,6 +148,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [topIds, setTopIds] = useState([]);
+  const [salesMap, setSalesMap] = useState({});
   const [promos, setPromos] = useState([]);
   const [settings, setSettings] = useState(null);
   const [error, setError] = useState("");
@@ -170,15 +171,16 @@ export default function Home() {
     let alive = true;
     (async () => {
       try {
-        const [data, ranking, promoData, settingsData] = await Promise.all([
+        const [data, topData, promoData, settingsData] = await Promise.all([
           fetchProducts(),
-          fetchTopSellingIds(),
+          fetchTopSellingData().catch(() => ({ topIds: [], salesMap: {} })),
           fetchPromoCodes().catch(() => []),
           fetchSettings().catch(() => ({})),
         ]);
         if (!alive) return;
         setProducts(data);
-        setTopIds(ranking);
+        setTopIds(topData?.topIds || []);
+        setSalesMap(topData?.salesMap || {});
         setSettings(settingsData || {});
 
         const allowedCodes = settingsData?.home_promos?.codes || [];
@@ -205,15 +207,21 @@ export default function Home() {
   const popularProducts = useMemo(() => {
     if (products.length === 0) return [];
     const sorted = [...products].sort((a, b) => {
+      const soldA = salesMap[a.id] ?? (a.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
+      const soldB = salesMap[b.id] ?? (b.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
+
+      if (soldA !== soldB) return soldB - soldA;
+
       const ra = topIds.indexOf(a.id);
       const rb = topIds.indexOf(b.id);
       if (ra !== -1 && rb === -1) return -1;
       if (ra === -1 && rb !== -1) return 1;
       if (ra !== -1 && rb !== -1) return ra - rb;
-      return a.sort_order - b.sort_order;
+
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
     });
     return sorted.slice(0, 4);
-  }, [products, topIds]);
+  }, [products, topIds, salesMap]);
 
   const totalActiveProducts = useMemo(
     () => products.filter((p) => (p?.product_variants || []).some((v) => v?.is_active)).length,
@@ -280,8 +288,14 @@ export default function Home() {
               ) : (
                 popularProducts.map((p, idx) => (
                   <div key={p.id} className="reveal reveal-scale" style={{ transitionDelay: `${80 + idx * 70}ms` }}>
-                    {/* 3D Tilt disabled with disableTilt={true} */}
-                    <ProductTile product={p} rank={idx + 1} layout="list" disableTilt={true} disableFlip={true} />
+                    <ProductTile
+                      product={p}
+                      rank={idx + 1}
+                      layout="list"
+                      disableTilt={true}
+                      disableFlip={true}
+                      overrideSold={salesMap[p.id] != null ? salesMap[p.id] : null}
+                    />
                   </div>
                 ))
               )}

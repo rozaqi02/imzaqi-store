@@ -15,7 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts } from "../lib/api";
+import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts, fetchTopSellingData } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
 import { asVariantList, formatIDR, normalizeProductRecord } from "../lib/format";
@@ -365,13 +365,6 @@ const VariantCard = React.memo(({
               </span>
             ) : null}
           </div>
-          {stock > 0 && maxVariantStock > 1 ? (
-            <div className="pdx-stockBarWrap">
-              <div className="pdx-stockBar" role="progressbar" aria-valuemin={0} aria-valuemax={maxVariantStock}>
-                <span className="pdx-stockBarFill" style={{ width: `${(stock / maxVariantStock) * 100}%` }} />
-              </div>
-            </div>
-          ) : null}
         </div>
 
         <div className="pdx-packPriceWrap">
@@ -540,6 +533,7 @@ export default function ProductDetail() {
   const recommendationsRef = useRef(null);
   const [error, setError] = useState("");
   const [flashSaleMap, setFlashSaleMap] = useState(new Map());
+  const [topSalesMap, setTopSalesMap] = useState({});
   const [activeTab, setActiveTab] = useState("semua");
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [addedVariantId, setAddedVariantId] = useState(null);
@@ -599,12 +593,14 @@ export default function ProductDetail() {
       try {
         setLoading(true);
         setError("");
-        const [data, flashSales] = await Promise.all([
+        const [data, flashSales, topData] = await Promise.all([
           fetchProductBySlug(slug),
           fetchActiveFlashSales().catch(() => []),
+          fetchTopSellingData().catch(() => ({ salesMap: {} })),
         ]);
         if (!alive) return;
         setProduct(normalizeProductRecord(data));
+        setTopSalesMap(topData?.salesMap || {});
         const fsMap = new Map();
         (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
         setFlashSaleMap(fsMap);
@@ -706,10 +702,13 @@ export default function ProductDetail() {
     };
   }, [variants, flashSaleMap]);
 
-  const soldTotal = useMemo(
-    () => variants.reduce((sum, variant) => sum + Math.max(0, Number(variant?.sold_count || 0)), 0),
-    [variants]
-  );
+  const soldTotal = useMemo(() => {
+    if (product?.id && topSalesMap && topSalesMap[product.id] != null) {
+      return topSalesMap[product.id];
+    }
+    const allVars = asVariantList(product?.product_variants);
+    return allVars.reduce((sum, v) => sum + Math.max(0, Number(v?.sold_count || 0)), 0);
+  }, [product, topSalesMap]);
 
   const liveViewers = null; // removed fake data
   const [emojiFloats, setEmojiFloats] = useState([]);

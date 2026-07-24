@@ -1,48 +1,52 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useEffect, useState, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useFunnelRoute } from "../hooks/useFunnelRoute";
-import { Clock, Flame, X } from "lucide-react";
+import { BellOff, Clock, Flame } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { formatIDR } from "../lib/format";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import "./FlashSalePopup.css";
 
-const POPUP_STORAGE_KEY = "imzaqi_flash_sale_popup_shown_v2";
+const SUPPRESS_DATE_KEY = "imzaqi_flash_sale_suppress_date_v1";
+
+function getTodayString() {
+  return new Date().toDateString();
+}
 
 export default function FlashSalePopup() {
   const navigate = useNavigate();
+  const location = useLocation();
   const isFunnel = useFunnelRoute();
   const [isOpen, setIsOpen] = useState(false);
   const [salesItems, setSalesItems] = useState([]);
   const [closestEndTime, setClosestEndTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
+  const [isSuppressed, setIsSuppressed] = useState(() => {
+    return localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
+  });
+
+  const prevPathnameRef = useRef(location.pathname);
 
   // 1. Fetch active flash sales and enrich with product/variant info
   useEffect(() => {
     let active = true;
-    let openTimer = null;
 
     async function loadPromoData() {
       try {
-        // Cek dulu apakah di session ini pop-up sudah pernah ditampilkan
-        const isShown = sessionStorage.getItem(POPUP_STORAGE_KEY);
-        if (isShown) return;
-
         const [flashSales, products] = await Promise.all([
           fetchActiveFlashSales({ useCache: true }),
           fetchProducts({ includeInactive: false })
         ]);
 
         if (!active) return;
-        if (!flashSales.length || !products.length) return;
+        if (!flashSales || !flashSales.length || !products || !products.length) return;
 
         // Padukan data flash sale dengan data produk & variannya
         const enriched = [];
         let minEndTime = null;
 
         flashSales.forEach((sale) => {
-          // Cari variant yang cocok di semua produk
           for (const product of products) {
             const variant = (product.product_variants || []).find(
               (v) => v.id === sale.variant_id
@@ -67,24 +71,25 @@ export default function FlashSalePopup() {
                 endsAt: sale.ends_at
               });
 
-              // Cari waktu berakhir terdekat
               const saleEndTime = new Date(sale.ends_at).getTime();
               if (!minEndTime || saleEndTime < minEndTime) {
                 minEndTime = saleEndTime;
               }
-              break; // Variant sudah ketemu, lanjut ke sale berikutnya
+              break;
             }
           }
         });
 
-        if (enriched.length > 0) {
+        if (enriched.length > 0 && active) {
           setSalesItems(enriched);
           setClosestEndTime(minEndTime);
-          openTimer = window.setTimeout(() => {
-            if (!active) return;
-            setIsOpen(true);
-            sessionStorage.setItem(POPUP_STORAGE_KEY, "1");
-          }, OVERLAY_TIMING.flashSaleMs);
+
+          const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
+          if (!suppressedToday && !isFunnel) {
+            window.setTimeout(() => {
+              if (active) setIsOpen(true);
+            }, OVERLAY_TIMING.flashSaleMs);
+          }
         }
       } catch (err) {
         console.warn("[FlashSalePopup] Gagal memuat data flash sale:", err);
@@ -95,11 +100,22 @@ export default function FlashSalePopup() {
 
     return () => {
       active = false;
-      if (openTimer) window.clearTimeout(openTimer);
     };
   }, []);
 
-  // 2. Countdown Timer
+  // 2. Pop-up muncul otomatis saat beralih menu (navigation), kecuali jika suppressed hari ini atau di funnel route
+  useEffect(() => {
+    if (prevPathnameRef.current !== location.pathname) {
+      prevPathnameRef.current = location.pathname;
+
+      const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
+      if (!suppressedToday && !isFunnel && salesItems.length > 0) {
+        setIsOpen(true);
+      }
+    }
+  }, [location.pathname, isFunnel, salesItems.length]);
+
+  // 3. Countdown Timer
   useEffect(() => {
     if (!isOpen || !closestEndTime) return undefined;
 
@@ -109,7 +125,7 @@ export default function FlashSalePopup() {
 
       if (diff <= 0) {
         setTimeLeft("Berakhir!");
-        setIsOpen(false); // Otomatis tutup jika flash sale berakhir
+        setIsOpen(false);
         return;
       }
 
@@ -120,10 +136,21 @@ export default function FlashSalePopup() {
       setTimeLeft(`${hours}:${minutes}:${seconds}`);
     }
 
-    updateTimer(); // Jalankan sekali di awal
+    updateTimer();
     const interval = setInterval(updateTimer, 1000);
     return () => clearInterval(interval);
   }, [isOpen, closestEndTime]);
+
+  const handleToggleSuppress = (e) => {
+    const checked = e.target.checked;
+    setIsSuppressed(checked);
+    if (checked) {
+      localStorage.setItem(SUPPRESS_DATE_KEY, getTodayString());
+      setIsOpen(false);
+    } else {
+      localStorage.removeItem(SUPPRESS_DATE_KEY);
+    }
+  };
 
   if (isFunnel || !isOpen || salesItems.length === 0) return null;
 
@@ -149,14 +176,6 @@ export default function FlashSalePopup() {
             </span>
             <h2 className="fsp-title">Lagi Diskon Gede!</h2>
           </div>
-          <button
-            className="fsp-closeBtn"
-            type="button"
-            onClick={() => setIsOpen(false)}
-            aria-label="Tutup"
-          >
-            <X size={16} />
-          </button>
         </div>
 
         {/* Body (List items on sale) */}
@@ -176,9 +195,12 @@ export default function FlashSalePopup() {
                     )}
                   </div>
                   <div className="fsp-itemInfo">
-                    <span className="fsp-itemName">{item.productName}</span>
+                    <div className="fsp-itemNameRow">
+                      <span className="fsp-itemName">{item.productName}</span>
+                      <span className="fsp-discountBadge">-{item.discountPercent}%</span>
+                    </div>
                     <span className="fsp-itemMeta">
-                      {item.variantName} / {item.durationLabel}
+                      {item.variantName} • {item.durationLabel}
                     </span>
                   </div>
                 </div>
@@ -211,19 +233,37 @@ export default function FlashSalePopup() {
         {/* Foot */}
         <div className="fsp-foot">
           {timeLeft && (
-            <div className="fsp-countdownWrap">
-              <Clock size={12} />
-              <span>Berakhir:</span>
-              <span className="fsp-countdownVal">{timeLeft}</span>
+            <div className="fsp-footTop">
+              <div className="fsp-countdownWrap">
+                <Clock size={12} />
+                <span className="fsp-countdownLabel">Promo Berakhir:</span>
+                <span className="fsp-countdownVal">{timeLeft}</span>
+              </div>
             </div>
           )}
-          <button
-            type="button"
-            className="fsp-closeTextLink"
-            onClick={() => setIsOpen(false)}
-          >
-            Nanti Aja
-          </button>
+
+          <div className="fsp-footBottom">
+            <button
+              type="button"
+              className="fsp-dontShowBtn"
+              onClick={() => {
+                localStorage.setItem(SUPPRESS_DATE_KEY, getTodayString());
+                setIsSuppressed(true);
+                setIsOpen(false);
+              }}
+              title="Sembunyikan pemberitahuan flash sale ini sampai esok hari"
+            >
+              <BellOff size={13} strokeWidth={2.2} style={{ marginRight: 6, flexShrink: 0 }} />
+              Jangan Beritahu Lagi Hari Ini
+            </button>
+            <button
+              type="button"
+              className="fsp-closeTextLink"
+              onClick={() => setIsOpen(false)}
+            >
+              Nanti Aja
+            </button>
+          </div>
         </div>
       </div>
     </div>,

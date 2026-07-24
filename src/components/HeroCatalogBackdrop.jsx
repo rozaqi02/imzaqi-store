@@ -2,12 +2,12 @@ import React, { useEffect, useMemo, useRef } from "react";
 import { useDeviceCapability } from "../hooks/useIsMobile";
 import "./HeroCatalogBackdrop.css";
 
-const DESKTOP_ROW_COUNT = 4;
+const DESKTOP_ROW_COUNT = 5;
 const DESKTOP_MIN_TILES = 10;
-const MOBILE_ROW_COUNT = 4;
-const MOBILE_MIN_TILES = 8;
-const ROW_DURATIONS = ["88s", "104s", "96s", "112s"];
-const MOBILE_ROW_DURATIONS = ["120s", "136s", "128s", "144s"];
+const MOBILE_ROW_COUNT = 5;
+const MOBILE_MIN_TILES = 7;
+const ROW_DURATIONS = ["88s", "104s", "96s", "112s", "100s"];
+const MOBILE_ROW_DURATIONS = ["120s", "136s", "128s", "144s", "116s"];
 
 function getBackdropConfig(caps) {
   const isMobile = Boolean(caps?.isMobile);

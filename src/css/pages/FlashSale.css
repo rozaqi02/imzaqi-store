@@ -3,9 +3,9 @@
   margin-bottom: 18px;
   padding: 16px;
   border-radius: 24px;
-  border: 1px solid rgba(255, 60, 100, 0.24);
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   background:
-    linear-gradient(135deg, rgba(255, 60, 100, 0.06), rgba(255, 60, 100, 0) 60%),
+    linear-gradient(135deg, rgba(0, 194, 208, 0.04), rgba(0, 194, 208, 0) 60%),
     var(--skeu-panel-bg);
   box-shadow: var(--skeu-panel-shadow);
   overflow: hidden;
@@ -17,12 +17,12 @@
 
 @keyframes flashUrgent {
   0%, 100% {
-    border-color: rgba(255, 60, 100, 0.24);
+    border-color: var(--brand-line, rgba(0, 194, 208, 0.16));
     box-shadow: var(--skeu-panel-shadow);
   }
   50% {
-    border-color: rgba(255, 60, 100, 0.5);
-    box-shadow: var(--skeu-panel-shadow), 0 0 20px rgba(255, 60, 100, 0.15);
+    border-color: rgba(0, 214, 180, 0.4);
+    box-shadow: var(--skeu-panel-shadow), 0 0 20px rgba(0, 214, 180, 0.12);
   }
 }
 
@@ -32,12 +32,12 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
 
 @keyframes flashUrgentLight {
   0%, 100% {
-    border-color: rgba(255, 60, 100, 0.18);
+    border-color: rgba(0, 138, 148, 0.18);
     box-shadow: var(--skeu-panel-shadow);
   }
   50% {
-    border-color: rgba(255, 60, 100, 0.35);
-    box-shadow: var(--skeu-panel-shadow), 0 0 16px rgba(255, 60, 100, 0.1);
+    border-color: rgba(0, 138, 148, 0.35);
+    box-shadow: var(--skeu-panel-shadow), 0 0 16px rgba(0, 138, 148, 0.1);
   }
 }
 
@@ -113,9 +113,9 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
   width: min(220px, 42vw);
   height: 6px;
   border-radius: 999px;
-  background: var(--skeu-inset-bg, rgba(255, 60, 100, 0.12));
+  background: var(--skeu-inset-bg, rgba(0, 194, 208, 0.08));
   box-shadow: var(--skeu-inset-shadow, none);
-  border: 1px solid rgba(255, 60, 100, 0.18);
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   overflow: hidden;
 }
 
@@ -123,7 +123,7 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, #ff3c64, #ff7a96);
+  background: linear-gradient(90deg, var(--accent, #00d6b4), #5ce0ff);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 
@@ -166,7 +166,7 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
 
 .flash-sale-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(255, 60, 100, 0.3);
+  border-color: rgba(0, 214, 180, 0.35);
 }
 
 .flash-sale-card::before {
@@ -177,7 +177,7 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
   right: 0;
   height: 3px;
   border-radius: 18px 18px 0 0;
-  background: linear-gradient(90deg, #ff3c64, #ff9bb0, #ff3c64);
+  background: linear-gradient(90deg, #00d6b4, #5ce0ff, #00d6b4);
   opacity: 0.7;
   pointer-events: none;
 }
@@ -260,7 +260,7 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
 .flash-sale-discounted {
   font-size: 13px;
   font-weight: 1000;
-  color: #ff3c64;
+  color: #ffd54a !important; /* Vibrant yellow color for flash sale price in dark mode */
   letter-spacing: -0.02em;
 }
 
@@ -273,9 +273,9 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
 
 /* ── Light mode ── */
 html[data-theme="light"] .flash-sale-banner {
-  border-color: rgba(255, 60, 100, 0.18);
+  border-color: rgba(0, 138, 148, 0.18);
   background:
-    linear-gradient(135deg, rgba(255, 60, 100, 0.04), rgba(255, 60, 100, 0) 60%),
+    linear-gradient(135deg, rgba(0, 214, 180, 0.06), rgba(0, 214, 180, 0) 60%),
     var(--skeu-panel-bg);
 }
 
@@ -284,7 +284,7 @@ html[data-theme="light"] .flash-sale-card {
 }
 
 html[data-theme="light"] .flash-sale-discounted {
-  color: #dc2050;
+  color: #d97706 !important; /* Warm amber-yellow color for flash sale price in light mode */
 }
 
 html[data-theme="light"] .flash-sale-title,

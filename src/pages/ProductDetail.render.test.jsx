@@ -53,6 +53,7 @@ vi.mock("../lib/api", () => ({
   fetchProductBySlug: vi.fn(() => Promise.resolve(mockProduct)),
   fetchActiveFlashSales: vi.fn(() => Promise.resolve([])),
   fetchProducts: vi.fn(() => Promise.resolve([mockProduct])),
+  fetchTopSellingData: vi.fn(() => Promise.resolve({ topIds: [], salesMap: {} })),
 }));
 
 vi.mock("../context/ToastContext", () => ({
