@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
+﻿import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
+import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -40,6 +40,8 @@ const QRIS_INITIAL = {
   failed: false,
   mode: "idle",
 };
+
+const QRIS_EXPIRY_MS = 30 * 60 * 1000; // 30 menit
 
 function qrisReducer(state, action) {
   switch (action.type) {
@@ -292,7 +294,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode pay-successCode--animate">{orderCode}</div>
-            <p className="pay-successLead">Simpan ID ini — dipakai setiap kali kamu cek status order.</p>
+            <p className="pay-successLead">Simpan ID ini - dipakai setiap kali kamu cek status order.</p>
           </div>
 
           <div className="pay-successActions">
@@ -411,7 +413,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
             <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Bayar"}</div>
             <div className="pay-confirmModalSub">
               {isAllChecked
-                ? "Semua langkah selesai — siap dikonfirmasi"
+                ? "Semua langkah selesai - siap dikonfirmasi"
                 : isFree
                   ? "Centang semua detail sebelum lanjut"
                   : "Centang semua opsi buat konfirmasi"}
@@ -511,6 +513,39 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
   );
 }
 
+function useQrisTimer(active) {
+  const TOTAL_MS = QRIS_EXPIRY_MS;
+  const [remaining, setRemaining] = useState(TOTAL_MS);
+  const startRef = useRef(null);
+
+  useEffect(() => {
+    if (!active) {
+      setRemaining(TOTAL_MS);
+      startRef.current = null;
+      return;
+    }
+    startRef.current = Date.now();
+    setRemaining(TOTAL_MS);
+
+    const id = setInterval(() => {
+      const elapsed = Date.now() - startRef.current;
+      const left = Math.max(0, TOTAL_MS - elapsed);
+      setRemaining(left);
+      if (left === 0) clearInterval(id);
+    }, 1000);
+
+    return () => clearInterval(id);
+  }, [active, TOTAL_MS]);
+
+  const minutes = Math.floor(remaining / 60000);
+  const seconds = Math.floor((remaining % 60000) / 1000);
+  const expired = remaining === 0;
+  const urgent = remaining <= 5 * 60 * 1000 && remaining > 0; // < 5 menit
+  const label = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  return { label, expired, urgent, remaining };
+}
+
 export default function Pay() {
   const nav = useNavigate();
   const location = useLocation();
@@ -559,28 +594,36 @@ export default function Pay() {
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
   const [qrisJustUnlocked, setQrisJustUnlocked] = useState(false);
+  const [qrisShownAt, setQrisShownAt] = useState(null);
   const prevCanShowQrisRef = useRef(false);
   const contactCardRef = useRef(null);
   const buyerEmailRef = useRef(null);
+  const focusTimerRef = useRef(null);
   const showPayCta = !ok && !orderCode && items.length > 0;
 
+  // Cleanup focus timer saat unmount
+  useEffect(() => () => { if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current); }, []);
+
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY_BUYER_EMAIL, buyerEmail); } catch {}
+    try { localStorage.setItem(STORAGE_KEY_BUYER_EMAIL, buyerEmail); } catch (e) { warn("localStorage buyerEmail:", e); }
   }, [buyerEmail]);
 
   useEffect(() => {
-    try { localStorage.setItem(STORAGE_KEY_NOTES, notes); } catch {}
+    try { localStorage.setItem(STORAGE_KEY_NOTES, notes); } catch (e) { warn("localStorage notes:", e); }
   }, [notes]);
 
   useEffect(() => {
+    let active = true;
     fetchSettings()
-      .then((result) =>
+      .then((result) => {
+        if (!active) return;
         setSettings({
           whatsapp: result.whatsapp || { number: "6283136049987" },
           qris: result.qris || {},
-        })
-      )
+        });
+      })
       .catch(() => {});
+    return () => { active = false; };
   }, []);
 
   useEffect(() => {
@@ -616,7 +659,7 @@ export default function Pay() {
     async function loadQris() {
       dispatchQris({ type: "RESET" });
 
-      // Free order (100% promo) — skip QRIS entirely
+      // Free order (100% promo) - skip QRIS entirely
       if (total === 0) {
         dispatchQris({ type: "FREE" });
         return;
@@ -685,6 +728,10 @@ export default function Pay() {
 
   const canShowQris = hasValidWhatsApp && !missingBuyerEmailNote;
   const isFreeOrder = total === 0 && subtotal > 0;
+
+  // Start timer when QRIS becomes visible
+  const qrisTimerActive = canShowQris && !isFreeOrder && qris.mode !== "idle";
+  const qrisTimer = useQrisTimer(qrisTimerActive);
 
   useEffect(() => {
     if (!prevCanShowQrisRef.current && canShowQris && !isFreeOrder) {
@@ -788,7 +835,7 @@ export default function Pay() {
       if (flashDiscount && flashDiscount > 0) {
         safePrice = Math.round(safePrice * (1 - flashDiscount / 100));
       } else if (activeFlashSales === null) {
-        // Flash sales fetch failed — use the price from cart to avoid mismatch
+        // Flash sales fetch failed - use the price from cart to avoid mismatch
         safePrice = Math.max(0, Number(item?.price_idr || safePrice));
       }
 
@@ -821,7 +868,7 @@ export default function Pay() {
     const requestedPromo = String(promo?.code || "").trim().toUpperCase();
 
     // Use the already-validated promo data from usePromo context.
-    // Do NOT call validate_promo RPC again here — it was already called in
+    // Do NOT call validate_promo RPC again here - it was already called in
     // Checkout when the user applied the code. Calling it a second time
     // caused a double-claim bug (slot decremented twice).
     if (requestedPromo && Number(promo?.percent || 0) > 0) {
@@ -1044,7 +1091,8 @@ export default function Pay() {
   function focusBlockingField() {
     if (!hasValidWhatsApp) {
       contactCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      window.setTimeout(() => {
+      if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current);
+      focusTimerRef.current = window.setTimeout(() => {
         document.getElementById("whatsapp-input")?.focus({ preventScroll: true });
       }, 280);
       return;
@@ -1052,7 +1100,8 @@ export default function Pay() {
 
     if (missingBuyerEmailNote) {
       buyerEmailRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
-      window.setTimeout(() => {
+      if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current);
+      focusTimerRef.current = window.setTimeout(() => {
         buyerEmailRef.current?.focus({ preventScroll: true });
       }, 280);
     }
@@ -1122,9 +1171,9 @@ export default function Pay() {
     <div className="page pay-shell pay-page">
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
-          <div className="pay-shell-copy">
-            <h1 className="h1 pay-shell-title">Bayar.</h1>
-            <p className="pay-shell-sub">Scan QRIS, konfirmasi, simpan ID — selesai.</p>
+          <div className="pay-shell-copy hero-anim-wrap">
+            <h1 className="h1 pay-shell-title hero-anim-title">Bayar.</h1>
+            <p className="pay-shell-sub hero-anim-sub">Scan QRIS, konfirmasi, simpan ID - selesai.</p>
           </div>
         </div>
 
@@ -1198,12 +1247,14 @@ export default function Pay() {
                     placeholder="pembeli@email.com"
                     aria-invalid={missingBuyerEmailNote || undefined}
                     aria-describedby="pay-email-hint"
+                    autoComplete="email"
+                    inputMode="email"
                   />
 
                   <div id="pay-email-hint" className="pay-emailHintText">
                     {missingBuyerEmailNote
                       ? `${requiredEmailProductsText} butuh email pembeli buat aktivasi akun.`
-                      : "Email pembeli sudah terisi — akun bakal dikirim ke sini."}
+                      : "Email pembeli sudah terisi - akun bakal dikirim ke sini."}
                   </div>
                 </div>
               )}
@@ -1349,6 +1400,19 @@ export default function Pay() {
                           </div>
                         ) : null}
                         {qris.failed ? <div className="hint subtle">QRIS gagal dimuat. Refresh lalu coba lagi.</div> : null}
+                        {/* QRIS timer - tampil saat QR aktif dan belum expired */}
+                        {qris.loaded && !qris.failed && !qrisTimer.expired && (
+                          <div className={`pay-qrisTimer${qrisTimer.urgent ? " is-urgent" : ""}`} aria-live="polite">
+                            <Clock size={13} />
+                            <span>QR valid: <strong>{qrisTimer.label}</strong></span>
+                          </div>
+                        )}
+                        {qrisTimer.expired && (
+                          <div className="pay-qrisTimer is-expired" role="alert">
+                            <Clock size={13} />
+                            <span>QR kedaluwarsa - refresh halaman untuk QR baru</span>
+                          </div>
+                        )}
                       </>
                     ) : (
                       <div className="pay-qrisLocked">
@@ -1360,7 +1424,7 @@ export default function Pay() {
                   </div>
 
                   <div className={`pay-stageFoot ${canShowQris && !isDynamicQris && !isFreeOrder ? "warning" : ""}`}>
-                    {isFreeOrder ? "Promo 100% aktif — tidak ada pembayaran yang diperlukan." : qrisFootText}
+                    {isFreeOrder ? "Promo 100% aktif - tidak ada pembayaran yang diperlukan." : qrisFootText}
                   </div>
                   {canShowQris && qris.notice && !isFreeOrder ? (
                     <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qris.notice}</div>

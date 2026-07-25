@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
@@ -79,7 +79,7 @@ export default function Checkout() {
 
   usePageMeta({
     title: "Checkout",
-    description: "Cek order & total dulu sebelum bayar — biar gak salah.",
+    description: "Cek order & total dulu sebelum bayar - biar gak salah.",
   });
 
   useEffect(() => {
@@ -205,7 +205,9 @@ export default function Checkout() {
       setMsg(text);
       toast.error(text);
       setPromoStatus("error");
-      setTimeout(() => setPromoStatus(null), 1500);
+      const t = setTimeout(() => setPromoStatus(null), 1500);
+      // eslint-disable-next-line no-underscore-dangle
+      onApplyPromo._lastTimer = t;
       return;
     }
 
@@ -225,7 +227,9 @@ export default function Checkout() {
       toast.error("Gagal cek kode promo. Coba lagi ya.");
     } finally {
       setIsVerifying(false);
-      setTimeout(() => setPromoStatus(null), 1500);
+      const t = setTimeout(() => setPromoStatus(null), 1500);
+      // eslint-disable-next-line no-underscore-dangle
+      onApplyPromo._lastTimer = t;
     }
   }
 
@@ -285,6 +289,9 @@ export default function Checkout() {
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             disabled={isVerifying}
             aria-describedby={msg ? "checkout-promo-message" : undefined}
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -475,9 +482,9 @@ export default function Checkout() {
               <ArrowLeft size={16} />
               <span>Kembali</span>
             </button>
-            <div className="checkout-full-title-wrap">
-              <h1 className="h1 checkout-full-title">Checkout</h1>
-              <p className="checkout-full-sub">Cek order dulu sebelum bayar.</p>
+            <div className="checkout-full-title-wrap hero-anim-wrap">
+              <h1 className="h1 checkout-full-title hero-anim-title">Checkout</h1>
+              <p className="checkout-full-sub hero-anim-sub">Cek order dulu sebelum bayar.</p>
             </div>
           </div>
 
@@ -767,7 +774,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
         >
           <span className="checkout-stockWarn-text">
             {stockWarnings[item.variant_id].type === "out"
-              ? "Stok abis nih — hapus dulu biar lanjut"
+              ? "Stok abis nih - hapus dulu biar lanjut"
               : `Stok cuma ${stockWarnings[item.variant_id].available}, kamu pesan ${item.qty}`}
           </span>
           <div className="checkout-stockWarn-actions">

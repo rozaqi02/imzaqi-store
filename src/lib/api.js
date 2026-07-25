@@ -228,13 +228,13 @@ export async function fetchTestimonials({ includeInactive = false, useCache = !i
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
   if (cached) return cached;
 
-  const q = supabase
+  let q = supabase
     .from("testimonials")
     .select("id,image_url,caption,is_active,sort_order,created_at")
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: false });
 
-  if (!includeInactive) q.eq("is_active", true);
+  if (!includeInactive) q = q.eq("is_active", true);
 
   const { data, error } = await q;
   if (error) throw error;
@@ -325,7 +325,11 @@ export async function fetchTopSellingIds(options) {
 
 // New: Check stock availability for cart items
 export async function checkStockAvailability(cartItems) {
-  const variantIds = cartItems.map(item => item.variant_id);
+  // Filter out items dengan variant_id null agar tidak crash di .in() query
+  const validItems = cartItems.filter(item => item.variant_id != null);
+  if (!validItems.length) return { isAvailable: true, outOfStock: [], insufficient: [], stockMap: {} };
+
+  const variantIds = validItems.map(item => item.variant_id);
   
   const { data, error } = await supabase
     .from("product_variants")
@@ -346,7 +350,8 @@ export async function checkStockAvailability(cartItems) {
   const outOfStock = [];
   const insufficient = [];
   
-  cartItems.forEach(item => {
+  // Cek validItems saja — item dengan variant_id null dianggap valid (free item)
+  validItems.forEach(item => {
     const variantStock = stockMap[item.variant_id];
     if (!variantStock || variantStock.is_active === false) {
       outOfStock.push(item);

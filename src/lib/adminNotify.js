@@ -1,4 +1,4 @@
-import { formatIDR } from "./format";
+﻿import { formatIDR } from "./format";
 
 export function buildAdminOrderAlertUrl(phone, order) {
   const digits = String(phone || "").replace(/\D/g, "");
@@ -10,7 +10,7 @@ export function buildAdminOrderAlertUrl(phone, order) {
 }
 
 export function notifyAdminNewOrder(order, adminPhone) {
-  const title = `Order baru: ${order?.order_code || "—"}`;
+  const title = `Order baru: ${order?.order_code || "-"}`;
   const body = `Total ${formatIDR(order?.total_idr || 0)}`;
 
   if (typeof Notification !== "undefined" && Notification.permission === "granted") {

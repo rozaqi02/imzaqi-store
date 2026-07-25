@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, memo } from "react";
+﻿import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, memo } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -28,7 +28,7 @@ import { useLongTaskMonitor } from "../hooks/usePerformanceMonitor";
 import { warn } from "../lib/log";
 import { fireConfetti } from "../components/Confetti";
 
-// ── Live viewer & countdown removed (fake data — hurts trust) ──────────────
+// ── Live viewer & countdown removed (fake data - hurts trust) ──────────────
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
 import { resolveProductCategory } from "../lib/productCategories";
@@ -336,7 +336,7 @@ const VariantCard = React.memo(({
           {isRecommended ? (
             <span className="pdx-packHot">
               <Flame size={12} />
-              Rameeee
+              Paling Laris
             </span>
           ) : null}
           <h3 className="pdx-packName">{variant.name}</h3>
@@ -539,6 +539,7 @@ export default function ProductDetail() {
   const [addedVariantId, setAddedVariantId] = useState(null);
   const [compareOpen, setCompareOpen] = useState(false);
   const addedFlashTimerRef = useRef(null);
+  const emojiTimersRef = useRef([]);
 
   usePageMeta({
     title: product?.name ? `${product.name} | Detail Produk` : "Detail Produk",
@@ -718,7 +719,6 @@ export default function ProductDetail() {
   const EMOJI_STORAGE_KEY = product?.id ? `imzaqi_reactions_${product.id}` : null;
 
   function handleEmojiReact(emoji) {
-    // Save count to localStorage
     if (EMOJI_STORAGE_KEY) {
       try {
         const stored = JSON.parse(localStorage.getItem(EMOJI_STORAGE_KEY) || "{}");
@@ -726,14 +726,18 @@ export default function ProductDetail() {
         localStorage.setItem(EMOJI_STORAGE_KEY, JSON.stringify(stored));
       } catch {}
     }
-    // Spawn float
     const id = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
     setEmojiFloats((prev) => [...prev.slice(-12), { id, emoji }]);
-    setTimeout(() => setEmojiFloats((prev) => prev.filter((f) => f.id !== id)), 1200);
+    // Track timer agar bisa di-cancel saat unmount
+    const t = setTimeout(() => {
+      setEmojiFloats((prev) => prev.filter((f) => f.id !== id));
+      emojiTimersRef.current = emojiTimersRef.current.filter((x) => x !== t);
+    }, 1200);
+    emojiTimersRef.current.push(t);
   }
 
   const maxVariantStock = useMemo(
-    () => Math.max(1, ...variants.map((v) => Number(v.stock || 0))),
+    () => variants.length > 0 ? Math.max(1, ...variants.map((v) => Number(v.stock || 0))) : 1,
     [variants]
   );
 
@@ -752,6 +756,9 @@ export default function ProductDetail() {
   useEffect(
     () => () => {
       if (addedFlashTimerRef.current) window.clearTimeout(addedFlashTimerRef.current);
+      // Clear semua emoji float timers saat unmount
+      emojiTimersRef.current.forEach((t) => window.clearTimeout(t));
+      emojiTimersRef.current = [];
     },
     []
   );
@@ -860,7 +867,7 @@ export default function ProductDetail() {
   async function handleShare() {
     if (!product) return;
     const shareUrl = window.location.href;
-    const minPrice = summary.minPrice ? ` — mulai ${formatIDR(summary.minPrice)}` : "";
+    const minPrice = summary.minPrice ? ` - mulai ${formatIDR(summary.minPrice)}` : "";
     const waText = encodeURIComponent(
       `Cek ${product.name} di Imzaqi Store${minPrice}\n${shareUrl}`
     );
@@ -1009,7 +1016,7 @@ export default function ProductDetail() {
                         <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
                         {variants.length > 1 ? (
                           <button className="pdx-compareBtn" type="button" onClick={() => setCompareOpen(true)}>
-                            Bandingkan
+                            ⇄ Bandingkan paket
                           </button>
                         ) : null}
                       </div>

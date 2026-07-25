@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
@@ -36,7 +36,7 @@ export default function Testimonials() {
 
   usePageMeta({
     title: "Testimoni",
-    description: "Bukti order asli dari buyer — anti-gimik, riil adanya.",
+    description: "Bukti order asli dari buyer - anti-gimik, riil adanya.",
   });
 
   useEffect(() => {
@@ -48,6 +48,7 @@ export default function Testimonials() {
         setItems(Array.isArray(data) ? data : []);
       } catch (e) {
         warn(e);
+        if (!alive) return;
         setError("Gagal load testimoni.");
       } finally {
         if (alive) setLoading(false);
@@ -114,11 +115,11 @@ export default function Testimonials() {
     <div className="page testimonials-page">
       <section className="section testi-shell">
         <div className="container testi-wrap">
-          <header className="testi-hero">
+          <header className="testi-hero hero-anim-wrap">
             <div className="testi-heroCopy">
-              <div className="testi-kicker">Bukti real</div>
-              <h1 className="h1 testi-title">Anti-gimik, riil adanya.</h1>
-              <p className="testi-sub">Screenshot asli dari buyer. No edit, no cap.</p>
+              <div className="testi-kicker hero-anim-kicker">Bukti real</div>
+              <h1 className="h1 testi-title hero-anim-title">Anti-gimik, riil adanya.</h1>
+              <p className="testi-sub hero-anim-sub">Screenshot asli dari buyer. No edit, no cap.</p>
             </div>
 
             <div className="testi-statePill">

@@ -1,4 +1,4 @@
-import React, { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+﻿import React, { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
@@ -813,7 +813,7 @@ export default function AdminDashboard() {
             return [newOrder, ...(prev || [])];
           });
           notifyAdminNewOrder(newOrder, waNumber);
-          toast.success(`Order baru: ${newOrder.order_code || "—"}`, { duration: 5000 });
+          toast.success(`Order baru: ${newOrder.order_code || "-"}`, { duration: 5000 });
           setNewOrderCount((prev) => prev + 1);
         }
       )
@@ -915,7 +915,7 @@ export default function AdminDashboard() {
 
       let { data, error } = await supabase.from("products").insert(insertPayload).select("id,category,name").single();
 
-      // Older DBs may not have category yet — surface a clear fix path
+      // Older DBs may not have category yet - surface a clear fix path
       if (error && /category/i.test(String(error.message || ""))) {
         throw new Error(
           "Kolom products.category belum ada di database. Jalankan migrasi supabase/migrations/003_products_category.sql di Supabase SQL Editor."
@@ -1006,7 +1006,7 @@ export default function AdminDashboard() {
         throw new Error(formatPgError(error));
       }
 
-      // RLS can return 200 with 0 rows — treat as failure
+      // RLS can return 200 with 0 rows - treat as failure
       if (!data?.id) {
         throw new Error(
           "Update tidak diterapkan (0 baris). Pastikan login admin valid dan policy products mengizinkan UPDATE."
@@ -1551,7 +1551,7 @@ export default function AdminDashboard() {
     try {
       const { error } = await supabase.from("promo_codes").upsert([row], { onConflict: "code" });
       if (error) {
-        // Database constraint violation — percent likely exceeds DB limit
+        // Database constraint violation - percent likely exceeds DB limit
         if (error.message?.includes("promo_codes_percent_check")) {
           toast.remove(tid);
           toast.error("Database membatasi diskon maksimal 99%. Ubah constraint di Supabase SQL Editor: ALTER TABLE promo_codes DROP CONSTRAINT promo_codes_percent_check; ALTER TABLE promo_codes ADD CONSTRAINT promo_codes_percent_check CHECK (percent >= 1 AND percent <= 100);");
@@ -1891,7 +1891,7 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* KPI strip off on work tabs — frees height for list panels */}
+            {/* KPI strip off on work tabs - frees height for list panels */}
             {!isOverviewTab &&
             !["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab) ? (
               <div className="admin-kpiStrip" aria-label="Ringkasan cepat operasional">
@@ -1981,7 +1981,7 @@ export default function AdminDashboard() {
                         <div className="admin-topbar-eyebrow">Ringkasan hari ini</div>
                         <div className="admin-heroTitle">Ringkasan toko, satu pandangan.</div>
                         <div className="admin-panel-sub">
-                          Revenue, order, stok, dan promo — semua di sini.
+                          Revenue, order, stok, dan promo - semua di sini.
                         </div>
                       </div>
 
@@ -2029,7 +2029,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Tren order dan revenue</div>
-                        <div className="admin-panel-sub">Ritme toko harian — order masuk vs revenue selesai.</div>
+                        <div className="admin-panel-sub">Ritme toko harian - order masuk vs revenue selesai.</div>
                       </div>
                     </div>
 
@@ -2255,7 +2255,7 @@ export default function AdminDashboard() {
                           Visitor Analytics
                         </div>
                         <div className="admin-panel-sub">
-                          Pengunjung baru vs. yang kembali lagi — {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
+                          Pengunjung baru vs. yang kembali lagi - {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
                         </div>
                       </div>
                       {analyticsLoading ? <span className="admin-panel-sub">Memuat...</span> : null}
@@ -2324,7 +2324,7 @@ export default function AdminDashboard() {
                           Tren Views Harian
                         </div>
                         <div className="admin-panel-sub">
-                          Unique views per hari dari tabel daily_stats — {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
+                          Unique views per hari dari tabel daily_stats - {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
                         </div>
                       </div>
                     </div>
@@ -3089,7 +3089,7 @@ export default function AdminDashboard() {
                     <summary className="admin-promo-bulkToggle">
                       <Tags size={14} />
                       <span>Import massal</span>
-                      <span className="admin-promo-bulkHint">Format: KODE,persen — satu per baris</span>
+                      <span className="admin-promo-bulkHint">Format: KODE,persen - satu per baris</span>
                     </summary>
                     <div className="admin-promo-bulkBody">
                       <textarea
@@ -3390,7 +3390,7 @@ export default function AdminDashboard() {
                             {(products || []).map((p) =>
                               (p.product_variants || []).filter((v) => v.is_active).map((v) => (
                                 <option key={v.id} value={v.id}>
-                                  {p.name} — {v.name} ({formatIDR(v.price_idr)})
+                                  {p.name} - {v.name} ({formatIDR(v.price_idr)})
                                 </option>
                               ))
                             )}
@@ -3518,7 +3518,7 @@ export default function AdminDashboard() {
                             <div className="admin-promo-cardTop">
                               <div className="admin-promo-cardLeft">
                                 <div className="admin-promo-cardCode">
-                                  <span>{product?.name || "?"} — {variant?.name || fs.variant_id.slice(0, 8)}</span>
+                                  <span>{product?.name || "?"} - {variant?.name || fs.variant_id.slice(0, 8)}</span>
                                 </div>
                                 <span className={`admin-promoBadge ${isLive ? "active" : isExpired ? "expired" : "off"}`}>
                                   {isLive ? "Live" : isExpired ? "Berakhir" : isUpcoming ? "Akan datang" : "Nonaktif"}
@@ -3752,7 +3752,7 @@ export default function AdminDashboard() {
         </div>
       </section>
 
-      {/* Create Product Modal — simplified for daily ops */}
+      {/* Create Product Modal - simplified for daily ops */}
       <Modal
         open={productModalOpen}
         title="Tambah Produk"
@@ -3855,7 +3855,7 @@ export default function AdminDashboard() {
         </div>
       </Modal>
 
-      {/* Variant Modal — core fields first, advanced collapsed */}
+      {/* Variant Modal - core fields first, advanced collapsed */}
       <Modal
         open={variantModalOpen}
         title={variantMode === "edit" ? "Edit Paket" : "Tambah Paket"}

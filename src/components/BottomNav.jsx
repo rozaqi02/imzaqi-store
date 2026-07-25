@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import {
   Activity,
-  CircleHelp,
   Grid2x2,
   House,
   MessageSquareQuote,
@@ -16,7 +15,6 @@ import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
 const ICONS = {
   "/": House,
   "/produk": Grid2x2,
-  "/faq": CircleHelp,
   "/testimoni": MessageSquareQuote,
   "/status": Activity,
 };
@@ -61,13 +59,16 @@ export default function BottomNav() {
     if (typeof ResizeObserver !== "undefined" && navRef.current) {
       observer = new ResizeObserver(syncOffset);
       observer.observe(navRef.current);
-    } else {
-      window.addEventListener("resize", syncOffset);
+      return () => {
+        observer.disconnect();
+        root.style.setProperty("--site-bottom-nav-offset", "0px");
+      };
     }
 
+    // Fallback ke resize event hanya jika ResizeObserver tidak tersedia
+    window.addEventListener("resize", syncOffset);
     return () => {
       window.removeEventListener("resize", syncOffset);
-      observer?.disconnect();
       root.style.setProperty("--site-bottom-nav-offset", "0px");
     };
   }, [hidden, location.pathname]);

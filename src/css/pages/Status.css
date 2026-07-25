@@ -1912,3 +1912,14 @@ html[data-theme="light"] .st-streakBadge {
   color: #2e1065;
   border-color: rgba(139, 92, 246, 0.4);
 }
+
+html[data-theme="light"] .oh-statusPill.is-reported {
+  background: linear-gradient(135deg, rgba(167, 139, 250, 0.85), rgba(109, 40, 217, 0.85));
+  color: #fff;
+  border-color: rgba(109, 40, 217, 0.35);
+}
+
+html[data-theme="light"] .st-inputWrap {
+  color: rgba(0, 100, 120, 0.8);
+}
+

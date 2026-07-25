@@ -3195,6 +3195,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-compareBtn:hover {
 .vcm {
   width: min(94vw, 860px);
   max-height: calc(88vh - 32px);
+  max-height: calc(88dvh - 32px);
   display: flex;
   flex-direction: column;
   border-radius: 24px;
@@ -3645,6 +3646,71 @@ html[data-theme="light"] .pdx-emojiBtn:hover {
   0%   { transform: translate(-50%, 0) scale(0.6); opacity: 1; }
   60%  { transform: translate(-50%, -60px) scale(1.2); opacity: 1; }
   100% { transform: translate(-50%, -100px) scale(0.8); opacity: 0; }
+}
+
+/* ── Compare button — lebih prominent ──────────────────────────────── */
+.pdx-compareBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 214, 180, 0.3);
+  background:
+    linear-gradient(180deg, rgba(0, 214, 180, 0.10), rgba(0, 214, 180, 0.03));
+  color: rgba(0, 214, 180, 0.9);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+  white-space: nowrap;
+}
+
+.pdx-compareBtn:hover {
+  background:
+    linear-gradient(180deg, rgba(0, 214, 180, 0.18), rgba(0, 214, 180, 0.06));
+  border-color: rgba(0, 214, 180, 0.5);
+  transform: translateY(-1px);
+}
+
+.pdx-compareBtn:active {
+  transform: scale(0.97);
+}
+
+html[data-theme="light"] .pdx-compareBtn {
+  border-color: rgba(0, 138, 148, 0.35);
+  background: rgba(0, 138, 148, 0.07);
+  color: #007a82;
+}
+
+html[data-theme="light"] .pdx-compareBtn:hover {
+  background: rgba(0, 138, 148, 0.13);
+  border-color: rgba(0, 138, 148, 0.5);
+}
+
+/* ── Variant badge Paling Laris ─────────────────────────────────────── */
+.pdx-packHot {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid rgba(255, 160, 40, 0.35);
+  background: linear-gradient(135deg, rgba(255, 160, 40, 0.18), rgba(255, 100, 20, 0.10));
+  color: #ffa028;
+  margin-bottom: 4px;
+  width: fit-content;
+}
+
+html[data-theme="light"] .pdx-packHot {
+  border-color: rgba(200, 100, 0, 0.3);
+  background: rgba(200, 100, 0, 0.08);
+  color: #b85c00;
 }
 
 @media (prefers-reduced-motion: reduce) {

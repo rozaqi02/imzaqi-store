@@ -72,6 +72,13 @@ html {
   touch-action: manipulation;
 }
 
+/* Disable smooth scroll on mobile/touch — causes bottom nav & FAB stutter on iOS momentum scroll */
+@media (max-width: 920px), (pointer: coarse) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 @media (max-width: 920px), (pointer: coarse) {
   html {
     scrollbar-gutter: auto;
@@ -93,6 +100,61 @@ html {
   }
 }
 
+/* ── Global focus states — visible focus ring untuk keyboard navigation ──── */
+:focus-visible {
+  outline: 2px solid rgba(0, 214, 180, 0.8);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Untuk elemen dengan border-radius besar, pakai box-shadow */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[tabindex]:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg0, #040714),
+    0 0 0 4px rgba(0, 214, 180, 0.6);
+}
+
+html[data-theme="light"] button:focus-visible,
+html[data-theme="light"] a:focus-visible,
+html[data-theme="light"] [role="button"]:focus-visible,
+html[data-theme="light"] [tabindex]:focus-visible {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgba(0, 138, 148, 0.65);
+}
+
+/* Input focus — ring tanpa double outline */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg0, #040714),
+    0 0 0 4px rgba(0, 214, 180, 0.5);
+}
+
+html[data-theme="light"] input:focus-visible,
+html[data-theme="light"] textarea:focus-visible,
+html[data-theme="light"] select:focus-visible {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgba(0, 138, 148, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:focus-visible,
+  a:focus-visible,
+  [role="button"]:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible {
+    transition: none;
+  }
+}
+
 [data-motion="lite"] .motion-safe-only {
   display: none;
 }
@@ -107,6 +169,7 @@ body {
     radial-gradient(500px 250px at 70% 40%, rgba(0, 214, 180, .08) 0%, transparent 60%),
     linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
   min-height: 100vh;
+  min-height: 100dvh;
 }
 
 /* Light mode: replace dark body gradient with light */

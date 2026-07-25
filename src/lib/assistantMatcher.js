@@ -1,4 +1,4 @@
-/**
+﻿/**
  * Context-aware Smart Matcher for Imzaqi AI
  *
  * Scoring layers:
@@ -314,7 +314,7 @@ function buildContextualLead(context, intent, query) {
 
   if (entities.orderCodes?.length) {
     const code = entities.orderCodes[0];
-    parts.push(`Aku catat order **${code}** — cek progresnya di tab **Status Order** atau lanjut tanya di sini.`);
+    parts.push(`Aku catat order **${code}** - cek progresnya di tab **Status Order** atau lanjut tanya di sini.`);
   }
 
   if (entities.products?.length && ["product", "comparison", "followup"].includes(intent?.id)) {
@@ -323,7 +323,7 @@ function buildContextualLead(context, intent, query) {
   }
 
   if (route?.tip && !parts.length && intent?.weight < 2.2) {
-    parts.push(`Kamu di halaman **${route.label}** — ${route.tip}`);
+    parts.push(`Kamu di halaman **${route.label}** - ${route.tip}`);
   }
 
   return parts;
@@ -335,7 +335,7 @@ function handleSpecialIntent(intent, context, query) {
   if (intent.id === "greeting") {
     const routeLine = route
       ? `Kamu lagi di **${route.label}**. ${route.tip}`
-      : "Pilih topik di bawah atau ketik pertanyaanmu — aku bantu jawab cepat.";
+      : "Pilih topik di bawah atau ketik pertanyaanmu - aku bantu jawab cepat.";
     return {
       id: `ai-greet-${Date.now()}`,
       q: query,
@@ -450,13 +450,13 @@ function buildLLMSystemPrompt(context, intent) {
     lines.push(`Pertanyaan terakhir user: "${historySignals.lastQuestion}".`);
   }
   if (context.isFollowUp) {
-    lines.push("Ini pertanyaan lanjutan — jawab dengan merujuk konteks sebelumnya.");
+    lines.push("Ini pertanyaan lanjutan - jawab dengan merujuk konteks sebelumnya.");
   }
   if (context.resolvedQuery && context.resolvedQuery !== context.originalQuery) {
     lines.push(`Query diperluas: "${context.resolvedQuery}".`);
   }
   if (intent?.negation) {
-    lines.push("User menyatakan negasi (belum/tidak) — sesuaikan jawaban.");
+    lines.push("User menyatakan negasi (belum/tidak) - sesuaikan jawaban.");
   }
 
   return lines.join("\n");
@@ -587,7 +587,7 @@ export async function answerQuery(query, history = [], options = {}) {
     };
   }
 
-  // Ultimate fallback — no LLM and no local match at all
+  // Ultimate fallback - no LLM and no local match at all
   return {
     id: `ai-fallback-${Date.now()}`,
     q: query,

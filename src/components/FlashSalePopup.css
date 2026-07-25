@@ -17,6 +17,7 @@
 .fsp-modal {
   width: min(100%, 460px);
   max-height: min(86vh, 680px);
+  max-height: min(86dvh, 680px);
   display: flex;
   flex-direction: column;
   border-radius: 28px;

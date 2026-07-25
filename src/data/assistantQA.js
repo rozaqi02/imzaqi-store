@@ -1,6 +1,6 @@
-/**
+﻿/**
  * 40 pre-defined Q&A pairs for the AI Assistant.
- * No manual user input — user picks from these prompts.
+ * No manual user input - user picks from these prompts.
  *
  * Each item has:
  *  - id: unique key
@@ -29,7 +29,7 @@ export const ASSISTANT_QA = [
     q: "Berapa lama garansi tiap produknya?",
     tags: ["garansi"],
     a: [
-      "Setiap varian punya periode garansi sendiri yang tertera di kartu paket — biasanya 1 bulan, 3 bulan, 6 bulan, sampai lifetime.",
+      "Setiap varian punya periode garansi sendiri yang tertera di kartu paket, biasanya 1 bulan, 3 bulan, 6 bulan, sampai lifetime.",
       "Lihat detail di halaman produk → buka paket yang kamu beli, dan periode garansi muncul sebagai chip di kartunya.",
     ],
   },
@@ -38,7 +38,7 @@ export const ASSISTANT_QA = [
     q: "Akun tiba-tiba ke-logout, apa diganti?",
     tags: ["garansi"],
     a: [
-      "Ya — selama dalam masa garansi dan akun tidak diubah passwordnya oleh kamu, admin akan replace.",
+      "Ya, selama dalam masa garansi dan akun tidak diubah passwordnya oleh kamu, admin akan replace.",
       "Kirim ID order ke admin di **WA: 0831-3604-9987** dan jelaskan kapan terakhir akun bekerja. Admin proses biasanya < 1 jam pas jam aktif.",
     ],
   },
@@ -60,7 +60,7 @@ export const ASSISTANT_QA = [
     tags: ["bayar"],
     a: [
       "Gampang kok 💳",
-      "Semua bayar lewat **QRIS** — tinggal scan pakai GoPay, OVO, DANA, ShopeePay, BCA Mobile, atau e-wallet & m-banking lain.",
+      "Semua bayar lewat **QRIS**, tinggal scan pakai GoPay, OVO, DANA, ShopeePay, BCA Mobile, atau e-wallet & m-banking lain.",
       "Abis checkout, langsung dibawa ke halaman QRIS. Nominalnya udah otomatis sesuai total pesanan kamu, tinggal scan aja.",
     ],
   },
@@ -69,7 +69,7 @@ export const ASSISTANT_QA = [
     q: "QRIS gagal scan, gimana?",
     tags: ["bayar"],
     a: [
-      "Coba refresh halaman QRIS — terkadang token sesi expired.",
+      "Coba refresh halaman QRIS, terkadang token sesi expired.",
       "Pastikan jaringan stabil dan aplikasi e-wallet kamu support QRIS dinamis.",
       "Kalau masih gagal, screenshot error dan kirim ke admin via WhatsApp.",
     ],
@@ -80,7 +80,7 @@ export const ASSISTANT_QA = [
     tags: ["bayar"],
     a: [
       "Default-nya QRIS karena lebih cepat verifikasinya.",
-      "Untuk kasus khusus (mis. nominal kecil & e-wallet penuh), chat admin dulu — admin bisa kasih opsi alternatif.",
+      "Untuk kasus khusus (mis. nominal kecil & e-wallet penuh), chat admin dulu, admin bisa kasih opsi alternatif.",
     ],
   },
   {
@@ -88,7 +88,7 @@ export const ASSISTANT_QA = [
     q: "Aku sudah bayar tapi statusnya masih pending",
     tags: ["bayar", "status"],
     a: [
-      "Santai dulu ya — biasanya status langsung ke-update otomatis dalam **1–5 menit** setelah bayar.",
+      "Santai dulu ya, biasanya status langsung ke-update otomatis dalam **1-5 menit** setelah bayar.",
       "Cek di tab **Status Order**, masukin ID order kamu (format `IMZ-XXXX`).",
       "Kalau udah lewat **15 menit** masih pending, kirim bukti bayar + ID order ke admin di **WA: 0831-3604-9987** biar dicek manual.",
     ],
@@ -111,7 +111,7 @@ export const ASSISTANT_QA = [
     tags: ["status"],
     a: [
       "Mau lacak pesanan? Buka tab **Status Order** (atau **Lacak** di menu bawah) → ketik ID order kamu → tap Cek.",
-      "Format ID-nya `IMZ-XXXX` — cuma 4 huruf/angka setelah IMZ- juga oke, nanti otomatis diformat.",
+      "Format ID-nya `IMZ-XXXX` - cuma 4 huruf/angka setelah IMZ- juga oke, nanti otomatis diformat.",
     ],
   },
   {
@@ -119,7 +119,7 @@ export const ASSISTANT_QA = [
     q: "Aku lupa ID ordernya",
     tags: ["status"],
     a: [
-      "Cek inbox WhatsApp dari admin — biasanya ID dikirim sesaat setelah pembayaran terkonfirmasi.",
+      "Cek inbox WhatsApp dari admin - biasanya ID dikirim sesaat setelah pembayaran terkonfirmasi.",
       "Kalau tetap tidak ketemu, sebut nama produk + nominal bayar + tanggal ke admin agar dilacak manual.",
     ],
   },
@@ -149,7 +149,7 @@ export const ASSISTANT_QA = [
     tags: ["status"],
     a: [
       "Selama pembayaran belum dilakukan, kamu bisa kembali ke checkout dan edit isi keranjang.",
-      "Kalau sudah bayar, perubahan harus lewat admin — tergantung statusnya, bisa diganti atau direfund.",
+      "Kalau sudah bayar, perubahan harus lewat admin - tergantung statusnya, bisa diganti atau direfund.",
     ],
   },
   {
@@ -157,9 +157,9 @@ export const ASSISTANT_QA = [
     q: "Mau batalkan order, gimana?",
     tags: ["status"],
     a: [
-      "Sebelum bayar — cukup tinggalkan halaman checkout, order tidak masuk sistem.",
-      "Sudah bayar tapi belum diproses — chat admin segera, refund 100% via e-wallet.",
-      "Sudah diproses (akun sudah dikirim) — refund tidak bisa, tapi bisa upgrade/swap dengan biaya selisih.",
+      "Sebelum bayar - cukup tinggalkan halaman checkout, order tidak masuk sistem.",
+      "Sudah bayar tapi belum diproses - chat admin segera, refund 100% via e-wallet.",
+      "Sudah diproses (akun sudah dikirim) - refund tidak bisa, tapi bisa upgrade/swap dengan biaya selisih.",
     ],
   },
 
@@ -198,7 +198,7 @@ export const ASSISTANT_QA = [
     q: "Ada produk baru?",
     tags: ["produk"],
     a: [
-      "Cek katalog dan aktifkan filter **Produk baru** — semua produk yang ditambahkan dalam 30 hari terakhir akan muncul.",
+      "Cek katalog dan aktifkan filter **Produk baru** - semua produk yang ditambahkan dalam 30 hari terakhir akan muncul.",
       "Kami rutin tambah produk subscription populer setiap bulan.",
     ],
   },
@@ -218,7 +218,7 @@ export const ASSISTANT_QA = [
     q: "Bisa ubah password akunnya?",
     tags: ["akun"],
     a: [
-      "**Tidak boleh** untuk akun sharing — akan menyebabkan user lain ke-logout dan garansi gugur.",
+      "**Tidak boleh** untuk akun sharing - akan menyebabkan user lain ke-logout dan garansi gugur.",
       "Untuk akun private, biasanya admin sudah ganti ke yang aman. Jangan ubah lagi kecuali admin instruksikan.",
     ],
   },
@@ -237,7 +237,7 @@ export const ASSISTANT_QA = [
     tags: ["akun", "garansi"],
     a: [
       "Cek dulu: apakah typo email/password? Pastikan copy-paste presis.",
-      "Kalau credential betul tapi tetap gagal, kemungkinan akun sedang re-stocked admin — chat admin dengan ID order, biasanya solved < 30 menit.",
+      "Kalau credential betul tapi tetap gagal, kemungkinan akun sedang re-stocked admin - chat admin dengan ID order, biasanya solved < 30 menit.",
     ],
   },
 
@@ -267,7 +267,7 @@ export const ASSISTANT_QA = [
     tags: ["promo"],
     a: [
       "Cek pin di Instagram untuk welcome promo.",
-      "Sering juga ada flash sale tiap akhir minggu — pantau katalog dengan filter **Promo**.",
+      "Sering juga ada flash sale tiap akhir minggu - pantau katalog dengan filter **Promo**.",
     ],
   },
 
@@ -286,7 +286,7 @@ export const ASSISTANT_QA = [
     q: "Aku salah masukin nomor WA",
     tags: ["pengiriman"],
     a: [
-      "Chat admin secepatnya dengan ID order + nomor WA yang benar — sebelum diproses, masih bisa diupdate.",
+      "Chat admin secepatnya dengan ID order + nomor WA yang benar - sebelum diproses, masih bisa diupdate.",
       "Kalau sudah dikirim ke nomor lama, admin akan kirim ulang ke nomor baru (pastikan nomor lama tidak akses).",
     ],
   },
@@ -306,7 +306,7 @@ export const ASSISTANT_QA = [
     q: "Refund belum cair",
     tags: ["refund"],
     a: [
-      "Cek mutasi e-wallet/bank kamu — kadang masuk dengan keterangan unik dari payment gateway.",
+      "Cek mutasi e-wallet/bank kamu - kadang masuk dengan keterangan unik dari payment gateway.",
       "Kalau > 24 jam dan tidak ada masuk, kirim bukti chat admin sebelumnya + nomor e-wallet ke admin.",
     ],
   },
@@ -326,7 +326,7 @@ export const ASSISTANT_QA = [
     q: "Akun yang dijual asli atau bajakan?",
     tags: ["toko"],
     a: [
-      "**100% asli** — semua akun adalah hasil subscription resmi yang dibagikan/diprivat ulang.",
+      "**100% asli** - semua akun adalah hasil subscription resmi yang dibagikan/diprivat ulang.",
       "Buktinya: bisa cek di app langsung tanpa watermark/limit aneh, plus garansi penggantian.",
     ],
   },
@@ -353,7 +353,7 @@ export const ASSISTANT_QA = [
     q: "Alamat fisik tokonya di mana?",
     tags: ["toko"],
     a: [
-      "Imzaqi Store adalah **toko 100% online** — semua transaksi via web ini & WhatsApp.",
+      "Imzaqi Store adalah **toko 100% online** - semua transaksi via web ini & WhatsApp.",
       "Tidak ada outlet fisik, biaya operasi rendah = harga akun lebih murah untuk kamu.",
     ],
   },
@@ -372,7 +372,7 @@ export const ASSISTANT_QA = [
     q: "Untuk keluarga banyak orang, rekomendasinya?",
     tags: ["produk"],
     a: [
-      "Pilih varian **Family / Premium** — biasanya support 4–6 user dengan profil terpisah.",
+      "Pilih varian **Family / Premium** - biasanya support 4–6 user dengan profil terpisah.",
       "Top picks: Netflix Premium Family, YouTube Premium Family, Spotify Family.",
     ],
   },
@@ -402,7 +402,7 @@ export const ASSISTANT_QA = [
     tags: ["bayar"],
     a: [
       "**Sesudah pembayaran terkonfirmasi**, admin akan kirim detail akun via WhatsApp.",
-      "Pengiriman tidak akan dilakukan sebelum konfirmasi pembayaran masuk — ini SOP keamanan kedua belah pihak.",
+      "Pengiriman tidak akan dilakukan sebelum konfirmasi pembayaran masuk - ini SOP keamanan kedua belah pihak.",
     ],
   },
   {
@@ -411,7 +411,7 @@ export const ASSISTANT_QA = [
     tags: ["toko"],
     a: [
       "Sama-sama 🙏 Terima kasih sudah belanja di Imzaqi Store.",
-      "Kalau berkenan, bantu drop review di tab **Testimoni** ya — sangat membantu user lain mempertimbangkan.",
+      "Kalau berkenan, bantu drop review di tab **Testimoni** ya - sangat membantu user lain mempertimbangkan.",
     ],
   },
 ];
@@ -429,7 +429,7 @@ const ROUTE_STARTER_TAGS = {
 };
 
 /**
- * Route-aware starter chips — prioritises Q&A matching current page.
+ * Route-aware starter chips - prioritises Q&A matching current page.
  */
 export function getContextualStarters(pathname = "/", history = []) {
   const askedIds = new Set(history.map((h) => h.id));

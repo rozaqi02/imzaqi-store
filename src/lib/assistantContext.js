@@ -1,4 +1,4 @@
-const ROUTE_HINTS = {
+﻿const ROUTE_HINTS = {
   "/": {
     label: "beranda",
     tags: ["produk", "toko"],
@@ -253,13 +253,13 @@ export function resolveFollowUpQuery(query, history = []) {
   }
 
   if (lower.includes("itu") || lower.includes("ini") || lower.includes("tadi")) {
-    if (orderHint) return `${raw} — konteks order ${orderHint} — topik: ${lastQ}`;
-    if (productHint) return `${raw} — konteks produk ${productHint} — topik: ${lastQ}`;
-    return `${raw} — lanjutan pertanyaan: ${lastQ}`;
+    if (orderHint) return `${raw} - konteks order ${orderHint} - topik: ${lastQ}`;
+    if (productHint) return `${raw} - konteks produk ${productHint} - topik: ${lastQ}`;
+    return `${raw} - lanjutan pertanyaan: ${lastQ}`;
   }
 
   if (lastQ) {
-    return `${raw} — lanjutan: ${lastQ} — topik: ${tagHints}`;
+    return `${raw} - lanjutan: ${lastQ} - topik: ${tagHints}`;
   }
 
   return raw;

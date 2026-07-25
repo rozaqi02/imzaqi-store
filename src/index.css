@@ -31,3 +31,6 @@
 
 /* Final neumorphic depth pass for badges / chips / icon buttons / qty */
 @import "./css/neumorphic-depth.css";
+
+/* Hero text animations — semua halaman kecuali Home */
+@import "./css/hero-animations.css";

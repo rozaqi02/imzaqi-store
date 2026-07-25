@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+﻿import { useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 // ── Page Title Ticker (tab blur) ─────────────────────────────────────────
@@ -71,7 +71,7 @@ function triggerKonamiEgg() {
     <div style="text-align:center;padding:32px;">
       <div style="font-size:80px;margin-bottom:16px;animation:konami-bounce 0.6s ease infinite alternate">${emoji}</div>
       <div style="font-size:28px;font-weight:800;color:#00d6b4;margin-bottom:8px;letter-spacing:-0.5px">${msg}</div>
-      <div style="font-size:15px;color:rgba(255,255,255,0.7);margin-bottom:24px">↑↑↓↓←→←→BA — Konami Code</div>
+      <div style="font-size:15px;color:rgba(255,255,255,0.7);margin-bottom:24px">↑↑↓↓←→←→BA - Konami Code</div>
       <div style="font-size:13px;color:rgba(255,255,255,0.4)">Klik di mana saja untuk tutup</div>
     </div>
   `;
@@ -98,6 +98,8 @@ export function useGlobalShortcuts() {
   const navigate = useNavigate();
   const location = useLocation();
   const konamiRef = useRef([]);
+  // Ganti window.__lastGKey dengan ref untuk menghindari polusi global object
+  const lastGKeyRef = useRef(0);
 
   useEffect(() => {
     function onKeyDown(e) {
@@ -129,13 +131,13 @@ export function useGlobalShortcuts() {
       }
 
       // "g h" → home, "g p" → produk, "g s" → status, "g r" → riwayat
-      // Simple two-key sequence: track last "g" press
+      // Simple two-key sequence: track last "g" press via ref, bukan window global
       if (e.key === "g" && !isTyping && !e.metaKey && !e.ctrlKey) {
-        window.__lastGKey = Date.now();
+        lastGKeyRef.current = Date.now();
         return;
       }
 
-      const lastG = window.__lastGKey || 0;
+      const lastG = lastGKeyRef.current || 0;
       if (Date.now() - lastG < 800 && !isTyping) {
         const map = { h: "/", p: "/produk", s: "/status", r: "/riwayat", f: "/faq" };
         if (map[e.key]) {

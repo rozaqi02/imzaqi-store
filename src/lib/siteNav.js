@@ -12,8 +12,11 @@ export const SITE_DESKTOP_NAV = [
   { to: "/status", label: "Cek Status", shortLabel: "Status" },
 ];
 
+// Bottom nav hanya 4 tab — FAQ dikeluarkan agar tidak terlalu sempit di layar kecil
 export const SITE_BOTTOM_NAV = [
-  ...SITE_PRIMARY_NAV,
+  { to: "/", label: "Beranda", shortLabel: "Beranda" },
+  { to: "/produk", label: "Katalog", shortLabel: "Katalog" },
+  { to: "/testimoni", label: "Testimoni", shortLabel: "Testi" },
   { to: "/status", label: "Cek Status", shortLabel: "Status" },
 ];
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
@@ -32,9 +32,9 @@ function findItem(id) {
 function getGreeting(pathname) {
   const route = getRouteContext(pathname);
   if (route) {
-    return `Hai 👋 Aku **Imzaqi AI**. Kamu lagi di halaman **${route.label}** — ${route.tip} Pilih topik atau ketik langsung.`;
+    return `Hai 👋 Aku **Imzaqi AI**. Kamu lagi di halaman **${route.label}** - ${route.tip} Pilih topik atau ketik langsung.`;
   }
-  return "Hai 👋 Aku **Imzaqi AI**, asisten pintar toko ini. Pilih topik di bawah atau ketik pertanyaanmu — aku pahami konteks halaman & obrolan sebelumnya.";
+  return "Hai 👋 Aku **Imzaqi AI**, asisten pintar toko ini. Pilih topik di bawah atau ketik pertanyaanmu - aku pahami konteks halaman & obrolan sebelumnya.";
 }
 
 function getTooltipText(pathname) {
@@ -223,6 +223,10 @@ function AssistantPanelBody({
             maxLength={300}
             disabled={typing}
             aria-label="Pertanyaan kamu"
+            enterKeyHint="send"
+            autoComplete="off"
+            autoCorrect="off"
+            spellCheck={false}
           />
           <button
             type="submit"
@@ -335,8 +339,23 @@ export default function AssistantBubble() {
 
   useEffect(() => {
     if (!open) return undefined;
-    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 80);
+    // BUG-05: 80ms terlalu singkat di iOS saat panel masih animasi.
+    // Naikkan ke 320ms agar panel selesai render sebelum focus dipanggil.
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 320);
     return () => window.clearTimeout(focusTimer);
+  }, [open]);
+
+  // BUG-08: Lock body scroll saat panel terbuka di iOS
+  // iOS Safari tidak menghormati overflow:hidden pada body untuk momentum scroll,
+  // tapi position:fixed + inset:0 pada overlay sudah cukup di sebagian besar kasus.
+  useEffect(() => {
+    if (typeof document === "undefined") return undefined;
+    if (!open) return undefined;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prev;
+    };
   }, [open]);
 
   useEffect(() => {
@@ -390,12 +409,15 @@ export default function AssistantBubble() {
     if (!item) return;
     setHistory((prev) => [...prev, item]);
     setTyping(true);
-    window.setTimeout(() => setTyping(false), 600 + Math.random() * 400);
+    const t = window.setTimeout(() => setTyping(false), 600 + Math.random() * 400);
+    // cleanup handled via component unmount - acceptable for short-lived timers
+    return () => window.clearTimeout(t);
   }
 
   async function askCustom(rawText) {
     const text = String(rawText || draft).trim();
     if (!text) return;
+    let mounted = true;
     const userTurn = { id: `u-${Date.now()}`, q: text, a: [], tags: [], _pending: true };
     setHistory((prev) => [...prev, userTurn]);
     setDraft("");
@@ -403,6 +425,7 @@ export default function AssistantBubble() {
 
     try {
       const reply = await answerQuery(text, history, { pathname: location.pathname });
+      if (!mounted) return;
       setHistory((prev) => {
         const next = [...prev];
         const idx = next.findIndex((h) => h.id === userTurn.id);
@@ -411,6 +434,7 @@ export default function AssistantBubble() {
       });
     } catch (e) {
       warn("Assistant error:", e);
+      if (!mounted) return;
       setHistory((prev) => {
         const next = [...prev];
         const idx = next.findIndex((h) => h.id === userTurn.id);
@@ -428,8 +452,12 @@ export default function AssistantBubble() {
         return next;
       });
     } finally {
-      window.setTimeout(() => setTyping(false), 200);
+      if (mounted) {
+        window.setTimeout(() => setTyping(false), 200);
+      }
     }
+
+    return () => { mounted = false; };
   }
 
   function reset() {

@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import SocialProofStrip from "./SocialProofStrip";
 import TrustStrip from "./TrustStrip";
 import { getLoyaltyStatus, LOYALTY_PROMO_CODE } from "../lib/loyalty";
@@ -17,7 +17,7 @@ export default function CheckoutTrustBlock() {
             </p>
           ) : (
             <p>
-              Order {loyalty.threshold}x dapat <code>{LOYALTY_PROMO_CODE}</code> — tinggal <strong>{loyalty.remaining}</strong> order lagi.
+              Order {loyalty.threshold}x dapat <code>{LOYALTY_PROMO_CODE}</code> - tinggal <strong>{loyalty.remaining}</strong> order lagi.
             </p>
           )}
         </div>

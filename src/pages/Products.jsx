@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
+﻿import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
@@ -84,7 +84,7 @@ const SORT_LABELS = {
 };
 
 const DEFAULT_SORT = "reco";
-/** Initial catalog batch — keeps mobile DOM/paint light; expand via "Muat lagi". */
+/** Initial catalog batch - keeps mobile DOM/paint light; expand via "Muat lagi". */
 const CATALOG_BATCH = 12;
 
 const SEARCH_QUERIES = [
@@ -431,7 +431,7 @@ export default function Products() {
     };
   }, [isRestoringScroll]);
 
-  // Peek saved scroll on mount — do not consume until restore succeeds (Strict Mode safe).
+  // Peek saved scroll on mount - do not consume until restore succeeds (Strict Mode safe).
   useLayoutEffect(() => {
     const saved = peekSavedScroll();
     if (!saved) return;
@@ -441,18 +441,19 @@ export default function Products() {
 
   useEffect(() => () => restoreCleanupRef.current?.(), []);
 
-  // Guard against late scroll-to-top / layout shifts stealing restored position.
+  // Guard against late scroll-to-top stealing restored position.
+  // Hanya berjalan selama restore aktif, berhenti segera setelah selesai.
   useEffect(() => {
-    if (!isRestoringScroll && !isCatalogRestoreLocked()) return undefined;
+    if (!isRestoringScroll) return undefined;
 
     let frame = 0;
     let ticks = 0;
-    const maxTicks = 120;
+    const maxTicks = 20; // ~333ms di 60fps - cukup untuk satu frame render
 
     const guard = () => {
       ticks += 1;
       const targetY = restoredScrollYRef.current;
-      if (ticks > maxTicks || (!isRestoringScroll && !isCatalogRestoreLocked())) return;
+      if (ticks > maxTicks || !isRestoringScroll) return;
       if (targetY != null && targetY > 120 && window.scrollY < targetY - 80) {
         window.scrollTo({ top: targetY, left: 0, behavior: "auto" });
       }
@@ -497,7 +498,7 @@ export default function Products() {
 
   usePageMeta({
     title: "Produk",
-    description: "Katalog langganan premium — cari, bandingin, langsung checkout.",
+    description: "Katalog langganan premium - cari, bandingin, langsung checkout.",
   });
 
   useEffect(() => {
@@ -623,6 +624,8 @@ export default function Products() {
     }
     document.addEventListener("keydown", onKey);
     return () => document.removeEventListener("keydown", onKey);
+  // searchRef adalah ref stabil, tidak perlu di deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersOpen]);
 
   const enriched = useMemo(() => {
@@ -810,7 +813,7 @@ export default function Products() {
   useEffect(() => {
     if (isRestoringScroll || pendingScrollRef.current) return;
     setVisibleCount(CATALOG_BATCH);
-    // Intentionally only react to filterSignature — finishing restore must not collapse the list.
+    // Intentionally only react to filterSignature - finishing restore must not collapse the list.
     // eslint-disable-next-line react-hooks/exhaustive-deps -- isRestoringScroll is a guard, not a trigger
   }, [filterSignature]);
 
@@ -860,17 +863,10 @@ export default function Products() {
     restoredScrollYRef.current = saved.y;
     restoreCleanupRef.current = restoreCatalogScroll(saved, () => {
       clearSavedScroll();
-      beginCatalogRestoreLock(1400);
-      window.setTimeout(() => {
-        if (restoredScrollYRef.current != null) {
-          window.scrollTo({ top: restoredScrollYRef.current, left: 0, behavior: "auto" });
-        }
-        setIsRestoringScroll(false);
-      }, 700);
-      window.setTimeout(() => {
-        restoredScrollYRef.current = null;
-        endCatalogRestoreLock();
-      }, 1200);
+      // Langsung release - tidak perlu extend lock setelah restore selesai
+      restoredScrollYRef.current = null;
+      endCatalogRestoreLock();
+      setIsRestoringScroll(false);
     });
   }, [loading, isFiltering, error, filtered.length, filterSignature, priceReady, isRestoringScroll]);
 
@@ -1048,10 +1044,10 @@ export default function Products() {
     <div className="page catalog-page">
       <section className="section catalog-hero">
         <div className="container">
-          <div className="catalog-heroGrid">
-            <div className="catalog-eyebrow">Katalog</div>
-            <h1 className="h1 catalog-title">Mau langganan apa hari ini?</h1>
-            <p className="catalog-sub">Scroll dulu, gas aja kalo cocok.</p>
+          <div className="catalog-heroGrid hero-anim-wrap">
+            <div className="catalog-eyebrow hero-anim-kicker">Katalog</div>
+            <h1 className="h1 catalog-title hero-anim-title">Mau langganan apa hari ini?</h1>
+            <p className="catalog-sub hero-anim-sub">Scroll dulu, gas aja kalo cocok.</p>
           </div>
 
           <div className="catalog-command">

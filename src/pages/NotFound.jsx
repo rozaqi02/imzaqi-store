@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Activity, ArrowRight, Compass, Grid2x2, History, Home } from "lucide-react";
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -16,7 +16,7 @@ export default function NotFound() {
   const [products, setProducts] = useState([]);
 
   usePageMeta({
-    title: "404 — Halaman Tidak Ditemukan",
+    title: "404 - Halaman Tidak Ditemukan",
     description: "Halaman ini nggak ada. Coba pilih halaman lain ya.",
   });
 

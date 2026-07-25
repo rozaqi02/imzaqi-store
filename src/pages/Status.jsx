@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { fireConfetti } from "../components/Confetti";
 import {
@@ -97,12 +97,12 @@ function getTimeline(status) {
   ];
 }
 
-// Dipakai saat onChange — hanya uppercase + strip spasi, biarkan user hapus dengan bebas
+// Dipakai saat onChange - hanya uppercase + strip spasi, biarkan user hapus dengan bebas
 function sanitizeOrderInput(value) {
   return String(value || "").toUpperCase().replace(/[^A-Z0-9-]/g, "");
 }
 
-// Dipakai saat lookup/submit — normalisasi penuh ke format IMZ-XXXX atau IMZ-XXXXXXXX
+// Dipakai saat lookup/submit - normalisasi penuh ke format IMZ-XXXX atau IMZ-XXXXXXXX
 function normalizeOrderCode(value) {
   // Strip semua karakter non-alphanumeric kecuali dash sementara
   const cleaned = String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
@@ -176,14 +176,18 @@ function FlowStep({ step }) {
 function DoneCelebration({ show, onDismiss }) {
   useEffect(() => {
     if (!show) return;
-    // Fire confetti from center of screen
     const cx = window.innerWidth / 2;
     const cy = window.innerHeight / 3;
     fireConfetti(cx, cy);
-    setTimeout(() => fireConfetti(cx - 80, cy + 20), 200);
-    setTimeout(() => fireConfetti(cx + 80, cy + 20), 400);
-    const t = setTimeout(onDismiss, 3200);
-    return () => clearTimeout(t);
+    // Track semua timer agar bisa di-clear saat unmount
+    const t1 = setTimeout(() => fireConfetti(cx - 80, cy + 20), 200);
+    const t2 = setTimeout(() => fireConfetti(cx + 80, cy + 20), 400);
+    const t3 = setTimeout(onDismiss, 3200);
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+    };
   }, [show, onDismiss]);
 
   if (!show) return null;
@@ -272,9 +276,9 @@ function TabCekStatus({ settings }) {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [toast]);
 
-  // Silent refresh — update status di background tanpa reset UI
+  // Silent refresh - update status di background tanpa reset UI
   const silentRefresh = useCallback(async (orderCode) => {
     if (!orderCode) return;
     setRefreshing(true);
@@ -286,7 +290,7 @@ function TabCekStatus({ settings }) {
       setOrder(row);
       setLastUpdated(new Date());
     } catch {
-      // silent — tidak tampil error untuk background refresh
+      // silent - tidak tampil error untuk background refresh
     } finally {
       setRefreshing(false);
     }
@@ -321,6 +325,9 @@ function TabCekStatus({ settings }) {
       return undefined;
     }
 
+    // Hanya buat interval baru jika order_code berubah - jangan reset saat status change
+    if (pollTimerRef.current) return undefined;
+
     pollTimerRef.current = setInterval(() => {
       silentRefresh(order.order_code);
     }, POLL_INTERVAL_MS);
@@ -331,7 +338,7 @@ function TabCekStatus({ settings }) {
         pollTimerRef.current = null;
       }
     };
-  }, [order?.order_code, order?.status, silentRefresh]);
+  }, [order?.order_code, silentRefresh]);
 
   const recentOrders = useMemo(() => {
     const all = getOrderHistory();
@@ -381,7 +388,7 @@ function TabCekStatus({ settings }) {
     if (val === "pending") return "Estimasi: bayar dalam 30 menit agar tidak expired";
     if (val === "paid_reported") return "Estimasi: konfirmasi admin ~15 menit";
     if (val === "processing") return "Estimasi: akun dikirim ~5 menit";
-    if (val === "done") return "Order selesai — akun sudah dikirim";
+    if (val === "done") return "Order selesai - akun sudah dikirim";
     if (val === "cancelled") return null;
     return null;
   }, [order?.status]);
@@ -500,8 +507,11 @@ function TabCekStatus({ settings }) {
             <Search size={16} />
             <input
               className="input st-input"
-              inputMode="text"
+              inputMode="search"
               autoCapitalize="characters"
+              autoCorrect="off"
+              autoComplete="off"
+              spellCheck={false}
               placeholder="Contoh: IMZ-ABCD atau IMZ-ABCDEFGH"
               value={input}
               onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
@@ -690,8 +700,10 @@ function TabCekStatus({ settings }) {
                   const description = String(item?.description || "").trim();
                   const requiresEmail = !!item?.requires_buyer_email;
                   const itemTotal = Number(item.price_idr || 0) * Number(item.qty || 0);
+                  // Gunakan kombinasi variant_id + index sebagai key yang lebih stabil dari index saja
+                  const itemKey = item?.variant_id ? `${item.variant_id}-${index}` : `item-${index}`;
                   return (
-                    <div key={index} className="st-itemRow st-itemRowDetailed">
+                    <div key={itemKey} className="st-itemRow st-itemRowDetailed">
                       <div className="st-itemHead">
                         <div className="st-itemIcon" aria-hidden="true">
                           {iconUrl ? (
@@ -1061,7 +1073,7 @@ function TabRiwayat() {
             {hasFetchError ? (
               <div className="oh-fetchError">
                 <AlertCircle size={13} />
-                <span>Gagal memperbarui — menampilkan status tersimpan</span>
+                <span>Gagal memperbarui - menampilkan status tersimpan</span>
               </div>
             ) : null}
 
@@ -1117,13 +1129,13 @@ export default function Status() {
     <div className="page status-page">
       <section className="section status-shell">
         <div className="container st-wrap">
-          <header className="st-hero">
+          <header className="st-hero hero-anim-wrap">
             <div className="st-heroCopy">
-              <div className="st-kicker">Track order</div>
-              <h1 className="h1 st-title">
+              <div className="st-kicker hero-anim-kicker">Track order</div>
+              <h1 className="h1 st-title hero-anim-title">
                 {activeTab === "riwayat" ? "Riwayat order kamu." : "Cek status order."}
               </h1>
-              <p className="st-sub">
+              <p className="st-sub hero-anim-sub">
                 {activeTab === "riwayat"
                   ? "Semua order dari browser ini kesimpen di sini."
                   : "Masukin ID order, langsung keliatan progress-nya."}

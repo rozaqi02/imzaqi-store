@@ -213,6 +213,13 @@ function ScrollToTop() {
       if (shouldSkipCatalogScrollToTop()) return;
     }
 
+    // Saat navigasi ke halaman non-katalog, pastikan scrollRestoration kembali
+    // ke "auto" — kalau tidak, iOS Safari akan ingat posisi scroll katalog
+    // dan menerapkannya ke halaman baru (biasanya footer/bawah halaman).
+    if (pathname !== "/produk" && typeof history !== "undefined") {
+      history.scrollRestoration = "auto";
+    }
+
     const reduce =
       typeof window !== "undefined" &&
       window.matchMedia &&
@@ -221,7 +228,19 @@ function ScrollToTop() {
       typeof window !== "undefined" &&
       window.matchMedia &&
       window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
-    window.scrollTo({ top: 0, behavior: reduce || coarse ? "auto" : "smooth" });
+
+    // iOS Safari kadang mengabaikan scrollTo saat dipanggil terlalu awal
+    // di siklus render. Double rAF memastikan scroll terjadi setelah paint.
+    const doScroll = () => {
+      window.scrollTo({ top: 0, left: 0, behavior: reduce || coarse ? "auto" : "smooth" });
+    };
+
+    if (coarse) {
+      // Mobile/touch: gunakan double rAF agar iOS tidak scroll ke posisi lama
+      requestAnimationFrame(() => requestAnimationFrame(doScroll));
+    } else {
+      doScroll();
+    }
   }, [pathname, location.key]);
 
   return null;
@@ -236,32 +255,34 @@ function AppRoutes() {
 
   return (
     <Layout routeKey={displayLocation.pathname}>
-      <Suspense fallback={<PageLoader />}>
-        <Routes location={displayLocation}>
-          <Route path="/" element={<BoundedRoute pageName="Home"><Home /></BoundedRoute>} />
-          <Route path="/produk/:slug" element={<BoundedRoute pageName="Detail Produk"><ProductDetail /></BoundedRoute>} />
-          <Route path="/produk" element={<BoundedRoute pageName="Katalog"><Products /></BoundedRoute>} />
-          <Route path="/tentang" element={<BoundedRoute pageName="Tentang"><About /></BoundedRoute>} />
-          <Route path="/faq" element={<BoundedRoute pageName="FAQ"><Faq /></BoundedRoute>} />
-          <Route path="/testimoni" element={<BoundedRoute pageName="Testimoni"><Testimonials /></BoundedRoute>} />
-          <Route path="/checkout" element={<BoundedRoute pageName="Checkout"><Checkout /></BoundedRoute>} />
-          <Route path="/bayar" element={<BoundedRoute pageName="Bayar"><Pay /></BoundedRoute>} />
-          <Route path="/status" element={<BoundedRoute pageName="Status Order"><Status /></BoundedRoute>} />
-          <Route path="/riwayat" element={<Navigate to="/status?tab=riwayat" replace />} />
-          <Route path="/admin" element={<BoundedRoute pageName="Admin Login"><AdminLogin /></BoundedRoute>} />
-          <Route
-            path="/admin/dashboard"
-            element={
-              <ProtectedRoute>
-                <BoundedRoute pageName="Admin Dashboard">
-                  <AdminDashboard />
-                </BoundedRoute>
-              </ProtectedRoute>
-            }
-          />
-          <Route path="*" element={<BoundedRoute pageName="404"><NotFound /></BoundedRoute>} />
-        </Routes>
-      </Suspense>
+      <PageErrorBoundary>
+        <Suspense fallback={<PageLoader />}>
+          <Routes location={displayLocation}>
+            <Route path="/" element={<BoundedRoute pageName="Home"><Home /></BoundedRoute>} />
+            <Route path="/produk/:slug" element={<BoundedRoute pageName="Detail Produk"><ProductDetail /></BoundedRoute>} />
+            <Route path="/produk" element={<BoundedRoute pageName="Katalog"><Products /></BoundedRoute>} />
+            <Route path="/tentang" element={<BoundedRoute pageName="Tentang"><About /></BoundedRoute>} />
+            <Route path="/faq" element={<BoundedRoute pageName="FAQ"><Faq /></BoundedRoute>} />
+            <Route path="/testimoni" element={<BoundedRoute pageName="Testimoni"><Testimonials /></BoundedRoute>} />
+            <Route path="/checkout" element={<BoundedRoute pageName="Checkout"><Checkout /></BoundedRoute>} />
+            <Route path="/bayar" element={<BoundedRoute pageName="Bayar"><Pay /></BoundedRoute>} />
+            <Route path="/status" element={<BoundedRoute pageName="Status Order"><Status /></BoundedRoute>} />
+            <Route path="/riwayat" element={<Navigate to="/status?tab=riwayat" replace />} />
+            <Route path="/admin" element={<BoundedRoute pageName="Admin Login"><AdminLogin /></BoundedRoute>} />
+            <Route
+              path="/admin/dashboard"
+              element={
+                <ProtectedRoute>
+                  <BoundedRoute pageName="Admin Dashboard">
+                    <AdminDashboard />
+                  </BoundedRoute>
+                </ProtectedRoute>
+              }
+            />
+            <Route path="*" element={<BoundedRoute pageName="404"><NotFound /></BoundedRoute>} />
+          </Routes>
+        </Suspense>
+      </PageErrorBoundary>
 
       {showCheckoutOverlay ? (
         <Suspense fallback={null}>

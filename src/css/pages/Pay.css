@@ -65,6 +65,10 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-emailState.warn{color:#ffd089;border-color:rgba(255,208,137,.4);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(255,208,137,.22),rgba(70,40,0,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(255,180,40,.14);}
 .pay-emailState.ok{color:#9ff5d9;border-color:rgba(159,245,217,.34);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(0,214,180,.22),rgba(0,50,45,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(0,180,150,.14);}
 .pay-emailInput{height:48px;border-radius:18px;background:var(--skeu-inset-bg,rgba(255,255,255,.045));box-shadow:var(--skeu-inset-shadow,none);border:1px solid var(--brand-line,rgba(255,255,255,.1));font-size:14px;padding:0 14px;}
+/* BUG-01: iOS Safari zoom pada input < 16px — override ke 16px di mobile */
+@media (max-width: 920px), (pointer: coarse) {
+  .pay-emailInput { font-size: 16px; }
+}
 .pay-emailInput:focus{border-color:rgba(78,255,218,.40);box-shadow:0 0 0 4px rgba(78,255,218,.10);}
 .pay-emailHintText{font-size:12px;line-height:1.5;color:var(--a11y-muted, rgba(255,255,255,.62));overflow-wrap:anywhere;min-width:0;}
 .pay-emailHintText.warn{color:#ffd089;}
@@ -1093,5 +1097,58 @@ html[data-theme="light"] .pay-zoomTip {
     min-width: 0;
     max-width: 100%;
   }
+}
+
+/* ── QRIS Timer ──────────────────────────────────────────────────────────── */
+.pay-qrisTimer {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 214, 180, 0.22);
+  background: linear-gradient(180deg, rgba(0, 214, 180, 0.08), rgba(0, 214, 180, 0.03));
+  font-size: 12px;
+  font-weight: 700;
+  color: rgba(0, 214, 180, 0.9);
+  letter-spacing: 0.02em;
+  transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.pay-qrisTimer.is-urgent {
+  border-color: rgba(255, 160, 60, 0.4);
+  background: linear-gradient(180deg, rgba(255, 160, 60, 0.12), rgba(255, 160, 60, 0.04));
+  color: #ffa03c;
+  animation: qrisTimerPulse 1.4s ease-in-out infinite;
+}
+
+.pay-qrisTimer.is-expired {
+  border-color: rgba(255, 90, 122, 0.4);
+  background: linear-gradient(180deg, rgba(255, 90, 122, 0.10), rgba(255, 90, 122, 0.03));
+  color: #ff5a7a;
+}
+
+@keyframes qrisTimerPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+html[data-theme="light"] .pay-qrisTimer {
+  border-color: rgba(0, 138, 148, 0.3);
+  background: rgba(0, 138, 148, 0.07);
+  color: #007a82;
+}
+
+html[data-theme="light"] .pay-qrisTimer.is-urgent {
+  border-color: rgba(200, 100, 0, 0.3);
+  background: rgba(200, 100, 0, 0.07);
+  color: #c86400;
+}
+
+html[data-theme="light"] .pay-qrisTimer.is-expired {
+  border-color: rgba(200, 30, 60, 0.3);
+  background: rgba(200, 30, 60, 0.07);
+  color: #c81e3c;
 }
 

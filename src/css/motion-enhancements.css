@@ -538,3 +538,11 @@ html[data-theme="light"] .status-commandBox:focus-within {
   border-color: rgba(6, 123, 136, 0.45) !important;
   background: rgba(255, 255, 255, 0.8) !important;
 }
+
+/* BUG-12: Reset will-change di mobile/touch agar tidak drain GPU mid-range Android */
+@media (max-width: 920px), (pointer: coarse) {
+  html[data-motion="lite"] .header .nav-active-pill,
+  html[data-motion="lite"] .header .nav-hover-pill {
+    will-change: auto;
+  }
+}

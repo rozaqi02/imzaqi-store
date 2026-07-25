@@ -501,6 +501,7 @@ html[data-theme="light"] .checkout-floating-bar-reason {
 /* ── DEDICATED FULL-PAGE CHECKOUT ── */
 .checkout-page-full {
   min-height: 100vh;
+  min-height: 100dvh;
   padding: 50px 0 130px;
   background: radial-gradient(circle at top left, rgba(16, 28, 48, 0.4), transparent), var(--bg, #070d19);
 }
@@ -851,6 +852,7 @@ html[data-theme="light"] .checkout-back-btn:hover {
   padding-left: 0 !important;
   padding-right: 0 !important;
   min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }

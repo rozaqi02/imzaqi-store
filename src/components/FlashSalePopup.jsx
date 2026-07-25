@@ -23,7 +23,11 @@ export default function FlashSalePopup() {
   const [closestEndTime, setClosestEndTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState("");
   const [isSuppressed, setIsSuppressed] = useState(() => {
-    return localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
+    try {
+      return localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
+    } catch {
+      return false;
+    }
   });
 
   const prevPathnameRef = useRef(location.pathname);

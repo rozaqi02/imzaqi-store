@@ -9,8 +9,8 @@ import "./ProductTile.css";
 export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false, overrideSold = null }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
-  const isMobileViewport = useIsMobile("(max-width: 720px)");
-  const useFlipCard = isGrid && !isMobileViewport && !disableFlip;
+  // Flip card dihapus — semua info tampil langsung di depan
+  const useFlipCard = false;
   const prefetchedRef = useRef(false);
 
   const prefetchDetail = useCallback(() => {

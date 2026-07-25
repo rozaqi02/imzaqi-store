@@ -28,9 +28,13 @@ export function recordCompletedOrder() {
 export function getLoyaltyStatus() {
   const count = getCompletedOrderCount();
   const remaining = Math.max(0, REWARD_THRESHOLD - count);
-  const rewardClaimed = localStorage.getItem(REWARD_KEY) === "claimed";
-  const rewardPending = localStorage.getItem(REWARD_KEY) === "pending";
-  return { count, remaining, rewardClaimed, rewardPending, threshold: REWARD_THRESHOLD };
+  try {
+    const rewardClaimed = localStorage.getItem(REWARD_KEY) === "claimed";
+    const rewardPending = localStorage.getItem(REWARD_KEY) === "pending";
+    return { count, remaining, rewardClaimed, rewardPending, threshold: REWARD_THRESHOLD };
+  } catch {
+    return { count, remaining, rewardClaimed: false, rewardPending: false, threshold: REWARD_THRESHOLD };
+  }
 }
 
 export function markLoyaltyRewardClaimed() {

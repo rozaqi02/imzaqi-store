@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+﻿import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import {
   ChevronDown,
@@ -36,7 +36,7 @@ const FAQ_ITEMS = [
     question: "QRIS-nya kok gak muncul?",
     answer: [
       "Biasanya karena nomor WA belum valid atau ada varian yang minta email buyer.",
-      "Lengkapi data di halaman bayar — QRIS bakal kebuka otomatis.",
+      "Lengkapi data di halaman bayar - QRIS bakal kebuka otomatis.",
     ],
     tags: ["qris", "locked", "email", "catatan"],
   },
@@ -66,7 +66,7 @@ const FAQ_ITEMS = [
     question: "Format ID order kayak gimana?",
     answer: [
       "Format utama: IMZ-ABCD.",
-      "Di halaman status bisa tempel kode pendek (ABCD) — sistem otomatis normalisasi.",
+      "Di halaman status bisa tempel kode pendek (ABCD) - sistem otomatis normalisasi.",
     ],
     tags: ["format", "id", "imz"],
   },
@@ -167,7 +167,7 @@ const HOWTO_STEPS = [
     num: "04",
     icon: CircleCheck,
     title: "Pantau progress",
-    desc: "Masukin ID di halaman Status — update real-time.",
+    desc: "Masukin ID di halaman Status - update real-time.",
     to: "/status",
   },
 ];
@@ -215,7 +215,7 @@ function FaqItem({ item, open, onToggle }) {
 export default function FaqPageContent() {
   usePageMeta({
     title: "FAQ",
-    description: "Jawaban cepet soal bayar, order, varian, & aktivasi — biar gak bingung.",
+    description: "Jawaban cepet soal bayar, order, varian, & aktivasi - biar gak bingung.",
   });
 
   const [waNumber, setWaNumber] = useState("6283136049987");
@@ -304,12 +304,12 @@ export default function FaqPageContent() {
     <div className="page">
       <section className="section faq-shell">
         <div className="container faq-wrap">
-          <header className="faq-hero reveal is-visible">
+          <header className="faq-hero reveal is-visible hero-anim-wrap">
             <div className="faq-heroCopy">
-              <div className="faq-kicker">Pusat bantuan</div>
-              <h1 className="h1 faq-title">Ada yang bingung?</h1>
-              <p className="faq-sub">
-                Bayar, order, produk, aktivasi — jawabannya ada di sini.
+              <div className="faq-kicker hero-anim-kicker">Pusat bantuan</div>
+              <h1 className="h1 faq-title hero-anim-title">Ada yang bingung?</h1>
+              <p className="faq-sub hero-anim-sub">
+                Bayar, order, produk, aktivasi - jawabannya ada di sini.
               </p>
             </div>
             <div className="faq-heroPill">

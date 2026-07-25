@@ -318,7 +318,7 @@ html[data-theme="light"] .steps--visual .step.done .step-sub {
   .steps--visual .step-sub {
     display: flex;
     justify-content: center;
-    font-size: 9px;
+    font-size: 10px;
     margin-top: 2px;
     letter-spacing: 0.08em;
   }
@@ -343,4 +343,41 @@ html[data-theme="light"] .steps--visual .step.done .step-sub {
 [data-motion="lite"] .steps--visual .step,
 [data-motion="lite"] .steps--visual .step-dot {
   backdrop-filter: none !important;
+}
+
+/* ── Step clickable (done steps bisa diklik untuk navigasi balik) ─────────── */
+.steps--visual .step--clickable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.steps--visual .step--clickable:hover {
+  border-color: rgba(0, 214, 180, 0.28);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10), rgba(255, 255, 255, 0) 28%),
+    var(--skeu-control-bg);
+  transform: translateY(-1px);
+}
+
+.steps--visual .step--clickable:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 2px var(--bg0, #040714),
+    0 0 0 4px rgba(0, 214, 180, 0.55);
+}
+
+html[data-theme="light"] .steps--visual .step--clickable:focus-visible {
+  box-shadow:
+    0 0 0 2px #fff,
+    0 0 0 4px rgba(0, 138, 148, 0.6);
+}
+
+.steps--visual .step--clickable:active {
+  transform: scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .steps--visual .step--clickable {
+    transition: none;
+  }
 }

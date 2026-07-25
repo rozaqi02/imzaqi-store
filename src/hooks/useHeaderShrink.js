@@ -54,7 +54,7 @@ export function useHeaderShrink() {
       }
 
       document.body.classList.remove("header-is-shrunk");
-      setIsShrunk(false);
+      // Tidak panggil setIsShrunk di cleanup — komponen sudah unmount
     };
   }, []);
 

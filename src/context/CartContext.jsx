@@ -28,6 +28,7 @@ function safeParse(json, fallback) {
 export function CartProvider({ children }) {
   const [bumpToken, setBumpToken] = useState(0);
   const [lastAddedVariantId, setLastAddedVariantId] = useState(null);
+  const lastAddedTimerRef = React.useRef(null);
   const [items, setItems] = useState(() => {
     const storage = safeStorage();
     if (!storage) return [];
@@ -51,7 +52,12 @@ export function CartProvider({ children }) {
     add(variant, qty = 1) {
       setBumpToken((t) => t + 1);
       setLastAddedVariantId(variant.id);
-      window.setTimeout(() => setLastAddedVariantId(null), 900);
+      // Track timer agar bisa di-cancel sebelum set ulang
+      if (lastAddedTimerRef.current) window.clearTimeout(lastAddedTimerRef.current);
+      lastAddedTimerRef.current = window.setTimeout(() => {
+        setLastAddedVariantId(null);
+        lastAddedTimerRef.current = null;
+      }, 900);
       setItems(prev => {
         const i = prev.findIndex(x => x.variant_id === variant.id);
         if (i >= 0) {

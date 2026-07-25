@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { formatIDR } from "../../lib/format";
 import { getOrderStatusTone, prettyOrderStatus } from "../../lib/orderStatus";
 
@@ -79,7 +79,7 @@ export function formatAdminDate(value) {
   }).format(date);
 }
 
-/** Waktu order lengkap — tanggal + jam:menit:detik WIB */
+/** Waktu order lengkap - tanggal + jam:menit:detik WIB */
 export function formatAdminDateTime(value) {
   if (!value) return "-";
   const date = value instanceof Date ? value : new Date(value);
@@ -102,7 +102,7 @@ export function formatOrderItemSummary(item) {
   const duration = String(item?.duration_label || "").trim();
   const details = [variant, duration].filter(Boolean).join(" · ");
   const qty = Number(item?.qty || 1);
-  return details ? `${name} — ${details} (×${qty})` : `${name} (×${qty})`;
+  return details ? `${name} - ${details} (×${qty})` : `${name} (×${qty})`;
 }
 
 export function formatDayLabel(value) {

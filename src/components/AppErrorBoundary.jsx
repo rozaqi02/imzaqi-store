@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { AlertTriangle, RefreshCw, MessageCircle } from "lucide-react";
 import { warn } from "../lib/log";
 
@@ -42,7 +42,7 @@ export default class AppErrorBoundary extends React.Component {
             <div className="aeb-kicker">Terjadi kesalahan</div>
             <h1 className="aeb-title">Oops, ada yang error</h1>
             <p className="aeb-sub">
-              Halaman mengalami masalah tak terduga. Coba refresh — biasanya langsung beres.
+              Halaman mengalami masalah tak terduga. Coba refresh - biasanya langsung beres.
             </p>
 
             {isDev && errorMsg ? (

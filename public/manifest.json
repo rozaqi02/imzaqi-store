@@ -2,14 +2,14 @@
   "id": "/",
   "name": "Imzaqi Store",
   "short_name": "Imzaqi",
-  "description": "Toko digital subscription — streaming, tools, dan lebih banyak lagi.",
+  "description": "Toko digital subscription - streaming, tools, dan lebih banyak lagi.",
   "lang": "id",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait-primary",
   "theme_color": "#032235",
-  "background_color": "#d8fff5",
+  "background_color": "#040714",
   "categories": ["shopping", "business"],
   "icons": [
     {
@@ -17,6 +17,12 @@
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
+    },
+    {
+      "src": "/icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
     },
     {
       "src": "/logo512.png",

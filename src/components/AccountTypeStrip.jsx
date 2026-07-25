@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+﻿import { useMemo } from "react";
 import { UserRound, Users } from "lucide-react";
 
 const TYPE_META = {
@@ -6,19 +6,19 @@ const TYPE_META = {
     label: "Sharing",
     icon: Users,
     color: "#5b8def",
-    tip: "Akun dipakai bersama — jangan ubah password, email, atau profil.",
+    tip: "Akun dipakai bersama - jangan ubah password, email, atau profil.",
   },
   private: {
     label: "Private",
     icon: UserRound,
     color: "#00d6b4",
-    tip: "Akun khusus kamu — lebih aman dengan garansi penuh.",
+    tip: "Akun khusus kamu - lebih aman dengan garansi penuh.",
   },
   family: {
     label: "Family",
     icon: Users,
     color: "#a855f7",
-    tip: "Slot family/invite — ikuti aturan paket saat checkout.",
+    tip: "Slot family/invite - ikuti aturan paket saat checkout.",
   },
 };
 
@@ -41,7 +41,7 @@ export default function AccountTypeStrip({ variants = [] }) {
   const tip =
     types.length === 1
       ? TYPE_META[types[0]].tip
-      : "Sharing lebih hemat, Private lebih aman — pilih sesuai kebutuhanmu.";
+      : "Sharing lebih hemat, Private lebih aman - pilih sesuai kebutuhanmu.";
 
   return (
     <div className="pdx-accountStrip" role="note" aria-label="Jenis akun tersedia">

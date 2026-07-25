@@ -139,7 +139,8 @@ html[data-theme="light"] .floating-order-dismiss:hover {
 
 @media (max-width: 720px) {
   .floating-order-status {
-    bottom: calc(var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift, 0px) + 4px);
+    /* BUG-05: Pertahankan stacking di atas FAB — jangan override bottom ke nilai flat */
+    bottom: calc(var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift, 0px) + var(--fab-assistant-size) + var(--fab-gap) + 4px);
     left: 50%;
     transform: translateX(-50%);
   }

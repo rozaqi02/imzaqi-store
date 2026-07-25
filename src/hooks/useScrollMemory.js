@@ -99,7 +99,9 @@ export function slugFromCatalogProductLink(href) {
 }
 
 export function saveScrollY({ slug, y } = {}) {
-  beginCatalogRestoreLock(1200);
+  // Tidak panggil beginCatalogRestoreLock di sini — lock hanya diperlukan
+  // saat restore, bukan saat save. Kalau di-lock di sini, ProductDetail
+  // akan masuk dengan scrollRestoration = "manual" yang bikin iOS scroll ke bawah.
   const current = getSaved();
   writeStorage({
     y: typeof y === "number" && Number.isFinite(y) ? y : window.scrollY,
@@ -125,14 +127,15 @@ export function getCatalogReturnPath() {
 export function restoreCatalogScroll({ y, slug } = {}, onDone) {
   if (typeof window === "undefined") return () => {};
 
-  beginCatalogRestoreLock(1600);
+  // Lock lebih pendek — cukup untuk satu frame restore, bukan 1.6 detik
+  beginCatalogRestoreLock(600);
 
   const prevRestoration = history.scrollRestoration;
   history.scrollRestoration = "manual";
   document.documentElement.classList.add("catalog-scroll-restore");
 
   let attempts = 0;
-  const maxAttempts = 64;
+  const maxAttempts = 32;
   let stabilizeTimer = null;
   let releaseTimer = null;
   let resizeObserver = null;
@@ -146,6 +149,7 @@ export function restoreCatalogScroll({ y, slug } = {}, onDone) {
     resizeObserver?.disconnect();
     document.documentElement.classList.remove("catalog-scroll-restore");
     history.scrollRestoration = prevRestoration;
+    endCatalogRestoreLock();
     onDone?.();
   };
 
@@ -176,10 +180,11 @@ export function restoreCatalogScroll({ y, slug } = {}, onDone) {
 
     applyScroll();
 
+    // ResizeObserver: hanya extend lock singkat (300ms), bukan 900ms
     if (!resizeObserver && typeof ResizeObserver !== "undefined") {
       resizeObserver = new ResizeObserver(() => {
         if (done) return;
-        beginCatalogRestoreLock(900);
+        beginCatalogRestoreLock(300);
         applyScroll();
       });
       resizeObserver.observe(document.documentElement);
@@ -188,12 +193,12 @@ export function restoreCatalogScroll({ y, slug } = {}, onDone) {
     if (!stabilizeTimer) {
       stabilizeTimer = window.setTimeout(() => {
         applyScroll();
-        beginCatalogRestoreLock(1200);
+        // Release lock segera setelah stabilize — tidak perlu extend 1200ms
         releaseTimer = window.setTimeout(() => {
           applyScroll();
           cleanup();
-        }, 520);
-      }, 120);
+        }, 200);
+      }, 80);
     }
   };
 

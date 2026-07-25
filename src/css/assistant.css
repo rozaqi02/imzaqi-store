@@ -19,7 +19,8 @@ html {
 .ai-bubble {
   position: fixed;
   right: var(--fab-edge-x, 18px);
-  bottom: calc(var(--fab-base-bottom, 18px) + env(safe-area-inset-bottom) + var(--fab-lift, 0px));
+  /* BUG-06 fix: hapus env(safe-area-inset-bottom) — sudah termasuk di --fab-lift via fab-stack.css */
+  bottom: calc(var(--fab-base-bottom, 18px) + var(--fab-lift, 0px));
   z-index: 9996;
   width: var(--fab-assistant-size, 56px);
   height: var(--fab-assistant-size, 56px);
@@ -964,6 +965,13 @@ html[data-theme="dark"] .ai-inputBar:focus-within {
 .ai-input::placeholder {
   color: var(--uni-muted);
   font-weight: 500;
+}
+
+/* BUG-01: iOS Safari zoom saat font-size < 16px — override di mobile */
+@media (max-width: 920px), (pointer: coarse) {
+  .ai-input {
+    font-size: 16px;
+  }
 }
 
 /* Override global focus rules */
