@@ -54,7 +54,7 @@ html[data-theme="light"] .fsp-modal {
   padding: 20px 22px 16px;
   display: flex;
   align-items: flex-start;
-  justify-content: space-between;
+  justify-content: flex-start;
   border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
   background: linear-gradient(180deg, rgba(0, 194, 208, 0.06), rgba(0, 194, 208, 0) 100%);
 }
@@ -67,52 +67,62 @@ html[data-theme="light"] .fsp-head {
 .fsp-titleBlock {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  align-items: flex-start;
+  text-align: left;
+  gap: 6px;
+  width: 100%;
+  min-width: 0;
 }
 
-/* Kicker pill — raised Neumorphic badge */
+/* Title — large bold yellow, left-aligned, no border / pill */
 .fsp-kicker {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 9.5px;
+  justify-content: flex-start;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+  font-size: clamp(26px, 6.5vw, 34px);
   font-weight: 900;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #00d6b4;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
-    rgba(0, 214, 180, 0.1);
-  border: 1px solid rgba(0, 214, 180, 0.28);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.16),
-    0 2px 6px rgba(0, 214, 180, 0.12);
+  letter-spacing: -0.03em;
+  text-transform: none;
+  color: #ffd54a !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
   animation: fspPulse 1.6s ease-in-out infinite;
+  text-align: left;
+  line-height: 1.05;
+}
+
+.fsp-kicker span {
+  font-weight: 900;
+  color: inherit !important;
 }
 
 html[data-theme="light"] .fsp-kicker {
-  color: #007080;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.65), rgba(255, 255, 255, 0.1) 40%),
-    rgba(0, 194, 208, 0.08) !important;
-  border-color: rgba(0, 138, 148, 0.28) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    0 2px 6px rgba(0, 138, 148, 0.1) !important;
+  color: #e6a800 !important;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
+/* Subtitle under Flash Sale! */
 .fsp-title {
-  font-size: 21px;
-  font-weight: 1000;
-  letter-spacing: -0.03em;
-  color: var(--brand-text, #f0f4f8);
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--brand-muted, rgba(220, 240, 255, 0.68));
+  text-shadow: none;
+  text-align: left;
+  width: 100%;
+  line-height: 1.35;
 }
 
 html[data-theme="light"] .fsp-title {
-  color: #0d2d39;
+  color: rgba(40, 80, 95, 0.72);
   text-shadow: none;
 }
 
@@ -473,14 +483,16 @@ html[data-theme="light"] .fsp-foot {
   width: 100%;
 }
 
-/* ── Countdown pill — inset Neumorphic timer (amber/yellow) ── */
+/* ── Countdown — jam / menit / detik under numbers ── */
 .fsp-countdownWrap {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 7px;
-  padding: 7px 16px;
-  border-radius: 999px;
+  gap: 8px 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border-radius: 16px;
   color: #ffd54a;
   font-size: 11px;
   font-weight: 800;
@@ -490,18 +502,58 @@ html[data-theme="light"] .fsp-foot {
     inset 2px 3px 7px rgba(0, 0, 0, 0.28),
     inset -1px -1px 4px rgba(255, 220, 80, 0.06),
     0 1px 0 rgba(255, 255, 255, 0.06);
+  box-sizing: border-box;
 }
 
 .fsp-countdownLabel {
-  color: rgba(255, 213, 74, 0.75);
+  color: rgba(255, 213, 74, 0.8);
   font-weight: 700;
+  white-space: nowrap;
+}
+
+.fsp-countdownUnits {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 4px;
+}
+
+.fsp-countdownUnit {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 34px;
 }
 
 .fsp-countdownVal {
   color: #ffd54a;
   font-weight: 900;
-  letter-spacing: 0.04em;
-  text-shadow: 0 0 8px rgba(255, 213, 74, 0.4);
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+  text-shadow: 0 0 8px rgba(255, 213, 74, 0.35);
+}
+
+.fsp-countdownUnit small {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: lowercase;
+  color: rgba(255, 213, 74, 0.72);
+  line-height: 1;
+}
+
+.fsp-countdownSep {
+  align-self: center;
+  margin-top: -10px;
+  color: rgba(255, 213, 74, 0.5);
+  font-weight: 900;
+  font-size: 13px;
+}
+
+.fsp-countdownUnit.is-sec .fsp-countdownVal {
+  color: #ffe082;
 }
 
 html[data-theme="light"] .fsp-countdownWrap {
@@ -523,69 +575,105 @@ html[data-theme="light"] .fsp-countdownVal {
   text-shadow: none !important;
 }
 
-/* ── "Jangan Beritahu" button — raised Neumorphic pill ── */
-.fsp-dontShowBtn {
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 9px 14px;
-  border-radius: 999px;
-  font-size: 11.5px;
-  font-weight: 800;
-  letter-spacing: 0.01em;
-  color: var(--brand-muted, rgba(200, 235, 245, 0.78));
-  background:
-    linear-gradient(170deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0) 32%),
-    var(--skeu-control-bg,
-      linear-gradient(175deg, rgba(20, 32, 62, 0.98), rgba(12, 20, 42, 0.95))
-    );
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.2));
-  box-shadow:
-    4px 5px 12px rgba(0, 0, 0, 0.3),
-    -3px -3px 8px rgba(255, 255, 255, 0.04),
-    inset 0 2px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.38);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: all 0.2s ease;
+html[data-theme="light"] .fsp-countdownUnit small {
+  color: rgba(180, 83, 9, 0.7) !important;
 }
 
-.fsp-dontShowBtn:hover {
-  transform: translateY(-2px);
-  border-color: rgba(0, 214, 180, 0.4);
-  color: var(--accent, #00d6b4);
-  box-shadow:
-    5px 6px 16px rgba(0, 0, 0, 0.34),
-    -3px -3px 8px rgba(255, 255, 255, 0.06),
-    inset 0 2px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.44),
-    0 0 14px rgba(0, 214, 180, 0.14);
+html[data-theme="light"] .fsp-countdownSep {
+  color: rgba(180, 83, 9, 0.45) !important;
 }
 
-.fsp-dontShowBtn:active {
-  transform: translateY(1px);
-  box-shadow:
-    inset 3px 4px 10px rgba(0, 0, 0, 0.42),
-    inset -2px -2px 6px rgba(255, 255, 255, 0.04),
-    inset 0 1px 0 rgba(0, 0, 0, 0.22);
+html[data-theme="light"] .fsp-countdownUnit.is-sec .fsp-countdownVal {
+  color: #c2410c !important;
 }
 
-html[data-theme="light"] .fsp-dontShowBtn {
-  background:
-    linear-gradient(145deg, #ffffff, #e6f4f8) !important;
-  border-color: rgba(0, 138, 148, 0.22) !important;
-  color: #0e3041 !important;
+/* ── "Jangan Beritahu" — forced red (beats global neo control overrides) ── */
+.fsp-backdrop .fsp-modal button.fsp-dontShowBtn,
+.fsp-backdrop .fsp-modal button.fsp-dontShowBtn.fsp-btn-red,
+button.fsp-dontShowBtn.fsp-btn-red {
+  flex: 1 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 9px 14px !important;
+  border-radius: 999px !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  border: 1px solid #9f1239 !important;
+  /* solid fallback first, then gradient */
+  background-color: #e11d3a !important;
+  background-image: linear-gradient(
+    165deg,
+    #ff5a6a 0%,
+    #e11d3a 50%,
+    #be123c 100%
+  ) !important;
   box-shadow:
-    5px 6px 14px rgba(67, 111, 129, 0.2),
-    -4px -4px 10px rgba(255, 255, 255, 1),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
+    0 8px 18px rgba(225, 29, 58, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 0 rgba(100, 0, 20, 0.3) !important;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease !important;
+  filter: none !important;
 }
 
-html[data-theme="light"] .fsp-dontShowBtn:hover {
-  color: var(--accent-light, #008a94) !important;
-  border-color: rgba(0, 138, 148, 0.42) !important;
+.fsp-backdrop .fsp-modal button.fsp-dontShowBtn:hover,
+.fsp-backdrop .fsp-modal button.fsp-dontShowBtn.fsp-btn-red:hover,
+button.fsp-dontShowBtn.fsp-btn-red:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.06) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: #e11d3a !important;
+  background-image: linear-gradient(
+    165deg,
+    #ff6b7a 0%,
+    #e11d3a 50%,
+    #be123c 100%
+  ) !important;
+  box-shadow:
+    0 10px 22px rgba(225, 29, 58, 0.38),
+    0 3px 8px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(100, 0, 20, 0.35) !important;
+}
+
+.fsp-backdrop .fsp-modal button.fsp-dontShowBtn:active,
+button.fsp-dontShowBtn.fsp-btn-red:active {
+  transform: translateY(1px) !important;
+  filter: brightness(0.96) !important;
+}
+
+html[data-theme="light"] .fsp-backdrop .fsp-modal button.fsp-dontShowBtn,
+html[data-theme="light"] .fsp-backdrop .fsp-modal button.fsp-dontShowBtn.fsp-btn-red,
+html[data-theme="light"] button.fsp-dontShowBtn.fsp-btn-red {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  border-color: #9f1239 !important;
+  background-color: #e11d3a !important;
+  background-image: linear-gradient(
+    165deg,
+    #ff5c6c 0%,
+    #e11d3a 52%,
+    #be123c 100%
+  ) !important;
+  box-shadow:
+    0 8px 18px rgba(225, 29, 58, 0.26),
+    0 2px 6px rgba(40, 20, 30, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 0 rgba(140, 20, 40, 0.28) !important;
+}
+
+html[data-theme="light"] .fsp-backdrop .fsp-modal button.fsp-dontShowBtn:hover,
+html[data-theme="light"] button.fsp-dontShowBtn.fsp-btn-red:hover {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  filter: brightness(1.05) !important;
 }
 
 /* ── "Nanti Aja" ghost link ── */

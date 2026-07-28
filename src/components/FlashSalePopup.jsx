@@ -2,12 +2,13 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useFunnelRoute } from "../hooks/useFunnelRoute";
-import { BellOff, Clock, Flame } from "lucide-react";
+import { BellOff, Clock } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { formatIDR } from "../lib/format";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import "./FlashSalePopup.css";
 
+// Note: no Flame icon in title (user preference)
 const SUPPRESS_DATE_KEY = "imzaqi_flash_sale_suppress_date_v1";
 
 function getTodayString() {
@@ -21,7 +22,7 @@ export default function FlashSalePopup() {
   const [isOpen, setIsOpen] = useState(false);
   const [salesItems, setSalesItems] = useState([]);
   const [closestEndTime, setClosestEndTime] = useState(null);
-  const [timeLeft, setTimeLeft] = useState("");
+  const [timeLeft, setTimeLeft] = useState(null);
   const [isSuppressed, setIsSuppressed] = useState(() => {
     try {
       return localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
@@ -128,16 +129,17 @@ export default function FlashSalePopup() {
       const diff = closestEndTime - now;
 
       if (diff <= 0) {
-        setTimeLeft("Berakhir!");
+        setTimeLeft({ expired: true, hours: "00", minutes: "00", seconds: "00" });
         setIsOpen(false);
         return;
       }
 
-      const hours = String(Math.floor(diff / 3600000)).padStart(2, "0");
-      const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0");
-      const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, "0");
-
-      setTimeLeft(`${hours}:${minutes}:${seconds}`);
+      setTimeLeft({
+        expired: false,
+        hours: String(Math.floor(diff / 3600000)).padStart(2, "0"),
+        minutes: String(Math.floor((diff % 3600000) / 60000)).padStart(2, "0"),
+        seconds: String(Math.floor((diff % 60000) / 1000)).padStart(2, "0"),
+      });
     }
 
     updateTimer();
@@ -168,17 +170,16 @@ export default function FlashSalePopup() {
         className="fsp-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Flash Sale Aktif"
+        aria-label="Flash Sale"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Head */}
         <div className="fsp-head">
           <div className="fsp-titleBlock">
-            <span className="fsp-kicker">
-              <Flame size={10} fill="#ff3b30" />
-              <span>Flash Sale Aktif</span>
-            </span>
-            <h2 className="fsp-title">Lagi Diskon Gede!</h2>
+            <h2 className="fsp-kicker">
+              <span>Flash Sale!</span>
+            </h2>
+            <p className="fsp-title">Lagi diskon lohh</p>
           </div>
         </div>
 
@@ -236,20 +237,44 @@ export default function FlashSalePopup() {
 
         {/* Foot */}
         <div className="fsp-foot">
-          {timeLeft && (
+          {timeLeft && !timeLeft.expired ? (
             <div className="fsp-footTop">
-              <div className="fsp-countdownWrap">
-                <Clock size={12} />
-                <span className="fsp-countdownLabel">Promo Berakhir:</span>
-                <span className="fsp-countdownVal">{timeLeft}</span>
+              <div
+                className="fsp-countdownWrap"
+                aria-label={`Sisa ${Number(timeLeft.hours)} jam ${Number(timeLeft.minutes)} menit ${Number(timeLeft.seconds)} detik`}
+              >
+                <Clock size={12} aria-hidden="true" />
+                <span className="fsp-countdownLabel">Promo berakhir</span>
+                <div className="fsp-countdownUnits">
+                  <span className="fsp-countdownUnit">
+                    <strong className="fsp-countdownVal">{timeLeft.hours}</strong>
+                    <small>jam</small>
+                  </span>
+                  <span className="fsp-countdownSep" aria-hidden="true">:</span>
+                  <span className="fsp-countdownUnit">
+                    <strong className="fsp-countdownVal">{timeLeft.minutes}</strong>
+                    <small>menit</small>
+                  </span>
+                  <span className="fsp-countdownSep" aria-hidden="true">:</span>
+                  <span className="fsp-countdownUnit is-sec">
+                    <strong className="fsp-countdownVal">{timeLeft.seconds}</strong>
+                    <small>detik</small>
+                  </span>
+                </div>
               </div>
             </div>
-          )}
+          ) : null}
 
           <div className="fsp-footBottom">
             <button
               type="button"
-              className="fsp-dontShowBtn"
+              className="fsp-dontShowBtn fsp-btn-red"
+              style={{
+                backgroundColor: "#e11d3a",
+                backgroundImage: "linear-gradient(165deg, #ff5a6a 0%, #e11d3a 50%, #be123c 100%)",
+                color: "#fff",
+                border: "1px solid #9f1239",
+              }}
               onClick={() => {
                 localStorage.setItem(SUPPRESS_DATE_KEY, getTodayString());
                 setIsSuppressed(true);
@@ -257,7 +282,7 @@ export default function FlashSalePopup() {
               }}
               title="Sembunyikan pemberitahuan flash sale ini sampai esok hari"
             >
-              <BellOff size={13} strokeWidth={2.2} style={{ marginRight: 6, flexShrink: 0 }} />
+              <BellOff size={13} strokeWidth={2.2} style={{ marginRight: 6, flexShrink: 0, color: "#fff" }} />
               Jangan Beritahu Lagi Hari Ini
             </button>
             <button

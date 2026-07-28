@@ -7,15 +7,22 @@ import Hero from "../components/Hero";
 import SectionHead from "../components/SectionHead";
 import "../css/pages/Home.css";
 import ProductTile from "../components/ProductTile";
-import { fetchProducts, fetchTopSellingData, fetchPromoCodes, fetchSettings } from "../lib/api";
+import { fetchProducts, fetchTopSellingData, fetchPromoCodes, fetchSettings, peekCachedProducts } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
+import { isAcademicProduct } from "../lib/productCategories";
 
 import { useToast } from "../context/ToastContext";
 import { copyToClipboard } from "../utils/clipboard";
 import { fireConfetti } from "../components/Confetti";
 import { warn } from "../lib/log";
+
+// Start products fetch as soon as Home module evaluates (eager in App bundle)
+// so hero backdrop can paint as soon as the first response/cache lands.
+if (typeof window !== "undefined") {
+  void fetchProducts({ useCache: true, ttlMs: 60_000 }).catch(() => {});
+}
 
 const HOME_FAQ = [
   {
@@ -144,9 +151,14 @@ function ScrollProgressBar() {
   return <div ref={barRef} className="home-scrollProgress" />;
 }
 
+function readSeededProducts() {
+  return peekCachedProducts({ ttlMs: 120_000 }) || [];
+}
+
 export default function Home() {
-  const [loading, setLoading] = useState(true);
-  const [products, setProducts] = useState([]);
+  // Seed from sync cache so hero catalog backdrop paints on first frame
+  const [products, setProducts] = useState(readSeededProducts);
+  const [loading, setLoading] = useState(() => readSeededProducts().length === 0);
   const [topIds, setTopIds] = useState([]);
   const [salesMap, setSalesMap] = useState({});
   const [promos, setPromos] = useState([]);
@@ -171,14 +183,18 @@ export default function Home() {
     let alive = true;
     (async () => {
       try {
-        const [data, topData, promoData, settingsData] = await Promise.all([
-          fetchProducts(),
+        // Products first so hero backdrop paints immediately (don't wait for extras)
+        const data = await fetchProducts({ useCache: true, ttlMs: 60_000 });
+        if (!alive) return;
+        setProducts(data || []);
+        setLoading(false);
+
+        const [topData, promoData, settingsData] = await Promise.all([
           fetchTopSellingData().catch(() => ({ topIds: [], salesMap: {} })),
           fetchPromoCodes().catch(() => []),
           fetchSettings().catch(() => ({})),
         ]);
         if (!alive) return;
-        setProducts(data);
         setTopIds(topData?.topIds || []);
         setSalesMap(topData?.salesMap || {});
         setSettings(settingsData || {});
@@ -196,12 +212,15 @@ export default function Home() {
         setPromos(activePromos);
       } catch (e) {
         warn(e);
-        setError("Gagal memuat produk.");
-      } finally {
-        if (alive) setLoading(false);
+        if (alive) {
+          setError("Gagal memuat produk.");
+          setLoading(false);
+        }
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, []);
 
   const popularProducts = useMemo(() => {
@@ -222,6 +241,19 @@ export default function Home() {
     });
     return sorted.slice(0, 4);
   }, [products, topIds, salesMap]);
+
+  /** All active academic / jasa akademik products for home section */
+  const academicProducts = useMemo(() => {
+    return (products || [])
+      .filter(
+        (p) =>
+          p &&
+          p.is_active !== false &&
+          isAcademicProduct(p) &&
+          (p.product_variants || []).some((v) => v?.is_active !== false)
+      )
+      .sort((a, b) => (a.sort_order ?? 0) - (b.sort_order ?? 0));
+  }, [products]);
 
   const totalActiveProducts = useMemo(
     () => products.filter((p) => (p?.product_variants || []).some((v) => v?.is_active)).length,
@@ -311,6 +343,52 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* ── Jasa Akademik — semua produk line academic (tampil begitu data ada) ── */}
+        {academicProducts.length > 0 ? (
+          <section className="home-section home-academicSection" aria-label="Jasa Akademik">
+            <div className="container home-sectionInner">
+              <div className="reveal" style={{ transitionDelay: "50ms" }}>
+                <HomeSectionHead
+                  kicker="Jasa Akademik"
+                  title="Bantu urusan kampus"
+                  sub="Semua layanan akademik di toko: parafrase, cek plagiasi, Turnitin, Mendeley, dan lainnya."
+                />
+              </div>
+
+              <div
+                className="product-grid-container home-popularList home-academicList list-mode"
+                role="list"
+                aria-label="Semua jasa akademik"
+              >
+                {academicProducts.map((p, idx) => (
+                  <div
+                    key={p.id}
+                    className="reveal reveal-scale"
+                    style={{ transitionDelay: `${60 + idx * 55}ms` }}
+                  >
+                    <ProductTile
+                      product={p}
+                      layout="list"
+                      disableTilt={true}
+                      disableFlip={true}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div
+                className="home-sectionCta reveal"
+                style={{ transitionDelay: `${70 + academicProducts.length * 50}ms` }}
+              >
+                <Link className="btn btn-ghost" to="/produk?cats=academic">
+                  Lihat di katalog Jasa Akademik
+                  <ArrowRight size={16} aria-hidden="true" />
+                </Link>
+              </div>
+            </div>
+          </section>
+        ) : null}
 
         {/* ── Kupon Promo — hanya tampil jika ada promo aktif ── */}
         {!loading && promos.length > 0 ? (

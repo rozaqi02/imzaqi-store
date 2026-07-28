@@ -479,21 +479,6 @@
     backdrop-filter: none !important;
   }
 
-  /* AI FAB: keep neo square, kill leftover motion cost */
-  .ai-bubble:not(.is-open)::before {
-    content: none !important;
-    display: none !important;
-  }
-  .ai-markFab {
-    animation: none !important;
-    transform: none !important;
-  }
-  .ai-bubble {
-    animation: none !important;
-    will-change: auto !important;
-    border-radius: 16px !important;
-  }
-
   /* Isolate Hero repaint boundaries */
   .hx-hero {
     contain: layout paint style;

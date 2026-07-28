@@ -203,10 +203,22 @@ html[data-theme="light"] body {
   overflow-y: visible;
 }
 
-/* Admin + catalog: remove overflow-x clip so position:sticky sidebars work */
-.app-main-admin,
+/* Catalog: overflow visible for sticky filters */
 .app-main-catalog {
   overflow: visible !important;
+}
+
+/* Admin desktop: allow sticky shell; mobile admin clips X via AdminApp.shell.css */
+.app-main-admin {
+  overflow: visible !important;
+}
+
+@media (max-width: 1100px) {
+  body.is-admin-app .app-main-admin {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    max-width: 100% !important;
+  }
 }
 
 ::selection {
@@ -3619,12 +3631,6 @@ body {
   filter: contrast(120%)brightness(100%);
 }
 
-.app-main::before,
-.app-main::after {
-  content: none !important;
-  display: none !important;
-}
-
 @media (max-width: 768px) {
   .global-bg::after {
     opacity: 0.06 !important;
@@ -3891,11 +3897,11 @@ body {
   mask-image: none !important;
 }
 
-/* ── 404 Not Found ── */
+/* ── 404 Not Found (legacy shell styles; page layout lives in pages/NotFound.css) ── */
 .nf-page {
   min-height: 80vh;
-  display: flex;
-  align-items: center;
+  /* Do not flex-center: fixed header overlays main; top padding owns clearance */
+  display: block;
 }
 
 .nf-shell {

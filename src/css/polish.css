@@ -380,28 +380,29 @@ a.btn:active {
   }
 }
 
-/* ─── 13. Soft scroll-fade at section edges ───────────────────────────── */
+/* ─── 13. Soft scroll-fade at section edges ─────────────────────────────
+   Right-edge only: first (left) item stays fully solid; right fades as a
+   scroll-hint that more content exists beyond the viewport.
+*/
 .catalog-quickFilters,
-.admin-kpiStrip,
-.admin-mobileTabs {
-  -webkit-mask-image: linear-gradient(90deg,
-      transparent 0%,
-      #000 12px,
-      #000 calc(100% - 12px),
-      transparent 100%);
-  mask-image: linear-gradient(90deg,
-      transparent 0%,
-      #000 12px,
-      #000 calc(100% - 12px),
-      transparent 100%);
+.admin-kpiStrip {
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    #000 0%,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    #000 0%,
+    #000 calc(100% - 28px),
+    transparent 100%
+  );
 }
 
-/* Don't fade-mask the bottom tab bar (it's not horizontal scroll) */
-@media (max-width: 720px) {
-  .admin-mobileTabs {
-    -webkit-mask-image: none !important;
-    mask-image: none !important;
-  }
+.admin-mobileTabs {
+  -webkit-mask-image: none !important;
+  mask-image: none !important;
 }
 
 /* ─── 14. Subtle aurora gradient on header brand text ─────────────────── */

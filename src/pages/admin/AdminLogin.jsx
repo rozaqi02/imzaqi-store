@@ -7,6 +7,7 @@ import { useToast } from "../../context/ToastContext";
 import { warn } from "../../lib/log";
 import { checkAdminAccess, checkIsAdmin } from "../../lib/adminAuth";
 import "../../css/pages/AdminLogin.css";
+import "../../css/pages/AdminUI.overhaul.css";
 
 export default function AdminLogin() {
   const nav = useNavigate();

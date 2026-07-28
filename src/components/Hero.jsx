@@ -7,7 +7,6 @@ import {
   Package,
   Search,
   ShoppingBag,
-  X,
   Zap,
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
@@ -275,42 +274,6 @@ function HeroStatsRow({ activeProductCount }) {
   );
 }
 
-const VISITED_KEY = "imzaqi_visited_v1";
-
-function OnboardingBanner() {
-  const [show, setShow] = useState(() => {
-    try {
-      return !window.localStorage.getItem(VISITED_KEY);
-    } catch {
-      return false;
-    }
-  });
-
-  if (!show) return null;
-
-  return (
-    <div className="hx-onboardBanner">
-      <span className="hx-onboardText">
-        Pertama kali? Ketik <strong>Netflix Premium</strong> atau{" "}
-        <strong>Gas Lihat Katalog</strong> mulai belanja!
-      </span>
-      <button
-        className="hx-onboardClose"
-        type="button"
-        onClick={() => {
-          try {
-            window.localStorage.setItem(VISITED_KEY, "1");
-          } catch {}
-          setShow(false);
-        }}
-        aria-label="Tutup"
-      >
-        <X size={14} />
-      </button>
-    </div>
-  );
-}
-
 /* ── Main Hero ── */
 export default function Hero({ products = [] }) {
   const caps = useDeviceCapability();
@@ -379,8 +342,6 @@ export default function Hero({ products = [] }) {
             <MotionP className="hx-subtitle" {...stagger(0.12)}>
               Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
             </MotionP>
-
-            <OnboardingBanner />
 
             <MotionTag className="hx-search-section" {...stagger(0.18)}>
               <HeroSearch products={products} />

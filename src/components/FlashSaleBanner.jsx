@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Zap } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
@@ -79,17 +79,27 @@ function CountdownDisplay({ endTime, startTime }) {
 
   if (expired) return <span className="flash-countdown-expired">Berakhir</span>;
 
+  const units = [
+    { key: "h", value: hours, label: "jam" },
+    { key: "m", value: minutes, label: "menit" },
+    { key: "s", value: seconds, label: "detik", sec: true },
+  ];
+
   return (
     <div className="flash-countdown-wrap">
-      <div className="flash-countdown">
-        <span className="flash-countdown-icon">⏱</span>
-        <span className="flash-countdown-num">{String(hours).padStart(2, "0")}</span>
-        <span className="flash-countdown-sep">:</span>
-        <span className="flash-countdown-num">{String(minutes).padStart(2, "0")}</span>
-        <span className="flash-countdown-sep">:</span>
-        <span className="flash-countdown-num flash-countdown-num--sec">
-          {String(seconds).padStart(2, "0")}
+      <div className="flash-countdown" aria-label={`Sisa ${hours} jam ${minutes} menit ${seconds} detik`}>
+        <span className="flash-countdown-icon" aria-hidden="true">
+          ⏱
         </span>
+        {units.map((unit, idx) => (
+          <React.Fragment key={unit.key}>
+            {idx > 0 ? <span className="flash-countdown-sep" aria-hidden="true">:</span> : null}
+            <span className={`flash-countdown-unit${unit.sec ? " is-sec" : ""}`}>
+              <span className="flash-countdown-num">{String(unit.value).padStart(2, "0")}</span>
+              <span className="flash-countdown-label">{unit.label}</span>
+            </span>
+          </React.Fragment>
+        ))}
       </div>
       <div className="flash-sale-progress" aria-hidden="true">
         <div className="flash-sale-progressFill" style={{ width: `${progressPct}%` }} />

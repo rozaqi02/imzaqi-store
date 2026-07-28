@@ -1,10 +1,12 @@
 import { supabase } from "./supabaseClient";
 import { orderStatusCsvLabel } from "./orderStatus";
 import { normalizeProductRecord } from "./format";
-import { setCatalogProductsCache } from "./catalogCache";
+import { getCatalogProductsCache, setCatalogProductsCache } from "./catalogCache";
 
 const PUBLIC_CACHE_PREFIX = "imzaqi-public-cache:";
 const publicCacheMemory = new Map();
+/** In-flight product list fetches — prevents duplicate network on warm + Home mount */
+const productsInflight = new Map();
 
 function safeStorage() {
   try {
@@ -126,52 +128,105 @@ function normalizeProductsList(list) {
   return (Array.isArray(list) ? list : []).map((item) => normalizeProductRecord(item));
 }
 
+/**
+ * Sync peek for first paint (hero backdrop, home shells).
+ * Checks in-memory catalog cache, then session public cache.
+ * @param {object} [opts]
+ * @param {boolean} [opts.includeInactive=false]
+ * @param {number} [opts.ttlMs=120000] generous TTL so revisit paints instantly
+ * @returns {Array|null}
+ */
+export function peekCachedProducts({ includeInactive = false, ttlMs = 120000 } = {}) {
+  if (!includeInactive) {
+    const mem = getCatalogProductsCache();
+    if (Array.isArray(mem) && mem.length) return mem;
+  }
+  const cacheKey = `products:v3:${includeInactive ? "all" : "active"}`;
+  const cached = readPublicCache(cacheKey, ttlMs);
+  if (cached) {
+    const list = normalizeProductsList(cached);
+    if (!includeInactive && list.length) setCatalogProductsCache(list);
+    return list;
+  }
+  return null;
+}
+
+/**
+ * @param {object} opts
+ * @param {boolean} [opts.includeInactive=false]
+ * @param {boolean} [opts.useCache] default: true for storefront (active-only); pass true + short ttlMs for admin SWR
+ * @param {number} [opts.ttlMs=45000]
+ */
 export async function fetchProducts({ includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {
   const cacheKey = `products:v3:${includeInactive ? "all" : "active"}`;
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
-  if (cached) return normalizeProductsList(cached);
-
-  const attempts = [
-    { includeCategory: true, includeTimestamps: true },
-    { includeCategory: false, includeTimestamps: true },
-    { includeCategory: true, includeTimestamps: false },
-    { includeCategory: false, includeTimestamps: false },
-  ];
-
-  let data;
-  let error;
-  for (const attempt of attempts) {
-    let q = supabase
-      .from("products")
-      .select(buildProductsSelect(attempt))
-      .order("sort_order", { ascending: true })
-      .order("sort_order", { foreignTable: "product_variants", ascending: true });
-
-    if (!includeInactive) q = q.eq("is_active", true);
-
-    // eslint-disable-next-line no-await-in-loop
-    const res = await q;
-    data = res.data;
-    error = res.error;
-
-    if (!error) break;
-
-    const message = String(error?.message || "").toLowerCase();
-    const schemaMismatch =
-      message.includes("does not exist") ||
-      message.includes("could not find") ||
-      message.includes("unknown column") ||
-      message.includes("category") ||
-      message.includes("created_at") ||
-      message.includes("updated_at");
-
-    if (!schemaMismatch) break;
+  if (cached) {
+    const list = normalizeProductsList(cached);
+    if (!includeInactive) setCatalogProductsCache(list);
+    return list;
   }
 
-  if (error) throw error;
-  const result = normalizeProductsList(data || []);
-  if (useCache) writePublicCache(cacheKey, result);
-  return result;
+  if (useCache && productsInflight.has(cacheKey)) {
+    return productsInflight.get(cacheKey);
+  }
+
+  const request = (async () => {
+    const attempts = [
+      { includeCategory: true, includeTimestamps: true },
+      { includeCategory: false, includeTimestamps: true },
+      { includeCategory: true, includeTimestamps: false },
+      { includeCategory: false, includeTimestamps: false },
+    ];
+
+    let data;
+    let error;
+    for (const attempt of attempts) {
+      let q = supabase
+        .from("products")
+        .select(buildProductsSelect(attempt))
+        .order("sort_order", { ascending: true })
+        .order("sort_order", { foreignTable: "product_variants", ascending: true });
+
+      if (!includeInactive) q = q.eq("is_active", true);
+
+      // eslint-disable-next-line no-await-in-loop
+      const res = await q;
+      data = res.data;
+      error = res.error;
+
+      if (!error) break;
+
+      const message = String(error?.message || "").toLowerCase();
+      const schemaMismatch =
+        message.includes("does not exist") ||
+        message.includes("could not find") ||
+        message.includes("unknown column") ||
+        message.includes("category") ||
+        message.includes("created_at") ||
+        message.includes("updated_at");
+
+      if (!schemaMismatch) break;
+    }
+
+    if (error) throw error;
+    const result = normalizeProductsList(data || []);
+    if (useCache) {
+      writePublicCache(cacheKey, result);
+      if (!includeInactive) setCatalogProductsCache(result);
+    }
+    return result;
+  })();
+
+  if (useCache) {
+    productsInflight.set(cacheKey, request);
+    try {
+      return await request;
+    } finally {
+      productsInflight.delete(cacheKey);
+    }
+  }
+
+  return request;
 }
 
 export async function fetchProductBySlug(slug, { includeInactive = false, useCache = !includeInactive, ttlMs = 45000 } = {}) {

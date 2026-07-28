@@ -1,13 +1,23 @@
-﻿import React, { startTransition, useDeferredValue, useEffect, useMemo, useState } from "react";
+﻿import React, {
+  startTransition,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { useNavigate } from "react-router-dom";
 import {
   AlertTriangle,
+  ArrowLeft,
   Box,
   Check,
   ClipboardList,
   Copy,
   Eye,
+  Filter,
   LayoutDashboard,
   MapPin,
   Pencil,
@@ -37,7 +47,23 @@ import "../../css/pages/AdminDashboard.css";
 import "../../css/pages/AdminDashboard.light.css";
 import "../../css/pages/AdminDashboard.fixes.css";
 import "../../css/pages/AdminNav.css";
+import "../../css/pages/AdminUI.overhaul.css";
+import "../../css/pages/AdminApp.shell.css";
 import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
+import VirtualList from "./components/VirtualList";
+import AdminOrderListItem from "./components/AdminOrderListItem";
+import {
+  ADMIN_PRODUCTS_CACHE_TTL_MS,
+  EMPTY_ANALYTICS_SUMMARY,
+  ORDERS_PAGE_SIZE,
+  ORDER_SELECT_DETAIL,
+  ORDER_SELECT_LIST,
+  ORDER_SELECT_LIST_FALLBACK,
+  REALTIME_TOAST_DEBOUNCE_MS,
+  STOCK_THIN_BELOW,
+  isThinStock,
+  statusFilterForBucket,
+} from "./adminPerf";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -75,7 +101,6 @@ import {
   buildWhatsAppLink,
   formatAdminDate,
   formatAdminDateTime,
-  formatCompactIDR,
   formatCompactNumber,
   formatDayLabel,
   formatPercent,
@@ -89,15 +114,10 @@ import {
 
 const BUCKET_ICONS = "product-icons"; // public
 const BUCKET_TESTIMONIALS = "testimonials"; // public
-const ORDERS_PAGE_SIZE = 500;
 const ANALYTICS_WINDOWS = [
   { value: "7d", label: "7 hari" },
   { value: "30d", label: "30 hari" },
 ];
-const ORDER_SELECT_FULL =
-  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp,notes,admin_note";
-const ORDER_SELECT_FALLBACK =
-  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp";
 const TAB_ICONS = {
   overview: LayoutDashboard,
   products: Box,
@@ -107,6 +127,11 @@ const TAB_ICONS = {
   testimonials: Star,
   settings: Settings2,
 };
+
+/** Tabs that need products in memory (stock / variants / category map). */
+const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders"]);
+/** Tabs that need orders list. */
+const TABS_NEED_ORDERS = new Set(["overview", "orders"]);
 
 function clampPercent(value) {
   return Math.max(0, Math.min(100, Number(value || 0)));
@@ -157,10 +182,18 @@ export default function AdminDashboard() {
   // Products UI state
   const [visibleProductsCount, setVisibleProductsCount] = useState(20);
   const [productQuery, setProductQuery] = useState("");
+  /** all | low — low = only products with thin stock variants */
+  const [productStockFilter, setProductStockFilter] = useState("all");
   const [selectedProductId, setSelectedProductId] = useState("");
   const [productForm, setProductForm] = useState(null);
+  const [adminEmail, setAdminEmail] = useState("");
   const [orderQuery, setOrderQuery] = useState("");
+  /** Status bucket: all | attention | done | cancelled */
   const [orderBucket, setOrderBucket] = useState("all");
+  /** Catalog line: all | app_premium | academic */
+  const [orderCatalogFilter, setOrderCatalogFilter] = useState("all");
+  const [orderStatusFilterOpen, setOrderStatusFilterOpen] = useState(false);
+  const [orderToolsOpen, setOrderToolsOpen] = useState(false);
   const [activeOrderId, setActiveOrderId] = useState("");
 
   // Product modal
@@ -176,7 +209,7 @@ export default function AdminDashboard() {
   // Variant modal
   const [variantModalOpen, setVariantModalOpen] = useState(false);
   const [variantMode, setVariantMode] = useState("create"); // create | edit
-  const [variantAdvancedOpen, setVariantAdvancedOpen] = useState(false);
+
   const [variantForm, setVariantForm] = useState({
     id: "",
     product_id: "",
@@ -208,8 +241,33 @@ export default function AdminDashboard() {
   const [exportDateTo, setExportDateTo] = useState("");
   const [ordersHasMore, setOrdersHasMore] = useState(false);
   const [ordersLoadingMore, setOrdersLoadingMore] = useState(false);
+  /** Exact status totals from DB (not limited to current page). */
+  const [orderDbStats, setOrderDbStats] = useState({
+    total: 0,
+    live: 0,
+    done: 0,
+    cancelled: 0,
+    paidReported: 0,
+    byStatus: {},
+    loaded: false,
+  });
   const [confirmDialog, setConfirmDialog] = useState(null);
   const [msgIsError, setMsgIsError] = useState(false);
+  /** Domain load flags — avoid re-fetch when switching tabs. */
+  const loadedRef = useRef({
+    settings: false,
+    products: false,
+    orders: false,
+    analytics: false,
+    promos: false,
+    flashsale: false,
+    testimonials: false,
+    claims: false,
+  });
+  const ordersBucketRef = useRef(orderBucket);
+  const realtimeToastAtRef = useRef(0);
+  const ordersRef = useRef(orders);
+  ordersRef.current = orders;
   const deferredProductQuery = useDeferredValue(productQuery);
   const deferredOrderQuery = useDeferredValue(orderQuery);
   const waNumber = settings?.whatsapp?.number || "";
@@ -225,7 +283,11 @@ export default function AdminDashboard() {
   // ===== Auth guard + admin-only body class =====
   useEffect(() => {
     checkAdminAccess().then((result) => {
-      if (!result.ok) nav(result.reason === "not_admin" ? "/admin?error=not_admin" : "/admin");
+      if (!result.ok) {
+        nav(result.reason === "not_admin" ? "/admin?error=not_admin" : "/admin");
+        return;
+      }
+      setAdminEmail(String(result.user?.email || ""));
     });
   }, [nav]);
 
@@ -287,26 +349,96 @@ export default function AdminDashboard() {
     setSettingsQrisImageUrl(String(qris.image_url || ""));
   }, [settings]);
 
-  async function fetchOrdersPage(offset = 0) {
+  async function fetchOrdersPage(offset = 0, { bucket = orderBucket, detail = false } = {}) {
     const end = offset + ORDERS_PAGE_SIZE - 1;
-    let query = supabase
-      .from("orders")
-      .select(ORDER_SELECT_FULL)
-      .order("created_at", { ascending: false })
-      .range(offset, end);
+    const selectFull = detail ? ORDER_SELECT_DETAIL : ORDER_SELECT_LIST;
+    const selectFallback = ORDER_SELECT_LIST_FALLBACK;
+    const statusFilter = statusFilterForBucket(bucket);
+
+    const applyStatus = (q) => {
+      if (!statusFilter) return q;
+      if (statusFilter.type === "in") return q.in("status", statusFilter.values);
+      return q.eq("status", statusFilter.value);
+    };
+
+    let query = applyStatus(
+      supabase
+        .from("orders")
+        .select(selectFull)
+        .order("created_at", { ascending: false })
+        .range(offset, end)
+    );
     let { data, error } = await query;
 
-    if (error && /(notes|admin_note)/i.test(String(error?.message || ""))) {
-      ({ data, error } = await supabase
-        .from("orders")
-        .select(ORDER_SELECT_FALLBACK)
-        .order("created_at", { ascending: false })
-        .range(offset, end));
+    if (error && /(notes|admin_note|payment_proof)/i.test(String(error?.message || ""))) {
+      query = applyStatus(
+        supabase
+          .from("orders")
+          .select(selectFallback)
+          .order("created_at", { ascending: false })
+          .range(offset, end)
+      );
+      ({ data, error } = await query);
     }
 
     if (error) throw error;
     const rows = data || [];
     return { rows, hasMore: rows.length === ORDERS_PAGE_SIZE };
+  }
+
+  async function fetchOrderDetail(orderId) {
+    if (!orderId) return null;
+    let { data, error } = await supabase
+      .from("orders")
+      .select(ORDER_SELECT_DETAIL)
+      .eq("id", orderId)
+      .maybeSingle();
+    if (error && /(notes|admin_note|payment_proof)/i.test(String(error?.message || ""))) {
+      ({ data, error } = await supabase
+        .from("orders")
+        .select(ORDER_SELECT_LIST_FALLBACK)
+        .eq("id", orderId)
+        .maybeSingle());
+    }
+    if (error) throw error;
+    return data;
+  }
+
+  /** Full DB counts by status — independent of list page size. */
+  async function fetchOrderDbStats() {
+    try {
+      const statuses = ORDER_STATUS_OPTIONS.map((o) => o.value);
+      const pairs = await Promise.all(
+        statuses.map(async (status) => {
+          const { count, error } = await supabase
+            .from("orders")
+            .select("id", { count: "exact", head: true })
+            .eq("status", status);
+          if (error) throw error;
+          return [status, Number(count || 0)];
+        })
+      );
+      const byStatus = Object.fromEntries(pairs);
+      const total = pairs.reduce((sum, [, n]) => sum + n, 0);
+      let live = 0;
+      LIVE_ORDER_STATUSES.forEach((st) => {
+        live += Number(byStatus[st] || 0);
+      });
+      const next = {
+        total,
+        live,
+        done: Number(byStatus.done || 0),
+        cancelled: Number(byStatus.cancelled || 0),
+        paidReported: Number(byStatus.paid_reported || 0),
+        byStatus,
+        loaded: true,
+      };
+      setOrderDbStats(next);
+      return next;
+    } catch (error) {
+      warn("Gagal memuat orderDbStats", error);
+      return null;
+    }
   }
 
   async function fetchPromoClaimsData() {
@@ -315,7 +447,7 @@ export default function AdminDashboard() {
         .from("promo_claims")
         .select("id,visitor_id,code,claimed_at")
         .order("claimed_at", { ascending: false })
-        .limit(1000);
+        .limit(500);
 
       if (error) throw error;
       return data || [];
@@ -363,24 +495,28 @@ export default function AdminDashboard() {
     };
   }
 
-  async function loadOrdersAndPulse({ append = false } = {}) {
-    const offset = append ? (orders?.length || 0) : 0;
+  async function loadOrdersAndPulse({ append = false, bucket = orderBucket } = {}) {
+    const offset = append ? (ordersRef.current?.length || 0) : 0;
     const [{ rows, hasMore }, nextPulse] = await Promise.all([
-      fetchOrdersPage(offset),
+      fetchOrdersPage(offset, { bucket }),
       fetchStorePulse(),
+      // Refresh exact totals whenever orders list loads (not only first page)
+      append ? Promise.resolve(null) : fetchOrderDbStats(),
     ]);
     setOrders((prev) => (append ? [...(prev || []), ...rows] : rows));
     setOrdersHasMore(hasMore);
     setStorePulse(nextPulse);
     setLastSyncedAt(new Date().toISOString());
-    return append ? [...(orders || []), ...rows] : rows;
+    loadedRef.current.orders = true;
+    ordersBucketRef.current = bucket;
+    return append ? [...(ordersRef.current || []), ...rows] : rows;
   }
 
   async function loadMoreOrders() {
     if (ordersLoadingMore || !ordersHasMore) return;
     setOrdersLoadingMore(true);
     try {
-      await loadOrdersAndPulse({ append: true });
+      await loadOrdersAndPulse({ append: true, bucket: orderBucket });
       toast.success("Order lama dimuat", { duration: 1400 });
     } catch (e) {
       toast.error("Gagal memuat order lama");
@@ -391,57 +527,40 @@ export default function AdminDashboard() {
     }
   }
 
-  async function refreshProducts() {
-    const nextProducts = await fetchProducts({ includeInactive: true });
+  async function refreshProducts({ force = false } = {}) {
+    const nextProducts = await fetchProducts({
+      includeInactive: true,
+      useCache: !force,
+      ttlMs: ADMIN_PRODUCTS_CACHE_TTL_MS,
+    });
     setProducts(nextProducts);
+    loadedRef.current.products = true;
     return nextProducts;
   }
 
-  async function refreshOrders() {
-    const [nextOrders, nextClaims] = await Promise.all([loadOrdersAndPulse(), fetchPromoClaimsData()]);
-    setPromoClaims(nextClaims);
+  async function refreshOrders({ force = false } = {}) {
+    if (!force && loadedRef.current.orders && ordersBucketRef.current === orderBucket) {
+      return ordersRef.current;
+    }
+    const [nextOrders, nextClaims] = await Promise.all([
+      loadOrdersAndPulse({ append: false, bucket: orderBucket }),
+      loadedRef.current.claims && !force
+        ? Promise.resolve(promoClaims)
+        : fetchPromoClaimsData().then((c) => {
+            setPromoClaims(c);
+            loadedRef.current.claims = true;
+            return c;
+          }),
+    ]);
     return nextOrders;
   }
 
-  async function refreshAll() {
-    setMsg("");
-    setMsgIsError(false);
-    const tid = toast.loading("Memuat dashboard");
-
-    try {
-      setLoading(true);
-      const [p, t, pr, s, fs] = await Promise.all([
-        fetchProducts({ includeInactive: true }),
-        fetchTestimonials({ includeInactive: true }),
-        fetchPromoCodes(),
-        fetchSettings(),
-        fetchAllFlashSales().catch(() => []),
-      ]);
-
-      setProducts(p);
-      setTestimonials(t);
-      setPromos(pr);
-      setSettings(s);
-      setFlashSales(fs);
-
-      await refreshOrders();
-
-      toast.remove(tid);
-      toast.success("Dashboard ter-update", { duration: 1600 });
-    } catch (e) {
-      toast.remove(tid);
-      toast.error("Gagal memuat data admin");
-      setMsg(e?.message || String(e));
-      setMsgIsError(true);
-    } finally {
-      setLoading(false);
+  async function refreshAnalytics(days, { force = false } = {}) {
+    if (!force && loadedRef.current.analytics && analyticsWindow === (days === 30 ? "30d" : "7d")) {
+      // Still allow window change via force from effect
     }
-  }
-
-  async function refreshAnalytics(days) {
     setAnalyticsLoading(true);
     try {
-      // Pakai allSettled supaya satu RPC error tidak menggagalkan semuanya.
       const [dailyResult, visitorResult, pagesResult, cohortResult] = await Promise.allSettled([
         fetchDailyStats({ days }),
         fetchVisitorStats({ days }),
@@ -472,6 +591,7 @@ export default function AdminDashboard() {
       } else {
         warn("fetchCohortReturn gagal:", cohortResult.reason);
       }
+      loadedRef.current.analytics = true;
     } catch (e) {
       warn("Gagal memuat analytics:", e);
     } finally {
@@ -479,23 +599,206 @@ export default function AdminDashboard() {
     }
   }
 
-  useEffect(() => {
-    refreshAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  /** Load only domains needed for a tab (lazy). */
+  async function ensureTabData(tabId, { force = false } = {}) {
+    const tasks = [];
 
-  // Reload analytics setiap kali window berubah
+    if (!loadedRef.current.settings || force) {
+      tasks.push(
+        fetchSettings({ useCache: !force, ttlMs: 30_000 }).then((s) => {
+          setSettings(s);
+          loadedRef.current.settings = true;
+        })
+      );
+    }
+
+    if (TABS_NEED_PRODUCTS.has(tabId) && (!loadedRef.current.products || force)) {
+      tasks.push(refreshProducts({ force }));
+    }
+
+    if (TABS_NEED_ORDERS.has(tabId) && (!loadedRef.current.orders || force || ordersBucketRef.current !== orderBucket)) {
+      tasks.push(refreshOrders({ force: force || ordersBucketRef.current !== orderBucket }));
+    } else if (TABS_NEED_ORDERS.has(tabId) && !orderDbStats.loaded) {
+      tasks.push(fetchOrderDbStats());
+    }
+
+    if (tabId === "overview" && (!loadedRef.current.analytics || force)) {
+      const days = analyticsWindow === "30d" ? 30 : 7;
+      tasks.push(refreshAnalytics(days, { force: true }));
+      // Counts for KPI even if orders page already loaded
+      if (!orderDbStats.loaded || force) tasks.push(fetchOrderDbStats());
+    }
+
+    if (tabId === "promos" && (!loadedRef.current.promos || force)) {
+      tasks.push(
+        fetchPromoCodes().then((pr) => {
+          setPromos(pr);
+          loadedRef.current.promos = true;
+        })
+      );
+      if (!loadedRef.current.claims || force) {
+        tasks.push(
+          fetchPromoClaimsData().then((c) => {
+            setPromoClaims(c);
+            loadedRef.current.claims = true;
+          })
+        );
+      }
+    }
+
+    if (tabId === "flashsale" && (!loadedRef.current.flashsale || force)) {
+      tasks.push(
+        fetchAllFlashSales()
+          .catch(() => [])
+          .then((fs) => {
+            setFlashSales(fs);
+            loadedRef.current.flashsale = true;
+          })
+      );
+    }
+
+    if (tabId === "testimonials" && (!loadedRef.current.testimonials || force)) {
+      tasks.push(
+        fetchTestimonials({ includeInactive: true, useCache: !force, ttlMs: ADMIN_PRODUCTS_CACHE_TTL_MS }).then((t) => {
+          setTestimonials(t);
+          loadedRef.current.testimonials = true;
+        })
+      );
+    }
+
+    if (tasks.length) {
+      await Promise.all(tasks);
+      setLastSyncedAt(new Date().toISOString());
+    }
+  }
+
+  /** Manual full refresh (toolbar) — still scoped smarter than old refreshAll. */
+  async function refreshAll() {
+    setMsg("");
+    setMsgIsError(false);
+    const tid = toast.loading("Memuat dashboard");
+
+    try {
+      setLoading(true);
+      // Invalidate domain flags so ensureTabData reloads active tab deeply
+      loadedRef.current = {
+        settings: false,
+        products: false,
+        orders: false,
+        analytics: false,
+        promos: false,
+        flashsale: false,
+        testimonials: false,
+        claims: false,
+      };
+      invalidateProductCaches();
+      await ensureTabData(tab, { force: true });
+      // Always refresh pulse with orders when forced
+      if (!TABS_NEED_ORDERS.has(tab)) {
+        const pulse = await fetchStorePulse();
+        setStorePulse(pulse);
+      }
+      toast.remove(tid);
+      toast.success("Dashboard ter-update", { duration: 1600 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal memuat data admin");
+      setMsg(e?.message || String(e));
+      setMsgIsError(true);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  // Bootstrap + lazy tab data (single effect — avoids double-fetch on mount)
   useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      const isCold = !loadedRef.current.settings && !lastSyncedAt;
+      if (isCold) setLoading(true);
+      try {
+        await ensureTabData(tab);
+      } catch (e) {
+        if (!cancelled) {
+          if (isCold) {
+            toast.error("Gagal memuat data admin");
+            setMsg(e?.message || String(e));
+            setMsgIsError(true);
+          } else {
+            warn("ensureTabData:", e);
+          }
+        }
+      } finally {
+        if (!cancelled && isCold) setLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tab]);
+
+  // Server-side re-query when order status bucket changes (after first orders load)
+  useEffect(() => {
+    if (!loadedRef.current.orders) return;
+    if (ordersBucketRef.current === orderBucket) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        setOrdersLoadingMore(true);
+        await loadOrdersAndPulse({ append: false, bucket: orderBucket });
+      } catch (e) {
+        if (!cancelled) {
+          toast.error("Gagal filter order");
+          warn(e);
+        }
+      } finally {
+        if (!cancelled) setOrdersLoadingMore(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderBucket]);
+
+  // Analytics window: only while on overview
+  useEffect(() => {
+    if (tab !== "overview") return;
     const days = analyticsWindow === "30d" ? 30 : 7;
-    refreshAnalytics(days);
+    refreshAnalytics(days, { force: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [analyticsWindow]);
+  }, [analyticsWindow, tab]);
 
-  // Ensure selected product exists
+  // Hydrate order detail fields when opening a row
   useEffect(() => {
-    if (!products || products.length === 0) return;
-    if (selectedProductId && products.some((p) => p.id === selectedProductId)) return;
-    setSelectedProductId(products[0].id);
+    if (!activeOrderId) return;
+    const existing = (orders || []).find((o) => o.id === activeOrderId);
+    if (existing?.payment_proof_url !== undefined || existing?.notes !== undefined) return;
+    let cancelled = false;
+    fetchOrderDetail(activeOrderId)
+      .then((row) => {
+        if (cancelled || !row) return;
+        setOrders((prev) => (prev || []).map((o) => (o.id === row.id ? { ...o, ...row } : o)));
+      })
+      .catch((e) => warn("fetchOrderDetail:", e));
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeOrderId]);
+
+  // If selected product was deleted / no longer in list, clear selection.
+  // Do NOT auto-pick products[0] — that trapped mobile "Daftar" back onto the first item (e.g. Canva).
+  useEffect(() => {
+    if (!selectedProductId) return;
+    if (!products || products.length === 0) {
+      setSelectedProductId("");
+      return;
+    }
+    if (!products.some((p) => p.id === selectedProductId)) {
+      setSelectedProductId("");
+    }
   }, [products, selectedProductId]);
 
   useEffect(() => {
@@ -514,15 +817,52 @@ export default function AdminDashboard() {
     });
   }, [orders]);
 
+  const lowStockProductIds = useMemo(() => {
+    const ids = new Set();
+    for (const product of products || []) {
+      const thin = (product.product_variants || []).some(
+        (v) => v?.is_active && isThinStock(v?.stock)
+      );
+      if (thin) ids.add(product.id);
+    }
+    return ids;
+  }, [products]);
+
   const filteredProducts = useMemo(() => {
     const q = String(deferredProductQuery || "").trim().toLowerCase();
-    if (!q) return products;
-    return (products || []).filter((p) => {
+    let list = products || [];
+    if (productStockFilter === "low") {
+      list = list.filter((p) => lowStockProductIds.has(p.id));
+    }
+    if (!q) return list;
+    return list.filter((p) => {
       const name = String(p.name || "").toLowerCase();
       const slug = String(p.slug || "").toLowerCase();
       return name.includes(q) || slug.includes(q);
     });
-  }, [deferredProductQuery, products]);
+  }, [deferredProductQuery, lowStockProductIds, productStockFilter, products]);
+
+  function openLowStockProducts() {
+    setProductStockFilter("low");
+    setProductQuery("");
+    setVisibleProductsCount(80);
+    // Open first thin-stock product so right editor is not empty
+    const firstThin = (products || []).find((p) => lowStockProductIds.has(p.id));
+    if (firstThin?.id) {
+      setSelectedProductId(firstThin.id);
+    } else {
+      setSelectedProductId("");
+    }
+    startTransition(() => setTab("products"));
+  }
+
+  // When entering low-stock mode after products load, auto-select first thin item
+  useEffect(() => {
+    if (tab !== "products" || productStockFilter !== "low") return;
+    if (selectedProductId && lowStockProductIds.has(selectedProductId)) return;
+    const firstThin = (products || []).find((p) => lowStockProductIds.has(p.id));
+    if (firstThin?.id) setSelectedProductId(firstThin.id);
+  }, [tab, productStockFilter, products, lowStockProductIds, selectedProductId]);
 
   const selectedProduct = useMemo(() => {
     return (products || []).find((p) => p.id === selectedProductId) || null;
@@ -555,8 +895,37 @@ export default function AdminDashboard() {
   }, [products]);
 
   const analyticsDays = analyticsWindow === "30d" ? 30 : 7;
+  /** Heavy overview rollup only when needed (overview tab or sidebar stock/live). */
+  const shouldComputeOverview = tab === "overview";
 
   const analyticsSummary = useMemo(() => {
+    // Lightweight stub when not on overview — avoid O(orders×items) on every orders keystroke
+    if (!shouldComputeOverview) {
+      const stockAlerts = (allVariants || [])
+        .filter((variant) => variant?.is_active && isThinStock(variant?.stock))
+        .sort((a, b) => Number(a?.stock || 0) - Number(b?.stock || 0))
+        .slice(0, 6);
+      let todayOrders = 0;
+      let todayRevenue = 0;
+      const todayKey = toDateKeyWIB(new Date());
+      for (const order of orders || []) {
+        if (toDateKeyWIB(order?.created_at) === todayKey) {
+          todayOrders += 1;
+          if (String(order?.status) === "done") todayRevenue += Number(order?.total_idr || 0);
+        }
+      }
+      return {
+        ...EMPTY_ANALYTICS_SUMMARY,
+        todayOrders: todayOrders || storePulse.today_orders || 0,
+        todayRevenue,
+        stockAlerts,
+        activeProducts: (products || []).filter((p) => p.is_active).length,
+        inactiveProducts: (products || []).filter((p) => !p.is_active).length,
+        activePromos: (promos || []).filter((p) => p.is_active).length,
+        activeTestimonials: (testimonials || []).filter((t) => t.is_active).length,
+      };
+    }
+
     const now = new Date();
     const start = new Date(now);
     start.setDate(start.getDate() - (analyticsDays - 1));
@@ -579,7 +948,6 @@ export default function AdminDashboard() {
       return acc;
     }, {});
 
-    const topProductsMap = new Map();
     const categoryMap = new Map();
     const promoUsageMap = new Map();
 
@@ -590,6 +958,22 @@ export default function AdminDashboard() {
     let doneOrders = 0;
     let pipelineValue = 0;
     let discountTotal = 0;
+
+    // Prefer full daily_stats window for revenue/trend (not clipped to list page)
+    const dailyRows = Array.isArray(dailyStats) ? dailyStats : [];
+    const revenueFromDaily = dailyRows.reduce((sum, row) => sum + Number(row.revenueIdr || 0), 0);
+    const ordersFromDaily = dailyRows.reduce((sum, row) => sum + Number(row.totalOrders || 0), 0);
+    if (dailyRows.length) {
+      dailyRows.forEach((row) => {
+        const key = toDateKeyWIB(row.date);
+        if (trendMap.has(key)) {
+          const point = trendMap.get(key);
+          point.orders = Number(row.totalOrders || 0);
+          point.revenue = Number(row.revenueIdr || 0);
+        }
+      });
+      revenueWindow = revenueFromDaily;
+    }
 
     orderRows.forEach((order) => {
       const status = String(order?.status || "pending");
@@ -610,7 +994,7 @@ export default function AdminDashboard() {
         doneOrders += 1;
         discountTotal += discountAmount;
 
-        if (inWindow) revenueWindow += total;
+        if (!dailyRows.length && inWindow) revenueWindow += total;
         if (orderKey === todayKey) todayRevenue += total;
       }
 
@@ -618,7 +1002,7 @@ export default function AdminDashboard() {
         todayOrders += 1;
       }
 
-      if (inWindow && trendMap.has(orderKey)) {
+      if (!dailyRows.length && inWindow && trendMap.has(orderKey)) {
         const point = trendMap.get(orderKey);
         point.orders += 1;
         if (status === "done") point.revenue += total;
@@ -633,16 +1017,10 @@ export default function AdminDashboard() {
       }
 
       getSafeOrderItems(order).forEach((item) => {
-        const label = String(item?.product_name || item?.variant_name || "Tanpa nama");
-        const qty = Number(item?.qty || 0);
-        const revenue = Number(item?.price_idr || 0) * qty;
-        const productEntry = topProductsMap.get(label) || { name: label, quantity: 0, revenue: 0 };
-        productEntry.quantity += qty;
-        productEntry.revenue += revenue;
-        topProductsMap.set(label, productEntry);
-
         const productId = item?.product_id;
         const category = prettyCategory(productMap.get(productId)?.category || "other");
+        const qty = Number(item?.qty || 0);
+        const revenue = Number(item?.price_idr || 0) * qty;
         const categoryEntry = categoryMap.get(category) || { category, quantity: 0, revenue: 0 };
         categoryEntry.quantity += qty;
         categoryEntry.revenue += revenue;
@@ -650,31 +1028,70 @@ export default function AdminDashboard() {
       });
     });
 
+    // Top products from full catalog sold_count (not limited to loaded order page)
+    const topProducts = (products || [])
+      .map((product) => {
+        const variants = product?.product_variants || [];
+        const quantity = variants.reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
+        const revenue = variants.reduce(
+          (sum, v) => sum + Number(v?.sold_count || 0) * Number(v?.price_idr || 0),
+          0
+        );
+        return {
+          name: product?.name || "Tanpa nama",
+          quantity,
+          revenue,
+        };
+      })
+      .filter((row) => row.quantity > 0)
+      .sort((a, b) => b.quantity - a.quantity || b.revenue - a.revenue)
+      .slice(0, 5);
+
+    // Prefer exact DB done count when available
+    if (orderDbStats.loaded) {
+      doneOrders = orderDbStats.done;
+      ORDER_STATUS_OPTIONS.forEach((opt) => {
+        statusMap[opt.value] = Number(orderDbStats.byStatus?.[opt.value] || 0);
+      });
+    }
+
+    // Today figures: prefer store pulse + daily when present
+    if (storePulse.today_orders) {
+      todayOrders = Math.max(todayOrders, Number(storePulse.today_orders || 0));
+    }
+    if (dailyRows.length) {
+      const todayDaily = dailyRows.find((row) => toDateKeyWIB(row.date) === todayKey);
+      if (todayDaily) {
+        todayRevenue = Math.max(todayRevenue, Number(todayDaily.revenueIdr || 0));
+      }
+    }
+
     const stockAlerts = allVariants
-      .filter((variant) => variant?.is_active && Number(variant?.stock || 0) <= 3)
+      .filter((variant) => variant?.is_active && isThinStock(variant?.stock))
       .sort((a, b) => Number(a?.stock || 0) - Number(b?.stock || 0))
       .slice(0, 6);
 
     const trend = Array.from(trendMap.values());
     const maxOrders = Math.max(1, ...trend.map((point) => point.orders));
     const maxRevenue = Math.max(1, ...trend.map((point) => point.revenue));
+    const totalOrdersForConv = orderDbStats.loaded
+      ? orderDbStats.total
+      : ordersFromDaily || orders.length;
 
     return {
-      revenueTotal,
+      revenueTotal: orderDbStats.loaded && revenueFromDaily ? Math.max(revenueTotal, revenueFromDaily) : revenueTotal || revenueFromDaily,
       revenueWindow,
       todayRevenue,
       todayOrders,
       doneOrders,
       pipelineValue,
       discountTotal,
-      averageOrderValue: doneOrders ? revenueTotal / doneOrders : 0,
+      averageOrderValue: doneOrders ? (revenueTotal || revenueFromDaily) / doneOrders : 0,
       trend,
       maxOrders,
       maxRevenue,
       statusMap,
-      topProducts: Array.from(topProductsMap.values())
-        .sort((a, b) => b.quantity - a.quantity)
-        .slice(0, 5),
+      topProducts,
       categories: Array.from(categoryMap.values())
         .sort((a, b) => b.revenue - a.revenue)
         .slice(0, 4),
@@ -682,13 +1099,27 @@ export default function AdminDashboard() {
         .sort((a, b) => b.orders - a.orders)
         .slice(0, 5),
       stockAlerts,
-      conversionRatio: storePulse.total_views ? (orders.length / storePulse.total_views) * 100 : 0,
+      conversionRatio: storePulse.total_views
+        ? (totalOrdersForConv / storePulse.total_views) * 100
+        : 0,
       activeProducts: (products || []).filter((product) => product.is_active).length,
       inactiveProducts: (products || []).filter((product) => !product.is_active).length,
       activePromos: (promos || []).filter((promo) => promo.is_active).length,
       activeTestimonials: (testimonials || []).filter((item) => item.is_active).length,
     };
-  }, [allVariants, analyticsDays, orders, products, promos, storePulse.total_views, testimonials]);
+  }, [
+    allVariants,
+    analyticsDays,
+    dailyStats,
+    orderDbStats,
+    orders,
+    products,
+    promos,
+    shouldComputeOverview,
+    storePulse.today_orders,
+    storePulse.total_views,
+    testimonials,
+  ]);
 
   const testimonialsWithoutCaption = useMemo(
     () => (testimonials || []).filter((item) => item.is_active && !String(item.caption || "").trim()).length,
@@ -700,22 +1131,22 @@ export default function AdminDashboard() {
       {
         key: "revenue",
         label: `Revenue ${analyticsWindow}`,
-        value: formatCompactIDR(analyticsSummary.revenueWindow),
-        helper: `${analyticsSummary.doneOrders} order sukses`,
+        value: formatIDR(analyticsSummary.revenueWindow),
+        helper: `${new Intl.NumberFormat("id-ID").format(analyticsSummary.doneOrders)} order sukses`,
         icon: Wallet,
       },
       {
         key: "pipeline",
         label: "Butuh tindak lanjut",
-        value: `${orders.filter((order) => LIVE_ORDER_STATUSES.has(String(order.status || "pending"))).length}`,
-        helper: formatCompactIDR(analyticsSummary.pipelineValue),
+        value: `${orderDbStats.loaded ? orderDbStats.live : orders.filter((order) => LIVE_ORDER_STATUSES.has(String(order.status || "pending"))).length}`,
+        helper: formatIDR(analyticsSummary.pipelineValue),
         icon: ClipboardList,
       },
       {
         key: "traffic",
         label: "Views hari ini",
-        value: formatCompactNumber(storePulse.today_views),
-        helper: `${storePulse.today_orders || analyticsSummary.todayOrders} order masuk`,
+        value: new Intl.NumberFormat("id-ID").format(storePulse.today_views || 0),
+        helper: `${new Intl.NumberFormat("id-ID").format(storePulse.today_orders || analyticsSummary.todayOrders)} order masuk`,
         icon: Eye,
       },
       {
@@ -726,16 +1157,64 @@ export default function AdminDashboard() {
         icon: AlertTriangle,
       },
     ];
-  }, [analyticsSummary, analyticsWindow, orders, storePulse.today_orders, storePulse.today_views]);
+  }, [analyticsSummary, analyticsWindow, orderDbStats.live, orderDbStats.loaded, orders, storePulse.today_orders, storePulse.today_views]);
 
   const orderStats = useMemo(() => {
+    // Prefer exact DB totals so page size (40) never clips KPI numbers
+    if (orderDbStats.loaded) {
+      return {
+        total: orderDbStats.total,
+        live: orderDbStats.live,
+        done: orderDbStats.done,
+        cancelled: orderDbStats.cancelled,
+        paidReported: orderDbStats.paidReported,
+        byStatus: orderDbStats.byStatus,
+        pageCount: (orders || []).length,
+      };
+    }
+    const byStatus = { pending: 0, paid_reported: 0, processing: 0, done: 0, cancelled: 0 };
+    for (const order of orders || []) {
+      const key = String(order.status || "pending");
+      byStatus[key] = (byStatus[key] || 0) + 1;
+    }
     return {
       total: orders.length,
       live: orders.filter((order) => LIVE_ORDER_STATUSES.has(String(order.status || "pending"))).length,
-      done: orders.filter((order) => String(order.status || "pending") === "done").length,
-      cancelled: orders.filter((order) => String(order.status || "pending") === "cancelled").length,
+      done: byStatus.done || 0,
+      cancelled: byStatus.cancelled || 0,
+      paidReported: byStatus.paid_reported || 0,
+      byStatus,
+      pageCount: (orders || []).length,
     };
-  }, [orders]);
+  }, [orderDbStats, orders]);
+
+  const productCategoryById = useMemo(() => {
+    const map = new Map();
+    for (const p of products || []) {
+      if (p?.id) map.set(p.id, String(p.category || "other").toLowerCase());
+    }
+    return map;
+  }, [products]);
+
+  function isAcademicOrderItem(item) {
+    if (!item) return false;
+    const catFromProduct = item.product_id ? productCategoryById.get(item.product_id) : null;
+    if (catFromProduct === "academic") return true;
+    const name = String(item.product_name || item.variant_name || "").toLowerCase();
+    return /turnitin|parafrase|paraphrase|plagiasi|zerogpt|mendeley|jasa\s*akademik|cek\s*ai|skripsi|tesis/.test(
+      name
+    );
+  }
+
+  function orderHasAcademicItems(order) {
+    return getSafeOrderItems(order).some((item) => isAcademicOrderItem(item));
+  }
+
+  function orderHasAppPremiumItems(order) {
+    const items = getSafeOrderItems(order);
+    if (!items.length) return true; // unknown → treat as app catalog
+    return items.some((item) => !isAcademicOrderItem(item));
+  }
 
   const filteredOrders = useMemo(() => {
     const query = String(deferredOrderQuery || "").trim().toLowerCase();
@@ -750,6 +1229,13 @@ export default function AdminDashboard() {
             : status === orderBucket;
 
       if (!matchesBucket) return false;
+
+      if (orderCatalogFilter === "academic") {
+        if (!orderHasAcademicItems(order)) return false;
+      } else if (orderCatalogFilter === "app_premium") {
+        if (!orderHasAppPremiumItems(order)) return false;
+      }
+
       if (!query) return true;
 
       const haystacks = [
@@ -763,7 +1249,7 @@ export default function AdminDashboard() {
 
       return haystacks.some((value) => String(value || "").toLowerCase().includes(query));
     });
-  }, [deferredOrderQuery, orderBucket, orders]);
+  }, [deferredOrderQuery, orderBucket, orderCatalogFilter, orders, productCategoryById]);
 
   const activeOrder = useMemo(() => {
     return (orders || []).find((order) => order.id === activeOrderId) || null;
@@ -799,7 +1285,7 @@ export default function AdminDashboard() {
     requestAdminNotificationPermission().catch(() => {});
   }, []);
 
-  // ===== Realtime subscription for orders =====
+  // ===== Realtime subscription for orders (minimal patch + debounced toast) =====
   useEffect(() => {
     const channel = supabase
       .channel("admin-orders-realtime")
@@ -808,13 +1294,41 @@ export default function AdminDashboard() {
         { event: "INSERT", schema: "public", table: "orders" },
         (payload) => {
           const newOrder = payload.new;
-          setOrders((prev) => {
-            if ((prev || []).some((o) => o.id === newOrder.id)) return prev;
-            return [newOrder, ...(prev || [])];
+          if (!newOrder?.id) return;
+          // Patch list only if orders domain is loaded
+          if (loadedRef.current.orders) {
+            setOrders((prev) => {
+              if ((prev || []).some((o) => o.id === newOrder.id)) return prev;
+              return [newOrder, ...(prev || [])];
+            });
+          }
+          setNewOrderCount((prev) => prev + 1);
+          setStorePulse((prev) => ({
+            ...prev,
+            today_orders: Number(prev.today_orders || 0) + 1,
+            total_orders: Number(prev.total_orders || 0) + 1,
+          }));
+          setOrderDbStats((prev) => {
+            if (!prev.loaded) return prev;
+            const status = String(newOrder.status || "pending");
+            const byStatus = { ...prev.byStatus, [status]: Number(prev.byStatus[status] || 0) + 1 };
+            const liveDelta = LIVE_ORDER_STATUSES.has(status) ? 1 : 0;
+            return {
+              ...prev,
+              total: prev.total + 1,
+              live: prev.live + liveDelta,
+              done: status === "done" ? prev.done + 1 : prev.done,
+              cancelled: status === "cancelled" ? prev.cancelled + 1 : prev.cancelled,
+              paidReported: status === "paid_reported" ? prev.paidReported + 1 : prev.paidReported,
+              byStatus,
+            };
           });
           notifyAdminNewOrder(newOrder, waNumber);
-          toast.success(`Order baru: ${newOrder.order_code || "-"}`, { duration: 5000 });
-          setNewOrderCount((prev) => prev + 1);
+          const now = Date.now();
+          if (now - realtimeToastAtRef.current >= REALTIME_TOAST_DEBOUNCE_MS) {
+            realtimeToastAtRef.current = now;
+            toast.success(`Order baru: ${newOrder.order_code || "-"}`, { duration: 4000 });
+          }
         }
       )
       .on(
@@ -822,10 +1336,17 @@ export default function AdminDashboard() {
         { event: "UPDATE", schema: "public", table: "orders" },
         (payload) => {
           const updated = payload.new;
-          if (!updated?.id) return;
-          setOrders((prev) =>
-            (prev || []).map((o) => (o.id === updated.id ? { ...o, ...updated } : o))
-          );
+          if (!updated?.id || !loadedRef.current.orders) return;
+          // Minimal patch — merge only changed row; do not recompute analytics here
+          setOrders((prev) => {
+            const list = prev || [];
+            const idx = list.findIndex((o) => o.id === updated.id);
+            if (idx < 0) return list;
+            if (list[idx] === updated) return list;
+            const next = list.slice();
+            next[idx] = { ...list[idx], ...updated };
+            return next;
+          });
         }
       )
       .subscribe();
@@ -925,7 +1446,7 @@ export default function AdminDashboard() {
       if (!data?.id) throw new Error("Insert produk gagal (tidak ada data kembali). Cek RLS admin.");
 
       invalidateProductCaches();
-      await refreshProducts();
+      await refreshProducts({ force: true });
       setSelectedProductId(data.id);
       setProductModalOpen(false);
       toast.remove(tid);
@@ -993,12 +1514,16 @@ export default function AdminDashboard() {
 
       if (error) {
         const raw = `${error.message || ""} ${error.details || ""} ${error.hint || ""} ${error.code || ""}`;
-        // Enum / CHECK still missing ai|design
+        // Enum / CHECK missing allowed category key (e.g. ai, design, academic)
         if (/invalid input value for enum|check constraint|category/i.test(raw)) {
+          const migrationHint =
+            category === "academic"
+              ? "supabase/migrations/004_products_category_academic.sql"
+              : "supabase/migrations/003_products_category.sql (atau 004 jika kategori Jasa Akademik)";
           throw new Error(
             `Kategori ditolak database (${category}). ` +
-              `Biasanya ENUM/CHECK lama belum mengizinkan "ai"/"design". ` +
-              `Jalankan script supabase/migrations/003_products_category.sql di Supabase SQL Editor, ` +
+              `Biasanya ENUM/CHECK lama belum mengizinkan nilai ini. ` +
+              `Jalankan script ${migrationHint} di Supabase SQL Editor, ` +
               `lalu reload schema (Settings → API → Reload schema) dan coba lagi. ` +
               `PG: ${formatPgError(error)}`
           );
@@ -1020,7 +1545,7 @@ export default function AdminDashboard() {
       }
 
       invalidateProductCaches();
-      await refreshProducts();
+      await refreshProducts({ force: true });
       // Keep editor form in sync with confirmed DB category
       setProductForm((prev) => (prev ? { ...prev, category: data.category || category } : prev));
       toast.remove(tid);
@@ -1057,7 +1582,7 @@ export default function AdminDashboard() {
       const { error: pErr } = await supabase.from("products").delete().eq("id", id);
       if (pErr) throw pErr;
 
-      await refreshProducts();
+      await refreshProducts({ force: true });
       toast.remove(tid);
       toast.success("Produk dihapus", { duration: 1400 });
     } catch (e) {
@@ -1083,7 +1608,7 @@ export default function AdminDashboard() {
       if (error) throw error;
 
       setProductForm((p) => (p ? { ...p, icon_url: url } : p));
-      await refreshProducts();
+      await refreshProducts({ force: true });
 
       toast.remove(tid);
       toast.success("Ikon diupload", { duration: 1400 });
@@ -1099,7 +1624,6 @@ export default function AdminDashboard() {
     if (!selectedProduct) return;
 
     setVariantMode("create");
-    setVariantAdvancedOpen(false);
     setVariantForm({
       id: "",
       product_id: selectedProduct.id,
@@ -1118,7 +1642,6 @@ export default function AdminDashboard() {
 
   function openEditVariant(v) {
     setVariantMode("edit");
-    setVariantAdvancedOpen(false);
     setVariantForm({
       id: v.id,
       product_id: v.product_id,
@@ -1200,7 +1723,7 @@ export default function AdminDashboard() {
       }
 
       invalidateProductCaches();
-      await refreshProducts();
+      await refreshProducts({ force: true });
       setVariantModalOpen(false);
       toast.remove(tid);
       toast.success(variantMode === "edit" ? "Paket diperbarui" : "Paket ditambahkan", { duration: 1400 });
@@ -1238,7 +1761,7 @@ export default function AdminDashboard() {
       const { error } = await supabase.from("product_variants").delete().eq("id", id);
       if (error) throw error;
 
-      await refreshProducts();
+      await refreshProducts({ force: true });
       toast.remove(tid);
       toast.success("Varian dihapus", { duration: 1400 });
     } catch (e) {
@@ -1775,37 +2298,56 @@ export default function AdminDashboard() {
 
   // ===== Render =====
   const tabs = [
-    { id: "overview", label: "Ringkasan", hint: "Kondisi toko hari ini" },
-    { id: "products", label: "Produk", hint: "Katalog dan paket aktif" },
-    { id: "orders", label: "Pesanan", hint: "Antrean dan tindak lanjut" },
-    { id: "promos", label: "Promo", hint: "Kode diskon dan penggunaan" },
+    { id: "overview", label: "Ringkasan", hint: "Apa yang perlu dikerjakan sekarang" },
+    { id: "products", label: "Produk", hint: "Katalog, paket, dan stok" },
+    { id: "orders", label: "Pesanan", hint: "Antrean bayar & proses" },
+    { id: "promos", label: "Promo", hint: "Kode diskon pelanggan" },
     { id: "flashsale", label: "Flash Sale", hint: "Diskon kilat per varian" },
-    { id: "testimonials", label: "Testimoni", hint: "Bukti pelanggan yang tayang" },
-    { id: "settings", label: "Pengaturan", hint: "WA, QRIS, dan operasional" },
+    { id: "testimonials", label: "Testimoni", hint: "Bukti sosial di etalase" },
+    { id: "settings", label: "Pengaturan", hint: "WA, QRIS, operasional" },
   ];
 
   const activeTab = tabs.find((item) => item.id === tab) || tabs[0];
-  const ActiveTabIcon = TAB_ICONS[activeTab.id] || Box;
-  const tabMeta = {
-    overview: `${analyticsSummary.todayOrders} hari ini`,
-    products: `${products.length} produk`,
-    orders: `${orderStats.live} aktif`,
-    promos: `${analyticsSummary.activePromos} aktif`,
-    flashsale: `${flashSales.filter(fs => { const now = new Date(); return fs.is_active && new Date(fs.ends_at) >= now && new Date(fs.starts_at) <= now; }).length} live`,
-    testimonials: `${analyticsSummary.activeTestimonials} tayang`,
-    settings: normalizeWhatsApp(settingsWhatsApp || waNumber) ? "WA siap" : "WA kosong",
-  };
+  const liveFlashCount = flashSales.filter((fs) => {
+    const now = new Date();
+    return fs.is_active && new Date(fs.ends_at) >= now && new Date(fs.starts_at) <= now;
+  }).length;
   const syncCopy = loading
     ? "Menyelaraskan data..."
     : lastSyncedAt
-      ? `Terakhir sinkron ${formatAdminDate(lastSyncedAt)}`
-      : activeTab.hint;
-  const isOverviewTab = activeTab.id === "overview";
-  const topbarEyebrow = isOverviewTab ? activeTab.label : "Area kerja";
-  const topbarTitle = isOverviewTab ? "Dashboard" : activeTab.label;
-  const topbarLead = isOverviewTab
-    ? "Kondisi toko hari ini. Semua yang perlu kamu tahu, satu layar."
-    : activeTab.hint;
+      ? `Sinkron ${formatAdminDate(lastSyncedAt)}`
+      : "Belum sinkron";
+
+  const primaryWorkspaceAction = {
+    overview: {
+      label: orderStats.live > 0 ? "Proses pesanan" : "Lihat pesanan",
+      onClick: () => handleSelectTab("orders"),
+      icon: ClipboardList,
+    },
+    orders: {
+      label: "Export CSV",
+      onClick: handleExportCSV,
+      icon: ClipboardList,
+    },
+    products: {
+      label: "Tambah produk",
+      onClick: openCreateProduct,
+      icon: Plus,
+    },
+    promos: {
+      label: "Buat promo",
+      onClick: openCreatePromo,
+      icon: Plus,
+    },
+    flashsale: {
+      label: "Buat flash sale",
+      onClick: () => setFlashFormOpen(true),
+      icon: Plus,
+    },
+    testimonials: null,
+    settings: null,
+  }[activeTab.id];
+
   const activeOrderWhatsApp = activeOrder ? buildWhatsAppLink(activeOrder.customer_whatsapp) : "";
   const flashSaleEndingSoon = flashSales.some((fs) => {
     const now = new Date();
@@ -1814,39 +2356,70 @@ export default function AdminDashboard() {
     return fs.is_active && diff > 0 && diff < 2 * 60 * 60 * 1000;
   });
 
-  function handleSelectTab(id) {
+  function handleSelectTab(id, opts = {}) {
+    if (id === "products" && opts?.lowStock) {
+      openLowStockProducts();
+      return;
+    }
+    if (id === "products" && !opts?.lowStock) {
+      // Keep stock filter if user already filtered; only clear when switching from other tabs intentionally
+    }
+    if (id !== "products") {
+      // leave productStockFilter as-is so returning to products remembers filter
+    }
     startTransition(() => setTab(id));
     if (id === "orders") setNewOrderCount(0);
   }
 
+  const adminGreetingName = useMemo(() => {
+    const email = String(adminEmail || "").toLowerCase();
+    if (email.includes("rojaki")) return "Bos Zaqi";
+    if (email.includes("kambingbiru")) return "King Agta";
+    if (email) return email.split("@")[0] || "Admin";
+    return "Admin";
+  }, [adminEmail]);
+
+  const PrimaryActionIcon = primaryWorkspaceAction?.icon || Plus;
+
   return (
-    <div className="page admin-page">
+    <div className="page admin-page admin-page--app">
       <section className="section admin-section">
-        <div className="container admin-shell">
+        <div className="admin-shell">
           <AdminSidebar
             tabs={tabs}
             activeTabId={tab}
             onSelectTab={handleSelectTab}
             icons={TAB_ICONS}
+            greetingName={adminGreetingName}
             todayOrders={analyticsSummary.todayOrders}
-            todayRevenue={formatCompactIDR(analyticsSummary.todayRevenue)}
+            todayRevenue={formatIDR(analyticsSummary.todayRevenue)}
+            liveOrders={orderStats.live}
             newOrderCount={newOrderCount}
             stockAlertCount={analyticsSummary.stockAlerts.length}
             flashSaleEndingSoon={flashSaleEndingSoon}
             onRefresh={refreshAll}
             onLogout={logout}
+            syncLabel={syncCopy}
           />
 
           <main className="admin-main">
-            <div className="admin-mobileControls adm-mobileHead">
-              <div className="adm-mobileHeadInner">
-                <div className="adm-mobileHeadIcon">
-                  {React.createElement(ActiveTabIcon, { size: 18, strokeWidth: 2.1 })}
-                </div>
-                <div className="adm-mobileHeadCopy">
-                  <strong>{activeTab.label}</strong>
-                  <span>{syncCopy}</span>
-                </div>
+            {/* Slim action bar only — tab title lives inside each pane (no double header) */}
+            <div className="admin-workspaceToolbar" role="toolbar" aria-label="Aksi halaman">
+              <div className="admin-workspaceSync" title={syncCopy}>
+                <span className={`admin-syncDot${loading ? " is-loading" : ""}`} />
+                <span>{syncCopy}</span>
+              </div>
+              <div className="admin-workspaceToolbarActions">
+                <button type="button" className="btn btn-ghost btn-sm" onClick={refreshAll}>
+                  <Eye size={15} />
+                  Refresh
+                </button>
+                {primaryWorkspaceAction ? (
+                  <button type="button" className="btn btn-primary btn-sm" onClick={primaryWorkspaceAction.onClick}>
+                    <PrimaryActionIcon size={15} />
+                    {primaryWorkspaceAction.label}
+                  </button>
+                ) : null}
               </div>
             </div>
 
@@ -1862,104 +2435,67 @@ export default function AdminDashboard() {
               onLogout={logout}
             />
 
-            {/* Compact chrome on work tabs (products/orders) so panels get more height */}
-            <div
-              className={`admin-topbar${
-                ["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab)
-                  ? " admin-topbar--compact"
-                  : ""
-              }`}
-            >
-              <div className="admin-topbarCopy">
-                {["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab) ? null : (
-                  <div className="admin-topbar-eyebrow">{topbarEyebrow}</div>
-                )}
-                <h1 className="h2">{topbarTitle}</h1>
-                {["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab) ? null : (
-                  <div className="muted">{topbarLead}</div>
-                )}
-              </div>
-
-              <div className="admin-topbar-current">
-                <span className="admin-topbar-currentIcon">
-                  <ActiveTabIcon size={16} />
-                </span>
-                <div>
-                  <strong>{activeTab.label}</strong>
-                  <span>{syncCopy}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* KPI strip off on work tabs - frees height for list panels */}
-            {!isOverviewTab &&
-            !["products", "orders", "promos", "flashsale", "testimonials", "settings"].includes(tab) ? (
-              <div className="admin-kpiStrip" aria-label="Ringkasan cepat operasional">
-                {dashboardStats.map((stat) => (
-                  <article key={stat.key} className="admin-kpiChip">
-                    <span>{stat.label}</span>
-                    <strong>{stat.value}</strong>
-                    <small>{stat.helper}</small>
-                  </article>
-                ))}
-              </div>
-            ) : null}
-
             {msg ? (
-              <div className="admin-alert" role="alert">
-                <b>{msgIsError ? "Error:" : "Info:"}</b> {msg}
+              <div className={`admin-alert${msgIsError ? " is-error" : ""}`} role="alert">
+                <b>{msgIsError ? "Perlu diperbaiki" : "Info"}</b>
+                <span>{msg}</span>
+                <button type="button" className="admin-alertDismiss" onClick={() => setMsg("")} aria-label="Tutup">
+                  <X size={14} />
+                </button>
               </div>
             ) : null}
 
             {loading && !lastSyncedAt ? (
               <div className="admin-initialLoad" role="status" aria-label="Memuat dashboard">
-                <div className="skeleton" style={{ height: 48, borderRadius: 12 }} />
-                <div className="skeleton" style={{ height: 120, marginTop: 12, borderRadius: 12 }} />
-                <div className="skeleton" style={{ height: 200, marginTop: 12, borderRadius: 12 }} />
+                <div className="admin-initialLoadCard">
+                  <div className="skeleton" style={{ height: 20, width: "40%", borderRadius: 8 }} />
+                  <div className="skeleton" style={{ height: 14, width: "70%", marginTop: 10, borderRadius: 8 }} />
+                  <div className="skeleton" style={{ height: 120, marginTop: 18, borderRadius: 16 }} />
+                  <div className="skeleton" style={{ height: 180, marginTop: 12, borderRadius: 16 }} />
+                </div>
               </div>
             ) : null}
 
             {tab === "overview" ? (
               <div className="admin-overview admin-workspaceScroll">
-                {/* Inside scrollport so Ringkasan is never clipped by the locked shell */}
-                <FlowAssist
-                  eyebrow="Konteks kerja"
-                  title={`Fokus: ${activeTab.label}.`}
-                  description="Ringkasan inti tetap dekat."
-                  badges={[
-                    { label: tabMeta[activeTab.id], tone: "emphasis", icon: <ActiveTabIcon size={13} /> },
-                    `${orderStats.live} order aktif`,
-                    `${analyticsSummary.stockAlerts.length} stok menipis`,
-                    testimonialsWithoutCaption ? `${testimonialsWithoutCaption} testimoni polos` : "Testimoni rapi",
-                  ]}
-                  actions={[
-                    {
-                      label: "Buka pesanan",
-                      onClick: () => startTransition(() => setTab("orders")),
-                      icon: <ClipboardList size={14} />,
-                    },
-                    {
-                      label: "Cek produk",
-                      onClick: () => startTransition(() => setTab("products")),
-                      ghost: true,
-                      icon: <Box size={14} />,
-                    },
-                    testimonialsWithoutCaption
-                      ? {
-                          label: "Rapikan testimoni",
-                          onClick: () => startTransition(() => setTab("testimonials")),
-                          ghost: true,
-                          icon: <Star size={14} />,
-                        }
-                      : null,
-                    { label: "Muat ulang", onClick: refreshAll, ghost: true, icon: <Eye size={14} /> },
-                  ].filter(Boolean)}
-                  className="admin-flowAssist"
-                  dense
-                />
+                <section className="admin-priorityBoard" aria-label="Antrian prioritas">
+                  <div className="admin-priorityBoardHead">
+                    <div>
+                      <div className="admin-sectionKicker">Fokus sekarang</div>
+                      <h2 className="admin-sectionTitle">Kerjakan dulu</h2>
+                    </div>
+                  </div>
+                  <div className="admin-priorityGrid">
+                    <button
+                      type="button"
+                      className="admin-priorityCard"
+                      onClick={() => {
+                        setOrderBucket("attention");
+                        handleSelectTab("orders");
+                      }}
+                    >
+                      <span className="admin-priorityIcon admin-priorityIcon--orders"><ClipboardList size={18} /></span>
+                      <strong>{orderStats.live}</strong>
+                      <span>Order aksi</span>
+                      <small>{newOrderCount > 0 ? `${newOrderCount} baru` : "Buka antrean"}</small>
+                    </button>
+                    <button type="button" className="admin-priorityCard" onClick={openLowStockProducts}>
+                      <span className="admin-priorityIcon admin-priorityIcon--stock"><AlertTriangle size={18} /></span>
+                      <strong>{analyticsSummary.stockAlerts.length}</strong>
+                      <span>Stok tipis</span>
+                      <small>Restock</small>
+                    </button>
+                    <button type="button" className="admin-priorityCard" onClick={() => handleSelectTab("flashsale")}>
+                      <span className="admin-priorityIcon admin-priorityIcon--flash"><TrendingUp size={18} /></span>
+                      <strong>{liveFlashCount}</strong>
+                      <span>Flash live</span>
+                      <small>{flashSaleEndingSoon ? "Hampir habis" : "Kelola"}</small>
+                    </button>
+                  </div>
+                </section>
 
-                <div className="admin-stats">
-                  {dashboardStats.map((stat) => {
+                <div className="admin-stats admin-stats--compact">
+                  {dashboardStats.slice(0, 4).map((stat) => {
                     const StatIcon = stat.icon || TAB_ICONS[stat.key] || Box;
                     return (
                       <div key={stat.key} className="admin-statCard">
@@ -1968,7 +2504,7 @@ export default function AdminDashboard() {
                         </span>
                         <span className="admin-statLabel">{stat.label}</span>
                         <strong className="admin-statValue">{stat.value}</strong>
-                        <span className="admin-statHelper">{stat.helper}</span>
+                        <span className="admin-statHelper admin-desktopOnly">{stat.helper}</span>
                       </div>
                     );
                   })}
@@ -1978,10 +2514,10 @@ export default function AdminDashboard() {
                   <div className="admin-panel-body">
                     <div className="admin-overviewHeroTop">
                       <div>
-                        <div className="admin-topbar-eyebrow">Ringkasan hari ini</div>
-                        <div className="admin-heroTitle">Ringkasan toko, satu pandangan.</div>
+                        <div className="admin-topbar-eyebrow">Kesehatan toko</div>
+                        <div className="admin-heroTitle">Performa & tren</div>
                         <div className="admin-panel-sub">
-                          Revenue, order, stok, dan promo - semua di sini.
+                          Revenue, order selesai, dan sinyal operasional.
                         </div>
                       </div>
 
@@ -2002,17 +2538,17 @@ export default function AdminDashboard() {
                     <div className="admin-miniGrid admin-miniGridHero">
                       <div className="admin-miniCard">
                         <span>Revenue total</span>
-                        <strong>{formatCompactIDR(analyticsSummary.revenueTotal)}</strong>
+                        <strong>{formatIDR(analyticsSummary.revenueTotal)}</strong>
                         <small>{analyticsSummary.doneOrders} order sukses</small>
                       </div>
                       <div className="admin-miniCard">
                         <span>Revenue hari ini</span>
-                        <strong>{formatCompactIDR(analyticsSummary.todayRevenue)}</strong>
+                        <strong>{formatIDR(analyticsSummary.todayRevenue)}</strong>
                         <small>{analyticsSummary.todayOrders} order masuk</small>
                       </div>
                       <div className="admin-miniCard">
                         <span>Rata-rata order</span>
-                        <strong>{formatCompactIDR(analyticsSummary.averageOrderValue)}</strong>
+                        <strong>{formatIDR(analyticsSummary.averageOrderValue)}</strong>
                         <small>Nilai order selesai</small>
                       </div>
                       <div className="admin-miniCard">
@@ -2056,7 +2592,7 @@ export default function AdminDashboard() {
                               </div>
                             </div>
                             <div className="admin-chartValue">
-                              <strong>{formatCompactIDR(point.revenue)}</strong>
+                              <strong>{formatIDR(point.revenue)}</strong>
                               <small>Revenue</small>
                             </div>
                           </div>
@@ -2095,7 +2631,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Produk paling laku</div>
-                        <div className="admin-panel-sub">Dari data order yang masuk.</div>
+                        <div className="admin-panel-sub">Akumulasi sold_count katalog (semua periode).</div>
                       </div>
                     </div>
                     <div className="admin-panel-body admin-stack">
@@ -2105,9 +2641,11 @@ export default function AdminDashboard() {
                             <div className="admin-rankIndex">#{index + 1}</div>
                             <div className="admin-rankCopy">
                               <strong>{item.name}</strong>
-                              <small>{item.quantity} item terjual</small>
+                              <small>
+                                {new Intl.NumberFormat("id-ID").format(item.quantity)} item terjual
+                              </small>
                             </div>
-                            <div className="admin-rankMeta">{formatCompactIDR(item.revenue)}</div>
+                            <div className="admin-rankMeta">{formatIDR(item.revenue)}</div>
                           </div>
                         ))
                       ) : (
@@ -2149,7 +2687,7 @@ export default function AdminDashboard() {
                               <strong>{item.category}</strong>
                               <small>{item.quantity} item</small>
                             </div>
-                            <div className="admin-rankMeta">{formatCompactIDR(item.revenue)}</div>
+                            <div className="admin-rankMeta">{formatIDR(item.revenue)}</div>
                           </div>
                         ))
                       ) : null}
@@ -2161,7 +2699,7 @@ export default function AdminDashboard() {
                               <strong>{item.code}</strong>
                               <small>{item.orders} order memakai promo ini</small>
                             </div>
-                            <div className="admin-rankMeta">{formatCompactIDR(item.revenue)}</div>
+                            <div className="admin-rankMeta">{formatIDR(item.revenue)}</div>
                           </div>
                         ))
                       ) : (
@@ -2186,7 +2724,7 @@ export default function AdminDashboard() {
                         </div>
                         <div className="admin-miniCard">
                           <span>Pipeline</span>
-                          <strong>{formatCompactIDR(analyticsSummary.pipelineValue)}</strong>
+                          <strong>{formatIDR(analyticsSummary.pipelineValue)}</strong>
                           <small>{orderStats.live} order butuh aksi</small>
                         </div>
                       </div>
@@ -2229,7 +2767,7 @@ export default function AdminDashboard() {
                                             return;
                                           }
                                           toast.success(`Stok ${variant.name} → ${n}`);
-                                          refreshProducts();
+                                          refreshProducts({ force: true });
                                         });
                                     },
                                   });
@@ -2364,7 +2902,7 @@ export default function AdminDashboard() {
                                   </div>
                                   <div className="admin-chartValue">
                                     <strong>{point.totalOrders} order</strong>
-                                    <small>{formatCompactIDR(point.revenueIdr)}</small>
+                                    <small>{formatIDR(point.revenueIdr)}</small>
                                   </div>
                                 </div>
                               );
@@ -2507,12 +3045,12 @@ export default function AdminDashboard() {
                           <div className="admin-miniGrid">
                             <div className="admin-miniCard">
                               <span>Proyeksi 7 hari ke depan</span>
-                              <strong>{formatCompactIDR(forecast.forecast7d)}</strong>
+                              <strong>{formatIDR(forecast.forecast7d)}</strong>
                               <small>{trendIcon} {trendLabel}</small>
                             </div>
                             <div className="admin-miniCard">
                               <span>Rata-rata per hari (forecast)</span>
-                              <strong>{formatCompactIDR(Math.round(forecast.forecast7d / 7))}</strong>
+                              <strong>{formatIDR(Math.round(forecast.forecast7d / 7))}</strong>
                               <small>Berdasarkan {dailyStats.length} hari data</small>
                             </div>
                           </div>
@@ -2525,41 +3063,68 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "products" ? (
-              <div className="admin-products">
+              <div className={`admin-products admin-workspacePane${selectedProductId ? " has-selection" : ""}`}>
                 <div className="admin-panel admin-products-list">
                   <div className="admin-panel-head">
                     <div>
-                      <div className="admin-panel-title">Daftar produk</div>
-                      <div className="admin-panel-sub">Cari produk, cek status aktif, lalu edit paketnya dari panel sebelah.</div>
+                      <div className="admin-panel-title">Katalog</div>
+                      <div className="admin-panel-sub">Pilih produk untuk edit</div>
                     </div>
-                    <button className="btn btn-sm" onClick={openCreateProduct}>
-                      + Produk
+                    <button className="btn btn-sm btn-primary" onClick={openCreateProduct}>
+                      <Plus size={14} /> Produk
                     </button>
                   </div>
 
                   <div className="admin-panel-body admin-panel-body--scroll">
-                    <input
-                      className="input"
-                      placeholder="Cari produk"
-                      value={productQuery}
-                      onChange={(e) => setProductQuery(e.target.value)}
-                    />
-
-                    <div className="admin-miniGrid" style={{ marginTop: 14, marginBottom: 14 }}>
-                      <div className="admin-miniCard">
-                        <span>Total produk</span>
-                        <strong>{products.length}</strong>
-                        <small>{analyticsSummary.activeProducts} aktif</small>
+                    <div className="admin-stickyTools">
+                      <input
+                        className="input"
+                        placeholder="Cari produk..."
+                        value={productQuery}
+                        onChange={(e) => setProductQuery(e.target.value)}
+                      />
+                      <div className="admin-inlineStats" aria-label="Ringkas katalog">
+                        <span><strong>{products.length}</strong> produk</span>
+                        <span><strong>{allVariants.length}</strong> varian</span>
+                        {lowStockProductIds.size > 0 ? (
+                          <button
+                            type="button"
+                            className={`admin-inlineStatChip is-warn${productStockFilter === "low" ? " is-active" : ""}`}
+                            onClick={() => {
+                              if (productStockFilter === "low") {
+                                setProductStockFilter("all");
+                              } else {
+                                openLowStockProducts();
+                              }
+                            }}
+                          >
+                            <strong>{lowStockProductIds.size}</strong> stok tipis
+                          </button>
+                        ) : null}
                       </div>
-                      <div className="admin-miniCard">
-                        <span>Total varian</span>
-                        <strong>{allVariants.length}</strong>
-                        <small>{analyticsSummary.stockAlerts.length} stok tipis</small>
-                      </div>
+                      {productStockFilter === "low" ? (
+                        <div className="admin-filterBanner is-warn" role="status">
+                          <span>Menampilkan produk stok tipis (sisa 1, bukan kosong)</span>
+                          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setProductStockFilter("all")}>
+                            Tampilkan semua
+                          </button>
+                        </div>
+                      ) : null}
                     </div>
 
-                    <div className="admin-list" style={{ marginTop: 10 }}>
-                      {(filteredProducts || []).slice(0, visibleProductsCount).map((p) => (
+                    <div className="admin-list admin-list--dense">
+                      {(filteredProducts || []).length === 0 ? (
+                        <div className="admin-emptyInline" style={{ padding: "18px 8px" }}>
+                          {productStockFilter === "low"
+                            ? "Tidak ada produk dengan stok tipis."
+                            : "Belum ada produk."}
+                        </div>
+                      ) : null}
+                      {(filteredProducts || []).slice(0, visibleProductsCount).map((p) => {
+                        const thinCount = (p.product_variants || []).filter(
+                          (v) => v?.is_active && isThinStock(v?.stock)
+                        ).length;
+                        return (
                         <button
                           key={p.id}
                           className={"admin-product-row " + (p.id === selectedProductId ? "active" : "")}
@@ -2576,18 +3141,21 @@ export default function AdminDashboard() {
                             )}
                             <div>
                               <div className="admin-product-name">{p.name}</div>
-                              <div className="admin-product-sub">/{p.slug}</div>
-                              <div className="admin-categoryTag">{prettyCategory(p.category)}</div>
+                              <div className="admin-product-sub">
+                                {prettyCategory(p.category)}
+                                {thinCount > 0 ? ` · ${thinCount} varian tipis` : ""}
+                              </div>
                             </div>
                           </div>
 
                           <div className={"admin-product-pill " + (p.is_active ? "on" : "off")}
                             title={p.is_active ? "Aktif" : "Nonaktif"}
                           >
-                            {p.is_active ? "Aktif" : "Off"}
+                            {thinCount > 0 ? "Tipis" : p.is_active ? "Aktif" : "Off"}
                           </div>
                         </button>
-                      ))}
+                        );
+                      })}
 
                       {visibleProductsCount < filteredProducts.length && (
                         <div className="admin-loadMore" style={{ textAlign: "center", marginTop: 14 }}>
@@ -2612,28 +3180,38 @@ export default function AdminDashboard() {
 
                 <div className="admin-panel admin-products-editor">
                   {!selectedProduct || !productForm ? (
-                    <div className="admin-panel-body admin-panel-body--scroll">
+                    <div className="admin-panel-body admin-panel-body--scroll admin-products-editorEmpty">
                       <EmptyState
                         icon="?"
                         title="Pilih produk"
-                        description="Klik salah satu produk di kiri untuk mulai mengedit."
+                        description="Ketuk produk di daftar untuk mengedit."
                       />
                     </div>
                   ) : (
                     <>
-                      <div className="admin-panel-head">
-                        <div>
-                          <div className="admin-panel-title">Detail Produk</div>
-                          <div className="admin-panel-sub">Edit info produk + upload ikon.</div>
-                        </div>
-
-                        <div className="admin-head-actions">
-                          <a className="btn btn-ghost btn-sm" href={`/produk/${selectedProduct.slug}`} target="_blank" rel="noreferrer">
-                            Preview
-                          </a>
-                          <button className="btn btn-danger btn-sm" onClick={() => deleteProduct(selectedProduct.id)}>
-                            Hapus
-                          </button>
+                      <div className="admin-productsEditorChrome">
+                        <button
+                          type="button"
+                          className="admin-mobileBack"
+                          onClick={() => setSelectedProductId("")}
+                          aria-label="Kembali ke daftar produk"
+                        >
+                          <ArrowLeft size={16} strokeWidth={2.25} aria-hidden="true" />
+                          <span>Kembali</span>
+                        </button>
+                        <div className="admin-panel-head admin-panel-head--split admin-productsEditorHead">
+                          <div className="admin-panel-headMain">
+                            <div className="admin-panel-title">{selectedProduct.name || "Detail Produk"}</div>
+                            <div className="admin-panel-sub">Edit info + paket</div>
+                          </div>
+                          <div className="admin-head-actions admin-panel-headActions">
+                            <a className="btn btn-ghost btn-sm" href={`/produk/${selectedProduct.slug}`} target="_blank" rel="noreferrer">
+                              Preview
+                            </a>
+                            <button className="btn btn-danger btn-sm" type="button" onClick={() => deleteProduct(selectedProduct.id)}>
+                              Hapus
+                            </button>
+                          </div>
                         </div>
                       </div>
 
@@ -2729,7 +3307,7 @@ export default function AdminDashboard() {
                             className="btn btn-ghost"
                             type="button"
                             onClick={() => {
-                              // reset
+                              // Batalkan edit: kembalikan form ke data tersimpan
                               setProductForm({
                                 id: selectedProduct.id,
                                 name: selectedProduct.name || "",
@@ -2741,8 +3319,9 @@ export default function AdminDashboard() {
                                 sort_order: Number.isFinite(selectedProduct.sort_order) ? selectedProduct.sort_order : 100,
                               });
                             }}
+                            title="Buang perubahan yang belum disimpan"
                           >
-                            Reset
+                            Batalkan edit
                           </button>
                           <button className="btn" type="button" onClick={saveProduct}>
                             Simpan Produk
@@ -2755,7 +3334,7 @@ export default function AdminDashboard() {
                           <div>
                             <div className="admin-panel-title">Paket harga</div>
                             <div className="admin-panel-sub">
-                              Tambah paket (nama, harga, stok). Opsi lanjutan ada di form paket.
+                              Tambah paket: nama, harga, stok, durasi, garansi, dan opsi email.
                             </div>
                           </div>
 
@@ -2802,127 +3381,215 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "orders" ? (
-              <div className="admin-panel admin-panel--fill admin-ordersPanel">
-                <div className="admin-panel-head">
+              <div className="admin-panel admin-panel--fill admin-ordersPanel admin-workspacePane">
+                <div className="admin-panel-head admin-panel-head--split admin-ordersHead">
                   <div>
-                    <div className="admin-panel-title">Queue order</div>
-                    <div className="admin-panel-sub">Daftar dibuat lebih ringkas: scan cepat di list, buka detail lewat popup saat perlu aksi.</div>
+                    <div className="admin-panel-title">Pesanan</div>
+                    <div className="admin-panel-sub">
+                      {orderBucket === "attention"
+                        ? `${orderStats.live} perlu aksi (semua di database)`
+                        : `${filteredOrders.length} di halaman ini · ${orderStats.total} total di database`}
+                    </div>
                   </div>
-                  <button className="btn btn-ghost btn-sm" onClick={refreshOrders}>
-                    Refresh orders
-                  </button>
-                  <button className="btn btn-sm" type="button" onClick={handleExportCSV}>
-                    Export CSV
-                  </button>
+                  <div className="admin-panel-headActions">
+                    <button className="btn btn-ghost btn-sm" onClick={refreshOrders} type="button">
+                      Refresh
+                    </button>
+                    <button className="btn btn-sm btn-primary admin-desktopOnly" type="button" onClick={handleExportCSV}>
+                      Export
+                    </button>
+                  </div>
                 </div>
 
-                <div className="admin-panel-body admin-panel-body--scroll">
-                  <div className="admin-orderToolbar">
-                    <div className="admin-searchRow">
-                      <Search size={16} />
-                      <input
-                        className="input admin-searchInput"
-                        value={orderQuery}
-                        onChange={(e) => setOrderQuery(e.target.value)}
-                        placeholder="Cari kode, WA, promo, atau nama produk..."
-                      />
+                <div className="admin-panel-body admin-panel-body--scroll admin-ordersBody">
+                  <div className="admin-orderToolbar admin-orderToolbar--sticky">
+                    <input
+                      className="input"
+                      type="search"
+                      value={orderQuery}
+                      onChange={(e) => setOrderQuery(e.target.value)}
+                      placeholder="Cari kode / WA / produk..."
+                      autoComplete="off"
+                    />
+
+                    <div className="admin-orderFilterBar" aria-label="Filter order">
+                      <div className="admin-chipRow admin-chipRow--scroll" role="tablist" aria-label="Katalog pesanan">
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderCatalogFilter === "all" ? "active" : ""}`}
+                          onClick={() => {
+                            setOrderCatalogFilter("all");
+                            setOrderBucket("all");
+                            setOrderStatusFilterOpen(false);
+                          }}
+                        >
+                          Semua
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderCatalogFilter === "app_premium" ? "active" : ""}`}
+                          onClick={() => {
+                            setOrderCatalogFilter((prev) => (prev === "app_premium" ? "all" : "app_premium"));
+                          }}
+                        >
+                          App premium
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderCatalogFilter === "academic" ? "active" : ""}`}
+                          onClick={() => {
+                            setOrderCatalogFilter((prev) => (prev === "academic" ? "all" : "academic"));
+                          }}
+                        >
+                          Jasa Akademik
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip admin-chip--filter${orderStatusFilterOpen || orderBucket !== "all" ? " active" : ""}`}
+                          aria-expanded={orderStatusFilterOpen}
+                          onClick={() => setOrderStatusFilterOpen((v) => !v)}
+                        >
+                          <Filter size={14} />
+                          Filter
+                          {orderBucket !== "all" ? (
+                            <span className="admin-chipMeta">
+                              {orderBucket === "attention"
+                                ? "Aksi"
+                                : orderBucket === "done"
+                                  ? "Selesai"
+                                  : orderBucket === "cancelled"
+                                    ? "Batal"
+                                    : ""}
+                            </span>
+                          ) : null}
+                        </button>
+                      </div>
+
+                      {orderStatusFilterOpen ? (
+                        <div className="admin-orderStatusMenu" role="group" aria-label="Filter status">
+                          <button
+                            type="button"
+                            className={`admin-chip ${orderBucket === "attention" ? "active" : ""}`}
+                            onClick={() => setOrderBucket("attention")}
+                          >
+                            Aksi {orderStats.live > 0 ? `(${orderStats.live})` : ""}
+                          </button>
+                          <button
+                            type="button"
+                            className={`admin-chip ${orderBucket === "done" ? "active" : ""}`}
+                            onClick={() => setOrderBucket("done")}
+                          >
+                            Selesai
+                          </button>
+                          <button
+                            type="button"
+                            className={`admin-chip ${orderBucket === "cancelled" ? "active" : ""}`}
+                            onClick={() => setOrderBucket("cancelled")}
+                          >
+                            Batal
+                          </button>
+                          {orderBucket !== "all" ? (
+                            <button
+                              type="button"
+                              className="admin-chip"
+                              onClick={() => {
+                                setOrderBucket("all");
+                                setOrderStatusFilterOpen(false);
+                              }}
+                            >
+                              Reset status
+                            </button>
+                          ) : null}
+                        </div>
+                      ) : null}
                     </div>
 
-                    <div className="admin-exportDates">
-                      <label>
-                        <span>Dari</span>
-                        <input
-                          className="input"
-                          type="date"
-                          value={exportDateFrom}
-                          onChange={(e) => setExportDateFrom(e.target.value)}
-                        />
-                      </label>
-                      <label>
-                        <span>Sampai</span>
-                        <input
-                          className="input"
-                          type="date"
-                          value={exportDateTo}
-                          onChange={(e) => setExportDateTo(e.target.value)}
-                        />
-                      </label>
+                    <div className="admin-inlineStats admin-orderQuickStats">
+                      <span>
+                        <strong>{new Intl.NumberFormat("id-ID").format(orderStats.total)}</strong> total
+                      </span>
+                      <span className="is-warn">
+                        <strong>{new Intl.NumberFormat("id-ID").format(orderStats.live)}</strong> aksi
+                      </span>
+                      <span>
+                        <strong>{new Intl.NumberFormat("id-ID").format(orderStats.done)}</strong> selesai
+                      </span>
                     </div>
 
-                    <div className="admin-chipRow">
-                      <button type="button" className={`admin-chip ${orderBucket === "all" ? "active" : ""}`} onClick={() => setOrderBucket("all")}>
-                        Semua
-                      </button>
-                      <button
-                        type="button"
-                        className={`admin-chip ${orderBucket === "attention" ? "active" : ""}`}
-                        onClick={() => setOrderBucket("attention")}
-                      >
-                        Butuh aksi
-                      </button>
-                      <button type="button" className={`admin-chip ${orderBucket === "done" ? "active" : ""}`} onClick={() => setOrderBucket("done")}>
-                        Selesai
-                      </button>
-                      <button
-                        type="button"
-                        className={`admin-chip ${orderBucket === "cancelled" ? "active" : ""}`}
-                        onClick={() => setOrderBucket("cancelled")}
-                      >
-                        Batal
+                    <button
+                      type="button"
+                      className="admin-toolsToggle"
+                      aria-expanded={orderToolsOpen}
+                      onClick={() => setOrderToolsOpen((v) => !v)}
+                    >
+                      {orderToolsOpen ? "Sembunyikan export" : "Export & rentang tanggal"}
+                    </button>
+
+                    <div className={`admin-orderToolsExtra${orderToolsOpen ? " is-open" : ""}`}>
+                      <div className="admin-exportDates">
+                        <label>
+                          <span>Dari</span>
+                          <input
+                            className="input"
+                            type="date"
+                            value={exportDateFrom}
+                            onChange={(e) => setExportDateFrom(e.target.value)}
+                          />
+                        </label>
+                        <label>
+                          <span>Sampai</span>
+                          <input
+                            className="input"
+                            type="date"
+                            value={exportDateTo}
+                            onChange={(e) => setExportDateTo(e.target.value)}
+                          />
+                        </label>
+                      </div>
+                      <button className="btn btn-sm btn-primary" type="button" onClick={handleExportCSV}>
+                        Export CSV
                       </button>
                     </div>
-                  </div>
-
-                  <div className="admin-orderStatsStrip">
-                    <article className="admin-orderStat">
-                      <span>Total order</span>
-                      <strong>{orderStats.total}</strong>
-                      <small>Semua status</small>
-                    </article>
-                    <article className="admin-orderStat">
-                      <span>Perlu aksi</span>
-                      <strong>{orderStats.live}</strong>
-                      <small>{formatCompactIDR(analyticsSummary.pipelineValue)}</small>
-                    </article>
-                    <article className="admin-orderStat">
-                      <span>Selesai</span>
-                      <strong>{orderStats.done}</strong>
-                      <small>{formatCompactIDR(analyticsSummary.revenueTotal)}</small>
-                    </article>
-                    <article className="admin-orderStat">
-                      <span>Dibatalkan</span>
-                      <strong>{orderStats.cancelled}</strong>
-                      <small>Perlu review bila naik</small>
-                    </article>
                   </div>
 
                   {filteredOrders.length === 0 ? (
-                    <div className="card pad" style={{ marginTop: 16 }}>
-                      <EmptyState icon="ORD" title="Order tidak ditemukan" description="Coba ubah filter atau kata kunci pencarian." />
+                    <div className="admin-emptyWrap">
+                      <EmptyState
+                        icon="ORD"
+                        title={orderBucket === "attention" ? "Tidak ada order yang perlu aksi" : "Order tidak ditemukan"}
+                        description={
+                          orderBucket === "attention"
+                            ? "Semua antrean bersih. Buka filter Semua untuk melihat riwayat."
+                            : "Coba ubah filter atau kata kunci."
+                        }
+                        primaryAction={
+                          orderBucket === "attention"
+                            ? { label: "Lihat semua order", onClick: () => setOrderBucket("all") }
+                            : undefined
+                        }
+                      />
                     </div>
                   ) : (
                     <>
-                      {/* ── Bulk Action Bar ── */}
                       {selectedOrderIds.size > 0 ? (
-                        <div className="admin-bulkBar">
-                          <span className="admin-bulkCount">{selectedOrderIds.size} order dipilih</span>
+                        <div className="admin-bulkBar admin-bulkBar--sticky">
+                          <span className="admin-bulkCount">{selectedOrderIds.size} dipilih</span>
                           <div className="admin-bulkActions">
                             <button className="btn btn-sm" type="button" onClick={() => bulkUpdateStatus("done")}>
-                              ✓ Tandai Selesai
+                              Selesai
                             </button>
                             <button className="btn btn-danger btn-sm" type="button" onClick={() => bulkUpdateStatus("cancelled")}>
-                              Batalkan
+                              Batal
                             </button>
                             <button className="btn btn-ghost btn-sm" type="button" onClick={() => setSelectedOrderIds(new Set())}>
-                              Batal pilih
+                              Clear
                             </button>
                           </div>
                         </div>
                       ) : null}
 
-                      {/* ── Select All ── */}
                       <div className="admin-bulkSelectAll">
-                        <label style={{ display: "flex", alignItems: "center", gap: 8, cursor: "pointer", fontSize: 13 }}>
+                        <label className="admin-checkLabel">
                           <input
                             type="checkbox"
                             checked={filteredOrders.length > 0 && filteredOrders.every((o) => selectedOrderIds.has(o.id))}
@@ -2938,79 +3605,31 @@ export default function AdminDashboard() {
                         </label>
                       </div>
 
-                      <div className="admin-ordersList">
-                        {filteredOrders.map((o) => {
-                          const itemCount = getOrderItemCount(o);
-                          const whatsappLink = buildWhatsAppLink(o.customer_whatsapp);
-                          const isSelected = selectedOrderIds.has(o.id);
-
-                          return (
-                            <article key={o.id} className={`admin-orderListItem ${isSelected ? "is-selected" : ""}`}>
-                              <div className="admin-orderListCheckbox">
-                                <input
-                                  type="checkbox"
-                                  checked={isSelected}
-                                  aria-label={`Pilih order ${o.order_code || o.id}`}
-                                  onChange={(e) => {
-                                    setSelectedOrderIds((prev) => {
-                                      const next = new Set(prev);
-                                      if (e.target.checked) next.add(o.id);
-                                      else next.delete(o.id);
-                                      return next;
-                                    });
-                                  }}
-                                />
-                              </div>
-                              <div className="admin-orderListMain">
-                                <div className="admin-order-code">{o.order_code || o.id}</div>
-                                <div className="admin-order-sub">
-                                  {formatAdminDate(o.created_at)} | {itemCount} item | {o.customer_whatsapp || "Tanpa WA"}
-                                </div>
-                                <div className="admin-orderListMeta">
-                                  {o.promo_code ? <span className="admin-orderTag">Promo {o.promo_code}</span> : null}
-                                  {whatsappLink ? (
-                                    <a className="admin-orderLink" href={whatsappLink} target="_blank" rel="noreferrer">
-                                      Chat WhatsApp
-                                    </a>
-                                  ) : null}
-                                </div>
-                              </div>
-
-                              <div className="admin-orderListRight">
-                                <StatusBadge status={o.status} />
-                                <strong className="admin-orderTotal">{formatIDR(o.total_idr)}</strong>
-                                <div className="admin-orderRowActions">
-                                  <select
-                                    className="input admin-select admin-orderInlineSelect"
-                                    value={String(o.status || "pending")}
-                                    aria-label={`Ubah status order ${o.order_code || o.id}`}
-                                    onChange={(e) =>
-                                      requestOrderStatusChange(o.id, e.target.value, o.status)
-                                    }
-                                  >
-                                    {ORDER_STATUS_OPTIONS.map((option) => (
-                                      <option key={option.value} value={option.value}>
-                                        {option.label}
-                                      </option>
-                                    ))}
-                                  </select>
-                                  <button className="btn btn-sm" type="button" onClick={() => setActiveOrderId(o.id)}>
-                                    Detail
-                                  </button>
-                                  <button
-                                    className="btn btn-ghost btn-sm"
-                                    type="button"
-                                    onClick={() => copyStatusLink(o.order_code)}
-                                    title="Salin link status"
-                                  >
-                                    Salin link
-                                  </button>
-                                </div>
-                              </div>
-                            </article>
-                          );
-                        })}
-                      </div>
+                      <VirtualList
+                        className="admin-ordersList admin-ordersList--dense admin-ordersList--virtual"
+                        items={filteredOrders}
+                        estimateHeight={96}
+                        overscan={6}
+                        style={{ maxHeight: "min(70vh, 720px)" }}
+                        getKey={(o) => o.id}
+                        renderItem={(o) => (
+                          <AdminOrderListItem
+                            order={o}
+                            isSelected={selectedOrderIds.has(o.id)}
+                            onToggleSelect={(id, checked) => {
+                              setSelectedOrderIds((prev) => {
+                                const next = new Set(prev);
+                                if (checked) next.add(id);
+                                else next.delete(id);
+                                return next;
+                              });
+                            }}
+                            onStatusChange={requestOrderStatusChange}
+                            onOpenDetail={setActiveOrderId}
+                            onCopyStatusLink={copyStatusLink}
+                          />
+                        )}
+                      />
 
                       {ordersHasMore ? (
                         <div className="admin-capBanner" role="status">
@@ -3037,22 +3656,24 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "promos" ? (
-              <div className="admin-panel admin-panel--fill admin-promosPanel">
-                {/* Header */}
-                <div className="admin-panel-head">
+              <div className="admin-panel admin-panel--fill admin-promosPanel admin-workspacePane">
+                <div className="admin-panel-head admin-panel-head--split">
                   <div>
-                    <div className="admin-panel-title">Kode Promo</div>
-                    <div className="admin-panel-sub">Kelola diskon buat pelanggan.</div>
+                    <div className="admin-panel-title">Promo</div>
+                    <div className="admin-panel-sub">
+                      {promos.filter((p) => p.is_active && !isPromoExpired(p)).length} aktif
+                    </div>
                   </div>
-                  <button className="btn" type="button" onClick={openCreatePromo}>
-                    <Plus size={15} strokeWidth={2.5} />
-                    Buat Promo
-                  </button>
+                  <div className="admin-panel-headActions">
+                    <button className="btn btn-primary" type="button" onClick={openCreatePromo}>
+                      <Plus size={15} strokeWidth={2.5} />
+                      Buat
+                    </button>
+                  </div>
                 </div>
 
                 <div className="admin-panel-body admin-panel-body--scroll">
-                  {/* Search */}
-                  {promos.length > 3 && (
+                  <div className="admin-stickyTools">
                     <div className="admin-promo-search">
                       <Search size={14} className="admin-promo-searchIcon" />
                       <input
@@ -3062,25 +3683,11 @@ export default function AdminDashboard() {
                         onChange={(e) => setPromoQuery(e.target.value)}
                       />
                     </div>
-                  )}
-
-                  {/* Stats strip */}
-                  <div className="admin-promo-strip">
-                    <div className="admin-promo-stripItem">
-                      <strong>{promos.filter((p) => p.is_active && !isPromoExpired(p)).length}</strong>
-                      <span>Aktif</span>
-                    </div>
-                    <div className="admin-promo-stripItem">
-                      <strong>{promos.filter((p) => isPromoExpired(p)).length}</strong>
-                      <span>Kedaluwarsa</span>
-                    </div>
-                    <div className="admin-promo-stripItem">
-                      <strong>{promos.filter((p) => !p.is_active).length}</strong>
-                      <span>Nonaktif</span>
-                    </div>
-                    <div className="admin-promo-stripItem">
-                      <strong>{promos.reduce((s, p) => s + (p.used_count || 0), 0)}</strong>
-                      <span>Total pakai</span>
+                    <div className="admin-inlineStats">
+                      <span><strong>{promos.filter((p) => p.is_active && !isPromoExpired(p)).length}</strong> aktif</span>
+                      <span><strong>{promos.filter((p) => isPromoExpired(p)).length}</strong> expired</span>
+                      <span><strong>{promos.filter((p) => !p.is_active).length}</strong> off</span>
+                      <span><strong>{promos.reduce((s, p) => s + (p.used_count || 0), 0)}</strong> pakai</span>
                     </div>
                   </div>
 
@@ -3361,15 +3968,17 @@ export default function AdminDashboard() {
             )}
 
             {tab === "flashsale" ? (
-              <div className="admin-panel admin-panel--fill admin-flashsalePanel">
-                <div className="admin-panel-head">
+              <div className="admin-panel admin-panel--fill admin-flashsalePanel admin-workspacePane">
+                <div className="admin-panel-head admin-panel-head--split">
                   <div>
-                    <div className="admin-panel-title">Flash Sale</div>
-                    <div className="admin-panel-sub">Diskon kilat per varian. Otomatis tampil di halaman produk.</div>
+                    <div className="admin-panel-title">Flash sale</div>
+                    <div className="admin-panel-sub">{liveFlashCount} live sekarang</div>
                   </div>
-                  <button className="btn btn-sm" type="button" onClick={() => setFlashFormOpen(true)}>
-                    <Plus size={14} /> Buat Flash Sale
-                  </button>
+                  <div className="admin-panel-headActions">
+                    <button className="btn btn-sm btn-primary" type="button" onClick={() => setFlashFormOpen(true)}>
+                      <Plus size={14} /> Buat
+                    </button>
+                  </div>
                 </div>
 
                 <div className="admin-panel-body admin-panel-body--scroll">
@@ -3603,22 +4212,24 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "testimonials" ? (
-              <div className="admin-panel admin-panel--fill admin-testimonialsPanel">
+              <div className="admin-panel admin-panel--fill admin-testimonialsPanel admin-workspacePane">
                 <div className="admin-panel-head">
                   <div>
                     <div className="admin-panel-title">Testimoni</div>
-                    <div className="admin-panel-sub">Upload screenshot/chat pelanggan.</div>
+                    <div className="admin-panel-sub">{analyticsSummary.activeTestimonials} tayang</div>
                   </div>
                 </div>
 
                 <div className="admin-panel-body admin-panel-body--scroll">
-                  <form className="admin-testimonial-form" onSubmit={addTestimonials}>
-                    <input name="files" type="file" accept="image/*" multiple />
+                  <form className="admin-testimonial-form admin-stickyTools" onSubmit={addTestimonials}>
+                    <label className="admin-fileBtn">
+                      <input name="files" type="file" accept="image/*" multiple />
+                      Pilih gambar
+                    </label>
                     <input name="caption" className="input" placeholder="Caption (opsional)" />
-                    <button className="btn" type="submit">
+                    <button className="btn btn-primary" type="submit">
                       Upload
                     </button>
-                    <div className="hint subtle">Bucket: {BUCKET_TESTIMONIALS} (public)</div>
                   </form>
 
                   <div className="admin-grid" style={{ marginTop: 14 }}>
@@ -3663,17 +4274,17 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "settings" ? (
-              <div className="admin-overviewGrid admin-workspaceScroll">
-                <div className="admin-panel admin-panelWide">
+              <div className="admin-settingsGrid admin-workspaceScroll">
+                <div className="admin-panel admin-workspacePane">
                   <div className="admin-panel-head">
                     <div>
-                      <div className="admin-panel-title">Settings operasional</div>
-                      <div className="admin-panel-sub">Area ini disederhanakan agar update nomor admin tetap nyaman dilakukan dari mobile.</div>
+                      <div className="admin-panel-title">Kontak & pembayaran</div>
+                      <div className="admin-panel-sub">WA admin + payload QRIS checkout</div>
                     </div>
                   </div>
 
                   <div className="admin-panel-body">
-                    <div className="admin-form-grid">
+                    <div className="admin-form-grid admin-form-grid--settings">
                       <label className="admin-field admin-field-full">
                         <span>WhatsApp Admin</span>
                         <input
@@ -3682,7 +4293,7 @@ export default function AdminDashboard() {
                           placeholder="62813..."
                           onChange={(e) => setSettingsWhatsApp(e.target.value)}
                         />
-                        <div className="hint subtle">Gunakan format angka agar tombol chat customer tetap konsisten.</div>
+                        <div className="hint subtle">Format angka saja, contoh 62813…</div>
                       </label>
 
                       <label className="admin-field admin-field-full">
@@ -3694,7 +4305,7 @@ export default function AdminDashboard() {
                           placeholder="000201..."
                           onChange={(e) => setSettingsQrisBase(e.target.value)}
                         />
-                        <div className="hint subtle">Dipakai untuk generate QR dengan nominal otomatis.</div>
+                        <div className="hint subtle">Dipakai generate QR dengan nominal otomatis.</div>
                       </label>
 
                       <label className="admin-field admin-field-full">
@@ -3705,12 +4316,12 @@ export default function AdminDashboard() {
                           placeholder="https://..."
                           onChange={(e) => setSettingsQrisImageUrl(e.target.value)}
                         />
-                        <div className="hint subtle">Opsional. Dipakai jika generator QR otomatis gagal.</div>
+                        <div className="hint subtle">Opsional jika generator QR gagal.</div>
                       </label>
                     </div>
 
                     <div className="admin-form-actions">
-                      <button className="btn" type="button" onClick={() => saveWhatsApp(settingsWhatsApp)}>
+                      <button className="btn btn-primary" type="button" onClick={() => saveWhatsApp(settingsWhatsApp)}>
                         Simpan WhatsApp
                       </button>
                       <button className="btn btn-ghost" type="button" onClick={() => saveQrisSettings(settingsQrisBase, settingsQrisImageUrl)}>
@@ -3724,7 +4335,7 @@ export default function AdminDashboard() {
                   <div className="admin-panel-head">
                     <div>
                       <div className="admin-panel-title">Catatan sistem</div>
-                      <div className="admin-panel-sub">Info singkat yang sering dibutuhkan saat operasional.</div>
+                      <div className="admin-panel-sub">Status operasional singkat</div>
                     </div>
                   </div>
 
@@ -3756,19 +4367,20 @@ export default function AdminDashboard() {
       <Modal
         open={productModalOpen}
         title="Tambah Produk"
+        size="sm"
         onClose={() => setProductModalOpen(false)}
         footer={
-          <div className="modal-actions">
+          <div className="modal-actions modal-actions--fill">
             <button className="btn btn-ghost" type="button" onClick={() => setProductModalOpen(false)}>
               Batal
             </button>
-            <button className="btn" type="button" onClick={createProduct}>
+            <button className="btn btn-primary" type="button" onClick={createProduct}>
               Simpan Produk
             </button>
           </div>
         }
       >
-        <div className="admin-form-grid admin-form-grid--simple">
+        <div className="admin-form-grid admin-form-grid--simple admin-form-grid--modal">
           <div className="admin-field admin-field-full">
             <span>Ikon produk</span>
             <div className="admin-icon-row">
@@ -3780,16 +4392,19 @@ export default function AdminDashboard() {
                 </div>
               )}
               <div className="admin-icon-actions">
-                <input
-                  type="file"
-                  accept="image/png,image/jpeg,image/webp"
-                  onChange={(e) => {
-                    const file = e.target.files?.[0];
-                    uploadNewProductIcon(file);
-                    e.target.value = "";
-                  }}
-                />
-                <div className="hint subtle">Upload logo .jpg / .png / .webp</div>
+                <label className="admin-fileBtn">
+                  <input
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      uploadNewProductIcon(file);
+                      e.target.value = "";
+                    }}
+                  />
+                  Pilih gambar
+                </label>
+                <div className="hint subtle">JPG / PNG / WebP</div>
                 {newProduct.icon_url ? (
                   <button
                     type="button"
@@ -3830,12 +4445,14 @@ export default function AdminDashboard() {
           </label>
 
           <label className="admin-field admin-field-full">
-            <span>Deskripsi singkat <em className="admin-fieldOptional">(opsional)</em></span>
+            <span>
+              Deskripsi singkat <em className="admin-fieldOptional">(opsional)</em>
+            </span>
             <textarea
               className="input admin-textarea admin-textarea--short"
               value={newProduct.description}
               onChange={(e) => setNewProduct((p) => ({ ...p, description: e.target.value }))}
-              rows={3}
+              rows={2}
               placeholder="Contoh: Akun ready, garansi replace full"
             />
           </label>
@@ -3850,7 +4467,7 @@ export default function AdminDashboard() {
           </label>
 
           <p className="admin-formHint admin-field-full">
-            Link produk (slug) & urutan tampil diisi otomatis. Setelah simpan, tambah paket harga di bagian Varian.
+            Slug & urutan otomatis. Setelah simpan, tambah paket di Varian.
           </p>
         </div>
       </Modal>
@@ -3859,19 +4476,20 @@ export default function AdminDashboard() {
       <Modal
         open={variantModalOpen}
         title={variantMode === "edit" ? "Edit Paket" : "Tambah Paket"}
+        size="sm"
         onClose={() => setVariantModalOpen(false)}
         footer={
-          <div className="modal-actions">
+          <div className="modal-actions modal-actions--fill">
             <button className="btn btn-ghost" type="button" onClick={() => setVariantModalOpen(false)}>
               Batal
             </button>
-            <button className="btn" type="button" onClick={saveVariant}>
+            <button className="btn btn-primary" type="button" onClick={saveVariant}>
               Simpan Paket
             </button>
           </div>
         }
       >
-        <div className="admin-form-grid admin-form-grid--simple">
+        <div className="admin-form-grid admin-form-grid--simple admin-form-grid--modal">
           <label className="admin-field admin-field-full">
             <span>Nama paket</span>
             <input
@@ -3926,50 +4544,35 @@ export default function AdminDashboard() {
             />
           </label>
 
-          <div className="admin-field admin-field-full">
-            <button
-              type="button"
-              className="admin-advancedToggle"
-              onClick={() => setVariantAdvancedOpen((v) => !v)}
-              aria-expanded={variantAdvancedOpen}
-            >
-              {variantAdvancedOpen ? "Sembunyikan opsi lanjutan" : "Opsi lanjutan"}
-            </button>
-          </div>
+          <label className="admin-field admin-field-full">
+            <span>Deskripsi paket</span>
+            <textarea
+              className="input admin-textarea admin-textarea--short"
+              value={variantForm.description}
+              onChange={(e) => setVariantForm((p) => ({ ...p, description: e.target.value }))}
+              rows={3}
+              placeholder="Detail paket / aturan (opsional)"
+            />
+          </label>
 
-          {variantAdvancedOpen ? (
-            <>
-              <label className="admin-field admin-field-full">
-                <span>Deskripsi paket</span>
-                <textarea
-                  className="input admin-textarea admin-textarea--short"
-                  value={variantForm.description}
-                  onChange={(e) => setVariantForm((p) => ({ ...p, description: e.target.value }))}
-                  rows={3}
-                  placeholder="Detail paket / aturan (opsional)"
-                />
-              </label>
+          <label className="admin-field admin-field-full">
+            <span>Teks garansi</span>
+            <input
+              className="input"
+              value={variantForm.guarantee_text}
+              onChange={(e) => setVariantForm((p) => ({ ...p, guarantee_text: e.target.value }))}
+              placeholder="All full garansi"
+            />
+          </label>
 
-              <label className="admin-field admin-field-full">
-                <span>Teks garansi</span>
-                <input
-                  className="input"
-                  value={variantForm.guarantee_text}
-                  onChange={(e) => setVariantForm((p) => ({ ...p, guarantee_text: e.target.value }))}
-                  placeholder="All full garansi"
-                />
-              </label>
-
-              <label className="admin-field admin-field-switch admin-field-full">
-                <span>Wajib email buyer (sebelum QRIS)</span>
-                <input
-                  type="checkbox"
-                  checked={!!variantForm.requires_buyer_email}
-                  onChange={(e) => setVariantForm((p) => ({ ...p, requires_buyer_email: e.target.checked }))}
-                />
-              </label>
-            </>
-          ) : null}
+          <label className="admin-field admin-field-switch admin-field-full">
+            <span>Wajib email buyer (sebelum QRIS)</span>
+            <input
+              type="checkbox"
+              checked={!!variantForm.requires_buyer_email}
+              onChange={(e) => setVariantForm((p) => ({ ...p, requires_buyer_email: e.target.checked }))}
+            />
+          </label>
         </div>
       </Modal>
 

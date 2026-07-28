@@ -9,6 +9,7 @@ export const CATEGORY_OPTIONS = [
   { value: "ai", label: "AI" },
   { value: "design", label: "Design" },
   { value: "learning", label: "Belajar" },
+  { value: "academic", label: "Jasa Akademik" },
   { value: "other", label: "Lainnya" },
 ];
 

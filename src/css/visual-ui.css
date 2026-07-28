@@ -3,7 +3,6 @@
 body.is-funnel .abandoned-cart-banner,
 body.is-funnel .fsp-backdrop,
 body.is-funnel .achievement-toast,
-body.is-funnel .ai-bubble,
 body.is-funnel .bottom-nav {
   display: none !important;
 }

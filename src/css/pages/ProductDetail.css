@@ -1387,34 +1387,39 @@
   align-items: center;
 }
 
-.detail-page-v3 .pdx-productIcon,
-.detail-page-v3 .catalog-cardIcon.pdx-productIcon {
-  position: static;
+/* Isolated product icon — do not share catalog-cardIcon styles */
+.detail-page.detail-page-v3 .pdx-productIcon {
+  position: relative !important;
   transform: none !important;
-  flex: 0 0 clamp(60px, 10vw, 72px);
-  width: clamp(60px, 10vw, 72px);
-  height: clamp(60px, 10vw, 72px);
-  border-radius: clamp(18px, 3vw, 22px) !important;
+  flex: 0 0 clamp(64px, 10vw, 76px);
+  width: clamp(64px, 10vw, 76px);
+  height: clamp(64px, 10vw, 76px);
+  border-radius: 22px !important;
   overflow: hidden;
   border: 1px solid var(--brand-line, var(--pdx-line)) !important;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 28%),
-    var(--skeu-control-bg) !important;
-  box-shadow: 0 8px 20px var(--brand-color, rgba(0,0,0,0.15)) !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 32%),
+    var(--pdx-soft, var(--skeu-control-bg)) !important;
+  box-shadow: var(--pdx-soft-shadow) !important;
   display: grid;
   place-items: center;
   flex-shrink: 0;
+  z-index: 1;
 }
 
-.detail-page-v3 .pdx-productIcon::after {
+.detail-page.detail-page-v3 .pdx-productIcon::after,
+.detail-page.detail-page-v3 .pdx-productIcon::before {
+  content: none !important;
   display: none !important;
 }
 
-.detail-page-v3 .pdx-productIcon img {
+.detail-page.detail-page-v3 .pdx-productIcon img {
   width: 100%;
   height: 100%;
-  object-fit: contain !important;
-  padding: 8px;
+  object-fit: cover !important;
+  object-position: center;
+  padding: 0 !important;
+  display: block;
 }
 
 .detail-page-v3 .pdx-productIcon span {
@@ -1563,6 +1568,12 @@
   color: #ffd9a0;
 }
 
+.detail-page-v3 .pdx-categoryPill[data-category="academic"] {
+  border-color: rgba(99, 102, 241, 0.32);
+  background: rgba(99, 102, 241, 0.1);
+  color: #c7c9ff;
+}
+
 html[data-theme="light"] .detail-page-v3 .pdx-categoryPill {
   background: rgba(0, 0, 0, 0.03);
   box-shadow: none;
@@ -1598,14 +1609,21 @@ html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="learni
   background: rgba(255, 170, 70, 0.1);
 }
 
-.detail-page-v3 .pdx-title {
+html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="academic"] {
+  color: #4338ca;
+  background: rgba(99, 102, 241, 0.1);
+}
+
+.detail-page.detail-page-v3 .pdx-title {
   margin: 0;
-  /* Slightly more compact title on desktop so left card stays lean */
-  font-size: clamp(26px, 4.5vw, 38px) !important;
-  line-height: 1.08;
-  letter-spacing: -0.04em;
+  /* Compact title so long academic names don't blow up the hero card */
+  font-size: clamp(20px, 3.2vw, 30px) !important;
+  line-height: 1.15;
+  letter-spacing: -0.035em;
   overflow-wrap: anywhere;
+  word-break: break-word;
   color: var(--pdx-text-1);
+  max-width: 100%;
 }
 
 .detail-page-v3 .pdx-statsStrip {
@@ -1770,20 +1788,25 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   color: var(--pdx-text-1);
 }
 
-.detail-page-v3 .pdx-variantsSection {
-  padding: clamp(16px, 2.5vw, 24px) !important;
-  display: grid;
-  gap: 14px;
+.detail-page.detail-page-v3 .pdx-variantsSection {
+  padding: clamp(16px, 2.5vw, 22px) !important;
+  display: grid !important;
+  gap: 14px !important;
+  position: relative;
+  overflow: visible !important;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-/* Desktop: right card is static and not scrollable */
+/* Desktop: right panel aligns with left column (no sticky clip glitches) */
 @media (min-width: 1024px) {
-  .detail-page-v3 .pdx-variantsSection {
-    position: static;
+  .detail-page.detail-page-v3 .pdx-variantsSection {
+    position: relative;
     top: auto;
     max-height: none;
-    overflow: visible;
-    display: block;
+    overflow: visible !important;
+    align-self: start;
   }
 
   .detail-page-v3 .pdx-packList {
@@ -1881,54 +1904,81 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   gap: 10px;
 }
 
-.detail-page-v3 .pdx-packCard {
+/* Pack cards stay "inset" inside variants panel — avoid double outer card look */
+.detail-page.detail-page-v3 .pdx-packCard {
   padding: clamp(12px, 2vw, 16px);
   display: grid;
   gap: 10px;
-  background: var(--pdx-inset);
-  box-shadow: var(--pdx-inset-shadow);
-  border-radius: var(--uni-neo-radius-md, 20px);
+  background: var(--pdx-inset) !important;
+  box-shadow: var(--pdx-inset-shadow) !important;
+  border: 1px solid var(--brand-line, var(--pdx-line)) !important;
+  border-radius: 18px !important;
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
-.detail-page-v3 .pdx-packCard.is-recommended {
-  border-color: rgba(79, 255, 200, 0.38);
-  background: var(--pdx-panel);
-  box-shadow:
-    var(--pdx-panel-shadow),
-    0 0 0 1px rgba(79, 255, 200, 0.14);
-}
-
-.detail-page-v3 .pdx-packCard.is-selected {
-  border-color: rgba(79, 255, 218, 0.32);
+.detail-page.detail-page-v3 .pdx-packCard.is-recommended {
+  border-color: rgba(79, 255, 200, 0.4) !important;
+  background:
+    linear-gradient(160deg, rgba(79, 255, 200, 0.1), rgba(79, 255, 200, 0) 42%),
+    var(--pdx-inset) !important;
   box-shadow:
     var(--pdx-inset-shadow),
-    0 0 0 1px rgba(79, 255, 218, 0.18) inset;
+    0 0 0 1px rgba(79, 255, 200, 0.12) inset !important;
+}
+
+.detail-page.detail-page-v3 .pdx-packCard.is-selected {
+  border-color: rgba(79, 255, 218, 0.42) !important;
+  box-shadow:
+    var(--pdx-inset-shadow),
+    0 0 0 1px rgba(79, 255, 218, 0.16) inset !important;
   cursor: pointer;
 }
 
-.detail-page-v3 .pdx-packCard.is-selected.is-recommended {
-  border-color: rgba(79, 255, 200, 0.42);
+.detail-page.detail-page-v3 .pdx-packCard.is-selected.is-recommended {
+  border-color: rgba(79, 255, 200, 0.5) !important;
   box-shadow:
-    var(--pdx-panel-shadow),
-    0 0 0 1px rgba(79, 255, 200, 0.18),
-    0 0 0 1px rgba(79, 255, 218, 0.12) inset;
+    var(--pdx-inset-shadow),
+    0 0 0 1px rgba(79, 255, 200, 0.18) inset !important;
+}
+
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommended,
+html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommended {
+  border-color: rgba(0, 138, 148, 0.28) !important;
+  background:
+    linear-gradient(160deg, rgba(0, 194, 208, 0.08), rgba(0, 194, 208, 0) 48%),
+    var(--pdx-inset) !important;
 }
 
 .detail-page-v3 .pdx-packCard.is-out {
   opacity: 0.72;
 }
 
+/* Head: title row (name | price) then full-width meta — long guarantee never fights price */
 .detail-page-v3 .pdx-packHead {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.detail-page-v3 .pdx-packTitleRow {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 .detail-page-v3 .pdx-packInfo {
   min-width: 0;
-  flex: 1;
+  flex: 1 1 auto;
+  overflow: hidden;
 }
 
 .detail-page-v3 .pdx-packHot {
@@ -1945,19 +1995,25 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
 
 .detail-page-v3 .pdx-packName {
   margin: 0;
-  font-size: clamp(16px, 2.4vw, 18px);
+  font-size: clamp(15px, 2.4vw, 18px);
   font-weight: 1000;
-  line-height: 1.2;
+  line-height: 1.25;
   letter-spacing: -0.03em;
   overflow-wrap: anywhere;
+  word-break: break-word;
   color: var(--pdx-text-1);
+  min-width: 0;
 }
 
 .detail-page-v3 .pdx-packMeta {
   display: flex;
   flex-wrap: wrap;
+  align-items: flex-start;
   gap: 6px;
-  margin-top: 6px;
+  margin-top: 0;
+  min-width: 0;
+  max-width: 100%;
+  width: 100%;
 }
 
 .detail-page-v3 .pdx-packMetaItem {
@@ -1967,21 +2023,28 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   font-size: 11px;
   font-weight: 800;
   color: var(--pdx-text-3);
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
 }
 
 .detail-page-v3 .pdx-packPriceWrap {
   text-align: right;
-  flex-shrink: 0;
-  min-width: 96px;
+  flex: 0 0 auto;
+  min-width: 0;
+  max-width: min(48%, 9.5rem);
 }
 
 .detail-page-v3 .pdx-packPrice {
   color: var(--pdx-text-accent);
-  font-size: clamp(18px, 3vw, 22px);
+  font-size: clamp(15px, 2.6vw, 20px);
   font-weight: 1000;
   letter-spacing: -0.04em;
-  line-height: 1.1;
+  line-height: 1.15;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
 }
 
 .detail-page-v3 .pdx-variantOriginalPrice {
@@ -2072,8 +2135,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
 
 
   /* Icon: slightly bigger on mobile for better visual balance */
-  .detail-page-v3 .pdx-productIcon,
-  .detail-page-v3 .catalog-cardIcon.pdx-productIcon {
+  .detail-page.detail-page-v3 .pdx-productIcon {
     flex: 0 0 64px;
     width: 64px;
     height: 64px;
@@ -2116,15 +2178,16 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
     justify-content: center;
   }
 
-  /* Variant card: stack price below name on very small screens */
-  .detail-page-v3 .pdx-packHead {
-    flex-direction: column;
-    gap: 8px;
+  /* Head already stacks meta under title; only tighten price on tiny screens */
+  .detail-page-v3 .pdx-packTitleRow {
+    flex-wrap: wrap;
   }
 
   .detail-page-v3 .pdx-packPriceWrap {
     text-align: left;
-    width: 100%;
+    max-width: 100%;
+    width: auto;
+    margin-left: auto;
   }
 
   .detail-page-v3 .pdx-packActions {
@@ -2315,71 +2378,70 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
 
 
 /* 2. Redesign Variant Cards for a highly polished tactile feel */
-.detail-page-v3 .pdx-packCard {
-  background: var(--pdx-soft) !important;
+/* Pack card interaction layer — keep inset surface (no second outer panel) */
+.detail-page.detail-page-v3 .pdx-packCard {
+  background: var(--pdx-inset) !important;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08)) !important;
-  box-shadow: var(--pdx-soft-shadow) !important;
+  box-shadow: var(--pdx-inset-shadow) !important;
   transition: transform 0.22s cubic-bezier(0.25, 0.8, 0.25, 1), border-color 0.22s ease, box-shadow 0.22s ease;
   cursor: pointer;
 }
 
 @media (hover: hover) {
-  .detail-page-v3 .pdx-packCard:hover:not(.is-out) {
-    transform: translateY(-3px);
+  .detail-page.detail-page-v3 .pdx-packCard:hover:not(.is-out) {
+    transform: translateY(-2px);
     border-color: rgba(79, 255, 200, 0.28) !important;
-    box-shadow: 
-      0 14px 28px rgba(0, 0, 0, 0.25),
-      var(--pdx-inset-shadow) !important;
+    box-shadow:
+      var(--pdx-inset-shadow),
+      0 0 0 1px rgba(79, 255, 200, 0.1) inset !important;
   }
 }
 
-.detail-page-v3 .pdx-packCard.is-selected {
+.detail-page.detail-page-v3 .pdx-packCard.is-selected {
   border-color: rgba(79, 255, 218, 0.44) !important;
-  box-shadow: 
-    0 0 0 1px rgba(79, 255, 218, 0.26) inset,
-    0 8px 20px rgba(0, 214, 180, 0.08),
-    var(--pdx-inset-shadow) !important;
+  box-shadow:
+    var(--pdx-inset-shadow),
+    0 0 0 1px rgba(79, 255, 218, 0.2) inset !important;
 }
 
-.detail-page-v3 .pdx-packCard.is-recommended {
-  background: 
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0) 36%),
-    var(--pdx-panel) !important;
-  border-color: rgba(79, 255, 200, 0.34) !important;
-  box-shadow: 
-    0 14px 30px rgba(0, 14, 32, 0.22),
-    var(--pdx-panel-shadow) !important;
+.detail-page.detail-page-v3 .pdx-packCard.is-recommended {
+  background:
+    linear-gradient(180deg, rgba(79, 255, 200, 0.1), rgba(79, 255, 200, 0) 40%),
+    var(--pdx-inset) !important;
+  border-color: rgba(79, 255, 200, 0.36) !important;
+  box-shadow:
+    var(--pdx-inset-shadow),
+    0 0 0 1px rgba(79, 255, 200, 0.12) inset !important;
 }
 
 @media (hover: hover) {
-  .detail-page-v3 .pdx-packCard.is-recommended:hover:not(.is-out) {
+  .detail-page.detail-page-v3 .pdx-packCard.is-recommended:hover:not(.is-out) {
     border-color: rgba(79, 255, 200, 0.48) !important;
-    box-shadow: 
-      0 20px 42px rgba(0, 214, 180, 0.22),
-      var(--pdx-panel-shadow) !important;
+    box-shadow:
+      var(--pdx-inset-shadow),
+      0 0 0 1px rgba(79, 255, 200, 0.16) inset !important;
   }
 }
 
-.detail-page-v3 .pdx-packCard.is-selected.is-recommended {
+.detail-page.detail-page-v3 .pdx-packCard.is-selected.is-recommended {
   border-color: rgba(79, 255, 200, 0.52) !important;
-  box-shadow: 
-    0 0 0 1px rgba(79, 255, 218, 0.3) inset,
-    0 18px 36px rgba(0, 214, 180, 0.16),
-    var(--pdx-panel-shadow) !important;
+  box-shadow:
+    var(--pdx-inset-shadow),
+    0 0 0 1px rgba(79, 255, 218, 0.22) inset !important;
 }
 
-:root[data-theme="light"] .detail-page-v3 .pdx-packCard.is-recommended {
-  border-color: rgba(0, 194, 208, 0.38) !important;
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommended {
+  border-color: rgba(0, 194, 208, 0.32) !important;
 }
 
 @media (hover: hover) {
-  :root[data-theme="light"] .detail-page-v3 .pdx-packCard.is-recommended:hover:not(.is-out) {
-    border-color: rgba(0, 194, 208, 0.54) !important;
+  :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommended:hover:not(.is-out) {
+    border-color: rgba(0, 194, 208, 0.48) !important;
   }
 }
 
-:root[data-theme="light"] .detail-page-v3 .pdx-packCard.is-selected.is-recommended {
-  border-color: rgba(0, 194, 208, 0.6) !important;
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-selected.is-recommended {
+  border-color: rgba(0, 194, 208, 0.52) !important;
 }
 
 /* ── Neumorphic Depth Enhancements ── */
@@ -2435,17 +2497,15 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
 }
 
 /* 4. Enhanced image depth — product icon sits above glass */
-.detail-page-v3 .pdx-productIcon {
+.detail-page.detail-page-v3 .pdx-productIcon {
   transition:
     transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
     box-shadow 0.3s ease !important;
 }
 
-.detail-page-v3 .pdx-productIcon:hover {
-  transform: translateY(-1px);
-  box-shadow:
-    0 20px 42px var(--brand-color, rgba(0, 0, 0, 0.32)),
-    var(--pdx-soft-shadow) !important;
+.detail-page.detail-page-v3 .pdx-productIcon:hover {
+  transform: translateY(-1px) !important;
+  box-shadow: var(--pdx-soft-shadow) !important;
 }
 
 /* 5. Back link active state */
@@ -2633,9 +2693,9 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   border-radius: 8px !important;
 }
 
-/* Mobile variant swipe */
+/* Mobile: multi pack horizontal swipe; single pack still uses same card (full width in grid) */
 @media (max-width: 720px) {
-  .detail-page-v3 .pdx-packList {
+  .detail-page-v3 .pdx-packList:has(.pdx-packCard:nth-child(2)) {
     display: flex !important;
     flex-direction: row !important;
     flex-wrap: nowrap !important;
@@ -2650,13 +2710,26 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
     margin: 0 !important;
     scrollbar-width: none !important;
     -webkit-overflow-scrolling: touch;
+    /* Right-edge scroll hint only */
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      #000 0%,
+      #000 calc(100% - 28px),
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      #000 0%,
+      #000 calc(100% - 28px),
+      transparent 100%
+    );
   }
 
-  .detail-page-v3 .pdx-packList::-webkit-scrollbar {
+  .detail-page-v3 .pdx-packList:has(.pdx-packCard:nth-child(2))::-webkit-scrollbar {
     display: none !important;
   }
 
-  .detail-page-v3 .pdx-packCard {
+  .detail-page-v3 .pdx-packList:has(.pdx-packCard:nth-child(2)) .pdx-packCard {
     flex: 0 0 min(280px, 80vw) !important;
     width: min(280px, 80vw) !important;
     max-width: min(280px, 80vw) !important;
@@ -2665,6 +2738,18 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
     scroll-snap-align: start !important;
     min-width: 0 !important;
     overflow: hidden;
+  }
+
+  /* Single pack: same card style, full width (no flat flush panel) */
+  .detail-page-v3 .pdx-packList:not(:has(.pdx-packCard:nth-child(2))) {
+    display: grid !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .detail-page-v3 .pdx-packList:not(:has(.pdx-packCard:nth-child(2))) .pdx-packCard {
+    width: 100% !important;
+    max-width: 100% !important;
   }
 
   .detail-page-v3 .pdx-packCard .pdx-benefitList {
@@ -2702,25 +2787,78 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   }
 }
 
-/* ── Guarantee chip in variant card ── */
+/* Guarantee: always full-width row under compact chips, multi-line safe */
 .detail-page-v3 .pdx-packMetaItem--guarantee {
   color: #6ee7b7;
   background: rgba(16, 185, 129, 0.12);
   border: 1px solid rgba(52, 211, 153, 0.2);
-  border-radius: 999px;
-  padding: 0 8px;
-  min-height: 22px;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  border-radius: 12px;
+  padding: 6px 10px;
+  min-height: 0;
+  flex: 1 1 100%;
+  width: 100%;
+  max-width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
   font-size: 11px;
   font-weight: 700;
+  line-height: 1.4;
+  white-space: normal;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-sizing: border-box;
+}
+
+.detail-page-v3 .pdx-packMetaItem--guarantee svg {
+  flex-shrink: 0;
+  width: 12px;
+  height: 12px;
+  margin-top: 2px;
+}
+
+.detail-page-v3 .pdx-packMetaItem--guarantee .pdx-packMetaItemText {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   color: #047857;
   background: rgba(167, 243, 208, 0.45);
   border-color: rgba(16, 185, 129, 0.25);
+}
+
+.detail-page.detail-page-v3 .pdx-packCard {
+  overflow: hidden;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Mobile pack swipe cards: keep price fully visible */
+@media (max-width: 720px) {
+  .detail-page-v3 .pdx-packTitleRow {
+    gap: 8px;
+  }
+
+  .detail-page-v3 .pdx-packPriceWrap {
+    max-width: min(46%, 7.5rem);
+  }
+
+  .detail-page-v3 .pdx-packPrice {
+    font-size: clamp(14px, 3.8vw, 17px);
+  }
+
+  .detail-page-v3 .pdx-packMetaItem--guarantee {
+    font-size: 10.5px;
+    padding: 5px 8px;
+  }
 }
 
 .detail-page-v3 .pdx-stockUrgency {
@@ -2752,8 +2890,19 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
     padding-inline: 0 !important;
     margin-inline: 0 !important;
     scrollbar-width: none !important;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%) !important;
-    mask-image: linear-gradient(to right, transparent 0%, #000 6%, #000 94%, transparent 100%) !important;
+    /* Right-edge fade only — left tile stays solid (no clipped CapCut icon) */
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      #000 0%,
+      #000 calc(100% - 32px),
+      transparent 100%
+    ) !important;
+    mask-image: linear-gradient(
+      90deg,
+      #000 0%,
+      #000 calc(100% - 32px),
+      transparent 100%
+    ) !important;
   }
 
   .detail-page-v3 .pdx-recommendationsGrid::-webkit-scrollbar {
@@ -2792,42 +2941,64 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   line-height: 1.5;
 }
 
-/* Prevent floating action buttons (FABs) from overlapping/covering price text on mobile/tablet */
+/* Prevent floating chips from overlapping content on mobile/tablet */
 @media (max-width: 768px) {
   .detail-page-v3 {
     padding-bottom: calc(
       var(--site-bottom-nav-clearance)
-      + var(--fab-assistant-size, 52px)
       + var(--fab-gap, 10px)
     ) !important;
   }
 
 }
 
-/* Side-by-Side main content grid */
-.pdx-mainGrid {
+/* Side-by-Side main content grid — stack below desktop to avoid crushed cards */
+.detail-page-v3 .pdx-mainGrid {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: 18px;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  align-items: start;
+  min-width: 0;
+  width: 100%;
 }
 
-.pdx-mainGrid > * {
+.detail-page-v3 .pdx-mainGrid > * {
   min-width: 0;
+  max-width: 100%;
+}
+
+.detail-page-v3 .pdx-leftCol,
+.detail-page-v3 .pdx-rightCol {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  max-width: 100%;
 }
 
 @media (min-width: 1024px) {
-  .pdx-mainGrid {
-    /* Left (info) card is wider than right (variants) card */
-    grid-template-columns: 1.5fr 1fr;
+  .detail-page-v3 .pdx-mainGrid {
+    /* Left (info) wider than right (variants) */
+    grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
+    gap: 22px;
     align-items: start;
-    gap: 24px;
   }
 }
 
 /* Tabs Card style & content */
-.pdx-infoTabsCard {
-  margin-top: 16px;
-  padding: clamp(12px, 2vw, 16px) !important;
+.detail-page.detail-page-v3 .pdx-infoTabsCard {
+  margin-top: 0;
+  padding: clamp(14px, 2vw, 18px) !important;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.detail-page.detail-page-v3 .pdx-topCard {
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  isolation: isolate;
 }
 
 .pdx-infoTabsHeader {
@@ -3094,15 +3265,102 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
     transform: none !important;
   }
 
-  /* Stack left and right cards on mobile */
-  .pdx-mainGrid {
-    grid-template-columns: 1fr;
+  /* Stack already default on .detail-page-v3 .pdx-mainGrid; keep visible pack list */
+  .detail-page-v3 .pdx-packList {
+    display: grid;
   }
 
-  /* Ensure pack list is always visible on mobile */
-  .pdx-packList {
-    display: block;
+  .detail-page.detail-page-v3 .pdx-variantsSection {
+    position: static;
+    top: auto;
   }
+}
+
+/* ── Final isolation: stop global theme / polish from double-styling cards ── */
+.detail-page.detail-page-v3 .pdx-topCard,
+.detail-page.detail-page-v3 .pdx-variantsSection,
+.detail-page.detail-page-v3 .pdx-infoTabsCard {
+  border-radius: 28px !important;
+  background: var(--pdx-panel) !important;
+  box-shadow: var(--pdx-panel-shadow) !important;
+  border: 1px solid var(--brand-line, var(--pdx-line)) !important;
+  overflow: visible !important;
+}
+
+.detail-page.detail-page-v3 .pdx-variantsSection {
+  overflow: visible !important;
+  position: relative !important;
+  top: auto !important;
+  max-height: none !important;
+}
+
+/* Multi-pack: nested inset cards */
+.detail-page.detail-page-v3 .pdx-packCard {
+  border-radius: 18px !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  transform: none !important;
+}
+
+/* Note: 1-variant products use the same pack card chrome as multi-variant (no is-solo / is-flat). */
+
+/* Multi-pack selected/recommended: single subtle ring only (no double panel) */
+.detail-page.detail-page-v3 .pdx-packCard.is-selected,
+.detail-page.detail-page-v3 .pdx-packCard.is-recommended {
+  background: var(--pdx-inset) !important;
+  box-shadow: var(--pdx-inset-shadow) !important;
+}
+
+.detail-page.detail-page-v3 .pdx-packCard.is-selected {
+  border: 1.5px solid rgba(0, 194, 208, 0.42) !important;
+}
+
+.detail-page.detail-page-v3 .pdx-packCard.is-recommended {
+  border: 1.5px solid rgba(0, 194, 208, 0.28) !important;
+}
+
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-selected,
+html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-selected {
+  border-color: rgba(0, 138, 148, 0.4) !important;
+  background:
+    linear-gradient(160deg, rgba(0, 194, 208, 0.06), transparent 50%),
+    var(--pdx-inset) !important;
+}
+
+/* Counter theme-consolidated floating icon + dark aura */
+.detail-page.detail-page-v3 .pdx-productIcon {
+  transform: none !important;
+  translate: none;
+}
+
+.detail-page.detail-page-v3 .pdx-productIcon:hover {
+  transform: translateY(-1px) !important;
+}
+
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-productIcon {
+  box-shadow:
+    8px 10px 18px rgba(102, 140, 156, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(164, 197, 209, 0.22) !important;
+}
+
+/* Light mode outer panels — soft, consistent, no dark neumorph bleed */
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-topCard,
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-variantsSection,
+:root[data-theme="light"] .detail-page.detail-page-v3 .pdx-infoTabsCard,
+html[data-theme="light"] .detail-page.detail-page-v3 .pdx-topCard,
+html[data-theme="light"] .detail-page.detail-page-v3 .pdx-variantsSection,
+html[data-theme="light"] .detail-page.detail-page-v3 .pdx-infoTabsCard {
+  background:
+    linear-gradient(166deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 253, 255, 0.94) 50%, rgba(236, 246, 251, 0.96) 100%) !important;
+  border-color: rgba(119, 175, 194, 0.22) !important;
+  box-shadow:
+    12px 14px 28px rgba(97, 137, 153, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(166, 200, 211, 0.28) !important;
 }
 
 /* ── Compare Button ── */

@@ -890,6 +890,9 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
 
 .catalog-quickChip {
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
   min-height: 38px;
   padding: 0 14px;
   border-radius: 999px;
@@ -907,7 +910,152 @@ html[data-theme="light"] .catalog-chip.active .catalog-chip-count {
     background 0.25s ease,
     border-color 0.25s ease,
     box-shadow 0.25s ease,
-    color 0.25s ease;
+    color 0.25s ease,
+    transform 0.2s ease;
+}
+
+/* Store line chips — larger, bolder, clearer accent (desktop catalog top pills) */
+.catalog-page .catalog-quickChip.catalog-quickChip--line {
+  min-height: 46px !important;
+  gap: 10px !important;
+  padding: 0 16px 0 14px !important;
+  border-radius: 9999px !important;
+  border-width: 1.5px !important;
+  font-size: 13.5px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.01em !important;
+  box-shadow:
+    0 10px 22px rgba(0, 40, 60, 0.14),
+    0 2px 6px rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--line svg {
+  flex-shrink: 0 !important;
+  width: 18px !important;
+  height: 18px !important;
+  opacity: 1 !important;
+  stroke-width: 2.35 !important;
+}
+
+/* Aplikasi Premium — teal accent */
+.catalog-page .catalog-quickChip.catalog-quickChip--app_premium {
+  border-color: rgba(0, 180, 170, 0.42) !important;
+  background:
+    linear-gradient(165deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.06) 48%, rgba(255, 255, 255, 0.9) 100%),
+    linear-gradient(180deg, #ffffff, #eef9fb) !important;
+  color: #0a5c66 !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--app_premium svg {
+  color: #0b9a8f !important;
+}
+
+/* Jasa Akademik — indigo/violet accent for contrast */
+.catalog-page .catalog-quickChip.catalog-quickChip--academic {
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  background:
+    linear-gradient(165deg, rgba(129, 140, 248, 0.2) 0%, rgba(165, 180, 252, 0.08) 48%, rgba(255, 255, 255, 0.92) 100%),
+    linear-gradient(180deg, #ffffff, #f4f5ff) !important;
+  color: #3730a3 !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--academic svg {
+  color: #4f46e5 !important;
+}
+
+html[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--app_premium,
+:root[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--app_premium {
+  border-color: rgba(0, 214, 180, 0.45) !important;
+  background:
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28) 0%, rgba(0, 100, 110, 0.35) 55%, rgba(12, 24, 40, 0.95) 100%) !important;
+  color: #b8fff4 !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+html[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--academic,
+:root[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--academic {
+  border-color: rgba(129, 140, 248, 0.45) !important;
+  background:
+    linear-gradient(165deg, rgba(129, 140, 248, 0.28) 0%, rgba(67, 56, 140, 0.4) 55%, rgba(14, 16, 36, 0.95) 100%) !important;
+  color: #e0e7ff !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--line:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.03);
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--line.active {
+  border-color: transparent !important;
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+  transform: translateY(0) !important;
+  filter: none !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--line.active svg {
+  color: inherit !important;
+  opacity: 1 !important;
+}
+
+.catalog-quickChip--line svg {
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+.catalog-quickChipCount {
+  font-style: normal;
+  font-size: 11px;
+  font-weight: 800;
+  opacity: 0.72;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.08);
+}
+
+/* Count badge on line chips — solid pill, high contrast */
+.catalog-page .catalog-quickChip.catalog-quickChip--line .catalog-quickChipCount {
+  min-width: 26px;
+  min-height: 24px;
+  padding: 0 9px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 12px !important;
+  font-weight: 900 !important;
+  opacity: 1 !important;
+  border-radius: 999px !important;
+  letter-spacing: 0 !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--app_premium .catalog-quickChipCount {
+  background: linear-gradient(165deg, #2de8c8, #00a896) !important;
+  color: #032235 !important;
+  box-shadow: 0 2px 6px rgba(0, 160, 140, 0.28) !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--academic .catalog-quickChipCount {
+  background: linear-gradient(165deg, #818cf8, #4f46e5) !important;
+  color: #fff !important;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3) !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--line.active .catalog-quickChipCount {
+  background: rgba(3, 34, 53, 0.18) !important;
+  color: #032235 !important;
+  box-shadow: none !important;
+}
+
+.catalog-quickChip.active .catalog-quickChipCount {
+  background: rgba(0, 0, 0, 0.12);
+  opacity: 0.9;
 }
 
 .catalog-quickChip.active {

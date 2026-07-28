@@ -69,6 +69,18 @@
   padding: 4px 6px 2px;
 }
 
+.adm-sidebarGreeting {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--brand-text, #f0fdf9) !important;
+}
+
+html[data-theme="light"] .adm-sidebarGreeting {
+  color: #0f2f3a !important;
+}
+
 .adm-sidebarLogo {
   width: 42px;
   height: 42px;
@@ -91,6 +103,18 @@
   display: grid;
   gap: 2px;
   min-width: 0;
+}
+
+.adm-sidebarGreeting {
+  font-size: 15px !important;
+  font-weight: 900 !important;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  color: var(--brand-text, #f0fdf9) !important;
+}
+
+html[data-theme="light"] .adm-sidebarGreeting {
+  color: #0f2f3a !important;
 }
 
 .adm-sidebarBrand strong {
@@ -153,10 +177,11 @@
 
 .adm-navGroupLabel {
   padding: 6px 10px 4px;
-  font-size: 10px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: normal;
+  text-transform: none;
+  font-family: inherit;
   color: rgba(255, 255, 255, 0.38);
 }
 
@@ -191,23 +216,18 @@
 
 .adm-navItem.is-active {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.2), rgba(0, 80, 80, 0.35));
-  box-shadow: var(--skeu-control-shadow, none);
-  border: 1px solid rgba(0, 214, 180, 0.22);
-  color: #ecfffa;
+    linear-gradient(165deg, rgba(0, 214, 180, 0.3) 0%, rgba(0, 100, 110, 0.28) 100%),
+    var(--skeu-control-bg, rgba(0, 30, 40, 0.4));
+  box-shadow:
+    0 6px 14px rgba(0, 50, 60, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18);
+  border: 2px solid rgba(0, 200, 180, 0.5);
+  color: #f0fffc;
 }
 
 .adm-navItem.is-active::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 3px;
-  height: 18px;
-  border-radius: 0 4px 4px 0;
-  background: linear-gradient(180deg, #4effda, #00d6b4);
+  display: none;
 }
 
 .adm-navItemIcon {
@@ -536,24 +556,34 @@
   }
 
   .adm-dock {
+    /* 5 slots: Home | Order | Produk | Promo | Lainnya — must stay 1 row */
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-auto-flow: column;
+    grid-auto-rows: auto;
+    align-items: stretch;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     z-index: 90;
-    padding: 8px 10px calc(8px + env(safe-area-inset-bottom));
+    width: 100%;
+    max-width: 100vw;
+    box-sizing: border-box;
+    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
+    gap: 2px;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(12, 18, 26, 0.96);
     box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.28);
     backdrop-filter: blur(12px);
+    /* Prevent accidental wrap if any child grows */
+    overflow: hidden;
   }
 
   /* Toast portals to body — lift above admin bottom dock so it doesn't cover tabs */
   body:has(.app-main-admin) .toast-viewport,
   body:has(.admin-page) .toast-viewport {
-    bottom: calc(72px + env(safe-area-inset-bottom, 0px) + 12px);
+    bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 12px);
   }
 
   .adm-dockBtn {
@@ -561,9 +591,11 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    min-height: 52px;
-    padding: 4px 6px;
+    gap: 2px;
+    min-width: 0;
+    min-height: 48px;
+    max-width: 100%;
+    padding: 4px 2px;
     border: 0;
     border-radius: 12px;
     background: transparent;
@@ -581,13 +613,18 @@
     position: relative;
     display: grid;
     place-items: center;
+    flex-shrink: 0;
   }
 
   .adm-dockLabel {
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 800;
     letter-spacing: 0.01em;
     line-height: 1.1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 
   /* Hide legacy 7-tab bar */
@@ -677,29 +714,26 @@ html[data-theme="light"] .adm-navItemIcon {
 }
 
 html[data-theme="light"] .adm-navItem.is-active {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.12));
-  border: 1px solid rgba(0, 138, 148, 0.28);
+  background: linear-gradient(165deg, #c5f0ea, #95ddd5);
+  border: 2px solid rgba(0, 130, 140, 0.42);
   color: #053840;
   box-shadow:
-    0 4px 12px rgba(0, 138, 148, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+    0 5px 12px rgba(0, 100, 110, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(0, 90, 100, 0.1);
 }
 
 html[data-theme="light"] .adm-navItem.is-active .adm-navItemIcon {
-  color: #056b76;
-  border-color: rgba(0, 138, 148, 0.28);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.14));
+  color: #032235;
+  border-color: rgba(0, 120, 110, 0.35);
+  background: linear-gradient(165deg, #5eead4, #14b8a6);
   box-shadow:
-    0 3px 8px rgba(0, 138, 148, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+    0 3px 8px rgba(0, 100, 90, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
 }
 
 html[data-theme="light"] .adm-navItem.is-active::before {
-  background: linear-gradient(180deg, #00c2b0, #008a94);
+  display: none;
 }
 
 html[data-theme="light"] .adm-navDot {

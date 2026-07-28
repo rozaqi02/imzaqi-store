@@ -11,7 +11,7 @@
 .product-tile-rankBadge,
 .product-tile-arrow,
 .catalog-chip:not(.active),
-.catalog-quickChip:not(.active),
+.catalog-quickChip:not(.active):not(.catalog-quickChip--line),
 .catalog-viewBtn:not(.active),
 .catalog-filterBtnCount,
 .faq-chip:not(.active),
@@ -393,13 +393,12 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-/* Flash sale countdown units keep deep face */
-.fs-countdown-unit {
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.18)) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
-    var(--skeu-control-bg) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
+/* Flash sale countdown units — flat text, no deep face boxes */
+.fs-countdown-unit,
+.fs-countdown-unit * {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 /* Discount % badge — yellow only */
@@ -615,7 +614,7 @@ html[data-theme="light"] .st-progressBar-track {
 }
 
 .catalog-viewBtn:not(.active),
-.catalog-quickChip:not(.active) {
+.catalog-quickChip:not(.active):not(.catalog-quickChip--line) {
   border: 1px solid var(--brand-line) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
@@ -750,12 +749,15 @@ html[data-theme="light"] .rv-card {
   box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
-/* Flash sale countdown units */
+/* Flash sale countdown — no boxed frames (clean digits only) */
 .flash-countdown-unit,
 .flash-sale-timer-box,
 .fs-unit,
-.flash-countdown-num {
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.18)) !important;
+.flash-countdown-num,
+.flash-countdown-label {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
 }
 
 .flash-countdown-icon {
@@ -1271,8 +1273,6 @@ html[data-theme="light"] .adm-footBtn--danger {
 .toast-close,
 .modal-close,
 .trust-pill,
-.nf-linkCard,
-.nf-linkIcon,
 .admin-brand,
 .admin-nav-btn,
 .admin-nav-icon,
@@ -1291,7 +1291,6 @@ html[data-theme="light"] .adm-footBtn--danger {
 .toast-close,
 .modal-close,
 .trust-pill,
-.nf-linkIcon,
 .admin-nav-btn:not(.active),
 .admin-nav-icon,
 .admin-statIcon,
@@ -1305,8 +1304,7 @@ html[data-theme="light"] .adm-footBtn--danger {
 
 .admin-statCard,
 .admin-panel,
-.admin-brand,
-.nf-linkCard {
+.admin-brand {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 22%),
     var(--skeu-panel-bg) !important;
@@ -1586,6 +1584,63 @@ html[data-theme="light"] .home-page .hx-stat-item {
   border-color: var(--imzaqi-btn-border) !important;
   color: var(--imzaqi-btn-text) !important;
   box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+/* Catalog line pills (Aplikasi Premium / Jasa Akademik) — keep accent noticeability */
+.catalog-page .catalog-quickChip.catalog-quickChip--line:not(.active) {
+  min-height: 46px !important;
+  border-width: 1.5px !important;
+  border-radius: 9999px !important;
+  font-size: 13.5px !important;
+  box-shadow:
+    0 10px 22px rgba(0, 40, 60, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active) {
+  border-color: rgba(0, 180, 170, 0.45) !important;
+  background:
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22) 0%, rgba(0, 194, 208, 0.08) 50%, transparent 100%),
+    var(--skeu-control-bg, rgba(20, 34, 64, 0.92)) !important;
+  color: #9fffea !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) {
+  border-color: rgba(129, 140, 248, 0.45) !important;
+  background:
+    linear-gradient(165deg, rgba(129, 140, 248, 0.24) 0%, rgba(99, 102, 241, 0.1) 50%, transparent 100%),
+    var(--skeu-control-bg, rgba(20, 34, 64, 0.92)) !important;
+  color: #e0e7ff !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active) {
+  border-color: rgba(0, 160, 150, 0.42) !important;
+  background:
+    linear-gradient(165deg, rgba(0, 214, 180, 0.2) 0%, rgba(255, 255, 255, 0.95) 55%),
+    #eefbfa !important;
+  color: #0a5c66 !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) {
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  background:
+    linear-gradient(165deg, rgba(129, 140, 248, 0.22) 0%, rgba(255, 255, 255, 0.95) 55%),
+    #f4f5ff !important;
+  color: #3730a3 !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active) .catalog-quickChipCount {
+  background: linear-gradient(165deg, #2de8c8, #00a896) !important;
+  color: #032235 !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
+}
+
+.catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) .catalog-quickChipCount {
+  background: linear-gradient(165deg, #818cf8, #4f46e5) !important;
+  color: #fff !important;
+  opacity: 1 !important;
+  font-weight: 900 !important;
 }
 
 .catalog-page .catalog-filterSearch,

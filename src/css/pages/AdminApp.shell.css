@@ -1,0 +1,2253 @@
+/**
+ * Admin App Shell v2 — full-screen command center
+ * Layout + scroll + workspace chrome + priority board + nav
+ * Loaded last after AdminUI.overhaul.css
+ */
+
+/* ── Hide store chrome when body.is-admin-app ── */
+body.is-admin-app {
+  overflow: hidden;
+}
+
+body.is-admin-app .app-shell--admin {
+  min-height: 100dvh;
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+body.is-admin-app .app-main-admin {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+body.is-admin-app .app-main-admin > .route-transition {
+  height: 100%;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+body.is-admin-app .app-main-admin > .route-transition > .admin-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+/* ── Page = full viewport app ── */
+.admin-page.admin-page--app {
+  --adm-radius-lg: 20px;
+  --adm-radius-md: 14px;
+  --adm-gap: 12px;
+  min-height: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  overflow: hidden !important;
+}
+
+.admin-page.admin-page--app > .admin-section {
+  height: 100% !important;
+  max-height: 100% !important;
+  margin: 0 !important;
+  padding: 12px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+  box-sizing: border-box !important;
+}
+
+/* Remove site-header offset when header is hidden */
+body.is-admin-app .admin-page.admin-page--app > .admin-section {
+  margin-top: 0 !important;
+  padding-top: 12px !important;
+  height: 100% !important;
+  max-height: 100% !important;
+}
+
+.admin-page.admin-page--app .admin-shell {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  width: 100% !important;
+  max-width: 1600px !important;
+  margin: 0 auto !important;
+  display: grid !important;
+  grid-template-columns: 280px minmax(0, 1fr) !important;
+  gap: 14px !important;
+  overflow: hidden !important;
+  align-items: stretch !important;
+  padding: 0 !important;
+}
+
+/* ── Sidebar ── */
+.admin-page.admin-page--app .adm-sidebar {
+  height: 100% !important;
+  max-height: none !important;
+  position: relative !important;
+  top: auto !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 10px !important;
+  padding: 14px 12px !important;
+  border-radius: var(--adm-radius-lg) !important;
+  overflow: hidden !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarNav {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  overscroll-behavior: contain !important;
+  padding-right: 2px !important;
+}
+
+.admin-page .adm-sidebarHead {
+  gap: 10px !important;
+  padding: 2px 4px 4px !important;
+}
+
+.admin-page .adm-sidebarBrand strong {
+  font-size: 14px !important;
+  letter-spacing: -0.03em !important;
+}
+
+.admin-page .adm-sidebarBrand span {
+  font-size: 11px !important;
+  opacity: 0.75;
+}
+
+/* Next focus CTA — solid neo block, not thin outline */
+.admin-page .adm-nextFocus {
+  display: grid !important;
+  gap: 4px !important;
+  text-align: left !important;
+  width: 100% !important;
+  padding: 14px 14px 12px !important;
+  border-radius: 16px !important;
+  border: 2px solid rgba(0, 180, 160, 0.45) !important;
+  background:
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28) 0%, rgba(0, 120, 130, 0.22) 100%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06)) !important;
+  box-shadow:
+    0 8px 18px rgba(0, 40, 50, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.18) !important;
+  cursor: pointer !important;
+  transition: transform 0.15s ease, filter 0.15s ease !important;
+}
+
+.admin-page .adm-nextFocus:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.05);
+}
+
+.admin-page .adm-nextFocus:active {
+  transform: translateY(1px);
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+.admin-page .adm-nextFocusLabel {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  font-family: inherit !important;
+  color: rgba(200, 255, 245, 0.75) !important;
+}
+
+.admin-page .adm-nextFocus strong {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: #f0fffc !important;
+  letter-spacing: normal !important;
+  font-family: inherit !important;
+  line-height: 1.25 !important;
+}
+
+.admin-page .adm-nextFocusCta {
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  color: #9ff5e6 !important;
+  margin-top: 2px !important;
+}
+
+.admin-page .adm-nextFocus--warn {
+  border-color: rgba(217, 119, 6, 0.5) !important;
+  background:
+    linear-gradient(165deg, rgba(245, 158, 11, 0.32), rgba(180, 90, 10, 0.2)),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06)) !important;
+}
+
+.admin-page .adm-nextFocus--urgent {
+  border-color: rgba(220, 60, 80, 0.5) !important;
+  background:
+    linear-gradient(165deg, rgba(239, 68, 68, 0.28), rgba(140, 30, 40, 0.22)),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06)) !important;
+}
+
+.admin-page .adm-nextFocus--ok {
+  border-color: rgba(255, 255, 255, 0.12) !important;
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.03)),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06)) !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocus {
+  border: 2px solid rgba(0, 130, 140, 0.35) !important;
+  background:
+    linear-gradient(165deg, #d8f7f3 0%, #b8ebe6 45%, #a0ddd8 100%) !important;
+  box-shadow:
+    0 6px 14px rgba(40, 100, 110, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(0, 100, 110, 0.1) !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocusLabel {
+  color: #0a5c66 !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocus strong {
+  color: #063840 !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocusCta {
+  color: #0a6b76 !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocus--warn {
+  border-color: rgba(180, 100, 10, 0.4) !important;
+  background: linear-gradient(165deg, #fff3d6, #ffe4a8) !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocus--urgent {
+  border-color: rgba(180, 40, 50, 0.4) !important;
+  background: linear-gradient(165deg, #ffe0e4, #ffc4cb) !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocus--ok {
+  border-color: rgba(100, 140, 155, 0.28) !important;
+  background: linear-gradient(165deg, #f4fafc, #e4f0f5) !important;
+}
+
+/* Nav items with hints */
+.admin-page .adm-navItem {
+  min-height: 48px !important;
+  padding: 8px 10px !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+}
+
+.admin-page .adm-navItemCopy {
+  display: grid !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+  text-align: left !important;
+}
+
+.admin-page .adm-navItemLabel {
+  font-size: 13.5px !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  font-family: inherit !important;
+  letter-spacing: normal !important;
+}
+
+.admin-page .adm-navItemHint {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  font-family: inherit !important;
+  letter-spacing: normal !important;
+  color: var(--adm-text-3, rgba(200, 225, 240, 0.5)) !important;
+  line-height: 1.25 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.admin-page .adm-navItem.is-active .adm-navItemHint {
+  color: var(--adm-text-2, rgba(220, 240, 255, 0.7)) !important;
+}
+
+.admin-page .adm-navItemIcon {
+  margin-top: 2px !important;
+}
+
+.admin-page .adm-syncLabel {
+  font-size: 10.5px !important;
+  font-weight: 650 !important;
+  color: var(--adm-text-3) !important;
+  padding: 0 4px 4px !important;
+  letter-spacing: 0.01em;
+}
+
+.admin-page .adm-footBtn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: 40px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.08)) !important;
+  background: var(--adm-surface-soft, rgba(255, 255, 255, 0.04)) !important;
+  color: var(--adm-text-2) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+}
+
+.admin-page .adm-footBtn--danger {
+  color: #ff8a9a !important;
+  border-color: rgba(255, 90, 122, 0.22) !important;
+}
+
+html[data-theme="light"] .admin-page .adm-footBtn--danger {
+  color: #b42318 !important;
+}
+
+/* ── Main column ── */
+.admin-page.admin-page--app .admin-main {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  height: 100% !important;
+  overflow: hidden !important;
+  gap: 10px !important;
+}
+
+/* Slim toolbar: sync + actions only (no title — titles live in pane heads) */
+.admin-page .admin-workspaceToolbar {
+  display: flex !important;
+  flex-shrink: 0 !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding: 8px 12px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.08)) !important;
+  background: var(--adm-surface-soft, rgba(255, 255, 255, 0.04)) !important;
+  box-shadow: var(--adm-shadow-soft, none) !important;
+  font-family: inherit !important;
+}
+
+.admin-page .admin-workspaceToolbarActions {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-page .admin-workspaceSync {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  color: var(--adm-text-3) !important;
+  padding: 0 4px !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+/* Keep store fonts — never force Apple/system UI faces */
+.admin-page.admin-page--app,
+.admin-page.admin-page--app * {
+  font-family: inherit;
+}
+
+.admin-page.admin-page--app code,
+.admin-page.admin-page--app .admin-mono {
+  font-family: ui-monospace, "Cascadia Code", "Segoe UI Mono", Menlo, monospace;
+}
+
+.admin-page .admin-syncDot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 50% !important;
+  background: #22c55e !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15) !important;
+}
+
+.admin-page .admin-syncDot.is-loading {
+  background: #f59e0b !important;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18) !important;
+  animation: adminPulse 1s ease-in-out infinite;
+}
+
+@keyframes adminPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.45; }
+}
+
+/* ── Scrollports (critical) ── */
+@media (min-width: 1101px) {
+  .admin-page.admin-page--app .admin-main > .admin-overview,
+  .admin-page.admin-page--app .admin-main > .admin-workspaceScroll,
+  .admin-page.admin-page--app .admin-main > .admin-settingsGrid,
+  .admin-page.admin-page--app .admin-main > .admin-workspaceScroll.admin-settingsGrid {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 20px !important;
+  }
+
+  .admin-page.admin-page--app .admin-main > .admin-workspacePane,
+  .admin-page.admin-page--app .admin-main > .admin-products,
+  .admin-page.admin-page--app .admin-main > .admin-ordersPanel,
+  .admin-page.admin-page--app .admin-main > .admin-promosPanel,
+  .admin-page.admin-page--app .admin-main > .admin-flashsalePanel,
+  .admin-page.admin-page--app .admin-main > .admin-testimonialsPanel {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .admin-page.admin-page--app .admin-main > .admin-products {
+    display: grid !important;
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr) !important;
+    gap: 12px !important;
+    min-width: 0 !important;
+  }
+
+  .admin-page.admin-page--app .admin-products-list .admin-panel-body--scroll {
+    scrollbar-gutter: stable !important;
+    overflow-x: hidden !important;
+    padding-right: 14px !important;
+  }
+}
+
+/* ── Priority board (overview) ── */
+.admin-page .admin-priorityBoard {
+  padding: 14px 16px 16px !important;
+  border-radius: var(--adm-radius-lg) !important;
+  border: 1px solid var(--adm-line) !important;
+  background: var(--adm-surface) !important;
+  box-shadow: var(--adm-shadow) !important;
+}
+
+.admin-page .admin-priorityBoardHead {
+  margin-bottom: 12px !important;
+}
+
+.admin-page .admin-sectionKicker {
+  font-size: 10.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--adm-text-3) !important;
+  margin-bottom: 4px !important;
+}
+
+.admin-page .admin-sectionTitle {
+  margin: 0 !important;
+  font-size: 17px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page .admin-priorityGrid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+@media (max-width: 1100px) {
+  .admin-page .admin-priorityGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 520px) {
+  .admin-page .admin-priorityGrid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+}
+
+.admin-page .admin-priorityCard {
+  display: grid !important;
+  gap: 4px !important;
+  text-align: left !important;
+  padding: 14px 12px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--adm-line) !important;
+  background: var(--adm-surface-soft) !important;
+  box-shadow: var(--adm-shadow-soft) !important;
+  cursor: pointer !important;
+  color: inherit !important;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.admin-page .admin-priorityCard:hover {
+  transform: translateY(-2px);
+  border-color: rgba(0, 194, 208, 0.3) !important;
+}
+
+.admin-page .admin-priorityIcon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 10px !important;
+  display: grid !important;
+  place-items: center !important;
+  margin-bottom: 4px !important;
+  color: #032235 !important;
+}
+
+.admin-page .admin-priorityIcon--orders {
+  background: linear-gradient(145deg, #4effda, #00a8b0) !important;
+}
+.admin-page .admin-priorityIcon--pay {
+  background: linear-gradient(145deg, #93c5fd, #3b82f6) !important;
+}
+.admin-page .admin-priorityIcon--stock {
+  background: linear-gradient(145deg, #fcd34d, #f59e0b) !important;
+}
+.admin-page .admin-priorityIcon--flash {
+  background: linear-gradient(145deg, #f9a8d4, #ec4899) !important;
+}
+
+.admin-page .admin-priorityCard strong {
+  font-size: 24px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.04em !important;
+  color: var(--adm-text) !important;
+  line-height: 1 !important;
+}
+
+.admin-page .admin-priorityCard > span:not(.admin-priorityIcon) {
+  font-size: 12.5px !important;
+  font-weight: 750 !important;
+  color: var(--adm-text-2) !important;
+}
+
+.admin-page .admin-priorityCard small {
+  font-size: 11px !important;
+  color: var(--adm-text-3) !important;
+  line-height: 1.3 !important;
+}
+
+/* Overview stack */
+.admin-page .admin-overview.admin-workspaceScroll {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 12px !important;
+}
+
+/* Panel heads with actions */
+.admin-page .admin-panel-head--split {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.admin-page .admin-panel-headActions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+/* Workspace pane surface */
+.admin-page .admin-workspacePane {
+  border-radius: var(--adm-radius-lg) !important;
+}
+
+/* Alert dismissible */
+.admin-page .admin-alert {
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  flex-shrink: 0 !important;
+  padding: 12px 14px !important;
+  border-radius: 14px !important;
+}
+
+.admin-page .admin-alert span {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  font-size: 13px !important;
+  line-height: 1.4 !important;
+}
+
+.admin-page .admin-alertDismiss {
+  border: none !important;
+  background: transparent !important;
+  color: inherit !important;
+  opacity: 0.6 !important;
+  cursor: pointer !important;
+  padding: 2px !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+.admin-page .admin-alert.is-error {
+  border-color: rgba(239, 68, 68, 0.3) !important;
+  background: linear-gradient(145deg, rgba(239, 68, 68, 0.1), transparent 55%),
+    var(--adm-surface) !important;
+}
+
+/* Initial load */
+.admin-page .admin-initialLoad {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow: hidden !important;
+}
+
+.admin-page .admin-initialLoadCard {
+  padding: 18px !important;
+  border-radius: var(--adm-radius-lg) !important;
+  border: 1px solid var(--adm-line) !important;
+  background: var(--adm-surface) !important;
+  box-shadow: var(--adm-shadow) !important;
+}
+/* Order toolbar + sticky tools: no outer box */
+.admin-page .admin-orderToolbar,
+.admin-page .admin-orderToolbar--sticky,
+.admin-page .admin-stickyTools {
+  display: grid !important;
+  gap: 10px !important;
+  margin: 0 0 12px !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+}
+
+/* Order search uses plain .input — same as Produk search */
+.admin-page .admin-orderToolbar > .input {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+/* Promo search: icon only; single .input surface */
+.admin-page .admin-promo-search {
+  position: relative !important;
+  margin: 0 !important;
+  width: 100% !important;
+  padding: 0 !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.admin-page .admin-promo-searchIcon {
+  position: absolute !important;
+  left: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  opacity: 0.5 !important;
+  pointer-events: none !important;
+  z-index: 1 !important;
+  color: var(--adm-text-3, rgba(62, 91, 103, 0.65)) !important;
+}
+
+.admin-page .admin-promo-searchInput,
+.admin-page .admin-promo-search .input {
+  width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  padding-left: 40px !important;
+}
+
+.admin-page .admin-orderStatsStrip {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin-bottom: 14px !important;
+}
+
+@media (max-width: 720px) {
+  .admin-page .admin-orderStatsStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+.admin-page .admin-orderStat {
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--adm-line) !important;
+  background: var(--adm-surface-soft) !important;
+  box-shadow: var(--adm-shadow-soft) !important;
+  display: grid !important;
+  gap: 2px !important;
+}
+
+.admin-page .admin-orderStat span {
+  font-size: 10.5px !important;
+  font-weight: 750 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  color: var(--adm-text-3) !important;
+}
+
+.admin-page .admin-orderStat strong {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.03em !important;
+  color: var(--adm-text) !important;
+}
+
+/* Product list scrollport — reserve gutter so rows aren't sliced by scrollbar */
+.admin-page .admin-products-list {
+  min-width: 0 !important;
+}
+
+.admin-page .admin-products-list .admin-panel-body,
+.admin-page .admin-products-list .admin-panel-body--scroll {
+  min-width: 0 !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  scrollbar-gutter: stable !important;
+  padding-right: 14px !important;
+  box-sizing: border-box !important;
+}
+
+.admin-page .admin-products-list .admin-list,
+.admin-page .admin-products-list .admin-list--dense {
+  min-width: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+}
+
+/* Product list rows — chunky neo, active = pressed slab not thin ring */
+.admin-page .admin-product-row {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  padding: 12px !important;
+  border-radius: 16px !important;
+  border: 2px solid var(--brand-line, rgba(255, 255, 255, 0.1)) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 36%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.04)) !important;
+  box-shadow:
+    0 4px 10px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  overflow: hidden !important; /* keep pill + text inside card bounds */
+  transition: transform 0.15s ease, filter 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+.admin-page .admin-product-row:hover {
+  filter: brightness(1.04);
+  transform: translateY(-1px);
+}
+
+.admin-page .admin-product-row.active {
+  border: 2px solid rgba(0, 200, 180, 0.55) !important;
+  background:
+    linear-gradient(165deg, rgba(0, 214, 180, 0.32) 0%, rgba(0, 100, 110, 0.28) 100%),
+    var(--skeu-control-bg, rgba(0, 40, 50, 0.35)) !important;
+  box-shadow:
+    0 8px 18px rgba(0, 60, 70, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2) !important;
+  filter: none !important;
+  transform: none !important;
+}
+
+html[data-theme="light"] .admin-page .admin-product-row {
+  border: 2px solid rgba(120, 165, 180, 0.22) !important;
+  background:
+    linear-gradient(180deg, #ffffff, #eef6f9) !important;
+  box-shadow:
+    0 4px 12px rgba(70, 120, 140, 0.1),
+    inset 0 1px 0 #fff !important;
+}
+
+html[data-theme="light"] .admin-page .admin-product-row.active {
+  border: 2px solid rgba(0, 130, 140, 0.45) !important;
+  background:
+    linear-gradient(165deg, #c8f2ed 0%, #9fdfd8 55%, #8ad4ce 100%) !important;
+  box-shadow:
+    0 6px 16px rgba(0, 100, 110, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -2px 0 rgba(0, 90, 100, 0.12) !important;
+}
+
+.admin-page .admin-product-row-left {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-product-icon {
+  width: 40px !important;
+  height: 40px !important;
+  border-radius: 12px !important;
+  object-fit: cover !important;
+  flex-shrink: 0 !important;
+  border: 1px solid var(--adm-line) !important;
+  background: var(--adm-surface-inset) !important;
+}
+
+.admin-page .admin-product-icon-fallback {
+  display: grid !important;
+  place-items: center !important;
+  font-weight: 800 !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page .admin-product-name {
+  font-size: 13.5px !important;
+  font-weight: 750 !important;
+  color: var(--adm-text) !important;
+  letter-spacing: -0.02em !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+}
+
+.admin-page .admin-product-sub {
+  font-size: 11px !important;
+  color: var(--adm-text-3) !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-product-row-left > div:last-child {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.admin-page .admin-product-pill {
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+}
+
+/* Promo strip */
+.admin-page .admin-promo-strip {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  margin: 12px 0 !important;
+}
+
+@media (max-width: 720px) {
+  .admin-page .admin-promo-strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+.admin-page .admin-promo-stripItem {
+  padding: 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--adm-line) !important;
+  background: var(--adm-surface-soft) !important;
+  box-shadow: var(--adm-shadow-soft) !important;
+  display: grid !important;
+  gap: 2px !important;
+  text-align: center !important;
+}
+
+.admin-page .admin-promo-stripItem strong {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  color: var(--adm-text) !important;
+  letter-spacing: -0.03em !important;
+}
+
+.admin-page .admin-promo-stripItem span {
+  font-size: 11px !important;
+  color: var(--adm-text-3) !important;
+  font-weight: 700 !important;
+}
+
+/* Settings: always single-column stack (no broken 2-col spill) */
+.admin-page .admin-settingsGrid {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  align-items: stretch !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-settingsGrid > .admin-panel,
+.admin-page .admin-settingsGrid > .admin-panelWide {
+  grid-column: auto !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-settingsGrid .admin-panel-body {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 14px !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+.admin-page .admin-settingsGrid .admin-form-grid {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 14px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-settingsGrid .admin-field,
+.admin-page .admin-settingsGrid .admin-field-full {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-settingsGrid .admin-field .input,
+.admin-page .admin-settingsGrid .admin-field input,
+.admin-page .admin-settingsGrid .admin-field textarea {
+  width: 100% !important;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.admin-page .admin-settingsGrid .admin-form-actions {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 10px !important;
+  justify-content: flex-start !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding-top: 4px !important;
+  position: static !important;
+  float: none !important;
+}
+
+.admin-page .admin-settingsGrid .admin-stack {
+  display: grid !important;
+  gap: 10px !important;
+}
+
+/* Inline stats chips — ALL breakpoints (was mobile-only → text glued on desktop) */
+.admin-page .admin-inlineStats {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-inlineStats > span {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  border: 1px solid var(--adm-line, rgba(120, 165, 180, 0.22)) !important;
+  background: var(--adm-surface-soft, rgba(255, 255, 255, 0.7)) !important;
+  box-shadow: var(--adm-shadow-soft, none) !important;
+  color: var(--adm-text-2, rgba(23, 56, 73, 0.85)) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  font-family: inherit !important;
+  white-space: nowrap !important;
+  line-height: 1.2 !important;
+}
+
+.admin-page .admin-inlineStats > span strong {
+  color: var(--adm-text, #0d2d39) !important;
+  font-weight: 800 !important;
+  font-size: 12.5px !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.admin-page .admin-inlineStats > span.is-warn {
+  border-color: rgba(217, 119, 6, 0.35) !important;
+  background: rgba(255, 237, 213, 0.85) !important;
+  color: #9a3412 !important;
+}
+
+.admin-page .admin-inlineStats > span.is-warn strong {
+  color: #c2410c !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-inlineStats > span,
+:root[data-theme="dark"] .admin-page .admin-inlineStats > span {
+  background: rgba(255, 255, 255, 0.06) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color: rgba(220, 240, 255, 0.75) !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-inlineStats > span strong,
+:root[data-theme="dark"] .admin-page .admin-inlineStats > span strong {
+  color: #f0fffc !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-inlineStats > span.is-warn,
+:root[data-theme="dark"] .admin-page .admin-inlineStats > span.is-warn {
+  background: rgba(245, 158, 11, 0.14) !important;
+  border-color: rgba(245, 158, 11, 0.3) !important;
+  color: #fbbf24 !important;
+}
+
+/* Mobile shell — vertical scroll OK, horizontal scroll FORBIDDEN */
+@media (max-width: 1100px) {
+  html:has(body.is-admin-app),
+  body.is-admin-app {
+    overflow-x: hidden !important; /* clip/hidden — block sideways swipe */
+    overflow-y: auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    position: relative !important;
+  }
+
+  /* Beat global .app-main-admin { overflow: visible !important } */
+  body.is-admin-app .app-shell--admin,
+  body.is-admin-app .app-main-admin,
+  body.is-admin-app .app-main-admin > .route-transition,
+  body.is-admin-app .app-main-admin > .route-transition > .admin-page {
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  body.is-admin-app .app-main-admin {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .admin-page.admin-page--app {
+    height: auto !important;
+    max-height: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .admin-page.admin-page--app > .admin-section {
+    height: auto !important;
+    max-height: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    padding: 10px 10px calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-page.admin-page--app .admin-shell {
+    grid-template-columns: minmax(0, 1fr) !important;
+    height: auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .admin-page.admin-page--app .adm-sidebar {
+    display: none !important;
+  }
+
+  .admin-page.admin-page--app .admin-main {
+    height: auto !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+
+  .admin-page.admin-page--app .admin-main > * {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-page.admin-page--app .admin-main > .admin-overview,
+  .admin-page.admin-page--app .admin-main > .admin-workspaceScroll,
+  .admin-page.admin-page--app .admin-main > .admin-workspacePane,
+  .admin-page.admin-page--app .admin-main > .admin-products,
+  .admin-page.admin-page--app .admin-main > .admin-ordersPanel,
+  .admin-page.admin-page--app .admin-main > .admin-promosPanel,
+  .admin-page.admin-page--app .admin-main > .admin-flashsalePanel,
+  .admin-page.admin-page--app .admin-main > .admin-testimonialsPanel,
+  .admin-page.admin-page--app .admin-main > .admin-settingsGrid {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .admin-page.admin-page--app .admin-main > .admin-products {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  /* Common wide children that push the page sideways */
+  .admin-page.admin-page--app .admin-panel,
+  .admin-page.admin-page--app .admin-panel-body,
+  .admin-page.admin-page--app .admin-panel-body--scroll,
+  .admin-page.admin-page--app .admin-orderToolbar,
+  .admin-page.admin-page--app .admin-exportDates,
+  .admin-page.admin-page--app .admin-chipRow,
+  .admin-page.admin-page--app .admin-stats,
+  .admin-page.admin-page--app .admin-miniGrid,
+  .admin-page.admin-page--app .admin-miniGridHero,
+  .admin-page.admin-page--app .admin-overviewGrid,
+  .admin-page.admin-page--app .admin-promo-grid,
+  .admin-page.admin-page--app .admin-promo-strip,
+  .admin-page.admin-page--app .admin-orderStatsStrip,
+  .admin-page.admin-page--app .admin-priorityGrid,
+  .admin-page.admin-page--app .admin-form-grid,
+  .admin-page.admin-page--app .admin-list,
+  .admin-page.admin-page--app .admin-workspaceToolbar,
+  .admin-page.admin-page--app table,
+  .admin-page.admin-page--app .admin-table {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-page.admin-page--app .admin-miniGridHero,
+  .admin-page.admin-page--app .admin-stats,
+  .admin-page.admin-page--app .admin-overviewGrid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .admin-page.admin-page--app .admin-priorityGrid,
+  .admin-page.admin-page--app .admin-promo-strip,
+  .admin-page.admin-page--app .admin-orderStatsStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-page.admin-page--app .admin-exportDates {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 8px !important;
+    width: 100% !important;
+  }
+
+  .admin-page.admin-page--app .admin-exportDates label,
+  .admin-page.admin-page--app .admin-exportDates .input {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+
+  .admin-page.admin-page--app .admin-chipRow {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    max-width: 100% !important;
+  }
+
+  .admin-page.admin-page--app .admin-panel-head--split {
+    flex-wrap: wrap !important;
+  }
+
+  .admin-page.admin-page--app .admin-panel-headActions {
+    width: 100% !important;
+  }
+
+  .admin-page.admin-page--app .admin-workspaceToolbar {
+    flex-wrap: wrap !important;
+  }
+
+  .admin-page.admin-page--app img,
+  .admin-page.admin-page--app svg,
+  .admin-page.admin-page--app video,
+  .admin-page.admin-page--app canvas {
+    max-width: 100% !important;
+  }
+
+  .admin-page.admin-page--app .admin-topbar-current {
+    min-width: 0 !important;
+  }
+
+  /* Horizontal scroll only inside intentional toolbars, not the page */
+  .admin-page.admin-page--app .admin-chipRow.is-scroll,
+  .admin-page.admin-page--app .admin-nav {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    overscroll-behavior-x: contain !important;
+  }
+}
+
+/* Dock clearance already handled; refine dock look */
+.adm-dock {
+  z-index: 80 !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Admin modals — mobile bottom sheet, compact, no chrome fight
+   ═══════════════════════════════════════════════════════════════════ */
+.modal-backdrop {
+  z-index: 12000 !important; /* above admin dock (80) */
+}
+
+.modal--sm {
+  width: min(440px, 100%);
+}
+
+.modal-actions--fill {
+  display: grid !important;
+  grid-template-columns: 1fr 1.2fr !important;
+  gap: 8px !important;
+  width: 100% !important;
+}
+
+.modal-actions--fill .btn {
+  width: 100% !important;
+  min-height: 44px !important;
+}
+
+/* Styled file picker (hide ugly native control) */
+.admin-fileBtn {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 38px !important;
+  padding: 0 14px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.12)) !important;
+  background: var(--adm-surface-soft, rgba(255, 255, 255, 0.06)) !important;
+  box-shadow: var(--adm-shadow-soft, none) !important;
+  color: var(--adm-text, inherit) !important;
+  font-size: 13px !important;
+  font-weight: 700 !important;
+  font-family: inherit !important;
+  cursor: pointer !important;
+  width: fit-content !important;
+}
+
+.admin-fileBtn input[type="file"] {
+  position: absolute !important;
+  inset: 0 !important;
+  opacity: 0 !important;
+  cursor: pointer !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.admin-form-grid--modal {
+  gap: 12px !important;
+}
+
+.admin-form-grid--modal .admin-field {
+  gap: 6px !important;
+}
+
+.admin-form-grid--modal .admin-icon-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+}
+
+.admin-form-grid--modal .admin-icon-preview {
+  width: 56px !important;
+  height: 56px !important;
+  border-radius: 14px !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-form-grid--modal .admin-icon-actions {
+  display: grid !important;
+  gap: 6px !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.admin-form-grid--modal .admin-textarea--short {
+  min-height: 64px !important;
+  resize: vertical !important;
+}
+
+.admin-form-grid--modal .admin-formHint {
+  margin: 0 !important;
+  font-size: 12px !important;
+  line-height: 1.4 !important;
+  opacity: 0.75 !important;
+}
+
+.admin-form-grid--modal .admin-field-switch {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  padding: 10px 12px !important;
+  border-radius: 12px !important;
+  border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.1)) !important;
+  background: var(--adm-surface-inset, rgba(0, 0, 0, 0.12)) !important;
+}
+
+.admin-form-grid--modal .admin-field-switch span {
+  flex: 1 1 auto !important;
+}
+
+.admin-form-grid--modal .admin-field-switch input[type="checkbox"] {
+  width: 18px !important;
+  height: 18px !important;
+  min-height: 18px !important;
+  flex-shrink: 0 !important;
+}
+
+@media (max-width: 720px) {
+  .modal-backdrop {
+    align-items: flex-end !important;
+    justify-content: center !important;
+    padding: 0 !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    background: rgba(0, 0, 0, 0.55) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    overflow: hidden !important;
+  }
+
+  .modal,
+  .modal--sm,
+  .modal--md,
+  body:has(.admin-page) .modal,
+  .admin-page ~ .modal-backdrop .modal {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    border-radius: 18px 18px 0 0 !important;
+    max-height: min(88dvh, calc(100dvh - env(safe-area-inset-top, 0px) - 8px)) !important;
+    height: auto !important;
+    box-shadow:
+      0 -12px 40px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    border-left: none !important;
+    border-right: none !important;
+    border-bottom: none !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .modal-head {
+    flex-shrink: 0 !important;
+    padding: 12px 14px !important;
+    gap: 8px !important;
+  }
+
+  .modal-title {
+    font-size: 16px !important;
+    font-weight: 800 !important;
+    font-family: inherit !important;
+    letter-spacing: normal !important;
+    line-height: 1.2 !important;
+  }
+
+  .modal-close {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 12px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .modal-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: contain !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 12px 14px 10px !important;
+  }
+
+  .modal-foot {
+    flex-shrink: 0 !important;
+    padding: 10px 14px calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    border-top: 1px solid var(--adm-line, rgba(255, 255, 255, 0.08)) !important;
+  }
+
+  .modal-body .admin-form-grid,
+  .modal-body .admin-form-grid--simple,
+  .modal-body .admin-form-grid--modal {
+    gap: 10px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .modal-body .admin-field,
+  .modal-body .input,
+  .modal-body select,
+  .modal-body textarea {
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .modal-body .input,
+  .modal-body select,
+  .modal-body textarea {
+    min-height: 42px !important;
+    font-size: 16px !important; /* prevent iOS zoom */
+    border-radius: 12px !important;
+  }
+
+  .modal-body textarea {
+    min-height: 56px !important;
+  }
+
+  .modal-body .admin-field > span {
+    font-size: 12px !important;
+    font-weight: 700 !important;
+  }
+
+  /* Hide dock while any modal is open so sheet isn't covered */
+  body:has(.modal-backdrop) .adm-dock,
+  body:has(.modal-backdrop) .adm-moreSheet {
+    visibility: hidden !important;
+    pointer-events: none !important;
+  }
+}
+
+html[data-theme="light"] .admin-fileBtn {
+  background: #fff !important;
+  border-color: rgba(119, 175, 194, 0.22) !important;
+  color: #0d2d39 !important;
+}
+
+html[data-theme="light"] .modal-body .admin-field-switch {
+  background: rgba(232, 242, 246, 0.9) !important;
+  border-color: rgba(119, 175, 194, 0.2) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   MOBILE UX MAX — less scroll, sticky tools, denser work panes
+   ═══════════════════════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .admin-desktopOnly {
+    display: none !important;
+  }
+
+  .admin-page .admin-workspaceToolbar {
+    padding: 6px 10px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .admin-page .admin-panel-sub {
+    font-size: 12px !important;
+  }
+
+  .admin-page .admin-panel-head {
+    padding: 12px 12px 0 !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 5 !important;
+    background: inherit !important;
+  }
+
+  .admin-page .admin-panel-body,
+  .admin-page .admin-panel-body--scroll {
+    padding: 10px 12px 18px !important;
+  }
+
+  /* Sticky tools: no outer chrome (search has its own single box) */
+  .admin-page .admin-stickyTools,
+  .admin-page .admin-orderToolbar--sticky {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 4 !important;
+    display: grid !important;
+    gap: 8px !important;
+    padding: 0 0 10px !important;
+    margin: 0 0 4px !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  html[data-theme="light"] .admin-page .admin-stickyTools,
+  html[data-theme="light"] .admin-page .admin-orderToolbar--sticky {
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .admin-page .admin-inlineStats > span {
+    min-height: 28px !important;
+    padding: 0 9px !important;
+    font-size: 11.5px !important;
+  }
+
+  .admin-page .admin-chipRow--scroll {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 8px !important;
+    overflow-x: auto !important;
+    max-width: 100% !important;
+    padding-bottom: 2px !important;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .admin-page .admin-chipRow--scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .admin-page .admin-chipRow--scroll .admin-chip {
+    flex: 0 0 auto !important;
+    min-height: 36px !important;
+    padding: 0 12px !important;
+    white-space: nowrap !important;
+  }
+
+  .admin-page .admin-toolsToggle {
+    width: 100% !important;
+    min-height: 36px !important;
+    border-radius: 10px !important;
+    border: 1px dashed var(--adm-line) !important;
+    background: transparent !important;
+    color: var(--adm-text-3) !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    font-family: inherit !important;
+    cursor: pointer !important;
+  }
+
+  .admin-page .admin-orderToolsExtra {
+    display: none !important;
+    gap: 8px !important;
+  }
+
+  .admin-page .admin-orderToolsExtra.is-open {
+    display: grid !important;
+  }
+
+  /* Hide bulky 4-card stats strips on mobile (replaced by inline stats) */
+  .admin-page .admin-orderStatsStrip,
+  .admin-page .admin-promo-strip {
+    display: none !important;
+  }
+
+  /* ── Orders: dense cards (no nested button surfaces) ── */
+  .admin-page .admin-ordersList--dense {
+    display: grid !important;
+    gap: 8px !important;
+  }
+
+  .admin-page .admin-orderListItem {
+    display: grid !important;
+    grid-template-columns: 28px minmax(0, 1fr) !important;
+    gap: 8px 10px !important;
+    padding: 12px !important;
+    border-radius: 16px !important;
+    border: 1px solid var(--adm-line, rgba(120, 165, 180, 0.22)) !important;
+    background: var(--adm-surface-soft, #fff) !important;
+    box-shadow: var(--adm-shadow-soft) !important;
+    align-items: start !important;
+  }
+
+  .admin-page .admin-orderListItem .admin-orderListMain {
+    min-width: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .admin-page .admin-orderListItem .admin-orderListRight {
+    grid-column: 1 / -1 !important;
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 8px !important;
+    align-items: center !important;
+    width: 100% !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .admin-page .admin-orderListTop {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 8px !important;
+  }
+
+  .admin-page .admin-orderListBottom {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    margin-top: 4px !important;
+  }
+
+  .admin-page .admin-order-code {
+    font-size: 13.5px !important;
+    font-weight: 800 !important;
+  }
+
+  .admin-page .admin-order-sub {
+    font-size: 11.5px !important;
+    line-height: 1.35 !important;
+    margin-top: 2px !important;
+  }
+
+  .admin-page .admin-orderTotal {
+    font-size: 15px !important;
+  }
+
+  .admin-page .admin-orderInlineSelect {
+    min-height: 40px !important;
+    font-size: 14px !important;
+    flex: 1 1 140px !important;
+    width: auto !important;
+    max-width: 100% !important;
+  }
+
+  .admin-page .admin-orderRowActions {
+    display: flex !important;
+    gap: 6px !important;
+    flex-shrink: 0 !important;
+  }
+
+  .admin-page .admin-orderRowActions .btn {
+    min-height: 40px !important;
+    padding: 0 12px !important;
+  }
+
+  .admin-page .admin-bulkBar--sticky {
+    position: sticky !important;
+    top: 118px !important;
+    z-index: 3 !important;
+  }
+
+  .admin-page .admin-bulkSelectAll {
+    margin: 0 0 8px !important;
+  }
+
+  .admin-page .admin-checkLabel {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+    font-size: 13px !important;
+    cursor: pointer !important;
+  }
+
+  .admin-page .admin-emptyWrap {
+    padding: 24px 8px !important;
+  }
+
+  /* ── Products: list OR editor (not both) ── */
+  .admin-page .admin-products {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 0 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+
+  .admin-page .admin-products.has-selection .admin-products-list {
+    display: none !important;
+  }
+
+  .admin-page .admin-products:not(.has-selection) .admin-products-editor {
+    display: none !important;
+  }
+
+  .admin-page .admin-products:not(.has-selection) .admin-products-editorEmpty {
+    display: none !important;
+  }
+
+  /* Single clean surface — avoid nested double-box look on mobile */
+  .admin-page .admin-products > .admin-panel,
+  .admin-page .admin-products-list,
+  .admin-page .admin-products-editor {
+    min-width: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    border-radius: 20px !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Form fields were clipped on the right by overflow + tight padding + 2-col grid */
+  .admin-page .admin-products-editor .admin-panel-body,
+  .admin-page .admin-products-editor .admin-panel-body--scroll {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    scrollbar-gutter: stable !important;
+    padding: 12px 16px calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .admin-page .admin-products-editor .admin-form-grid,
+  .admin-page .admin-products-editor .admin-form-grid--simple {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    gap: 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-page .admin-products-editor .admin-field,
+  .admin-page .admin-products-editor .admin-field-full {
+    display: grid !important;
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .admin-page .admin-products-editor .admin-field .input,
+  .admin-page .admin-products-editor .admin-field input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+  .admin-page .admin-products-editor .admin-field textarea,
+  .admin-page .admin-products-editor .admin-field select {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    display: block !important;
+  }
+
+  .admin-page .admin-products-editor .admin-icon-row,
+  .admin-page .admin-products-editor .admin-form-actions {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    flex-wrap: wrap !important;
+  }
+
+  .admin-page .admin-productsEditorChrome {
+    display: grid !important;
+    gap: 10px !important;
+    padding: 12px 14px 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  /* Dedicated back control — not a stacked ghost btn inside title */
+  .admin-page .admin-mobileBack {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 8px !important;
+    width: fit-content !important;
+    max-width: 100% !important;
+    min-height: 40px !important;
+    margin: 0 !important;
+    padding: 0 14px 0 12px !important;
+    border-radius: 999px !important;
+    border: 1px solid var(--adm-line, rgba(120, 165, 180, 0.22)) !important;
+    background: var(--adm-surface-soft, rgba(255, 255, 255, 0.06)) !important;
+    box-shadow: none !important;
+    color: var(--adm-text, #eef8f4) !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    font-family: inherit !important;
+    line-height: 1 !important;
+    cursor: pointer !important;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .admin-page .admin-mobileBack:active {
+    transform: scale(0.98);
+    filter: brightness(0.98);
+  }
+
+  html[data-theme="light"] .admin-page .admin-mobileBack {
+    background: #fff !important;
+    border-color: rgba(119, 175, 194, 0.28) !important;
+    color: #0d3a48 !important;
+    box-shadow: 0 2px 8px rgba(40, 94, 117, 0.08) !important;
+  }
+
+  /* Product editor head: keep title + actions on one logical row when space allows */
+  .admin-page .admin-products-editor .admin-panel-head,
+  .admin-page .admin-productsEditorHead {
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    padding: 0 !important;
+    width: 100% !important;
+  }
+
+  .admin-page .admin-panel-headMain {
+    display: grid !important;
+    gap: 2px !important;
+    min-width: 0 !important;
+    flex: 1 1 160px !important;
+  }
+
+  .admin-page .admin-products-editor .admin-head-actions,
+  .admin-page .admin-products-editor .admin-panel-headActions {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    gap: 8px !important;
+    width: auto !important;
+    flex: 0 1 auto !important;
+  }
+
+  .admin-page .admin-products-editor .admin-head-actions .btn,
+  .admin-page .admin-products-editor .admin-panel-headActions .btn {
+    min-height: 36px !important;
+    flex: 0 0 auto !important;
+  }
+
+  .admin-page .admin-product-row {
+    padding: 10px !important;
+  }
+
+  .admin-page .admin-product-sub {
+    font-size: 11px !important;
+  }
+
+  .admin-page .admin-list--dense {
+    display: grid !important;
+    gap: 8px !important;
+    margin-top: 8px !important;
+  }
+
+  /* ── Overview denser ── */
+  .admin-page .admin-priorityBoard {
+    padding: 12px !important;
+  }
+
+  .admin-page .admin-priorityGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .admin-page .admin-priorityCard {
+    padding: 12px 10px !important;
+  }
+
+  .admin-page .admin-priorityCard strong {
+    font-size: 22px !important;
+  }
+
+  .admin-page .admin-stats--compact {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .admin-page .admin-statCard {
+    min-height: 0 !important;
+    padding: 10px !important;
+    gap: 4px !important;
+  }
+
+  .admin-page .admin-statValue {
+    font-size: 18px !important;
+  }
+
+  .admin-page .admin-statHelper {
+    display: none !important;
+  }
+
+  /* Collapse heavy analytics blocks a bit */
+  .admin-page .admin-overviewHero .admin-panel-sub {
+    display: none !important;
+  }
+
+  .admin-page .admin-overviewGrid {
+    gap: 10px !important;
+  }
+
+  .admin-page .admin-chartList {
+    gap: 8px !important;
+  }
+
+  /* Promo / flash / testimonials denser */
+  .admin-page .admin-promo-card,
+  .admin-page .admin-thumb {
+    border-radius: 14px !important;
+  }
+
+  .admin-page .admin-testimonial-form {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 8px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .admin-page .admin-testimonial-form .admin-fileBtn {
+    width: 100% !important;
+  }
+
+  /* Settings: single column dense */
+  .admin-page .admin-settingsGrid {
+    gap: 10px !important;
+  }
+
+  .admin-page .admin-form-grid {
+    gap: 10px !important;
+  }
+}
+
+@media (min-width: 1101px) {
+  .admin-mobileBack {
+    display: none !important;
+  }
+
+  .admin-page .admin-productsEditorChrome {
+    display: block !important;
+    padding: 16px 18px 0 !important;
+    gap: 0 !important;
+  }
+
+  .admin-page .admin-productsEditorHead {
+    padding: 0 !important;
+  }
+
+  .admin-page .admin-toolsToggle {
+    display: none !important;
+  }
+
+  .admin-page .admin-orderToolsExtra,
+  .admin-page .admin-orderToolsExtra.is-open {
+    display: grid !important;
+    grid-template-columns: 1fr auto !important;
+    gap: 12px !important;
+    align-items: end !important;
+  }
+
+  .admin-page .admin-orderToolbar--sticky {
+    display: grid !important;
+    gap: 12px !important;
+    position: static !important;
+  }
+
+  /* Desktop order row: checkbox | info | actions — single clean card */
+  .admin-page .admin-ordersList--dense {
+    display: grid !important;
+    gap: 10px !important;
+  }
+
+  .admin-page .admin-orderListItem {
+    display: grid !important;
+    grid-template-columns: 28px minmax(0, 1fr) minmax(200px, 260px) !important;
+    gap: 12px 14px !important;
+    align-items: center !important;
+    padding: 14px 16px !important;
+    border-radius: 18px !important;
+    border: 1px solid var(--adm-line, rgba(120, 165, 180, 0.2)) !important;
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(245, 251, 253, 0.95)) !important;
+    box-shadow:
+      0 4px 12px rgba(70, 110, 130, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  }
+
+  html[data-theme="dark"] .admin-page .admin-orderListItem,
+  :root[data-theme="dark"] .admin-page .admin-orderListItem {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02)),
+      var(--skeu-control-bg, rgba(255, 255, 255, 0.04)) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: var(--skeu-control-shadow, none) !important;
+  }
+
+  .admin-page .admin-orderListItem.is-selected {
+    border-color: rgba(0, 160, 150, 0.4) !important;
+    background:
+      linear-gradient(165deg, rgba(0, 214, 180, 0.12), rgba(0, 194, 208, 0.05)),
+      var(--adm-surface-soft, #fff) !important;
+  }
+
+  .admin-page .admin-orderListMain {
+    min-width: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    display: grid !important;
+    gap: 4px !important;
+  }
+
+  .admin-page .admin-orderListTop {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+  }
+
+  .admin-page .admin-orderListBottom {
+    display: flex !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .admin-page .admin-orderListItem .admin-orderListRight {
+    grid-column: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  .admin-page .admin-orderInlineSelect {
+    width: 100% !important;
+    min-height: 38px !important;
+  }
+
+  .admin-page .admin-orderRowActions {
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 6px !important;
+  }
+
+  .admin-page .admin-orderTotal {
+    font-size: 18px !important;
+    font-weight: 800 !important;
+  }
+
+  /* Checkbox: plain control, no neo green slab */
+  .admin-page .admin-orderListCheckbox {
+    display: grid !important;
+    place-items: center !important;
+    width: 28px !important;
+    height: 28px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .admin-page .admin-orderCheck {
+    width: 18px !important;
+    height: 18px !important;
+    min-width: 18px !important;
+    min-height: 18px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    accent-color: #0b8292 !important;
+    background: #fff !important;
+    border: 1.5px solid rgba(100, 140, 155, 0.45) !important;
+    border-radius: 4px !important;
+    box-shadow: none !important;
+    appearance: auto !important;
+    -webkit-appearance: auto !important;
+  }
+}
+
+/* Checkbox reset for all breakpoints (overrides neo input styles) */
+.admin-page .admin-orderListCheckbox {
+  display: grid !important;
+  place-items: center !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  height: auto !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  cursor: pointer !important;
+}
+
+/* Beat .admin-page input { min-height: 42px; neo surface } on checkboxes */
+.admin-page .admin-orderCheck,
+.admin-page .admin-orderListCheckbox input[type="checkbox"],
+.admin-page .admin-checkLabel input[type="checkbox"],
+.admin-page input.admin-orderCheck,
+.admin-page input[type="checkbox"].admin-orderCheck {
+  width: 18px !important;
+  height: 18px !important;
+  min-width: 18px !important;
+  max-width: 18px !important;
+  min-height: 18px !important;
+  max-height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  flex-shrink: 0 !important;
+  accent-color: #0b8292 !important;
+  background: #fff !important;
+  background-image: none !important;
+  border: 1.5px solid rgba(100, 140, 155, 0.5) !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+  appearance: checkbox !important;
+  -webkit-appearance: checkbox !important;
+  -moz-appearance: checkbox !important;
+  cursor: pointer !important;
+}
+
+.admin-page .admin-orderListMain {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Kill leftover tap-button styles if any */
+.admin-page .admin-orderListMain--tap,
+.admin-page button.admin-orderListMain {
+  all: unset !important;
+  display: grid !important;
+  gap: 4px !important;
+  min-width: 0 !important;
+  width: 100% !important;
+  cursor: pointer !important;
+  box-sizing: border-box !important;
+}
+
+.adm-moreSheetGrab {
+  width: 40px;
+  height: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 8px auto 4px;
+}
+
+html[data-theme="light"] .adm-moreSheetGrab {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+/* Light mode surfaces */
+html[data-theme="light"] .admin-page.admin-page--app .admin-workspaceToolbar,
+html[data-theme="light"] .admin-page.admin-page--app .adm-sidebar,
+html[data-theme="light"] .admin-page .admin-priorityBoard {
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.98), rgba(242, 250, 253, 0.95)) !important;
+  border-color: rgba(119, 175, 194, 0.22) !important;
+  box-shadow:
+    10px 14px 28px rgba(97, 137, 153, 0.12),
+    inset 0 1px 0 #fff !important;
+}
+
+/* FlowAssist + legacy topbar off (toolbar is enough) */
+.admin-page .admin-flowAssist {
+  display: none !important;
+}
+
+.admin-page.admin-page--app .admin-topbar {
+  display: none !important;
+}
+
+.admin-page.admin-page--app .admin-kpiStrip {
+  display: none !important;
+}
+
+.admin-page.admin-page--app .adm-mobileHead {
+  display: none !important;
+}
+
+/* Soften “Apple Settings” typography — keep store weight/spacing */
+.admin-page.admin-page--app .admin-panel-title,
+.admin-page.admin-page--app .admin-sectionTitle,
+.admin-page.admin-page--app .admin-heroTitle,
+.admin-page.admin-page--app .adm-navItemLabel,
+.admin-page.admin-page--app .adm-sidebarBrand strong {
+  letter-spacing: normal !important;
+  font-family: inherit !important;
+}
+
+.admin-page.admin-page--app .admin-sectionKicker,
+.admin-page.admin-page--app .adm-navGroupLabel,
+.admin-page.admin-page--app .admin-statLabel,
+.admin-page.admin-page--app .admin-topbar-eyebrow,
+.admin-page.admin-page--app .adm-nextFocusLabel {
+  letter-spacing: normal !important;
+  text-transform: none !important;
+  font-family: inherit !important;
+}
+
+.admin-page.admin-page--app .adm-navGroupLabel {
+  font-size: 11px !important;
+  font-weight: 700 !important;
+}
+
+/* Order search uses plain .input like other admin fields. */
+
+/* Order catalog filters + status filter menu */
+.admin-page .admin-orderFilterBar {
+  display: grid !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+.admin-page .admin-orderStatusMenu {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 8px !important;
+  padding: 10px !important;
+  border-radius: 14px !important;
+  border: 1px solid var(--adm-line, rgba(120, 165, 180, 0.22)) !important;
+  background: var(--adm-surface-soft, rgba(255, 255, 255, 0.75)) !important;
+  box-shadow: var(--adm-shadow-soft, none) !important;
+}
+
+.admin-page .admin-chip--filter {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+}
+
+.admin-page .admin-chipMeta {
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  opacity: 0.85 !important;
+  padding: 1px 6px !important;
+  border-radius: 999px !important;
+  background: rgba(0, 138, 148, 0.12) !important;
+}
+
+html[data-theme="dark"] .admin-page .admin-orderStatusMenu,
+:root[data-theme="dark"] .admin-page .admin-orderStatusMenu {
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+}

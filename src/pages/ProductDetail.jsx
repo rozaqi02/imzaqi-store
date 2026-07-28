@@ -316,70 +316,90 @@ const VariantCard = React.memo(({
   const out = stock <= 0;
   const disableEntranceAnim = isMotionOff || motionMode === "lite";
 
+  // Same card chrome for 1-variant and multi-variant products
   const cardProps = {
     role: "button",
     tabIndex: 0,
-    className: `pdx-packCard ${out ? "is-out" : ""} ${isRecommended ? "is-recommended" : ""} ${isSelected ? "is-selected" : ""} ${isAdded ? "is-added" : ""}`,
-    onClick: () => onSelect(variant.id),
+    className: [
+      "pdx-packCard",
+      out ? "is-out" : "",
+      isRecommended ? "is-recommended" : "",
+      isSelected ? "is-selected" : "",
+      isAdded ? "is-added" : "",
+    ]
+      .filter(Boolean)
+      .join(" "),
+    onClick: () => {
+      if (out) return;
+      onSelect(variant.id);
+    },
     onKeyDown: (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        onSelect(variant.id);
+        if (!out) onSelect(variant.id);
       }
     },
   };
 
+  const guaranteeLabel = variant.guarantee_text
+    ? String(variant.guarantee_text).toLowerCase().startsWith("garansi")
+      ? String(variant.guarantee_text)
+      : `Garansi ${variant.guarantee_text}`
+    : "";
+
   const cardChildren = (
     <>
       <div className="pdx-packHead">
-        <div className="pdx-packInfo">
-          {isRecommended ? (
-            <span className="pdx-packHot">
-              <Flame size={12} />
-              Paling Laris
-            </span>
-          ) : null}
-          <h3 className="pdx-packName">{variant.name}</h3>
-          <div className="pdx-packMeta">
-            <StockPill stock={variant.stock} />
-            {variant.duration_label ? (
-              <span className="pdx-packMetaItem">
-                <Clock3 size={12} />
-                {String(variant.duration_label).toLowerCase().startsWith("durasi")
-                  ? variant.duration_label
-                  : `Durasi ${variant.duration_label}`}
+        {/* Row 1: name + price — never compete with long guarantee chips */}
+        <div className="pdx-packTitleRow">
+          <div className="pdx-packInfo">
+            {isRecommended ? (
+              <span className="pdx-packHot">
+                <Flame size={12} />
+                Paling Laris
               </span>
             ) : null}
-            {variant.guarantee_text ? (
-              <span className="pdx-packMetaItem pdx-packMetaItem--guarantee">
-                <ShieldCheck size={12} />
-                {String(variant.guarantee_text).toLowerCase().startsWith("garansi")
-                  ? variant.guarantee_text
-                  : `Garansi ${variant.guarantee_text}`}
-              </span>
-            ) : null}
-            {variant.requires_buyer_email ? (
-              <span className="pdx-packMetaItem pdx-packMetaItem--emailRequired">
-                <Mail size={12} />
-                Butuh email
-              </span>
-            ) : null}
+            <h3 className="pdx-packName">{variant.name}</h3>
+          </div>
+          <div className="pdx-packPriceWrap">
+            {flashDiscount ? (
+              <>
+                <div className="pdx-packPrice pdx-variantPrice--flash">
+                  {formatIDR(effectivePrice)}
+                </div>
+                <div className="pdx-variantOriginalPrice">
+                  {formatIDR(variant.price_idr)}
+                </div>
+              </>
+            ) : (
+              <div className="pdx-packPrice">{formatIDR(variant.price_idr)}</div>
+            )}
           </div>
         </div>
 
-        <div className="pdx-packPriceWrap">
-          {flashDiscount ? (
-            <>
-              <div className="pdx-packPrice pdx-variantPrice--flash">
-                {formatIDR(effectivePrice)}
-              </div>
-              <div className="pdx-variantOriginalPrice">
-                {formatIDR(variant.price_idr)}
-              </div>
-            </>
-          ) : (
-            <div className="pdx-packPrice">{formatIDR(variant.price_idr)}</div>
-          )}
+        {/* Row 2: chips full width under title */}
+        <div className="pdx-packMeta">
+          <StockPill stock={variant.stock} />
+          {variant.duration_label ? (
+            <span className="pdx-packMetaItem">
+              <Clock3 size={12} aria-hidden="true" />
+              {String(variant.duration_label).toLowerCase().startsWith("durasi")
+                ? variant.duration_label
+                : `Durasi ${variant.duration_label}`}
+            </span>
+          ) : null}
+          {variant.requires_buyer_email ? (
+            <span className="pdx-packMetaItem pdx-packMetaItem--emailRequired">
+              <Mail size={12} aria-hidden="true" />
+              Butuh email
+            </span>
+          ) : null}
+          {guaranteeLabel ? (
+            <span className="pdx-packMetaItem pdx-packMetaItem--guarantee" title={guaranteeLabel}>
+              <ShieldCheck size={12} aria-hidden="true" />
+              <span className="pdx-packMetaItemText">{guaranteeLabel}</span>
+            </span>
+          ) : null}
         </div>
       </div>
 
@@ -954,8 +974,8 @@ export default function ProductDetail() {
                   </div>
 
                   <div className="pdx-heroMain">
-                    <div 
-                      className="catalog-cardIcon pdx-productIcon"
+                    <div
+                      className="pdx-productIcon"
                       style={{ "--brand-color": brandColor }}
                     >
                       {icon ? (
@@ -1061,6 +1081,7 @@ export default function ProductDetail() {
                       displayedVariants.map((variant) => {
                         const stock = Number(variant.stock ?? 0);
                         const out = stock <= 0;
+                        // Same card UI for 1-variant and multi-variant
                         const isRecommended = variant.id === recommendedVariantId;
                         const flashDiscount = flashSaleMap.get(variant.id);
                         const effectivePrice =

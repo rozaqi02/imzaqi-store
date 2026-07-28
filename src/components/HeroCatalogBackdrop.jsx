@@ -73,7 +73,7 @@ function buildRows(pool, config) {
   });
 }
 
-function CatalogTile({ product, compact = false }) {
+function CatalogTile({ product, compact = false, eager = false }) {
   const name = product?.name || "Produk";
   const initial = String(name).slice(0, 1).toUpperCase();
 
@@ -84,9 +84,9 @@ function CatalogTile({ product, compact = false }) {
           <img
             src={product.icon_url}
             alt=""
-            loading="lazy"
+            loading={eager ? "eager" : "lazy"}
             decoding="async"
-            fetchPriority="low"
+            fetchPriority={eager ? "high" : "low"}
             draggable={false}
           />
         ) : (
@@ -129,12 +129,13 @@ export default function HeroCatalogBackdrop({ products = [] }) {
     return () => observer.disconnect();
   }, [config.motionOff]);
 
-  if (!rows.length) return null;
-
+  // Always mount shell so hero never waits on empty state flash
   const className = [
     "hx-catalog-backdrop",
+    "is-ready",
     config.isMobile ? "is-mobile" : "",
     config.motionOff ? "is-static" : "",
+    rows.length ? "" : "is-empty",
   ]
     .filter(Boolean)
     .join(" ");
@@ -153,12 +154,14 @@ export default function HeroCatalogBackdrop({ products = [] }) {
                 <CatalogTile
                   key={`${row.id}-a-${product.id}-${idx}`}
                   product={product}
+                  eager={row.id < 2 && idx < 4}
                 />
               ))}
               {row.items.map((product, idx) => (
                 <CatalogTile
                   key={`${row.id}-b-${product.id}-${idx}`}
                   product={product}
+                  eager={false}
                 />
               ))}
             </div>

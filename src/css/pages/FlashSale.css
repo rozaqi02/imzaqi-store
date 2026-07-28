@@ -64,43 +64,83 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
   color: #ff3c64;
 }
 
-/* Countdown */
+/* Countdown — clean digits, no boxed “kotak” frames */
 .flash-countdown-wrap {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
 }
 
 .flash-countdown {
   display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  align-items: flex-end;
+  gap: 8px;
   font-size: 13px;
   font-weight: 900;
+  flex-wrap: wrap;
 }
 
 .flash-countdown-icon {
-  margin-right: 4px;
+  margin-right: 2px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+
+.flash-countdown-unit {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 0;
 }
 
 .flash-countdown-num {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 28px;
-  height: 28px;
-  padding: 0 6px;
-  border-radius: 8px;
-  border: 1px solid var(--brand-line);
-  background: var(--skeu-control-bg);
-  box-shadow: var(--skeu-control-shadow);
+  min-width: 1.4ch;
+  height: auto;
+  padding: 0;
+  border: none !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
   color: var(--brand-text);
   font-variant-numeric: tabular-nums;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.flash-countdown-label {
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: lowercase;
+  color: var(--brand-muted);
+  line-height: 1;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.flash-countdown-unit.is-sec .flash-countdown-num {
+  color: var(--brand-icon, #0b8292);
 }
 
 .flash-countdown-sep {
   color: var(--brand-muted);
   font-weight: 900;
+  font-size: 14px;
+  align-self: flex-start;
+  margin-top: 2px;
+  opacity: 0.55;
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 .flash-countdown-expired {
@@ -337,8 +377,15 @@ html[data-theme="light"] .flash-sale-badge {
   }
 
   .flash-countdown-num {
-    min-width: 24px;
-    height: 24px;
-    font-size: 11px;
+    min-width: 1.2ch;
+    height: auto;
+    font-size: 15px;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .flash-countdown {
+    gap: 6px;
   }
 }

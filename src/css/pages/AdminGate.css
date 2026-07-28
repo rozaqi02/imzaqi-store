@@ -1,0 +1,237 @@
+/* ── Admin access gate (ProtectedRoute loading) ── */
+
+.admin-gate-page {
+  position: relative;
+  min-height: calc(100dvh - var(--site-header-offset, 72px));
+  display: grid;
+  place-items: center;
+  padding: 24px 16px 48px;
+  box-sizing: border-box;
+}
+
+.admin-gate-bg {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 70% 50% at 50% 20%, rgba(0, 214, 180, 0.14), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 80%, rgba(0, 138, 148, 0.1), transparent 55%);
+  opacity: 0.9;
+}
+
+.admin-gate-card {
+  position: relative;
+  z-index: 1;
+  width: min(420px, 100%);
+  padding: 28px 26px 24px;
+  border-radius: 28px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  background:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.02) 40%, transparent 100%),
+    var(--skeu-panel-bg, rgba(14, 20, 32, 0.92));
+  box-shadow:
+    var(--skeu-panel-shadow, 0 24px 48px rgba(0, 0, 0, 0.28)),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  display: grid;
+  gap: 22px;
+}
+
+html[data-theme="light"] .admin-gate-card {
+  background:
+    linear-gradient(165deg, #ffffff 0%, #f3fafc 55%, #eaf6f9 100%);
+  border-color: rgba(119, 175, 194, 0.22);
+  box-shadow:
+    0 20px 40px rgba(40, 94, 117, 0.12),
+    inset 0 1px 0 #fff;
+}
+
+.admin-gate-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-gate-logoWrap {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  flex-shrink: 0;
+  display: grid;
+  place-items: center;
+}
+
+.admin-gate-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  object-fit: contain;
+  z-index: 1;
+  box-shadow: 0 8px 18px rgba(0, 140, 140, 0.22);
+}
+
+.admin-gate-ring {
+  position: absolute;
+  inset: -2px;
+  border-radius: 18px;
+  border: 2px solid transparent;
+  border-top-color: #00d6b4;
+  border-right-color: rgba(0, 214, 180, 0.35);
+  animation: adminGateSpin 0.9s linear infinite;
+}
+
+.admin-gate-brandCopy {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-gate-kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--brand-icon, #4effda);
+}
+
+html[data-theme="light"] .admin-gate-kicker {
+  color: #0b8292;
+}
+
+.admin-gate-brandCopy strong {
+  font-size: 17px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--brand-text, #f0fdf9);
+}
+
+html[data-theme="light"] .admin-gate-brandCopy strong {
+  color: #0d2d39;
+}
+
+.admin-gate-body {
+  display: grid;
+  justify-items: center;
+  text-align: center;
+  gap: 10px;
+  padding: 4px 0 2px;
+}
+
+.admin-gate-spinner {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid rgba(0, 214, 180, 0.15);
+  border-top-color: #00d6b4;
+  animation: adminGateSpin 0.75s linear infinite;
+  margin-bottom: 4px;
+}
+
+.admin-gate-title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--brand-text, #f0fdf9);
+}
+
+html[data-theme="light"] .admin-gate-title {
+  color: #0d2d39;
+}
+
+.admin-gate-sub {
+  margin: 0;
+  max-width: 28ch;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: var(--brand-muted, rgba(220, 240, 255, 0.65));
+}
+
+html[data-theme="light"] .admin-gate-sub {
+  color: rgba(40, 80, 95, 0.72);
+}
+
+.admin-gate-skeleton {
+  display: grid;
+  gap: 10px;
+  opacity: 0.85;
+}
+
+.admin-gate-skel {
+  border-radius: 12px;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.14) 45%,
+    rgba(255, 255, 255, 0.06) 100%
+  );
+  background-size: 200% 100%;
+  animation: adminGateShimmer 1.4s ease-in-out infinite;
+}
+
+html[data-theme="light"] .admin-gate-skel {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 138, 148, 0.06) 0%,
+    rgba(0, 194, 208, 0.12) 45%,
+    rgba(0, 138, 148, 0.06) 100%
+  );
+  background-size: 200% 100%;
+}
+
+.admin-gate-skel--nav {
+  height: 36px;
+  border-radius: 999px;
+}
+
+.admin-gate-skelRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+}
+
+.admin-gate-skel--stat {
+  height: 52px;
+  border-radius: 14px;
+}
+
+.admin-gate-skel--panel {
+  height: 88px;
+  border-radius: 16px;
+}
+
+@keyframes adminGateSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes adminGateShimmer {
+  0% {
+    background-position: 100% 0;
+  }
+  100% {
+    background-position: -100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-gate-ring,
+  .admin-gate-spinner,
+  .admin-gate-skel {
+    animation: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-gate-card {
+    padding: 22px 18px 20px;
+    border-radius: 22px;
+  }
+
+  .admin-gate-title {
+    font-size: 16px;
+  }
+}

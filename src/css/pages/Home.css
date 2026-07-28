@@ -240,22 +240,16 @@ html[data-theme="light"] .hero-search-shell:focus-within {
 }
 
 @media (max-width: 460px) {
-  .home-page .home-popularList {
-    padding-inline: 2px;
-  }
-
-  /* Mobile adaptation: stack top and bottom sections vertically.
-     Desktop layout (1fr auto) breaks below ~460px because pills + price
-     compete for narrow space and squish the title to one char per line. */
+  /* Global list tiles (non-home): keep equal padding */
   .product-tile--list {
-    grid-template-columns: 1fr;
-    gap: 8px;
-    padding: 10px 12px;
-    border-radius: 18px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px 12px;
+    padding: 12px;
+    border-radius: 16px;
   }
 
   .product-tile--list .product-tile-top {
-    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-columns: auto minmax(0, 1fr);
     gap: 10px;
     align-items: center;
   }
@@ -278,41 +272,19 @@ html[data-theme="light"] .hero-search-shell:focus-within {
   }
 
   .product-tile--list .product-tile-arrow {
-    width: 28px;
-    height: 28px;
-    border-radius: 8px;
+    display: none;
   }
 
   .product-tile--list .product-tile-bottom {
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end;
     min-width: 0;
     gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .product-tile--list .product-tile-pills {
-    justify-content: flex-start;
-    gap: 5px;
-    flex-wrap: wrap;
-  }
-
-  .product-tile--list .product-tile-pill {
-    height: 22px;
-    padding: 0 8px;
-    font-size: 10px;
-    gap: 4px;
-  }
-
-  .product-tile--list .product-tile-pill svg {
-    width: 10px;
-    height: 10px;
   }
 
   .product-tile--list .product-tile-price {
-    font-size: 15px;
-    margin-left: auto;
+    font-size: 14.5px;
   }
 }
 
@@ -446,7 +418,7 @@ html[data-theme="light"] .hero-search-shell:focus-within {
   }
 
   .home-page .home-popularList .product-tile {
-    padding: 14px 15px;
+    padding: 14px !important;
     transition-duration: 100ms !important;
     will-change: auto !important;
     content-visibility: auto;
@@ -1367,15 +1339,35 @@ html[data-theme="light"] .home-section {
   padding-top: clamp(28px, 3.5vw, 40px);
 }
 
+/* Jasa Akademik — accent strip under popular products */
+.home-academicSection {
+  position: relative;
+  background:
+    radial-gradient(ellipse 70% 80% at 8% 20%, rgba(56, 189, 248, 0.08), transparent 55%),
+    radial-gradient(ellipse 55% 60% at 92% 70%, rgba(99, 102, 241, 0.07), transparent 50%);
+}
+
+html[data-theme="light"] .home-academicSection {
+  background:
+    radial-gradient(ellipse 70% 80% at 8% 20%, rgba(14, 165, 233, 0.07), transparent 55%),
+    radial-gradient(ellipse 55% 60% at 92% 70%, rgba(99, 102, 241, 0.05), transparent 50%);
+}
+
 .home-sectionInner {
   display: grid;
   gap: 18px;
 }
 
-.home-sectionHead {
+/* Override global .section-head flex so home titles stay stacked */
+.home-sectionHead,
+.home-page .home-sectionHead.section-head {
   display: grid;
+  align-items: start;
+  justify-content: start;
   gap: 6px;
   max-width: 540px;
+  margin-bottom: 0;
+  width: 100%;
 }
 
 .home-sectionTitle {
@@ -1398,6 +1390,7 @@ html[data-theme="light"] .home-section {
 .home-sectionCta .btn {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
   /* Match global .btn radius — not full pill */
   border-radius: 14px !important;
@@ -1629,29 +1622,27 @@ html[data-theme="light"] .home-howCard-icon {
   }
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Mobile: compact cards with desc visible Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Mobile: compact vertical how-it-works cards ── */
 @media (max-width: 720px) {
   .home-howSection {
     overflow: visible;
   }
 
   .home-howGrid {
-    /* Stack vertically di mobile Ã¢â‚¬â€ lebih readable dari horizontal scroll */
     display: grid;
     grid-template-columns: 1fr;
     gap: 10px;
   }
 
-  /* Override connector dashed line Ã¢â‚¬â€ tidak perlu di mobile vertical stack */
   .home-howGrid::before {
     display: none !important;
   }
 
   .home-howCard {
-    padding: 14px 16px;
+    padding: 14px;
     border-radius: 16px;
     gap: 12px;
-    /* Kurangi animasi di mobile */
+    align-items: flex-start;
     animation-duration: 0.28s !important;
     transition: none;
   }
@@ -1677,7 +1668,6 @@ html[data-theme="light"] .home-howCard-icon {
     font-weight: 900;
   }
 
-  /* Tampilkan desc di mobile untuk context */
   .home-howCard-desc {
     display: block;
     font-size: 12.5px;
@@ -1685,8 +1675,29 @@ html[data-theme="light"] .home-howCard-icon {
     margin-top: 2px;
   }
 
+  /* Show step numbers on mobile for clear 01/02/03 rhythm */
   .home-howCard-step {
-    display: none;
+    display: grid !important;
+    place-items: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 11px;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: -0.03em;
+    color: var(--brand-icon, var(--uni-neo-icon, #9cddff));
+    border: 1px solid var(--brand-line, rgba(0, 214, 180, 0.28));
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
+      var(--skeu-control-bg, rgba(0, 214, 180, 0.08));
+    box-shadow: var(--skeu-control-shadow, 0 3px 8px rgba(0, 0, 0, 0.12));
+    margin-top: 2px;
+  }
+
+  html[data-theme="light"] .home-howCard-step {
+    color: #007a85;
+    border-color: rgba(0, 138, 148, 0.2);
   }
 
   .home-howCard::after {
@@ -1904,10 +1915,12 @@ html[data-theme="light"] .home-promoCard-action {
 
 /* Home list reveals follow global --reveal-dur (no snappy override) */
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Popular products: grid on desktop Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* ── Popular products list (restore pre-polish mobile layout) ── */
 .home-page .home-popularList {
   overflow: visible !important;
-  padding-bottom: 4px !important;
+  /* No extra side padding/margin — parent .container already gutters */
+  padding: 0 0 4px !important;
+  margin: 0 !important;
 }
 
 .home-page .home-popularList .product-tile {
@@ -1915,51 +1928,31 @@ html[data-theme="light"] .home-promoCard-action {
   overflow: visible !important;
 }
 
-/* Let top + bottom participate in the card grid (fixes awkward spacing).
-   Link wrapper must also be contents, otherwise it becomes a lone grid
-   cell and shoves content into one column (heart alone on the other). */
+/* Promote top/bottom into the card grid */
 .home-page .home-popularList .product-tile-link,
 .home-page .home-popularList .product-tile-tiltWrap {
   display: contents;
   overflow: visible;
 }
 
-.home-page .home-popularList .product-tile-favBtn {
-  position: absolute !important;
-  top: 50% !important;
-  right: 52px !important;
-  left: auto !important;
-  transform: translateY(-50%);
-  z-index: 12;
-}
-
-.home-page .home-popularList .product-tile-favBtn:hover {
-  transform: translateY(-50%) scale(1.06);
-}
-
-.home-page .home-popularList .product-tile-favBtn:active {
-  transform: translateY(-50%) scale(0.94);
-}
-
-.home-page .home-popularList .product-tile-favBtn.is-active {
-  transform: translateY(-50%);
-}
-
-/* Clean one-row popular cards */
 .home-page .home-popularList .product-tile--list {
   display: grid !important;
   grid-template-columns: minmax(0, 1fr) auto !important;
   align-items: center !important;
   margin: 0 !important;
+  /* Equal L/R — match original home list feel */
   padding: 14px 16px !important;
   gap: 12px 14px !important;
   border-radius: 18px !important;
   min-height: 0 !important;
+  width: 100% !important;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
 }
 
 .home-page .home-popularList .product-tile-top {
   display: grid !important;
-  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
   gap: 12px !important;
   align-items: center !important;
   min-width: 0;
@@ -1992,21 +1985,55 @@ html[data-theme="light"] .home-promoCard-action {
   margin: 0 !important;
 }
 
-/* Hide product description on home popular cards */
-.home-page .home-popularList .product-tile-desc {
+.home-page .home-popularList .product-tile-desc,
+.home-page .home-popularList .product-tile-arrow {
   display: none !important;
 }
 
-.home-page .home-popularList .product-tile-arrow {
-  width: 34px !important;
-  height: 34px !important;
-  border-radius: 11px !important;
-  flex-shrink: 0;
+.home-page .home-popularList .product-tile-pill:not(.home-popularSold),
+.home-page .home-popularList .product-typeBadge,
+.home-page .home-popularList .product-lowStockBadge,
+.home-page .home-popularList .home-deliveryPill {
+  display: none !important;
 }
 
-.home-page .home-popularList .product-tile-arrow svg {
-  width: 15px;
-  height: 15px;
+/* Terlaris section: rank + sold */
+.home-page .home-popularList:not(.home-academicList) .product-tile-rankBadge {
+  display: inline-flex !important;
+  height: 20px;
+  padding: 0 7px;
+  font-size: 10px;
+}
+
+.home-page .home-popularList:not(.home-academicList) .product-tile-pills {
+  display: flex !important;
+  margin: 0 !important;
+  gap: 0 !important;
+}
+
+.home-page .home-popularList:not(.home-academicList) .home-popularSold {
+  display: inline-flex !important;
+  height: 28px !important;
+  padding: 0 11px !important;
+  font-size: 11px !important;
+  border: none !important;
+  border-radius: 999px !important;
+  background: var(--skeu-control-bg) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  color: var(--text) !important;
+}
+
+.home-page .home-popularList:not(.home-academicList) .home-popularSold svg {
+  color: var(--accent, #00d6b4) !important;
+  width: 13px;
+  height: 13px;
+}
+
+/* Academic: no rank / sold */
+.home-page .home-academicList .product-tile-rankBadge,
+.home-page .home-academicList .home-popularSold,
+.home-page .home-academicList .product-tile-pills {
+  display: none !important;
 }
 
 .home-page .home-popularList .product-tile-bottom {
@@ -2020,11 +2047,6 @@ html[data-theme="light"] .home-promoCard-action {
   padding: 0 !important;
 }
 
-.home-page .home-popularList .product-tile-pills {
-  margin: 0 !important;
-  gap: 0 !important;
-}
-
 .home-page .home-popularList .product-tile-price {
   font-size: 15.5px !important;
   letter-spacing: -0.02em;
@@ -2032,30 +2054,6 @@ html[data-theme="light"] .home-promoCard-action {
   white-space: nowrap;
 }
 
-.home-page .home-popularList .product-tile-rankBadge {
-  height: 20px;
-  padding: 0 7px;
-  font-size: 10px;
-}
-
-.home-page .home-popularList .home-popularSold {
-  height: 28px !important;
-  padding: 0 11px !important;
-  font-size: 11px !important;
-  border: none !important;
-  border-radius: 999px !important;
-  background: var(--skeu-control-bg) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
-  color: var(--text) !important;
-}
-
-.home-page .home-popularList .home-popularSold svg {
-  color: var(--accent, #00d6b4) !important;
-  width: 13px;
-  height: 13px;
-}
-
-/* Popular section: subtle hover feedback (no flip card) */
 @media (hover: hover) {
   .home-page .home-popularList .product-tile {
     transition:
@@ -2073,12 +2071,6 @@ html[data-theme="light"] .home-promoCard-action {
     opacity: 0.5;
   }
 
-  .home-page .home-popularList .product-tile:hover .product-tile-arrow {
-    transform: translate(2px, -2px);
-    color: var(--accent, #4effda);
-    background: rgba(0, 214, 180, 0.1);
-  }
-
   .home-page .home-popularList .product-tile:hover .product-tile-icon {
     box-shadow: 0 10px 26px var(--brand-color, rgba(0, 214, 180, 0.18));
   }
@@ -2086,11 +2078,6 @@ html[data-theme="light"] .home-promoCard-action {
 
 html[data-theme="light"] .home-page .home-popularList .product-tile:hover {
   border-color: rgba(0, 138, 148, 0.28);
-}
-
-html[data-theme="light"] .home-page .home-popularList .product-tile:hover .product-tile-arrow {
-  color: #008a94;
-  background: rgba(0, 138, 148, 0.08);
 }
 
 .home-page .home-popularList.list-mode {
@@ -2104,8 +2091,9 @@ html[data-theme="light"] .home-page .home-popularList .product-tile:hover .produ
   }
 
   .home-page .home-popularList .product-tile--list {
-    padding: 12px 14px !important;
-    gap: 10px 12px !important;
+    /* Equal 12px L/R — same as original mobile home list */
+    padding: 12px !important;
+    gap: 10px !important;
   }
 
   .home-page .home-popularList .product-tile-top {
@@ -2126,39 +2114,10 @@ html[data-theme="light"] .home-page .home-popularList .product-tile:hover .produ
     font-size: 14.5px !important;
   }
 
-  .home-page .home-popularList .product-tile-arrow {
-    width: 30px !important;
-    height: 30px !important;
-  }
-}
-
-/* Narrow phones: stack meta under title, keep padding even */
-@media (max-width: 460px) {
-  .home-page .home-popularList .product-tile--list {
-    grid-template-columns: 1fr !important;
-    padding: 12px !important;
-    gap: 10px !important;
-  }
-
-  .home-page .home-popularList .product-tile-bottom {
-    justify-content: space-between !important;
-    width: 100%;
-  }
-
-  .home-page .home-popularList .product-tile-arrow {
-    display: none !important;
-  }
-
-  .home-page .home-popularList .product-tile-favBtn {
-    top: 10px !important;
-    right: 10px !important;
-    transform: none;
-  }
-
-  .home-page .home-popularList .product-tile-favBtn:hover,
-  .home-page .home-popularList .product-tile-favBtn:active,
-  .home-page .home-popularList .product-tile-favBtn.is-active {
-    transform: none;
+  .home-page .home-popularList:not(.home-academicList) .home-popularSold {
+    height: 26px !important;
+    padding: 0 10px !important;
+    font-size: 11px !important;
   }
 }
 
@@ -2495,6 +2454,318 @@ html[data-theme="light"] .hx-onboardClose:hover {
   }
   .hx-onboardText {
     font-size: 11px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Home body — mobile layout polish (all sections except hero)
+   Scoped to .home-page .home-body so hero stays untouched.
+   ═══════════════════════════════════════════════════════════════════════════ */
+@media (max-width: 720px) {
+  .home-page .home-body {
+    display: grid;
+    gap: 0;
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow-x: clip;
+  }
+
+  .home-page .home-body > .home-section {
+    padding: 22px 0;
+    contain-intrinsic-size: auto 320px;
+  }
+
+  .home-page .home-body > .home-section:first-child {
+    padding-top: 20px;
+  }
+
+  .home-page .home-body > .home-section:last-child {
+    padding-bottom: 28px;
+  }
+
+  .home-page .home-sectionInner {
+    gap: 14px;
+    min-width: 0;
+    width: 100%;
+  }
+
+  /* Section heads: full-width stacked copy */
+  .home-page .home-body .home-sectionHead,
+  .home-page .home-body .home-sectionHead.section-head {
+    display: grid;
+    gap: 5px;
+    max-width: 100%;
+    width: 100%;
+    margin-bottom: 0;
+    align-items: start;
+    justify-content: start;
+  }
+
+  .home-page .home-body .home-sectionTitle,
+  .home-page .home-body .home-sectionTitle.h2 {
+    font-size: clamp(20px, 5.8vw, 24px);
+    line-height: 1.18;
+    letter-spacing: -0.03em;
+    max-width: 18ch;
+  }
+
+  .home-page .home-body .home-sectionSub {
+    font-size: 13px;
+    line-height: 1.55;
+    max-width: 36ch;
+  }
+
+  .home-page .home-body .home-kicker,
+  .home-page .home-body .section-head-kicker {
+    font-size: 11px;
+    letter-spacing: 0.08em;
+  }
+
+  /* CTA: full-width touch targets */
+  .home-page .home-sectionCta {
+    margin-top: 2px;
+  }
+
+  .home-page .home-sectionCta .btn {
+    width: 100%;
+    max-width: 100%;
+    min-height: 46px;
+    padding: 12px 16px;
+    font-size: 14px;
+    border-radius: 14px !important;
+  }
+
+  /* Product list spacing handled above — do not re-pad here */
+
+  /* Skeleton matches list cards */
+  .home-page .home-tileSkeleton {
+    padding: 12px;
+    border-radius: 16px;
+    gap: 10px;
+  }
+
+  .home-page .home-tileSkeleton-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+  }
+
+  .home-page .home-tileSkeleton-arrow,
+  .home-page .home-tileSkeleton-bottom {
+    display: none;
+  }
+
+  /* ── Promo coupons ── */
+  .home-page .home-promoGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .home-page .home-promoCard {
+    min-height: 80px;
+    border-radius: 16px;
+    width: 100%;
+  }
+
+  .home-page .home-promoCard-stub {
+    flex: 0 0 72px;
+  }
+
+  .home-page .home-promoCard-percent {
+    font-size: 20px;
+  }
+
+  .home-page .home-promoCard-code {
+    font-size: 13.5px;
+    letter-spacing: 0.04em;
+    word-break: break-all;
+  }
+
+  .home-page .home-promoCard-action {
+    font-size: 11px;
+  }
+
+  /* ── How it works ── */
+  .home-page .home-howCard-content {
+    min-width: 0;
+  }
+
+  .home-page .home-howCard-expandedContent p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  /* ── FAQ ── */
+  .home-page .home-faqSearchWrap {
+    max-width: 100%;
+    margin: 0 0 12px;
+  }
+
+  .home-page .home-faqList {
+    gap: 8px;
+  }
+
+  .home-page .home-faqItem.faq-item {
+    border-radius: 16px;
+  }
+
+  .home-page .home-faqSection .faq-itemHead {
+    padding: 13px 12px;
+    gap: 10px;
+    font-size: 14.5px;
+    min-height: 48px;
+    align-items: flex-start;
+  }
+
+  .home-page .home-faqSection .faq-itemQuestion {
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .home-page .home-faqSection .faq-itemCategory {
+    min-height: 20px;
+    font-size: 9.5px;
+    padding: 0 7px;
+  }
+
+  .home-page .home-faqSection .faq-itemBody {
+    padding: 0 12px 13px;
+    gap: 6px;
+  }
+
+  .home-page .home-faqSection .faq-itemBody p {
+    font-size: 13px;
+    line-height: 1.6;
+    max-width: none;
+  }
+
+  .home-page .home-faqSection .faq-itemHead svg {
+    margin-top: 2px;
+  }
+
+  /* Academic accent — lighter so it doesn't dominate small screens */
+  .home-page .home-academicSection {
+    background:
+      radial-gradient(ellipse 90% 70% at 0% 0%, rgba(56, 189, 248, 0.07), transparent 60%);
+  }
+
+  html[data-theme="light"] .home-page .home-academicSection {
+    background:
+      radial-gradient(ellipse 90% 70% at 0% 0%, rgba(14, 165, 233, 0.06), transparent 60%);
+  }
+}
+
+/* Narrow phones — tighter rhythm */
+@media (max-width: 480px) {
+  .home-page .home-body > .home-section {
+    padding: 18px 0;
+  }
+
+  .home-page .home-body > .home-section:first-child {
+    padding-top: 16px;
+  }
+
+  .home-page .home-sectionInner {
+    gap: 12px;
+  }
+
+  .home-page .home-body .home-sectionTitle,
+  .home-page .home-body .home-sectionTitle.h2 {
+    font-size: clamp(19px, 6.2vw, 22px);
+    max-width: 16ch;
+  }
+
+  .home-page .home-body .home-sectionSub {
+    font-size: 12.5px;
+    max-width: 32ch;
+  }
+
+  .home-page .home-popularList .product-tile--list {
+    padding: 12px !important;
+    border-radius: 16px !important;
+    gap: 10px !important;
+  }
+
+  .home-page .home-popularList .product-tile-icon {
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 12px !important;
+  }
+
+  .home-page .home-popularList .product-tile-name {
+    font-size: 14px !important;
+  }
+
+  .home-page .home-popularList .product-tile-price {
+    font-size: 14px !important;
+  }
+
+  .home-page .home-howCard {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .home-page .home-howCard-step {
+    width: 34px;
+    height: 34px;
+    font-size: 11px;
+    border-radius: 10px;
+  }
+
+  .home-page .home-howCard-title {
+    font-size: 14.5px;
+  }
+
+  .home-page .home-howCard-desc {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .home-page .home-promoCard {
+    min-height: 76px;
+  }
+
+  .home-page .home-promoCard-stub {
+    flex: 0 0 66px;
+  }
+
+  .home-page .home-sectionCta .btn {
+    min-height: 44px;
+    font-size: 13.5px;
+  }
+}
+
+/* Very small phones */
+@media (max-width: 360px) {
+  .home-page .home-body > .home-section {
+    padding: 16px 0;
+  }
+
+  .home-page .home-howCard-desc {
+    font-size: 11.5px;
+  }
+
+  .home-page .home-faqSection .faq-itemHead {
+    font-size: 14px;
+    padding: 12px 10px;
+  }
+}
+
+/* Touch devices: kill hover lift on home body cards */
+@media (hover: none) and (max-width: 720px) {
+  .home-page .home-body .product-tile:hover,
+  .home-page .home-body .home-howCard:hover,
+  .home-page .home-body .home-promoCard:hover {
+    transform: none !important;
+  }
+
+  .home-page .home-body .product-tile:active {
+    transform: scale(0.99);
+  }
+
+  .home-page .home-body .home-promoCard:active {
+    transform: scale(0.99);
   }
 }
 

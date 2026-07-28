@@ -119,10 +119,11 @@
   .admin-page .admin-products {
     flex: 1 1 auto;
     min-height: 0;
+    min-width: 0;
     align-items: stretch;
-    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    /* Wider list so cards + scrollbar don't crush row content */
+    grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
     overflow: hidden;
-    /* reclaim space under compact chrome */
     margin-top: 4px;
   }
 
@@ -132,6 +133,7 @@
     display: flex;
     flex-direction: column;
     min-height: 0;
+    min-width: 0;
     overflow: hidden;
   }
 
@@ -151,7 +153,14 @@
 
   .admin-page .admin-products .admin-panel-body--scroll,
   .admin-page .admin-products .admin-panel-body {
-    padding: 12px 14px 14px;
+    padding: 12px 12px 14px 14px;
+    scrollbar-gutter: stable;
+    min-width: 0;
+  }
+
+  .admin-page .admin-products-list .admin-product-row {
+    max-width: 100%;
+    box-sizing: border-box;
   }
 
   /* Compact title row on work tabs */
@@ -678,9 +687,10 @@
 
 .admin-products {
   display: grid;
-  grid-template-columns: 360px minmax(0, 1fr);
+  grid-template-columns: minmax(320px, 400px) minmax(0, 1fr);
   gap: 16px;
   align-items: start;
+  min-width: 0;
 }
 
 .admin-panel {
@@ -756,11 +766,14 @@
 }
 
 .admin-product-row.active {
-  border-color: rgba(0, 214, 180, 0.3);
+  border: 2px solid rgba(0, 200, 180, 0.55);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.2), rgba(0, 80, 80, 0.35));
-  box-shadow: var(--skeu-control-shadow, none);
+    linear-gradient(165deg, rgba(0, 214, 180, 0.32) 0%, rgba(0, 100, 110, 0.28) 100%),
+    var(--skeu-control-bg, rgba(0, 40, 50, 0.35));
+  box-shadow:
+    0 8px 18px rgba(0, 60, 70, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .admin-product-row-left {

@@ -6,7 +6,6 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import NetworkBridge from "./components/NetworkBridge";
 import PolishEffects from "./components/PolishEffects";
 import Confetti from "./components/Confetti";
-import AssistantBubble from "./components/AssistantBubble";
 import FlashSalePopup from "./components/FlashSalePopup";
 
 const DEFER_POLISH_MS = 2000;
@@ -359,7 +358,6 @@ export default function App() {
       {polishReady ? (
         <>
           <Confetti />
-          <AssistantBubble />
           <FlashSalePopup />
         </>
       ) : null}

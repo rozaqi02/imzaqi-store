@@ -1,21 +1,56 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
-import { Box, LogOut, MoreHorizontal, RefreshCw } from "lucide-react";
+import {
+  Box,
+  ClipboardList,
+  LayoutDashboard,
+  LogOut,
+  MoreHorizontal,
+  RefreshCw,
+  Settings2,
+  Sparkles,
+  Star,
+  Tags,
+  Zap,
+} from "lucide-react";
 import "../../../css/pages/AdminNav.css";
 
 export const ADMIN_NAV_GROUPS = [
-  { key: "ops", label: "Operasional", tabIds: ["overview", "orders", "products"] },
-  { key: "promo", label: "Promosi", tabIds: ["promos", "flashsale", "testimonials"] },
-  { key: "system", label: "Sistem", tabIds: ["settings"] },
+  {
+    key: "ops",
+    label: "Hari ini",
+    tabIds: ["overview", "orders", "products"],
+  },
+  {
+    key: "growth",
+    label: "Growth",
+    tabIds: ["promos", "flashsale", "testimonials"],
+  },
+  {
+    key: "system",
+    label: "Sistem",
+    tabIds: ["settings"],
+  },
 ];
 
-export const MOBILE_PRIMARY_TAB_IDS = ["overview", "orders", "products"];
-export const MOBILE_MORE_TAB_IDS = ["promos", "flashsale", "testimonials", "settings"];
+export const MOBILE_PRIMARY_TAB_IDS = ["overview", "orders", "products", "promos"];
+export const MOBILE_MORE_TAB_IDS = ["flashsale", "testimonials", "settings"];
 
 const MOBILE_SHORT_LABELS = {
-  overview: "Beranda",
+  overview: "Home",
   orders: "Order",
   products: "Produk",
+  promos: "Promo",
+};
+
+const TAB_HINTS = {
+  overview: "Apa yang perlu dikerjakan sekarang",
+  orders: "Antrean bayar & proses",
+  products: "Katalog & stok paket",
+  promos: "Kode diskon aktif",
+  flashsale: "Diskon kilat per varian",
+  testimonials: "Bukti sosial di etalase",
+  settings: "WA, QRIS, operasional",
 };
 
 function NavDot({ tone = "accent", children }) {
@@ -41,23 +76,27 @@ function getTabAlerts(tabId, ctx) {
   return alerts;
 }
 
-function AdminNavItem({ tab, Icon, active, onSelect, alerts }) {
+function AdminNavItem({ tab, Icon, active, onSelect, alerts, hint }) {
   return (
     <button
       type="button"
       className={`adm-navItem${active ? " is-active" : ""}`}
       aria-current={active ? "page" : undefined}
       onClick={() => onSelect(tab.id)}
+      title={hint || tab.hint}
     >
       <span className="adm-navItemIcon">
-        <Icon size={18} strokeWidth={2.1} />
+        <Icon size={18} strokeWidth={2.15} />
         {alerts.map((a, i) => (
           <NavDot key={i} tone={a.tone}>
             {a.value}
           </NavDot>
         ))}
       </span>
-      <span className="adm-navItemLabel">{tab.label}</span>
+      <span className="adm-navItemCopy">
+        <span className="adm-navItemLabel">{tab.label}</span>
+        <span className="adm-navItemHint">{hint || tab.hint}</span>
+      </span>
     </button>
   );
 }
@@ -67,30 +106,60 @@ export function AdminSidebar({
   activeTabId,
   onSelectTab,
   icons,
+  greetingName = "Admin",
   todayOrders,
   todayRevenue,
+  liveOrders = 0,
   newOrderCount,
   stockAlertCount,
   flashSaleEndingSoon,
   onRefresh,
   onLogout,
+  syncLabel,
 }) {
   const tabsById = useMemo(() => Object.fromEntries(tabs.map((t) => [t.id, t])), [tabs]);
   const alertCtx = { newOrderCount, stockAlertCount, flashSaleEndingSoon };
 
+  const nextFocus = useMemo(() => {
+    if (newOrderCount > 0) return { id: "orders", label: `${newOrderCount} order baru`, tone: "accent" };
+    if (liveOrders > 0) return { id: "orders", label: `${liveOrders} order aktif`, tone: "accent" };
+    if (stockAlertCount > 0) {
+      return { id: "products", label: `${stockAlertCount} stok tipis`, tone: "warn", opts: { lowStock: true } };
+    }
+    if (flashSaleEndingSoon) return { id: "flashsale", label: "Flash sale hampir habis", tone: "urgent" };
+    return { id: "overview", label: "Toko aman · pantau ringkasan", tone: "ok" };
+  }, [newOrderCount, liveOrders, stockAlertCount, flashSaleEndingSoon]);
+
+  const greetingHello = useMemo(() => {
+    const name = String(greetingName || "Admin").trim() || "Admin";
+    return `Halo, ${name}`;
+  }, [greetingName]);
+
   return (
     <aside className="adm-sidebar" aria-label="Navigasi admin">
       <header className="adm-sidebarHead">
-        <div className="adm-sidebarLogo">IM</div>
+        <div className="adm-sidebarLogo" aria-hidden="true">
+          IM
+        </div>
         <div className="adm-sidebarBrand">
-          <strong>Admin</strong>
-          <span>imzaqi.store</span>
+          <strong className="adm-sidebarGreeting">{greetingHello}</strong>
+          <span>Command Center · imzaqi.store</span>
         </div>
       </header>
 
-      <div className="adm-sidebarStats" aria-label="Ringkasan hari ini">
+      <button
+        type="button"
+        className={`adm-nextFocus adm-nextFocus--${nextFocus.tone}`}
+        onClick={() => onSelectTab(nextFocus.id, nextFocus.opts)}
+      >
+        <span className="adm-nextFocusLabel">Fokus sekarang</span>
+        <strong>{nextFocus.label}</strong>
+        <span className="adm-nextFocusCta">Buka →</span>
+      </button>
+
+      <div className="adm-sidebarStats" aria-label="Snapshot hari ini">
         <div className="adm-statPill">
-          <span>Order</span>
+          <span>Order hari ini</span>
           <strong>{todayOrders}</strong>
         </div>
         <div className="adm-statPill">
@@ -116,6 +185,7 @@ export function AdminSidebar({
                     active={activeTabId === id}
                     onSelect={onSelectTab}
                     alerts={getTabAlerts(id, alertCtx)}
+                    hint={TAB_HINTS[id] || tab.hint}
                   />
                 );
               })}
@@ -125,9 +195,10 @@ export function AdminSidebar({
       </nav>
 
       <footer className="adm-sidebarFoot">
+        {syncLabel ? <div className="adm-syncLabel">{syncLabel}</div> : null}
         <button className="adm-footBtn" type="button" onClick={onRefresh}>
           <RefreshCw size={16} />
-          Muat ulang
+          Sinkron data
         </button>
         <button className="adm-footBtn adm-footBtn--danger" type="button" onClick={onLogout}>
           <LogOut size={16} />
@@ -199,9 +270,10 @@ export function AdminMobileNav({
         aria-hidden={moreOpen ? undefined : "true"}
         aria-label="Menu lainnya"
       >
+        <div className="adm-moreSheetGrab" aria-hidden="true" />
         <div className="adm-moreSheetHead">
-          <strong>Menu lainnya</strong>
-          <span>Promo, flash sale, testimoni, pengaturan</span>
+          <strong>Lainnya</strong>
+          <span>Flash sale, testimoni, pengaturan</span>
         </div>
         <div className="adm-moreSheetList">
           {moreTabs.map((tab) => {
@@ -224,20 +296,34 @@ export function AdminMobileNav({
                 </span>
                 <span className="adm-moreSheetCopy">
                   <strong>{tab.label}</strong>
-                  <small>{tab.hint}</small>
+                  <small>{TAB_HINTS[tab.id] || tab.hint}</small>
                 </span>
               </button>
             );
           })}
         </div>
         <div className="adm-moreSheetActions">
-          <button className="adm-moreAction" type="button" onClick={() => { setMoreOpen(false); onRefresh(); }}>
+          <button
+            className="adm-moreAction"
+            type="button"
+            onClick={() => {
+              setMoreOpen(false);
+              onRefresh();
+            }}
+          >
             <RefreshCw size={16} />
-            Muat ulang data
+            Sinkron data
           </button>
-          <button className="adm-moreAction adm-moreAction--danger" type="button" onClick={() => { setMoreOpen(false); onLogout(); }}>
+          <button
+            className="adm-moreAction adm-moreAction--danger"
+            type="button"
+            onClick={() => {
+              setMoreOpen(false);
+              onLogout();
+            }}
+          >
             <LogOut size={16} />
-            Keluar admin
+            Keluar
           </button>
         </div>
       </div>
@@ -278,10 +364,22 @@ export function AdminMobileNav({
             <MoreHorizontal size={20} strokeWidth={2.1} />
             {moreAlertCount > 0 ? <NavDot tone="accent">{moreAlertCount}</NavDot> : null}
           </span>
-          <span className="adm-dockLabel">Menu</span>
+          <span className="adm-dockLabel">Lainnya</span>
         </button>
       </nav>
     </>,
     document.body
   );
 }
+
+// re-export icons map helper for dashboard if needed
+export const ADMIN_NAV_ICONS_FALLBACK = {
+  overview: LayoutDashboard,
+  orders: ClipboardList,
+  products: Box,
+  promos: Tags,
+  flashsale: Zap,
+  testimonials: Star,
+  settings: Settings2,
+  sparkles: Sparkles,
+};

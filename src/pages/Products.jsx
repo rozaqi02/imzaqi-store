@@ -3,19 +3,13 @@ import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
-  Blocks,
-  Bot,
   CircleAlert,
-  Film,
   Flame,
-  GraduationCap,
   Grid2x2,
   Layers3,
   List,
-  Music4,
   PackageCheck,
   PackageSearch,
-  Palette,
   Search,
   SlidersHorizontal,
   Sparkles,
@@ -34,6 +28,12 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { formatIDR, summarizeCatalogCopy, detectAccountTypes, classifyStock } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
+import {
+  CATALOG_LINE_FILTERS,
+  countCatalogLines,
+  matchesCatalogLineFilters,
+  resolveCatalogLine,
+} from "../lib/productCategories";
 import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useDebounce } from "../hooks/useDebounce";
@@ -58,15 +58,7 @@ import {
 import TypewriterSearchInput from "../components/TypewriterSearchInput";
 import "../css/pages/Products.css";
 
-const CATEGORIES = [
-  { key: "streaming", label: "Streaming", icon: Film },
-  { key: "music", label: "Music", icon: Music4 },
-  { key: "tools", label: "Tools", icon: Blocks },
-  { key: "ai", label: "AI", icon: Bot },
-  { key: "design", label: "Design", icon: Palette },
-  { key: "learning", label: "Belajar", icon: GraduationCap },
-  { key: "other", label: "Lainnya", icon: Sparkles },
-];
+const CATEGORIES = CATALOG_LINE_FILTERS;
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 // "Produk baru" = ditambahkan dalam N hari terakhir.
@@ -97,8 +89,7 @@ const SEARCH_QUERIES = [
 ];
 
 function inferCategory(product) {
-  const explicit = String(product?.category || "").trim().toLowerCase();
-  return explicit || "other";
+  return resolveCatalogLine(product);
 }
 
 function clamp(n, min, max) {
@@ -350,7 +341,13 @@ export default function Products() {
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
   const [error, setError] = useState("");
-  const [cats, setCats] = useState(() => (params.get("cats") ? params.get("cats").split(",") : []));
+  const [cats, setCats] = useState(() => {
+    if (params.get("cats")) return params.get("cats").split(",").filter(Boolean);
+    // Alias: /produk?line=academic (used by home academic CTA)
+    const line = params.get("line");
+    if (line === "academic" || line === "app_premium") return [line];
+    return [];
+  });
   const [inStockOnly, setInStockOnly] = useState(() => params.get("ready") === "1");
   const [newOnly, setNewOnly] = useState(() => params.get("new") === "1");
   const [restockOnly, setRestockOnly] = useState(() => params.get("restock") === "1");
@@ -765,7 +762,9 @@ export default function Products() {
     const restockCutoff = now - RESTOCK_DAYS * DAY_MS;
     let list = (enriched || []).filter((item) => item?.is_active);
 
-    if (cats.length) list = list.filter((item) => cats.includes(item._category));
+    if (cats.length) {
+      list = list.filter((item) => matchesCatalogLineFilters(item, cats));
+    }
     if (inStockOnly) list = list.filter((item) => Number(item._stock || 0) > 0);
     if (newOnly) list = list.filter((item) => Number(item._createdAtTs || 0) >= newCutoff);
     if (restockOnly) list = list.filter((item) => Number(item._latestInStockUpdateTs || 0) >= restockCutoff);
@@ -881,6 +880,10 @@ export default function Products() {
 
   const skeletonCount = view === "list" ? 6 : 8;
   const insights = useMemo(() => buildStoreInsights({ products }), [products]);
+  const catalogLineCounts = useMemo(
+    () => countCatalogLines((products || []).filter((p) => p?.is_active !== false)),
+    [products]
+  );
   const freshnessCounts = useMemo(() => {
     const now = Date.now();
     const newCutoff = now - NEW_PRODUCT_DAYS * DAY_MS;
@@ -892,68 +895,20 @@ export default function Products() {
     };
   }, [enriched]);
   const quickFilters = useMemo(
-    () => [
-      {
-        key: "popular",
-        label: insights.topProduct ? `Best Seller: ${insights.topProduct.name}` : "Urut best seller",
-        active: sort === "popular",
-        onClick: () => setSort("popular"),
-      },
-      {
-        key: "ready",
-        label: `Ready ${insights.readyVariantsCount}`,
-        active: inStockOnly,
-        onClick: () => setInStockOnly((prev) => !prev),
-      },
-      {
-        key: "new",
-        label: freshnessCounts.newProducts ? `Baru rilis ${freshnessCounts.newProducts}` : "Baru rilis",
-        active: newOnly,
-        onClick: () => setNewOnly((p) => !p),
-      },
-      {
-        key: "restock",
-        label: freshnessCounts.restocked ? `Restock ${freshnessCounts.restocked}` : "Restock",
-        active: restockOnly,
-        onClick: () => setRestockOnly((prev) => !prev),
-      },
-      {
-        key: "streaming",
-        label: `Streaming ${insights.categoryCounts.streaming || 0}`,
-        active: cats.length === 1 && cats[0] === "streaming",
-        onClick: () => setSoloCategory("streaming"),
-      },
-      {
-        key: "tools",
-        label: `Tools ${insights.categoryCounts.tools || 0}`,
-        active: cats.length === 1 && cats[0] === "tools",
-        onClick: () => setSoloCategory("tools"),
-      },
-      {
-        key: "budget",
-        label: "Di bawah 10rb",
-        active: priceReady && price.min === priceBounds.min && price.max <= 10000,
-        onClick: () => applyBudgetCap(10000),
-      },
-    ],
-    [
-      applyBudgetCap,
-      cats,
-      inStockOnly,
-      insights.categoryCounts.streaming,
-      insights.categoryCounts.tools,
-      insights.readyVariantsCount,
-      insights.topProduct,
-      freshnessCounts.newProducts,
-      freshnessCounts.restocked,
-      price.max,
-      price.min,
-      priceBounds.min,
-      priceReady,
-      sort,
-      newOnly,
-      restockOnly,
-    ]
+    () =>
+      CATALOG_LINE_FILTERS.map((line) => {
+        const Icon = line.icon;
+        const count = catalogLineCounts[line.key] || 0;
+        return {
+          key: line.key,
+          label: line.label,
+          count,
+          Icon,
+          active: cats.length === 1 && cats[0] === line.key,
+          onClick: () => setSoloCategory(line.key),
+        };
+      }),
+    [cats, catalogLineCounts]
   );
 
   const activeSummaryTags = useMemo(() => {
@@ -1033,7 +988,8 @@ export default function Products() {
         },
       });
     }
-    chips.push({ key: "streaming", label: "Streaming", onClick: () => setSoloCategory("streaming") });
+    chips.push({ key: "app_premium", label: "Aplikasi Premium", onClick: () => setSoloCategory("app_premium") });
+    chips.push({ key: "academic", label: "Jasa Akademik", onClick: () => setSoloCategory("academic") });
     chips.push({ key: "reset-all", label: "Reset semua", onClick: resetFilters });
     return chips.slice(0, 5);
     // resetFilters / setSoloCategory are stable handlers; omit to avoid recomputing every render
@@ -1212,29 +1168,28 @@ export default function Products() {
               view={view}
               setView={setView}
               onReset={resetFilters}
-              categoryCounts={insights.categoryCounts}
+              categoryCounts={catalogLineCounts}
             />
           </CatalogFilterSidebar>
 
           <div className="catalog-content">
-            <div className="catalog-quickFilters" aria-label="Pilih cepat">
-              {quickFilters.map((item) => (
-                <button
-                  key={item.key}
-                  type="button"
-                  className={`catalog-quickChip catalog-quickChip--${item.key}${item.active ? " active" : ""}`}
-                  onClick={item.onClick}
-                  aria-pressed={item.active}
-                >
-                  {item.label}
-                </button>
-              ))}
-
-              {activeFiltersCount ? (
-                <button type="button" className="catalog-quickChip ghost" onClick={resetFilters}>
-                  Reset semua
-                </button>
-              ) : null}
+            <div className="catalog-quickFilters" aria-label="Kategori toko">
+              {quickFilters.map((item) => {
+                const Icon = item.Icon;
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    className={`catalog-quickChip catalog-quickChip--line catalog-quickChip--${item.key}${item.active ? " active" : ""}`}
+                    onClick={item.onClick}
+                    aria-pressed={item.active}
+                  >
+                    {Icon ? <Icon size={18} strokeWidth={2.4} aria-hidden="true" /> : null}
+                    <span>{item.label}</span>
+                    {item.count > 0 ? <em className="catalog-quickChipCount">{item.count}</em> : null}
+                  </button>
+                );
+              })}
             </div>
 
             <div className="catalog-contentBar">
@@ -1404,7 +1359,7 @@ export default function Products() {
                     view={view}
                     setView={setView}
                     onReset={resetFilters}
-                    categoryCounts={insights.categoryCounts}
+                    categoryCounts={catalogLineCounts}
                   />
                 </div>
 

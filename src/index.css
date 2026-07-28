@@ -14,9 +14,6 @@
 /* Polish layer: 10 lightweight UX effects */
 @import "./css/polish.css";
 
-/* AI assistant bubble */
-@import "./css/assistant.css";
-
 /* Overrides v3 (Mobile blur, footer redesign, genZ accents) */
 @import "./css/overrides-v3.css";
 
@@ -34,3 +31,6 @@
 
 /* Hero text animations — semua halaman kecuali Home */
 @import "./css/hero-animations.css";
+
+/* Flash sale popup after neo depth so red CTA / kicker styles always win */
+@import "./components/FlashSalePopup.css";

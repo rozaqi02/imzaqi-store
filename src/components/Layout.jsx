@@ -27,22 +27,25 @@ export default function Layout({ children, routeKey }) {
   useRevealOnScroll(revealKey);
 
   const hideFooter = isAdminDashboardRoute || (isCheckoutRoute && isMobile);
+  const hideStoreChrome = isAdminDashboardRoute; // full-screen admin app shell
   const isFunnel = isFunnelPath(location.pathname);
 
   React.useEffect(() => {
     if (typeof document === "undefined") return undefined;
     document.body.classList.toggle("is-funnel", isFunnel);
+    document.body.classList.toggle("is-admin-app", hideStoreChrome);
     return () => {
       document.body.classList.remove("is-funnel");
+      document.body.classList.remove("is-admin-app");
     };
-  }, [isFunnel]);
+  }, [isFunnel, hideStoreChrome]);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${hideStoreChrome ? " app-shell--admin" : ""}`}>
       <div className="global-bg" aria-hidden="true" />
       <div className="global-noise" aria-hidden="true" />
 
-      <Header />
+      {hideStoreChrome ? null : <Header />}
       <main
         className={`app-main${isAdminDashboardRoute ? " app-main-admin" : ""}${isCatalogRoute ? " app-main-catalog" : ""}${isCheckoutRoute ? " app-main-checkout" : ""}`}
       >
@@ -51,7 +54,7 @@ export default function Layout({ children, routeKey }) {
         </div>
       </main>
       {hideFooter ? null : <Footer key={revealKey} />}
-      <BottomNav />
+      {hideStoreChrome ? null : <BottomNav />}
     </div>
   );
 }

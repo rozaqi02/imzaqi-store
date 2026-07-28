@@ -25,6 +25,11 @@ SELECT * FROM public.admin_users;
    **Wajib** jika admin dapat `400 Bad Request` saat ganti kategori ke AI/Design  
    (biasanya ENUM/CHECK lama hanya mengizinkan streaming/music/tools/learning/other).
 
+4. `migrations/004_products_category_academic.sql` — izinkan kategori `academic` (Jasa Akademik)
+
+   **Wajib** sebelum simpan produk dengan kategori Jasa Akademik di admin,
+   jika CHECK constraint masih menolak nilai `academic`.
+
    Setelah dijalankan di SQL Editor, reload schema cache PostgREST bila perlu  
    (Dashboard → Settings → API → Reload schema).
 

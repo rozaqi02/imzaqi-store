@@ -317,6 +317,175 @@ html[data-theme="light"] .modal .admin-order-adminNote {
   color: #a4fff0 !important;
 }
 
+/* ── Desktop product list: don't clip cards under scrollbar ── */
+@media (min-width: 1101px) {
+  .admin-page .admin-products-list .admin-panel-body--scroll {
+    overflow-x: hidden !important;
+    scrollbar-gutter: stable !important;
+    padding-inline: 14px 16px !important;
+  }
+
+  .admin-page .admin-products-list .admin-product-row {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ── Mobile product editor: field boxes must not clip on the right ── */
+@media (max-width: 1100px) {
+  .admin-page.admin-page--app > .admin-section {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .admin-page .admin-products,
+  .admin-page .admin-products-editor {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .admin-page .admin-products-editor .admin-panel-body--scroll {
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    overflow-x: hidden !important;
+  }
+
+  .admin-page .admin-products-editor .admin-form-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+
+  .admin-page .admin-products-editor .admin-field .input,
+  .admin-page .admin-products-editor input.input,
+  .admin-page .admin-products-editor textarea,
+  .admin-page .admin-products-editor select {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* ── Products editor mobile chrome (back + head) ── */
+.admin-productsEditorChrome {
+  display: grid;
+  gap: 10px;
+}
+
+.admin-mobileBack {
+  display: none;
+}
+
+@media (max-width: 1100px) {
+  .admin-page .admin-productsEditorChrome {
+    display: grid !important;
+    gap: 10px !important;
+    padding: 12px 14px 0 !important;
+  }
+
+  /* Kill global column-stack that made ← Daftar look broken */
+  .admin-page .admin-products-editor > .admin-panel-head,
+  .admin-page .admin-products-editor .admin-panel-head.admin-panel-head--split,
+  .admin-page .admin-productsEditorHead {
+    flex-direction: row !important;
+    align-items: flex-start !important;
+  }
+}
+
+/* ── Catalog stock filter chip / banner ── */
+.admin-page .admin-inlineStatChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.28);
+  background: rgba(245, 158, 11, 0.1);
+  color: #f5c842;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.admin-page .admin-inlineStatChip.is-active {
+  border-color: rgba(245, 158, 11, 0.5);
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.12);
+}
+
+.admin-page .admin-filterBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(245, 158, 11, 0.24);
+  background: rgba(245, 158, 11, 0.08);
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--brand-text, #eef8f4);
+}
+
+html[data-theme="light"] .admin-page .admin-filterBanner {
+  color: #7a4b00;
+  background: rgba(255, 196, 60, 0.12);
+}
+
+html[data-theme="light"] .admin-page .admin-inlineStatChip {
+  color: #9a5b00;
+  background: rgba(255, 196, 60, 0.16);
+}
+
+/* ── Perf: lighter list cards (less multi-inset shadow while scrolling) ── */
+.admin-page .admin-orderListItem,
+.admin-page .admin-ordersList--dense .admin-orderListItem {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: none !important;
+  transition: border-color 0.15s ease, background 0.15s ease !important;
+}
+
+html[data-theme="light"] .admin-page .admin-orderListItem,
+html[data-theme="light"] .admin-page .admin-ordersList--dense .admin-orderListItem {
+  box-shadow:
+    0 1px 0 #fff inset,
+    0 3px 10px rgba(40, 94, 117, 0.08) !important;
+}
+
+.admin-page .admin-ordersList--virtual {
+  display: block !important;
+  gap: 0 !important;
+  min-height: 200px;
+}
+
+.admin-page .admin-ordersList--virtual .admin-orderListItem {
+  margin-bottom: 8px;
+}
+
+/* Product pills / promo cards — lighter while scrolling long lists */
+.admin-page .admin-product-pill,
+.admin-page .admin-promo-card {
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 3px 10px rgba(0, 0, 0, 0.1) !important;
+}
+
+@media (max-width: 720px) {
+  .admin-page .admin-orderListItem,
+  .admin-page .admin-statCard,
+  .admin-page .admin-panel {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 2px 8px rgba(0, 0, 0, 0.12) !important;
+  }
+}
+
 .admin-page .admin-orderListItem.is-selected {
   background: rgba(0, 214, 180, 0.08) !important;
   border-color: rgba(0, 214, 180, 0.24) !important;
@@ -334,9 +503,6 @@ html[data-theme="light"] .modal .admin-order-adminNote {
 
 /* Hide store distractions on admin */
 body.is-admin .fsp-backdrop,
-body.is-admin .ai-bubble,
-body.is-admin .ai-backdrop,
-body.is-admin .ai-panel,
 body.is-admin .abandoned-cart-banner {
   display: none !important;
 }

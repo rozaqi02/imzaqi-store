@@ -1,9 +1,8 @@
-/* Floating action stack (assistant + order chip) */
+/* Floating order chip (no AI assistant FAB) */
 html {
   --fab-edge-x: max(18px, calc(18px + env(safe-area-inset-right)));
   --fab-base-bottom: 18px;
   --fab-lift: 0px;
-  --fab-assistant-size: 56px;
   --fab-gap: 12px;
 }
 
@@ -11,7 +10,6 @@ html {
   html {
     --fab-edge-x: max(14px, calc(14px + env(safe-area-inset-right)));
     --fab-base-bottom: 14px;
-    --fab-assistant-size: 52px;
     --fab-gap: 10px;
   }
 }
@@ -34,7 +32,7 @@ html {
 
 .floating-order-status {
   position: fixed;
-  bottom: calc(var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift, 0px) + var(--fab-assistant-size) + var(--fab-gap) + 8px);
+  bottom: calc(var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift, 0px) + 8px);
   left: 50%;
   transform: translateX(-50%);
   z-index: 9998;
@@ -140,7 +138,7 @@ html[data-theme="light"] .floating-order-dismiss:hover {
 @media (max-width: 720px) {
   .floating-order-status {
     /* BUG-05: Pertahankan stacking di atas FAB — jangan override bottom ke nilai flat */
-    bottom: calc(var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift, 0px) + var(--fab-assistant-size) + var(--fab-gap) + 4px);
+    bottom: calc(var(--fab-base-bottom) + env(safe-area-inset-bottom) + var(--fab-lift, 0px) + 4px);
     left: 50%;
     transform: translateX(-50%);
   }

@@ -482,7 +482,7 @@ html[data-theme="light"] .product-tile-back-cta {
 }
 
 .product-tile--list .product-tile-bottom {
-  min-width: 138px;
+  min-width: 0;
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
@@ -534,6 +534,28 @@ html[data-theme="light"] .product-tile-back-cta {
 
 html[data-theme="light"] .home-popularList .home-popularSold {
   color: var(--text);
+}
+
+/* Academic home section: name + price only */
+.home-academicList .product-tile-rankBadge,
+.home-academicList .home-popularSold,
+.home-academicList .product-tile-pills,
+.home-academicList .product-tile-pill,
+.home-academicList .product-tile-arrow {
+  display: none !important;
+}
+
+.home-popularList .product-tile-arrow {
+  display: none !important;
+}
+
+/* Home list: sold + price in one horizontal row, no forced right column width */
+.home-popularList .product-tile-bottom {
+  min-width: 0 !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 8px !important;
 }
 
 .product-tile--grid .product-tile-pills {
