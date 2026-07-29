@@ -25,6 +25,15 @@ function safeParse(json, fallback) {
   }
 }
 
+function getItemCategoryLine(item) {
+  if (item?.category === "academic" || item?.catalog_line === "academic") return "academic";
+  const name = String(item?.product_name || item?.name || item?.variant_name || "").toLowerCase();
+  if (/turnitin|parafrase|paraphrase|plagiasi|zerogpt|mendeley|skripsi|tesis|jurnal|akademik/.test(name)) {
+    return "academic";
+  }
+  return "app_premium";
+}
+
 export function CartProvider({ children }) {
   const [bumpToken, setBumpToken] = useState(0);
   const [lastAddedVariantId, setLastAddedVariantId] = useState(null);
@@ -50,6 +59,22 @@ export function CartProvider({ children }) {
     lastAddedVariantId,
 
     add(variant, qty = 1) {
+      const newItemCategory = getItemCategoryLine(variant);
+      const hasConflict = items.some((existingItem) => {
+        const existingCategory = getItemCategoryLine(existingItem);
+        return existingCategory !== newItemCategory;
+      });
+
+      if (hasConflict) {
+        return {
+          success: false,
+          conflict: true,
+          conflictType: "mixed_category",
+          message:
+            "Produk 'Jasa Akademik' dan 'Aplikasi Premium' harus dipesan secara terpisah karena memiliki metode pembayaran QRIS yang berbeda. Mohon selesaikan atau kosongkan pesanan sebelumnya terlebih dahulu.",
+        };
+      }
+
       setBumpToken((t) => t + 1);
       setLastAddedVariantId(variant.id);
       // Track timer agar bisa di-cancel sebelum set ulang
@@ -58,8 +83,8 @@ export function CartProvider({ children }) {
         setLastAddedVariantId(null);
         lastAddedTimerRef.current = null;
       }, 900);
-      setItems(prev => {
-        const i = prev.findIndex(x => x.variant_id === variant.id);
+      setItems((prev) => {
+        const i = prev.findIndex((x) => x.variant_id === variant.id);
         if (i >= 0) {
           const next = [...prev];
           next[i] = {
@@ -76,6 +101,7 @@ export function CartProvider({ children }) {
               "",
             description: variant.description ?? next[i].description,
             guarantee_text: variant.guarantee_text ?? next[i].guarantee_text,
+            catalog_line: newItemCategory,
             requires_buyer_email:
               typeof variant.requires_buyer_email === "boolean"
                 ? variant.requires_buyer_email
@@ -96,11 +122,13 @@ export function CartProvider({ children }) {
             product_icon_url: variant.product_icon_url || variant.icon_url || "",
             description: variant.description || "",
             guarantee_text: variant.guarantee_text || "",
+            catalog_line: newItemCategory,
             requires_buyer_email: !!variant.requires_buyer_email,
             qty: clamp(qty, 1, 99),
           },
         ];
       });
+      return { success: true };
     },
 
     remove(variant_id) {

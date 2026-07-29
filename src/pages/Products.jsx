@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
+import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
@@ -1006,6 +1006,10 @@ export default function Products() {
             <p className="catalog-sub hero-anim-sub">Scroll dulu, gas aja kalo cocok.</p>
           </div>
 
+          <div style={{ margin: "20px 0 24px" }}>
+            <FlashSaleBanner />
+          </div>
+
           <div className="catalog-command">
             <div className="catalog-commandSearch">
               <div className="search-dropdown-anchor" ref={searchWrapRef}>
@@ -1140,10 +1144,6 @@ export default function Products() {
           </div>
         </div>
       </section>
-
-      <div className="container">
-        <FlashSaleBanner />
-      </div>
 
       <section className="section catalog-body" style={{ paddingTop: 0 }}>
         <div className="container catalog-layout">

@@ -720,11 +720,12 @@
 .pdx-benefitItem {
   display: flex;
   align-items: flex-start;
-  gap: 10px;
+  gap: 8px;
   padding: 6px 10px;
   border-radius: 10px;
-  color: var(--pdx-muted);
-  font-size: 12.5px;
+  color: var(--pdx-text, rgba(220, 240, 255, 0.95));
+  font-size: 13px;
+  font-weight: 700;
   line-height: 1.5;
   overflow-wrap: break-word;
   word-break: normal;
@@ -733,6 +734,10 @@
     max-height 0.3s ease,
     opacity 0.25s ease,
     padding 0.3s ease;
+}
+
+:root[data-theme="light"] .pdx-benefitItem {
+  color: #1e3a44 !important;
 }
 
 @media (hover: hover) {
@@ -1506,112 +1511,132 @@
   align-items: center;
   gap: 6px;
   min-height: 28px;
-  padding: 0 11px;
-  border-radius: 999px;
-  border: 1px solid var(--brand-line, var(--pdx-line));
-  background: rgba(255, 255, 255, 0.05);
-  box-shadow: none;
+  padding: 2px 14px;
+  border-radius: 9999px;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.16));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+  box-shadow:
+    var(--skeu-control-shadow, none),
+    0 4px 12px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
   color: var(--pdx-text-3);
-  font-size: 10px;
+  font-size: 10.5px;
   font-weight: 900;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   text-decoration: none;
   white-space: nowrap;
-  transition: border-color 0.18s ease, color 0.18s ease, background-color 0.18s ease;
+  transition: all 0.2s ease;
 }
 
 .detail-page-v3 .pdx-categoryPill:hover {
-  border-color: rgba(79, 255, 200, 0.28);
-  color: var(--pdx-text-accent);
-  background: rgba(255, 255, 255, 0.08);
+  transform: translateY(-1px);
+  filter: brightness(1.06);
+  box-shadow:
+    0 6px 16px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
 }
 
 .detail-page-v3 .pdx-categoryPill svg {
   flex-shrink: 0;
-  opacity: 0.85;
-}
-
-.detail-page-v3 .pdx-categoryPill[data-category="streaming"] {
-  border-color: rgba(229, 9, 20, 0.22);
-  background: rgba(229, 9, 20, 0.08);
-  color: #ffb4bc;
-}
-
-.detail-page-v3 .pdx-categoryPill[data-category="music"] {
-  border-color: rgba(29, 185, 84, 0.24);
-  background: rgba(29, 185, 84, 0.08);
-  color: #9ef0c0;
-}
-
-.detail-page-v3 .pdx-categoryPill[data-category="tools"] {
-  border-color: rgba(117, 178, 214, 0.28);
-  background: rgba(117, 178, 214, 0.08);
-  color: #b8e4ff;
-}
-
-.detail-page-v3 .pdx-categoryPill[data-category="ai"] {
-  border-color: rgba(16, 163, 127, 0.28);
-  background: rgba(16, 163, 127, 0.08);
-  color: #8ef0d8;
-}
-
-.detail-page-v3 .pdx-categoryPill[data-category="design"] {
-  border-color: rgba(0, 196, 204, 0.28);
-  background: rgba(0, 196, 204, 0.08);
-  color: #8ef6fb;
-}
-
-.detail-page-v3 .pdx-categoryPill[data-category="learning"] {
-  border-color: rgba(255, 170, 70, 0.28);
-  background: rgba(255, 170, 70, 0.08);
-  color: #ffd9a0;
+  opacity: 0.95;
 }
 
 .detail-page-v3 .pdx-categoryPill[data-category="academic"] {
-  border-color: rgba(99, 102, 241, 0.32);
-  background: rgba(99, 102, 241, 0.1);
-  color: #c7c9ff;
+  border-color: rgba(99, 102, 241, 0.4) !important;
+  color: #818cf8 !important;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.22), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-categoryPill[data-category="streaming"] {
+  border-color: rgba(229, 9, 20, 0.4) !important;
+  color: #f87171 !important;
+  box-shadow: 0 4px 14px rgba(229, 9, 20, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-categoryPill[data-category="music"] {
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  color: #34d399 !important;
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-categoryPill[data-category="tools"] {
+  border-color: rgba(56, 189, 248, 0.4) !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 4px 14px rgba(56, 189, 248, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-categoryPill[data-category="ai"] {
+  border-color: rgba(20, 184, 166, 0.4) !important;
+  color: #2dd4bf !important;
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-categoryPill[data-category="design"] {
+  border-color: rgba(6, 182, 212, 0.4) !important;
+  color: #22d3ee !important;
+  box-shadow: 0 4px 14px rgba(6, 182, 212, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
+}
+
+.detail-page-v3 .pdx-categoryPill[data-category="learning"] {
+  border-color: rgba(245, 158, 11, 0.4) !important;
+  color: #fbbf24 !important;
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.25) !important;
 }
 
 html[data-theme="light"] .detail-page-v3 .pdx-categoryPill {
-  background: rgba(0, 0, 0, 0.03);
-  box-shadow: none;
-}
-
-html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="streaming"] {
-  color: #b42318;
-  background: rgba(229, 9, 20, 0.06);
-}
-
-html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="music"] {
-  color: #15803d;
-  background: rgba(29, 185, 84, 0.08);
-}
-
-html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="tools"] {
-  color: #1d6a8a;
-  background: rgba(117, 178, 214, 0.1);
-}
-
-html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="ai"] {
-  color: #0f766e;
-  background: rgba(16, 163, 127, 0.08);
-}
-
-html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="design"] {
-  color: #0e7490;
-  background: rgba(0, 196, 204, 0.08);
-}
-
-html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="learning"] {
-  color: #b45309;
-  background: rgba(255, 170, 70, 0.1);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 40%),
+    var(--skeu-control-bg, #ffffff) !important;
+  border-color: rgba(40, 60, 75, 0.14) !important;
+  box-shadow:
+    0 4px 12px rgba(40, 70, 90, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
 html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="academic"] {
-  color: #4338ca;
-  background: rgba(99, 102, 241, 0.1);
+  color: #4338ca !important;
+  border-color: rgba(99, 102, 241, 0.35) !important;
+  background: linear-gradient(180deg, #ffffff, #eef2ff) !important;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.16), inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="streaming"] {
+  color: #dc2626 !important;
+  border-color: rgba(229, 9, 20, 0.35) !important;
+  background: linear-gradient(180deg, #ffffff, #fef2f2) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="music"] {
+  color: #059669 !important;
+  border-color: rgba(16, 185, 129, 0.35) !important;
+  background: linear-gradient(180deg, #ffffff, #ecfdf5) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="tools"] {
+  color: #0284c7 !important;
+  border-color: rgba(56, 189, 248, 0.35) !important;
+  background: linear-gradient(180deg, #ffffff, #f0f9ff) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="ai"] {
+  color: #0d9488 !important;
+  border-color: rgba(20, 184, 166, 0.35) !important;
+  background: linear-gradient(180deg, #ffffff, #f0fdfa) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="design"] {
+  color: #0891b2 !important;
+  border-color: rgba(6, 182, 212, 0.35) !important;
+  background: linear-gradient(180deg, #ffffff, #ecfeff) !important;
+}
+
+html[data-theme="light"] .detail-page-v3 .pdx-categoryPill[data-category="learning"] {
+  color: #d97706 !important;
+  border-color: rgba(245, 158, 11, 0.35) !important;
+  background: linear-gradient(180deg, #ffffff, #fffbeb) !important;
 }
 
 .detail-page.detail-page-v3 .pdx-title {
@@ -2336,12 +2361,12 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
    Detail Page Overhaul: Premium Glassmorphism & Grid Alignment
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* 1. Top Card — full neumorphism 3D, no glassmorphism */
+/* 1. Top Card — full neumorphism 3D with artistic brand color ambient blur */
 .detail-page-v3 .pdx-topCard {
   background:
+    radial-gradient(ellipse 90% 70% at 15% 25%, var(--brand-color, rgba(0, 214, 180, 0.35)), transparent 75%),
+    radial-gradient(ellipse 65% 55% at 85% 75%, var(--brand-color, rgba(99, 102, 241, 0.25)), transparent 70%),
     linear-gradient(166deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.01) 50%, rgba(255, 255, 255, 0) 100%),
-    radial-gradient(ellipse 80% 60% at 10% 20%, var(--brand-color, rgba(78, 255, 218, 0.10)), rgba(0, 0, 0, 0) 85%),
-    radial-gradient(ellipse 50% 40% at 90% 80%, var(--brand-color, rgba(78, 255, 218, 0.05)), rgba(0, 0, 0, 0) 80%),
     var(--skeu-panel-bg, linear-gradient(175deg, rgba(20, 34, 64, 1), rgba(4, 8, 22, 1))) !important;
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16)) !important;
   box-shadow:
@@ -2352,20 +2377,67 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
     inset 0 3px 0 rgba(255, 255, 255, 0.10),
     inset 0 -3px 0 rgba(0, 0, 0, 0.48) !important;
   position: relative;
-  overflow: clip;
+  overflow: hidden;
+  isolation: isolate;
 }
 
-/* Light mode top card */
+/* Artistic Abstract Blurred Color Glow Orbs */
+.detail-page-v3 .pdx-topCard::before {
+  content: "";
+  position: absolute;
+  top: -50px;
+  left: -40px;
+  width: 260px;
+  height: 260px;
+  border-radius: 50%;
+  background: var(--brand-color, rgba(0, 214, 180, 0.5));
+  filter: blur(55px);
+  opacity: 0.55;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.detail-page-v3 .pdx-topCard::after {
+  content: "";
+  position: absolute;
+  bottom: -40px;
+  right: -30px;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: var(--brand-color, rgba(129, 140, 248, 0.4));
+  filter: blur(50px);
+  opacity: 0.45;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.detail-page-v3 .pdx-topCard > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Light mode top card with vibrant artistic ambient blur */
 :root[data-theme="light"] .detail-page-v3 .pdx-topCard {
   background:
-    radial-gradient(ellipse 85% 65% at 10% 20%, var(--brand-color, rgba(126, 194, 224, 0.18)), rgba(0, 0, 0, 0) 85%),
-    radial-gradient(ellipse 55% 45% at 90% 80%, var(--brand-color, rgba(126, 194, 224, 0.10)), rgba(0, 0, 0, 0) 80%),
-    linear-gradient(166deg, rgba(255, 255, 255, 0.98) 0%, rgba(242, 250, 253, 0.88) 50%, rgba(232, 246, 251, 0.94) 100%) !important;
+    radial-gradient(ellipse 90% 70% at 15% 25%, var(--brand-color, rgba(0, 194, 208, 0.35)), transparent 75%),
+    radial-gradient(ellipse 65% 55% at 85% 75%, var(--brand-color, rgba(99, 102, 241, 0.22)), transparent 70%),
+    linear-gradient(166deg, rgba(255, 255, 255, 0.96) 0%, rgba(242, 250, 253, 0.88) 50%, rgba(232, 246, 251, 0.94) 100%) !important;
   border-color: rgba(0, 138, 148, 0.18) !important;
   box-shadow:
     12px 14px 28px rgba(97, 137, 153, 0.18),
     inset 0 2px 0 rgba(255, 255, 255, 1),
     inset 0 -2px 0 rgba(166, 200, 211, 0.28) !important;
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-topCard::before {
+  opacity: 0.45;
+  filter: blur(50px);
+}
+
+:root[data-theme="light"] .detail-page-v3 .pdx-topCard::after {
+  opacity: 0.35;
+  filter: blur(45px);
 }
 
 /* Add a beautiful radial brand glow behind icon */
@@ -3969,6 +4041,100 @@ html[data-theme="light"] .pdx-packHot {
   border-color: rgba(200, 100, 0, 0.3);
   background: rgba(200, 100, 0, 0.08);
   color: #b85c00;
+}
+
+/* ── Title row & Compare button styling ───────────────────────────── */
+.pdx-variantsTitleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 4px;
+  width: 100%;
+}
+
+@media (max-width: 560px) {
+  .pdx-variantsTitleRow {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+}
+
+/* ── Package Scroll Hint / Slider Indicator ────────────────────────── */
+.pdx-scrollHint {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 12px;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  background: rgba(0, 0, 0, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="light"] .pdx-scrollHint {
+  background: rgba(240, 246, 250, 0.9);
+  border-color: rgba(40, 60, 75, 0.14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.pdx-scrollPills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdx-scrollDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.25);
+  transition: width 0.25s ease, background 0.25s ease;
+}
+
+.pdx-scrollDot.is-active {
+  width: 22px;
+  background: #00d6b4;
+}
+
+html[data-theme="light"] .pdx-scrollDot {
+  background: rgba(40, 70, 90, 0.2);
+}
+
+html[data-theme="light"] .pdx-scrollDot.is-active {
+  background: #009688;
+}
+
+.pdx-scrollText {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: rgba(234, 255, 245, 0.72);
+}
+
+html[data-theme="light"] .pdx-scrollText {
+  color: #324f59;
+}
+
+.pdx-scrollArrow {
+  font-size: 13px;
+  font-weight: 900;
+  color: #00d6b4;
+  display: inline-block;
+  animation: pdxSwipeArrow 1.4s infinite ease-in-out;
+}
+
+html[data-theme="light"] .pdx-scrollArrow {
+  color: #009688;
+}
+
+@keyframes pdxSwipeArrow {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -1,0 +1,454 @@
+/* ── Neumorphic Academic Popup Stylesheet (2x2 Desktop Grid + Mobile Friendly Layout) ── */
+
+.ac-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgba(0, 0, 0, 0.76);
+  animation: acPopupFadeIn 0.22s ease-out forwards;
+}
+
+@keyframes acPopupFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── Modal Shell (Wider for 2x2 Desktop Grid) ── */
+.ac-popup-modal {
+  width: min(100%, 620px);
+  max-height: min(90vh, 720px);
+  max-height: min(90dvh, 720px);
+  display: flex;
+  flex-direction: column;
+  border-radius: 28px;
+  position: relative;
+  overflow: hidden;
+
+  /* Solid Neumorphic Dark Panel */
+  background: var(--skeu-panel-bg, linear-gradient(170deg, #16264a 0%, #0d1a38 45%, #080f22 100%));
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.22));
+  box-shadow:
+    var(--skeu-panel-shadow, 0 32px 72px rgba(0, 0, 0, 0.78)),
+    0 0 32px rgba(0, 194, 208, 0.12),
+    inset 0 2px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -3px 0 rgba(0, 0, 0, 0.5);
+
+  transform: scale(0.92) translateY(16px);
+  opacity: 0;
+  animation: acPopUp 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+html[data-theme="light"] .ac-popup-modal {
+  /* Solid Neumorphic Light Panel */
+  background: var(--skeu-panel-bg, linear-gradient(170deg, #ffffff 0%, #f0f8fc 54%, #e4f3f8 100%)) !important;
+  border-color: rgba(0, 138, 148, 0.2) !important;
+  box-shadow:
+    var(--skeu-panel-shadow, 0 24px 60px rgba(20, 50, 70, 0.24)),
+    0 0 24px rgba(0, 138, 148, 0.1),
+    inset 0 2px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(154, 191, 203, 0.32) !important;
+}
+
+@keyframes acPopUp {
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* ── Head ── */
+.ac-popup-head {
+  padding: 22px 24px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.12));
+  background: linear-gradient(180deg, rgba(0, 194, 208, 0.06), rgba(0, 194, 208, 0) 100%);
+}
+
+html[data-theme="light"] .ac-popup-head {
+  border-bottom-color: rgba(0, 138, 148, 0.12) !important;
+  background: linear-gradient(180deg, rgba(0, 138, 148, 0.04), rgba(0, 138, 148, 0) 100%) !important;
+}
+
+.ac-popup-titleBlock {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: 6px;
+  width: 100%;
+}
+
+.ac-popup-kicker {
+  margin: 0;
+  font-size: clamp(22px, 5.5vw, 28px);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  color: var(--brand-text, #ffffff) !important;
+  line-height: 1.1;
+  animation: none !important;
+  text-shadow: none !important;
+}
+
+.ac-popup-kicker span {
+  animation: none !important;
+  color: inherit !important;
+  background: none !important;
+  -webkit-text-fill-color: initial !important;
+  text-shadow: none !important;
+}
+
+html[data-theme="light"] .ac-popup-kicker {
+  color: #0f172a !important;
+}
+
+.ac-popup-sub {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--brand-muted, rgba(220, 240, 255, 0.72));
+  line-height: 1.4;
+}
+
+html[data-theme="light"] .ac-popup-sub {
+  color: rgba(40, 80, 95, 0.75);
+}
+
+/* ── Body: 2x2 Grid on Desktop, 1-Col on Mobile ── */
+.ac-popup-body {
+  padding: 18px 20px 12px;
+  overflow-y: auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2x2 Layout on Desktop */
+  gap: 14px;
+}
+
+@media (max-width: 600px) {
+  .ac-popup-body {
+    grid-template-columns: 1fr; /* 1 Column on Mobile */
+    gap: 12px;
+    padding: 14px 16px 10px;
+  }
+}
+
+/* ── Neumorphic Product Card (Slim & Compact) ── */
+.ac-popup-item {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px 12px;
+  border-radius: 15px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 30%),
+    rgba(0, 8, 22, 0.28);
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.12));
+  box-shadow:
+    inset 3px 4px 10px rgba(0, 0, 0, 0.38),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.04),
+    inset 0 1px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+.ac-popup-item:hover {
+  border-color: rgba(0, 194, 208, 0.28);
+  transform: translateY(-1px);
+  box-shadow:
+    inset 3px 4px 10px rgba(0, 0, 0, 0.38),
+    inset -2px -2px 6px rgba(255, 255, 255, 0.06),
+    0 6px 18px rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="light"] .ac-popup-item {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 30%),
+    rgba(0, 60, 80, 0.04) !important;
+  border-color: rgba(0, 138, 148, 0.14) !important;
+  box-shadow:
+    inset 3px 4px 8px rgba(67, 111, 129, 0.14),
+    inset -2px -2px 5px rgba(255, 255, 255, 0.75),
+    inset 0 1px 0 rgba(67, 111, 129, 0.08) !important;
+}
+
+/* Card Top: Icon + Title */
+.ac-popup-itemMain {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+}
+
+.ac-popup-itemIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 11px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 38%),
+    var(--skeu-pill-bg, linear-gradient(175deg, rgba(20, 33, 62, 0.98), rgba(12, 20, 42, 0.96)));
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.2));
+  box-shadow:
+    2px 2px 6px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14);
+}
+
+html[data-theme="light"] .ac-popup-itemIcon {
+  background: linear-gradient(145deg, #ffffff, #e8f4f8) !important;
+  border-color: rgba(0, 138, 148, 0.18) !important;
+  box-shadow:
+    2px 2px 6px rgba(67, 111, 129, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+}
+
+.ac-popup-itemIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.ac-popup-fallbackText {
+  font-size: 15px;
+  font-weight: 900;
+  color: var(--accent, #00d6b4);
+}
+
+.ac-popup-itemContent {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.ac-popup-itemName {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1.25;
+  color: var(--brand-text, #f0f4f8);
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+}
+
+html[data-theme="light"] .ac-popup-itemName {
+  color: #0d2d39;
+}
+
+/* Card Bottom: Price + Pesan Action Button */
+.ac-popup-itemFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+}
+
+html[data-theme="light"] .ac-popup-itemFooter {
+  border-top-color: rgba(0, 138, 148, 0.1) !important;
+}
+
+.ac-popup-itemPrice {
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--accent, #00d6b4);
+}
+
+html[data-theme="light"] .ac-popup-itemPrice {
+  color: #008a94;
+}
+
+/* Raised Neumorphic Action Button (Identical to Flash Sale "Beli" button) */
+.ac-popup-actionBtn {
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 900;
+  border-radius: 10px;
+  min-height: 28px;
+  letter-spacing: 0.02em;
+  color: #03160e;
+  background: var(--imzaqi-btn-face,
+    linear-gradient(170deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda, #00d6b4 60%, #008a94)
+  );
+  border: 1px solid var(--imzaqi-btn-border, rgba(0, 138, 148, 0.38));
+  box-shadow: var(--imzaqi-btn-shadow,
+    inset 0 2px 0 rgba(255, 255, 255, 0.72),
+    inset 0 -2px 0 rgba(0, 80, 68, 0.5),
+    0 4px 12px rgba(0, 180, 150, 0.28)
+  );
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+.ac-popup-actionBtn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.ac-popup-actionBtn:active {
+  transform: translateY(1px);
+}
+
+html[data-theme="light"] .ac-popup-actionBtn {
+  color: #03160e !important;
+  background: var(--imzaqi-btn-face,
+    linear-gradient(170deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 28%),
+    linear-gradient(135deg, #4effda, #25ebc8 36%, #00d6b4 58%, #008a94)
+  ) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+/* ── Foot ── */
+.ac-popup-foot {
+  padding: 10px 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border-top: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.15), rgba(0, 0, 0, 0.3));
+}
+
+html[data-theme="light"] .ac-popup-foot {
+  border-top-color: rgba(0, 138, 148, 0.12) !important;
+  background: linear-gradient(180deg, rgba(240, 248, 252, 0.5), rgba(228, 243, 248, 0.8)) !important;
+}
+
+/* Trust Bar — Forced Single Line on Mobile */
+.ac-popup-trustBar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--accent, #00d6b4);
+  white-space: nowrap !important;
+  width: 100%;
+}
+
+html[data-theme="light"] .ac-popup-trustBar {
+  color: #008a94;
+}
+
+.ac-popup-trustBar span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap !important;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .ac-popup-trustBar {
+    font-size: 10px !important;
+    gap: 8px !important;
+    white-space: nowrap !important;
+  }
+}
+
+/* Bottom Action Buttons (Jangan ingatkan hari ini & Nanti Aja) */
+.ac-popup-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ac-popup-suppressBtn,
+.ac-popup-backdrop .ac-popup-modal button.ac-popup-suppressBtn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  padding: 9px 14px !important;
+  border-radius: 999px !important;
+  font-size: 11.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.01em !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  cursor: pointer !important;
+  white-space: nowrap !important;
+  border: 1px solid #9f1239 !important;
+  background-color: #e11d3a !important;
+  background-image: linear-gradient(
+    165deg,
+    #ff5a6a 0%,
+    #e11d3a 50%,
+    #be123c 100%
+  ) !important;
+  box-shadow:
+    0 8px 18px rgba(225, 29, 58, 0.32),
+    0 2px 6px rgba(0, 0, 0, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 0 rgba(100, 0, 20, 0.3) !important;
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease !important;
+  filter: none !important;
+}
+
+.ac-popup-suppressBtn:hover,
+.ac-popup-backdrop .ac-popup-modal button.ac-popup-suppressBtn:hover {
+  transform: translateY(-2px) !important;
+  filter: brightness(1.06) !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background-color: #e11d3a !important;
+  background-image: linear-gradient(
+    165deg,
+    #ff6b7a 0%,
+    #e11d3a 50%,
+    #be123c 100%
+  ) !important;
+  box-shadow:
+    0 10px 22px rgba(225, 29, 58, 0.38),
+    0 3px 8px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4),
+    inset 0 -2px 0 rgba(100, 0, 20, 0.35) !important;
+}
+
+.ac-popup-suppressBtn:active {
+  transform: translateY(1px) !important;
+  filter: brightness(0.96) !important;
+}
+
+.ac-popup-laterBtn {
+  background: none;
+  border: none;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--brand-muted, rgba(200, 240, 255, 0.55));
+  cursor: pointer;
+  transition: color 0.2s ease;
+}
+
+html[data-theme="light"] .ac-popup-laterBtn {
+  color: rgba(0, 60, 80, 0.65);
+}
+
+.ac-popup-laterBtn:hover {
+  color: var(--brand-text, #ffffff);
+  text-decoration: underline;
+}
+
+html[data-theme="light"] .ac-popup-laterBtn:hover {
+  color: #0d2d39;
+}

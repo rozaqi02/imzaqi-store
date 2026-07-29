@@ -51,8 +51,11 @@ export default function Footer() {
             </Link>
 
             <div className="site-footerGoContact">
-              <a href="https://wa.me/6283136049987" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
-                Chat Admin: 0831-3604-9987
+              <a href="https://wa.me/6282245964007" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
+                📱 +62 822-4596-4007 <span style={{ opacity: 0.75, fontSize: "12px", fontWeight: 600 }}>(Khusus App Premium)</span>
+              </a>
+              <a href="https://wa.me/6281232742374" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
+                🎓 +62 812-3274-2374 <span style={{ opacity: 0.75, fontSize: "12px", fontWeight: 600 }}>(Khusus Jasa Akademik)</span>
               </a>
             </div>
           </div>
@@ -87,7 +90,7 @@ export default function Footer() {
 
           <div className="site-footerGoLegal">
             <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
-            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.4.0</p>
+            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.5.0</p>
           </div>
         </div>
       </div>

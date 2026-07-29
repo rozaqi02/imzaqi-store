@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { fireConfetti } from "../components/Confetti";
 import {
@@ -234,7 +234,15 @@ function TabCekStatus({ settings }) {
   const [showCelebration, setShowCelebration] = useState(false);
   const prevStatusRef = useRef(null);
 
-  const waNumber = settings?.whatsapp?.number || "6283136049987";
+  const isAcademicOrder = useMemo(() => {
+    if (!order?.items || !Array.isArray(order.items)) return false;
+    return order.items.some((item) => {
+      const name = String(item.product_name || item.name || "").toLowerCase();
+      return /turnitin|parafrase|paraphrase|plagiasi|zerogpt|mendeley|skripsi|tesis|jurnal|akademik/.test(name);
+    });
+  }, [order]);
+
+  const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6282245964007");
   const pollTimerRef = useRef(null);
 
   const lookup = useCallback(async (rawValue) => {

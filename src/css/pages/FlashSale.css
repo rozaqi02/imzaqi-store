@@ -210,16 +210,7 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
 }
 
 .flash-sale-card::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  border-radius: 18px 18px 0 0;
-  background: linear-gradient(90deg, #00d6b4, #5ce0ff, #00d6b4);
-  opacity: 0.7;
-  pointer-events: none;
+  display: none !important;
 }
 
 /* Discount badge — solid yellow alert */

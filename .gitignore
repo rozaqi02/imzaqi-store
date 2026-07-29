@@ -5,3 +5,4 @@ dist/
 commit-msg.txt
 COMMIT_MSG.txt
 *.log
+build/

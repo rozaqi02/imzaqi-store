@@ -1,4 +1,4 @@
-﻿import React, {
+import React, {
   startTransition,
   useCallback,
   useDeferredValue,
@@ -236,6 +236,7 @@ export default function AdminDashboard() {
   const [settingsWhatsApp, setSettingsWhatsApp] = useState("");
   const [settingsQrisBase, setSettingsQrisBase] = useState("");
   const [settingsQrisImageUrl, setSettingsQrisImageUrl] = useState("");
+  const [settingsAcademicPopupEnabled, setSettingsAcademicPopupEnabled] = useState(true);
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [exportDateFrom, setExportDateFrom] = useState("");
   const [exportDateTo, setExportDateTo] = useState("");
@@ -347,6 +348,11 @@ export default function AdminDashboard() {
     const qris = settings?.qris || {};
     setSettingsQrisBase(String(qris.base_payload || ""));
     setSettingsQrisImageUrl(String(qris.image_url || ""));
+
+    const ac = settings?.academic_popup;
+    if (ac && typeof ac === "object" && typeof ac.enabled === "boolean") {
+      setSettingsAcademicPopupEnabled(ac.enabled);
+    }
   }, [settings]);
 
   async function fetchOrdersPage(offset = 0, { bucket = orderBucket, detail = false } = {}) {
@@ -2292,6 +2298,22 @@ export default function AdminDashboard() {
     } catch (e) {
       toast.remove(tid);
       toast.error("Gagal simpan QRIS");
+      setMsg(e?.message || String(e));
+    }
+  }
+
+  async function saveAcademicPopupSettings(enabled) {
+    const tid = toast.loading("Simpan setting pop-up akademik");
+    try {
+      await upsertSetting("academic_popup", { enabled: Boolean(enabled) });
+      const nextSettings = await fetchSettings({ useCache: false });
+      setSettings(nextSettings);
+      setSettingsAcademicPopupEnabled(Boolean(enabled));
+      toast.remove(tid);
+      toast.success("Status Pop-Up Akademik disimpan", { duration: 1200 });
+    } catch (e) {
+      toast.remove(tid);
+      toast.error("Gagal menyimpan status pop-up");
       setMsg(e?.message || String(e));
     }
   }
@@ -4275,7 +4297,8 @@ export default function AdminDashboard() {
 
             {tab === "settings" ? (
               <div className="admin-settingsGrid admin-workspaceScroll">
-                <div className="admin-panel admin-workspacePane">
+                <div className="admin-panel">
+                  {/* Section 1: Kontak & Pembayaran */}
                   <div className="admin-panel-head">
                     <div>
                       <div className="admin-panel-title">Kontak & pembayaran</div>
@@ -4329,10 +4352,42 @@ export default function AdminDashboard() {
                       </button>
                     </div>
                   </div>
-                </div>
 
-                <div className="admin-panel">
-                  <div className="admin-panel-head">
+                  {/* Section 2: Pop-up Promosi & Jasa Akademik */}
+                  <div className="admin-panel-head" style={{ borderTop: "1px solid var(--admin-border, rgba(255,255,255,0.08))", paddingTop: 20 }}>
+                    <div>
+                      <div className="admin-panel-title">Pop-up Promosi & Jasa Akademik</div>
+                      <div className="admin-panel-sub">Kontrol tayang pop-up penawaran layanan kampus di storefront</div>
+                    </div>
+                  </div>
+
+                  <div className="admin-panel-body">
+                    <label className="admin-checkboxLabel" style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14, fontWeight: 700, margin: "4px 0 12px" }}>
+                      <input
+                        type="checkbox"
+                        checked={settingsAcademicPopupEnabled}
+                        onChange={(e) => setSettingsAcademicPopupEnabled(e.target.checked)}
+                        style={{ width: 18, height: 18, accentColor: "#10b981", cursor: "pointer" }}
+                      />
+                      <span>Aktifkan Pop-up Jasa Akademik di Storefront</span>
+                    </label>
+                    <div className="hint subtle" style={{ marginBottom: 16 }}>
+                      Jika diaktifkan, pengunjung toko akan melihat pop-up Jasa Akademik terlebih dahulu, kemudian diikuti pop-up Flash Sale.
+                    </div>
+
+                    <div className="admin-form-actions">
+                      <button
+                        className="btn btn-primary"
+                        type="button"
+                        onClick={() => saveAcademicPopupSettings(settingsAcademicPopupEnabled)}
+                      >
+                        Simpan Status Pop-up Akademik
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Section 3: Catatan sistem */}
+                  <div className="admin-panel-head" style={{ borderTop: "1px solid var(--admin-border, rgba(255,255,255,0.08))", paddingTop: 20 }}>
                     <div>
                       <div className="admin-panel-title">Catatan sistem</div>
                       <div className="admin-panel-sub">Status operasional singkat</div>

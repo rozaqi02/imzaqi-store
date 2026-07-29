@@ -312,14 +312,10 @@ export async function fetchSettings({ useCache = true, ttlMs = 30000 } = {}) {
 }
 
 export async function upsertSetting(key, value) {
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from("site_settings")
-    .update({ value, updated_at: new Date().toISOString() })
-    .eq("key", key)
-    .select("key")
-    .maybeSingle();
+    .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
   if (error) throw error;
-  if (!data) throw new Error(`Setting ${key} tidak ditemukan di database.`);
   clearPublicCache("settings");
 }
 

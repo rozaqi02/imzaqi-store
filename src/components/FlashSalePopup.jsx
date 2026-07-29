@@ -88,13 +88,6 @@ export default function FlashSalePopup() {
         if (enriched.length > 0 && active) {
           setSalesItems(enriched);
           setClosestEndTime(minEndTime);
-
-          const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
-          if (!suppressedToday && !isFunnel) {
-            window.setTimeout(() => {
-              if (active) setIsOpen(true);
-            }, OVERLAY_TIMING.flashSaleMs);
-          }
         }
       } catch (err) {
         console.warn("[FlashSalePopup] Gagal memuat data flash sale:", err);
@@ -108,17 +101,46 @@ export default function FlashSalePopup() {
     };
   }, []);
 
-  // 2. Pop-up muncul otomatis saat beralih menu (navigation), kecuali jika suppressed hari ini atau di funnel route
+  // 2. Pop-up muncul otomatis setelah Academic Popup selesai/ditutup
   useEffect(() => {
-    if (prevPathnameRef.current !== location.pathname) {
-      prevPathnameRef.current = location.pathname;
+    const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
+    if (suppressedToday || isFunnel || salesItems.length === 0) return;
 
-      const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
-      if (!suppressedToday && !isFunnel && salesItems.length > 0) {
-        setIsOpen(true);
-      }
+    function checkAndOpenFlashSale() {
+      const isAcademicActive = Boolean(
+        window.__imzaqi_academic_popup_active ||
+        document.querySelector(".ac-popup-backdrop")
+      );
+
+      // Never open if Academic Popup is currently showing
+      if (isAcademicActive) return;
+
+      setIsOpen(true);
     }
-  }, [location.pathname, isFunnel, salesItems.length]);
+
+    // Check after initial delay (2.5s) if Academic Popup is NOT showing
+    const initialTimer = setTimeout(checkAndOpenFlashSale, 2500);
+
+    // Listen for custom event when Academic Popup is closed/disabled
+    const handleAcademicClosed = () => {
+      setTimeout(() => {
+        const isAcademicStillActive = Boolean(
+          window.__imzaqi_academic_popup_active ||
+          document.querySelector(".ac-popup-backdrop")
+        );
+        if (!isAcademicStillActive) {
+          setIsOpen(true);
+        }
+      }, 500);
+    };
+
+    window.addEventListener("imzaqi_academic_popup_closed", handleAcademicClosed);
+
+    return () => {
+      clearTimeout(initialTimer);
+      window.removeEventListener("imzaqi_academic_popup_closed", handleAcademicClosed);
+    };
+  }, [isFunnel, salesItems.length]);
 
   // 3. Countdown Timer
   useEffect(() => {
@@ -158,7 +180,12 @@ export default function FlashSalePopup() {
     }
   };
 
-  if (isFunnel || !isOpen || salesItems.length === 0) return null;
+  const isAcademicActive = Boolean(
+    window.__imzaqi_academic_popup_active ||
+    (typeof document !== "undefined" && document.querySelector(".ac-popup-backdrop"))
+  );
+
+  if (isFunnel || !isOpen || salesItems.length === 0 || isAcademicActive) return null;
 
   return createPortal(
     <div

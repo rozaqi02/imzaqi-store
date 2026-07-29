@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, memo } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, memo } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
@@ -140,7 +140,7 @@ function VariantBenefitList({ rawText, variant, isSelected = false }) {
           setExpanded((current) => !current);
         }}
       >
-        <span>Info paket</span>
+        <span>Deskripsi</span>
         <ChevronDown size={15} className="pdx-benefitChevron" />
       </button>
 
@@ -171,7 +171,6 @@ function VariantBenefitList({ rawText, variant, isSelected = false }) {
                 <ul className="pdx-benefitItems">
                   {section.items.map((item, ii) => (
                     <li key={ii} className="pdx-benefitItem">
-                      <span className="pdx-benefitDot" />
                       <span>{item}</span>
                     </li>
                   ))}
@@ -558,6 +557,16 @@ export default function ProductDetail() {
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [addedVariantId, setAddedVariantId] = useState(null);
   const [compareOpen, setCompareOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
+
+  const handlePackScroll = (e) => {
+    const target = e.currentTarget;
+    const maxScroll = target.scrollWidth - target.clientWidth;
+    if (maxScroll > 0) {
+      const progress = Math.min(1, Math.max(0, target.scrollLeft / maxScroll));
+      setScrollProgress(progress);
+    }
+  };
   const addedFlashTimerRef = useRef(null);
   const emojiTimersRef = useRef([]);
 
@@ -785,15 +794,23 @@ export default function ProductDetail() {
 
   const brandColor = useMemo(() => {
     const name = String(product?.name || "").toLowerCase();
-    if (name.includes("netflix")) return "rgba(229, 9, 20, 0.45)";
-    if (name.includes("canva")) return "rgba(0, 196, 204, 0.45)";
-    if (name.includes("spotify")) return "rgba(29, 185, 84, 0.45)";
-    if (name.includes("youtube")) return "rgba(255, 0, 0, 0.45)";
-    if (name.includes("chatgpt")) return "rgba(16, 163, 127, 0.45)";
-    if (name.includes("capcut")) return "rgba(0, 0, 0, 0.35)";
-    if (name.includes("disney")) return "rgba(17, 60, 207, 0.45)";
-    if (name.includes("prime")) return "rgba(0, 168, 225, 0.45)";
-    return "rgba(255, 255, 255, 0.15)";
+    if (name.includes("zerogpt") || name.includes("cek ai")) return "rgba(14, 116, 144, 0.65)";
+    if (name.includes("turnitin") || name.includes("plagiasi")) return "rgba(2, 132, 199, 0.65)";
+    if (name.includes("parafrase") || name.includes("paraphrase")) return "rgba(16, 185, 129, 0.65)";
+    if (name.includes("mendeley")) return "rgba(225, 29, 72, 0.65)";
+    if (name.includes("netflix")) return "rgba(229, 9, 20, 0.65)";
+    if (name.includes("canva")) return "rgba(0, 196, 204, 0.65)";
+    if (name.includes("spotify")) return "rgba(29, 185, 84, 0.65)";
+    if (name.includes("youtube")) return "rgba(255, 0, 0, 0.65)";
+    if (name.includes("chatgpt")) return "rgba(16, 163, 127, 0.65)";
+    if (name.includes("capcut")) return "rgba(0, 0, 0, 0.45)";
+    if (name.includes("disney")) return "rgba(17, 60, 207, 0.65)";
+    if (name.includes("prime")) return "rgba(0, 168, 225, 0.65)";
+    if (name.includes("grammarly")) return "rgba(21, 128, 61, 0.65)";
+    if (name.includes("claude")) return "rgba(217, 119, 6, 0.65)";
+    if (name.includes("gemini")) return "rgba(99, 102, 241, 0.65)";
+    if (name.includes("figma")) return "rgba(242, 78, 30, 0.65)";
+    return "rgba(0, 194, 208, 0.55)";
   }, [product?.name]);
 
   const productCategory = useMemo(() => resolveProductCategory(product), [product]);
@@ -849,16 +866,26 @@ export default function ProductDetail() {
         ? Math.round(variant.price_idr * (1 - flashDiscount / 100))
         : variant.price_idr;
 
-    add(
+    const res = cart.add(
       {
         ...variant,
         price_idr: effectivePrice,
         product_id: product.id,
         product_name: product.name,
         product_icon_url: product.icon_url || "",
+        category: product.category,
       },
       qty
     );
+
+    if (res && res.conflict) {
+      toast.warning(res.message, {
+        title: "Pesanan Harus Terpisah",
+        duration: 5000,
+      });
+      alert(res.message);
+      return false;
+    }
 
     toast.success(`${variant.name} · ${formatIDR(effectivePrice)}`, {
       title: "Masuk keranjang",
@@ -1025,150 +1052,168 @@ export default function ProductDetail() {
                 />
               </div>
 
-              <div className="pdx-rightCol">
-                <section id="paket-tersedia" className="pdx-variantsSection">
-                  <AccountTypeStrip variants={variants} />
+            <div className="pdx-rightCol">
+              <section id="paket-tersedia" className="pdx-variantsSection">
+                <AccountTypeStrip variants={variants} />
 
-                  <div className="pdx-variantsHead">
-                    <div className="pdx-variantsHeadTop">
-                      <div className="pdx-eyebrow">Pilih paket</div>
-                      <div className="pdx-variantsHeadRight">
-                        <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
-                        {variants.length > 1 ? (
-                          <button className="pdx-compareBtn" type="button" onClick={() => setCompareOpen(true)}>
-                            ⇄ Bandingkan paket
-                          </button>
-                        ) : null}
-                      </div>
-                    </div>
-                    <h2 className="pdx-sectionTitle">Pilih Paket Terbaikmu</h2>
+                <div className="pdx-variantsHead">
+                  <div className="pdx-variantsHeadTop">
+                    <div className="pdx-eyebrow">Pilih paket</div>
+                    <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
                   </div>
+                  <div className="pdx-variantsTitleRow">
+                    <h2 className="pdx-sectionTitle">Pilih Paket Terbaikmu</h2>
+                    {variants.length > 1 ? (
+                      <button className="pdx-compareBtn" type="button" onClick={() => setCompareOpen(true)}>
+                        <span className="pdx-compareIcon">⇄</span>
+                        <span>Bandingkan paket</span>
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
 
-                  {categoryTabs.length > 2 ? (
-                    <div className="pdx-filters">
-                      {categoryTabs.map((tab) => (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          onClick={() => setActiveTab(tab.id)}
-                          className={`pdx-filterChip ${activeTab === tab.id ? "is-active" : ""}`}
-                        >
-                          {tab.label}
-                        </button>
+                {categoryTabs.length > 2 ? (
+                  <div className="pdx-filters">
+                    {categoryTabs.map((tab) => (
+                      <button
+                        key={tab.id}
+                        type="button"
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`pdx-filterChip ${activeTab === tab.id ? "is-active" : ""}`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
+
+                <div className="pdx-packList" onScroll={handlePackScroll}>
+                  {displayedVariants.length === 0 ? (
+                    <div className="pdx-emptyCard">
+                      <EmptyState
+                        icon="-"
+                        title={variants.length === 0 ? "Belum ada paket" : "Gak ada paket di kategori ini"}
+                        description={
+                          variants.length === 0
+                            ? "Admin belum nambahin varian buat produk ini."
+                            : "Coba pilih kategori lain atau intip semua paket."
+                        }
+                        primaryAction={
+                          variants.length > 0
+                            ? { label: "Intip semua", onClick: () => setActiveTab("semua") }
+                            : { label: "Balik ke katalog", onClick: goBackToCatalog }
+                        }
+                      />
+                    </div>
+                  ) : (
+                    displayedVariants.map((variant) => {
+                      const stock = Number(variant.stock ?? 0);
+                      const out = stock <= 0;
+                      // Same card UI for 1-variant and multi-variant
+                      const isRecommended = variant.id === recommendedVariantId;
+                      const flashDiscount = flashSaleMap.get(variant.id);
+                      const effectivePrice =
+                        flashDiscount && flashDiscount > 0
+                          ? Math.round(variant.price_idr * (1 - flashDiscount / 100))
+                          : variant.price_idr;
+                      const descriptionBody = String(
+                        variant.description ||
+                          (out
+                            ? "Slot lagi abis. Cek lagi kalo stok udah kebuka."
+                            : "Varian siap diproses abis pembayaran diverifikasi.")
+                      )
+                        .replace(/\r\n/g, " ")
+                        .trim();
+
+                      return (
+                        <VariantCard
+                          key={variant.id}
+                          variant={variant}
+                          isSelected={selectedVariantId === variant.id}
+                          isAdded={addedVariantId === variant.id}
+                          isRecommended={isRecommended}
+                          flashDiscount={flashDiscount}
+                          effectivePrice={effectivePrice}
+                          descriptionBody={descriptionBody}
+                          isMotionOff={isMotionOff}
+                          motionMode={motionMode}
+                          maxVariantStock={maxVariantStock}
+                          onSelect={setSelectedVariantId}
+                          onAdd={handleAdd}
+                          onBuy={(v, q, e) => {
+                            handleAdd(v, q, e);
+                            goCheckout();
+                          }}
+                        />
+                      );
+                    })
+                  )}
+                </div>
+
+                {displayedVariants.length > 1 ? (
+                  <div className="pdx-scrollHint">
+                    <div className="pdx-scrollPills">
+                      {displayedVariants.map((v, i) => (
+                        <span
+                          key={v.id}
+                          className={`pdx-scrollDot ${Math.round(scrollProgress * (displayedVariants.length - 1)) === i ? "is-active" : ""}`}
+                        />
                       ))}
                     </div>
-                  ) : null}
-
-                  <div className="pdx-packList">
-                    {displayedVariants.length === 0 ? (
-                      <div className="pdx-emptyCard">
-                        <EmptyState
-                          icon="-"
-                          title={variants.length === 0 ? "Belum ada paket" : "Gak ada paket di kategori ini"}
-                          description={
-                            variants.length === 0
-                              ? "Admin belum nambahin varian buat produk ini."
-                              : "Coba pilih kategori lain atau intip semua paket."
-                          }
-                          primaryAction={
-                            variants.length > 0
-                              ? { label: "Intip semua", onClick: () => setActiveTab("semua") }
-                              : { label: "Balik ke katalog", onClick: goBackToCatalog }
-                          }
-                        />
-                      </div>
-                    ) : (
-                      displayedVariants.map((variant) => {
-                        const stock = Number(variant.stock ?? 0);
-                        const out = stock <= 0;
-                        // Same card UI for 1-variant and multi-variant
-                        const isRecommended = variant.id === recommendedVariantId;
-                        const flashDiscount = flashSaleMap.get(variant.id);
-                        const effectivePrice =
-                          flashDiscount && flashDiscount > 0
-                            ? Math.round(variant.price_idr * (1 - flashDiscount / 100))
-                            : variant.price_idr;
-                        const descriptionBody = String(
-                          variant.description ||
-                            (out
-                              ? "Slot lagi abis. Cek lagi kalo stok udah kebuka."
-                              : "Varian siap diproses abis pembayaran diverifikasi.")
-                        )
-                          .replace(/\r\n/g, " ")
-                          .trim();
-
-                        return (
-                          <VariantCard
-                            key={variant.id}
-                            variant={variant}
-                            isSelected={selectedVariantId === variant.id}
-                            isAdded={addedVariantId === variant.id}
-                            isRecommended={isRecommended}
-                            flashDiscount={flashDiscount}
-                            effectivePrice={effectivePrice}
-                            descriptionBody={descriptionBody}
-                            isMotionOff={isMotionOff}
-                            motionMode={motionMode}
-                            maxVariantStock={maxVariantStock}
-                            onSelect={setSelectedVariantId}
-                            onAdd={handleAdd}
-                            onBuy={(v, q, e) => {
-                              handleAdd(v, q, e);
-                              goCheckout();
-                            }}
-                          />
-                        );
-                      })
-                    )}
+                    <div className="pdx-scrollText">
+                      <span>Geser untuk opsi paket lainnya</span>
+                      <span className="pdx-scrollArrow">→</span>
+                    </div>
                   </div>
-                </section>
-              </div>
+                ) : null}
+              </section>
             </div>
-
-            {!caps.isMobile ? (
-              <div className="pdx-emojiReactions" aria-label="Reaksi produk">
-                {EMOJI_REACTIONS.map((emoji) => (
-                  <button
-                    key={emoji}
-                    type="button"
-                    className="pdx-emojiBtn"
-                    onClick={() => handleEmojiReact(emoji)}
-                    aria-label={`Reaksi ${emoji}`}
-                  >
-                    {emoji}
-                  </button>
-                ))}
-                {emojiFloats.map((f) => (
-                  <span key={f.id} className="pdx-emojiFloat" aria-hidden="true">{f.emoji}</span>
-                ))}
-              </div>
-            ) : null}
-
-            <section className="pdx-recommendations" ref={recommendationsRef} aria-label="Rekomendasi produk">
-              <div className="pdx-recommendationsHead">
-                <div className="pdx-eyebrow">Mungkin kamu butuh</div>
-                <h2 className="pdx-sectionTitle">Rekomendasi lainnya</h2>
-              </div>
-              {recommendations.length > 0 ? (
-                <div className="product-grid-container grid-mode pdx-recommendationsGrid" role="list">
-                  {recommendations.map((p) => (
-                    <ProductTile key={p.id} product={p} layout="grid" disableTilt={true} />
-                  ))}
-                </div>
-              ) : recommendationsReady ? (
-                <p className="pdx-recommendationsEmpty">Belum ada rekomendasi lain untuk produk ini.</p>
-              ) : null}
-            </section>
           </div>
-        </div>
-      </section>
 
-      <VariantCompareModal
-        open={compareOpen}
-        variants={displayedVariants}
-        flashSaleMap={flashSaleMap}
-        onClose={() => setCompareOpen(false)}
-      />
-    </div>
+          {!caps.isMobile ? (
+            <div className="pdx-emojiReactions" aria-label="Reaksi produk">
+              {EMOJI_REACTIONS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  className="pdx-emojiBtn"
+                  onClick={() => handleEmojiReact(emoji)}
+                  aria-label={`Reaksi ${emoji}`}
+                >
+                  {emoji}
+                </button>
+              ))}
+              {emojiFloats.map((f) => (
+                <span key={f.id} className="pdx-emojiFloat" aria-hidden="true">{f.emoji}</span>
+              ))}
+            </div>
+          ) : null}
+
+          <section className="pdx-recommendations" ref={recommendationsRef} aria-label="Rekomendasi produk">
+            <div className="pdx-recommendationsHead">
+              <div className="pdx-eyebrow">Mungkin kamu butuh</div>
+              <h2 className="pdx-sectionTitle">Rekomendasi lainnya</h2>
+            </div>
+            {recommendations.length > 0 ? (
+              <div className="product-grid-container grid-mode pdx-recommendationsGrid" role="list">
+                {recommendations.map((p) => (
+                  <ProductTile key={p.id} product={p} layout="grid" disableTilt={true} />
+                ))}
+              </div>
+            ) : recommendationsReady ? (
+              <p className="pdx-recommendationsEmpty">Belum ada rekomendasi lain untuk produk ini.</p>
+            ) : null}
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <VariantCompareModal
+      open={compareOpen}
+      variants={displayedVariants}
+      flashSaleMap={flashSaleMap}
+      onClose={() => setCompareOpen(false)}
+    />
+  </div>
   );
 }

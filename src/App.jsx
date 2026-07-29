@@ -7,6 +7,7 @@ import NetworkBridge from "./components/NetworkBridge";
 import PolishEffects from "./components/PolishEffects";
 import Confetti from "./components/Confetti";
 import FlashSalePopup from "./components/FlashSalePopup";
+import AcademicPopup from "./components/AcademicPopup";
 
 const DEFER_POLISH_MS = 2000;
 
@@ -359,6 +360,7 @@ export default function App() {
         <>
           <Confetti />
           <FlashSalePopup />
+          <AcademicPopup />
         </>
       ) : null}
       <AchievementToast />

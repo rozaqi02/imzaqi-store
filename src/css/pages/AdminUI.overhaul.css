@@ -99,9 +99,11 @@ html[data-theme="light"] .admin-page,
     overflow: hidden !important; /* chrome fixed; children scroll */
   }
 
-  /* Overview / ringkasan — THIS is the scrollport */
+  /* Overview / ringkasan / settings — THIS is the scrollport */
   .admin-page .admin-main > .admin-overview,
   .admin-page .admin-main > .admin-workspaceScroll,
+  .admin-page .admin-main > .admin-settingsGrid,
+  .admin-page .admin-main > .admin-workspaceScroll.admin-settingsGrid,
   .admin-page .admin-main > .admin-overview.admin-workspaceScroll {
     flex: 1 1 auto !important;
     min-height: 0 !important;
@@ -110,8 +112,20 @@ html[data-theme="light"] .admin-page,
     overflow-x: hidden !important;
     overscroll-behavior: contain !important;
     -webkit-overflow-scrolling: touch;
-    padding-bottom: 28px !important;
+    padding-bottom: 40px !important;
     scrollbar-gutter: stable;
+  }
+
+  .admin-page .admin-settingsGrid .admin-panel {
+    flex: 0 0 auto !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  .admin-page .admin-settingsGrid .admin-panel-body {
+    overflow: visible !important;
+    max-height: none !important;
   }
 
   /* Kill the old “main scrolls, overview visible” path that broke Ringkasan */
@@ -129,13 +143,14 @@ html[data-theme="light"] .admin-page,
   /* Settings / multi-panel grids */
   .admin-page .admin-main > .admin-grid,
   .admin-page .admin-main > .admin-overviewGrid,
-  .admin-page .admin-main > .admin-overviewGrid.admin-workspaceScroll {
+  .admin-page .admin-main > .admin-overviewGrid.admin-workspaceScroll,
+  .admin-page .admin-main > .admin-settingsGrid {
     flex: 1 1 auto !important;
     min-height: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     overscroll-behavior: contain !important;
-    padding-bottom: 24px !important;
+    padding-bottom: 32px !important;
   }
 
   /* Single-panel tabs: body scrolls inside panel */

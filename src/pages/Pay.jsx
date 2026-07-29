@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
+import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
@@ -189,9 +189,9 @@ function QRISZoomModal({ open, qrisUrl, onClose }) {
   );
 }
 
-function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, onCopied }) {
+function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, onCopied, isAcademicOrder = false }) {
   const [copied, setCopied] = useState(false);
-  const modalRef = React.useRef(null);
+  const modalRef = useRef(null);
 
   useDialogA11y({
     open,
@@ -240,6 +240,10 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
       // Ignore clipboard failure.
     }
   }
+
+  const academicWaUrl = `https://wa.me/6281232742374?text=${encodeURIComponent(
+    `Halo Admin Jasa Akademik, saya telah menyelesaikan pembayaran dengan ID Order: ${orderCode}`
+  )}`;
 
   return createPortal(
     <div className="modal-backdrop pay-overlay" onMouseDown={onClose} role="presentation">
@@ -297,17 +301,36 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
             <p className="pay-successLead">Simpan ID ini - dipakai setiap kali kamu cek status order.</p>
           </div>
 
-          <div className="pay-successActions">
-            <Link className="btn btn-wide btn-primary" to={statusUrl}>
-              Cek Status Order
-            </Link>
-            <button className="btn btn-ghost" type="button" onClick={copyCode}>
-              {copied ? "✓ ID tersalin" : "Salin ID"}
-            </button>
-            <a className="btn btn-ghost" href={adminWaUrl} target="_blank" rel="noreferrer">
-              Chat Admin
-            </a>
-          </div>
+          {isAcademicOrder ? (
+            <div className="pay-successActions">
+              <a
+                className="btn btn-wide btn-primary"
+                href={academicWaUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Hubungi Admin WA
+              </a>
+              <Link className="btn btn-ghost" to={statusUrl}>
+                Cek Status Order
+              </Link>
+              <button className="btn btn-ghost" type="button" onClick={copyCode}>
+                {copied ? "✓ ID tersalin" : "Salin ID"}
+              </button>
+            </div>
+          ) : (
+            <div className="pay-successActions">
+              <Link className="btn btn-wide btn-primary" to={statusUrl}>
+                Cek Status Order
+              </Link>
+              <button className="btn btn-ghost" type="button" onClick={copyCode}>
+                {copied ? "✓ ID tersalin" : "Salin ID"}
+              </button>
+              <a className="btn btn-ghost" href={adminWaUrl} target="_blank" rel="noreferrer">
+                Chat Admin
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </div>,
@@ -570,12 +593,20 @@ export default function Pay() {
   const { discount, total } = useMemo(() => calcTotal(subtotal, promoPercent), [subtotal, promoPercent]);
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [items]);
 
-  const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" }, qris: {} });
-  const waNumber = settings?.whatsapp?.number || "6283136049987";
+  const isAcademicOrder = useMemo(() => {
+    return items.some((item) => {
+      if (item.category === "academic" || item.catalog_line === "academic") return true;
+      const name = String(item.product_name || item.variant_name || item.name || "").toLowerCase();
+      return /turnitin|parafrase|paraphrase|plagiasi|zerogpt|mendeley|skripsi|tesis|jurnal|akademik/.test(name);
+    });
+  }, [items]);
+
+  const [settings, setSettings] = useState({ whatsapp: { number: "6282245964007" }, qris: {} });
+  const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6282245964007");
   const qrisBaseFromSettings = String(settings?.qris?.base_payload || "").trim();
   const qrisBaseFromEnv = String(import.meta.env.VITE_QRIS_BASE || "").trim();
   const qrisBase = qrisBaseFromSettings || qrisBaseFromEnv;
-  const fallbackQrisUrl = String(settings?.qris?.image_url || "").trim() || "/qris_payment.jpeg";
+  const fallbackQrisUrl = isAcademicOrder ? "/qris_academic.jpg" : (String(settings?.qris?.image_url || "").trim() || "/qris_payment.jpeg");
 
   const [customerWhatsApp, setCustomerWhatsApp] = useState("");
   const [isWaValid, setIsWaValid] = useState(false);
@@ -665,6 +696,27 @@ export default function Pay() {
         return;
       }
 
+      if (isAcademicOrder) {
+        const academicBase = String(settings?.qris_academic?.base_payload || "").trim();
+        if (academicBase) {
+          try {
+            const { dataUrl } = await buildDynamicQrisImage(academicBase, total);
+            if (!active) return;
+            dispatchQris({ type: "DYNAMIC", url: dataUrl, notice: "QRIS khusus Jasa Akademik (AGTA STORE)." });
+            return;
+          } catch (e) {
+            // fallback below
+          }
+        }
+        if (!active) return;
+        dispatchQris({
+          type: "FALLBACK",
+          url: "/qris_academic.jpg",
+          notice: "QRIS khusus Jasa Akademik (AGTA_STORE, DIGITAL & KREATIF).",
+        });
+        return;
+      }
+
       if (!qrisBase) {
         if (!active) return;
         dispatchQris({ type: "FALLBACK", url: fallbackQrisUrl, notice: "QR statis aktif. Isi QRIS base di admin agar nominal otomatis lagi." });
@@ -685,7 +737,7 @@ export default function Pay() {
     return () => {
       active = false;
     };
-  }, [fallbackQrisUrl, qrisBase, total]);
+  }, [fallbackQrisUrl, qrisBase, total, isAcademicOrder, settings]);
 
   useEffect(() => {
     if (!ok && !orderCode && items.length === 0) {
@@ -1360,47 +1412,8 @@ export default function Pay() {
                         </div>
                       </div>
                     ) : canShowQris ? (
-                      <>
-                        {!qris.loaded && !qris.failed ? <QRISSkeleton /> : null}
-                        {qris.url ? (
-                          <div style={{ width: '100%' }}>
-                            <button
-                              type="button"
-                              className="pay-qrisZoomBtn"
-                              aria-label="Perbesar QRIS pembayaran"
-                              onClick={() => setIsZoomed(true)}
-                              onKeyDown={(event) => {
-                                if (event.key === "Enter" || event.key === " ") {
-                                  event.preventDefault();
-                                  setIsZoomed(true);
-                                }
-                              }}
-                              style={{ display: qris.loaded && !qris.failed ? "block" : "none" }}
-                            >
-                              <img
-                                src={qris.url}
-                                alt=""
-                                className="qris-img"
-                                onLoad={() => dispatchQris({ type: "LOADED" })}
-                                onError={(event) => {
-                                  event.target.style.display = "none";
-                                  dispatchQris({ type: "FAILED" });
-                                }}
-                              />
-                            </button>
-                            {qris.loaded && !qris.failed && (
-                              <a
-                                href={qris.url}
-                                download="qris-imzaqi-store.png"
-                                className="btn btn-ghost btn-sm pay-qrisDownload"
-                              >
-                                Simpan QRIS ke Galeri
-                              </a>
-                            )}
-                          </div>
-                        ) : null}
-                        {qris.failed ? <div className="hint subtle">QRIS gagal dimuat. Refresh lalu coba lagi.</div> : null}
-                        {/* QRIS timer - tampil saat QR aktif dan belum expired */}
+                      <div className="pay-qrisBox">
+                        {/* QRIS timer - tampil paling atas di atas kartu QR */}
                         {qris.loaded && !qris.failed && !qrisTimer.expired && (
                           <div className={`pay-qrisTimer${qrisTimer.urgent ? " is-urgent" : ""}`} aria-live="polite">
                             <Clock size={13} />
@@ -1413,7 +1426,47 @@ export default function Pay() {
                             <span>QR kedaluwarsa - refresh halaman untuk QR baru</span>
                           </div>
                         )}
-                      </>
+
+                        {!qris.loaded && !qris.failed ? <QRISSkeleton /> : null}
+                        {qris.url ? (
+                          <button
+                            type="button"
+                            className="pay-qrisZoomBtn"
+                            aria-label="Perbesar QRIS pembayaran"
+                            onClick={() => setIsZoomed(true)}
+                            onKeyDown={(event) => {
+                              if (event.key === "Enter" || event.key === " ") {
+                                event.preventDefault();
+                                setIsZoomed(true);
+                              }
+                            }}
+                            style={{ display: qris.loaded && !qris.failed ? "block" : "none" }}
+                          >
+                            <img
+                              src={qris.url}
+                              alt=""
+                              className="qris-img"
+                              onLoad={() => dispatchQris({ type: "LOADED" })}
+                              onError={(event) => {
+                                event.target.style.display = "none";
+                                dispatchQris({ type: "FAILED" });
+                              }}
+                            />
+                          </button>
+                        ) : null}
+
+                        {qris.loaded && !qris.failed && qris.url && (
+                          <a
+                            href={qris.url}
+                            download="qris-pembayaran.png"
+                            className="btn btn-ghost btn-sm pay-qrisDownload"
+                          >
+                            Simpan QRIS ke Galeri
+                          </a>
+                        )}
+
+                        {qris.failed ? <div className="hint subtle">QRIS gagal dimuat. Refresh lalu coba lagi.</div> : null}
+                      </div>
                     ) : (
                       <div className="pay-qrisLocked">
                         <Phone size={24} />
@@ -1466,6 +1519,7 @@ export default function Pay() {
         orderCode={orderCode}
         statusUrl={statusUrl}
         adminWaUrl={adminWaUrl}
+        isAcademicOrder={isAcademicOrder}
         onClose={() => nav(statusUrl)}
         onCopied={() => toast.success("ID order disalin")}
       />
