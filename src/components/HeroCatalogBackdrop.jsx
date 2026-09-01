@@ -1,16 +1,19 @@
 import React, { useEffect, useMemo, useRef } from "react";
-import { useDeviceCapability } from "../hooks/useIsMobile";
-import "./HeroCatalogBackdrop.css";
+import { useDeviceCapability, useMediaQuery } from "../hooks/useIsMobile";
 
-const DESKTOP_ROW_COUNT = 5;
-const DESKTOP_MIN_TILES = 10;
+const DESKTOP_ROW_COUNT = 4;
+// One source row must be wider than the stage. Three copies then keep both
+// directions continuously filled throughout the marquee animation.
+const DESKTOP_MIN_TILES = 18;
 const MOBILE_ROW_COUNT = 5;
-const MOBILE_MIN_TILES = 7;
-const ROW_DURATIONS = ["88s", "104s", "96s", "112s", "100s"];
-const MOBILE_ROW_DURATIONS = ["120s", "136s", "128s", "144s", "116s"];
+const MOBILE_MIN_TILES = 8;
+const ROW_DURATIONS = ["88s", "104s", "96s", "112s"];
+const MOBILE_ROW_DURATIONS = ["120s", "136s", "128s", "144s", "124s"];
 
-function getBackdropConfig(caps) {
-  const isMobile = Boolean(caps?.isMobile);
+function getBackdropConfig(caps, isNarrowViewport) {
+  // A desktop touchscreen can report `pointer: coarse`. The backdrop should
+  // still use its desktop four-row layout when there is desktop-width space.
+  const isMobile = isNarrowViewport;
   const motionOff =
     caps?.isReducedMotion || caps?.saveData || caps?.lowMemory;
 
@@ -53,10 +56,9 @@ function buildProductPool(products, config) {
 function buildRows(pool, config) {
   if (!pool.length) return [];
 
-  const perRow = Math.max(
-    config.minTilesPerRow,
-    Math.ceil(pool.length / config.rowCount) + (config.isMobile ? 1 : 2)
-  );
+  // Background dekoratif cukup memakai sampel kecil katalog; tidak perlu
+  // menggandakan seluruh daftar produk di atas lipatan pertama.
+  const perRow = config.minTilesPerRow;
 
   return Array.from({ length: config.rowCount }, (_, index) => {
     const offset = index * 2;
@@ -100,9 +102,10 @@ function CatalogTile({ product, compact = false, eager = false }) {
 
 export default function HeroCatalogBackdrop({ products = [] }) {
   const caps = useDeviceCapability();
+  const isNarrowViewport = useMediaQuery("(max-width: 720px)");
   const config = useMemo(
-    () => getBackdropConfig(caps),
-    [caps.isMobile, caps.isReducedMotion, caps.saveData, caps.lowMemory]
+    () => getBackdropConfig(caps, isNarrowViewport),
+    [isNarrowViewport, caps.isReducedMotion, caps.saveData, caps.lowMemory]
   );
   const rootRef = useRef(null);
 
@@ -120,13 +123,22 @@ export default function HeroCatalogBackdrop({ products = [] }) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        root.classList.toggle("is-paused", !entry?.isIntersecting);
+        root.classList.toggle("is-paused", !entry?.isIntersecting || document.hidden);
       },
       { threshold: 0.08, rootMargin: "40px 0px" }
     );
 
     observer.observe(hero);
-    return () => observer.disconnect();
+
+    const handleVisibility = () => {
+      root.classList.toggle("is-paused", document.hidden);
+    };
+    document.addEventListener("visibilitychange", handleVisibility, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      document.removeEventListener("visibilitychange", handleVisibility);
+    };
   }, [config.motionOff]);
 
   // Always mount shell so hero never waits on empty state flash
@@ -157,13 +169,24 @@ export default function HeroCatalogBackdrop({ products = [] }) {
                   eager={row.id < 2 && idx < 4}
                 />
               ))}
-              {row.items.map((product, idx) => (
-                <CatalogTile
-                  key={`${row.id}-b-${product.id}-${idx}`}
-                  product={product}
-                  eager={false}
-                />
-              ))}
+              {!config.motionOff ? (
+                <>
+                  {row.items.map((product, idx) => (
+                    <CatalogTile
+                      key={`${row.id}-b-${product.id}-${idx}`}
+                      product={product}
+                      eager={false}
+                    />
+                  ))}
+                  {row.items.map((product, idx) => (
+                    <CatalogTile
+                      key={`${row.id}-c-${product.id}-${idx}`}
+                      product={product}
+                      eager={false}
+                    />
+                  ))}
+                </>
+              ) : null}
             </div>
           </div>
         ))}

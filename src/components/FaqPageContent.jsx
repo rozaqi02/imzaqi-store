@@ -1,5 +1,6 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import "../css/pages/About.css";
 import {
   ChevronDown,
   CircleCheck,
@@ -17,7 +18,6 @@ import {
 import { fetchSettings } from "../lib/api";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "./EmptyState";
-import "../css/pages/About.css";
 
 const FAQ_ITEMS = [
   {

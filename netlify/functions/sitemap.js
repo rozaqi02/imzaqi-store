@@ -1,4 +1,4 @@
-const SITE_URL = "https://imzaqistore.my.id";
+const SITE_URL = "https://imzaqi.store";
 
 exports.handler = async () => {
   const staticPaths = ["/", "/produk", "/tentang", "/testimoni", "/status", "/faq", "/bayar"];

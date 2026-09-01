@@ -297,3 +297,67 @@ html[data-motion="lite"] .hero-anim-wrap .hero-deco-svg .deco-line-accent,
 html[data-motion="lite"] .hero-anim-wrap .hero-deco-svg .deco-circle {
   animation: heroLinesDraw 0.8s ease 0.2s both;
 }
+
+/* ── Hero Entrance Keyframes & Stagger ── */
+@keyframes heroEntranceFadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hx-eyebrow-row {
+  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
+}
+
+.hx-subtitle {
+  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+}
+
+.hx-search-section {
+  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
+}
+
+.hx-ctas-row {
+  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
+}
+
+.hx-stats-row {
+  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hx-eyebrow-row,
+  .hx-subtitle,
+  .hx-search-section,
+  .hx-ctas-row,
+  .hx-stats-row {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+html[data-motion="off"] .hx-eyebrow-row,
+html[data-motion="off"] .hx-subtitle,
+html[data-motion="off"] .hx-search-section,
+html[data-motion="off"] .hx-ctas-row,
+html[data-motion="off"] .hx-stats-row {
+  animation: none !important;
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+html[data-motion="lite"] .hx-eyebrow-row,
+html[data-motion="lite"] .hx-subtitle,
+html[data-motion="lite"] .hx-search-section,
+html[data-motion="lite"] .hx-ctas-row,
+html[data-motion="lite"] .hx-stats-row {
+  animation-duration: 0.3s !important;
+  transform: none !important;
+}
+

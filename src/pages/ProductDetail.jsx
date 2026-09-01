@@ -1,6 +1,6 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, memo } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
-import { motion } from "framer-motion";
+import "../css/pages/ProductDetail.css";
 import {
   ArrowLeft,
   ChevronDown,
@@ -34,7 +34,6 @@ import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory"
 import { resolveProductCategory } from "../lib/productCategories";
 import ProductTile from "../components/ProductTile";
 import AccountTypeStrip from "../components/AccountTypeStrip";
-import "../css/pages/ProductDetail.css";
 
 function normalizeInlineText(text) {
   return String(text || "")
@@ -315,16 +314,14 @@ const VariantCard = React.memo(({
   const out = stock <= 0;
   const disableEntranceAnim = isMotionOff || motionMode === "lite";
 
-  // Same card chrome for 1-variant and multi-variant products
   const cardProps = {
     role: "button",
     tabIndex: 0,
     className: [
       "pdx-packCard",
       out ? "is-out" : "",
-      isRecommended ? "is-recommended" : "",
       isSelected ? "is-selected" : "",
-      isAdded ? "is-added" : "",
+      isRecommended ? "is-recommended" : "",
     ]
       .filter(Boolean)
       .join(" "),
@@ -437,24 +434,8 @@ const VariantCard = React.memo(({
     </>
   );
 
-  // On mobile (lite/off motion mode), skip Framer Motion entirely to avoid its
-  // internal JS overhead (ref tracking, animation scheduler) for every card.
-  if (disableEntranceAnim) {
-    return <article {...cardProps}>{cardChildren}</article>;
-  }
-
-  return (
-    <motion.article
-      {...cardProps}
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2 }}
-    >
-      {cardChildren}
-    </motion.article>
-  );
+  return <article {...cardProps}>{cardChildren}</article>;
 });
-
 
 VariantCard.displayName = "VariantCard";
 
@@ -854,10 +835,17 @@ export default function ProductDetail() {
 
   function handleAdd(variant, qty = 1, event) {
     const stock = Number(variant?.stock ?? 999);
+    const requestedQty = Math.max(1, Math.floor(Number(qty) || 1));
+    const cartQty = cart.items
+      .filter((item) => item.variant_id === variant?.id)
+      .reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-    if (stock <= 0) {
-      toast.error("Produk ini lagi abis", { title: variant.name, duration: 2500 });
-      return;
+    if (stock <= 0 || cartQty + requestedQty > stock) {
+      const message = stock > 0
+        ? `Stok tersisa ${stock}. Kurangi jumlah di keranjang terlebih dahulu.`
+        : "Produk ini lagi abis";
+      toast.error(message, { title: variant.name, duration: 3000 });
+      return false;
     }
 
     const flashDiscount = flashSaleMap.get(variant.id);
@@ -875,7 +863,7 @@ export default function ProductDetail() {
         product_icon_url: product.icon_url || "",
         category: product.category,
       },
-      qty
+      requestedQty
     );
 
     if (res && res.conflict) {
@@ -909,6 +897,7 @@ export default function ProductDetail() {
       btn.classList.add("is-pressed");
       window.setTimeout(() => btn.classList.remove("is-pressed"), 180);
     }
+    return true;
   }
 
   async function handleShare() {
@@ -1141,8 +1130,7 @@ export default function ProductDetail() {
                           onSelect={setSelectedVariantId}
                           onAdd={handleAdd}
                           onBuy={(v, q, e) => {
-                            handleAdd(v, q, e);
-                            goCheckout();
+                            if (handleAdd(v, q, e)) goCheckout();
                           }}
                         />
                       );

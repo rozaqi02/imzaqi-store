@@ -5,7 +5,6 @@ import { useTilt } from "../hooks/useTilt";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { warn } from "../lib/log";
 import { formatIDR } from "../lib/format";
-import "../css/pages/FlashSale.css";
 
 function FlashSaleCard({ item, maxFlashStock }) {
   const tiltRef = useTilt({ max: 8, scale: 1.012 });

@@ -2,13 +2,14 @@ import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useFunnelRoute } from "../hooks/useFunnelRoute";
-import { BellOff, ShieldCheck, CheckCircle2 } from "lucide-react";
+import { BellOff, ShieldCheck, CheckCircle2, X } from "lucide-react";
 import { fetchProducts, fetchSettings } from "../lib/api";
 import { isAcademicProduct } from "../lib/productCategories";
 import { formatIDR, summarizeCatalogCopy } from "../lib/format";
-import "./AcademicPopup.css";
+import { useDialogA11y } from "../hooks/useDialogA11y";
 
 const SUPPRESS_DATE_KEY = "imzaqi_academic_suppress_date_v1";
+const SESSION_DONE_KEY = "imzaqi_academic_popup_done";
 
 function getTodayString() {
   return new Date().toDateString();
@@ -17,9 +18,17 @@ function getTodayString() {
 function notifyAcademicPopupClosed() {
   try {
     window.__imzaqi_academic_popup_active = false;
-    sessionStorage.setItem("imzaqi_academic_popup_done", "true");
+    sessionStorage.setItem(SESSION_DONE_KEY, "true");
     window.dispatchEvent(new CustomEvent("imzaqi_academic_popup_closed"));
   } catch {}
+}
+
+function wasHandledThisSession() {
+  try {
+    return sessionStorage.getItem(SESSION_DONE_KEY) === "true";
+  } catch {
+    return false;
+  }
 }
 
 export default function AcademicPopup() {
@@ -28,7 +37,9 @@ export default function AcademicPopup() {
   const isFunnel = useFunnelRoute();
   const [isOpen, setIsOpen] = useState(false);
   const [academicItems, setAcademicItems] = useState([]);
-  const [isEnabled, setIsEnabled] = useState(true);
+  // Default aman: pop-up tidak boleh muncul sebelum setting admin berhasil dibaca.
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [settingsReady, setSettingsReady] = useState(false);
   const [isSuppressed, setIsSuppressed] = useState(() => {
     try {
       return localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
@@ -38,6 +49,7 @@ export default function AcademicPopup() {
   });
 
   const prevPathnameRef = useRef(location.pathname);
+  const modalRef = useRef(null);
 
   // Sync global active status flag
   useEffect(() => {
@@ -66,12 +78,11 @@ export default function AcademicPopup() {
 
         // Check if enabled from admin settings
         const acSetting = settings?.academic_popup;
-        const enabledSetting = !(acSetting && typeof acSetting === "object" && acSetting.enabled === false);
+        // Hanya aktif bila admin secara eksplisit menyimpan nilai true.
+        const enabledSetting = Boolean(
+          acSetting && typeof acSetting === "object" && acSetting.enabled === true
+        );
         setIsEnabled(enabledSetting);
-
-        if (!enabledSetting) {
-          notifyAcademicPopupClosed();
-        }
 
         if (products && products.length > 0) {
           const filtered = products.filter((p) => isAcademicProduct(p) && p.is_active !== false);
@@ -96,6 +107,8 @@ export default function AcademicPopup() {
         }
       } catch (err) {
         console.warn("[AcademicPopup] Gagal memuat data:", err);
+      } finally {
+        if (active) setSettingsReady(true);
       }
     }
 
@@ -106,20 +119,22 @@ export default function AcademicPopup() {
     };
   }, []);
 
-  // 2. Schedule Academic Popup opening (opens FIRST after 1.5s)
+  // 2. Schedule only after the persisted admin setting and product data are ready.
   useEffect(() => {
-    const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
-    if (suppressedToday || !isEnabled || isFunnel) {
+    if (!settingsReady || isSuppressed || !isEnabled || isFunnel || wasHandledThisSession()) {
       notifyAcademicPopupClosed();
       return;
     }
+
+    // Jangan tampilkan fallback generik saat katalog gagal dimuat.
+    if (academicItems.length === 0) return undefined;
 
     const timer = setTimeout(() => {
       setIsOpen(true);
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [isFunnel, isEnabled]);
+  }, [academicItems.length, isEnabled, isFunnel, isSuppressed, settingsReady]);
 
   // 3. Lock scroll when open
   useEffect(() => {
@@ -158,42 +173,14 @@ export default function AcademicPopup() {
     notifyAcademicPopupClosed();
   };
 
-  if (!isOpen || !isEnabled || isSuppressed || isFunnel) return null;
+  useDialogA11y({
+    open: isOpen,
+    containerRef: modalRef,
+    onClose: handleClose,
+    initialFocusSelector: ".ac-popup-closeBtn",
+  });
 
-  const displayItems = academicItems.length > 0 ? academicItems : [
-    {
-      id: "f1",
-      name: "Jasa Parafrase",
-      slug: "jasa-parafrase",
-      iconUrl: "/icon-jasa-parafrase.jpg",
-      summary: "Turunkan skor Turnitin & rapikan kalimat",
-      formattedPrice: "Rp 2.500",
-    },
-    {
-      id: "f2",
-      name: "Cek AI ZeroGPT",
-      slug: "cek-ai-zerogpt",
-      iconUrl: "/icon-cek-ai-zerogpt.jpg",
-      summary: "Deteksi teks AI, akurat & laporan lengkap",
-      formattedPrice: "Rp 9.000",
-    },
-    {
-      id: "f3",
-      name: "Cek Plagiasi Turnitin No Repository",
-      slug: "cek-plagiasi-turnitin",
-      iconUrl: "/icon-cek-turnitin.jpg",
-      summary: "No Repository — dokumen 100% aman!",
-      formattedPrice: "Rp 7.000",
-    },
-    {
-      id: "f4",
-      name: "Jasa Mendeley",
-      slug: "jasa-mendeley",
-      iconUrl: "/icon-jasa-mendeley.jpg",
-      summary: "Sitasi & daftar pustaka otomatis rapi",
-      formattedPrice: "Rp 1.000",
-    },
-  ];
+  if (!isOpen || !settingsReady || !isEnabled || isSuppressed || isFunnel || academicItems.length === 0) return null;
 
   return createPortal(
     <div
@@ -202,27 +189,31 @@ export default function AcademicPopup() {
       role="presentation"
     >
       <div
+        ref={modalRef}
         className="ac-popup-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Jasa Akademik"
+        aria-labelledby="academic-popup-title"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Head */}
         <div className="ac-popup-head">
           <div className="ac-popup-titleBlock">
-            <h2 className="ac-popup-kicker">
+            <h2 id="academic-popup-title" className="ac-popup-kicker">
               <span>Jasa Akademik</span>
             </h2>
             <p className="ac-popup-sub">
               Semua layanan akademik dikerjakan cepat, akurat, aman no repo, dan harga mahasiswa!
             </p>
           </div>
+          <button type="button" className="ac-popup-closeBtn" onClick={handleClose} aria-label="Tutup pop-up Jasa Akademik">
+            <X size={18} aria-hidden="true" />
+          </button>
         </div>
 
         {/* Body */}
         <div className="ac-popup-body">
-          {displayItems.map((item) => {
+          {academicItems.map((item) => {
             const iconUrl = String(item.iconUrl || "").trim();
             return (
               <div key={item.id || item.slug} className="ac-popup-item">

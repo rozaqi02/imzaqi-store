@@ -1,13 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
   Eye,
   Package,
   Search,
   ShoppingBag,
-  Zap,
+  X,
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
 import NumberCounter from "./NumberCounter";
@@ -221,7 +220,7 @@ function ActiveShoppersBadge() {
       });
 
     return () => {
-      channel.unsubscribe();
+      supabase.removeChannel(channel);
     };
   }, []);
 
@@ -238,13 +237,12 @@ function ActiveShoppersBadge() {
 }
 
 function HeroStatsRow({ activeProductCount }) {
-  const { last7DaysViews, totalOrders, weekOrders } = useLiveStats({
+  const { last7DaysViews, totalOrders } = useLiveStats({
     intervalMs: 60000,
   });
 
   const stats = [
     { val: totalOrders || 0, label: "Total Order", icon: ShoppingBag },
-    { val: weekOrders || 0, label: "Order 7 Hari", accent: true, icon: Zap },
     { val: activeProductCount, label: "Produk Aktif", icon: Package },
     { val: last7DaysViews || 0, label: "Views 7 Hari", icon: Eye },
   ];
@@ -256,7 +254,7 @@ function HeroStatsRow({ activeProductCount }) {
         return (
           <div
             key={s.label}
-            className={`hx-stat-item${s.accent ? " hx-stat-item--accent" : ""}`}
+            className="hx-stat-item"
           >
             <span className="hx-stat-icon-wrap" aria-hidden="true">
               <Icon size={15} className="hx-stat-icon" />
@@ -287,18 +285,6 @@ export default function Hero({ products = [] }) {
     [products]
   );
 
-  const stagger = (delay) =>
-    isMotionReduced
-      ? {}
-      : {
-          initial: { opacity: 0, y: 16 },
-          animate: { opacity: 1, y: 0 },
-          transition: { duration: 0.5, ease: [0.16, 1, 0.3, 1], delay },
-        };
-
-  const MotionTag = isMotionReduced ? "div" : motion.div;
-  const MotionP = isMotionReduced ? "p" : motion.p;
-
   return (
     <section className="hx-hero" aria-label="Marketplace Hero">
       <HeroCatalogBackdrop products={products} />
@@ -306,9 +292,9 @@ export default function Hero({ products = [] }) {
       <div className="container">
         <div className="hx-stage">
           <div className="hx-main">
-            <MotionTag className="hx-eyebrow-row" {...stagger(0.04)}>
+            <div className="hx-eyebrow-row">
               <ActiveShoppersBadge />
-            </MotionTag>
+            </div>
 
             <h1
               className={`hx-headline${isMotionReduced ? " hx-headline--static" : " hx-headline--enter"}`}
@@ -339,26 +325,26 @@ export default function Hero({ products = [] }) {
               </span>
             </h1>
 
-            <MotionP className="hx-subtitle" {...stagger(0.12)}>
+            <p className="hx-subtitle">
               Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
-            </MotionP>
+            </p>
 
-            <MotionTag className="hx-search-section" {...stagger(0.18)}>
+            <div className="hx-search-section">
               <HeroSearch products={products} />
-            </MotionTag>
+            </div>
 
-            <MotionTag className="hx-ctas-row" {...stagger(0.24)}>
+            <div className="hx-ctas-row">
               <Link className="hx-btn-primary" to="/produk">
                 <ShoppingBag size={15} aria-hidden="true" />
                 <span>Gas Lihat Katalog</span>
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
-            </MotionTag>
+            </div>
           </div>
 
-          <MotionTag className="hx-stats-row" {...stagger(0.3)} aria-label="Statistik toko">
+          <div className="hx-stats-row" aria-label="Statistik toko">
             <HeroStatsRow activeProductCount={activeProductCount} />
-          </MotionTag>
+          </div>
         </div>
       </div>
     </section>

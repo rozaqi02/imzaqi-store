@@ -53,9 +53,9 @@ import { useFunnelRoute } from "./hooks/useFunnelRoute";
 
 // ── Eager-loaded pages (critical path) ──
 import Home from "./pages/Home";
-import Faq from "./pages/Faq";
 
 // ── Lazy-loaded pages (non-critical, reduces initial bundle) ──
+const Faq = React.lazy(() => import("./pages/Faq"));
 const Products = React.lazy(() => import("./pages/Products"));
 const ProductDetail = React.lazy(() => import("./pages/ProductDetail"));
 const Status = React.lazy(() => import("./pages/Status"));

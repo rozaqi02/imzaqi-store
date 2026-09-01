@@ -13,7 +13,9 @@
 .hx-heroZone {
   position: relative;
   z-index: 1;
-  margin-bottom: clamp(-72px, -8vw, -48px);
+  /* Preserve the hero's bottom breathing room so stats-card shadows are not
+     covered by the section that follows. */
+  margin-bottom: 0;
 }
 
 .hx-heroZone::after {
@@ -24,7 +26,8 @@
   bottom: 0;
   height: clamp(120px, 18vw, 200px);
   pointer-events: none;
-  z-index: 2;
+  /* Keep the blend behind hero content so card shadows stay fully visible. */
+  z-index: 1;
   background: linear-gradient(
     180deg,
     transparent 0%,
@@ -39,11 +42,17 @@ html[data-theme="light"] .hx-heroZone::after {
   background: linear-gradient(
     180deg,
     transparent 0%,
-    color-mix(in srgb, var(--bg1, #d5eaff) 22%, transparent) 24%,
-    color-mix(in srgb, var(--bg1, #d5eaff) 68%, transparent) 54%,
-    color-mix(in srgb, var(--bg1, #d5eaff) 96%, transparent) 80%,
-    var(--bg1, #d5eaff) 100%
+    color-mix(in srgb, #f4fafc 22%, transparent) 24%,
+    color-mix(in srgb, #f4fafc 68%, transparent) 54%,
+    color-mix(in srgb, #f4fafc 96%, transparent) 80%,
+    #f4fafc 100%
   );
+}
+
+/* The hero fades into this exact surface. Keeping both sides identical removes
+   the visible horizontal seam at the start of the first home section. */
+html[data-theme="light"] .home-page .home-body {
+  background: #f4fafc;
 }
 
 
@@ -394,7 +403,7 @@ html[data-theme="light"] .hero-search-shell:focus-within {
 
   /* Scope layout containment to the list, not individual tiles */
   .home-page .home-popularList {
-    contain: layout;
+    contain: none;
   }
 
   /* Simpler shadows — avoids GPU overdraw on large blur radii */
@@ -421,9 +430,9 @@ html[data-theme="light"] .hero-search-shell:focus-within {
     padding: 14px !important;
     transition-duration: 100ms !important;
     will-change: auto !important;
-    content-visibility: auto;
-    contain-intrinsic-size: auto 120px;
-    contain: layout paint style;
+    content-visibility: visible;
+    contain-intrinsic-size: none;
+    contain: none;
   }
 
   .home-page .home-popularList .product-tile-pill {
@@ -448,6 +457,7 @@ html[data-theme="light"] .hero-search-shell:focus-within {
 
 .hx-hero {
   position: relative;
+  z-index: 2;
   padding-top: calc(var(--site-header-offset) + 36px) !important;
   padding-bottom: clamp(48px, 6vw, 72px);
   /* Transparent so body/global page background continues seamlessly */
@@ -825,7 +835,7 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 /* â”€â”€ Stats dock (dipertahankan, visual neo card) â”€â”€ */
 .hx-stats-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
   width: 100%;
   margin: 0;
@@ -835,7 +845,6 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 
 @media (min-width: 721px) {
   .hx-stats-row {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 14px;
   }
 }
@@ -867,12 +876,6 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
   color: var(--accent2);
 }
 
-.hx-stat-item--accent .hx-stat-icon-wrap {
-  color: var(--imzaqi-btn-text, #032235);
-  background: var(--imzaqi-btn-face);
-  box-shadow: var(--imzaqi-btn-shadow);
-}
-
 .hx-stat-meta {
   display: flex;
   flex-direction: column;
@@ -893,11 +896,6 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 
 .hx-stat-icon {
   flex-shrink: 0;
-}
-
-.hx-stat-item--accent .hx-stat-val {
-  color: var(--accent);
-  text-shadow: 0 0 10px rgba(0, 214, 180, 0.12);
 }
 
 .hx-stat-label {
@@ -947,7 +945,7 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
   }
 
   .hx-heroZone {
-    margin-bottom: -40px;
+    margin-bottom: 0;
   }
 
   .hx-heroZone::after {
@@ -1128,41 +1126,42 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
     height: 16px;
   }
 
-  /* ── Block 3: stats ── */
+  /* ── Block 3: stats — always one row of three ── */
   .hx-stats-row {
     width: 100%;
     margin: 0;
     padding: 4px 4px 2px;
-    gap: 10px;
+    gap: 8px;
     flex: 0 0 auto;
     box-sizing: border-box;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .hx-stat-item {
-    padding: 12px 11px;
-    gap: 10px;
+    padding: 10px 8px;
+    gap: 7px;
     border-radius: 16px;
   }
 
   .hx-stat-icon-wrap {
-    width: 36px;
-    height: 36px;
-    border-radius: 12px;
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
   }
 
   .hx-stat-icon-wrap svg,
   .hx-stat-icon {
-    width: 15px;
-    height: 15px;
+    width: 13px;
+    height: 13px;
   }
 
   .hx-stat-val {
-    font-size: 17px;
+    font-size: 15px;
   }
 
   .hx-stat-label {
-    font-size: 10px;
-    letter-spacing: 0.04em;
+    font-size: 8.5px;
+    letter-spacing: 0.03em;
   }
 
   .hx-live-badge {
@@ -1228,15 +1227,15 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 
   .hx-stats-row {
     padding: 2px 4px 0;
-    gap: 8px;
+    gap: 6px;
   }
 
   .hx-stat-item {
-    padding: 10px 9px;
+    padding: 9px 6px;
   }
 
   .hx-stat-val {
-    font-size: 15.5px;
+    font-size: 14.5px;
   }
 }
 
@@ -1278,21 +1277,26 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
   }
 
   .hx-stat-item {
-    padding: 11px 9px;
-    gap: 8px;
+    padding: 8px 6px;
+    gap: 6px;
   }
 
   .hx-stat-icon-wrap {
-    width: 34px;
-    height: 34px;
+    width: 26px;
+    height: 26px;
   }
 
   .hx-stat-val {
-    font-size: 16px;
+    font-size: 14px;
   }
 
   .hx-stat-label {
-    font-size: 9.5px;
+    font-size: 8px;
+    letter-spacing: 0;
+    white-space: normal;
+    line-height: 1.15;
+    overflow: visible;
+    text-overflow: unset;
   }
 }
 
@@ -1324,14 +1328,32 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 }
 
 .home-section {
-  padding: clamp(22px, 3.2vw, 34px) 0;
-  border-top: 1px solid var(--brand-line, rgba(255, 255, 255, 0.05));
-  content-visibility: auto;
-  contain-intrinsic-size: auto 400px;
+  position: relative;
+  padding: clamp(32px, 4vw, 44px) 0;
+  border-top: 0;
+  content-visibility: visible;
+  contain-intrinsic-size: none;
 }
 
 html[data-theme="light"] .home-section {
-  border-top-color: rgba(0, 138, 148, 0.08);
+  border-top-color: transparent;
+}
+
+/* One continuous canvas, with depth coming from spacing and cards rather than
+   hard horizontal rules. This prevents sections from looking clipped apart. */
+html[data-theme="light"] .home-page .home-body,
+html[data-theme="light"] .home-page .home-section {
+  background-color: #f4fafc;
+}
+
+.home-page .home-academicList,
+.home-page .home-academicList > .reveal {
+  width: 100%;
+  min-width: 0;
+}
+
+.home-page .home-academicList > .reveal {
+  overflow: visible;
 }
 
 .home-body > .home-section:first-child {
@@ -1339,18 +1361,14 @@ html[data-theme="light"] .home-section {
   padding-top: clamp(28px, 3.5vw, 40px);
 }
 
-/* Jasa Akademik — accent strip under popular products */
+/* Jasa Akademik stays on the same canvas as the surrounding sections. */
 .home-academicSection {
   position: relative;
-  background:
-    radial-gradient(ellipse 70% 80% at 8% 20%, rgba(56, 189, 248, 0.08), transparent 55%),
-    radial-gradient(ellipse 55% 60% at 92% 70%, rgba(99, 102, 241, 0.07), transparent 50%);
+  background: transparent;
 }
 
 html[data-theme="light"] .home-academicSection {
-  background:
-    radial-gradient(ellipse 70% 80% at 8% 20%, rgba(14, 165, 233, 0.07), transparent 55%),
-    radial-gradient(ellipse 55% 60% at 92% 70%, rgba(99, 102, 241, 0.05), transparent 50%);
+  background: transparent;
 }
 
 .home-sectionInner {
@@ -1358,24 +1376,27 @@ html[data-theme="light"] .home-academicSection {
   gap: 18px;
 }
 
-/* Override global .section-head flex so home titles stay stacked */
+/* Override global .section-head flex so home titles stay stacked and centered */
 .home-sectionHead,
 .home-page .home-sectionHead.section-head {
   display: grid;
-  align-items: start;
-  justify-content: start;
+  align-items: center;
+  justify-content: center;
+  justify-items: center;
   gap: 6px;
   max-width: 540px;
-  margin-bottom: 0;
+  margin: 0 auto;
   width: 100%;
+  text-align: center;
 }
 
-.home-sectionTitle {
+.home-sectionTitle,
+.home-sectionSub {
   margin: 0;
+  margin-inline: auto;
 }
 
 .home-sectionSub {
-  margin: 0;
   color: var(--brand-muted, rgba(234, 255, 245, 0.64));
   font-size: 14px;
   line-height: 1.6;
@@ -2153,16 +2174,10 @@ html[data-theme="light"] .home-page .home-popularList .product-tile:hover {
   border-radius: 22px;
 }
 
+/* About.css styles every `.faq-item` with this decorative circle. Home FAQ
+   cards intentionally keep a clean surface. */
 .home-faqItem.faq-item::after {
-  content: "";
-  position: absolute;
-  right: -120px;
-  bottom: -120px;
-  width: 240px;
-  height: 240px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(83, 204, 255, 0.16), rgba(83, 204, 255, 0));
-  pointer-events: none;
+  display: none;
 }
 
 .home-faqSection .faq-itemHead {
@@ -2370,8 +2385,7 @@ html[data-theme="light"] .home-howCard.is-expanded {
     box-shadow: var(--skeu-control-shadow) !important;
   }
   /* 5. Strip glows and text-shadows */
-  .home-promoCard-percent,
-  .hx-stat-item--accent .hx-stat-val {
+  .home-promoCard-percent {
     text-shadow: none !important;
   }
 }
@@ -2472,8 +2486,9 @@ html[data-theme="light"] .hx-onboardClose:hover {
   }
 
   .home-page .home-body > .home-section {
-    padding: 22px 0;
-    contain-intrinsic-size: auto 320px;
+    padding: 28px 0;
+    content-visibility: visible;
+    contain-intrinsic-size: none;
   }
 
   .home-page .home-body > .home-section:first-child {
@@ -2498,8 +2513,10 @@ html[data-theme="light"] .hx-onboardClose:hover {
     max-width: 100%;
     width: 100%;
     margin-bottom: 0;
-    align-items: start;
-    justify-content: start;
+    align-items: center;
+    justify-content: center;
+    justify-items: center;
+    text-align: center;
   }
 
   .home-page .home-body .home-sectionTitle,
@@ -2646,13 +2663,11 @@ html[data-theme="light"] .hx-onboardClose:hover {
 
   /* Academic accent — lighter so it doesn't dominate small screens */
   .home-page .home-academicSection {
-    background:
-      radial-gradient(ellipse 90% 70% at 0% 0%, rgba(56, 189, 248, 0.07), transparent 60%);
+    background: transparent;
   }
 
   html[data-theme="light"] .home-page .home-academicSection {
-    background:
-      radial-gradient(ellipse 90% 70% at 0% 0%, rgba(14, 165, 233, 0.06), transparent 60%);
+    background: transparent;
   }
 }
 
@@ -2766,6 +2781,128 @@ html[data-theme="light"] .hx-onboardClose:hover {
 
   .home-page .home-body .home-promoCard:active {
     transform: scale(0.99);
+  }
+}
+
+/* The footer sits outside `.home-page` in Layout. Bridge it to the same canvas
+   so the last FAQ section does not end in a different-colour rectangle. */
+html[data-theme="light"] .app-shell:has(.home-page) .site-footer {
+  background: #f4fafc !important;
+  border-top: 0 !important;
+}
+
+/* Scroll-triggered transforms made long-page rendering unstable: elements
+   changed position while the browser stitched the page, which looked like
+   duplicated or sliced sections. Home content is now position-stable. */
+.home-page .reveal,
+.app-shell:has(.home-page) .site-footer .reveal {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+/* ── Canonical light surface for Home ────────────────────────────────────
+   Home used to combine multiple gradients, inset edges and 54px shadows on
+   nearly every component. A single surface recipe keeps the page calm and
+   makes sections feel like one product rather than separate templates. */
+html[data-theme="light"] .home-page {
+  --home-canvas: #f4fafc;
+  --home-surface: linear-gradient(145deg, #ffffff 0%, #f5fbfd 46%, #e3f1f5 100%);
+  --home-line: rgba(15, 125, 141, 0.13);
+  --home-shadow:
+    8px 12px 24px rgba(49, 96, 111, 0.13),
+    -6px -6px 16px rgba(255, 255, 255, 0.92),
+    inset 0 2px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -3px 0 rgba(103, 157, 172, 0.12);
+  --home-shadow-hover:
+    10px 16px 30px rgba(49, 96, 111, 0.16),
+    -7px -7px 18px rgba(255, 255, 255, 0.96),
+    inset 0 2px 0 #ffffff,
+    inset 0 -3px 0 rgba(70, 147, 163, 0.14);
+  background: var(--home-canvas) !important;
+}
+
+html[data-theme="light"] .home-page .hx-stat-item,
+html[data-theme="light"] .home-page .home-popularList .product-tile,
+html[data-theme="light"] .home-page .home-howCard,
+html[data-theme="light"] .home-page .home-faqItem.faq-item,
+html[data-theme="light"] .home-page .home-tileSkeleton {
+  background: var(--home-surface) !important;
+  border: 1px solid var(--home-line) !important;
+  box-shadow: var(--home-shadow) !important;
+}
+
+html[data-theme="light"] .home-page .hx-stat-item,
+html[data-theme="light"] .home-page .home-popularList .product-tile,
+html[data-theme="light"] .home-page .home-howCard {
+  border-radius: 18px !important;
+}
+
+html[data-theme="light"] .home-page .home-faqItem.faq-item {
+  border-radius: 20px !important;
+}
+
+@media (hover: hover) {
+  html[data-theme="light"] .home-page .home-popularList .product-tile:hover,
+  html[data-theme="light"] .home-page .home-howCard:hover,
+  html[data-theme="light"] .home-page .home-faqItem.faq-item:hover {
+    border-color: rgba(0, 151, 161, 0.24) !important;
+    box-shadow: var(--home-shadow-hover) !important;
+    transform: translateY(-2px);
+  }
+}
+
+html[data-theme="light"] .home-page .hero-search-shell,
+html[data-theme="light"] .home-page .home-faqSection .faq-searchWrap {
+  background: linear-gradient(145deg, #edf7fa, #ffffff) !important;
+  border: 1px solid rgba(15, 125, 141, 0.16) !important;
+  box-shadow:
+    inset 4px 4px 10px rgba(69, 113, 128, 0.10),
+    inset -4px -4px 10px rgba(255, 255, 255, 0.96),
+    0 9px 22px rgba(37, 91, 108, 0.10) !important;
+}
+
+html[data-theme="light"] .home-page .home-sectionCta .btn,
+html[data-theme="light"] .home-page .hx-btn-primary {
+  box-shadow:
+    inset 0 3px 0 rgba(255, 255, 255, 0.62),
+    inset 0 -4px 0 rgba(0, 105, 112, 0.34),
+    0 11px 22px rgba(0, 126, 134, 0.25),
+    -3px -3px 10px rgba(255, 255, 255, 0.82) !important;
+}
+
+html[data-theme="light"] .home-page .home-sectionCta .btn-ghost {
+  background: linear-gradient(145deg, #ffffff, #e8f4f7) !important;
+  border: 1px solid var(--home-line) !important;
+  box-shadow:
+    6px 8px 18px rgba(49, 96, 111, 0.13),
+    -5px -5px 14px rgba(255, 255, 255, 0.94),
+    inset 0 2px 0 #ffffff,
+    inset 0 -3px 0 rgba(103, 157, 172, 0.12) !important;
+}
+
+html[data-theme="light"] .app-shell:has(.home-page) .site-footerPanel {
+  background: linear-gradient(145deg, #f8feff 0%, #e6f4f7 100%) !important;
+  border: 1px solid rgba(15, 125, 141, 0.14) !important;
+  border-radius: 26px !important;
+  box-shadow:
+    14px 20px 42px rgba(49, 96, 111, 0.14),
+    -10px -10px 28px rgba(255, 255, 255, 0.92),
+    inset 0 2px 0 #ffffff !important;
+}
+
+html[data-theme="light"] .home-page .home-sectionCta .btn:active,
+html[data-theme="light"] .home-page .hx-btn-primary:active {
+  transform: translateY(2px) !important;
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -2px 0 rgba(0, 105, 112, 0.30),
+    0 5px 12px rgba(0, 126, 134, 0.22) !important;
+}
+
+@media (min-width: 721px) {
+  .home-page {
+    padding-bottom: 0 !important;
   }
 }
 

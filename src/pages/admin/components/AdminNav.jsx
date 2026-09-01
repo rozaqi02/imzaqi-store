@@ -13,7 +13,6 @@ import {
   Tags,
   Zap,
 } from "lucide-react";
-import "../../../css/pages/AdminNav.css";
 
 export const ADMIN_NAV_GROUPS = [
   {

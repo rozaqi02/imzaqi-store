@@ -2,9 +2,9 @@ import { describe, expect, test } from "vitest";
 import { getAdminNavTarget, isNavItemActive, SITE_BOTTOM_NAV } from "./siteNav";
 
 describe("siteNav", () => {
-  test("covers all former hamburger primary + lacak routes", () => {
+  test("keeps the compact navigation at four primary routes", () => {
     const paths = SITE_BOTTOM_NAV.map((item) => item.to);
-    expect(paths).toEqual(["/", "/produk", "/faq", "/testimoni", "/status"]);
+    expect(paths).toEqual(["/", "/produk", "/testimoni", "/status"]);
   });
 
   test("getAdminNavTarget points to dashboard or login", () => {

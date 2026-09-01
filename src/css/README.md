@@ -1,7 +1,9 @@
-# CSS split
+# Sistem CSS
 
-File ini dibuat otomatis untuk memecah `src/index.css` jadi lebih modular.
+Semua visual aplikasi dimuat dari satu entry point: `src/styles.css`.
 
-- `src/index.css` sekarang hanya berisi `@import` ke file-file di folder ini.
-- `src/css/global.css` : global/base + shared components
-- `src/css/pages/*.css` : CSS khusus per halaman/menu (route)
+- Komponen dan menu tidak boleh menambahkan `import "*.css"` sendiri.
+- `src/styles.css` menentukan urutan cascade global, komponen, route, dan admin.
+- File di `src/css/pages/` tetap menjadi sumber aturan layout per route, tetapi
+  harus memakai token dari `theme-variables.css` dan selector yang di-scope ke
+  kelas halaman agar tidak menimpa menu lain.

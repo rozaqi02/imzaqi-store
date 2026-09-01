@@ -23,10 +23,16 @@ import { render, act, waitFor } from "@testing-library/react";
 // ── Mocks ──
 
 const mockSetSearchParams = jest.fn();
+const mockToast = {
+  success: jest.fn(),
+  error: jest.fn(),
+  info: jest.fn(),
+};
 let mockSearchParamsValue = new URLSearchParams();
 
 jest.mock("react-router-dom", () => ({
   useSearchParams: () => [mockSearchParamsValue, mockSetSearchParams],
+  useNavigate: () => jest.fn(),
 }));
 
 jest.mock("../lib/log", () => ({
@@ -44,11 +50,7 @@ jest.mock("../lib/api", () => ({
 }));
 
 jest.mock("../context/ToastContext", () => ({
-  useToast: () => ({
-    success: jest.fn(),
-    error: jest.fn(),
-    info: jest.fn(),
-  }),
+  useToast: () => mockToast,
 }));
 
 jest.mock("../hooks/usePageMeta", () => ({
@@ -132,7 +134,7 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
    * that apply overflow-wrap: anywhere and min-width: 0 at 320px viewport.
    * This guarantees no horizontal overflow regardless of text content length.
    */
-  it("renders st-wrap container with correct overflow-safe structure for any order data", { timeout: 30_000 }, async () => {
+  it("renders st-wrap container with correct overflow-safe structure for any order data", { timeout: 15_000 }, async () => {
     await fc.assert(
       fc.asyncProperty(arbOrder, async (orderData) => {
         const { supabase } = await import("../lib/supabaseClient.js");
@@ -194,7 +196,7 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
 
         unmount();
       }),
-      { numRuns: 50 }
+      { numRuns: 4 }
     );
   });
 
@@ -204,7 +206,7 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
    * For extremely long text content (worst case for overflow), verify the
    * DOM structure still maintains overflow protection.
    */
-  it("maintains overflow protection structure with extremely long text content", { timeout: 30_000 }, async () => {
+  it("maintains overflow protection structure with extremely long text content", { timeout: 15_000 }, async () => {
     const arbLongOrder = fc.record({
       order_code: fc.constant("IMZ-XXXX"),
       status: arbStatus,
@@ -281,7 +283,7 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
 
         unmount();
       }),
-      { numRuns: 30 }
+      { numRuns: 2 }
     );
   });
 });

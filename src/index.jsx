@@ -1,7 +1,7 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./fonts.js";
-import "./index.css";
+import "./styles.css";
 import App from "./App";
 import { CartProvider } from "./context/CartContext";
 

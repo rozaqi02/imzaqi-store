@@ -28,14 +28,6 @@ function addDaysISO(isoDate, days) {
   return d.toISOString().slice(0, 10);
 }
 
-function startOfWeekISO(isoDate) {
-  const d = new Date(`${isoDate}T00:00:00Z`);
-  const dayOfWeek = d.getUTCDay();
-  const diffToMonday = dayOfWeek === 0 ? -6 : 1 - dayOfWeek;
-  d.setUTCDate(d.getUTCDate() + diffToMonday);
-  return d.toISOString().slice(0, 10);
-}
-
 async function sumLast7DaysUniqueViews() {
   try {
     const { data, error } = await supabase.rpc("get_daily_stats", { p_days: 7 });
@@ -94,25 +86,11 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
       }
 
       const day = todayISO("Asia/Jakarta");
-      const nextDay = addDaysISO(day, 1);
-      const weekStart = startOfWeekISO(day);
-      const startWIB = `${day}T00:00:00+07:00`;
-      const endWIB = `${nextDay}T00:00:00+07:00`;
-      const weekStartWIB = `${weekStart}T00:00:00+07:00`;
 
       try {
         // Prefer RPC (lebih aman kalau RLS orders/page_views ketat)
-        const [
-          { data: stats, error: rpcErr },
-          { count: oWeek },
-          views7d,
-        ] = await Promise.all([
+        const [{ data: stats, error: rpcErr }, views7d] = await Promise.all([
           supabase.rpc("get_public_stats"),
-          supabase
-            .from("orders")
-            .select("id", { count: "exact", head: true })
-            .gte("created_at", weekStartWIB)
-            .lt("created_at", endWIB),
           sumLast7DaysUniqueViews(),
         ]);
 
@@ -131,31 +109,14 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
             last7DaysViews,
             totalOrders: Number(stats.total_orders || 0),
             todayOrders: Number(stats.today_orders || 0),
-            weekOrders: Number(stats.week_orders ?? oWeek ?? 0),
+            weekOrders: Number(stats.week_orders || 0),
           });
           return;
         }
 
         // Fallback (kalau RPC belum tersedia): ambil view dari site_stats.
-        const [
-          { data: siteStats },
-          { count: oToday },
-          { count: oTotal },
-          { count: oWeekFallback },
-          views7dFallback,
-        ] = await Promise.all([
+        const [{ data: siteStats }, views7dFallback] = await Promise.all([
           supabase.from("site_stats").select("total_views,today_views,last_date").maybeSingle(),
-          supabase
-            .from("orders")
-            .select("id", { count: "exact", head: true })
-            .gte("created_at", startWIB)
-            .lt("created_at", endWIB),
-          supabase.from("orders").select("id", { count: "exact", head: true }),
-          supabase
-            .from("orders")
-            .select("id", { count: "exact", head: true })
-            .gte("created_at", weekStartWIB)
-            .lt("created_at", endWIB),
           sumLast7DaysUniqueViews(),
         ]);
 
@@ -164,9 +125,9 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
           totalViews: Number(siteStats?.total_views || 0),
           todayViews: Number(siteStats?.today_views || 0),
           last7DaysViews: Number(views7dFallback ?? siteStats?.today_views ?? 0),
-          totalOrders: Number(oTotal || 0),
-          todayOrders: Number(oToday || 0),
-          weekOrders: Number(oWeekFallback || 0),
+          totalOrders: 0,
+          todayOrders: 0,
+          weekOrders: 0,
         });
       } catch {}
     }

@@ -59,6 +59,8 @@ export function CartProvider({ children }) {
     lastAddedVariantId,
 
     add(variant, qty = 1) {
+      const requestedQty = Math.max(1, Math.floor(Number(qty) || 1));
+      const availableStock = Number(variant?.stock);
       const newItemCategory = getItemCategoryLine(variant);
       const hasConflict = items.some((existingItem) => {
         const existingCategory = getItemCategoryLine(existingItem);
@@ -72,6 +74,19 @@ export function CartProvider({ children }) {
           conflictType: "mixed_category",
           message:
             "Produk 'Jasa Akademik' dan 'Aplikasi Premium' harus dipesan secara terpisah karena memiliki metode pembayaran QRIS yang berbeda. Mohon selesaikan atau kosongkan pesanan sebelumnya terlebih dahulu.",
+        };
+      }
+
+      const existingItem = items.find((item) => item.variant_id === variant.id);
+      const nextQty = Number(existingItem?.qty || 0) + requestedQty;
+      if (Number.isFinite(availableStock) && availableStock >= 0 && nextQty > availableStock) {
+        return {
+          success: false,
+          outOfStock: true,
+          available: availableStock,
+          message: availableStock > 0
+            ? `Stok tersisa ${availableStock}. Jumlah di keranjang tidak boleh melebihi stok.`
+            : "Produk ini sedang habis.",
         };
       }
 
@@ -106,7 +121,8 @@ export function CartProvider({ children }) {
               typeof variant.requires_buyer_email === "boolean"
                 ? variant.requires_buyer_email
                 : !!next[i].requires_buyer_email,
-            qty: clamp(next[i].qty + qty, 1, 99),
+            stock: Number.isFinite(availableStock) ? availableStock : next[i].stock,
+            qty: clamp(next[i].qty + requestedQty, 1, 99),
           };
           return next;
         }
@@ -124,7 +140,8 @@ export function CartProvider({ children }) {
             guarantee_text: variant.guarantee_text || "",
             catalog_line: newItemCategory,
             requires_buyer_email: !!variant.requires_buyer_email,
-            qty: clamp(qty, 1, 99),
+            stock: Number.isFinite(availableStock) ? availableStock : null,
+            qty: clamp(requestedQty, 1, 99),
           },
         ];
       });
@@ -136,7 +153,13 @@ export function CartProvider({ children }) {
     },
 
     setQty(variant_id, qty) {
-      setItems(prev => prev.map(x => x.variant_id === variant_id ? { ...x, qty: clamp(qty, 1, 99) } : x));
+      setItems(prev => prev.map((x) => {
+        if (x.variant_id !== variant_id) return x;
+        const maxQty = Number.isFinite(Number(x.stock)) && Number(x.stock) >= 0
+          ? Math.min(99, Number(x.stock))
+          : 99;
+        return { ...x, qty: clamp(qty, 1, Math.max(1, maxQty)) };
+      }));
     },
 
     clear() {

@@ -11,6 +11,8 @@ import { getVisitorIdAsUUID } from "../lib/visitor";
 import { makeOrderCode } from "../lib/orderCode";
 import { buildDynamicQrisImage } from "../lib/qris";
 import CheckoutSteps from "../components/CheckoutSteps";
+import "../css/pages/Pay.css";
+import "../css/checkout-steps.css";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
@@ -21,7 +23,6 @@ import { recordCompletedOrder, LOYALTY_PROMO_CODE } from "../lib/loyalty";
 import { copyToClipboard } from "../utils/clipboard";
 import { warn } from "../lib/log";
 import { saveBuyerName } from "../lib/greeting";
-import "../css/pages/Pay.css";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
 const BUYER_EMAIL_REQUIREMENT_REGEX =
@@ -995,7 +996,7 @@ export default function Pay() {
         Number(canonicalOrder.discountPercent) !== Number(promoPercent) ||
         Number(canonicalOrder.total) !== Number(total);
 
-      if (hasPricingMismatch && isFreeOrder) {
+      if (hasPricingMismatch) {
         setSnapshot(canonicalOrder.items);
         if (!canonicalOrder.promoCode && promo?.code) {
           clearPromo();
@@ -1024,25 +1025,6 @@ export default function Pay() {
 
       if (!createdOrder) throw new Error("Gagal membuat ID order.");
 
-      if (hasPricingMismatch && !isFreeOrder) {
-        // Log mismatch details in the database and mark as paid_reported for manual review
-        const mismatchNotes = `[PERINGATAN: Selisih Harga! Bayar: ${formatIDR(total)}, DB: ${formatIDR(canonicalOrder.total)}]\n` + (noteText || "");
-        const { error: rpcError } = await supabase.rpc("report_order_payment_mismatch", {
-          p_order_id: createdOrder.id,
-          p_notes: mismatchNotes,
-        });
-        if (rpcError) {
-          const { error: updateError } = await supabase
-            .from("orders")
-            .update({ status: "paid_reported", notes: mismatchNotes })
-            .eq("id", createdOrder.id);
-          if (updateError) throw updateError;
-        }
-
-        createdOrder.status = "paid_reported";
-        createdOrder.notes = mismatchNotes;
-      }
-
       setOrderCode(generatedCode);
       setOk(true);
       setSnapshot(canonicalOrder.items);
@@ -1058,7 +1040,7 @@ export default function Pay() {
         order_code: generatedCode,
         created_at: new Date().toISOString(),
         total_idr: canonicalOrder.total,
-        status: "pending",
+        status: createdOrder.status || (hasPricingMismatch ? "paid_reported" : "pending"),
       });
       const loyaltyResult = recordCompletedOrder();
       if (loyaltyResult.unlocked) {

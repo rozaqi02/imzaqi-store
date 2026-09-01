@@ -3,7 +3,6 @@ import { Navigate } from "react-router-dom";
 import { ShieldCheck } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { checkAdminAccess } from "../lib/adminAuth";
-import "../css/pages/AdminGate.css";
 
 /**
  * Admin route guard — session + admin_users row or app_metadata.role === "admin".

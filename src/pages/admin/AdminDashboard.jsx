@@ -43,12 +43,6 @@ import {
   LIVE_ORDER_STATUSES,
   prettyOrderStatus,
 } from "../../lib/orderStatus";
-import "../../css/pages/AdminDashboard.css";
-import "../../css/pages/AdminDashboard.light.css";
-import "../../css/pages/AdminDashboard.fixes.css";
-import "../../css/pages/AdminNav.css";
-import "../../css/pages/AdminUI.overhaul.css";
-import "../../css/pages/AdminApp.shell.css";
 import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
 import VirtualList from "./components/VirtualList";
 import AdminOrderListItem from "./components/AdminOrderListItem";
@@ -64,6 +58,12 @@ import {
   isThinStock,
   statusFilterForBucket,
 } from "./adminPerf";
+import "../../css/pages/AdminDashboard.css";
+import "../../css/pages/AdminDashboard.light.css";
+import "../../css/pages/AdminDashboard.fixes.css";
+import "../../css/pages/AdminNav.css";
+import "../../css/pages/AdminUI.overhaul.css";
+import "../../css/pages/AdminApp.shell.css";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -236,7 +236,7 @@ export default function AdminDashboard() {
   const [settingsWhatsApp, setSettingsWhatsApp] = useState("");
   const [settingsQrisBase, setSettingsQrisBase] = useState("");
   const [settingsQrisImageUrl, setSettingsQrisImageUrl] = useState("");
-  const [settingsAcademicPopupEnabled, setSettingsAcademicPopupEnabled] = useState(true);
+  const [settingsAcademicPopupEnabled, setSettingsAcademicPopupEnabled] = useState(false);
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [exportDateFrom, setExportDateFrom] = useState("");
   const [exportDateTo, setExportDateTo] = useState("");
@@ -352,6 +352,8 @@ export default function AdminDashboard() {
     const ac = settings?.academic_popup;
     if (ac && typeof ac === "object" && typeof ac.enabled === "boolean") {
       setSettingsAcademicPopupEnabled(ac.enabled);
+    } else {
+      setSettingsAcademicPopupEnabled(false);
     }
   }, [settings]);
 
@@ -4372,7 +4374,7 @@ export default function AdminDashboard() {
                       <span>Aktifkan Pop-up Jasa Akademik di Storefront</span>
                     </label>
                     <div className="hint subtle" style={{ marginBottom: 16 }}>
-                      Jika diaktifkan, pengunjung toko akan melihat pop-up Jasa Akademik terlebih dahulu, kemudian diikuti pop-up Flash Sale.
+                      Jika diaktifkan, pop-up hanya muncul sekali per sesi setelah katalog layanan berhasil dimuat. Jika dimatikan, storefront tidak menjadwalkannya.
                     </div>
 
                     <div className="admin-form-actions">

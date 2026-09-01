@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { GraduationCap, Smartphone } from "lucide-react";
 
 const footerColumns = [
   {
@@ -52,10 +53,18 @@ export default function Footer() {
 
             <div className="site-footerGoContact">
               <a href="https://wa.me/6282245964007" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
-                📱 +62 822-4596-4007 <span style={{ opacity: 0.75, fontSize: "12px", fontWeight: 600 }}>(Khusus App Premium)</span>
+                <span className="site-footerGoContactIcon" aria-hidden="true"><Smartphone size={16} /></span>
+                <span className="site-footerGoContactCopy">
+                  <strong>+62 822-4596-4007</strong>
+                  <small>Khusus App Premium</small>
+                </span>
               </a>
               <a href="https://wa.me/6281232742374" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
-                🎓 +62 812-3274-2374 <span style={{ opacity: 0.75, fontSize: "12px", fontWeight: 600 }}>(Khusus Jasa Akademik)</span>
+                <span className="site-footerGoContactIcon" aria-hidden="true"><GraduationCap size={16} /></span>
+                <span className="site-footerGoContactCopy">
+                  <strong>+62 812-3274-2374</strong>
+                  <small>Khusus Jasa Akademik</small>
+                </span>
               </a>
             </div>
           </div>

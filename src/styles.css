@@ -1,0 +1,35 @@
+/*
+ * Imzaqi Store visual entry point.
+ *
+ * Every route loads this one stylesheet, so shared tokens, surfaces, spacing,
+ * shadows, focus states and breakpoints resolve in one predictable cascade.
+ * Keep page files scoped to their route class; add cross-route visuals here.
+ */
+
+@import "./css/global.css";
+@import "./css/theme-variables.css";
+@import "./css/theme-consolidated.css";
+@import "./css/motion-enhancements.css";
+@import "./css/motion-ux.css";
+@import "./css/motion-adaptive.css";
+@import "./css/polish.css";
+@import "./css/overrides-v3.css";
+@import "./css/visual-ui.css";
+@import "./css/fab-stack.css";
+@import "./css/bottom-nav.css";
+@import "./css/light-mode-cards.css";
+@import "./css/neumorphic-depth.css";
+@import "./css/hero-animations.css";
+
+/* Shared components */
+@import "./components/AcademicPopup.css";
+@import "./components/AbandonedCartBanner.css";
+@import "./components/CheckoutTrustBlock.css";
+@import "./components/FlashSalePopup.css";
+@import "./components/HeroCatalogBackdrop.css";
+@import "./components/ProductTile.css";
+@import "./components/RecentlyViewed.css";
+@import "./components/SocialProofStrip.css";
+@import "./components/SwUpdateToast.css";
+@import "./components/TrustStrip.css";
+

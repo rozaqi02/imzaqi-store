@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /checkout
 Disallow: /bayar
 
-Sitemap: https://imzaqistore.my.id/sitemap.xml
+Sitemap: https://imzaqi.store/sitemap.xml

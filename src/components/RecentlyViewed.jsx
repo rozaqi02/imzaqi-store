@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { getRecentlyViewed } from "../lib/recentlyViewed";
 import { formatIDR } from "../lib/format";
-import "./RecentlyViewed.css";
 
 export default function RecentlyViewed({ currentProductId }) {
   const [items, setItems] = useState([]);

@@ -1,5 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
+import "../css/pages/Status.css";
+import "../css/pages/OrderHistory.css";
 import { fireConfetti } from "../components/Confetti";
 import {
   Activity,
@@ -36,8 +38,6 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { warn } from "../lib/log";
 import { copyToClipboard } from "../utils/clipboard";
-import "../css/pages/OrderHistory.css";
-import "../css/pages/Status.css";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -102,16 +102,15 @@ function sanitizeOrderInput(value) {
   return String(value || "").toUpperCase().replace(/[^A-Z0-9-]/g, "");
 }
 
-// Dipakai saat lookup/submit - normalisasi penuh ke format IMZ-XXXX atau IMZ-XXXXXXXX
+// Kode pesanan baru selalu memakai 8 karakter acak. Jangan memotong input karena
+// itu dapat mengubah kode panjang menjadi kode lain yang valid.
 function normalizeOrderCode(value) {
   // Strip semua karakter non-alphanumeric kecuali dash sementara
   const cleaned = String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (!cleaned) return "";
   // Cek apakah sudah ada prefix IMZ
   const withoutPrefix = cleaned.startsWith("IMZ") ? cleaned.slice(3) : cleaned;
-  // Gunakan 8 karakter jika panjangnya tepat 8, jika tidak ambil 4 karakter terakhir
-  const code = withoutPrefix.length === 8 ? withoutPrefix : withoutPrefix.slice(-4);
-  if (code.length === 4 || code.length === 8) return `IMZ-${code}`;
+  if (withoutPrefix.length === 8) return `IMZ-${withoutPrefix}`;
   // Kode belum lengkap, kembalikan mentah untuk ditampilkan error
   return cleaned;
 }

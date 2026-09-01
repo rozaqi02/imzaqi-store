@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-const SITE_URL = "https://imzaqistore.my.id";
+const SITE_URL = "https://imzaqi.store";
 const DEFAULT_OG_IMAGE = `${SITE_URL}/imzaqistore_logo.png`;
 
 function resolveAbsoluteUrl(url) {

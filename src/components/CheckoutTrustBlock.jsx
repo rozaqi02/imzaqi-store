@@ -2,7 +2,6 @@
 import SocialProofStrip from "./SocialProofStrip";
 import TrustStrip from "./TrustStrip";
 import { getLoyaltyStatus, LOYALTY_PROMO_CODE } from "../lib/loyalty";
-import "./CheckoutTrustBlock.css";
 
 export default function CheckoutTrustBlock() {
   const loyalty = useMemo(() => getLoyaltyStatus(), []);

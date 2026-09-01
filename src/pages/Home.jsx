@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, ChevronDown, Search, X } from "lucide-react";
+import "../css/pages/Home.css";
 
 import Hero from "../components/Hero";
 
 import SectionHead from "../components/SectionHead";
-import "../css/pages/Home.css";
 import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingData, fetchPromoCodes, fetchSettings, peekCachedProducts } from "../lib/api";
 import EmptyState from "../components/EmptyState";

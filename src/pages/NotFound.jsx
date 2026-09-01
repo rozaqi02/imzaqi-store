@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import "../css/pages/NotFound.css";
 import {
   Activity,
   ArrowRight,
@@ -13,7 +14,6 @@ import {
 import { usePageMeta } from "../hooks/usePageMeta";
 import { fetchProducts } from "../lib/api";
 import ProductTile from "../components/ProductTile";
-import "../css/pages/NotFound.css";
 
 const QUICK_LINKS = [
   { to: "/", label: "Beranda", icon: Home, desc: "Kembali ke halaman utama" },

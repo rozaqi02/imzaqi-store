@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
+import "../../css/pages/AdminGate.css";
+import "../../css/pages/AdminLogin.css";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
 import { warn } from "../../lib/log";
 import { checkAdminAccess, checkIsAdmin } from "../../lib/adminAuth";
-import "../../css/pages/AdminLogin.css";
-import "../../css/pages/AdminUI.overhaul.css";
 
 export default function AdminLogin() {
   const nav = useNavigate();

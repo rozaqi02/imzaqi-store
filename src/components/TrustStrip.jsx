@@ -1,5 +1,4 @@
 import { MessageCircle, QrCode, ShieldCheck, Timer } from "lucide-react";
-import "./TrustStrip.css";
 
 const DEFAULT_ITEMS = [
   { icon: QrCode, label: "QRIS" },

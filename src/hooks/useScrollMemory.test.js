@@ -96,11 +96,11 @@ describe("useScrollMemory", () => {
     );
   });
 
-  it("locks catalog scroll-to-top while restore is pending", () => {
+  it("does not retain the restore lock after saved scroll is cleared", () => {
     saveScrollY({ slug: "gemini", y: 900 });
     expect(shouldSkipCatalogScrollToTop()).toBe(true);
     clearSavedScroll();
-    expect(isCatalogRestoreLocked()).toBe(true);
+    expect(isCatalogRestoreLocked()).toBe(false);
     endCatalogRestoreLock();
     expect(shouldSkipCatalogScrollToTop()).toBe(false);
   });

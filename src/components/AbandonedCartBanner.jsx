@@ -4,7 +4,6 @@ import { ShoppingCart, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { shouldShowAbandonedCartReminder, dismissAbandonedCartReminder } from "../lib/cartReminder";
 import { useFunnelRoute } from "../hooks/useFunnelRoute";
-import "./AbandonedCartBanner.css";
 
 export default function AbandonedCartBanner() {
   const location = useLocation();

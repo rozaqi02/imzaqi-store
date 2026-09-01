@@ -4,7 +4,6 @@ import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-
 import { useTilt } from "../hooks/useTilt";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { formatIDR, classifyStock, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
-import "./ProductTile.css";
 
 export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false, overrideSold = null }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });

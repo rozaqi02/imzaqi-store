@@ -2,11 +2,11 @@ import React, { useEffect, useState, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useFunnelRoute } from "../hooks/useFunnelRoute";
-import { BellOff, Clock } from "lucide-react";
+import { BellOff, Clock, X } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { formatIDR } from "../lib/format";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
-import "./FlashSalePopup.css";
+import { useDialogA11y } from "../hooks/useDialogA11y";
 
 // Note: no Flame icon in title (user preference)
 const SUPPRESS_DATE_KEY = "imzaqi_flash_sale_suppress_date_v1";
@@ -32,6 +32,7 @@ export default function FlashSalePopup() {
   });
 
   const prevPathnameRef = useRef(location.pathname);
+  const modalRef = useRef(null);
 
   // 1. Fetch active flash sales and enrich with product/variant info
   useEffect(() => {
@@ -101,44 +102,27 @@ export default function FlashSalePopup() {
     };
   }, []);
 
-  // 2. Pop-up muncul otomatis setelah Academic Popup selesai/ditutup
+  // 2. Jangan menumpuk dua modal promosi dalam satu kunjungan.
   useEffect(() => {
     const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
     if (suppressedToday || isFunnel || salesItems.length === 0) return;
 
-    function checkAndOpenFlashSale() {
+    const checkAndOpenFlashSale = () => {
       const isAcademicActive = Boolean(
         window.__imzaqi_academic_popup_active ||
         document.querySelector(".ac-popup-backdrop")
       );
 
-      // Never open if Academic Popup is currently showing
+      // Bila akademik sedang tampil, flash sale tidak menyela setelahnya.
       if (isAcademicActive) return;
 
       setIsOpen(true);
-    }
-
-    // Check after initial delay (2.5s) if Academic Popup is NOT showing
-    const initialTimer = setTimeout(checkAndOpenFlashSale, 2500);
-
-    // Listen for custom event when Academic Popup is closed/disabled
-    const handleAcademicClosed = () => {
-      setTimeout(() => {
-        const isAcademicStillActive = Boolean(
-          window.__imzaqi_academic_popup_active ||
-          document.querySelector(".ac-popup-backdrop")
-        );
-        if (!isAcademicStillActive) {
-          setIsOpen(true);
-        }
-      }, 500);
     };
 
-    window.addEventListener("imzaqi_academic_popup_closed", handleAcademicClosed);
+    const initialTimer = setTimeout(checkAndOpenFlashSale, OVERLAY_TIMING.flashSaleMs);
 
     return () => {
       clearTimeout(initialTimer);
-      window.removeEventListener("imzaqi_academic_popup_closed", handleAcademicClosed);
     };
   }, [isFunnel, salesItems.length]);
 
@@ -185,29 +169,42 @@ export default function FlashSalePopup() {
     (typeof document !== "undefined" && document.querySelector(".ac-popup-backdrop"))
   );
 
+  const handleClose = () => setIsOpen(false);
+
+  useDialogA11y({
+    open: isOpen,
+    containerRef: modalRef,
+    onClose: handleClose,
+    initialFocusSelector: ".fsp-closeBtn",
+  });
+
   if (isFunnel || !isOpen || salesItems.length === 0 || isAcademicActive) return null;
 
   return createPortal(
     <div
       className="fsp-backdrop"
-      onMouseDown={() => setIsOpen(false)}
+      onMouseDown={handleClose}
       role="presentation"
     >
       <div
+        ref={modalRef}
         className="fsp-modal"
         role="dialog"
         aria-modal="true"
-        aria-label="Flash Sale"
+        aria-labelledby="flash-sale-title"
         onMouseDown={(e) => e.stopPropagation()}
       >
         {/* Head */}
         <div className="fsp-head">
           <div className="fsp-titleBlock">
-            <h2 className="fsp-kicker">
+            <h2 id="flash-sale-title" className="fsp-kicker">
               <span>Flash Sale!</span>
             </h2>
             <p className="fsp-title">Lagi diskon lohh</p>
           </div>
+          <button type="button" className="fsp-closeBtn" onClick={handleClose} aria-label="Tutup pop-up Flash Sale">
+            <X size={18} aria-hidden="true" />
+          </button>
         </div>
 
         {/* Body (List items on sale) */}
@@ -315,7 +312,7 @@ export default function FlashSalePopup() {
             <button
               type="button"
               className="fsp-closeTextLink"
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
             >
               Nanti Aja
             </button>

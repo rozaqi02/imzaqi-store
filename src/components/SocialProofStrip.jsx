@@ -1,7 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
 import { fetchTestimonials } from "../lib/api";
-import "./SocialProofStrip.css";
 
 export default function SocialProofStrip({ limit = 3, title = "Dipercaya pembeli lain" }) {
   const [items, setItems] = useState([]);

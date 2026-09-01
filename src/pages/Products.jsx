@@ -16,6 +16,8 @@ import {
   X,
 } from "lucide-react";
 
+import "../css/pages/Products.css";
+import "../css/pages/FlashSale.css";
 import { fetchProducts } from "../lib/api";
 import { warn } from "../lib/log";
 import CatalogCardSkeleton from "../components/CatalogCardSkeleton";
@@ -56,7 +58,6 @@ import {
   setCatalogProductsCache,
 } from "../lib/catalogCache";
 import TypewriterSearchInput from "../components/TypewriterSearchInput";
-import "../css/pages/Products.css";
 
 const CATEGORIES = CATALOG_LINE_FILTERS;
 
@@ -178,6 +179,7 @@ function FilterPanel({
   variant = "sidebar",
   showViewToggle = true,
   showReset = true,
+  showCategories = true,
   idPrefix = "",
   categoryCounts = {},
 }) {
@@ -190,31 +192,33 @@ function FilterPanel({
 
   return (
     <div className={`catalog-filter ${isSheet ? "is-sheet" : "is-sidebar"}`}>
-      <section className="catalog-filterSection">
-        <header className="catalog-filterSectionHead">
-          <span className="catalog-filterLabel">Kategori</span>
-        </header>
-        <div className="catalog-chipGrid">
-          {CATEGORIES.map((category) => {
-            const Icon = category.icon;
-            const active = cats.includes(category.key);
-            const count = categoryCounts[category.key] || 0;
-            return (
-              <button
-                key={category.key}
-                type="button"
-                className={`catalog-chip ${active ? "active" : ""}`}
-                onClick={() => toggleCat(category.key)}
-                aria-pressed={active}
-              >
-                <Icon size={14} />
-                <span>{category.label}</span>
-                {count > 0 && <span className="catalog-chip-count">{count}</span>}
-              </button>
-            );
-          })}
-        </div>
-      </section>
+      {showCategories ? (
+        <section className="catalog-filterSection">
+          <header className="catalog-filterSectionHead">
+            <span className="catalog-filterLabel">Kategori</span>
+          </header>
+          <div className="catalog-chipGrid">
+            {CATEGORIES.map((category) => {
+              const Icon = category.icon;
+              const active = cats.includes(category.key);
+              const count = categoryCounts[category.key] || 0;
+              return (
+                <button
+                  key={category.key}
+                  type="button"
+                  className={`catalog-chip ${active ? "active" : ""}`}
+                  onClick={() => toggleCat(category.key)}
+                  aria-pressed={active}
+                >
+                  <Icon size={14} />
+                  <span>{category.label}</span>
+                  {count > 0 && <span className="catalog-chip-count">{count}</span>}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+      ) : null}
 
       <section className="catalog-filterSection" style={{ "--section-i": 1 }}>
         <header className="catalog-filterSectionHead">
@@ -917,7 +921,7 @@ export default function Products() {
 
     if (trimmedQuery) {
       const queryPreview = trimmedQuery.length > 20 ? `${trimmedQuery.slice(0, 20).trimEnd()}...` : trimmedQuery;
-      tags.push(`Cari: "${queryPreview}"`);
+      tags.push({ key: "query", label: `Cari: "${queryPreview}"`, onRemove: () => setQuery("") });
     }
 
     if (cats.length) {
@@ -925,26 +929,30 @@ export default function Products() {
         .map((key) => CATEGORIES.find((item) => item.key === key)?.label || key)
         .filter(Boolean);
       if (categoryLabels.length <= 2) {
-        tags.push(`Kategori: ${categoryLabels.join(", ")}`);
+        tags.push({ key: "categories", label: `Kategori: ${categoryLabels.join(", ")}`, onRemove: () => setCats([]) });
       } else {
-        tags.push(`Kategori: ${categoryLabels.slice(0, 2).join(", ")} +${categoryLabels.length - 2}`);
+        tags.push({ key: "categories", label: `Kategori: ${categoryLabels.slice(0, 2).join(", ")} +${categoryLabels.length - 2}`, onRemove: () => setCats([]) });
       }
     }
 
-    if (inStockOnly) tags.push("Hanya ready");
-    if (newOnly) tags.push(`Produk baru <= ${NEW_PRODUCT_DAYS} hari`);
-    if (restockOnly) tags.push(`Restock <= ${RESTOCK_DAYS} hari`);
+    if (inStockOnly) tags.push({ key: "ready", label: "Hanya ready", onRemove: () => setInStockOnly(false) });
+    if (newOnly) tags.push({ key: "new", label: `Produk baru <= ${NEW_PRODUCT_DAYS} hari`, onRemove: () => setNewOnly(false) });
+    if (restockOnly) tags.push({ key: "restock", label: `Restock <= ${RESTOCK_DAYS} hari`, onRemove: () => setRestockOnly(false) });
 
     if (priceReady && priceBounds.max > 0 && (price.min !== priceBounds.min || price.max !== priceBounds.max)) {
-      tags.push(`Harga: ${formatCompactIDR(price.min)}-${formatCompactIDR(price.max)}`);
+      tags.push({
+        key: "price",
+        label: `Harga: ${formatCompactIDR(price.min)}-${formatCompactIDR(price.max)}`,
+        onRemove: () => setPrice({ min: priceBounds.min, max: priceBounds.max }),
+      });
     }
 
     if (sort !== DEFAULT_SORT) {
-      tags.push(`Urut: ${SORT_LABELS[sort] || sort}`);
+      tags.push({ key: "sort", label: `Urut: ${SORT_LABELS[sort] || sort}`, onRemove: () => setSort(DEFAULT_SORT) });
     }
 
     if (view !== "grid") {
-      tags.push("Tampilan: List");
+      tags.push({ key: "view", label: "Tampilan: List", onRemove: () => setView("grid") });
     }
 
     return tags;
@@ -1151,6 +1159,8 @@ export default function Products() {
             <FilterPanel
               idPrefix="catalog-side"
               variant="sidebar"
+              showCategories={false}
+              showViewToggle={false}
               showReset={false}
               cats={cats}
               toggleCat={toggleCat}
@@ -1206,6 +1216,17 @@ export default function Products() {
               </div>
 
               <div className="catalog-contentActions">
+                <select
+                  className="input catalog-contentSort"
+                  value={sort}
+                  onChange={(e) => setSort(e.target.value)}
+                  aria-label="Urutkan produk"
+                >
+                  {Object.entries(SORT_LABELS).map(([value, label]) => (
+                    <option key={value} value={value}>{label}</option>
+                  ))}
+                </select>
+                <div className="catalog-contentViewSwitch" aria-label="Tampilan katalog">
                 <button
                   type="button"
                   className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
@@ -1224,15 +1245,18 @@ export default function Products() {
                 >
                   <List size={15} />
                 </button>
+                </div>
               </div>
             </div>
 
             {activeSummaryTags.length ? (
               <div className="catalog-activeState" aria-label="Ringkasan filter aktif">
-                {activeSummaryTags.map((tag, idx) => (
-                  <span key={`${tag}-${idx}`} className="catalog-activeTag">
-                    {tag}
-                  </span>
+                {activeSummaryTags.map((tag) => (
+                  <button key={tag.key} type="button" className="catalog-activeTag" onClick={tag.onRemove}>
+                    <span>{tag.label}</span>
+                    <X size={13} aria-hidden="true" />
+                    <span className="sr-only">Hapus filter {tag.label}</span>
+                  </button>
                 ))}
                 {activeFiltersCount ? (
                   <button type="button" className="catalog-activeReset" onClick={resetFilters}>
@@ -1473,7 +1497,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
       </div>
 
       <div className="catalog-cardFoot">
-        <span>Intip paket</span>
+        <span>Pilih paket</span>
         <ArrowRight size={15} />
       </div>
     </Link>

@@ -1,6 +1,5 @@
 ﻿import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
-import "./SwUpdateToast.css";
 
 export default function SwUpdateToast() {
   const [waitingWorker, setWaitingWorker] = useState(null);

@@ -1,7 +1,8 @@
-﻿import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
+import "../css/pages/Testimonials.css";
 import {
   ChevronLeft,
   ChevronRight,
@@ -19,7 +20,6 @@ import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { warn } from "../lib/log";
-import "../css/pages/Testimonials.css";
 
 export default function Testimonials() {
   const [loading, setLoading] = useState(true);
