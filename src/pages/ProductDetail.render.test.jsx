@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { vi } from "vitest";
 import ProductDetail from "./ProductDetail";
@@ -95,6 +95,44 @@ describe("ProductDetail render", () => {
     await waitFor(() => {
       expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
     });
+  });
+
+  it("sorts variant cards from the filter chips", async () => {
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+    });
+
+    expect(screen.getByRole("button", { name: "Rekomendasi" })).toBeInTheDocument();
+    const expensive = await screen.findByRole("button", { name: "Termahal" });
+    fireEvent.click(expensive);
+
+    expect(expensive).toHaveAttribute("aria-pressed", "true");
+    const packNames = [...document.querySelectorAll(".pdx-packName")].map((el) => el.textContent);
+    expect(packNames[0]).toBe("Sharing 1 Profil 1 User");
+  });
+
+  it("links Hubungi Admin to the premium WhatsApp number with a prefilled message", async () => {
+    renderDetail();
+    const contact = await screen.findByRole("link", { name: "Hubungi Admin" });
+    expect(contact).toHaveAttribute("href", expect.stringContaining("https://wa.me/6282245964007?text="));
+    expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Netflix Premium");
+    expect(decodeURIComponent(contact.getAttribute("href"))).toContain("App Premium");
+  });
+
+  it("links Hubungi Admin to the academic WhatsApp number for jasa akademik", async () => {
+    const { fetchProductBySlug } = await import("../lib/api");
+    fetchProductBySlug.mockResolvedValueOnce({
+      ...mockProduct,
+      name: "Turnitin Check",
+      slug: "turnitin-check",
+      category: "academic",
+    });
+    renderDetail();
+    const contact = await screen.findByRole("link", { name: "Hubungi Admin" });
+    expect(contact.getAttribute("href")).toContain("https://wa.me/6281232742374?text=");
+    expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Jasa Akademik");
+    expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Turnitin Check");
   });
 
   it("survives malformed product_variants cache shape", async () => {

@@ -59,6 +59,25 @@ export function resolveCatalogLine(product) {
   return isAcademicProduct(product) ? "academic" : "app_premium";
 }
 
+/** Dedicated admin WhatsApp numbers — keep in sync with Footer. */
+export const CATALOG_LINE_WHATSAPP = {
+  app_premium: "6282245964007",
+  academic: "6281232742374",
+};
+
+export function buildCatalogAdminWhatsAppUrl(product, { minPriceLabel = "", pageUrl = "" } = {}) {
+  const line = resolveCatalogLine(product);
+  const number = CATALOG_LINE_WHATSAPP[line];
+  const name = String(product?.name || "produk ini").trim();
+  const priceBit = minPriceLabel ? ` Mulai dari ${minPriceLabel}.` : "";
+  const urlBit = pageUrl ? `\n${pageUrl}` : "";
+  const message =
+    line === "academic"
+      ? `Halo Admin Jasa Akademik Imzaqi Store, saya tertarik dengan ${name}.${priceBit} Boleh dibantu info paket dan prosesnya?${urlBit}`
+      : `Halo Admin App Premium Imzaqi Store, saya tertarik dengan ${name}.${priceBit} Boleh dibantu paket yang ready?${urlBit}`;
+  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+}
+
 /** Whether product matches selected catalog line filters (cats array) */
 export function matchesCatalogLineFilters(product, cats = []) {
   if (!Array.isArray(cats) || cats.length === 0) return true;

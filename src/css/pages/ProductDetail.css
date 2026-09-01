@@ -1755,6 +1755,35 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   50% { opacity: 0.4; transform: scale(0.75); }
 }
 
+.detail-page-v3 .pdx-contactAdmin {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 2px;
+  padding: 0 16px;
+  border-radius: 999px;
+  border: 1px solid var(--brand-line, var(--pdx-line));
+  background: var(--pdx-soft);
+  box-shadow: var(--pdx-soft-shadow);
+  color: var(--pdx-text-1);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.detail-page-v3 .pdx-contactAdmin:hover {
+  border-color: rgba(37, 211, 102, 0.45);
+  color: var(--pdx-text-1);
+}
+
+.detail-page-v3 .pdx-contactAdmin svg {
+  color: #25d366;
+  flex-shrink: 0;
+}
+
 .detail-page-v3 .pdx-statsChips {
   display: flex;
   align-items: center;
@@ -1880,13 +1909,39 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   gap: 8px;
   overflow-x: auto;
   /* padding prevents filter chips from being clipped by the overflow */
-  padding: 6px 2px 24px;
+  padding: 6px 2px 12px;
   margin: 0;
   min-width: 0;
   max-width: 100%;
   scroll-snap-type: x proximity;
   scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
+}
+
+.detail-page-v3 .pdx-sortBar {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.detail-page-v3 .pdx-sortLabel {
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--pdx-text-4, var(--pdx-muted));
+}
+
+.detail-page-v3 .pdx-sortFilters {
+  flex-wrap: wrap;
+  overflow: visible;
+  row-gap: 8px;
+  padding: 0;
+  scroll-snap-type: none;
+}
+
+.detail-page-v3 .pdx-sortBar + .pdx-filters {
+  padding-top: 0;
 }
 
 .detail-page-v3 .pdx-filters::-webkit-scrollbar {
@@ -4139,4 +4194,88 @@ html[data-theme="light"] .pdx-scrollArrow {
 
 @media (prefers-reduced-motion: reduce) {
   .pdx-emojiFloat { animation: none; }
+}
+
+/* Mobile product detail: compact hero, packages first, stacked cards */
+@media (max-width: 720px) {
+  .detail-page-v3 .pdx-mainGrid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .detail-page-v3 .pdx-leftCol,
+  .detail-page-v3 .pdx-rightCol {
+    display: contents;
+  }
+
+  .detail-page-v3 .pdx-topCard {
+    order: 1;
+    padding: 14px !important;
+  }
+
+  .detail-page-v3 .pdx-variantsSection {
+    order: 2;
+    padding: 14px !important;
+    gap: 10px !important;
+  }
+
+  .detail-page-v3 .pdx-infoTabsCard {
+    order: 3;
+    padding: 14px !important;
+  }
+
+  .detail-page-v3 .pdx-accountStrip,
+  .detail-page-v3 .pdx-variantsTitleRow,
+  .detail-page-v3 .pdx-scrollHint {
+    display: none !important;
+  }
+
+  .detail-page-v3 .pdx-packList,
+  .detail-page-v3 .pdx-packList:has(.pdx-packCard:nth-child(2)) {
+    display: grid !important;
+    flex-direction: unset !important;
+    flex-wrap: unset !important;
+    overflow: visible !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+    gap: 10px !important;
+    padding: 0 !important;
+  }
+
+  .detail-page-v3 .pdx-packList:has(.pdx-packCard:nth-child(2)) .pdx-packCard {
+    flex: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    scroll-snap-align: unset !important;
+  }
+
+  .detail-page-v3 .pdx-sortFilters .pdx-filterChip,
+  .detail-page-v3 .pdx-filters .pdx-filterChip {
+    min-height: 36px;
+    padding: 0 12px;
+    font-size: 11.5px;
+  }
+
+  .detail-page-v3 .pdx-heroMain {
+    gap: 12px;
+  }
+
+  .detail-page-v3 .pdx-statsStrip {
+    margin-top: 10px;
+    gap: 10px;
+  }
+
+  .detail-page-v3 .pdx-contactAdmin {
+    min-height: 42px;
+    font-size: 13px;
+  }
+
+  .detail-page-v3 .pdx-packActions {
+    gap: 8px;
+  }
+
+  .detail-page-v3 .pdx-toolbar {
+    padding-bottom: 10px;
+  }
 }

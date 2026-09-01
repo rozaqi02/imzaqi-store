@@ -8,6 +8,7 @@ import {
   Flame,
   Info,
   Mail,
+  MessageCircle,
   Share2,
   ShieldCheck,
   ShoppingBag,
@@ -31,7 +32,7 @@ import { fireConfetti } from "../components/Confetti";
 // ── Live viewer & countdown removed (fake data - hurts trust) ──────────────
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
-import { resolveProductCategory } from "../lib/productCategories";
+import { buildCatalogAdminWhatsAppUrl, resolveProductCategory } from "../lib/productCategories";
 import ProductTile from "../components/ProductTile";
 import AccountTypeStrip from "../components/AccountTypeStrip";
 
@@ -103,7 +104,7 @@ const SECTION_ICONS = {
   catatan: Info,
 };
 
-function VariantBenefitList({ rawText, variant, isSelected = false }) {
+function VariantBenefitList({ rawText, variant }) {
   const [expanded, setExpanded] = useState(false);
   const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
 
@@ -119,13 +120,6 @@ function VariantBenefitList({ rawText, variant, isSelected = false }) {
   }, [variant]);
 
   const hasContent = infoRows.length > 0 || sections.length > 0;
-
-  useEffect(() => {
-    if (!hasContent) return;
-    if (variant?.requires_buyer_email && isSelected) {
-      setExpanded(true);
-    }
-  }, [hasContent, isSelected, variant?.requires_buyer_email, variant?.id]);
 
   if (!hasContent) return null;
 
@@ -204,6 +198,21 @@ function pickRecommendedVariant(variants) {
 
       return Number(b?.stock || 0) - Number(a?.stock || 0);
     })[0]?.id;
+}
+
+const VARIANT_SORTS = [
+  { id: "reco", label: "Rekomendasi" },
+  { id: "price_asc", label: "Termurah" },
+  { id: "price_desc", label: "Termahal" },
+  { id: "popular", label: "Terlaris" },
+  { id: "stock_desc", label: "Stok banyak" },
+];
+
+function getVariantEffectivePrice(variant, flashSaleMap) {
+  const base = Number(variant?.price_idr || 0);
+  const discount = flashSaleMap?.get?.(variant?.id);
+  if (discount && discount > 0) return Math.round(base * (1 - discount / 100));
+  return base;
 }
 
 function formatPriceRange(min, max) {
@@ -402,7 +411,6 @@ const VariantCard = React.memo(({
       <VariantBenefitList
         rawText={descriptionBody}
         variant={variant}
-        isSelected={isSelected}
       />
 
       <div className="pdx-packActions">
@@ -535,6 +543,7 @@ export default function ProductDetail() {
   const [flashSaleMap, setFlashSaleMap] = useState(new Map());
   const [topSalesMap, setTopSalesMap] = useState({});
   const [activeTab, setActiveTab] = useState("semua");
+  const [variantSort, setVariantSort] = useState("reco");
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [addedVariantId, setAddedVariantId] = useState(null);
   const [compareOpen, setCompareOpen] = useState(false);
@@ -690,10 +699,44 @@ export default function ProductDetail() {
     return tabArr;
   }, [variants]);
 
+  const recommendedVariantId = useMemo(() => pickRecommendedVariant(variants), [variants]);
+
   const displayedVariants = useMemo(() => {
-    if (activeTab === "semua") return variants;
-    return variants.filter((v) => classifyVariant(v.name) === activeTab);
-  }, [variants, activeTab]);
+    const filtered =
+      activeTab === "semua"
+        ? variants.slice()
+        : variants.filter((v) => classifyVariant(v.name) === activeTab);
+
+    const inStockFirst = (a, b) => {
+      const aOut = Number(a?.stock || 0) <= 0 ? 1 : 0;
+      const bOut = Number(b?.stock || 0) <= 0 ? 1 : 0;
+      return aOut - bOut;
+    };
+
+    const bySort = {
+      reco: (a, b) => {
+        if (a.id === recommendedVariantId) return -1;
+        if (b.id === recommendedVariantId) return 1;
+        return (a.sort_order || 0) - (b.sort_order || 0);
+      },
+      price_asc: (a, b) =>
+        getVariantEffectivePrice(a, flashSaleMap) - getVariantEffectivePrice(b, flashSaleMap),
+      price_desc: (a, b) =>
+        getVariantEffectivePrice(b, flashSaleMap) - getVariantEffectivePrice(a, flashSaleMap),
+      popular: (a, b) => Number(b?.sold_count || 0) - Number(a?.sold_count || 0),
+      stock_desc: (a, b) => Number(b?.stock || 0) - Number(a?.stock || 0),
+    }[variantSort];
+
+    return filtered.sort((a, b) => {
+      if (variantSort !== "stock_desc") {
+        const stockDiff = inStockFirst(a, b);
+        if (stockDiff !== 0) return stockDiff;
+      }
+      const diff = bySort ? bySort(a, b) : 0;
+      if (diff !== 0) return diff;
+      return (a.sort_order || 0) - (b.sort_order || 0);
+    });
+  }, [variants, activeTab, variantSort, recommendedVariantId, flashSaleMap]);
 
   const summary = useMemo(() => {
     const prices = variants
@@ -751,17 +794,25 @@ export default function ProductDetail() {
     [variants]
   );
 
-  const recommendedVariantId = useMemo(() => pickRecommendedVariant(variants), [variants]);
+  useEffect(() => {
+    setActiveTab("semua");
+    setVariantSort("reco");
+  }, [slug]);
 
   useEffect(() => {
     if (!displayedVariants.length) {
       setSelectedVariantId(null);
       return;
     }
-    const preferred =
-      displayedVariants.find((variant) => variant.id === recommendedVariantId) || displayedVariants[0];
-    setSelectedVariantId(preferred?.id ?? null);
-  }, [activeTab, displayedVariants, recommendedVariantId]);
+    setSelectedVariantId((current) => {
+      if (current && displayedVariants.some((variant) => variant.id === current)) return current;
+      return (
+        displayedVariants.find((variant) => variant.id === recommendedVariantId)?.id ??
+        displayedVariants[0]?.id ??
+        null
+      );
+    });
+  }, [displayedVariants, recommendedVariantId]);
 
   useEffect(
     () => () => {
@@ -832,6 +883,15 @@ export default function ProductDetail() {
     () => product?.description || "Pilih paket, checkout, selesai.",
     [product?.description]
   );
+
+  const adminWhatsAppUrl = useMemo(() => {
+    if (!product) return "";
+    const pageUrl = typeof window === "undefined" ? "" : window.location.href;
+    return buildCatalogAdminWhatsAppUrl(product, {
+      minPriceLabel: summary.minPrice ? formatIDR(summary.minPrice) : "",
+      pageUrl,
+    });
+  }, [product, summary.minPrice]);
 
   function handleAdd(variant, qty = 1, event) {
     const stock = Number(variant?.stock ?? 999);
@@ -1032,6 +1092,17 @@ export default function ProductDetail() {
                         Garansi
                       </span>
                     </div>
+                    {adminWhatsAppUrl ? (
+                      <a
+                        className="pdx-contactAdmin"
+                        href={adminWhatsAppUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <MessageCircle size={16} aria-hidden="true" />
+                        <span>Hubungi Admin</span>
+                      </a>
+                    ) : null}
                   </div>
                 </header>
 
@@ -1061,14 +1132,34 @@ export default function ProductDetail() {
                   </div>
                 </div>
 
+                {variants.length > 1 ? (
+                  <div className="pdx-sortBar">
+                    <span className="pdx-sortLabel">Urutkan</span>
+                    <div className="pdx-filters pdx-sortFilters" role="toolbar" aria-label="Urutkan paket">
+                      {VARIANT_SORTS.map((sort) => (
+                        <button
+                          key={sort.id}
+                          type="button"
+                          onClick={() => setVariantSort(sort.id)}
+                          className={`pdx-filterChip ${variantSort === sort.id ? "is-active" : ""}`}
+                          aria-pressed={variantSort === sort.id}
+                        >
+                          {sort.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                ) : null}
+
                 {categoryTabs.length > 2 ? (
-                  <div className="pdx-filters">
+                  <div className="pdx-filters" role="toolbar" aria-label="Kategori paket">
                     {categoryTabs.map((tab) => (
                       <button
                         key={tab.id}
                         type="button"
                         onClick={() => setActiveTab(tab.id)}
                         className={`pdx-filterChip ${activeTab === tab.id ? "is-active" : ""}`}
+                        aria-pressed={activeTab === tab.id}
                       >
                         {tab.label}
                       </button>
