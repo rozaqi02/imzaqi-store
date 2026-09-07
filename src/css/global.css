@@ -1,12 +1,12 @@
 html {
-  --bg0: #111827;
-  --bg1: #0b1220;
-  --bg2: #021a2b;
+  --bg0: #0a0a0a;
+  --bg1: #111111;
+  --bg2: #1a1a1a;
   --card: rgba(255, 255, 255, .04);
   --card2: rgba(255, 255, 255, .06);
-  --line: rgba(255, 255, 255, .10);
-  --text: #f8fafc;
-  --muted: #94a3b8;
+  --line: rgba(255, 255, 255, .12);
+  --text: #f5f5f5;
+  --muted: #a3a3a3;
   /* --accent intentionally NOT set here — defined in theme-variables.css to avoid cascade conflict */
   --accent2: #008a94;
   --danger: #ff5a7a;
@@ -269,10 +269,14 @@ input {
 
 body.checkout-open {
   overflow: hidden;
+  position: fixed;
+  width: 100%;
+  left: 0;
+  right: 0;
 }
 
 .container {
-  width: min(1100px, 100%);
+  width: min(1200px, 100%);
   margin: 0
     /**/
     auto;
@@ -1645,11 +1649,13 @@ body {
 }
 
 .empty-desc {
-  color: rgba(234, 255, 245, .85);
+  color: var(--muted, #5f5f5f);
   max-width: 520px;
-  margin: 0
-    /**/
-    auto;
+  margin: 0 auto;
+}
+
+html:not([data-theme="light"]) .empty-desc {
+  color: rgba(234, 255, 245, 0.82);
 }
 
 .empty-actions {

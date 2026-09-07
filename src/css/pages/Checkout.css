@@ -502,7 +502,7 @@ html[data-theme="light"] .checkout-floating-bar-reason {
 .checkout-page-full {
   min-height: 100vh;
   min-height: 100dvh;
-  padding: 50px 0 130px;
+  padding: calc(var(--site-header-offset, 72px) + 24px) 0 130px;
   background: radial-gradient(circle at top left, rgba(16, 28, 48, 0.4), transparent), var(--bg, #070d19);
 }
 
@@ -716,7 +716,7 @@ html[data-theme="light"] .checkout-back-btn:hover {
 /* Mobile Media Queries for Full Page */
 @media (max-width: 720px) {
   .checkout-page-full {
-    padding: 20px 0 120px;
+    padding: calc(var(--site-header-offset, 64px) + 16px) 0 120px;
   }
 
   .checkout-full-header {
@@ -806,11 +806,11 @@ html[data-theme="light"] .checkout-back-btn:hover {
     font-size: 19px;
     font-weight: 900;
     letter-spacing: -0.02em;
-    color: #4effda;
+    color: #00a86b;
   }
 
   html[data-theme="light"] .checkout-floating-bar-price {
-    color: #008a94;
+    color: #009e60;
   }
 
   .checkout-floating-bar-btn {

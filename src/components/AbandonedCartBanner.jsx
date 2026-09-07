@@ -3,16 +3,16 @@ import { Link, useLocation } from "react-router-dom";
 import { ShoppingCart, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { shouldShowAbandonedCartReminder, dismissAbandonedCartReminder } from "../lib/cartReminder";
-import { useFunnelRoute } from "../hooks/useFunnelRoute";
+import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 
 export default function AbandonedCartBanner() {
   const location = useLocation();
-  const isFunnel = useFunnelRoute();
+  const overlayBlocked = useStorefrontOverlayBlocked();
   const cart = useCart();
   const [dismissed, setDismissed] = useState(false);
   const count = (cart?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0);
 
-  if (dismissed || isFunnel || !shouldShowAbandonedCartReminder(count)) return null;
+  if (dismissed || overlayBlocked || !shouldShowAbandonedCartReminder(count)) return null;
 
   return (
     <div className="abandoned-cart-banner" role="status">

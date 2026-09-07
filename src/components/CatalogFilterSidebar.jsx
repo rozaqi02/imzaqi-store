@@ -21,10 +21,7 @@ export default function CatalogFilterSidebar({
         <span className="catalog-filterHeadIcon" aria-hidden="true">
           <SlidersHorizontal size={18} />
         </span>
-        <div>
-          <h2 className="catalog-filterHeadTitle">Filter</h2>
-          <p className="catalog-filterHeadSub">Sesuaikan katalog kamu</p>
-        </div>
+        <h2 className="catalog-filterHeadTitle">Filter</h2>
       </div>
       {activeFiltersCount ? (
         <button type="button" className="catalog-filterHeadReset" onClick={onReset}>

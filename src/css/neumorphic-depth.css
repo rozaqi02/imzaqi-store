@@ -184,33 +184,25 @@ html[data-theme="light"] .btn-danger {
     0 0 0 1px color-mix(in srgb, var(--type-color, var(--accent)) 28%, transparent) !important;
 }
 
-/* Compare button — yellow (not generic control grey/teal) */
+/* Compare button — brand green, inset 3D */
 .detail-page-v3 .pdx-compareBtn,
 .pdx-compareBtn {
-  border: 1px solid rgba(255, 200, 40, 0.55) !important;
-  background:
-    linear-gradient(175deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 30%),
-    linear-gradient(135deg, #ffe066 0%, #ffd54a 40%, #f5b800 100%) !important;
-  color: #3d2a00 !important;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.65),
-    inset 0 -2px 0 rgba(140, 90, 0, 0.28),
-    0 8px 16px rgba(0, 8, 18, 0.22),
-    0 4px 10px rgba(245, 180, 0, 0.28) !important;
+  border: 1px solid var(--imzaqi-btn-border, #067a4c) !important;
+  background: var(--imzaqi-btn-face, #009e60) !important;
+  color: var(--imzaqi-btn-text, #fff) !important;
+  box-shadow: var(--imzaqi-btn-shadow,
+    inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -4px 0 rgba(0, 60, 40, 0.42)) !important;
 }
 
 html[data-theme="light"] .detail-page-v3 .pdx-compareBtn,
 html[data-theme="light"] .pdx-compareBtn {
-  border-color: rgba(212, 160, 0, 0.45) !important;
-  background:
-    linear-gradient(175deg, rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0) 32%),
-    linear-gradient(135deg, #ffe57a 0%, #ffd54a 45%, #f0b400 100%) !important;
-  color: #5c4200 !important;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -2px 0 rgba(160, 110, 0, 0.2),
-    0 6px 14px rgba(212, 160, 0, 0.22),
-    0 3px 8px rgba(180, 130, 0, 0.14) !important;
+  border-color: var(--imzaqi-btn-border, #067a4c) !important;
+  background: var(--imzaqi-btn-face, #009e60) !important;
+  color: var(--imzaqi-btn-text, #fff) !important;
+  box-shadow: var(--imzaqi-btn-shadow,
+    inset 0 3px 0 rgba(255, 255, 255, 0.5),
+    inset 0 -4px 0 rgba(0, 60, 40, 0.42)) !important;
 }
 
 /* Product detail account chips (Sharing / Private / Family) */
@@ -1593,8 +1585,9 @@ html[data-theme="light"] .home-page .hx-stat-item {
   border-radius: 9999px !important;
   font-size: 13.5px !important;
   box-shadow:
-    0 10px 22px rgba(0, 40, 60, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.75),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.08),
+    0 1px 2px rgba(0, 0, 0, 0.08) !important;
 }
 
 .catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active) {

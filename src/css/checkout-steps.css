@@ -86,7 +86,7 @@
 }
 
 .steps--visual .step.active {
-  border-color: rgba(0, 194, 208, 0.3);
+  border-color: rgba(0, 158, 96, 0.32);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
     var(--skeu-control-bg);
@@ -94,8 +94,8 @@
 }
 
 .steps--visual .step.active .step-dot {
-  border-color: rgba(0, 214, 180, 0.38);
-  background: linear-gradient(165deg, #4aefd4 0%, #00c2d0 48%, #008a94 100%);
+  border-color: rgba(0, 158, 96, 0.4);
+  background: linear-gradient(165deg, #1ecf80 0%, #009e60 48%, #067a4c 100%);
   color: #fff;
   box-shadow: var(--skeu-accent-shadow);
 }

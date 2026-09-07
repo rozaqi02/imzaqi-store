@@ -4812,7 +4812,6 @@ html[data-theme="light"] {
     linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(242, 250, 253, 0.7) 46%, rgba(232, 244, 249, 0.84) 100%);
   --uni-neo-control-shadow:
     5px 7px 14px rgba(98, 136, 151, 0.14),
-    -3px -3px 8px rgba(255, 255, 255, 0.95),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 0 rgba(164, 197, 209, 0.25);
   --uni-neo-inset:

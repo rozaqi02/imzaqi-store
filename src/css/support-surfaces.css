@@ -1,0 +1,26 @@
+/* Shared green surfaces for the help center and customer gallery. */
+.help-page,
+.reviews-page,
+.reviews-lightbox,
+.store-hero {
+  --surface-face: #1c2923;
+  --surface-well: #142019;
+  --surface-line: #35493c;
+  --surface-text: #f0f8f3;
+  --surface-muted: #b2c5b9;
+  --surface-accent: #7be4b0;
+  --surface-raised: 7px 7px 18px #00000045, -4px -4px 12px #7eb7970a, inset 0 1px 0 #ffffff16, inset 0 -2px 0 #00000035;
+  --surface-inset: inset 4px 4px 8px #00000055, inset -3px -3px 7px #8bcba110;
+  --surface-glaze: linear-gradient(155deg, #ffffff0c, #ffffff00 48%);
+}
+html[data-theme="light"] :is(.help-page, .reviews-page, .reviews-lightbox, .store-hero) {
+  --surface-face: #f0f5ef;
+  --surface-well: #eaf0e9;
+  --surface-line: #d4e0d5;
+  --surface-text: #172c23;
+  --surface-muted: #54685b;
+  --surface-accent: #087b4e;
+  --surface-raised: 7px 7px 18px #b1c2b44d, -5px -5px 14px #ffffffed, inset 0 1px 0 #fff, inset 0 -2px 0 #cad7cd80;
+  --surface-inset: inset 4px 4px 8px #b6c6b659, inset -4px -4px 8px #ffffffeb;
+  --surface-glaze: linear-gradient(155deg, #ffffff80, #ffffff00 55%);
+}

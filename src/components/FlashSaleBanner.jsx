@@ -4,7 +4,7 @@ import { Zap } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { warn } from "../lib/log";
-import { formatIDR } from "../lib/format";
+import { formatIDR, isKnownOutOfStock } from "../lib/format";
 
 function FlashSaleCard({ item, maxFlashStock }) {
   const tiltRef = useTilt({ max: 8, scale: 1.012 });
@@ -109,14 +109,16 @@ function CountdownDisplay({ endTime, startTime }) {
 
 let cachedFlashSales = null;
 let cachedFlashProducts = null;
+let cachedFlashAt = 0;
+const FLASH_CACHE_TTL_MS = 60_000;
 
 export default function FlashSaleBanner() {
   const [flashSales, setFlashSales] = useState(cachedFlashSales || []);
   const [products, setProducts] = useState(cachedFlashProducts || []);
-  const [loading, setLoading] = useState(!cachedFlashSales || !cachedFlashProducts);
+  const [loading, setLoading] = useState(!cachedFlashSales || !cachedFlashProducts || Date.now() - cachedFlashAt > FLASH_CACHE_TTL_MS);
 
   useEffect(() => {
-    if (cachedFlashSales && cachedFlashProducts) return;
+    if (cachedFlashSales && cachedFlashProducts && Date.now() - cachedFlashAt < FLASH_CACHE_TTL_MS) return;
 
     let alive = true;
     (async () => {
@@ -128,6 +130,7 @@ export default function FlashSaleBanner() {
         if (!alive) return;
         cachedFlashSales = sales;
         cachedFlashProducts = prods;
+        cachedFlashAt = Date.now();
         setFlashSales(sales);
         setProducts(prods);
       } catch (e) {
@@ -152,12 +155,23 @@ export default function FlashSaleBanner() {
   const items = useMemo(() => {
     if (!flashSales.length || !products.length) return [];
 
+    const now = Date.now();
     const result = [];
     products.forEach((product) => {
       (product.product_variants || []).forEach((variant) => {
         const sale = flashMap.get(variant.id);
         if (!sale) return;
         if (!variant.is_active) return;
+        if (isKnownOutOfStock(variant) || Number(variant.stock || 0) <= 0) return;
+
+        if (sale.ends_at) {
+          const end = new Date(sale.ends_at).getTime();
+          if (Number.isFinite(end) && end <= now) return;
+        }
+        if (sale.starts_at) {
+          const start = new Date(sale.starts_at).getTime();
+          if (Number.isFinite(start) && start > now) return;
+        }
 
         const originalPrice = Number(variant.price_idr || 0);
         const discountedPrice = Math.round(originalPrice * (1 - sale.discount_percent / 100));
@@ -179,21 +193,24 @@ export default function FlashSaleBanner() {
   }, [flashSales, products, flashMap]);
 
   const countdownWindow = useMemo(() => {
-    if (!flashSales.length) return null;
+    if (!items.length) return null;
     let earliestStart = Infinity;
     let latestEnd = 0;
-    flashSales.forEach((sale) => {
+    items.forEach((item) => {
+      const sale = flashMap.get(item.variant.id);
+      if (!sale) return;
       const start = new Date(sale.starts_at || sale.created_at || sale.ends_at).getTime();
       const end = new Date(sale.ends_at).getTime();
       if (Number.isFinite(start) && start < earliestStart) earliestStart = start;
       if (Number.isFinite(end) && end > latestEnd) latestEnd = end;
     });
     if (!Number.isFinite(earliestStart)) earliestStart = Date.now();
+    if (latestEnd <= Date.now()) return null;
     return {
       startTime: new Date(earliestStart).toISOString(),
       endTime: new Date(latestEnd).toISOString(),
     };
-  }, [flashSales]);
+  }, [items, flashMap]);
 
   const bannerCountdown = useCountdown(countdownWindow?.endTime);
   const isUrgent = Boolean(countdownWindow && !bannerCountdown.expired && bannerCountdown.totalSeconds <= 10);
@@ -203,7 +220,7 @@ export default function FlashSaleBanner() {
     [items]
   );
 
-  if (loading || items.length === 0) return null;
+  if (loading || items.length === 0 || !countdownWindow || bannerCountdown.expired) return null;
 
   return (
     <section className={`flash-sale-banner${isUrgent ? " is-urgent" : ""}`}>

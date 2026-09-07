@@ -6,3 +6,10 @@ commit-msg.txt
 COMMIT_MSG.txt
 *.log
 build/
+.agents/
+.temp_*
+*.mp4
+audit-out/
+*recovered*
+*restored*
+

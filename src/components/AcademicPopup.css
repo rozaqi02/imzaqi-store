@@ -1,4 +1,177 @@
-/* ── Neumorphic Academic Popup Stylesheet (2x2 Desktop Grid + Mobile Friendly Layout) ── */
+.ac-popup-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(10px);
+  animation: acPopupFadeIn 0.35s ease both;
+}
+
+.ac-popup-stage {
+  position: relative;
+  width: min(860px, 100%);
+  animation: fspRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.ac-popup-closeFloat {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: #0a0a0a;
+  color: #fff;
+  cursor: pointer;
+}
+
+.ac-billboard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  overflow: hidden;
+  border-radius: 28px;
+  background: #fff;
+  color: #0a0a0a;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] .ac-billboard {
+  background: #141414;
+  color: #f5f5f5;
+}
+
+.ac-visual {
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+  padding: 40px 28px;
+  background:
+    radial-gradient(80% 80% at 30% 20%, rgba(255, 255, 255, 0.28), transparent 55%),
+    linear-gradient(160deg, #1a1a1a 0%, #0a0a0a 100%);
+}
+
+.ac-visualIcon {
+  width: min(180px, 46vw);
+  height: min(180px, 46vw);
+  border-radius: 36px;
+  overflow: hidden;
+  background: #fff;
+  display: grid;
+  place-items: center;
+}
+
+.ac-visualIcon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 18px;
+}
+
+.ac-visualIcon span {
+  font-size: 56px;
+  font-weight: 900;
+  color: #009e60;
+}
+
+.ac-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 10px;
+  padding: 36px 36px 28px;
+}
+
+.ac-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #009e60;
+}
+
+.ac-headline {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  line-height: 1.05;
+}
+
+.ac-meta {
+  margin: 0;
+  font-size: 15px;
+  color: #525252;
+}
+
+.ac-shop {
+  margin-top: 10px;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+html[data-theme="dark"] .ac-shop {
+  background: #00d6b4;
+  color: #04140e;
+}
+
+.ac-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ac-moreChip {
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 10, 10, 0.1);
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.ac-quiet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.ac-quiet button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+@media (max-width: 720px) {
+  .ac-billboard { grid-template-columns: 1fr; }
+  .ac-visual { min-height: 180px; }
+  .ac-visualIcon { width: 112px; height: 112px; border-radius: 28px; }
+  .ac-copy { padding: 22px; }
+  .ac-popup-closeFloat { top: 10px; right: 10px; }
+}
 
 .ac-popup-backdrop {
   position: fixed;
@@ -7,9 +180,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  background: rgba(0, 0, 0, 0.76);
-  animation: acPopupFadeIn 0.22s ease-out forwards;
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, 0.48);
+  animation: acPopupFadeIn 0.35s ease both;
 }
 
 @keyframes acPopupFadeIn {

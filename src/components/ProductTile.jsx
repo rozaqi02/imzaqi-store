@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { formatIDR, classifyStock, summarizeCatalogCopy, detectAccountTypes } from "../lib/format";
+import { formatIDR, classifyStock, summarizeCatalogCopy, detectAccountTypes, getCatalogPriceRange } from "../lib/format";
 
-export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false, overrideSold = null }) {
+export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false, overrideSold = null, flashSaleMap = null }) {
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
   // Flip card dihapus — semua info tampil langsung di depan
@@ -21,22 +21,20 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
   const summary = useMemo(() => {
     const allVariants = product?.product_variants || [];
     const activeVariants = allVariants.filter((v) => v?.is_active !== false);
-    const prices = activeVariants
-      .map((v) => Number(v.price_idr || 0))
-      .filter((n) => Number.isFinite(n) && n > 0);
+    const range = getCatalogPriceRange(activeVariants, flashSaleMap);
 
     const stock = activeVariants.reduce((sum, item) => sum + Number(item?.stock || 0), 0);
     const fallbackSold = allVariants.reduce((sum, item) => sum + Number(item?.sold_count || 0), 0);
     const sold = overrideSold != null ? overrideSold : fallbackSold;
 
     return {
-      minPrice: prices.length ? Math.min(...prices) : 0,
+      minPrice: range.minPrice,
       variantsCount: activeVariants.length,
       stock,
       sold,
       summaryCopy: summarizeCatalogCopy(product?.description),
     };
-  }, [product, overrideSold]);
+  }, [product, overrideSold, flashSaleMap]);
 
   const brandColor = useMemo(() => {
     const name = String(product?.name || "").toLowerCase();

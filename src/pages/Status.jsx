@@ -34,6 +34,7 @@ import {
   clearOrderHistory,
 } from "../lib/orderHistory";
 import CheckoutSteps from "../components/CheckoutSteps";
+import { StatusHero } from "../components/StorefrontHero";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { warn } from "../lib/log";
@@ -241,7 +242,7 @@ function TabCekStatus({ settings }) {
     });
   }, [order]);
 
-  const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6282245964007");
+  const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6283136049987");
   const pollTimerRef = useRef(null);
 
   const lookup = useCallback(async (rawValue) => {
@@ -519,7 +520,7 @@ function TabCekStatus({ settings }) {
               autoCorrect="off"
               autoComplete="off"
               spellCheck={false}
-              placeholder="Contoh: IMZ-ABCD atau IMZ-ABCDEFGH"
+              placeholder="IMZ-ABCD1234"
               value={input}
               onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
               onKeyDown={(e) => {
@@ -539,7 +540,7 @@ function TabCekStatus({ settings }) {
         </div>
 
         <div className={`st-searchHint${message ? " is-error" : ""}`}>
-          {message || (order ? "Klik kartu ID order buat salin cepet." : "Format singkat juga bisa: ABCD")}
+          {message || (order ? "Tap kartu ID untuk salin." : "Bisa pakai 8 karakter terakhir.")}
         </div>
       </section>
 
@@ -571,9 +572,9 @@ function TabCekStatus({ settings }) {
 
       {!order ? (
         <section className="st-empty">
-          <div className="st-emptyBadge">IMZ</div>
-          <h2 className="st-emptyTitle">Status ordermu siap dipantau</h2>
-          <p className="st-emptyText">Tempel ID order, semua ringkasan bakal muncul otomatis di sini.</p>
+          <div className="st-emptyBadge">ID</div>
+          <h2 className="st-emptyTitle">Belum ada order</h2>
+          <p className="st-emptyText">Tempel ID, status langsung muncul.</p>
           <div className="st-emptyActions">
             <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>
               Tempel ID
@@ -589,8 +590,8 @@ function TabCekStatus({ settings }) {
             <article className="st-card st-noteCard st-noteTopAccent is-accent">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Catatan admin</div>
-                  <h2 className="st-cardTitle">Penting buat dibaca</h2>
+                  <div className="st-kicker">Admin</div>
+                  <h2 className="st-cardTitle">Catatan</h2>
                 </div>
                 <button
                   type="button"
@@ -668,8 +669,8 @@ function TabCekStatus({ settings }) {
             <article className="st-card st-flow">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Progress</div>
-                  <h2 className="st-cardTitle">Tahap order</h2>
+                  <div className="st-kicker">Progres</div>
+                  <h2 className="st-cardTitle">Tahap</h2>
                 </div>
                 <div className={`st-statePill is-${statusMeta.tone}`}>
                   <StatusIcon size={14} />
@@ -690,8 +691,8 @@ function TabCekStatus({ settings }) {
             <article className="st-card st-items">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Item order</div>
-                  <h2 className="st-cardTitle">Daftar paket</h2>
+                  <div className="st-kicker">Order</div>
+                  <h2 className="st-cardTitle">Paket</h2>
                 </div>
                 <div className="st-cardIcon">
                   <Package size={16} />
@@ -763,8 +764,8 @@ function TabCekStatus({ settings }) {
             <article className="st-card st-payCard">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Pembayaran</div>
-                  <h2 className="st-cardTitle">Ringkasan total</h2>
+                  <div className="st-kicker">Bayar</div>
+                  <h2 className="st-cardTitle">Total</h2>
                 </div>
                 <div className="st-cardIcon">
                   <WalletCards size={16} />
@@ -806,8 +807,8 @@ function TabCekStatus({ settings }) {
             <article className="st-card st-noteCard">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Catatan buyer</div>
-                  <h2 className="st-cardTitle">Info tambahan</h2>
+                  <div className="st-kicker">Buyer</div>
+                  <h2 className="st-cardTitle">Catatan</h2>
                 </div>
                 <div className="st-cardIcon">
                   <MessageSquareText size={16} />
@@ -823,7 +824,7 @@ function TabCekStatus({ settings }) {
                 <div className="st-cardHead">
                   <div>
                     <div className="st-kicker">Promo</div>
-                    <h2 className="st-cardTitle">Kode aktif</h2>
+                    <h2 className="st-cardTitle">Kode</h2>
                   </div>
                   <div className="st-cardIcon">
                     <BadgePercent size={16} />
@@ -840,14 +841,14 @@ function TabCekStatus({ settings }) {
               <div className="st-cardHead">
                 <div>
                   <div className="st-kicker">Bantuan</div>
-                  <h2 className="st-cardTitle">Perlu follow up?</h2>
+                  <h2 className="st-cardTitle">Admin</h2>
                 </div>
                 <div className="st-cardIcon">
                   <Sparkles size={16} />
                 </div>
               </div>
 
-              <p className="st-helpText">Kalo ada kendala, kirim ID order ini ke admin biar diproses lebih cepet.</p>
+              <p className="st-helpText">Kirim ID order ke admin kalau ada kendala.</p>
 
               <div className="st-helpActions">
                 <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
@@ -995,12 +996,12 @@ function TabRiwayat() {
         <div className="oh-emptyIcon">
           <Package size={32} />
         </div>
-        <h2 className="oh-emptyTitle">Belum ada riwayat order dari browser ini</h2>
+        <h2 className="oh-emptyTitle">Belum ada riwayat</h2>
         <p className="oh-emptyText">
-          Order yang kamu buat bakal otomatis kesimpen di sini buat ngecek status.
+          Order dari browser ini muncul di sini.
         </p>
         <Link className="btn" to="/produk">
-          Intip Produk
+          Lihat katalog
         </Link>
       </div>
     );
@@ -1136,19 +1137,7 @@ export default function Status() {
     <div className="page status-page">
       <section className="section status-shell">
         <div className="container st-wrap">
-          <header className="st-hero hero-anim-wrap">
-            <div className="st-heroCopy">
-              <div className="st-kicker hero-anim-kicker">Track order</div>
-              <h1 className="h1 st-title hero-anim-title">
-                {activeTab === "riwayat" ? "Riwayat order kamu." : "Cek status order."}
-              </h1>
-              <p className="st-sub hero-anim-sub">
-                {activeTab === "riwayat"
-                  ? "Semua order dari browser ini kesimpen di sini."
-                  : "Masukin ID order, langsung keliatan progress-nya."}
-              </p>
-            </div>
-          </header>
+          <StatusHero history={activeTab === "riwayat"} />
 
           {activeTab === "cek" ? (
             <div className="st-checkoutSteps">

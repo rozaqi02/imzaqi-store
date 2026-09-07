@@ -1338,7 +1338,6 @@ html[data-theme="dark"] .admin-page .admin-inlineStats > span.is-warn,
     padding-top: env(safe-area-inset-top, 0px) !important;
     background: rgba(0, 0, 0, 0.55) !important;
     backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
     overflow: hidden !important;
   }
 

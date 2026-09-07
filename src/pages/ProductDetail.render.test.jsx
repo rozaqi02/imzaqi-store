@@ -57,7 +57,7 @@ vi.mock("../lib/api", () => ({
 }));
 
 vi.mock("../context/ToastContext", () => ({
-  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn() }),
+  useToast: () => ({ success: vi.fn(), error: vi.fn(), info: vi.fn(), warning: vi.fn() }),
 }));
 
 vi.mock("../context/CartContext", () => ({
@@ -104,18 +104,44 @@ describe("ProductDetail render", () => {
     });
 
     expect(screen.getByRole("button", { name: "Rekomendasi" })).toBeInTheDocument();
-    const expensive = await screen.findByRole("button", { name: "Termahal" });
-    fireEvent.click(expensive);
+    const cheapest = await screen.findByRole("button", { name: "Termurah" });
+    fireEvent.click(cheapest);
 
-    expect(expensive).toHaveAttribute("aria-pressed", "true");
+    expect(cheapest).toHaveAttribute("aria-pressed", "true");
     const packNames = [...document.querySelectorAll(".pdx-packName")].map((el) => el.textContent);
-    expect(packNames[0]).toBe("Sharing 1 Profil 1 User");
+    expect(packNames[0]).toBe("Sharing 1 Profil 2 User");
+  });
+
+  it("sorts Termurah by price even if the cheapest pack is out of stock", async () => {
+    const { fetchProductBySlug } = await import("../lib/api");
+    fetchProductBySlug.mockResolvedValueOnce({
+      ...mockProduct,
+      product_variants: [
+        { ...mockProduct.product_variants[0], price_idr: 120000, stock: 3, sold_count: 20, name: "Gemini Pro" },
+        { ...mockProduct.product_variants[1], price_idr: 22000, stock: 0, sold_count: 1, name: "Gemini 1 Bulan" },
+      ],
+    });
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+    });
+    fireEvent.click(await screen.findByRole("button", { name: "Termurah" }));
+    const packNames = [...document.querySelectorAll(".pdx-packName")].map((el) => el.textContent);
+    expect(packNames[0]).toBe("Gemini 1 Bulan");
+  });
+
+  it("shows Bandingkan paket on the compare button", async () => {
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+    });
+    expect(screen.getByRole("button", { name: "Bandingkan paket" })).toBeInTheDocument();
   });
 
   it("links Hubungi Admin to the premium WhatsApp number with a prefilled message", async () => {
     renderDetail();
     const contact = await screen.findByRole("link", { name: "Hubungi Admin" });
-    expect(contact).toHaveAttribute("href", expect.stringContaining("https://wa.me/6282245964007?text="));
+    expect(contact).toHaveAttribute("href", expect.stringContaining("https://wa.me/6283136049987?text="));
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Netflix Premium");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("App Premium");
   });
@@ -133,6 +159,52 @@ describe("ProductDetail render", () => {
     expect(contact.getAttribute("href")).toContain("https://wa.me/6281232742374?text=");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Jasa Akademik");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Turnitin Check");
+  });
+
+  it("labels the top-selling pack as Paling Laris instead of a cheapest-pack fake", async () => {
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Paling Laris")).toBeInTheDocument();
+    expect(screen.queryByText("Paling hemat")).not.toBeInTheDocument();
+  });
+
+  it("shows Paling hemat on the cheapest pack when another pack is terlaris", async () => {
+    const { fetchProductBySlug } = await import("../lib/api");
+    fetchProductBySlug.mockResolvedValueOnce({
+      ...mockProduct,
+      product_variants: [
+        { ...mockProduct.product_variants[0], price_idr: 18000, sold_count: 1, stock: 8 },
+        { ...mockProduct.product_variants[1], price_idr: 32000, sold_count: 18, stock: 6 },
+      ],
+    });
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Paling Laris")).toBeInTheDocument();
+    expect(screen.getByText("Paling hemat")).toBeInTheDocument();
+  });
+
+  it("shows a skeleton while the product is loading", async () => {
+    const { fetchProductBySlug } = await import("../lib/api");
+    let resolveProduct;
+    fetchProductBySlug.mockImplementationOnce(
+      () => new Promise((resolve) => {
+        resolveProduct = resolve;
+      })
+    );
+
+    renderDetail();
+    expect(document.querySelector(".pdx-skeletonGrid")).toBeTruthy();
+    expect(document.querySelector(".detail-page-v3")).toHaveAttribute("aria-busy", "true");
+
+    resolveProduct(mockProduct);
+    await waitFor(() => {
+      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+    });
+    expect(document.querySelector(".pdx-skeletonGrid")).toBeNull();
   });
 
   it("survives malformed product_variants cache shape", async () => {

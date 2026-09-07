@@ -60,10 +60,12 @@ export function resolveCatalogLine(product) {
 }
 
 /** Dedicated admin WhatsApp numbers — keep in sync with Footer. */
-export const CATALOG_LINE_WHATSAPP = {
-  app_premium: "6282245964007",
+export const STORE_WHATSAPP = {
+  app_premium: "6283136049987",
   academic: "6281232742374",
 };
+
+export const CATALOG_LINE_WHATSAPP = STORE_WHATSAPP;
 
 export function buildCatalogAdminWhatsAppUrl(product, { minPriceLabel = "", pageUrl = "" } = {}) {
   const line = resolveCatalogLine(product);

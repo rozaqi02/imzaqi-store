@@ -5,19 +5,19 @@ const TYPE_META = {
   sharing: {
     label: "Sharing",
     icon: Users,
-    color: "#5b8def",
+    color: "var(--text)",
     tip: "Akun dipakai bersama - jangan ubah password, email, atau profil.",
   },
   private: {
     label: "Private",
     icon: UserRound,
-    color: "#00d6b4",
+    color: "var(--accent)",
     tip: "Akun khusus kamu - lebih aman dengan garansi penuh.",
   },
   family: {
     label: "Family",
     icon: Users,
-    color: "#a855f7",
+    color: "var(--text)",
     tip: "Slot family/invite - ikuti aturan paket saat checkout.",
   },
 };

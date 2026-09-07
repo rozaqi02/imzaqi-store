@@ -37,6 +37,12 @@ function setAppInert(active) {
   } catch {}
 }
 
+function isDisplayedDialog(container) {
+  if (!(container instanceof HTMLElement) || !container.isConnected) return false;
+  const style = window.getComputedStyle(container);
+  return style.display !== "none" && style.visibility !== "hidden";
+}
+
 function isFocusable(element) {
   if (!(element instanceof HTMLElement)) return false;
   if (element.hasAttribute("disabled")) return false;
@@ -55,7 +61,7 @@ export function useDialogA11y({ open, containerRef, onClose, initialFocusSelecto
     if (!open || typeof document === "undefined") return undefined;
 
     const container = containerRef?.current;
-    if (!(container instanceof HTMLElement)) return undefined;
+    if (!isDisplayedDialog(container)) return undefined;
 
     setAppInert(true);
     container.setAttribute("tabindex", "-1");

@@ -1,0 +1,57 @@
+import React from "react";
+import { fireEvent, render, screen, within, waitFor } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
+import Testimonials from "./Testimonials";
+import { fetchTestimonials } from "../lib/api";
+vi.mock("../lib/api", () => ({ fetchTestimonials: vi.fn() }));
+vi.mock("../hooks/usePageMeta", () => ({ usePageMeta: () => {} }));
+vi.mock("../lib/log", () => ({ warn: vi.fn() }));
+const samples = Array.from({ length: 20 }, (_, i) => ({ id: String(i), image_url: `/test-${i}.png`, caption: i % 2 ? null : `Paket Canva ${i}`, created_at: "2026-09-07T00:00:00Z" }));
+const openPage = () => render(<MemoryRouter><Testimonials /></MemoryRouter>);
+beforeEach(() => { fetchTestimonials.mockReset(); fetchTestimonials.mockResolvedValue(samples); });
+it("paginates gallery and resets both search and caption filter", async () => {
+  openPage();
+  await screen.findByRole("button", { name: "Buka testimoni 1: Paket Canva 0" });
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(18);
+  fireEvent.click(screen.getByRole("button", { name: "Lihat lebih banyak" }));
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(20);
+  fireEvent.click(screen.getByRole("button", { name: "Foto saja" }));
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(10);
+  fireEvent.change(screen.getByRole("searchbox"), { target: { value: "canva" } });
+  expect(screen.getByText("Ceritanya belum ketemu")).toBeVisible();
+  fireEvent.click(screen.getByRole("button", { name: "Lihat semua testimoni" }));
+  expect(screen.getByRole("button", { name: "Semua", pressed: true })).toBeVisible();
+  expect(screen.getByRole("searchbox")).toHaveValue("");
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(18);
+});
+it("navigates the image dialog, handles image errors, and closes with Escape", async () => {
+  openPage();
+  const opener = await screen.findByRole("button", { name: "Buka testimoni 1: Paket Canva 0" });
+  opener.focus(); fireEvent.click(opener);
+  const dialog = screen.getByRole("dialog");
+  expect(document.body.style.overflow).toBe("hidden");
+  fireEvent.click(within(dialog).getByRole("button", { name: "Testimoni berikutnya" }));
+  expect(dialog).toHaveAccessibleName("Testimoni 2 dari 20");
+  fireEvent.error(within(dialog).getByRole("img"));
+  expect(within(dialog).getByText("Gambar belum bisa ditampilkan")).toBeVisible();
+  fireEvent.keyDown(window, { key: "ArrowLeft" });
+  expect(dialog).toHaveAccessibleName("Testimoni 1 dari 20");
+  fireEvent.keyDown(window, { key: "Escape" });
+  expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  expect(document.body.style.overflow).not.toBe("hidden");
+  expect(opener).toHaveFocus();
+});
+it("retries a failed request without reloading the page", async () => {
+  fetchTestimonials.mockRejectedValueOnce(new Error("offline"));
+  openPage();
+  fireEvent.click(await screen.findByRole("button", { name: "Coba lagi" }));
+  await waitFor(() => expect(screen.getByRole("status")).toHaveTextContent("20 testimoni"));
+  expect(fetchTestimonials).toHaveBeenLastCalledWith({ useCache: false });
+});
+it("adapts the gallery when every testimonial has a nullable caption", async () => {
+  fetchTestimonials.mockResolvedValue(samples.map(item => ({ ...item, caption: null })));
+  openPage();
+  await screen.findByRole("button", { name: "Buka testimoni 1", exact: true });
+  expect(screen.queryByRole("searchbox")).not.toBeInTheDocument();
+  expect(screen.getByText("Ketuk screenshot untuk membaca pengalaman lengkap.")).toBeVisible();
+});

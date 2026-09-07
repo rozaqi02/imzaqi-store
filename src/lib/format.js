@@ -12,6 +12,57 @@ export function formatIDR(n) {
   return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(value);
 }
 
+export function isKnownOutOfStock(variant) {
+  if (variant?.stock == null || variant?.stock === "") return false;
+  const stock = Number(variant.stock);
+  return Number.isFinite(stock) && stock <= 0;
+}
+
+export function getVariantEffectivePrice(variant, flashSaleMap) {
+  const base = Number(variant?.price_idr || 0);
+  if (!Number.isFinite(base) || base <= 0) return 0;
+  const discount = Number(
+    flashSaleMap instanceof Map ? flashSaleMap.get(variant?.id) : 0
+  );
+  if (discount > 0) return Math.round(base * (1 - discount / 100));
+  return base;
+}
+
+export function getCatalogPriceRange(variants, flashSaleMap) {
+  const list = asVariantList(variants);
+  const active = list.filter((variant) => variant?.is_active !== false);
+  const sellable = active.filter((variant) => !isKnownOutOfStock(variant));
+  const pool = (sellable.length ? sellable : active)
+    .map((variant) => getVariantEffectivePrice(variant, flashSaleMap))
+    .filter((value) => Number.isFinite(value) && value > 0);
+  return {
+    minPrice: pool.length ? Math.min(...pool) : 0,
+    maxPrice: pool.length ? Math.max(...pool) : 0,
+    inStockCount: sellable.length,
+  };
+}
+
+export function formatGuaranteeLabel(text) {
+  const raw = String(text || "").trim();
+  if (!raw) return "";
+  if (/garansi/i.test(raw)) return raw;
+  return `Garansi ${raw}`;
+}
+
+export function packDisplayName(variant, siblings = []) {
+  const name = String(variant?.name || "").trim();
+  const duration = String(variant?.duration_label || "").replace(/^durasi\s+/i, "").trim();
+  if (!name) return duration || "";
+  if (!duration) return name;
+  if (name.toLowerCase().includes(duration.toLowerCase())) return name;
+  const nameHasSpan = /\b(bulan(?:an)?|tahun(?:an)?|hari|jam|hidup|lifetime)\b/i.test(name);
+  const durationHasSpan = /bulan(?:an)?|tahun(?:an)?|hari|jam|hidup|lifetime/i.test(duration);
+  if (nameHasSpan && durationHasSpan) return name;
+  const duplicate = asVariantList(siblings).filter((item) => String(item?.name || "").trim() === name).length > 1;
+  if (!duplicate) return name;
+  return `${name} · ${duration}`;
+}
+
 export function clamp(n, min, max) {
   return Math.min(max, Math.max(min, n));
 }
@@ -139,12 +190,12 @@ export function isPromoExpired(promo) {
 }
 
 const ACCOUNT_TYPE_KEYWORDS = [
-  { keyword: "private", label: "Private", color: "var(--accent, #00d6b4)" },
-  { keyword: "sharing", label: "Sharing", color: "#5b8def" },
-  { keyword: "family", label: "Family", color: "#a855f7" },
-  { keyword: "premium", label: "Premium", color: "#f59e0b" },
-  { keyword: "student", label: "Student", color: "#10b981" },
-  { keyword: "basic", label: "Basic", color: "#94a3b8" },
+  { keyword: "private", label: "Private", color: "var(--accent)" },
+  { keyword: "sharing", label: "Sharing", color: "var(--text)" },
+  { keyword: "family", label: "Family", color: "var(--text)" },
+  { keyword: "premium", label: "Premium", color: "var(--accent)" },
+  { keyword: "student", label: "Student", color: "var(--accent)" },
+  { keyword: "basic", label: "Basic", color: "var(--muted)" },
 ];
 
 export function detectAccountTypes(variants) {

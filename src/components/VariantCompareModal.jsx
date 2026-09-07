@@ -2,23 +2,22 @@ import React, { useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   Clock3,
-  Coins,
   Flame,
   Info,
   Mail,
   ShieldCheck,
   X,
 } from "lucide-react";
-import { formatIDR } from "../lib/format";
+import { formatGuaranteeLabel, formatIDR, packDisplayName } from "../lib/format";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 
 function classifyType(name) {
   const n = String(name || "").toLowerCase();
-  if (n.includes("private")) return "Private";
-  if (n.includes("sharing")) return "Sharing";
-  if (n.includes("family")) return "Family";
-  if (n.includes("student")) return "Student";
-  if (n.includes("basic")) return "Basic";
+  if (n.match(/sharing|share/)) return "Sharing";
+  if (n.match(/fam|family/)) return "Family";
+  if (n.match(/private|privat|prem|\bpro\b|standart|ultimate|diamond/)) return "Private";
+  if (n.match(/student/)) return "Student";
+  if (n.match(/basic/)) return "Basic";
   return "Lainnya";
 }
 
@@ -44,8 +43,7 @@ function stockLabel(stock) {
 }
 
 function normalizeGuarantee(text) {
-  const value = String(text || "Replace 24 Jam").trim();
-  return value.toLowerCase().startsWith("garansi") ? value : `Garansi ${value}`;
+  return formatGuaranteeLabel(text || "Replace 24 Jam");
 }
 
 function normalizeDuration(text) {
@@ -181,18 +179,17 @@ export default function VariantCompareModal({
       >
         <div className="vcm-head">
           <div className="vcm-headText">
-            <h2 id="vcm-title" className="vcm-title">Bandingkan Varian</h2>
-            <p id="vcm-desc" className="vcm-subtitle">
-              Bandingkan harga, durasi, dan garansi dalam satu tabel.
-            </p>
+            <p className="vcm-label">Paket</p>
+            <h2 id="vcm-title" className="vcm-title">Bandingkan</h2>
+            <p id="vcm-desc" className="vcm-subtitle">Harga, durasi, stok, dan garansi.</p>
           </div>
           <button
-            className="modal-close vcm-close"
+            className="vcm-close"
             type="button"
             onClick={() => onClose?.()}
             aria-label="Tutup perbandingan"
           >
-            <X size={18} />
+            <X size={16} strokeWidth={2.4} />
           </button>
         </div>
 
@@ -214,12 +211,10 @@ export default function VariantCompareModal({
                         ].filter(Boolean).join(" ")}
                         scope="col"
                       >
-                        <span className="vcm-colName">{item.variant.name}</span>
+                        <span className="vcm-colName">{packDisplayName(item.variant, variants)}</span>
+                        <span className="vcm-colMeta">{item.duration}</span>
                         {isBest ? (
-                          <span className="vcm-chip vcm-chip--best">
-                            <Coins size={10} aria-hidden="true" />
-                            Termurah
-                          </span>
+                          <span className="vcm-chip vcm-chip--best">Termurah</span>
                         ) : null}
                       </th>
                     );
@@ -257,7 +252,7 @@ export default function VariantCompareModal({
               <span>Baris yang disorot = nilai berbeda antar paket</span>
             </div>
           )}
-          <button className="btn btn-sm btn-ghost vcm-dismissBtn" type="button" onClick={() => onClose?.()}>
+          <button className="btn btn-sm vcm-dismissBtn" type="button" onClick={() => onClose?.()}>
             Tutup
           </button>
         </div>

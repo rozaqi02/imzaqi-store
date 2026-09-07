@@ -7,7 +7,7 @@ import Hero from "../components/Hero";
 
 import SectionHead from "../components/SectionHead";
 import ProductTile from "../components/ProductTile";
-import { fetchProducts, fetchTopSellingData, fetchPromoCodes, fetchSettings, peekCachedProducts } from "../lib/api";
+import { fetchProducts, fetchTopSellingData, fetchPromoCodes, fetchSettings, peekCachedProducts, fetchActiveFlashSales } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
@@ -163,6 +163,7 @@ export default function Home() {
   const [salesMap, setSalesMap] = useState({});
   const [promos, setPromos] = useState([]);
   const [settings, setSettings] = useState(null);
+  const [flashSaleMap, setFlashSaleMap] = useState(() => new Map());
   const [error, setError] = useState("");
   
   // Interactive States
@@ -189,15 +190,21 @@ export default function Home() {
         setProducts(data || []);
         setLoading(false);
 
-        const [topData, promoData, settingsData] = await Promise.all([
+        const [topData, promoData, settingsData, flashSales] = await Promise.all([
           fetchTopSellingData().catch(() => ({ topIds: [], salesMap: {} })),
           fetchPromoCodes().catch(() => []),
           fetchSettings().catch(() => ({})),
+          fetchActiveFlashSales({ useCache: true }).catch(() => []),
         ]);
         if (!alive) return;
         setTopIds(topData?.topIds || []);
         setSalesMap(topData?.salesMap || {});
         setSettings(settingsData || {});
+        const nextFlash = new Map();
+        (flashSales || []).forEach((sale) => {
+          if (sale?.variant_id) nextFlash.set(sale.variant_id, sale.discount_percent);
+        });
+        setFlashSaleMap(nextFlash);
 
         const allowedCodes = settingsData?.home_promos?.codes || [];
         const activePromos = (promoData || [])
@@ -291,9 +298,7 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
-                kicker="Produk favorit"
-                title="Yang lagi viral"
-                sub="Gas pilih langsung dari daftar teratas, atau intip katalog lengkap."
+                title="Terlaris"
               />
             </div>
 
@@ -327,6 +332,7 @@ export default function Home() {
                       disableTilt={true}
                       disableFlip={true}
                       overrideSold={salesMap[p.id] != null ? salesMap[p.id] : null}
+                      flashSaleMap={flashSaleMap}
                     />
                   </div>
                 ))
@@ -350,9 +356,7 @@ export default function Home() {
             <div className="container home-sectionInner">
               <div className="reveal" style={{ transitionDelay: "50ms" }}>
                 <HomeSectionHead
-                  kicker="Jasa Akademik"
-                  title="Bantu urusan kampus"
-                  sub="Semua layanan akademik di toko: parafrase, cek plagiasi, Turnitin, Mendeley, dan lainnya."
+                  title="Jasa Akademik"
                 />
               </div>
 
@@ -371,6 +375,7 @@ export default function Home() {
                       product={p}
                       layout="list"
                       disableTilt={true}
+                      flashSaleMap={flashSaleMap}
                       disableFlip={true}
                     />
                   </div>
@@ -399,9 +404,7 @@ export default function Home() {
             <div className="container home-sectionInner">
               <div className="reveal" style={{ transitionDelay: "60ms" }}>
                 <HomeSectionHead
-                  kicker="Promo aktif"
-                  title="Diskon, gas!"
-                  sub="Tap kartu buat salin kode promo."
+                  title="Promo"
                 />
               </div>
 
@@ -428,7 +431,6 @@ export default function Home() {
                     </div>
                     <div className="home-promoCard-body">
                       <span className="home-promoCard-code">{promo.code}</span>
-                      <span className="home-promoCard-action">Tap buat salin</span>
                     </div>
                   </div>
                 ))}
@@ -445,9 +447,7 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal reveal-left" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
-                kicker="Gampang"
-                title="3 langkah doang, gas!"
-                sub="Dari pilih sampai aktif. Tap kartu buat tips ekstra."
+                title="Cara beli"
               />
             </div>
             <div className="home-howGrid">
@@ -499,9 +499,7 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
-                kicker="FAQ"
-                title="Yang sering ditanyakan"
-                sub="Jawaban singkat biar makin pede."
+                title="FAQ"
               />
             </div>
 

@@ -1,12 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getOrderHistory } from "../lib/orderHistory";
 import { getNewAchievements } from "../lib/achievements";
-import { useFunnelRoute } from "../hooks/useFunnelRoute";
+import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 
 const ACHIEVEMENT_CHECK_KEY = "imzaqi_achievement_last_check";
 
 export default function AchievementToast() {
-  const isFunnel = useFunnelRoute();
+  const overlayBlocked = useStorefrontOverlayBlocked();
   const [queue, setQueue] = useState([]);
   const [current, setCurrent] = useState(null);
   const timerRef = useRef(null);
@@ -43,7 +43,7 @@ export default function AchievementToast() {
     return () => clearTimeout(timerRef.current);
   }, [current, queue]);
 
-  if (isFunnel || !current) return null;
+  if (overlayBlocked || !current) return null;
 
   return (
     <div className="achievement-toast" role="status" aria-live="polite">

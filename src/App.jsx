@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import Layout from "./components/Layout";
 import RouteProgress from "./components/RouteProgress";
 import ProtectedRoute from "./components/ProtectedRoute";
+import AdminLoader from "./components/AdminLoader";
 import NetworkBridge from "./components/NetworkBridge";
 import PolishEffects from "./components/PolishEffects";
 import Confetti from "./components/Confetti";
@@ -49,7 +50,7 @@ import PageErrorBoundary from "./components/PageErrorBoundary";
 import { shouldSkipCatalogScrollToTop } from "./hooks/useScrollMemory";
 import { getOrderHistory } from "./lib/orderHistory";
 import { captureReferralFromUrl } from "./lib/referral";
-import { useFunnelRoute } from "./hooks/useFunnelRoute";
+import { useStorefrontOverlayBlocked } from "./hooks/useFunnelRoute";
 
 // ── Eager-loaded pages (critical path) ──
 import Home from "./pages/Home";
@@ -110,9 +111,20 @@ function PageLoader() {
   );
 }
 
+function StorefrontOverlays() {
+  const blocked = useStorefrontOverlayBlocked();
+  if (blocked) return null;
+  return (
+    <>
+      <FlashSalePopup />
+      <AcademicPopup />
+    </>
+  );
+}
+
 // ── Floating recent order button ──
 function FloatingOrderStatus() {
-  const isFunnel = useFunnelRoute();
+  const overlayBlocked = useStorefrontOverlayBlocked();
   const [order, setOrder] = useState(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -129,12 +141,12 @@ function FloatingOrderStatus() {
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
-    const active = Boolean(order && !dismissed);
+    const active = Boolean(order && !dismissed && !overlayBlocked);
     document.body.classList.toggle("has-floating-order", active);
     return () => document.body.classList.remove("has-floating-order");
-  }, [order, dismissed]);
+  }, [order, dismissed, overlayBlocked]);
 
-  if (isFunnel || !order || dismissed) return null;
+  if (overlayBlocked || !order || dismissed) return null;
 
   return (
     <div className="floating-order-status">
@@ -199,17 +211,19 @@ function useCheckoutOverlayLocation(location) {
 
 function ScrollToTop() {
   const location = useLocation();
-  const { displayLocation } = useCheckoutOverlayLocation(location);
+  const { displayLocation, showCheckoutOverlay } = useCheckoutOverlayLocation(location);
   const pathname = displayLocation.pathname;
   const prevPathRef = useRef(pathname);
 
   useLayoutEffect(() => {
     const prevPath = prevPathRef.current;
+    if (prevPath === pathname) return;
     prevPathRef.current = pathname;
+
+    if (showCheckoutOverlay) return;
 
     if (pathname === "/produk") {
       // URL filter sync can re-run this effect — never scroll-to-top for that.
-      if (prevPath === "/produk") return;
       if (shouldSkipCatalogScrollToTop()) return;
     }
 
@@ -241,7 +255,7 @@ function ScrollToTop() {
     } else {
       doScroll();
     }
-  }, [pathname, location.key]);
+  }, [pathname, showCheckoutOverlay]);
 
   return null;
 }
@@ -256,7 +270,7 @@ function AppRoutes() {
   return (
     <Layout routeKey={displayLocation.pathname}>
       <PageErrorBoundary>
-        <Suspense fallback={<PageLoader />}>
+        <Suspense fallback={displayLocation.pathname.startsWith("/admin") ? <AdminLoader /> : <PageLoader />}>
           <Routes location={displayLocation}>
             <Route path="/" element={<BoundedRoute pageName="Home"><Home /></BoundedRoute>} />
             <Route path="/produk/:slug" element={<BoundedRoute pageName="Detail Produk"><ProductDetail /></BoundedRoute>} />
@@ -359,8 +373,7 @@ export default function App() {
       {polishReady ? (
         <>
           <Confetti />
-          <FlashSalePopup />
-          <AcademicPopup />
+          <StorefrontOverlays />
         </>
       ) : null}
       <AchievementToast />

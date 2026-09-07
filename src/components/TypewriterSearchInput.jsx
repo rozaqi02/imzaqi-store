@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 
 function useTypewriter(words) {
-  const [text, setText] = useState("Ketik nama produk..");
+  const [text, setText] = useState("Cari produk...");
 
   useEffect(() => {
     let wordIdx = 0, charIdx = 0, deleting = false, timer;
@@ -11,7 +11,7 @@ function useTypewriter(words) {
       const word = words[wordIdx];
       if (deleting) {
         charIdx--;
-        setText(`Ketik "${word.slice(0, charIdx)}"`);
+        setText(`Cari ${word.slice(0, charIdx)}`);
         timer = setTimeout(tick, charIdx === 0 ? 480 : 38);
         if (charIdx === 0) {
           deleting = false;
@@ -19,7 +19,7 @@ function useTypewriter(words) {
         }
       } else {
         charIdx++;
-        setText(`Ketik "${word.slice(0, charIdx)}"`);
+        setText(`Cari ${word.slice(0, charIdx)}`);
         if (charIdx === word.length) {
           deleting = true;
           timer = setTimeout(tick, 1600 + Math.random() * 400);

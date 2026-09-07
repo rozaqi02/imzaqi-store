@@ -1,6 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { GraduationCap, Smartphone } from "lucide-react";
+import { STORE_WHATSAPP } from "../lib/productCategories";
 
 const footerColumns = [
   {
@@ -15,7 +16,7 @@ const footerColumns = [
   {
     label: "Order",
     links: [
-      { label: "Bayar", to: "/checkout" },
+      { label: "Bayar", to: "/checkout", overlay: true },
       { label: "Cek Status", to: "/status" },
       { label: "Riwayat Order", to: "/status?tab=riwayat" },
     ],
@@ -23,6 +24,7 @@ const footerColumns = [
 ];
 
 function FooterLink({ item, className = "" }) {
+  const location = useLocation();
   if (item.href) {
     return (
       <a className={className} href={item.href} target="_blank" rel="noreferrer">
@@ -32,7 +34,11 @@ function FooterLink({ item, className = "" }) {
   }
 
   return (
-    <Link className={className} to={item.to}>
+    <Link
+      className={className}
+      to={item.to}
+      state={item.overlay ? { backgroundLocation: location } : undefined}
+    >
       {item.label}
     </Link>
   );
@@ -52,14 +58,14 @@ export default function Footer() {
             </Link>
 
             <div className="site-footerGoContact">
-              <a href="https://wa.me/6282245964007" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
+              <a href={`https://wa.me/${STORE_WHATSAPP.app_premium}`} target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
                 <span className="site-footerGoContactIcon" aria-hidden="true"><Smartphone size={16} /></span>
                 <span className="site-footerGoContactCopy">
-                  <strong>+62 822-4596-4007</strong>
+                  <strong>+62 831-3604-9987</strong>
                   <small>Khusus App Premium</small>
                 </span>
               </a>
-              <a href="https://wa.me/6281232742374" target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
+              <a href={`https://wa.me/${STORE_WHATSAPP.academic}`} target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
                 <span className="site-footerGoContactIcon" aria-hidden="true"><GraduationCap size={16} /></span>
                 <span className="site-footerGoContactCopy">
                   <strong>+62 812-3274-2374</strong>
@@ -99,7 +105,7 @@ export default function Footer() {
 
           <div className="site-footerGoLegal">
             <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
-            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.5.0</p>
+            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.6.0</p>
           </div>
         </div>
       </div>

@@ -26,6 +26,21 @@ function safeParse(json, fallback) {
   }
 }
 
+export async function checkPromoCode(codeInput) {
+  const code = String(codeInput || "").trim().toUpperCase();
+  if (!code) return { ok: false, message: "Kode kosong.", percent: 0, code: "" };
+
+  const { data, error } = await supabase.rpc("validate_promo", {
+    p_code: code,
+    p_visitor_id: getVisitorIdAsUUID(),
+  });
+  if (error) return { ok: false, message: "Gagal cek kode promo.", percent: 0, code, error: true };
+
+  const mapped = mapPromoResult(Number(data));
+  if (!mapped.ok) return { ok: false, message: mapped.message, percent: 0, code };
+  return { ok: true, message: mapped.message, percent: mapped.percent, code };
+}
+
 export function usePromo() {
   // Use sessionStorage instead of localStorage so promo resets when the
   // browser tab is closed. Also clear any legacy localStorage entry.
@@ -58,26 +73,27 @@ export function usePromo() {
     clear() { setPromo({ code: "", percent: 0 }); },
 
     async apply(codeInput) {
-      const code = String(codeInput || "").trim().toUpperCase();
-      if (!code) return { ok: false, message: "Kode kosong." };
-
-      const { data, error } = await supabase.rpc("validate_promo", {
-        p_code: code,
-        p_visitor_id: getVisitorIdAsUUID(),
-      });
-      if (error) return { ok: false, message: "Gagal cek kode promo." };
-
-      const mapped = mapPromoResult(Number(data));
-      if (!mapped.ok) return { ok: false, message: mapped.message };
-      const percent = mapped.percent;
-
-      setPromo({ code, percent });
+      const result = await checkPromoCode(codeInput);
+      if (!result.ok) return result;
+      setPromo({ code: result.code, percent: result.percent });
 
       // NOTE: promo_claims insert is NOT done here — it happens once
       // during order creation (create_order_with_stock_check RPC) in Pay.
       // Previously this caused a double-claim bug (slot decremented twice).
 
-      return { ok: true, message: `Berhasil! Diskon ${percent}% diterapkan.` };
+      return { ok: true, message: `Berhasil! Diskon ${result.percent}% diterapkan.`, percent: result.percent };
+    },
+
+    async revalidate() {
+      const code = String(promo.code || "").trim();
+      if (!code) return { ok: true, percent: 0, code: "" };
+      const result = await checkPromoCode(code);
+      if (result.ok) {
+        setPromo({ code: result.code, percent: result.percent });
+      } else if (!result.error) {
+        setPromo({ code: "", percent: 0 });
+      }
+      return result;
     },
   }), [promo]);
 

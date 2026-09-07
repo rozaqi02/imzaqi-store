@@ -166,6 +166,34 @@ export function CartProvider({ children }) {
       setItems([]);
     },
 
+    syncPrices(nextItems) {
+      if (!Array.isArray(nextItems) || nextItems.length === 0) return;
+      const byId = new Map(nextItems.map((item) => [String(item.variant_id), item]));
+      setItems((prev) => {
+        let changed = false;
+        const next = prev.map((item) => {
+          const live = byId.get(String(item.variant_id));
+          if (!live) return item;
+          if (Number(item.price_idr) === Number(live.price_idr)
+            && item.product_name === live.product_name
+            && item.variant_name === live.variant_name) {
+            return item;
+          }
+          changed = true;
+          return {
+            ...item,
+            price_idr: live.price_idr,
+            product_name: live.product_name || item.product_name,
+            variant_name: live.variant_name || item.variant_name,
+            duration_label: live.duration_label || item.duration_label,
+            stock: Number.isFinite(Number(live.stock)) ? Number(live.stock) : item.stock,
+            requires_buyer_email: live.requires_buyer_email ?? item.requires_buyer_email,
+          };
+        });
+        return changed ? next : prev;
+      });
+    },
+
     subtotal() {
       return items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0);
     },

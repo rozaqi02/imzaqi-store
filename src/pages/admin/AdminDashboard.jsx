@@ -2124,7 +2124,7 @@ export default function AdminDashboard() {
         home_promos: { codes: nextCodes },
       }));
       toast.remove(tid);
-      toast.success("Tampilan kupon diperbarui!");
+      toast.success("Kupon beranda dan label atas diperbarui!");
     } catch (e) {
       toast.remove(tid);
       toast.error("Gagal menyimpan pengaturan.");
@@ -3842,7 +3842,7 @@ export default function AdminDashboard() {
                                       className={"btn btn-sm " + (showOnHome ? "btn-primary" : "btn-ghost")}
                                       type="button"
                                       onClick={() => toggleHomePromo(p.code)}
-                                      title={showOnHome ? "Sembunyikan kupon dari Halaman Utama" : "Tampilkan kupon di Halaman Utama"}
+                                      title={showOnHome ? "Sembunyikan kupon dari beranda dan label atas" : "Tampilkan kupon di beranda dan label atas"}
                                     >
                                       {showOnHome ? "Tampil di Home" : "Set ke Home"}
                                     </button>

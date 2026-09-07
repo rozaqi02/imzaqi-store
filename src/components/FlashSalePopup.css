@@ -1,6 +1,3 @@
-/* ── Neumorphic Flash Sale Popup ────────────────────────────────────────── */
-
-/* Overlay backdrop */
 .fsp-backdrop {
   position: fixed;
   inset: 0;
@@ -8,718 +5,299 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
-  background: rgba(3, 5, 10, 0.72);
-  animation: fspFadeIn 0.22s ease-out forwards;
+  padding: 24px 16px;
+  background: rgba(0, 0, 0, 0.48);
+  backdrop-filter: blur(10px);
+  animation: fspFade 0.35s ease both;
 }
 
-/* ── Modal shell: Raised Neumorphic Panel (solid) ── */
-.fsp-modal {
-  width: min(100%, 460px);
-  max-height: min(86vh, 680px);
-  max-height: min(86dvh, 680px);
-  display: flex;
-  flex-direction: column;
-  border-radius: 28px;
-  /* Solid dark navy — no transparency */
-  background: linear-gradient(170deg, #16264a 0%, #0d1a38 45%, #080f22 100%);
-  border: 1px solid rgba(0, 194, 208, 0.22);
-  box-shadow:
-    0 32px 72px rgba(0, 0, 0, 0.78),
-    0 8px 24px rgba(0, 0, 0, 0.45),
-    inset 0 2px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.5),
-    0 0 0 1px rgba(0, 194, 208, 0.1);
-  overflow: hidden;
+@keyframes fspFade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fsp-stage {
   position: relative;
-  transform: scale(0.92) translateY(16px);
-  opacity: 0;
-  animation: fspPopUp 0.32s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+  width: min(860px, 100%);
+  animation: fspRise 0.5s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-html[data-theme="light"] .fsp-modal {
-  /* Solid white — no transparency */
-  background: linear-gradient(170deg, #ffffff 0%, #f0f8fc 54%, #e4f3f8 100%) !important;
-  border-color: rgba(0, 138, 148, 0.2) !important;
-  box-shadow:
-    0 24px 60px rgba(20, 50, 70, 0.24),
-    0 6px 18px rgba(20, 50, 70, 0.14),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.32),
-    0 0 0 1px rgba(0, 138, 148, 0.1) !important;
+@keyframes fspRise {
+  from {
+    opacity: 0;
+    transform: translateY(28px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
 }
 
-/* ── Head ── */
-.fsp-head {
-  padding: 20px 22px 16px;
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-start;
-  border-bottom: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
-  background: linear-gradient(180deg, rgba(0, 194, 208, 0.06), rgba(0, 194, 208, 0) 100%);
+.fsp-closeFloat {
+  position: absolute;
+  top: -12px;
+  right: -8px;
+  z-index: 2;
+  width: 40px;
+  height: 40px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  background: #0a0a0a;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
-html[data-theme="light"] .fsp-head {
-  border-bottom-color: rgba(0, 138, 148, 0.12) !important;
-  background: linear-gradient(180deg, rgba(0, 194, 208, 0.04), rgba(0, 194, 208, 0) 100%) !important;
+.fsp-closeFloat:hover {
+  transform: scale(1.06);
+  background: #1a1a1a;
 }
 
-.fsp-titleBlock {
+.fsp-billboard {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  overflow: hidden;
+  border-radius: 28px;
+  background: #fff;
+  color: #0a0a0a;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.22);
+}
+
+html[data-theme="dark"] .fsp-billboard {
+  background: #141414;
+  color: #f5f5f5;
+}
+
+.fsp-visual {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 240px;
+  padding: 32px 24px;
+  background:
+    radial-gradient(80% 80% at 30% 20%, rgba(255, 255, 255, 0.22), transparent 55%),
+    linear-gradient(160deg, #00c48a 0%, #009e60 55%, #067a4c 100%);
+}
+
+.fsp-off {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.fsp-visualIcon {
+  width: 148px !important;
+  height: 148px !important;
+  aspect-ratio: 1 / 1;
+  flex: 0 0 auto;
+  max-width: none;
+  max-height: none;
+  border-radius: 28px;
+  overflow: hidden;
+  background: transparent !important;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.18);
+  display: grid;
+  place-items: center;
+}
+
+.fsp-visualIcon:has(span) {
+  background: rgba(255, 255, 255, 0.94) !important;
+}
+
+.fsp-visualIcon img {
+  width: auto !important;
+  height: auto !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
+  object-fit: contain !important;
+  object-position: center;
+  padding: 0 !important;
+  background: transparent;
+}
+
+.fsp-visualIcon span {
+  font-size: 52px;
+  font-weight: 900;
+  color: #009e60;
+}
+
+.fsp-copy {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-  gap: 6px;
-  width: 100%;
-  min-width: 0;
+  justify-content: center;
+  gap: 10px;
+  padding: 36px 36px 28px;
 }
 
-/* Title — large bold yellow, left-aligned, no border / pill */
-.fsp-kicker {
-  display: inline-flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 8px;
+.fsp-label {
   margin: 0;
-  padding: 0;
-  border-radius: 0;
-  font-size: clamp(26px, 6.5vw, 34px);
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  text-transform: none;
-  color: #ffd54a !important;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-  animation: fspPulse 1.6s ease-in-out infinite;
-  text-align: left;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #009e60;
+}
+
+.fsp-headline {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.04em;
   line-height: 1.05;
 }
 
-.fsp-kicker span {
-  font-weight: 900;
-  color: inherit !important;
-}
-
-html[data-theme="light"] .fsp-kicker {
-  color: #e6a800 !important;
-  background: none !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Subtitle under Flash Sale! */
-.fsp-title {
+.fsp-meta {
   margin: 0;
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  color: var(--brand-muted, rgba(220, 240, 255, 0.68));
-  text-shadow: none;
-  text-align: left;
-  width: 100%;
-  line-height: 1.35;
+  font-size: 14px;
+  color: #525252;
 }
 
-html[data-theme="light"] .fsp-title {
-  color: rgba(40, 80, 95, 0.72);
-  text-shadow: none;
+html[data-theme="dark"] .fsp-meta {
+  color: #a3a3a3;
 }
 
-/* ── Close button — raised Neumorphic circle ── */
-.fsp-closeBtn {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0) 36%),
-    var(--skeu-control-bg, linear-gradient(175deg, rgba(22, 34, 64, 0.98), rgba(12, 20, 42, 0.95)));
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.2));
-  color: var(--brand-muted, rgba(200, 240, 255, 0.55));
-  box-shadow:
-    4px 4px 10px rgba(0, 0, 0, 0.32),
-    -3px -3px 8px rgba(255, 255, 255, 0.04),
-    inset 0 2px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.38);
-  transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.fsp-closeBtn:hover {
-  border-color: rgba(0, 214, 180, 0.4);
-  color: var(--accent, #00d6b4);
-  transform: rotate(90deg) scale(1.06);
-  box-shadow:
-    4px 4px 12px rgba(0, 0, 0, 0.36),
-    -2px -2px 6px rgba(255, 255, 255, 0.06),
-    inset 0 2px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.44),
-    0 0 14px rgba(0, 214, 180, 0.18);
-}
-
-.fsp-closeBtn:active {
-  transform: scale(0.94);
-  box-shadow:
-    inset 4px 4px 10px rgba(0, 0, 0, 0.44),
-    inset -2px -2px 6px rgba(255, 255, 255, 0.04),
-    inset 0 1px 0 rgba(0, 0, 0, 0.22);
-}
-
-html[data-theme="light"] .fsp-closeBtn {
-  background:
-    linear-gradient(145deg, #ffffff, #e8f4f8) !important;
-  border-color: rgba(0, 138, 148, 0.2) !important;
-  color: rgba(0, 60, 80, 0.65) !important;
-  box-shadow:
-    5px 5px 12px rgba(67, 111, 129, 0.2),
-    -4px -4px 10px rgba(255, 255, 255, 1),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.28) !important;
-}
-
-html[data-theme="light"] .fsp-closeBtn:hover {
-  color: var(--accent-light, #008a94) !important;
-}
-
-/* ── Body: scrollable item list ── */
-.fsp-body {
-  padding: 18px 18px 10px;
-  overflow-y: auto;
+.fsp-priceRow {
   display: flex;
-  flex-direction: column;
+  align-items: baseline;
   gap: 12px;
+  margin-top: 6px;
 }
 
-/* ── Item card: Inset Neumorphic well ── */
-.fsp-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 14px 15px;
-  border-radius: 18px;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0) 30%),
-    rgba(0, 8, 22, 0.28);
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
-  box-shadow:
-    inset 3px 4px 10px rgba(0, 0, 0, 0.38),
-    inset -2px -2px 6px rgba(255, 255, 255, 0.04),
-    inset 0 1px 0 rgba(0, 0, 0, 0.3);
-  transition: all 0.2s ease;
-}
-
-.fsp-item:hover {
-  border-color: rgba(0, 194, 208, 0.24);
-  transform: translateY(-1px);
-  box-shadow:
-    inset 3px 4px 10px rgba(0, 0, 0, 0.38),
-    inset -2px -2px 6px rgba(255, 255, 255, 0.06),
-    inset 0 1px 0 rgba(0, 0, 0, 0.3),
-    0 4px 14px rgba(0, 0, 0, 0.22);
-}
-
-html[data-theme="light"] .fsp-item {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
-    rgba(0, 60, 80, 0.04) !important;
-  border-color: rgba(0, 138, 148, 0.14) !important;
-  box-shadow:
-    inset 3px 4px 8px rgba(67, 111, 129, 0.14),
-    inset -2px -2px 5px rgba(255, 255, 255, 0.75),
-    inset 0 1px 0 rgba(67, 111, 129, 0.08) !important;
-}
-
-/* ── Item layout helpers ── */
-.fsp-itemLeft {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  min-width: 0;
-  flex: 1 1 auto;
-}
-
-/* ── Icon: Raised Neumorphic icon box ── */
-.fsp-itemIcon {
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  background:
-    linear-gradient(145deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 38%),
-    var(--skeu-pill-bg, linear-gradient(175deg, rgba(20, 33, 62, 0.98), rgba(12, 20, 42, 0.96)));
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.2));
-  box-shadow:
-    5px 5px 12px rgba(0, 0, 0, 0.3),
-    -3px -3px 8px rgba(255, 255, 255, 0.05),
-    inset 0 2px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.38);
-}
-
-html[data-theme="light"] .fsp-itemIcon {
-  background:
-    linear-gradient(145deg, #ffffff, #e8f4f8) !important;
-  border-color: rgba(0, 138, 148, 0.18) !important;
-  box-shadow:
-    5px 5px 12px rgba(67, 111, 129, 0.18),
-    -4px -4px 10px rgba(255, 255, 255, 0.96),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.24) !important;
-}
-
-.fsp-itemIcon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.fsp-fallbackText {
-  font-size: 17px;
-  font-weight: 900;
-  color: var(--accent, #00d6b4);
-  text-shadow: 0 0 10px rgba(0, 214, 180, 0.3);
-}
-
-html[data-theme="light"] .fsp-fallbackText {
-  color: #007080;
-  text-shadow: none;
-}
-
-/* ── Item info column ── */
-.fsp-itemInfo {
-  display: flex;
-  flex-direction: column;
-  flex: 1 1 auto;
-  min-width: 0;
-  gap: 3px;
-}
-
-.fsp-itemNameRow {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.fsp-itemName {
-  font-size: 13.5px;
+.fsp-now {
+  font-size: clamp(26px, 3vw, 34px);
   font-weight: 800;
-  color: var(--brand-text, #f0f4f8);
-  white-space: normal;
-  word-break: break-word;
-  overflow-wrap: break-word;
-  line-height: 1.25;
+  letter-spacing: -0.04em;
 }
 
-html[data-theme="light"] .fsp-itemName {
-  color: #0d2d39;
-}
-
-.fsp-itemMeta {
-  font-size: 10.5px;
-  font-weight: 600;
-  color: var(--brand-muted, rgba(180, 230, 240, 0.55));
-  line-height: 1.3;
-}
-
-html[data-theme="light"] .fsp-itemMeta {
-  color: rgba(0, 60, 80, 0.5);
-}
-
-/* ── Discount badge — glossy gold pill ── */
-.fsp-discountBadge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 2px 8px;
-  border-radius: 999px;
-  font-size: 10px;
-  font-weight: 900;
-  color: #3d2a00;
-  letter-spacing: 0.02em;
-  flex-shrink: 0;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.42) 0%, rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, #ffd54a, #f5b800);
-  border: 1px solid rgba(255, 200, 40, 0.55);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.55),
-    inset 0 -2px 0 rgba(140, 90, 0, 0.28),
-    0 3px 8px rgba(245, 180, 0, 0.28);
-}
-
-/* ── Right column: price + CTA ── */
-.fsp-itemRight {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-shrink: 0;
-}
-
-/* ── Price column ── */
-.fsp-priceCol {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 1px;
-}
-
-.fsp-originalPrice {
-  font-size: 10.5px;
-  font-weight: 700;
-  color: var(--brand-muted, rgba(200, 230, 240, 0.38));
+.fsp-was {
+  font-size: 15px;
+  color: #888;
   text-decoration: line-through;
 }
 
-html[data-theme="light"] .fsp-originalPrice {
-  color: rgba(0, 60, 80, 0.38);
-}
-
-.fsp-promoPrice {
-  font-size: 14.5px;
-  font-weight: 900;
-  letter-spacing: -0.02em;
-  color: #ffd54a !important;
-  text-shadow: 0 0 8px rgba(255, 213, 74, 0.35);
-}
-
-html[data-theme="light"] .fsp-promoPrice {
-  color: #d97706 !important;
-  text-shadow: none !important;
-}
-
-/* ── CTA "Beli" button — full Neumorphic raised ── */
-.fsp-actionBtn {
-  padding: 9px 16px;
-  font-size: 11.5px;
-  font-weight: 900;
-  border-radius: 12px;
-  letter-spacing: 0.02em;
-  color: #03160e;
-  background: var(--imzaqi-btn-face,
-    linear-gradient(170deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0) 28%),
-    linear-gradient(135deg, #4effda, #00d6b4 60%, #008a94)
-  );
-  border: 1px solid var(--imzaqi-btn-border, rgba(0, 138, 148, 0.38));
-  box-shadow: var(--imzaqi-btn-shadow,
-    inset 0 2px 0 rgba(255, 255, 255, 0.72),
-    inset 0 -3px 0 rgba(0, 80, 68, 0.5),
-    0 8px 18px rgba(0, 180, 150, 0.28),
-    0 3px 8px rgba(0, 0, 0, 0.22)
-  );
-  cursor: pointer;
-  transition: all 0.18s ease;
+.fsp-timer {
   display: inline-flex;
   align-items: center;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-.fsp-actionBtn:hover {
-  filter: brightness(1.1);
-  transform: translateY(-2px);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.82),
-    inset 0 -3px 0 rgba(0, 80, 68, 0.55),
-    0 12px 24px rgba(0, 180, 150, 0.34),
-    0 4px 12px rgba(0, 0, 0, 0.28);
-}
-
-.fsp-actionBtn:active {
-  transform: translateY(1px);
-  box-shadow:
-    inset 0 3px 6px rgba(0, 80, 68, 0.5),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.2),
-    0 2px 6px rgba(0, 0, 0, 0.22);
-}
-
-html[data-theme="light"] .fsp-actionBtn {
-  color: #03160e !important;
-  background: var(--imzaqi-btn-face,
-    linear-gradient(170deg, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0) 28%),
-    linear-gradient(135deg, #4effda, #25ebc8 36%, #00d6b4 58%, #008a94)
-  ) !important;
-  box-shadow: var(--imzaqi-btn-shadow) !important;
-}
-
-/* ── Footer ── */
-.fsp-foot {
-  padding: 14px 18px 18px;
-  border-top: 1px solid var(--brand-line, rgba(0, 194, 208, 0.1));
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex-shrink: 0;
-  background:
-    linear-gradient(180deg, rgba(0, 194, 208, 0.05), rgba(0, 194, 208, 0) 60%),
-    rgba(0, 0, 0, 0.16);
-}
-
-html[data-theme="light"] .fsp-foot {
-  background:
-    linear-gradient(180deg, rgba(0, 138, 148, 0.04), rgba(0, 138, 148, 0) 60%),
-    rgba(0, 60, 80, 0.025) !important;
-  border-top-color: rgba(0, 138, 148, 0.12) !important;
-}
-
-.fsp-footTop {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-}
-
-.fsp-footBottom {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  width: 100%;
-}
-
-/* ── Countdown — jam / menit / detik under numbers ── */
-.fsp-countdownWrap {
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  gap: 8px 10px;
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: 16px;
-  color: #ffd54a;
-  font-size: 11px;
-  font-weight: 800;
-  background: rgba(255, 213, 74, 0.09);
-  border: 1px solid rgba(255, 213, 74, 0.28);
-  box-shadow:
-    inset 2px 3px 7px rgba(0, 0, 0, 0.28),
-    inset -1px -1px 4px rgba(255, 220, 80, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.06);
-  box-sizing: border-box;
-}
-
-.fsp-countdownLabel {
-  color: rgba(255, 213, 74, 0.8);
-  font-weight: 700;
-  white-space: nowrap;
-}
-
-.fsp-countdownUnits {
-  display: inline-flex;
-  align-items: flex-start;
-  gap: 4px;
-}
-
-.fsp-countdownUnit {
-  display: inline-flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2px;
-  min-width: 34px;
-}
-
-.fsp-countdownVal {
-  color: #ffd54a;
-  font-weight: 900;
-  font-size: 15px;
-  letter-spacing: 0.02em;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.1;
-  text-shadow: 0 0 8px rgba(255, 213, 74, 0.35);
-}
-
-.fsp-countdownUnit small {
-  font-size: 9px;
-  font-weight: 800;
-  letter-spacing: 0.02em;
-  text-transform: lowercase;
-  color: rgba(255, 213, 74, 0.72);
-  line-height: 1;
-}
-
-.fsp-countdownSep {
-  align-self: center;
-  margin-top: -10px;
-  color: rgba(255, 213, 74, 0.5);
-  font-weight: 900;
+  gap: 8px;
+  margin: 4px 0 0;
   font-size: 13px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: #525252;
 }
 
-.fsp-countdownUnit.is-sec .fsp-countdownVal {
-  color: #ffe082;
-}
-
-html[data-theme="light"] .fsp-countdownWrap {
-  background: rgba(217, 119, 6, 0.06) !important;
-  border-color: rgba(217, 119, 6, 0.22) !important;
-  color: #b45309 !important;
-  box-shadow:
-    inset 2px 3px 6px rgba(67, 111, 129, 0.12),
-    inset -1px -1px 3px rgba(255, 255, 255, 0.85),
-    0 1px 0 rgba(255, 255, 255, 0.6) !important;
-}
-
-html[data-theme="light"] .fsp-countdownLabel {
-  color: rgba(180, 83, 9, 0.75) !important;
-}
-
-html[data-theme="light"] .fsp-countdownVal {
-  color: #b45309 !important;
-  text-shadow: none !important;
-}
-
-html[data-theme="light"] .fsp-countdownUnit small {
-  color: rgba(180, 83, 9, 0.7) !important;
-}
-
-html[data-theme="light"] .fsp-countdownSep {
-  color: rgba(180, 83, 9, 0.45) !important;
-}
-
-html[data-theme="light"] .fsp-countdownUnit.is-sec .fsp-countdownVal {
-  color: #c2410c !important;
-}
-
-/* ── "Jangan Beritahu" — forced red (beats global neo control overrides) ── */
-.fsp-backdrop .fsp-modal button.fsp-dontShowBtn,
-.fsp-backdrop .fsp-modal button.fsp-dontShowBtn.fsp-btn-red,
-button.fsp-dontShowBtn.fsp-btn-red {
-  flex: 1 !important;
-  display: inline-flex !important;
-  align-items: center !important;
-  justify-content: center !important;
-  padding: 9px 14px !important;
-  border-radius: 999px !important;
-  font-size: 11.5px !important;
-  font-weight: 800 !important;
-  letter-spacing: 0.01em !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  cursor: pointer !important;
-  white-space: nowrap !important;
-  border: 1px solid #9f1239 !important;
-  /* solid fallback first, then gradient */
-  background-color: #e11d3a !important;
-  background-image: linear-gradient(
-    165deg,
-    #ff5a6a 0%,
-    #e11d3a 50%,
-    #be123c 100%
-  ) !important;
-  box-shadow:
-    0 8px 18px rgba(225, 29, 58, 0.32),
-    0 2px 6px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -2px 0 rgba(100, 0, 20, 0.3) !important;
-  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease !important;
-  filter: none !important;
-}
-
-.fsp-backdrop .fsp-modal button.fsp-dontShowBtn:hover,
-.fsp-backdrop .fsp-modal button.fsp-dontShowBtn.fsp-btn-red:hover,
-button.fsp-dontShowBtn.fsp-btn-red:hover {
-  transform: translateY(-2px) !important;
-  filter: brightness(1.06) !important;
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  background-color: #e11d3a !important;
-  background-image: linear-gradient(
-    165deg,
-    #ff6b7a 0%,
-    #e11d3a 50%,
-    #be123c 100%
-  ) !important;
-  box-shadow:
-    0 10px 22px rgba(225, 29, 58, 0.38),
-    0 3px 8px rgba(0, 0, 0, 0.18),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4),
-    inset 0 -2px 0 rgba(100, 0, 20, 0.35) !important;
-}
-
-.fsp-backdrop .fsp-modal button.fsp-dontShowBtn:active,
-button.fsp-dontShowBtn.fsp-btn-red:active {
-  transform: translateY(1px) !important;
-  filter: brightness(0.96) !important;
-}
-
-html[data-theme="light"] .fsp-backdrop .fsp-modal button.fsp-dontShowBtn,
-html[data-theme="light"] .fsp-backdrop .fsp-modal button.fsp-dontShowBtn.fsp-btn-red,
-html[data-theme="light"] button.fsp-dontShowBtn.fsp-btn-red {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  border-color: #9f1239 !important;
-  background-color: #e11d3a !important;
-  background-image: linear-gradient(
-    165deg,
-    #ff5c6c 0%,
-    #e11d3a 52%,
-    #be123c 100%
-  ) !important;
-  box-shadow:
-    0 8px 18px rgba(225, 29, 58, 0.26),
-    0 2px 6px rgba(40, 20, 30, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -2px 0 rgba(140, 20, 40, 0.28) !important;
-}
-
-html[data-theme="light"] .fsp-backdrop .fsp-modal button.fsp-dontShowBtn:hover,
-html[data-theme="light"] button.fsp-dontShowBtn.fsp-btn-red:hover {
-  color: #ffffff !important;
-  -webkit-text-fill-color: #ffffff !important;
-  filter: brightness(1.05) !important;
-}
-
-/* ── "Nanti Aja" ghost link ── */
-.fsp-closeTextLink {
-  padding: 9px 12px;
-  background: none;
-  border: none;
-  font-size: 12px;
+.fsp-shop {
+  margin-top: 10px;
+  width: 100%;
+  min-height: 52px;
+  border: 0;
+  border-radius: 14px;
+  background: #0a0a0a;
+  color: #fff;
+  font-size: 15px;
   font-weight: 800;
-  color: var(--brand-muted, rgba(200, 235, 245, 0.48));
+  letter-spacing: 0.02em;
   cursor: pointer;
-  white-space: nowrap;
-  transition: color 0.18s ease, transform 0.18s ease;
+  transition: transform 0.2s ease, background 0.2s ease;
 }
 
-.fsp-closeTextLink:hover {
-  color: var(--accent, #00d6b4);
-  transform: translateX(-2px);
+.fsp-shop:hover {
+  transform: translateY(-1px);
+  background: #1a1a1a;
 }
 
-html[data-theme="light"] .fsp-closeTextLink {
-  color: rgba(0, 60, 80, 0.52);
+html[data-theme="dark"] .fsp-shop {
+  background: #00d6b4;
+  color: #04140e;
 }
 
-html[data-theme="light"] .fsp-closeTextLink:hover {
-  color: var(--accent-light, #008a94);
+.fsp-more {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
 }
 
-/* ── Animations ── */
-@keyframes fspFadeIn {
-  from { opacity: 0; }
-  to   { opacity: 1; }
+.fsp-moreChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(10, 10, 10, 0.1);
+  background: transparent;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
-@keyframes fspPopUp {
-  from {
-    transform: scale(0.92) translateY(16px);
-    opacity: 0;
+.fsp-moreChip em {
+  font-style: normal;
+  color: #009e60;
+}
+
+.fsp-quiet {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 8px;
+}
+
+.fsp-quiet button {
+  padding: 0;
+  border: 0;
+  background: none;
+  color: #737373;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.fsp-quiet button:hover {
+  color: inherit;
+}
+
+@media (max-width: 720px) {
+  .fsp-billboard {
+    grid-template-columns: 1fr;
   }
-  to {
-    transform: scale(1) translateY(0);
-    opacity: 1;
+
+  .fsp-visual {
+    min-height: 200px;
+    padding: 28px 20px 20px;
+  }
+
+  .fsp-visualIcon {
+    width: 132px !important;
+    height: 132px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 28px;
+  }
+
+  .fsp-copy {
+    padding: 22px 22px 20px;
+  }
+
+  .fsp-closeFloat {
+    top: 10px;
+    right: 10px;
   }
 }
 
-@keyframes fspPulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.62; }
+@media (prefers-reduced-motion: reduce) {
+  .fsp-backdrop,
+  .fsp-stage {
+    animation: none;
+  }
 }

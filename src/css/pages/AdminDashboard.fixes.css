@@ -501,10 +501,20 @@ html[data-theme="light"] .admin-page .admin-ordersList--dense .admin-orderListIt
   border-color: rgba(255, 191, 74, 0.24);
 }
 
-/* Hide store distractions on admin */
+/* Hide store distractions on admin — never enough on its own:
+   a display:none dialog can still mark #root inert and freeze the dashboard. */
 body.is-admin .fsp-backdrop,
-body.is-admin .abandoned-cart-banner {
+body.is-admin .ac-popup-backdrop,
+body.is-admin .abandoned-cart-banner,
+body.is-admin .achievement-toast,
+body.is-admin .floating-order-status,
+body.is-admin-app .fsp-backdrop,
+body.is-admin-app .ac-popup-backdrop,
+body.is-admin-app .abandoned-cart-banner,
+body.is-admin-app .achievement-toast,
+body.is-admin-app .floating-order-status {
   display: none !important;
+  pointer-events: none !important;
 }
 
 /* Mobile: hide inline status select — use detail modal */

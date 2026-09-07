@@ -6,7 +6,9 @@ import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
-import { fetchProducts, fetchSettings, fetchActiveFlashSales } from "../lib/api";
+import { fetchProducts, fetchSettings } from "../lib/api";
+import { buildLiveCartItems } from "../lib/liveCartPricing";
+import { STORE_WHATSAPP } from "../lib/productCategories";
 import { getVisitorIdAsUUID } from "../lib/visitor";
 import { makeOrderCode } from "../lib/orderCode";
 import { buildDynamicQrisImage } from "../lib/qris";
@@ -66,12 +68,6 @@ function qrisReducer(state, action) {
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
   return { discount, total: Math.max(0, subtotal - discount) };
-}
-
-function sanitizeQty(value) {
-  const qty = Math.floor(Number(value || 0));
-  if (!Number.isFinite(qty)) return 1;
-  return Math.max(1, Math.min(99, qty));
 }
 
 function variantNeedsBuyerEmail(item) {
@@ -265,11 +261,12 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
 
         <div className="modal-head pay-successHead">
           <div>
-            <div className="modal-title">Pembayaran siap 🎉</div>
-            <div className="modal-sub">Salin ID order di bawah, lalu lacak progresnya kapan saja.</div>
+            <p className="pay-successLabel">Order</p>
+            <div className="modal-title">Pembayaran siap</div>
+            <div className="modal-sub">Salin ID, lalu lacak statusnya kapan saja.</div>
           </div>
-          <button className="icon-btn" type="button" onClick={onClose} aria-label="Tutup">
-            <X size={18} />
+          <button className="pay-successClose" type="button" onClick={onClose} aria-label="Tutup">
+            <X size={16} strokeWidth={2.4} />
           </button>
         </div>
 
@@ -574,7 +571,7 @@ export default function Pay() {
   const nav = useNavigate();
   const location = useLocation();
   const cart = useCart();
-  const { promo, clear: clearPromo } = usePromo();
+  const { promo, clear: clearPromo, revalidate } = usePromo();
   const toast = useToast();
 
   usePageMeta({
@@ -588,8 +585,60 @@ export default function Pay() {
     if (Array.isArray(cart.items) && cart.items.length > 0) setSnapshot(cart.items);
   }, [cart.items]);
 
+  useEffect(() => {
+    let alive = true;
+    const code = String(promo?.code || "").trim();
+    const stored = Number(promo?.percent || 0);
+    if (!code || stored <= 0) {
+      setPromoPercent(0);
+      return undefined;
+    }
+
+    revalidate()
+      .then((result) => {
+        if (!alive) return;
+        if (result?.ok && Number(result.percent) > 0) {
+          setPromoPercent(Number(result.percent));
+          return;
+        }
+        setPromoPercent(0);
+        if (!result?.error && result?.message) {
+          toast.info(result.message, { title: "Promo tidak berlaku" });
+        }
+      })
+      .catch(() => {
+        if (alive) setPromoPercent(0);
+      });
+
+    return () => {
+      alive = false;
+    };
+    // Re-check once when Pay mounts with the session promo.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    if (!Array.isArray(cart.items) || cart.items.length === 0) return undefined;
+
+    buildLiveCartItems(cart.items)
+      .then((live) => {
+        if (!alive) return;
+        setSnapshot(live.items);
+        cart.syncPrices?.(live.items);
+      })
+      .catch((err) => {
+        warn("Live cart pricing failed:", err);
+      });
+
+    return () => {
+      alive = false;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const items = snapshot;
-  const promoPercent = Number(promo?.percent || 0);
+  const [promoPercent, setPromoPercent] = useState(0);
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + (Number(item.price_idr) || 0) * (Number(item.qty) || 0), 0), [items]);
   const { discount, total } = useMemo(() => calcTotal(subtotal, promoPercent), [subtotal, promoPercent]);
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [items]);
@@ -602,8 +651,8 @@ export default function Pay() {
     });
   }, [items]);
 
-  const [settings, setSettings] = useState({ whatsapp: { number: "6282245964007" }, qris: {} });
-  const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6282245964007");
+  const [settings, setSettings] = useState({ whatsapp: { number: STORE_WHATSAPP.app_premium }, qris: {}, qris_academic: {} });
+  const waNumber = isAcademicOrder ? STORE_WHATSAPP.academic : (settings?.whatsapp?.number || STORE_WHATSAPP.app_premium);
   const qrisBaseFromSettings = String(settings?.qris?.base_payload || "").trim();
   const qrisBaseFromEnv = String(import.meta.env.VITE_QRIS_BASE || "").trim();
   const qrisBase = qrisBaseFromSettings || qrisBaseFromEnv;
@@ -650,8 +699,9 @@ export default function Pay() {
       .then((result) => {
         if (!active) return;
         setSettings({
-          whatsapp: result.whatsapp || { number: "6283136049987" },
+          whatsapp: result.whatsapp || { number: STORE_WHATSAPP.app_premium },
           qris: result.qris || {},
+          qris_academic: result.qris_academic || {},
         });
       })
       .catch(() => {});
@@ -761,7 +811,7 @@ export default function Pay() {
   const hasValidWhatsApp = Boolean(customerWhatsApp && isWaValid);
   const requiredBuyerEmailItems = useMemo(() => items.filter((item) => variantNeedsBuyerEmail(item)), [items]);
   const requiresBuyerEmailNote = requiredBuyerEmailItems.length > 0;
-  const hasEmailInNotes = Boolean(buyerEmail.trim());
+  const hasEmailInNotes = EMAIL_IN_TEXT_REGEX.test(String(buyerEmail || "").trim());
   const missingBuyerEmailNote = requiresBuyerEmailNote && !hasEmailInNotes;
   const requiredEmailProductsText = useMemo(() => {
     const names = Array.from(
@@ -835,81 +885,8 @@ export default function Pay() {
   const statusUrl = orderCode ? `/status?order=${encodeURIComponent(orderCode)}` : "/status";
 
   async function buildCanonicalOrderPayload() {
-    const [latestProducts, activeFlashSales] = await Promise.all([
-      fetchProducts({ includeInactive: true, useCache: false }),
-      fetchActiveFlashSales({ useCache: false }).catch((err) => {
-        warn("Flash sales fetch failed in canonical check:", err);
-        return null; // null = unknown, don't apply flash sale discount
-      }),
-    ]);
-
-    // Build flash sale map: variant_id → discount_percent
-    // If fetch failed (null), we skip flash sale pricing to avoid mismatch
-    const flashSaleMap = new Map();
-    if (activeFlashSales !== null) {
-      (activeFlashSales || []).forEach((sale) => {
-        flashSaleMap.set(sale.variant_id, sale.discount_percent);
-      });
-    }
-
-    const variantMap = new Map();
-
-    (latestProducts || []).forEach((product) => {
-      (product?.product_variants || []).forEach((variant) => {
-        variantMap.set(String(variant?.id || ""), {
-          product,
-          variant,
-        });
-      });
-    });
-
-    const canonicalItems = (items || []).map((item) => {
-      const variantId = String(item?.variant_id || "");
-      if (!variantId) {
-        throw new Error("Item keranjang tidak valid.");
-      }
-
-      const entry = variantMap.get(variantId);
-      if (!entry) {
-        throw new Error("Ada item yang sudah tidak tersedia.");
-      }
-
-      const productActive = entry.product?.is_active !== false;
-      const variantActive = entry.variant?.is_active !== false;
-      if (!productActive || !variantActive) {
-        throw new Error("Ada item nonaktif di keranjang.");
-      }
-
-      const safeQty = sanitizeQty(item?.qty);
-      let safePrice = Math.max(0, Number(entry.variant?.price_idr || 0));
-
-      // Apply flash sale discount to variant price (only if flash sales were fetched successfully)
-      const flashDiscount = flashSaleMap.get(variantId);
-      if (flashDiscount && flashDiscount > 0) {
-        safePrice = Math.round(safePrice * (1 - flashDiscount / 100));
-      } else if (activeFlashSales === null) {
-        // Flash sales fetch failed - use the price from cart to avoid mismatch
-        safePrice = Math.max(0, Number(item?.price_idr || safePrice));
-      }
-
-      return {
-        variant_id: entry.variant.id,
-        product_id: entry.product.id,
-        product_name: String(entry.product?.name || item?.product_name || ""),
-        variant_name: String(entry.variant?.name || item?.variant_name || ""),
-        duration_label: String(entry.variant?.duration_label || item?.duration_label || ""),
-        price_idr: safePrice,
-        product_icon_url: String(entry.product?.icon_url || item?.product_icon_url || ""),
-        description: String(entry.variant?.description || item?.description || ""),
-        guarantee_text: String(entry.variant?.guarantee_text || item?.guarantee_text || ""),
-        requires_buyer_email: !!entry.variant?.requires_buyer_email,
-        qty: safeQty,
-      };
-    });
-
-    if (!canonicalItems.length) {
-      throw new Error("Keranjang kosong.");
-    }
+    const live = await buildLiveCartItems(items);
+    const canonicalItems = live.items;
 
     const canonicalSubtotal = canonicalItems.reduce(
       (sum, item) => sum + Number(item.price_idr || 0) * Number(item.qty || 0),
@@ -920,13 +897,12 @@ export default function Pay() {
     let canonicalDiscountPercent = 0;
     const requestedPromo = String(promo?.code || "").trim().toUpperCase();
 
-    // Use the already-validated promo data from usePromo context.
-    // Do NOT call validate_promo RPC again here - it was already called in
-    // Checkout when the user applied the code. Calling it a second time
-    // caused a double-claim bug (slot decremented twice).
-    if (requestedPromo && Number(promo?.percent || 0) > 0) {
-      canonicalPromoCode = requestedPromo;
-      canonicalDiscountPercent = Number(promo.percent);
+    if (requestedPromo) {
+      const checked = await revalidate();
+      if (checked?.ok && Number(checked.percent) > 0) {
+        canonicalPromoCode = checked.code || requestedPromo;
+        canonicalDiscountPercent = Number(checked.percent);
+      }
     }
 
     const canonicalDiscount = Math.round((canonicalSubtotal * canonicalDiscountPercent) / 100);
@@ -1206,8 +1182,8 @@ export default function Pay() {
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
           <div className="pay-shell-copy hero-anim-wrap">
-            <h1 className="h1 pay-shell-title hero-anim-title">Bayar.</h1>
-            <p className="pay-shell-sub hero-anim-sub">Scan QRIS, konfirmasi, simpan ID - selesai.</p>
+            <p className="pay-shell-kicker">QRIS</p>
+            <h1 className="h1 pay-shell-title hero-anim-title">Bayar</h1>
           </div>
         </div>
 

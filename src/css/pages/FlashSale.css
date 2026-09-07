@@ -1,11 +1,11 @@
 /* ── Flash Sale Banner ─────────────────────────────────────────────────── */
 .flash-sale-banner {
   margin-bottom: 18px;
-  padding: 16px;
+  padding: 14px 16px 12px;
   border-radius: 24px;
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
+  border: 1px solid var(--brand-line, rgba(0, 158, 96, 0.16));
   background:
-    linear-gradient(135deg, rgba(0, 194, 208, 0.04), rgba(0, 194, 208, 0) 60%),
+    linear-gradient(135deg, rgba(0, 158, 96, 0.05), rgba(0, 158, 96, 0) 60%),
     var(--skeu-panel-bg);
   box-shadow: var(--skeu-panel-shadow);
   overflow: hidden;
@@ -163,7 +163,7 @@ html[data-theme="light"] .flash-sale-banner.is-urgent {
   display: block;
   height: 100%;
   border-radius: inherit;
-  background: linear-gradient(90deg, var(--accent, #00d6b4), #5ce0ff);
+  background: linear-gradient(90deg, #1ecf80, #009e60);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
 }
 

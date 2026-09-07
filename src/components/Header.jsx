@@ -11,6 +11,7 @@ import { useHeaderShrink } from "../hooks/useHeaderShrink";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { COMPACT_NAV_MEDIA } from "../lib/breakpoints";
 import { rafThrottle } from "../utils/throttle";
+import PromoTicker from "./PromoTicker";
 
 const HEADER_SHRINK_MS = 280;
 const NAV_LINKS = SITE_DESKTOP_NAV;
@@ -71,7 +72,7 @@ function ThemeToggleButton({ onToggle, isDark }) {
 
 export default function Header() {
   const { items, bumpToken } = useCart();
-  const isHeaderShrunk = useHeaderShrink();
+  useHeaderShrink();
   const { isDark, toggleTheme } = useTheme();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
   const isCompactNav = useIsMobile(COMPACT_NAV_MEDIA);
@@ -128,7 +129,7 @@ export default function Header() {
   useEffect(() => {
     const timer = window.setTimeout(updatePill, HEADER_SHRINK_MS + 20);
     return () => window.clearTimeout(timer);
-  }, [isHeaderShrunk, updatePill]);
+  }, [updatePill]);
   const [pillBump, setPillBump] = useState(false);
   const pillBumpTimerRef = useRef(null);
 
@@ -169,7 +170,8 @@ export default function Header() {
 
   return (
     <>
-      <header ref={headerRef} className={`header${isHeaderShrunk ? " is-shrunk" : ""}`}>
+      <header ref={headerRef} className="header is-shrunk">
+        <PromoTicker />
         <div className="container header-inner">
           <Link to="/" className="brand">
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />

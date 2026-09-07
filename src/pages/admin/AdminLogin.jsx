@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { KeyRound, LockKeyhole, ShieldCheck } from "lucide-react";
-import "../../css/pages/AdminGate.css";
 import "../../css/pages/AdminLogin.css";
 import { supabase } from "../../lib/supabaseClient";
 import { useNavigate, useSearchParams } from "react-router-dom";

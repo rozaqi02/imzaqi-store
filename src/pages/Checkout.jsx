@@ -111,9 +111,15 @@ export default function Checkout() {
   }, [cart.items]);
 
   useEffect(() => {
+    const scrollY = window.scrollY;
     document.body.classList.add("checkout-open");
+    document.body.style.top = `-${scrollY}px`;
     markCheckoutVisited();
-    return () => document.body.classList.remove("checkout-open");
+    return () => {
+      document.body.classList.remove("checkout-open");
+      document.body.style.top = "";
+      window.scrollTo(0, scrollY);
+    };
   }, []);
 
   useEffect(() => {
@@ -251,7 +257,7 @@ export default function Checkout() {
       return;
     }
 
-    nav("/bayar");
+    nav("/bayar", backgroundLocation ? { state: { backgroundLocation } } : {});
   }
 
   function renderPromoCard() {
@@ -359,8 +365,7 @@ export default function Checkout() {
 
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
-            <h1 className="h1 checkout-drawerTitle">Checkout.</h1>
-            <p className="checkout-drawerSub">Cek order dulu sebelum bayar.</p>
+            <h1 className="h1 checkout-drawerTitle">Checkout</h1>
           </div>
 
           <button

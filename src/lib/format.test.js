@@ -1,6 +1,62 @@
 import * as fc from "fast-check";
 import { describe, it, expect } from "vitest";
-import { asVariantList, getTimeline, normalizeProductRecord } from "./format";
+import {
+  asVariantList,
+  formatGuaranteeLabel,
+  getCatalogPriceRange,
+  getTimeline,
+  normalizeProductRecord,
+  packDisplayName,
+} from "./format";
+
+describe("getCatalogPriceRange", () => {
+  it("keeps unknown stock in the sellable pool", () => {
+    const range = getCatalogPriceRange([
+      { id: "a", price_idr: 22000, is_active: true },
+    ]);
+    expect(range.minPrice).toBe(22000);
+    expect(range.inStockCount).toBe(1);
+  });
+
+  it("uses in-stock prices and ignores empty packs", () => {
+    const range = getCatalogPriceRange([
+      { id: "a", price_idr: 22000, stock: 0, is_active: true },
+      { id: "b", price_idr: 120000, stock: 3, is_active: true },
+      { id: "c", price_idr: 49600, stock: 0, is_active: true },
+    ]);
+    expect(range.minPrice).toBe(120000);
+    expect(range.inStockCount).toBe(1);
+  });
+
+  it("applies flash sale only to the matching variant", () => {
+    const flash = new Map([["c", 38]]);
+    const range = getCatalogPriceRange([
+      { id: "b", price_idr: 120000, stock: 3, is_active: true },
+      { id: "c", price_idr: 80000, stock: 2, is_active: true },
+    ], flash);
+    expect(range.minPrice).toBe(Math.round(80000 * (1 - 0.38)));
+  });
+});
+
+describe("formatGuaranteeLabel", () => {
+  it("does not double the word Garansi", () => {
+    expect(formatGuaranteeLabel("Full Garansi")).toBe("Full Garansi");
+    expect(formatGuaranteeLabel("Garansi 6 Bulan")).toBe("Garansi 6 Bulan");
+    expect(formatGuaranteeLabel("6 Bulan")).toBe("Garansi 6 Bulan");
+  });
+});
+
+describe("packDisplayName", () => {
+  it("appends duration when the pack name is generic", () => {
+    const twins = [
+      { name: "Gemini Pro", duration_label: "18 Bulan" },
+      { name: "Gemini Pro", duration_label: "1 Tahun" },
+    ];
+    expect(packDisplayName(twins[0], twins)).toBe("Gemini Pro · 18 Bulan");
+    expect(packDisplayName({ name: "Sharing 1 Profil 2 User", duration_label: "28 Hari" }, twins)).toBe("Sharing 1 Profil 2 User");
+    expect(packDisplayName({ name: "Canva Pro (bulanan)", duration_label: "1 bulan" })).toBe("Canva Pro (bulanan)");
+  });
+});
 
 describe("asVariantList", () => {
   it("returns arrays only", () => {

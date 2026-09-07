@@ -24,6 +24,7 @@ import CatalogCardSkeleton from "../components/CatalogCardSkeleton";
 import CatalogFilterSidebar from "../components/CatalogFilterSidebar";
 import EmptyState from "../components/EmptyState";
 import FlashSaleBanner from "../components/FlashSaleBanner";
+import { CatalogHero } from "../components/StorefrontHero";
 import NumberCounter from "../components/NumberCounter";
 
 import { usePageMeta } from "../hooks/usePageMeta";
@@ -1008,140 +1009,136 @@ export default function Products() {
     <div className="page catalog-page">
       <section className="section catalog-hero">
         <div className="container">
-          <div className="catalog-heroGrid hero-anim-wrap">
-            <div className="catalog-eyebrow hero-anim-kicker">Katalog</div>
-            <h1 className="h1 catalog-title hero-anim-title">Mau langganan apa hari ini?</h1>
-            <p className="catalog-sub hero-anim-sub">Scroll dulu, gas aja kalo cocok.</p>
-          </div>
+          <FlashSaleBanner />
 
-          <div style={{ margin: "20px 0 24px" }}>
-            <FlashSaleBanner />
-          </div>
-
-          <div className="catalog-command">
-            <div className="catalog-commandSearch">
-              <div className="search-dropdown-anchor" ref={searchWrapRef}>
-              <div className="hero-search-shell catalog-heroSearch">
-                <span className="hero-search-icon" aria-hidden="true">
-                  <Search size={16} />
-                </span>
-                <TypewriterSearchInput
-                  ref={searchRef}
-                  className="input hero-search-input"
-                  value={query}
-                  words={SEARCH_QUERIES}
-                  onFocus={() => setSearchOpen(true)}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setSearchOpen(true);
-                    setActiveSuggestionIndex(-1);
-                  }}
-                  onKeyDown={(e) => {
-                    if (e.key === "ArrowDown" && searchSuggestions.length > 0) {
-                      e.preventDefault();
+          <CatalogHero
+            products={products}
+            loading={loading}
+            error={error}
+            productCount={insights.productCount}
+            readyCount={insights.readyVariantsCount}
+          >
+            <div className="catalog-heroSearchRow">
+              <div className="search-dropdown-anchor catalog-heroSearchWrap" ref={searchWrapRef}>
+                <div className="hero-search-shell catalog-heroSearch">
+                  <span className="hero-search-icon" aria-hidden="true">
+                    <Search size={16} />
+                  </span>
+                  <TypewriterSearchInput
+                    ref={searchRef}
+                    className="input hero-search-input"
+                    value={query}
+                    words={SEARCH_QUERIES}
+                    onFocus={() => setSearchOpen(true)}
+                    onChange={(e) => {
+                      setQuery(e.target.value);
                       setSearchOpen(true);
-                      setActiveSuggestionIndex((p) => (p >= searchSuggestions.length - 1 ? 0 : p + 1));
-                      return;
-                    }
-                    if (e.key === "ArrowUp" && searchSuggestions.length > 0) {
-                      e.preventDefault();
-                      setSearchOpen(true);
-                      setActiveSuggestionIndex((p) => (p <= 0 ? searchSuggestions.length - 1 : p - 1));
-                      return;
-                    }
-                    if (e.key === "Enter") {
-                      if (searchOpen && activeSuggestionIndex >= 0) {
-                        const pick = searchSuggestions[activeSuggestionIndex];
-                        if (pick) {
-                          e.preventDefault();
-                          applySearchTerm(pick);
-                        }
-                      } else if (query.trim()) {
-                        e.preventDefault();
-                        applySearchTerm(query);
-                      }
-                    }
-                    if (e.key === "Escape") {
-                      setSearchOpen(false);
-                      setActiveSuggestionIndex(-1);
-                    }
-                  }}
-                  role="combobox"
-                  aria-autocomplete="list"
-                  aria-expanded={searchOpen && searchSuggestions.length > 0}
-                  aria-controls={searchOpen && searchSuggestions.length > 0 ? catalogListboxId : undefined}
-                  aria-activedescendant={
-                    activeSuggestionIndex >= 0
-                      ? `${catalogListboxId}-option-${activeSuggestionIndex}`
-                      : undefined
-                  }
-                  aria-label="Cari produk"
-                />
-                {query ? (
-                  <button
-                    className="hero-search-clear"
-                    onClick={() => {
-                      setQuery("");
-                      setSearchOpen(false);
                       setActiveSuggestionIndex(-1);
                     }}
-                    type="button"
-                    aria-label="Hapus pencarian"
+                    onKeyDown={(e) => {
+                      if (e.key === "ArrowDown" && searchSuggestions.length > 0) {
+                        e.preventDefault();
+                        setSearchOpen(true);
+                        setActiveSuggestionIndex((p) => (p >= searchSuggestions.length - 1 ? 0 : p + 1));
+                        return;
+                      }
+                      if (e.key === "ArrowUp" && searchSuggestions.length > 0) {
+                        e.preventDefault();
+                        setSearchOpen(true);
+                        setActiveSuggestionIndex((p) => (p <= 0 ? searchSuggestions.length - 1 : p - 1));
+                        return;
+                      }
+                      if (e.key === "Enter") {
+                        if (searchOpen && activeSuggestionIndex >= 0) {
+                          const pick = searchSuggestions[activeSuggestionIndex];
+                          if (pick) {
+                            e.preventDefault();
+                            applySearchTerm(pick);
+                          }
+                        } else if (query.trim()) {
+                          e.preventDefault();
+                          applySearchTerm(query);
+                        }
+                      }
+                      if (e.key === "Escape") {
+                        setSearchOpen(false);
+                        setActiveSuggestionIndex(-1);
+                      }
+                    }}
+                    role="combobox"
+                    aria-autocomplete="list"
+                    aria-expanded={searchOpen && searchSuggestions.length > 0}
+                    aria-controls={searchOpen && searchSuggestions.length > 0 ? catalogListboxId : undefined}
+                    aria-activedescendant={
+                      activeSuggestionIndex >= 0
+                        ? `${catalogListboxId}-option-${activeSuggestionIndex}`
+                        : undefined
+                    }
+                    aria-label="Cari produk"
+                  />
+                  {query ? (
+                    <button
+                      className="hero-search-clear"
+                      onClick={() => {
+                        setQuery("");
+                        setSearchOpen(false);
+                        setActiveSuggestionIndex(-1);
+                      }}
+                      type="button"
+                      aria-label="Hapus pencarian"
+                    >
+                      <X size={14} />
+                    </button>
+                  ) : null}
+                </div>
+                {searchOpen && searchSuggestions.length > 0 ? (
+                  <div
+                    className="suggestions suggestions--animate catalog-searchSuggestions"
+                    role="listbox"
+                    id={catalogListboxId}
                   >
-                    <X size={14} />
-                  </button>
+                    {!query.trim() ? (
+                      <div className="catalog-searchHistoryHead">
+                        <span className="catalog-searchHistoryLabel">Pencarian terakhir</span>
+                        <button
+                          type="button"
+                          className="catalog-searchHistoryClear"
+                          onClick={() => {
+                            clearSearchHistory();
+                            setSearchSuggestions([]);
+                          }}
+                        >
+                          Hapus
+                        </button>
+                      </div>
+                    ) : null}
+                    {searchSuggestions.map((sug, idx) => (
+                      <button
+                        key={sug}
+                        id={`${catalogListboxId}-option-${idx}`}
+                        type="button"
+                        role="option"
+                        aria-selected={idx === activeSuggestionIndex}
+                        className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
+                        style={{ "--suggest-i": idx }}
+                        onMouseEnter={() => setActiveSuggestionIndex(idx)}
+                        onClick={() => applySearchTerm(sug)}
+                      >
+                        <Search size={13} />
+                        <span>{sug}</span>
+                      </button>
+                    ))}
+                  </div>
                 ) : null}
               </div>
-              {searchOpen && searchSuggestions.length > 0 ? (
-                <div
-                  className="suggestions suggestions--animate catalog-searchSuggestions"
-                  role="listbox"
-                  id={catalogListboxId}
-                >
-                  {!query.trim() ? (
-                    <div className="catalog-searchHistoryHead">
-                      <span className="catalog-searchHistoryLabel">Pencarian terakhir</span>
-                      <button
-                        type="button"
-                        className="catalog-searchHistoryClear"
-                        onClick={() => {
-                          clearSearchHistory();
-                          setSearchSuggestions([]);
-                        }}
-                      >
-                        Hapus
-                      </button>
-                    </div>
-                  ) : null}
-                  {searchSuggestions.map((sug, idx) => (
-                    <button
-                      key={sug}
-                      id={`${catalogListboxId}-option-${idx}`}
-                      type="button"
-                      role="option"
-                      aria-selected={idx === activeSuggestionIndex}
-                      className={`suggestion-item${idx === activeSuggestionIndex ? " is-active" : ""}`}
-                      style={{ "--suggest-i": idx }}
-                      onMouseEnter={() => setActiveSuggestionIndex(idx)}
-                      onClick={() => applySearchTerm(sug)}
-                    >
-                      <Search size={13} />
-                      <span>{sug}</span>
-                    </button>
-                  ))}
-                </div>
-              ) : null}
-              </div>
-            </div>
 
-            <div className="catalog-commandActions">
               <button
                 type="button"
-                className="btn btn-ghost catalog-filterBtn"
+                className="btn btn-ghost catalog-filterBtn catalog-heroFilterBtn"
                 onClick={openFilters}
+                aria-label={activeFiltersCount ? `Filter, ${activeFiltersCount} aktif` : "Filter"}
               >
                 <SlidersHorizontal size={16} />
-                <span>Filter</span>
                 {activeFiltersCount ? (
                   <span className="catalog-filterBtnCount" key={activeFiltersCount}>
                     {activeFiltersCount}
@@ -1149,7 +1146,7 @@ export default function Products() {
                 ) : null}
               </button>
             </div>
-          </div>
+          </CatalogHero>
         </div>
       </section>
 
@@ -1184,6 +1181,18 @@ export default function Products() {
 
           <div className="catalog-content">
             <div className="catalog-quickFilters" aria-label="Kategori toko">
+              <button
+                type="button"
+                className={`catalog-quickChip catalog-quickChip--filter catalog-filterBtn${activeFiltersCount ? " active" : ""}`}
+                onClick={openFilters}
+                aria-label={activeFiltersCount ? `Filter, ${activeFiltersCount} aktif` : "Filter"}
+              >
+                <SlidersHorizontal size={15} />
+                <span>Filter</span>
+                {activeFiltersCount ? (
+                  <em className="catalog-quickChipCount">{activeFiltersCount}</em>
+                ) : null}
+              </button>
               {quickFilters.map((item) => {
                 const Icon = item.Icon;
                 return (

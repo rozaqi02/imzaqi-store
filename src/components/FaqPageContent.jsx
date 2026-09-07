@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import "../css/pages/About.css";
+import "../css/support-surfaces.css";
+import "../css/pages/Faq.css";
 import {
   ChevronDown,
   CircleCheck,
@@ -12,7 +13,7 @@ import {
   Search,
   ShieldCheck,
   ShoppingBag,
-  Sparkles,
+  ArrowUpRight,
   X,
 } from "lucide-react";
 import { fetchSettings } from "../lib/api";
@@ -123,7 +124,7 @@ const FAQ_ITEMS = [
   {
     id: "support-channel",
     category: "support",
-    question: "Error/error, hubungi ke mana?",
+    question: "Ada kendala, hubungi ke mana?",
     answer: [
       "Pencet tombol Hubungi Admin di halaman bayar atau status.",
       "Sertain ID order biar ceknya cepet diproses.",
@@ -178,7 +179,7 @@ const CATEGORY_LABELS = Object.fromEntries(
 
 function faqMatches(item, query) {
   if (!query) return true;
-  const q = query.toLowerCase();
+  const q = query.trim().toLowerCase();
   const blob = [item.question, ...item.answer, ...(item.tags || [])].join(" ").toLowerCase();
   return blob.includes(q);
 }
@@ -187,22 +188,24 @@ function FaqItem({ item, open, onToggle }) {
   const categoryLabel = CATEGORY_LABELS[item.category] || "FAQ";
 
   return (
-    <article className={`faq-item${open ? " open" : ""}`}>
+    <article className={`help-item${open ? " open" : ""}`}>
       <button
         type="button"
-        className="faq-itemHead"
+        className="help-itemHead"
+        id={`faq-question-${item.id}`}
+        aria-controls={`faq-answer-${item.id}`}
         aria-expanded={open}
         onClick={() => onToggle(item.id)}
       >
-        <span className="faq-itemQuestion">
-          <span className="faq-itemCategory">{categoryLabel}</span>
+        <span className="help-itemQuestion">
+          <span className="help-itemCategory">{categoryLabel}</span>
           <span>{item.question}</span>
         </span>
         <ChevronDown size={17} />
       </button>
 
-      <div className="faq-itemBodyWrap" aria-hidden={!open}>
-        <div className="faq-itemBody">
+      <div id={`faq-answer-${item.id}`} className="help-itemBodyWrap" hidden={!open} role="region" aria-labelledby={`faq-question-${item.id}`}>
+        <div className="help-itemBody">
           {item.answer.map((line) => (
             <p key={line}>{line}</p>
           ))}
@@ -290,176 +293,53 @@ export default function FaqPageContent() {
     return `https://wa.me/${waNumber}?text=${message}`;
   }, [waNumber]);
 
-  const emptySuggestions = useMemo(
-    () => [
-      { key: "clear", label: "Hapus pencarian", onClick: () => handleQueryChange("") },
-      { key: "all", label: "Semua kategori", onClick: () => setActiveCategory("all") },
-      { key: "payment", label: "Bayar", onClick: () => setActiveCategory("payment") },
-      { key: "order", label: "Order", onClick: () => setActiveCategory("order") },
-    ],
-    []
-  );
-
   return (
-    <div className="page">
-      <section className="section faq-shell">
-        <div className="container faq-wrap">
-          <header className="faq-hero reveal is-visible hero-anim-wrap">
-            <div className="faq-heroCopy">
-              <div className="faq-kicker hero-anim-kicker">Pusat bantuan</div>
-              <h1 className="h1 faq-title hero-anim-title">Ada yang bingung?</h1>
-              <p className="faq-sub hero-anim-sub">
-                Bayar, order, produk, aktivasi - jawabannya ada di sini.
-              </p>
+    <div className="help-page">
+      <div className="help-wrap">
+        <header className="help-hero">
+          <div className="help-heroCopy">
+            <span className="help-eyebrow"><CircleHelp size={16} /> PUSAT BANTUAN</span>
+            <h1>Biar jelas.<br /><span>Biar tenang.</span></h1>
+            <p>Dari pilih paket sampai akun aktif. Temukan jawabanmu dan lanjut belanja tanpa bingung.</p>
+            <div className="help-search">
+              <Search size={21} aria-hidden="true" />
+              <input value={query} onChange={(e) => handleQueryChange(e.target.value)} placeholder="Cari QRIS, promo, aktivasi…" aria-label="Cari FAQ" type="search" />
+              {query && <button type="button" onClick={() => handleQueryChange("")} aria-label="Hapus pencarian"><X size={18} /></button>}
             </div>
-            <div className="faq-heroPill">
-              <CircleHelp size={16} />
-              <span>{filteredFaq.length} topik</span>
-            </div>
-          </header>
-
-          <section className="faq-howto reveal is-visible" aria-label="Cara pesan">
-            <div className="faq-howtoHead">
-              <div className="faq-kicker">Cara pesan</div>
-              <h2 className="faq-howtoTitle">4 langkah, gas!</h2>
-            </div>
-            <div className="faq-howtoSteps">
-              {HOWTO_STEPS.map((step) => {
-                const Icon = step.icon;
-                return (
-                  <Link key={step.num} className="faq-howtoStep" to={step.to}>
-                    <div className="faq-howtoNum">{step.num}</div>
-                    <div className="faq-howtoIcon" aria-hidden="true">
-                      <Icon size={22} />
-                    </div>
-                    <div className="faq-howtoCopy">
-                      <strong>{step.title}</strong>
-                      <p>{step.desc}</p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </section>
-
-          <section className="faq-command reveal is-visible">
-            <div className="faq-searchWrap">
-              <Search size={16} />
-              <input
-                className="input faq-searchInput"
-                value={query}
-                onChange={(e) => handleQueryChange(e.target.value)}
-                placeholder="Cari: QRIS, ID order, email, promo..."
-                aria-label="Cari FAQ"
-              />
-              {query ? (
-                <button
-                  type="button"
-                  className="faq-searchClear"
-                  onClick={() => handleQueryChange("")}
-                  aria-label="Hapus pencarian"
-                >
-                  <X size={14} />
-                </button>
-              ) : null}
-            </div>
-
-            <div className="faq-chips" role="tablist" aria-label="Filter kategori FAQ">
-              {FAQ_CATEGORIES.map((category) => {
-                const active = category.key === activeCategory;
-                const count = categoryCounts[category.key] || 0;
-                return (
-                  <button
-                    key={category.key}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    className={`faq-chip${active ? " active" : ""}`}
-                    onClick={() => setActiveCategory(category.key)}
-                  >
-                    {category.label}
-                    <span className="faq-chipCount">{count}</span>
-                  </button>
-                );
-              })}
-            </div>
-          </section>
-
-          <div className="faq-layout">
-            <main className="faq-main">
-              <div className="faq-listHead">
-                <div className="faq-listKicker">Hasil</div>
-                <div className="faq-listCount">{filteredFaq.length} pertanyaan</div>
-              </div>
-
-              {filteredFaq.length ? (
-                <div className="faq-list">
-                  {filteredFaq.map((item) => (
-                    <FaqItem
-                      key={item.id}
-                      item={item}
-                      open={item.id === openId}
-                      onToggle={handleToggle}
-                    />
-                  ))}
-                </div>
-              ) : (
-                <div className="faq-empty">
-                  <EmptyState
-                    icon={<PackageSearch size={28} />}
-                    title="Gak ada FAQ yang cocok"
-                    description="Coba kata kunci lain atau pilih kategori beda."
-                    suggestions={emptySuggestions}
-                    primaryAction={{
-                      label: "Lihat semua",
-                      onClick: () => {
-                        handleQueryChange("");
-                        setActiveCategory("all");
-                      },
-                    }}
-                  />
-                </div>
-              )}
-            </main>
-
-            <aside className="faq-side">
-              <article className="faq-sideCard reveal is-visible">
-                <div className="faq-sideHead">
-                  <Sparkles size={16} />
-                  <h3>Akses cepet</h3>
-                </div>
-                <div className="faq-sideActions">
-                  <Link className="btn btn-wide" to="/produk">
-                    Intip produk
-                  </Link>
-                  <Link className="btn btn-ghost btn-wide" to="/status">
-                    Cek status
-                  </Link>
-                  <a className="btn btn-ghost btn-wide" href={waUrl} target="_blank" rel="noreferrer">
-                    Hubungi admin
-                  </a>
-                </div>
-              </article>
-
-              <article className="faq-sideCard faq-sideCardAccent reveal is-visible">
-                <div className="faq-sideHead">
-                  <ShieldCheck size={16} />
-                  <h3>Butuh bantuan?</h3>
-                </div>
-                <ul className="faq-sideTips">
-                  <li>Simpen ID order abis bayar.</li>
-                  <li>Isi catatan kalo varian minta email aktivasi.</li>
-                  <li>Chat admin sertain ID order.</li>
-                </ul>
-                <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
-                  Chat admin
-                  <MessageCircle size={16} />
-                </a>
-              </article>
-            </aside>
+            <div className="help-popular"><span>Sering dicari:</span>{["QRIS", "ID order", "email"].map(term => <button key={term} type="button" onClick={() => { handleQueryChange(term); setActiveCategory("all"); }}>{term}</button>)}</div>
           </div>
+          <div className="help-heroAside">
+            <span className="help-asideLabel">BELANJA LEBIH NYAMAN</span>
+            <div className="help-heroSymbol" aria-hidden="true"><MessageCircle size={68} strokeWidth={1.4} /><span><CircleCheck size={26} /></span></div>
+            <h2>Ada jawaban.<br />Ada yang bantu.</h2>
+            <p>Cari panduan di sini, atau ngobrol langsung dengan admin.</p>
+            <a className="hx-btn-primary" href={waUrl} target="_blank" rel="noreferrer">Tanya admin <ArrowUpRight size={18} /></a>
+          </div>
+        </header>
+
+        <div className="help-workspace">
+          <aside className="help-sidebar">
+            <span className="help-eyebrow">JELAJAHI TOPIK</span>
+            <div className="help-categories" role="group" aria-label="Filter kategori FAQ">
+              {FAQ_CATEGORIES.map(category => <button key={category.key} type="button" aria-pressed={category.key === activeCategory} onClick={() => setActiveCategory(category.key)}><span>{category.label}</span>{" "}<span className="help-count">{categoryCounts[category.key] || 0}</span></button>)}
+            </div>
+            <Link className="help-orderLink" to="/status"><ClipboardList size={22} /><span><strong>Sudah punya order?</strong><small>Pantau status pesananmu</small></span><ArrowUpRight size={18} /></Link>
+          </aside>
+          <section className="help-answers" aria-labelledby="help-results-title">
+            <div className="help-listHead"><div><span className="help-eyebrow">JAWABAN UNTUKMU</span><h2 id="help-results-title">{query.trim() ? "Hasil pencarian" : activeCategory === "all" ? "Pertanyaan yang sering ditanya" : CATEGORY_LABELS[activeCategory]}</h2></div><span className="help-resultCount" role="status">{filteredFaq.length} pertanyaan</span></div>
+            {filteredFaq.length ? <div className="help-list">{filteredFaq.map(item => <FaqItem key={item.id} item={item} open={item.id === openId} onToggle={handleToggle} />)}</div> : <div className="help-empty"><PackageSearch size={38} /><h3>Jawabannya belum ketemu</h3><p>Coba kata kunci lain atau tampilkan semua topik.</p><button className="help-button" type="button" onClick={() => { handleQueryChange(""); setActiveCategory("all"); }}>Lihat semua pertanyaan</button></div>}
+          </section>
         </div>
-      </section>
+
+        <section className="help-howto" aria-labelledby="help-howto-title">
+          <div className="help-sectionHead"><div><span className="help-eyebrow">BARU PERTAMA BELANJA?</span><h2 id="help-howto-title">Dari pilih sampai siap pakai.</h2></div><Link to="/produk">Jelajahi produk <ArrowUpRight size={18} /></Link></div>
+          <div className="help-steps">{HOWTO_STEPS.map(step => { const Icon = step.icon; return <div className="help-step" key={step.num}><div className="help-stepTop"><Icon size={23} /><span>{step.num}</span></div><h3>{step.title}</h3><p>{step.desc}</p></div>; })}</div>
+        </section>
+
+        <section className="help-support" aria-labelledby="help-support-title">
+          <div className="help-supportIcon"><ShieldCheck size={30} /></div><div><span className="help-eyebrow">KAMI BANTU SAMPAI JELAS</span><h2 id="help-support-title">Masih ada yang mengganjal?</h2><p>Kirim ID order dan ceritakan kendalamu. Jangan bagikan password atau kode OTP saat meminta bantuan.</p></div><a className="help-button" href={waUrl} target="_blank" rel="noreferrer"><MessageCircle size={18} /> Chat admin</a>
+        </section>
+      </div>
     </div>
   );
 }

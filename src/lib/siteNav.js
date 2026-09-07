@@ -4,7 +4,7 @@ export const SITE_PRIMARY_NAV = [
   { to: "/", label: "Beranda", shortLabel: "Beranda" },
   { to: "/produk", label: "Katalog", shortLabel: "Katalog" },
   { to: "/faq", label: "FAQ", shortLabel: "FAQ" },
-  { to: "/testimoni", label: "Testimoni", shortLabel: "Testi" },
+  { to: "/testimoni", label: "Testimoni", shortLabel: "Ulasan" },
 ];
 
 export const SITE_DESKTOP_NAV = [
@@ -16,7 +16,7 @@ export const SITE_DESKTOP_NAV = [
 export const SITE_BOTTOM_NAV = [
   { to: "/", label: "Beranda", shortLabel: "Beranda" },
   { to: "/produk", label: "Katalog", shortLabel: "Katalog" },
-  { to: "/testimoni", label: "Testimoni", shortLabel: "Testi" },
+  { to: "/testimoni", label: "Testimoni", shortLabel: "Ulasan" },
   { to: "/status", label: "Cek Status", shortLabel: "Status" },
 ];
 

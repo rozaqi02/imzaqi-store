@@ -33,6 +33,7 @@ let mockSearchParamsValue = new URLSearchParams();
 jest.mock("react-router-dom", () => ({
   useSearchParams: () => [mockSearchParamsValue, mockSetSearchParams],
   useNavigate: () => jest.fn(),
+  Link: ({ children, to, ...props }) => <a href={to} {...props}>{children}</a>,
 }));
 
 jest.mock("../lib/log", () => ({

@@ -34,3 +34,4 @@
 
 /* Flash sale popup after neo depth so red CTA / kicker styles always win */
 @import "./components/FlashSalePopup.css";
+@import "./css/storefront-chrome.css";

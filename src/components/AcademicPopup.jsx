@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useFunnelRoute } from "../hooks/useFunnelRoute";
-import { BellOff, ShieldCheck, CheckCircle2, X } from "lucide-react";
+import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
+import { X } from "lucide-react";
 import { fetchProducts, fetchSettings } from "../lib/api";
 import { isAcademicProduct } from "../lib/productCategories";
-import { formatIDR, summarizeCatalogCopy } from "../lib/format";
+import { formatIDR, getCatalogPriceRange, summarizeCatalogCopy } from "../lib/format";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 
 const SUPPRESS_DATE_KEY = "imzaqi_academic_suppress_date_v1";
@@ -34,7 +34,7 @@ function wasHandledThisSession() {
 export default function AcademicPopup() {
   const navigate = useNavigate();
   const location = useLocation();
-  const isFunnel = useFunnelRoute();
+  const overlayBlocked = useStorefrontOverlayBlocked();
   const [isOpen, setIsOpen] = useState(false);
   const [academicItems, setAcademicItems] = useState([]);
   // Default aman: pop-up tidak boleh muncul sebelum setting admin berhasil dibaca.
@@ -88,8 +88,7 @@ export default function AcademicPopup() {
           const filtered = products.filter((p) => isAcademicProduct(p) && p.is_active !== false);
           const mapped = filtered.map((product) => {
             const variants = (product.product_variants || []).filter((v) => v.is_active !== false);
-            const prices = variants.map((v) => Number(v.price_idr || 0)).filter((n) => n > 0);
-            const minPrice = prices.length ? Math.min(...prices) : 0;
+            const minPrice = getCatalogPriceRange(variants).minPrice;
             return {
               id: product.id,
               name: product.name,
@@ -121,7 +120,15 @@ export default function AcademicPopup() {
 
   // 2. Schedule only after the persisted admin setting and product data are ready.
   useEffect(() => {
-    if (!settingsReady || isSuppressed || !isEnabled || isFunnel || wasHandledThisSession()) {
+    if (overlayBlocked) {
+      setIsOpen(false);
+      try {
+        window.__imzaqi_academic_popup_active = false;
+      } catch {}
+      return;
+    }
+
+    if (!settingsReady || isSuppressed || !isEnabled || wasHandledThisSession()) {
       notifyAcademicPopupClosed();
       return;
     }
@@ -134,7 +141,15 @@ export default function AcademicPopup() {
     }, 1500);
 
     return () => clearTimeout(timer);
-  }, [academicItems.length, isEnabled, isFunnel, isSuppressed, settingsReady]);
+  }, [academicItems.length, isEnabled, overlayBlocked, isSuppressed, settingsReady]);
+
+  useEffect(() => {
+    if (!overlayBlocked) return;
+    setIsOpen(false);
+    try {
+      window.__imzaqi_academic_popup_active = false;
+    } catch {}
+  }, [overlayBlocked]);
 
   // 3. Lock scroll when open
   useEffect(() => {
@@ -174,117 +189,79 @@ export default function AcademicPopup() {
   };
 
   useDialogA11y({
-    open: isOpen,
+    open: isOpen && !overlayBlocked,
     containerRef: modalRef,
     onClose: handleClose,
-    initialFocusSelector: ".ac-popup-closeBtn",
+    initialFocusSelector: ".ac-popup-closeFloat",
   });
 
-  if (!isOpen || !settingsReady || !isEnabled || isSuppressed || isFunnel || academicItems.length === 0) return null;
+  if (
+    overlayBlocked ||
+    !isOpen ||
+    !settingsReady ||
+    !isEnabled ||
+    isSuppressed ||
+    academicItems.length === 0
+  ) {
+    return null;
+  }
+
+  const featured = academicItems[0];
+  const extras = academicItems.slice(1, 4);
+  const featuredIcon = String(featured?.iconUrl || "").trim();
+
+  function goProduct(slug) {
+    setIsOpen(false);
+    notifyAcademicPopupClosed();
+    navigate(`/produk/${slug}`);
+  }
 
   return createPortal(
-    <div
-      className="ac-popup-backdrop"
-      onMouseDown={handleClose}
-      role="presentation"
-    >
+    <div className="ac-popup-backdrop" onMouseDown={handleClose} role="presentation">
       <div
         ref={modalRef}
-        className="ac-popup-modal"
+        className="ac-popup-stage"
         role="dialog"
         aria-modal="true"
         aria-labelledby="academic-popup-title"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        {/* Head */}
-        <div className="ac-popup-head">
-          <div className="ac-popup-titleBlock">
-            <h2 id="academic-popup-title" className="ac-popup-kicker">
-              <span>Jasa Akademik</span>
-            </h2>
-            <p className="ac-popup-sub">
-              Semua layanan akademik dikerjakan cepat, akurat, aman no repo, dan harga mahasiswa!
-            </p>
+        <button type="button" className="ac-popup-closeFloat" onClick={handleClose} aria-label="Tutup">
+          <X size={18} aria-hidden="true" />
+        </button>
+
+        <article className="ac-billboard">
+          <div className="ac-visual">
+            <div className="ac-visualIcon">
+              {featuredIcon ? (
+                <img src={featuredIcon} alt="" />
+              ) : (
+                <span>{String(featured.name || "A").slice(0, 1).toUpperCase()}</span>
+              )}
+            </div>
           </div>
-          <button type="button" className="ac-popup-closeBtn" onClick={handleClose} aria-label="Tutup pop-up Jasa Akademik">
-            <X size={18} aria-hidden="true" />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="ac-popup-body">
-          {academicItems.map((item) => {
-            const iconUrl = String(item.iconUrl || "").trim();
-            return (
-              <div key={item.id || item.slug} className="ac-popup-item">
-                <div className="ac-popup-itemMain">
-                  <div className="ac-popup-itemIcon">
-                    {iconUrl ? (
-                      <img src={iconUrl} alt={item.name} loading="lazy" />
-                    ) : (
-                      <span className="ac-popup-fallbackText">
-                        {String(item.name || "A").slice(0, 1).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="ac-popup-itemContent">
-                    <h3 className="ac-popup-itemName">{item.name}</h3>
-                  </div>
-                </div>
-
-                <div className="ac-popup-itemFooter">
-                  <span className="ac-popup-itemPrice">
-                    Mulai {item.formattedPrice}
-                  </span>
-                  <button
-                    type="button"
-                    className="ac-popup-actionBtn"
-                    onClick={() => {
-                      setIsOpen(false);
-                      notifyAcademicPopupClosed();
-                      navigate(`/produk/${item.slug}`);
-                    }}
-                  >
-                    Pesan
+          <div className="ac-copy">
+            <p className="ac-label">Jasa akademik</p>
+            <h2 id="academic-popup-title" className="ac-headline">{featured.name}</h2>
+            <p className="ac-meta">Mulai {featured.formattedPrice}</p>
+            <button type="button" className="ac-shop" onClick={() => goProduct(featured.slug)}>
+              Lihat paket
+            </button>
+            {extras.length ? (
+              <div className="ac-more">
+                {extras.map((item) => (
+                  <button key={item.id || item.slug} type="button" className="ac-moreChip" onClick={() => goProduct(item.slug)}>
+                    {item.name}
                   </button>
-                </div>
+                ))}
               </div>
-            );
-          })}
-        </div>
-
-        {/* Foot */}
-        <div className="ac-popup-foot">
-          {/* Trust Bar */}
-          <div className="ac-popup-trustBar">
-            <span>
-              <ShieldCheck size={13} /> Garansi Kerahasiaan File
-            </span>
-            <span>
-              <CheckCircle2 size={13} /> Pengerjaan Cepat
-            </span>
+            ) : null}
+            <div className="ac-quiet">
+              <button type="button" onClick={handleClose}>Nanti</button>
+              <button type="button" onClick={handleSuppressToday}>Jangan tampilkan hari ini</button>
+            </div>
           </div>
-
-          {/* Bottom Actions */}
-          <div className="ac-popup-actions">
-            <button
-              type="button"
-              className="ac-popup-suppressBtn"
-              onClick={handleSuppressToday}
-              title="Sembunyikan pemberitahuan ini sampai esok hari"
-            >
-              <BellOff size={13} strokeWidth={2.2} />
-              <span>Jangan ingatkan hari ini</span>
-            </button>
-            <button
-              type="button"
-              className="ac-popup-laterBtn"
-              onClick={handleClose}
-            >
-              Nanti Aja
-            </button>
-          </div>
-        </div>
+        </article>
       </div>
     </div>,
     document.body

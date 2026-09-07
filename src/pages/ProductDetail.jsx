@@ -1,25 +1,29 @@
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback, memo } from "react";
+import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import "../css/pages/ProductDetail.css";
 import {
+  ArrowDown,
   ArrowLeft,
   ChevronDown,
   Clock3,
   Flame,
   Info,
-  Mail,
+  LayoutGrid,
   MessageCircle,
   Share2,
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
   Sparkles,
+  UserRound,
+  Users,
 } from "lucide-react";
 
 import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts, fetchTopSellingData } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-import { asVariantList, formatIDR, normalizeProductRecord } from "../lib/format";
+import { asVariantList, formatGuaranteeLabel, formatIDR, getCatalogPriceRange, normalizeProductRecord, packDisplayName } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
@@ -32,9 +36,11 @@ import { fireConfetti } from "../components/Confetti";
 // ── Live viewer & countdown removed (fake data - hurts trust) ──────────────
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
-import { buildCatalogAdminWhatsAppUrl, resolveProductCategory } from "../lib/productCategories";
+import { buildCatalogAdminWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
 import ProductTile from "../components/ProductTile";
 import AccountTypeStrip from "../components/AccountTypeStrip";
+import RecentlyViewed from "../components/RecentlyViewed";
+import { addRecentlyViewed } from "../lib/recentlyViewed";
 
 function normalizeInlineText(text) {
   return String(text || "")
@@ -107,70 +113,102 @@ const SECTION_ICONS = {
 function VariantBenefitList({ rawText, variant }) {
   const [expanded, setExpanded] = useState(false);
   const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
+  const previewItems = useMemo(() => {
+    const items = [];
+    sections.forEach((section) => {
+      (section.items || []).forEach((item) => {
+        if (items.length < 3) items.push(item);
+      });
+    });
+    return items;
+  }, [sections]);
+  const extraItemCount = Math.max(
+    0,
+    sections.reduce((sum, section) => sum + (section.items?.length || 0), 0) - previewItems.length
+  );
 
-  // Build structured info rows from variant DB fields
   const infoRows = useMemo(() => {
     const rows = [];
-    if (variant?.duration_label) rows.push({ icon: Clock3, label: "Durasi", value: variant.duration_label });
-    if (variant?.guarantee_text) rows.push({ icon: ShieldCheck, label: "Garansi", value: variant.guarantee_text });
-    if (variant?.requires_buyer_email) rows.push({ icon: Mail, label: "Email buyer", value: "Wajib sertakan email aktif saat checkout" });
-    if (typeof variant?.stock === "number") rows.push({ icon: Sparkles, label: "Stok tersedia", value: `${variant.stock} unit` });
-    if (typeof variant?.sold_count === "number" && variant.sold_count > 0) rows.push({ icon: ShoppingBag, label: "Terjual", value: `${variant.sold_count}×` });
+    if (typeof variant?.sold_count === "number" && variant.sold_count > 0) {
+      rows.push({ icon: ShoppingBag, label: "Terjual", value: `${variant.sold_count}×` });
+    }
     return rows;
   }, [variant]);
 
-  const hasContent = infoRows.length > 0 || sections.length > 0;
+  const hasExtra = extraItemCount > 0;
+  if (!previewItems.length && !hasExtra) return null;
 
-  if (!hasContent) return null;
+  if (previewItems.length === 1 && !hasExtra) {
+    return <p className="pdx-packBlurb">{previewItems[0]}</p>;
+  }
 
   return (
     <div className="pdx-benefitList">
-      <button
-        type="button"
-        className={`pdx-benefitToggle-modern ${expanded ? "is-expanded" : ""}`}
-        onClick={(event) => {
-          event.stopPropagation();
-          setExpanded((current) => !current);
-        }}
-      >
-        <span>Deskripsi</span>
-        <ChevronDown size={15} className="pdx-benefitChevron" />
-      </button>
+      {previewItems.length ? (
+        <ul className="pdx-benefitItems pdx-benefitItems--preview">
+          {previewItems.map((item, index) => (
+            <li key={`${item}-${index}`} className="pdx-benefitItem">
+              <span className="pdx-benefitDot" aria-hidden="true" />
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
 
-      {expanded ? (
+      {hasExtra ? (
         <>
-          {infoRows.length > 0 ? (
-            <div className="pdx-infoRows">
-              {infoRows.map(({ icon: Icon, label, value }) => (
-                <div key={label} className="pdx-infoRow">
-                  <span className="pdx-infoRow-icon"><Icon size={13} /></span>
-                  <span className="pdx-infoRow-label">{label}</span>
-                  <span className="pdx-infoRow-value">{value}</span>
-                </div>
-              ))}
-            </div>
-          ) : null}
+          <button
+            type="button"
+            className={`pdx-benefitToggle-modern ${expanded ? "is-expanded" : ""}`}
+            onClick={(event) => {
+              event.stopPropagation();
+              setExpanded((current) => !current);
+            }}
+          >
+            <span>{expanded ? "Sembunyikan" : `+${extraItemCount} lagi`}</span>
+            <ChevronDown size={14} className="pdx-benefitChevron" />
+          </button>
 
-          {sections.map((section, si) => {
-            const SectionIcon = section.icon ? SECTION_ICONS[section.icon] || Info : null;
-            return (
-              <div key={si} className={`pdx-benefitSection ${section.label ? "has-label" : ""}`}>
-                {section.label ? (
-                  <div className={`pdx-benefitSectionLabel icon-${section.icon || "default"}`}>
-                    {SectionIcon ? <SectionIcon size={13} /> : null}
-                    <span>{section.label}</span>
-                  </div>
-                ) : null}
-                <ul className="pdx-benefitItems">
-                  {section.items.map((item, ii) => (
-                    <li key={ii} className="pdx-benefitItem">
-                      <span>{item}</span>
-                    </li>
+          {expanded ? (
+            <>
+              {infoRows.length > 0 ? (
+                <div className="pdx-infoRows">
+                  {infoRows.map(({ icon: Icon, label, value }) => (
+                    <div key={label} className="pdx-infoRow">
+                      <span className="pdx-infoRow-icon"><Icon size={13} /></span>
+                      <span className="pdx-infoRow-label">{label}</span>
+                      <span className="pdx-infoRow-value">{value}</span>
+                    </div>
                   ))}
-                </ul>
-              </div>
-            );
-          })}
+                </div>
+              ) : null}
+
+              {sections.map((section, si) => {
+                const SectionIcon = section.icon ? SECTION_ICONS[section.icon] || Info : null;
+                const remaining = (section.items || []).filter((item) => !previewItems.includes(item));
+                if (remaining.length === 0) return null;
+                return (
+                  <div key={si} className={`pdx-benefitSection ${section.label ? "has-label" : ""}`}>
+                    {section.label ? (
+                      <div className={`pdx-benefitSectionLabel icon-${section.icon || "default"}`}>
+                        {SectionIcon ? <SectionIcon size={13} /> : null}
+                        <span>{section.label}</span>
+                      </div>
+                    ) : null}
+                    {remaining.length ? (
+                      <ul className="pdx-benefitItems">
+                        {remaining.map((item, ii) => (
+                          <li key={ii} className="pdx-benefitItem">
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </>
+          ) : null}
         </>
       ) : null}
     </div>
@@ -182,7 +220,7 @@ function parseDays(label) {
   return match ? Number(match[1]) : 0;
 }
 
-function pickRecommendedVariant(variants) {
+function pickRecommendedVariant(variants, flashSaleMap) {
   const source = variants.filter((variant) => Number(variant?.stock || 0) > 0);
   const target = source.length ? source : variants;
   if (!target.length) return null;
@@ -190,7 +228,7 @@ function pickRecommendedVariant(variants) {
   return target
     .slice()
     .sort((a, b) => {
-      const priceDiff = Number(a?.price_idr || 0) - Number(b?.price_idr || 0);
+      const priceDiff = getVariantEffectivePrice(a, flashSaleMap) - getVariantEffectivePrice(b, flashSaleMap);
       if (priceDiff !== 0) return priceDiff;
 
       const dayDiff = parseDays(b?.duration_label) - parseDays(a?.duration_label);
@@ -200,25 +238,43 @@ function pickRecommendedVariant(variants) {
     })[0]?.id;
 }
 
-const VARIANT_SORTS = [
-  { id: "reco", label: "Rekomendasi" },
-  { id: "price_asc", label: "Termurah" },
-  { id: "price_desc", label: "Termahal" },
-  { id: "popular", label: "Terlaris" },
-  { id: "stock_desc", label: "Stok banyak" },
-];
-
-function getVariantEffectivePrice(variant, flashSaleMap) {
-  const base = Number(variant?.price_idr || 0);
-  const discount = flashSaleMap?.get?.(variant?.id);
-  if (discount && discount > 0) return Math.round(base * (1 - discount / 100));
-  return base;
+function pickTopSellerVariant(variants) {
+  const source = variants.filter((variant) => Number(variant?.stock || 0) > 0);
+  const target = source.length ? source : variants;
+  if (!target.length) return null;
+  const ranked = target
+    .slice()
+    .sort((a, b) => Number(b?.sold_count || 0) - Number(a?.sold_count || 0));
+  if (Number(ranked[0]?.sold_count || 0) <= 0) return null;
+  return ranked[0]?.id;
 }
 
-function formatPriceRange(min, max) {
-  if (!min && !max) return "-";
-  if (min && max && min !== max) return `${formatIDR(min)} – ${formatIDR(max)}`;
-  return formatIDR(min || max);
+const VARIANT_SORTS = [
+  { id: "reco", label: "Rekomendasi", icon: Sparkles },
+  { id: "price_asc", label: "Termurah", icon: ArrowDown },
+  { id: "popular", label: "Terlaris", icon: Flame },
+];
+
+const VARIANT_TAB_META = {
+  semua: { label: "Semua", icon: LayoutGrid },
+  bulanan: { label: "Bulanan", icon: Clock3 },
+  tahunan: { label: "Tahunan", icon: Clock3 },
+  lifetime: { label: "Lifetime", icon: Sparkles },
+  sharing: { label: "Sharing", icon: Users },
+  private: { label: "Private", icon: UserRound },
+  family: { label: "Family", icon: Users },
+  membership: { label: "Member", icon: ShoppingBag },
+  topup: { label: "Topup", icon: ShoppingBag },
+};
+
+function getVariantEffectivePrice(variant, flashSaleMap) {
+  const base = Number(variant?.price_idr);
+  const price = Number.isFinite(base) ? base : Number.POSITIVE_INFINITY;
+  const discount = Number(flashSaleMap?.get?.(variant?.id) || 0);
+  if (discount > 0 && Number.isFinite(price) && price !== Number.POSITIVE_INFINITY) {
+    return Math.round(price * (1 - discount / 100));
+  }
+  return price;
 }
 
 function classifyVariant(name) {
@@ -236,13 +292,6 @@ function classifyVariant(name) {
   return "lainnya";
 }
 
-function getProductCategory(name) {
-  const n = String(name || "").toLowerCase();
-  if (n.match(/netflix|youtube|spotify|disney|prime|wetv|viu|iqiyi|hbo/)) return "streaming";
-  if (n.match(/canva|chatgpt|capcut|midjourney|notion|office|zoom|github|copilot/)) return "productivity";
-  return "other";
-}
-
 function ProductDescription({ text }) {
   return (
     <div className="pdx-descBlock is-expanded">
@@ -251,16 +300,6 @@ function ProductDescription({ text }) {
       </p>
     </div>
   );
-}
-
-function StockPill({ stock }) {
-  const value = Number(stock ?? 0);
-  const safe = Number.isFinite(value) ? value : 0;
-
-  if (safe <= 0) return <span className="pdx-stockPill out">Abis</span>;
-
-  const tone = safe <= 5 ? "low" : safe <= 20 ? "mid" : "ok";
-  return <span className={`pdx-stockPill ${tone}`}>Stok {safe}</span>;
 }
 
 function LazyProductImage({ src, alt, className, fetchPriority }) {
@@ -306,9 +345,11 @@ function LazyProductImage({ src, alt, className, fetchPriority }) {
 
 const VariantCard = React.memo(({
   variant,
+  siblingVariants,
   isSelected,
   isAdded,
   isRecommended,
+  isTopSeller,
   flashDiscount,
   effectivePrice,
   descriptionBody,
@@ -346,25 +387,29 @@ const VariantCard = React.memo(({
     },
   };
 
-  const guaranteeLabel = variant.guarantee_text
-    ? String(variant.guarantee_text).toLowerCase().startsWith("garansi")
-      ? String(variant.guarantee_text)
-      : `Garansi ${variant.guarantee_text}`
-    : "";
+  const guaranteeLabel = formatGuaranteeLabel(variant.guarantee_text);
+  const durationLabel = String(variant.duration_label || "").replace(/^durasi\s+/i, "").trim();
+  const factItems = [
+    out ? "Habis" : `Stok ${stock}`,
+    durationLabel || null,
+    guaranteeLabel || null,
+    variant.requires_buyer_email ? "Perlu email" : null,
+  ].filter(Boolean);
 
   const cardChildren = (
     <>
       <div className="pdx-packHead">
-        {/* Row 1: name + price — never compete with long guarantee chips */}
         <div className="pdx-packTitleRow">
           <div className="pdx-packInfo">
-            {isRecommended ? (
+            {isTopSeller ? (
               <span className="pdx-packHot">
                 <Flame size={12} />
                 Paling Laris
               </span>
+            ) : isRecommended ? (
+              <span className="pdx-packHot pdx-packHot--value">Paling hemat</span>
             ) : null}
-            <h3 className="pdx-packName">{variant.name}</h3>
+            <h3 className="pdx-packName">{packDisplayName(variant, siblingVariants)}</h3>
           </div>
           <div className="pdx-packPriceWrap">
             {flashDiscount ? (
@@ -382,30 +427,13 @@ const VariantCard = React.memo(({
           </div>
         </div>
 
-        {/* Row 2: chips full width under title */}
-        <div className="pdx-packMeta">
-          <StockPill stock={variant.stock} />
-          {variant.duration_label ? (
-            <span className="pdx-packMetaItem">
-              <Clock3 size={12} aria-hidden="true" />
-              {String(variant.duration_label).toLowerCase().startsWith("durasi")
-                ? variant.duration_label
-                : `Durasi ${variant.duration_label}`}
-            </span>
-          ) : null}
-          {variant.requires_buyer_email ? (
-            <span className="pdx-packMetaItem pdx-packMetaItem--emailRequired">
-              <Mail size={12} aria-hidden="true" />
-              Butuh email
-            </span>
-          ) : null}
-          {guaranteeLabel ? (
-            <span className="pdx-packMetaItem pdx-packMetaItem--guarantee" title={guaranteeLabel}>
-              <ShieldCheck size={12} aria-hidden="true" />
-              <span className="pdx-packMetaItemText">{guaranteeLabel}</span>
-            </span>
-          ) : null}
-        </div>
+        {factItems.length ? (
+          <p className="pdx-packFacts">
+            {factItems.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </p>
+        ) : null}
       </div>
 
       <VariantBenefitList
@@ -425,7 +453,6 @@ const VariantCard = React.memo(({
           aria-label="Tambah ke keranjang"
         >
           <ShoppingCart size={14} />
-          <span className="pdx-addBtnLabel">Keranjang</span>
         </button>
         <button
           className={`btn btn-sm pdx-buyNowBtn ${out ? "btn-disabled" : ""}`}
@@ -505,6 +532,48 @@ function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
   );
 }
 
+function ProductDetailSkeleton() {
+  return (
+    <div className="page detail-page detail-page-v3" aria-busy="true" aria-live="polite" aria-label="Memuat detail produk">
+      <section className="section">
+        <div className="container">
+          <div className="pdx-layout">
+            <div className="pdx-mainGrid pdx-skeletonGrid">
+              <div className="pdx-leftCol">
+                <div className="pdx-skeletonBillboard">
+                  <div className="pdx-skel pdx-skeletonIcon" />
+                  <div className="pdx-skeletonCopy">
+                    <div className="pdx-skel pdx-skelLine w-24" />
+                    <div className="pdx-skel pdx-skelLine w-70" />
+                    <div className="pdx-skel pdx-skelLine w-44" />
+                    <div className="pdx-skel pdx-skelLine w-36" />
+                  </div>
+                </div>
+                <div className="pdx-skeletonTabs">
+                  <div className="pdx-skel pdx-skelChip" />
+                  <div className="pdx-skel pdx-skelChip" />
+                </div>
+                <div className="pdx-skel pdx-skelBlock" />
+              </div>
+              <div className="pdx-rightCol">
+                <div className="pdx-skel pdx-skelLine w-28" />
+                <div className="pdx-skeletonChips">
+                  <div className="pdx-skel pdx-skelChip" />
+                  <div className="pdx-skel pdx-skelChip" />
+                  <div className="pdx-skel pdx-skelChip" />
+                </div>
+                <div className="pdx-skel pdx-skelPack" />
+                <div className="pdx-skel pdx-skelPack" />
+                <div className="pdx-skel pdx-skelPack" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
+
 export default function ProductDetail() {
   const nav = useNavigate();
   const location = useLocation();
@@ -547,18 +616,7 @@ export default function ProductDetail() {
   const [selectedVariantId, setSelectedVariantId] = useState(null);
   const [addedVariantId, setAddedVariantId] = useState(null);
   const [compareOpen, setCompareOpen] = useState(false);
-  const [scrollProgress, setScrollProgress] = useState(0);
-
-  const handlePackScroll = (e) => {
-    const target = e.currentTarget;
-    const maxScroll = target.scrollWidth - target.clientWidth;
-    if (maxScroll > 0) {
-      const progress = Math.min(1, Math.max(0, target.scrollLeft / maxScroll));
-      setScrollProgress(progress);
-    }
-  };
   const addedFlashTimerRef = useRef(null);
-  const emojiTimersRef = useRef([]);
 
   usePageMeta({
     title: product?.name ? `${product.name} | Detail Produk` : "Detail Produk",
@@ -573,9 +631,9 @@ export default function ProductDetail() {
     if (existing) existing.remove();
 
     const activeVariants = asVariantList(product.product_variants).filter((v) => v?.is_active);
-    const prices = activeVariants.map((v) => Number(v.price_idr || 0)).filter((n) => n > 0);
-    const minPrice = prices.length ? Math.min(...prices) : 0;
-    const maxPrice = prices.length ? Math.max(...prices) : 0;
+    const range = getCatalogPriceRange(activeVariants, flashSaleMap);
+    const minPrice = range.minPrice;
+    const maxPrice = range.maxPrice;
     const totalStock = activeVariants.reduce((s, v) => s + Number(v.stock || 0), 0);
 
     const jsonld = {
@@ -604,7 +662,7 @@ export default function ProductDetail() {
     document.head.appendChild(script);
 
     return () => { document.getElementById("jsonld-product")?.remove(); };
-  }, [product]);
+  }, [product, flashSaleMap]);
 
   useEffect(() => {
     let alive = true;
@@ -679,27 +737,16 @@ export default function ProductDetail() {
 
   const categoryTabs = useMemo(() => {
     const tabs = new Set(variants.map((v) => classifyVariant(v.name)));
-    const tabArr = [{ id: "semua", label: "Semua" }];
-    const order = [
-      ["bulanan", "Bulanan"],
-      ["tahunan", "Tahunan"],
-      ["lifetime", "Lifetime"],
-      ["sharing", "Sharing"],
-      ["private", "Private"],
-      ["family", "Family"],
-      ["akun", "Akun"],
-      ["membership", "Member"],
-      ["topup", "Topup"],
-      ["promo", "Promo"],
-      ["lainnya", "Lainnya"],
-    ];
-    order.forEach(([id, label]) => {
-      if (tabs.has(id)) tabArr.push({ id, label });
+    const tabArr = [{ id: "semua", ...VARIANT_TAB_META.semua }];
+    Object.entries(VARIANT_TAB_META).forEach(([id, meta]) => {
+      if (id === "semua") return;
+      if (tabs.has(id)) tabArr.push({ id, ...meta });
     });
     return tabArr;
   }, [variants]);
 
-  const recommendedVariantId = useMemo(() => pickRecommendedVariant(variants), [variants]);
+  const recommendedVariantId = useMemo(() => pickRecommendedVariant(variants, flashSaleMap), [variants, flashSaleMap]);
+  const topSellerVariantId = useMemo(() => pickTopSellerVariant(variants), [variants]);
 
   const displayedVariants = useMemo(() => {
     const filtered =
@@ -707,54 +754,49 @@ export default function ProductDetail() {
         ? variants.slice()
         : variants.filter((v) => classifyVariant(v.name) === activeTab);
 
-    const inStockFirst = (a, b) => {
-      const aOut = Number(a?.stock || 0) <= 0 ? 1 : 0;
-      const bOut = Number(b?.stock || 0) <= 0 ? 1 : 0;
-      return aOut - bOut;
-    };
+    const inStockRank = (variant) => (Number(variant?.stock || 0) <= 0 ? 1 : 0);
+    const byOrder = (a, b) => (a.sort_order || 0) - (b.sort_order || 0);
 
-    const bySort = {
-      reco: (a, b) => {
+    return [...filtered].sort((a, b) => {
+      if (variantSort === "price_asc") {
+        const priceDiff =
+          getVariantEffectivePrice(a, flashSaleMap) - getVariantEffectivePrice(b, flashSaleMap);
+        if (priceDiff !== 0) return priceDiff;
+        return byOrder(a, b);
+      }
+
+      if (variantSort === "popular") {
+        const soldDiff = Number(b?.sold_count || 0) - Number(a?.sold_count || 0);
+        if (soldDiff !== 0) return soldDiff;
+        return (
+          getVariantEffectivePrice(a, flashSaleMap) - getVariantEffectivePrice(b, flashSaleMap) ||
+          byOrder(a, b)
+        );
+      }
+
+      const stockDiff = inStockRank(a) - inStockRank(b);
+      if (stockDiff !== 0) return stockDiff;
+      if (topSellerVariantId) {
+        if (a.id === topSellerVariantId) return -1;
+        if (b.id === topSellerVariantId) return 1;
+      }
+      if (recommendedVariantId) {
         if (a.id === recommendedVariantId) return -1;
         if (b.id === recommendedVariantId) return 1;
-        return (a.sort_order || 0) - (b.sort_order || 0);
-      },
-      price_asc: (a, b) =>
-        getVariantEffectivePrice(a, flashSaleMap) - getVariantEffectivePrice(b, flashSaleMap),
-      price_desc: (a, b) =>
-        getVariantEffectivePrice(b, flashSaleMap) - getVariantEffectivePrice(a, flashSaleMap),
-      popular: (a, b) => Number(b?.sold_count || 0) - Number(a?.sold_count || 0),
-      stock_desc: (a, b) => Number(b?.stock || 0) - Number(a?.stock || 0),
-    }[variantSort];
-
-    return filtered.sort((a, b) => {
-      if (variantSort !== "stock_desc") {
-        const stockDiff = inStockFirst(a, b);
-        if (stockDiff !== 0) return stockDiff;
       }
-      const diff = bySort ? bySort(a, b) : 0;
-      if (diff !== 0) return diff;
-      return (a.sort_order || 0) - (b.sort_order || 0);
+      return byOrder(a, b);
     });
-  }, [variants, activeTab, variantSort, recommendedVariantId, flashSaleMap]);
+  }, [variants, activeTab, variantSort, recommendedVariantId, topSellerVariantId, flashSaleMap]);
 
-  const summary = useMemo(() => {
-    const prices = variants
-      .map((variant) => {
-        const base = Number(variant?.price_idr || 0);
-        const flashDiscount = flashSaleMap.get(variant.id);
-        if (flashDiscount && flashDiscount > 0) {
-          return Math.round(base * (1 - flashDiscount / 100));
-        }
-        return base;
-      })
-      .filter((value) => Number.isFinite(value) && value > 0);
+  const summary = useMemo(() => getCatalogPriceRange(variants, flashSaleMap), [variants, flashSaleMap]);
 
-    return {
-      minPrice: prices.length ? Math.min(...prices) : 0,
-      maxPrice: prices.length ? Math.max(...prices) : 0,
-    };
-  }, [variants, flashSaleMap]);
+  useEffect(() => {
+    if (!product?.id) return;
+    addRecentlyViewed({
+      ...product,
+      _minPrice: summary.minPrice,
+    });
+  }, [product, summary.minPrice]);
 
   const soldTotal = useMemo(() => {
     if (product?.id && topSalesMap && topSalesMap[product.id] != null) {
@@ -763,31 +805,6 @@ export default function ProductDetail() {
     const allVars = asVariantList(product?.product_variants);
     return allVars.reduce((sum, v) => sum + Math.max(0, Number(v?.sold_count || 0)), 0);
   }, [product, topSalesMap]);
-
-  const liveViewers = null; // removed fake data
-  const [emojiFloats, setEmojiFloats] = useState([]);
-  const emojiCountsRef = useRef({});
-
-  const EMOJI_REACTIONS = ["\u2764\ufe0f","\ud83d\udd25","\ud83d\ude2e","\ud83d\udcaf"];
-  const EMOJI_STORAGE_KEY = product?.id ? `imzaqi_reactions_${product.id}` : null;
-
-  function handleEmojiReact(emoji) {
-    if (EMOJI_STORAGE_KEY) {
-      try {
-        const stored = JSON.parse(localStorage.getItem(EMOJI_STORAGE_KEY) || "{}");
-        stored[emoji] = (stored[emoji] || 0) + 1;
-        localStorage.setItem(EMOJI_STORAGE_KEY, JSON.stringify(stored));
-      } catch {}
-    }
-    const id = `${Date.now()}_${Math.random().toString(16).slice(2)}`;
-    setEmojiFloats((prev) => [...prev.slice(-12), { id, emoji }]);
-    // Track timer agar bisa di-cancel saat unmount
-    const t = setTimeout(() => {
-      setEmojiFloats((prev) => prev.filter((f) => f.id !== id));
-      emojiTimersRef.current = emojiTimersRef.current.filter((x) => x !== t);
-    }, 1200);
-    emojiTimersRef.current.push(t);
-  }
 
   const maxVariantStock = useMemo(
     () => variants.length > 0 ? Math.max(1, ...variants.map((v) => Number(v.stock || 0))) : 1,
@@ -807,19 +824,17 @@ export default function ProductDetail() {
     setSelectedVariantId((current) => {
       if (current && displayedVariants.some((variant) => variant.id === current)) return current;
       return (
+        displayedVariants.find((variant) => variant.id === topSellerVariantId)?.id ??
         displayedVariants.find((variant) => variant.id === recommendedVariantId)?.id ??
         displayedVariants[0]?.id ??
         null
       );
     });
-  }, [displayedVariants, recommendedVariantId]);
+  }, [displayedVariants, recommendedVariantId, topSellerVariantId]);
 
   useEffect(
     () => () => {
       if (addedFlashTimerRef.current) window.clearTimeout(addedFlashTimerRef.current);
-      // Clear semua emoji float timers saat unmount
-      emojiTimersRef.current.forEach((t) => window.clearTimeout(t));
-      emojiTimersRef.current = [];
     },
     []
   );
@@ -848,31 +863,48 @@ export default function ProductDetail() {
   const productCategory = useMemo(() => resolveProductCategory(product), [product]);
   const CategoryIcon = productCategory.icon;
 
+  const selectedVariant = useMemo(
+    () => displayedVariants.find((variant) => variant.id === selectedVariantId) || displayedVariants[0] || null,
+    [displayedVariants, selectedVariantId]
+  );
+  const selectedEffectivePrice = useMemo(() => {
+    if (!selectedVariant) return 0;
+    return getVariantEffectivePrice(selectedVariant, flashSaleMap);
+  }, [selectedVariant, flashSaleMap]);
+  const recommendedVariant = useMemo(
+    () => variants.find((variant) => variant.id === recommendedVariantId) || variants[0] || null,
+    [variants, recommendedVariantId]
+  );
+  const guaranteePreview = useMemo(() => {
+    const raw = String(recommendedVariant?.guarantee_text || "").trim();
+    if (!raw) return "Garansi replace";
+    return raw.toLowerCase().startsWith("garansi") ? raw : `Garansi ${raw}`;
+  }, [recommendedVariant]);
+
   const recommendations = useMemo(() => {
     if (!product || !allProducts.length) return [];
-    const currentCat = getProductCategory(product.name);
-    
+    const currentLine = resolveCatalogLine(product);
+    const currentCat = resolveProductCategory(product).key;
+
     return allProducts
-      .filter((p) => p.id !== product.id)
-      .map((p) => {
+      .filter((item) => item.id !== product.id)
+      .filter((item) => item?.is_active !== false)
+      .filter((item) => resolveCatalogLine(item) === currentLine)
+      .map((item) => {
         let score = 0;
-        const pCat = getProductCategory(p.name);
-        
-        // Category match
-        if (pCat === currentCat && currentCat !== "other") {
-          score += 10;
-        }
-        
-        // Sub-variant count / stock factor (favor active products with stock)
-        const variantsList = asVariantList(p.product_variants);
-        const activeVariants = variantsList.filter((v) => v.is_active);
-        const totalStock = activeVariants.reduce((sum, v) => sum + Number(v.stock || 0), 0);
-        const totalSold = activeVariants.reduce((sum, v) => sum + Number(v.sold_count || 0), 0);
-        
-        if (totalStock > 0) score += 5;
-        score += Math.min(5, totalSold * 0.01); // boost popular slightly
-        
-        return { product: p, score };
+        const itemCat = resolveProductCategory(item).key;
+        if (itemCat === currentCat && currentCat !== "other") score += 16;
+
+        const variantsList = asVariantList(item.product_variants);
+        const activeVariants = variantsList.filter((variant) => variant.is_active);
+        const totalStock = activeVariants.reduce((sum, variant) => sum + Number(variant.stock || 0), 0);
+        const totalSold = activeVariants.reduce((sum, variant) => sum + Number(variant.sold_count || 0), 0);
+
+        if (totalStock > 0) score += 6;
+        else score -= 4;
+        score += Math.min(8, totalSold * 0.02);
+
+        return { product: item, score };
       })
       .sort((a, b) => b.score - a.score)
       .slice(0, 5)
@@ -931,7 +963,6 @@ export default function ProductDetail() {
         title: "Pesanan Harus Terpisah",
         duration: 5000,
       });
-      alert(res.message);
       return false;
     }
 
@@ -987,22 +1018,7 @@ export default function ProductDetail() {
   }
 
   if (loading) {
-    return (
-      <div className="page detail-page detail-page-v3">
-        <section className="section">
-          <div className="container">
-            <div className="pdx-loading">
-              <div className="pdx-loadingLine w-34" />
-              <div className="pdx-loadingLine w-62" />
-              <div className="pdx-loadingGrid">
-                <div className="pdx-loadingBlock" />
-                <div className="pdx-loadingBlock" />
-              </div>
-            </div>
-          </div>
-        </section>
-      </div>
-    );
+    return <ProductDetailSkeleton />;
   }
 
   if (error || !product) {
@@ -1035,7 +1051,18 @@ export default function ProductDetail() {
           <div className="pdx-layout">
             <div className="pdx-mainGrid">
               <div className="pdx-leftCol">
-                <header className="pdx-topCard" style={{ "--brand-color": brandColor }}>
+                <header className="pdx-topCard pdx-billboard">
+                  <div className="pdx-visual">
+                    <div className="pdx-visualIcon">
+                      {icon ? (
+                        <img src={icon} alt="" fetchPriority="high" decoding="async" />
+                      ) : (
+                        <span>{String(product.name || "P").slice(0, 1).toUpperCase()}</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="pdx-copy">
                   <div className="pdx-toolbar">
                     <button type="button" className="pdx-backLink" onClick={goBackToCatalog}>
                       <ArrowLeft size={15} />
@@ -1049,22 +1076,9 @@ export default function ProductDetail() {
                     </div>
                   </div>
 
-                  <div className="pdx-heroMain">
-                    <div
-                      className="pdx-productIcon"
-                      style={{ "--brand-color": brandColor }}
-                    >
-                      {icon ? (
-                        <img src={icon} alt="" fetchPriority="high" decoding="async" />
-                      ) : (
-                        <span>{String(product.name || "P").slice(0, 1).toUpperCase()}</span>
-                      )}
-                    </div>
-
-                    <div className="pdx-heroContent">
                       <Link
                         to={`/produk?cats=${productCategory.key}`}
-                        className="pdx-categoryPill"
+                        className="pdx-label"
                         data-category={productCategory.key}
                         aria-label={`Lihat produk kategori ${productCategory.label}`}
                       >
@@ -1072,8 +1086,6 @@ export default function ProductDetail() {
                         <span>{productCategory.label}</span>
                       </Link>
                       <h1 className="pdx-title">{product.name}</h1>
-                    </div>
-                  </div>
 
                   <div className="pdx-statsStrip">
                     <div className="pdx-heroPrice">
@@ -1087,9 +1099,9 @@ export default function ProductDetail() {
                         <ShoppingBag size={13} />
                         {soldTotal} terjual
                       </span>
-                      <span className="pdx-heroStat">
+                      <span className="pdx-heroStat" title={guaranteePreview}>
                         <ShieldCheck size={13} />
-                        Garansi
+                        {guaranteePreview}
                       </span>
                     </div>
                     {adminWhatsAppUrl ? (
@@ -1104,6 +1116,7 @@ export default function ProductDetail() {
                       </a>
                     ) : null}
                   </div>
+                  </div>
                 </header>
 
                 <ProductInfoTabs
@@ -1117,16 +1130,12 @@ export default function ProductDetail() {
                 <AccountTypeStrip variants={variants} />
 
                 <div className="pdx-variantsHead">
-                  <div className="pdx-variantsHeadTop">
-                    <div className="pdx-eyebrow">Pilih paket</div>
-                    <div className="pdx-countBadge">{displayedVariants.length} opsi</div>
-                  </div>
                   <div className="pdx-variantsTitleRow">
-                    <h2 className="pdx-sectionTitle">Pilih Paket Terbaikmu</h2>
+                    <h2 className="pdx-sectionTitle">Paket</h2>
                     {variants.length > 1 ? (
                       <button className="pdx-compareBtn" type="button" onClick={() => setCompareOpen(true)}>
-                        <span className="pdx-compareIcon">⇄</span>
-                        <span>Bandingkan paket</span>
+                        <span className="pdx-compareIcon" aria-hidden="true">⇄</span>
+                        <span className="pdx-compareLabel">Bandingkan paket</span>
                       </button>
                     ) : null}
                   </div>
@@ -1134,40 +1143,49 @@ export default function ProductDetail() {
 
                 {variants.length > 1 ? (
                   <div className="pdx-sortBar">
-                    <span className="pdx-sortLabel">Urutkan</span>
                     <div className="pdx-filters pdx-sortFilters" role="toolbar" aria-label="Urutkan paket">
-                      {VARIANT_SORTS.map((sort) => (
-                        <button
-                          key={sort.id}
-                          type="button"
-                          onClick={() => setVariantSort(sort.id)}
-                          className={`pdx-filterChip ${variantSort === sort.id ? "is-active" : ""}`}
-                          aria-pressed={variantSort === sort.id}
-                        >
-                          {sort.label}
-                        </button>
-                      ))}
+                      {VARIANT_SORTS.map((sort) => {
+                        const active = variantSort === sort.id;
+                        const Icon = sort.icon;
+                        return (
+                          <button
+                            key={sort.id}
+                            type="button"
+                            onClick={() => setVariantSort(sort.id)}
+                            className={`pdx-filterChip ${active ? "is-active" : ""}`}
+                            aria-pressed={active}
+                          >
+                            {active && Icon ? <Icon size={14} strokeWidth={2.2} aria-hidden="true" /> : null}
+                            {sort.label}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 ) : null}
 
                 {categoryTabs.length > 2 ? (
                   <div className="pdx-filters" role="toolbar" aria-label="Kategori paket">
-                    {categoryTabs.map((tab) => (
-                      <button
-                        key={tab.id}
-                        type="button"
-                        onClick={() => setActiveTab(tab.id)}
-                        className={`pdx-filterChip ${activeTab === tab.id ? "is-active" : ""}`}
-                        aria-pressed={activeTab === tab.id}
-                      >
-                        {tab.label}
-                      </button>
-                    ))}
+                    {categoryTabs.map((tab) => {
+                      const active = activeTab === tab.id;
+                      const Icon = tab.icon;
+                      return (
+                        <button
+                          key={tab.id}
+                          type="button"
+                          onClick={() => setActiveTab(tab.id)}
+                          className={`pdx-filterChip ${active ? "is-active" : ""}`}
+                          aria-pressed={active}
+                        >
+                          {active && Icon ? <Icon size={14} strokeWidth={2.2} aria-hidden="true" /> : null}
+                          {tab.label}
+                        </button>
+                      );
+                    })}
                   </div>
                 ) : null}
 
-                <div className="pdx-packList" onScroll={handlePackScroll}>
+                <div className="pdx-packList" key={variantSort}>
                   {displayedVariants.length === 0 ? (
                     <div className="pdx-emptyCard">
                       <EmptyState
@@ -1190,7 +1208,7 @@ export default function ProductDetail() {
                       const stock = Number(variant.stock ?? 0);
                       const out = stock <= 0;
                       // Same card UI for 1-variant and multi-variant
-                      const isRecommended = variant.id === recommendedVariantId;
+                      const isRecommended = variant.id === recommendedVariantId || variant.id === topSellerVariantId;
                       const flashDiscount = flashSaleMap.get(variant.id);
                       const effectivePrice =
                         flashDiscount && flashDiscount > 0
@@ -1209,9 +1227,11 @@ export default function ProductDetail() {
                         <VariantCard
                           key={variant.id}
                           variant={variant}
+                          siblingVariants={variants}
                           isSelected={selectedVariantId === variant.id}
                           isAdded={addedVariantId === variant.id}
                           isRecommended={isRecommended}
+                          isTopSeller={variant.id === topSellerVariantId}
                           flashDiscount={flashDiscount}
                           effectivePrice={effectivePrice}
                           descriptionBody={descriptionBody}
@@ -1229,49 +1249,15 @@ export default function ProductDetail() {
                   )}
                 </div>
 
-                {displayedVariants.length > 1 ? (
-                  <div className="pdx-scrollHint">
-                    <div className="pdx-scrollPills">
-                      {displayedVariants.map((v, i) => (
-                        <span
-                          key={v.id}
-                          className={`pdx-scrollDot ${Math.round(scrollProgress * (displayedVariants.length - 1)) === i ? "is-active" : ""}`}
-                        />
-                      ))}
-                    </div>
-                    <div className="pdx-scrollText">
-                      <span>Geser untuk opsi paket lainnya</span>
-                      <span className="pdx-scrollArrow">→</span>
-                    </div>
-                  </div>
-                ) : null}
               </section>
             </div>
           </div>
 
-          {!caps.isMobile ? (
-            <div className="pdx-emojiReactions" aria-label="Reaksi produk">
-              {EMOJI_REACTIONS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  className="pdx-emojiBtn"
-                  onClick={() => handleEmojiReact(emoji)}
-                  aria-label={`Reaksi ${emoji}`}
-                >
-                  {emoji}
-                </button>
-              ))}
-              {emojiFloats.map((f) => (
-                <span key={f.id} className="pdx-emojiFloat" aria-hidden="true">{f.emoji}</span>
-              ))}
-            </div>
-          ) : null}
+          <RecentlyViewed currentProductId={product.id} />
 
           <section className="pdx-recommendations" ref={recommendationsRef} aria-label="Rekomendasi produk">
             <div className="pdx-recommendationsHead">
-              <div className="pdx-eyebrow">Mungkin kamu butuh</div>
-              <h2 className="pdx-sectionTitle">Rekomendasi lainnya</h2>
+              <h2 className="pdx-sectionTitle">Rekomendasi</h2>
             </div>
             {recommendations.length > 0 ? (
               <div className="product-grid-container grid-mode pdx-recommendationsGrid" role="list">
@@ -1293,6 +1279,44 @@ export default function ProductDetail() {
       flashSaleMap={flashSaleMap}
       onClose={() => setCompareOpen(false)}
     />
+
+    {selectedVariant && typeof document !== "undefined"
+      ? createPortal(
+          <div className={`pdx-mobileStickyCart is-buy${Number(selectedVariant.stock || 0) <= 0 ? " is-out" : ""}`}>
+            <div className="pdx-stickyCartInner pdx-stickyCartInner--buy">
+              <div className="pdx-stickyCartInfo">
+                <ShoppingBag size={18} aria-hidden="true" />
+                <div className="pdx-stickyCartText">
+                  <span className="pdx-stickyQty">{selectedVariant.name}</span>
+                  <span className="pdx-stickyPrice">{formatIDR(selectedEffectivePrice)}</span>
+                </div>
+              </div>
+              <div className="pdx-stickyBuyActions">
+                <button
+                  type="button"
+                  className="btn btn-ghost pdx-stickyAddBtn"
+                  disabled={Number(selectedVariant.stock || 0) <= 0}
+                  onClick={(event) => handleAdd(selectedVariant, 1, event)}
+                >
+                  <ShoppingCart size={15} />
+                  <span>Keranjang</span>
+                </button>
+                <button
+                  type="button"
+                  className="btn pdx-stickyCheckoutBtn"
+                  disabled={Number(selectedVariant.stock || 0) <= 0}
+                  onClick={(event) => {
+                    if (handleAdd(selectedVariant, 1, event)) goCheckout();
+                  }}
+                >
+                  {Number(selectedVariant.stock || 0) <= 0 ? "Habis" : "Beli"}
+                </button>
+              </div>
+            </div>
+          </div>,
+          document.body
+        )
+      : null}
   </div>
   );
 }
