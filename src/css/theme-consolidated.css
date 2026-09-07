@@ -5661,12 +5661,12 @@ html[data-theme="dark"] .detail-page .pdx-addBtn {
 
 /* Sticky Bottom Cart Mobile */
 .detail-page .pdx-mobileStickyCart {
-  display: none;
+  display: none !important;
 }
 
 @media (max-width: 768px) {
   .detail-page .pdx-mobileStickyCart {
-    display: block;
+    display: none !important;
     position: fixed;
     bottom: 16px;
     left: 16px;

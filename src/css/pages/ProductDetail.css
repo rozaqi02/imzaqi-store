@@ -4444,7 +4444,7 @@ html[data-theme="light"] .pdx-scrollArrow {
 }
 
 .pdx-mobileStickyCart {
-  display: none;
+  display: none !important;
 }
 
 .pdx-mobileStickyCart.is-out {
@@ -4459,7 +4459,7 @@ html[data-theme="light"] .pdx-scrollArrow {
 
 @media (max-width: 768px) {
   .pdx-mobileStickyCart {
-    display: block;
+    display: none !important;
     position: fixed;
     bottom: 16px;
     left: 16px;

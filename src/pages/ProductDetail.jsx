@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { createPortal } from "react-dom";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import "../css/pages/ProductDetail.css";
 import {
@@ -1279,44 +1278,6 @@ export default function ProductDetail() {
       flashSaleMap={flashSaleMap}
       onClose={() => setCompareOpen(false)}
     />
-
-    {selectedVariant && typeof document !== "undefined"
-      ? createPortal(
-          <div className={`pdx-mobileStickyCart is-buy${Number(selectedVariant.stock || 0) <= 0 ? " is-out" : ""}`}>
-            <div className="pdx-stickyCartInner pdx-stickyCartInner--buy">
-              <div className="pdx-stickyCartInfo">
-                <ShoppingBag size={18} aria-hidden="true" />
-                <div className="pdx-stickyCartText">
-                  <span className="pdx-stickyQty">{selectedVariant.name}</span>
-                  <span className="pdx-stickyPrice">{formatIDR(selectedEffectivePrice)}</span>
-                </div>
-              </div>
-              <div className="pdx-stickyBuyActions">
-                <button
-                  type="button"
-                  className="btn btn-ghost pdx-stickyAddBtn"
-                  disabled={Number(selectedVariant.stock || 0) <= 0}
-                  onClick={(event) => handleAdd(selectedVariant, 1, event)}
-                >
-                  <ShoppingCart size={15} />
-                  <span>Keranjang</span>
-                </button>
-                <button
-                  type="button"
-                  className="btn pdx-stickyCheckoutBtn"
-                  disabled={Number(selectedVariant.stock || 0) <= 0}
-                  onClick={(event) => {
-                    if (handleAdd(selectedVariant, 1, event)) goCheckout();
-                  }}
-                >
-                  {Number(selectedVariant.stock || 0) <= 0 ? "Habis" : "Beli"}
-                </button>
-              </div>
-            </div>
-          </div>,
-          document.body
-        )
-      : null}
   </div>
   );
 }
