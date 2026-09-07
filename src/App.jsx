@@ -200,8 +200,9 @@ function BoundedRoute({ pageName, children }) {
   return <PageErrorBoundary pageName={pageName}>{children}</PageErrorBoundary>;
 }
 
-function useCheckoutOverlayLocation(location) {
-  const backgroundLocation = location.state?.backgroundLocation || null;
+export function useCheckoutOverlayLocation(location) {
+  const isCheckout = location?.pathname === "/checkout";
+  const backgroundLocation = isCheckout ? (location.state?.backgroundLocation || null) : null;
   const useOverlay = Boolean(backgroundLocation);
   return {
     displayLocation: useOverlay ? backgroundLocation : location,

@@ -57,23 +57,40 @@ export function CatalogHero({
   );
 }
 
-export function StatusHero({ history = false }) {
+export function StatusHero({ history = false, hasOrder = false }) {
   return (
-    <header className="store-hero store-hero--status">
+    <header className={`store-hero store-hero--status${hasOrder ? " store-hero--hasOrder" : ""}`}>
       <div className="store-heroCopy">
-        <span className="store-heroEyebrow">{history ? <History size={16} /> : <PackageCheck size={16} />} {history ? "RIWAYAT PESANAN" : "PANTAU PESANANMU"}</span>
-        <h1>{history ? <>Pernah pesan?<br /><span>Temukan lagi.</span></> : <>Sudah pesan?<br /><span>Cek sampai beres.</span></>}</h1>
-        <p>{history ? "Lihat kembali order yang tersimpan di browser ini. Pilih pesanan untuk mengecek status terbarunya." : "Masukkan ID order untuk melihat perkembangan pesanan, detail pembayaran, dan informasi dari admin."}</p>
-        <div className="store-heroActions"><Link className="hx-btn-primary" to="/faq">Butuh panduan order? <ArrowUpRight size={17} /></Link></div>
-        <div className="store-statusTip"><ClipboardList size={18} /><span>{history ? "Riwayat mengikuti browser dan perangkat yang kamu gunakan." : "Siapkan ID order dari halaman konfirmasi pembayaran."}</span></div>
+        <span className="store-heroEyebrow">
+          {history ? <History size={14} /> : <PackageCheck size={14} />}
+          {history ? "RIWAYAT PESANAN" : "PANTAU PESANANMU"}
+        </span>
+        <h1>
+          {history ? (
+            <>Pernah pesan? <span>Temukan lagi.</span></>
+          ) : (
+            <>Sudah pesan? <span>Cek sampai beres.</span></>
+          )}
+        </h1>
+        <p>
+          {history
+            ? "Lihat kembali order yang tersimpan di browser perangkat ini."
+            : "Masukkan ID order untuk melihat perkembangan pesanan dan info dari admin."}
+        </p>
       </div>
-      <div className="store-statusArt">
-        <span className="store-artLabel">{history ? "CARA LIHAT RIWAYAT" : "CEK ORDER DALAM 3 LANGKAH"}</span>
-        <ol className="store-guideSteps">
-          {(history ? [["Buka riwayat", "Order tersimpan di browser ini."], ["Pilih pesanan", "Temukan order yang ingin dicek."], ["Lihat status", "Buka detail perkembangan order."]] : [["Siapkan ID order", "Salin dari konfirmasi pesanan."], ["Masukkan kode", "Gunakan kolom di bawah."], ["Lihat status", "Cek perkembangan pesananmu."]]).map(([title, text], index) => (
-            <li key={title}><span className="store-guideNumber" aria-hidden="true">{index === 2 ? <Check size={18} /> : `0${index + 1}`}</span><div><strong>{title}</strong><span>{text}</span></div></li>
-          ))}
-        </ol>
+
+      <div className="store-heroAside">
+        <Link className="hx-btn-primary store-statusBtn" to="/faq">
+          Panduan order <ArrowUpRight size={14} />
+        </Link>
+        <div className="store-statusTip">
+          <ClipboardList size={14} />
+          <span>
+            {history
+              ? "Riwayat tersimpan di perangkat ini."
+              : "Siapkan ID order dari konfirmasi pembayaran."}
+          </span>
+        </div>
       </div>
     </header>
   );

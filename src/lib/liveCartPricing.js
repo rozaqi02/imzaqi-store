@@ -65,7 +65,7 @@ export async function buildLiveCartItems(items) {
       duration_label: String(entry.variant?.duration_label || item?.duration_label || ""),
       price_idr: safePrice,
       product_icon_url: String(entry.product?.icon_url || item?.product_icon_url || ""),
-      description: String(entry.variant?.description || item?.description || ""),
+      description: String(entry.variant?.description || entry.product?.description || item?.description || ""),
       guarantee_text: String(entry.variant?.guarantee_text || item?.guarantee_text || ""),
       requires_buyer_email: !!entry.variant?.requires_buyer_email,
       stock: Number(entry.variant?.stock),

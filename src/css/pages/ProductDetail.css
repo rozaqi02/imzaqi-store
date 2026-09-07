@@ -2285,7 +2285,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
 }
 
 @media (max-width: 480px) {
-  .detail-page-v3 .pdx-topCard,
+  .detail-page-v3 .pdx-topCard:not(.pdx-billboard),
   .detail-page-v3 .pdx-variantsSection,
   .detail-page-v3 .pdx-packCard,
   .detail-page-v3 .pdx-infoTabsCard {
@@ -4299,7 +4299,7 @@ html[data-theme="light"] .pdx-scrollArrow {
     display: contents;
   }
 
-  .detail-page-v3 .pdx-topCard {
+  .detail-page-v3 .pdx-topCard:not(.pdx-billboard) {
     order: 1;
     padding: 14px !important;
   }

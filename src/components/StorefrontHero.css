@@ -114,9 +114,9 @@
   top: 50%;
   width: 350px;
   height: 190px;
-  transform: translateY(-50%) scale(1.05);
+  transform: translateY(-50%) scale(0.95);
   transform-origin: center right;
-  opacity: .38;
+  opacity: .35;
   pointer-events: none;
   mask-image: linear-gradient(to right, transparent 0%, #000 35%);
   -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 35%);
@@ -149,34 +149,42 @@
 @media (max-width: 1150px) {
   .catalog-productStack {
     right: -25px;
-    transform: translateY(-50%) scale(.95);
-    opacity: .35;
+    transform: translateY(-50%) scale(.88);
+    opacity: .32;
     mask-image: linear-gradient(to right, transparent 0%, #000 38%);
     -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%);
   }
 }
 @media (max-width: 960px) {
   .catalog-productStack {
-    top: 50%;
-    bottom: auto;
-    right: -35px;
-    transform-origin: center right;
-    transform: translateY(-50%) scale(1);
+    top: auto;
+    bottom: -10px;
+    right: -10px;
+    transform-origin: bottom right;
+    transform: scale(.72);
     opacity: .32;
-    mask-image: linear-gradient(to right, transparent 0%, #000 40%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 40%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%);
   }
 }
 @media (max-width: 600px) {
   .catalog-productStack {
-    top: 50%;
-    bottom: auto;
-    right: -45px;
-    transform-origin: center right;
-    transform: translateY(-50%) scale(1.04);
+    top: auto;
+    bottom: -10px;
+    right: -10px;
+    transform-origin: bottom right;
+    transform: scale(.62);
     opacity: .32;
-    mask-image: linear-gradient(to right, transparent 0%, #000 38%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%);
+    mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%);
+  }
+}
+@media (max-width: 380px) {
+  .catalog-productStack {
+    bottom: -10px;
+    right: -10px;
+    transform: scale(.54);
+    opacity: .30;
   }
 }
 
@@ -185,4 +193,144 @@
   aspect-ratio:1;
   border-radius:24px;
   object-fit:cover;
+}
+
+
+/* ── Revamped Status Hero: Zero Space Waste, Full-Size Typography ── */
+.store-hero.store-hero--status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 28px;
+  border-radius: 20px;
+  min-height: auto;
+  overflow: hidden;
+}
+
+.store-hero--status .store-heroCopy {
+  padding: 0;
+  display: grid;
+  gap: 5px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.store-hero--status .store-heroEyebrow {
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  gap: 6px;
+  color: var(--surface-accent);
+}
+
+.store-hero--status h1 {
+  margin: 0;
+  font-size: clamp(26px, 3.2vw, 34px);
+  line-height: 1.15;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--surface-text);
+}
+
+.store-hero--status h1 span {
+  color: var(--surface-accent);
+}
+
+.store-hero--status .store-heroCopy > p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--surface-muted);
+  max-width: 580px;
+}
+
+.store-hero--status .store-heroAside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.store-hero--status .store-statusBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 18px;
+  font-size: 13px;
+  font-weight: 800;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.store-hero--status .store-statusTip {
+  margin: 0;
+  padding: 7px 13px;
+  border-radius: 10px;
+  border: 1px solid var(--surface-line);
+  background: var(--surface-well);
+  box-shadow: var(--surface-inset);
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: var(--surface-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+}
+
+/* When viewing an active order: even cleaner and more compact */
+.store-hero.store-hero--status.store-hero--hasOrder {
+  padding: 16px 24px;
+}
+
+@media (max-width: 860px) {
+  .store-hero.store-hero--status {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 18px 20px;
+    gap: 16px;
+  }
+
+  .store-hero--status .store-heroAside {
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 10px;
+  }
+
+  .store-hero--status .store-statusBtn {
+    flex: 0 0 auto;
+  }
+}
+
+@media (max-width: 540px) {
+  .store-hero.store-hero--status {
+    padding: 16px;
+    border-radius: 16px;
+  }
+
+  .store-hero--status h1 {
+    font-size: 24px;
+  }
+
+  .store-hero--status .store-heroAside {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .store-hero--status .store-statusBtn {
+    justify-content: center;
+    width: 100%;
+  }
+
+  .store-hero--status .store-statusTip {
+    justify-content: center;
+    width: 100%;
+    white-space: normal;
+    text-align: center;
+  }
 }

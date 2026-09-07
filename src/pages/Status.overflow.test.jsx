@@ -30,6 +30,7 @@ const mockToast = {
 };
 let mockSearchParamsValue = new URLSearchParams();
 
+
 jest.mock("react-router-dom", () => ({
   useSearchParams: () => [mockSearchParamsValue, mockSetSearchParams],
   useNavigate: () => jest.fn(),
@@ -48,6 +49,7 @@ jest.mock("../lib/supabaseClient", () => ({
 
 jest.mock("../lib/api", () => ({
   fetchSettings: () => Promise.resolve({ whatsapp: { number: "6281234567890" } }),
+  fetchProducts: () => Promise.resolve([]),
 }));
 
 jest.mock("../context/ToastContext", () => ({

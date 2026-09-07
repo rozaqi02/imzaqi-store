@@ -13,6 +13,7 @@ import {
   Clock3,
   Copy,
   History,
+  Info,
   Mail,
   MessageSquareText,
   Package,
@@ -26,7 +27,7 @@ import {
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { formatIDR } from "../lib/format";
-import { fetchSettings } from "../lib/api";
+import { fetchSettings, fetchProducts } from "../lib/api";
 import {
   getOrderHistory,
   updateOrderHistoryStatus,
@@ -348,10 +349,37 @@ function TabCekStatus({ settings }) {
     };
   }, [order?.order_code, silentRefresh]);
 
+  const [products, setProducts] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+    fetchProducts({ useCache: true })
+      .then((list) => {
+        if (active && Array.isArray(list)) setProducts(list);
+      })
+      .catch(() => {});
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const productLookup = useMemo(() => {
+    const map = new Map();
+    products.forEach((p) => {
+      if (p.id) map.set(p.id, p);
+      if (p.name) map.set(String(p.name).toLowerCase().trim(), p);
+    });
+    return map;
+  }, [products]);
+
   const recentOrders = useMemo(() => {
     const all = getOrderHistory();
-    return all.slice(0, 3);
+    return all.slice(0, 4);
   }, []);
+
+  const otherRecentOrders = useMemo(() => {
+    return recentOrders.filter((r) => !order || r.order_code !== order.order_code);
+  }, [recentOrders, order]);
 
   const statusMeta = useMemo(() => getStatusMeta(order?.status), [order?.status]);
   const StatusIcon = statusMeta.icon;
@@ -364,61 +392,16 @@ function TabCekStatus({ settings }) {
     () => (order?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0),
     [order?.items]
   );
-  // Kalau subtotal 0, bar tetap kosong agar tidak menyesatkan
-  const paidRatioRaw = subtotalValue > 0
-    ? Math.round((totalValue / subtotalValue) * 100)
-    : 0;
-  const paidRatioBar = Math.max(4, paidRatioRaw);
-  const paidRatio = subtotalValue > 0 ? Math.min(100, paidRatioRaw) : 0;
-
-  const statusHint = useMemo(() => {
-    const val = order?.status;
-    if (val === "pending") return "Nunggu pembayaran QRIS";
-    if (val === "paid_reported") return "Nunggu konfirmasi admin";
-    if (val === "processing") return "Lagi diproses admin";
-    if (val === "done") return "Sukses, siap dipake";
-    if (val === "cancelled") return "Pesanan dibatalkan";
-    return "Status aktif";
-  }, [order?.status]);
-
-  const orderProgress = useMemo(() => {
-    const val = order?.status;
-    if (val === "done") return 100;
-    if (val === "processing") return 72;
-    if (val === "paid_reported") return 48;
-    if (val === "pending") return 24;
-    if (val === "cancelled") return 0;
-    return 12;
-  }, [order?.status]);
 
   const etaHint = useMemo(() => {
     const val = order?.status;
-    if (val === "pending") return "Estimasi: bayar dalam 30 menit agar tidak expired";
-    if (val === "paid_reported") return "Estimasi: konfirmasi admin ~15 menit";
-    if (val === "processing") return "Estimasi: akun dikirim ~5 menit";
-    if (val === "done") return "Order selesai - akun sudah dikirim";
-    if (val === "cancelled") return null;
+    if (val === "pending") return "Estimasi: Selesaikan pembayaran via QRIS dalam 30 menit agar pesanan tidak kedaluwarsa.";
+    if (val === "paid_reported") return "Estimasi: Pembayaran sedang diverifikasi admin (~15 menit).";
+    if (val === "processing") return "Estimasi: Admin sedang menyiapkan akun pesanan Anda (~5 menit).";
+    if (val === "done") return "Pesanan selesai — Detail akun telah dikirim. Selamat menikmati layanan kami!";
+    if (val === "cancelled") return "Pesanan ini telah dibatalkan.";
     return null;
   }, [order?.status]);
-
-  const statusIcon = useMemo(() => {
-    const val = order?.status;
-    if (val === "done") return CheckCircle2;
-    if (val === "processing") return Sparkles;
-    if (val === "cancelled") return XCircle;
-    return Clock3;
-  }, [order?.status]);
-
-  const totalHint = useMemo(() => {
-    return `${itemCount} item \u2022 Metode QRIS`;
-  }, [itemCount]);
-
-  const dateHint = useMemo(() => {
-    if (discountValue > 0) {
-      return `Hemat ${formatIDR(discountValue)} (Promo)`;
-    }
-    return "Metode QRIS Instant";
-  }, [discountValue]);
 
   const createdDateLabel = useMemo(() => formatDate(order?.created_at), [order?.created_at]);
 
@@ -471,119 +454,94 @@ function TabCekStatus({ settings }) {
         show={showCelebration}
         onDismiss={() => setShowCelebration(false)}
       />
-      {order ? (
-        <div className="st-statePillRow" aria-live="polite" aria-atomic="true">
-          <div className={`st-statePill is-${statusMeta.tone}`}>
-            <StatusIcon size={16} />
-            <span>{prettyStatus(order.status)}</span>
-          </div>
-          <div className="st-lastUpdated">
-            {refreshing ? <span className="st-refreshingDot" aria-hidden="true" /> : null}
-            {lastUpdatedLabel ? <span>Diperbarui {lastUpdatedLabel}</span> : null}
-            {!isTerminal ? (
-              <button
-                type="button"
-                className="st-refreshBtn"
-                onClick={() => silentRefresh(order.order_code)}
-                disabled={refreshing}
-                aria-label="Perbarui status"
-                title="Perbarui status"
-              >
-                <RefreshCw size={13} />
-              </button>
-            ) : null}
-          </div>
-          {isLiveStatus ? (
-            <p className="st-autoRefreshNote">Status diperbarui otomatis setiap 30 detik</p>
-          ) : null}
-        </div>
-      ) : null}
-
-      <section className="st-search">
-        <div className="st-searchHead">
-          <div>
-            <div className="st-kicker">ID order</div>
-            <h2 className="st-searchTitle">{order ? "Cari order lain" : "Masukin ID"}</h2>
-          </div>
-          <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
-            Tempel
-          </button>
-        </div>
-
-        <div className="st-searchRow">
-          <label className="st-inputWrap">
-            <Search size={16} />
-            <input
-              className="input st-input"
-              inputMode="search"
-              autoCapitalize="characters"
-              autoCorrect="off"
-              autoComplete="off"
-              spellCheck={false}
-              placeholder="IMZ-ABCD1234"
-              value={input}
-              onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") lookup(input);
-              }}
-            />
-          </label>
-
-          <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
-            {loading ? (
-              <>
-                <span className="st-checkSpinner" aria-hidden="true" />
-                Nyari...
-              </>
-            ) : "Cek status"}
-          </button>
-        </div>
-
-        <div className={`st-searchHint${message ? " is-error" : ""}`}>
-          {message || (order ? "Tap kartu ID untuk salin." : "Bisa pakai 8 karakter terakhir.")}
-        </div>
-      </section>
-
-      {recentOrders.length > 0 ? (
-        <section className="st-recent">
-          <div className="st-recentHead">
-            <History size={14} />
-            <span>Order terakhir</span>
-          </div>
-          <div className="st-recentList">
-            {recentOrders.map((r) => (
-              <button
-                key={r.order_code}
-                className="st-recentChip"
-                type="button"
-                onClick={() => {
-                  const code = r.order_code;
-                  setInput(code);
-                  lookup(code);
-                }}
-              >
-                <span className="st-recentCode">{r.order_code}</span>
-                {r.total_idr ? <span className="st-recentPrice">{formatIDR(r.total_idr)}</span> : null}
-              </button>
-            ))}
-          </div>
-        </section>
-      ) : null}
 
       {!order ? (
-        <section className="st-empty">
-          <div className="st-emptyBadge">ID</div>
-          <h2 className="st-emptyTitle">Belum ada order</h2>
-          <p className="st-emptyText">Tempel ID, status langsung muncul.</p>
-          <div className="st-emptyActions">
-            <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>
-              Tempel ID
-            </button>
-            <a className="btn" href={waUrl} target="_blank" rel="noreferrer">
-              Hubungi admin
-            </a>
-          </div>
-        </section>
+        <>
+          <section className="st-search">
+            <div className="st-searchHead">
+              <div>
+                <div className="st-kicker">ID order</div>
+                <h2 className="st-searchTitle">Masukin ID</h2>
+              </div>
+              <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
+                Tempel
+              </button>
+            </div>
+
+            <div className="st-searchRow">
+              <label className="st-inputWrap">
+                <Search size={16} />
+                <input
+                  className="input st-input"
+                  inputMode="search"
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="IMZ-ABCD1234"
+                  value={input}
+                  onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") lookup(input);
+                  }}
+                />
+              </label>
+
+              <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="st-checkSpinner" aria-hidden="true" />
+                    Nyari...
+                  </>
+                ) : "Cek status"}
+              </button>
+            </div>
+
+            <div className={`st-searchHint${message ? " is-error" : ""}`}>
+              {message || "Bisa pakai 8 karakter terakhir."}
+            </div>
+          </section>
+
+          {recentOrders.length > 0 ? (
+            <section className="st-recent">
+              <div className="st-recentHead">
+                <History size={14} />
+                <span>Order terakhir</span>
+              </div>
+              <div className="st-recentList">
+                {recentOrders.map((r) => (
+                  <button
+                    key={r.order_code}
+                    className="st-recentChip"
+                    type="button"
+                    onClick={() => {
+                      const code = r.order_code;
+                      setInput(code);
+                      lookup(code);
+                    }}
+                  >
+                    <span className="st-recentCode">{r.order_code}</span>
+                    {r.total_idr ? <span className="st-recentPrice">{formatIDR(r.total_idr)}</span> : null}
+                  </button>
+                ))}
+              </div>
+            </section>
+          ) : null}
+
+          <section className="st-empty">
+            <div className="st-emptyBadge">ID</div>
+            <h2 className="st-emptyTitle">Belum ada order</h2>
+            <p className="st-emptyText">Tempel ID pesanan Anda untuk melacak status proses pesanan.</p>
+            <div className="st-emptyActions">
+              <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>
+                Tempel ID
+              </button>
+              <a className="btn" href={waUrl} target="_blank" rel="noreferrer">
+                Hubungi admin
+              </a>
+            </div>
+          </section>
+        </>
       ) : (
         <div className="st-layout">
           {order.admin_note ? (
@@ -591,7 +549,7 @@ function TabCekStatus({ settings }) {
               <div className="st-cardHead">
                 <div>
                   <div className="st-kicker">Admin</div>
-                  <h2 className="st-cardTitle">Catatan</h2>
+                  <h2 className="st-cardTitle">Catatan & Akun</h2>
                 </div>
                 <button
                   type="button"
@@ -615,66 +573,100 @@ function TabCekStatus({ settings }) {
           ) : null}
 
           <main className="st-main">
-            <section className="st-metrics">
-              <InfoCard
-                label="Status"
-                value={prettyStatus(order.status)}
-                hint={statusHint}
-                tone={statusMeta.tone}
-                icon={statusIcon}
-              />
-
-              <button className="st-infoCard st-infoAction" type="button" onClick={copyOrderCode}>
-                <div className="st-infoCard-header" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", width: "100%" }}>
-                  <span>ID order</span>
-                  <Copy size={14} style={{ opacity: 0.8, color: "var(--st-muted)" }} />
+            {/* Header Ringkasan Pesanan Terpadu */}
+            <article className="st-card st-orderHeader">
+              <div className="st-orderHeader-top">
+                <div className="st-orderCodeWrap">
+                  <span className="st-kicker">ID Pesanan</span>
+                  <div className="st-orderCodeBadge">
+                    <strong className="st-orderCodeText">{order.order_code}</strong>
+                    <button
+                      type="button"
+                      className="st-copyCodeBtn"
+                      onClick={copyOrderCode}
+                      title="Salin ID Pesanan"
+                      aria-label="Salin ID Pesanan"
+                    >
+                      <Copy size={13} />
+                      <span>Salin</span>
+                    </button>
+                  </div>
                 </div>
-                <strong>{order.order_code}</strong>
-                <small>Tap buat salin ID</small>
-              </button>
 
-              <InfoCard
-                label="Total bayar"
-                value={formatIDR(totalValue)}
-                hint={totalHint}
-                icon={WalletCards}
-              />
-              <InfoCard
-                label="Tanggal"
-                value={createdDateLabel}
-                hint={dateHint}
-                icon={Calendar}
-              />
-            </section>
-
-            {order?.status && order.status !== "cancelled" ? (
-              <div className="st-progressBar" role="progressbar" aria-valuenow={orderProgress} aria-valuemin={0} aria-valuemax={100}>
-                <div className="st-progressBar-label">
-                  <span>Progress order</span>
-                  <span>{orderProgress}%</span>
-                </div>
-                <div className="st-progressBar-track">
-                  <div className="st-progressBar-fill" style={{ width: `${orderProgress}%` }} />
+                <div className="st-orderStatusWrap">
+                  <div className={`st-statePill is-${statusMeta.tone}`}>
+                    <StatusIcon size={15} />
+                    <span>{prettyStatus(order.status)}</span>
+                  </div>
+                  <div className="st-lastUpdated">
+                    {refreshing ? <span className="st-refreshingDot" aria-hidden="true" /> : null}
+                    {lastUpdatedLabel ? <span>Diperbarui {lastUpdatedLabel}</span> : null}
+                    {!isTerminal ? (
+                      <button
+                        type="button"
+                        className="st-refreshBtn"
+                        onClick={() => silentRefresh(order.order_code)}
+                        disabled={refreshing}
+                        aria-label="Perbarui status"
+                        title="Perbarui status"
+                      >
+                        <RefreshCw size={13} />
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
               </div>
-            ) : null}
 
-            {etaHint ? (
-              <div className="st-etaBanner" role="status">
-                <Clock3 size={14} />
-                <span>{etaHint}</span>
+              <div className="st-orderSummaryRow">
+                <div className="st-orderSummaryItem st-infoCard">
+                  <div className="st-summaryLabel">
+                    <Calendar size={13} />
+                    <span>Waktu Order</span>
+                  </div>
+                  <strong>{createdDateLabel}</strong>
+                </div>
+
+                <div className="st-orderSummaryItem st-infoCard">
+                  <div className="st-summaryLabel">
+                    <WalletCards size={13} />
+                    <span>Metode Bayar</span>
+                  </div>
+                  <strong>QRIS Instant</strong>
+                </div>
+
+                <div className="st-orderSummaryItem st-infoCard is-total">
+                  <div className="st-summaryLabel">
+                    <ShieldCheck size={13} />
+                    <span>Total Tagihan</span>
+                  </div>
+                  <strong>{formatIDR(totalValue)}</strong>
+                </div>
               </div>
-            ) : null}
 
+              {etaHint ? (
+                <div className={`st-orderEtaCallout is-${statusMeta.tone}`} role="status">
+                  <Clock3 size={15} />
+                  <span>{etaHint}</span>
+                </div>
+              ) : null}
+
+              {isLiveStatus ? (
+                <div className="st-liveHint">
+                  <span className="st-livePulse" />
+                  <span>Status diperbarui otomatis setiap 30 detik</span>
+                </div>
+              ) : null}
+            </article>
+
+            {/* Stepper Progress */}
             <article className="st-card st-flow">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Progres</div>
-                  <h2 className="st-cardTitle">Tahap</h2>
+                  <div className="st-kicker">Progres Pesanan</div>
+                  <h2 className="st-cardTitle">Tahap Pemrosesan</h2>
                 </div>
-                <div className={`st-statePill is-${statusMeta.tone}`}>
-                  <StatusIcon size={14} />
-                  <span>{prettyStatus(order.status)}</span>
+                <div className="st-cardIcon">
+                  <Activity size={16} />
                 </div>
               </div>
 
@@ -688,11 +680,12 @@ function TabCekStatus({ settings }) {
               </div>
             </article>
 
+            {/* Rincian Produk */}
             <article className="st-card st-items">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Order</div>
-                  <h2 className="st-cardTitle">Paket</h2>
+                  <div className="st-kicker">Rincian Paket ({itemCount} item)</div>
+                  <h2 className="st-cardTitle">Produk yang Dibeli</h2>
                 </div>
                 <div className="st-cardIcon">
                   <Package size={16} />
@@ -705,11 +698,14 @@ function TabCekStatus({ settings }) {
                   const guarantee = String(item?.guarantee_text || "").trim();
                   const variantName = String(item?.variant_name || "").trim();
                   const durationLabel = String(item?.duration_label || "").trim();
-                  const description = String(item?.description || "").trim();
+                  const matchedProduct =
+                    (item?.product_id ? productLookup.get(item.product_id) : null) ||
+                    (item?.product_name ? productLookup.get(String(item.product_name).toLowerCase().trim()) : null);
+                  const description = String(item?.description || matchedProduct?.description || "").trim();
                   const requiresEmail = !!item?.requires_buyer_email;
                   const itemTotal = Number(item.price_idr || 0) * Number(item.qty || 0);
-                  // Gunakan kombinasi variant_id + index sebagai key yang lebih stabil dari index saja
                   const itemKey = item?.variant_id ? `${item.variant_id}-${index}` : `item-${index}`;
+
                   return (
                     <div key={itemKey} className="st-itemRow st-itemRowDetailed">
                       <div className="st-itemHead">
@@ -752,20 +748,96 @@ function TabCekStatus({ settings }) {
                         ) : null}
                       </div>
 
-                      {description ? <div className="st-itemDesc">{description}</div> : null}
+                      {description ? (
+                        <div className="st-itemDesc">
+                          <div className="st-itemDescHeader">
+                            <Info size={13} />
+                            <span className="st-itemDescKicker">Deskripsi Produk</span>
+                          </div>
+                          <p className="st-itemDescText">{description}</p>
+                        </div>
+                      ) : null}
                     </div>
                   );
                 })}
               </div>
             </article>
+
+            {/* Pencarian Order Lain di Bagian Bawah */}
+            <section className="st-search st-search--bottom">
+              <div className="st-searchHead">
+                <div>
+                  <div className="st-kicker">Pencarian</div>
+                  <h2 className="st-searchTitle">Cari Order Lain</h2>
+                </div>
+                <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
+                  Tempel
+                </button>
+              </div>
+
+              <div className="st-searchRow">
+                <label className="st-inputWrap">
+                  <Search size={16} />
+                  <input
+                    className="input st-input"
+                    inputMode="search"
+                    autoCapitalize="characters"
+                    autoCorrect="off"
+                    autoComplete="off"
+                    spellCheck={false}
+                    placeholder="IMZ-ABCD1234"
+                    value={input}
+                    onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") lookup(input);
+                    }}
+                  />
+                </label>
+
+                <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
+                  {loading ? (
+                    <>
+                      <span className="st-checkSpinner" aria-hidden="true" />
+                      Nyari...
+                    </>
+                  ) : "Cek status"}
+                </button>
+              </div>
+
+              {otherRecentOrders.length > 0 ? (
+                <div className="st-recentOther">
+                  <div className="st-recentHead">
+                    <History size={13} />
+                    <span>Pesanan lain yang tersimpan di perangkat ini:</span>
+                  </div>
+                  <div className="st-recentList">
+                    {otherRecentOrders.map((r) => (
+                      <button
+                        key={r.order_code}
+                        className="st-recentChip"
+                        type="button"
+                        onClick={() => {
+                          const code = r.order_code;
+                          setInput(code);
+                          lookup(code);
+                        }}
+                      >
+                        <span className="st-recentCode">{r.order_code}</span>
+                        {r.total_idr ? <span className="st-recentPrice">{formatIDR(r.total_idr)}</span> : null}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </section>
           </main>
 
           <aside className="st-aside">
             <article className="st-card st-payCard">
               <div className="st-cardHead">
                 <div>
-                  <div className="st-kicker">Bayar</div>
-                  <h2 className="st-cardTitle">Total</h2>
+                  <div className="st-kicker">Ringkasan</div>
+                  <h2 className="st-cardTitle">Pembayaran</h2>
                 </div>
                 <div className="st-cardIcon">
                   <WalletCards size={16} />
@@ -777,54 +849,40 @@ function TabCekStatus({ settings }) {
                   <span>Subtotal</span>
                   <b>{formatIDR(subtotalValue)}</b>
                 </div>
-                <div className="st-payRow">
-                  <span>Potong</span>
-                  <b>{formatIDR(discountValue)}</b>
-                </div>
+                {discountValue > 0 ? (
+                  <div className="st-payRow is-discount">
+                    <span>Potongan Promo</span>
+                    <b className="st-discountVal">-{formatIDR(discountValue)}</b>
+                  </div>
+                ) : null}
                 <div className="st-payRow is-total">
-                  <span>Total</span>
+                  <span>Total Tagihan</span>
                   <b>{formatIDR(totalValue)}</b>
                 </div>
               </div>
-
-              <div className="st-payProgress">
-                <div
-                  className="st-payTrack"
-                  role="progressbar"
-                  aria-valuenow={paidRatio}
-                  aria-valuemin={0}
-                  aria-valuemax={100}
-                  aria-label={`Rasio bayar ${paidRatio}%`}
-                >
-                  <i style={{ width: `${paidRatioBar}%` }} />
-                </div>
-                <small>
-                  {subtotalValue > 0 ? `Rasio bayar ${paidRatio}%` : "Data harga belum tersedia"}
-                </small>
-              </div>
             </article>
 
-            <article className="st-card st-noteCard">
-              <div className="st-cardHead">
-                <div>
-                  <div className="st-kicker">Buyer</div>
-                  <h2 className="st-cardTitle">Catatan</h2>
+            {order.notes && order.notes.trim() ? (
+              <article className="st-card st-noteCard">
+                <div className="st-cardHead">
+                  <div>
+                    <div className="st-kicker">Catatan Pembeli</div>
+                    <h2 className="st-cardTitle">Pesan</h2>
+                  </div>
+                  <div className="st-cardIcon">
+                    <MessageSquareText size={16} />
+                  </div>
                 </div>
-                <div className="st-cardIcon">
-                  <MessageSquareText size={16} />
-                </div>
-              </div>
-              <div className={`st-noteBody${order.notes ? "" : " is-empty"}`}>
-                {order.notes || "Gak ada catatan customer."}
-              </div>
-            </article>
+                <div className="st-noteBody">{order.notes}</div>
+              </article>
+            ) : null}
 
             {order.promo_code ? (
               <article className="st-card st-promoCard">
                 <div className="st-cardHead">
                   <div>
                     <div className="st-kicker">Promo</div>
-                    <h2 className="st-cardTitle">Kode</h2>
+                    <h2 className="st-cardTitle">Kode Promo</h2>
                   </div>
                   <div className="st-cardIcon">
                     <BadgePercent size={16} />
@@ -841,23 +899,20 @@ function TabCekStatus({ settings }) {
               <div className="st-cardHead">
                 <div>
                   <div className="st-kicker">Bantuan</div>
-                  <h2 className="st-cardTitle">Admin</h2>
+                  <h2 className="st-cardTitle">Admin Store</h2>
                 </div>
                 <div className="st-cardIcon">
                   <Sparkles size={16} />
                 </div>
               </div>
 
-              <p className="st-helpText">Kirim ID order ke admin kalau ada kendala.</p>
+              <p className="st-helpText">Ada kendala atau butuh aktivasi lebih cepat? Hubungi admin resmi via WhatsApp.</p>
 
               <div className="st-helpActions">
                 <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
-                  Hubungi admin
+                  <span>Hubungi Admin WA</span>
                   <ArrowUpRight size={15} />
                 </a>
-                <button className="btn btn-ghost btn-wide" type="button" onClick={copyOrderCode}>
-                  Salin ID
-                </button>
               </div>
             </article>
           </aside>
@@ -1137,7 +1192,7 @@ export default function Status() {
     <div className="page status-page">
       <section className="section status-shell">
         <div className="container st-wrap">
-          <StatusHero history={activeTab === "riwayat"} />
+          <StatusHero history={activeTab === "riwayat"} hasOrder={activeTab === "cek" && Boolean(searchParams.get("order"))} />
 
           {activeTab === "cek" ? (
             <div className="st-checkoutSteps">

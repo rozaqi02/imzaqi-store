@@ -1134,7 +1134,7 @@ export default function Products() {
 
               <button
                 type="button"
-                className="btn btn-ghost catalog-filterBtn catalog-heroFilterBtn"
+                className={`btn btn-ghost catalog-filterBtn catalog-heroFilterBtn${activeFiltersCount ? " active" : ""}`}
                 onClick={openFilters}
                 aria-label={activeFiltersCount ? `Filter, ${activeFiltersCount} aktif` : "Filter"}
               >
@@ -1181,18 +1181,6 @@ export default function Products() {
 
           <div className="catalog-content">
             <div className="catalog-quickFilters" aria-label="Kategori toko">
-              <button
-                type="button"
-                className={`catalog-quickChip catalog-quickChip--filter catalog-filterBtn${activeFiltersCount ? " active" : ""}`}
-                onClick={openFilters}
-                aria-label={activeFiltersCount ? `Filter, ${activeFiltersCount} aktif` : "Filter"}
-              >
-                <SlidersHorizontal size={15} />
-                <span>Filter</span>
-                {activeFiltersCount ? (
-                  <em className="catalog-quickChipCount">{activeFiltersCount}</em>
-                ) : null}
-              </button>
               {quickFilters.map((item) => {
                 const Icon = item.Icon;
                 return (

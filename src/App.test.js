@@ -23,3 +23,37 @@ describe("order code", () => {
     expect(code).toMatch(/^IMZ-[A-Z2-9]{4}$/);
   });
 });
+
+import { useCheckoutOverlayLocation } from "./App";
+
+describe("useCheckoutOverlayLocation", () => {
+  test("activates overlay when on /checkout with backgroundLocation", () => {
+    const bg = { pathname: "/produk", search: "" };
+    const loc = { pathname: "/checkout", state: { backgroundLocation: bg } };
+    const res = useCheckoutOverlayLocation(loc);
+    expect(res.showCheckoutOverlay).toBe(true);
+    expect(res.displayLocation).toBe(bg);
+  });
+
+  test("does not activate overlay when on /checkout without backgroundLocation", () => {
+    const loc = { pathname: "/checkout", state: null };
+    const res = useCheckoutOverlayLocation(loc);
+    expect(res.showCheckoutOverlay).toBe(false);
+    expect(res.displayLocation).toBe(loc);
+  });
+
+  test("does not activate overlay on /bayar even if backgroundLocation is present", () => {
+    const bg = { pathname: "/produk", search: "" };
+    const loc = { pathname: "/bayar", state: { backgroundLocation: bg } };
+    const res = useCheckoutOverlayLocation(loc);
+    expect(res.showCheckoutOverlay).toBe(false);
+    expect(res.displayLocation).toBe(loc);
+  });
+
+  test("does not activate overlay on storefront or other pages", () => {
+    const loc = { pathname: "/", state: null };
+    const res = useCheckoutOverlayLocation(loc);
+    expect(res.showCheckoutOverlay).toBe(false);
+    expect(res.displayLocation).toBe(loc);
+  });
+});

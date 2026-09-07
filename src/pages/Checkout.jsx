@@ -49,6 +49,8 @@ const desktopDrawerVariantsLite = {
 export default function Checkout() {
   const nav = useNavigate();
   const location = useLocation();
+  const backgroundLocation = location.state?.backgroundLocation;
+  const isDrawerCheckout = Boolean(backgroundLocation);
   const cart = useCart();
   const { promo, apply, clear } = usePromo();
   const toast = useToast();
@@ -111,6 +113,10 @@ export default function Checkout() {
   }, [cart.items]);
 
   useEffect(() => {
+    if (!isDrawerCheckout) {
+      markCheckoutVisited();
+      return undefined;
+    }
     const scrollY = window.scrollY;
     document.body.classList.add("checkout-open");
     document.body.style.top = `-${scrollY}px`;
@@ -118,9 +124,11 @@ export default function Checkout() {
     return () => {
       document.body.classList.remove("checkout-open");
       document.body.style.top = "";
-      window.scrollTo(0, scrollY);
+      if (window.location.pathname === (backgroundLocation?.pathname || "")) {
+        window.scrollTo(0, scrollY);
+      }
     };
-  }, []);
+  }, [backgroundLocation?.pathname, isDrawerCheckout]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -165,8 +173,6 @@ export default function Checkout() {
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
   const hasStockIssue = useMemo(() => cart.items.some((item) => stockWarnings[item.variant_id]), [cart.items, stockWarnings]);
   const stockDisabledReason = hasStockIssue ? "Ada item yang stoknya abis atau kurang" : null;
-  const backgroundLocation = location.state?.backgroundLocation;
-  const isDrawerCheckout = Boolean(backgroundLocation);
 
   const requestClose = useCallback(() => {
     setClosing((prev) => (prev ? prev : true));
@@ -257,7 +263,7 @@ export default function Checkout() {
       return;
     }
 
-    nav("/bayar", backgroundLocation ? { state: { backgroundLocation } } : {});
+    nav("/bayar");
   }
 
   function renderPromoCard() {

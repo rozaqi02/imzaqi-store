@@ -170,7 +170,7 @@ html[data-theme="dark"] .ac-shop {
   .ac-visual { min-height: 180px; }
   .ac-visualIcon { width: 112px; height: 112px; border-radius: 28px; }
   .ac-copy { padding: 22px; }
-  .ac-popup-closeFloat { top: 10px; right: 10px; }
+  .ac-popup-closeFloat { top: -12px; right: -8px; }
 }
 
 .ac-popup-backdrop {

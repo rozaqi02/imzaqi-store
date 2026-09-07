@@ -290,8 +290,8 @@ html[data-theme="dark"] .fsp-shop {
   }
 
   .fsp-closeFloat {
-    top: 10px;
-    right: 10px;
+    top: -12px;
+    right: -8px;
   }
 }
 
