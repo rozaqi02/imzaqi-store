@@ -1,9 +1,8 @@
 .reviews-page {
-  background:#101715;
+  background:transparent;
   color:var(--surface-text);
   padding:calc(var(--site-header-offset, 0px) + 38px) 24px 72px;
 }
-html[data-theme="light"] .reviews-page { background:#f5f7f4; }
 .reviews-wrap { max-width:1160px; margin:0 auto; }
 .reviews-page *, .reviews-lightbox * { box-sizing:border-box; }
 .reviews-page :is(h1,h2,h3,p), .reviews-lightbox :is(h2,p) { margin:0; }

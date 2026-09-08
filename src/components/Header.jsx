@@ -173,7 +173,18 @@ export default function Header() {
       <header ref={headerRef} className="header is-shrunk">
         <PromoTicker />
         <div className="container header-inner">
-          <Link to="/" className="brand">
+          <div className="header-mobile-left">
+            <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+            {canAccessAdmin ? (
+              <AdminHeaderLink
+                to="/admin/dashboard"
+                isActive={isOnAdminRoute}
+                title="Admin Dashboard"
+              />
+            ) : null}
+          </div>
+
+          <Link to="/" className="brand" aria-label="Beranda Imzaqi Store">
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
           </Link>
 
@@ -206,7 +217,7 @@ export default function Header() {
             <div className="header-cart-container">
               <Link
                 to="/checkout"
-                state={{ backgroundLocation: location }}
+                state={location.pathname === "/checkout" ? undefined : { backgroundLocation: location }}
                 className="header-cart"
                 aria-label={
                   cartCount > 0
@@ -223,31 +234,16 @@ export default function Header() {
               </Link>
             </div>
 
-            {isCompactNav ? (
-              <>
-                <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-                {canAccessAdmin ? (
-                  <AdminHeaderLink
-                    to="/admin/dashboard"
-                    isActive={isOnAdminRoute}
-                    title="Admin Dashboard"
-                  />
-                ) : null}
-              </>
-            ) : (
-              <>
-                <div className="desktop-only">
-                  <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-                </div>
-                {canAccessAdmin ? (
-                  <AdminHeaderLink
-                    to="/admin/dashboard"
-                    isActive={isOnAdminRoute}
-                    title="Admin Dashboard"
-                  />
-                ) : null}
-              </>
-            )}
+            <div className="desktop-only header-desktop-toggles">
+              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+              {canAccessAdmin ? (
+                <AdminHeaderLink
+                  to="/admin/dashboard"
+                  isActive={isOnAdminRoute}
+                  title="Admin Dashboard"
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       </header>

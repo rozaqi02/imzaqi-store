@@ -89,8 +89,6 @@ export function matchesCatalogLineFilters(product, cats = []) {
   return cats.some((key) => {
     const k = String(key || "").toLowerCase();
     if (k === "app_premium" || k === "academic") return k === line;
-    // Legacy URL category keys map into the two storefront lines
-    if (k === "academic") return line === "academic";
     return line === "app_premium" && fine === k;
   });
 }

@@ -4,10 +4,8 @@ import "../css/pages/ProductDetail.css";
 import {
   ArrowDown,
   ArrowLeft,
-  ChevronDown,
   Clock3,
   Flame,
-  Info,
   LayoutGrid,
   MessageCircle,
   Share2,
@@ -102,116 +100,18 @@ function parseDescriptionToSections(rawText) {
   return sections;
 }
 
-const SECTION_ICONS = {
-  benefit: Sparkles,
-  detail: Info,
-  garansi: ShieldCheck,
-  catatan: Info,
-};
-
-function VariantBenefitList({ rawText, variant }) {
-  const [expanded, setExpanded] = useState(false);
+function VariantBenefitList({ rawText }) {
   const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
-  const previewItems = useMemo(() => {
+  const summary = useMemo(() => {
     const items = [];
     sections.forEach((section) => {
-      (section.items || []).forEach((item) => {
-        if (items.length < 3) items.push(item);
-      });
+      (section.items || []).forEach((item) => items.push(item));
     });
-    return items;
+    return items.join(" · ");
   }, [sections]);
-  const extraItemCount = Math.max(
-    0,
-    sections.reduce((sum, section) => sum + (section.items?.length || 0), 0) - previewItems.length
-  );
+  if (!summary) return null;
 
-  const infoRows = useMemo(() => {
-    const rows = [];
-    if (typeof variant?.sold_count === "number" && variant.sold_count > 0) {
-      rows.push({ icon: ShoppingBag, label: "Terjual", value: `${variant.sold_count}×` });
-    }
-    return rows;
-  }, [variant]);
-
-  const hasExtra = extraItemCount > 0;
-  if (!previewItems.length && !hasExtra) return null;
-
-  if (previewItems.length === 1 && !hasExtra) {
-    return <p className="pdx-packBlurb">{previewItems[0]}</p>;
-  }
-
-  return (
-    <div className="pdx-benefitList">
-      {previewItems.length ? (
-        <ul className="pdx-benefitItems pdx-benefitItems--preview">
-          {previewItems.map((item, index) => (
-            <li key={`${item}-${index}`} className="pdx-benefitItem">
-              <span className="pdx-benefitDot" aria-hidden="true" />
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      {hasExtra ? (
-        <>
-          <button
-            type="button"
-            className={`pdx-benefitToggle-modern ${expanded ? "is-expanded" : ""}`}
-            onClick={(event) => {
-              event.stopPropagation();
-              setExpanded((current) => !current);
-            }}
-          >
-            <span>{expanded ? "Sembunyikan" : `+${extraItemCount} lagi`}</span>
-            <ChevronDown size={14} className="pdx-benefitChevron" />
-          </button>
-
-          {expanded ? (
-            <>
-              {infoRows.length > 0 ? (
-                <div className="pdx-infoRows">
-                  {infoRows.map(({ icon: Icon, label, value }) => (
-                    <div key={label} className="pdx-infoRow">
-                      <span className="pdx-infoRow-icon"><Icon size={13} /></span>
-                      <span className="pdx-infoRow-label">{label}</span>
-                      <span className="pdx-infoRow-value">{value}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-
-              {sections.map((section, si) => {
-                const SectionIcon = section.icon ? SECTION_ICONS[section.icon] || Info : null;
-                const remaining = (section.items || []).filter((item) => !previewItems.includes(item));
-                if (remaining.length === 0) return null;
-                return (
-                  <div key={si} className={`pdx-benefitSection ${section.label ? "has-label" : ""}`}>
-                    {section.label ? (
-                      <div className={`pdx-benefitSectionLabel icon-${section.icon || "default"}`}>
-                        {SectionIcon ? <SectionIcon size={13} /> : null}
-                        <span>{section.label}</span>
-                      </div>
-                    ) : null}
-                    {remaining.length ? (
-                      <ul className="pdx-benefitItems">
-                        {remaining.map((item, ii) => (
-                          <li key={ii} className="pdx-benefitItem">
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
-                  </div>
-                );
-              })}
-            </>
-          ) : null}
-        </>
-      ) : null}
-    </div>
-  );
+  return <p className="pdx-packBlurb pdx-packBlurb--summary" title={summary}>{summary}</p>;
 }
 
 function parseDays(label) {
@@ -360,7 +260,9 @@ const VariantCard = React.memo(({
   onBuy
 }) => {
   const stock = Number(variant.stock ?? 0);
+  const soldCount = Math.max(0, Number(variant.sold_count || 0));
   const out = stock <= 0;
+  const lowStock = !out && stock <= 5;
   const disableEntranceAnim = isMotionOff || motionMode === "lite";
 
   const cardProps = {
@@ -374,6 +276,7 @@ const VariantCard = React.memo(({
     ]
       .filter(Boolean)
       .join(" "),
+    "aria-disabled": out || undefined,
     onClick: () => {
       if (out) return;
       onSelect(variant.id);
@@ -389,7 +292,6 @@ const VariantCard = React.memo(({
   const guaranteeLabel = formatGuaranteeLabel(variant.guarantee_text);
   const durationLabel = String(variant.duration_label || "").replace(/^durasi\s+/i, "").trim();
   const factItems = [
-    out ? "Habis" : `Stok ${stock}`,
     durationLabel || null,
     guaranteeLabel || null,
     variant.requires_buyer_email ? "Perlu email" : null,
@@ -435,9 +337,19 @@ const VariantCard = React.memo(({
         ) : null}
       </div>
 
+      <div className="pdx-packCommerce" aria-label="Ketersediaan dan penjualan varian">
+        <span className={`pdx-packSignal pdx-packStock${out ? " is-out" : lowStock ? " is-low" : ""}`}>
+          <span className="pdx-packSignalDot" aria-hidden="true" />
+          {out ? "Habis" : lowStock ? `Sisa ${stock}` : `Stok ${stock}`}
+        </span>
+        <span className="pdx-packSignal pdx-packSold">
+          <ShoppingBag size={12} aria-hidden="true" />
+          {soldCount} terjual
+        </span>
+      </div>
+
       <VariantBenefitList
         rawText={descriptionBody}
-        variant={variant}
       />
 
       <div className="pdx-packActions">
@@ -462,7 +374,7 @@ const VariantCard = React.memo(({
           }}
           disabled={out}
         >
-          {out ? "Abis" : "Beli sekarang"}
+          {out ? "Stok habis" : "Beli sekarang"}
         </button>
       </div>
     </>
@@ -679,7 +591,11 @@ export default function ProductDetail() {
         setProduct(normalizeProductRecord(data));
         setTopSalesMap(topData?.salesMap || {});
         const fsMap = new Map();
-        (flashSales || []).forEach((sale) => fsMap.set(sale.variant_id, sale.discount_percent));
+        (flashSales || []).forEach((sale) => {
+          if (!fsMap.has(sale.variant_id)) {
+            fsMap.set(sale.variant_id, sale.discount_percent);
+          }
+        });
         setFlashSaleMap(fsMap);
       } catch (fetchError) {
         warn(fetchError);
@@ -1240,7 +1156,7 @@ export default function ProductDetail() {
                           onSelect={setSelectedVariantId}
                           onAdd={handleAdd}
                           onBuy={(v, q, e) => {
-                            if (handleAdd(v, q, e)) goCheckout();
+                            if (handleAdd(v, q, e)) nav("/bayar");
                           }}
                         />
                       );

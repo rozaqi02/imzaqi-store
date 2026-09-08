@@ -37,7 +37,7 @@ function FooterLink({ item, className = "" }) {
     <Link
       className={className}
       to={item.to}
-      state={item.overlay ? { backgroundLocation: location } : undefined}
+      state={item.overlay && location.pathname !== "/checkout" ? { backgroundLocation: location } : undefined}
     >
       {item.label}
     </Link>
@@ -105,7 +105,7 @@ export default function Footer() {
 
           <div className="site-footerGoLegal">
             <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
-            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.6.0</p>
+            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.7.0</p>
           </div>
         </div>
       </div>

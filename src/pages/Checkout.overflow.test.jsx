@@ -1,6 +1,6 @@
 import * as fc from "fast-check";
 import React from "react";
-import { render, act } from "@testing-library/react";
+import { render, act, screen } from "@testing-library/react";
 
 /**
  * Property 2: Checkout item controls contained within card boundary
@@ -341,5 +341,34 @@ describe("Checkout Page - Property 2: Checkout item controls contained within ca
       ),
       { numRuns: 30 }
     );
+  });
+
+  it("keeps the payable total and promo entry clear on mobile", async () => {
+    mockCartItems.current = [{
+      variant_id: "netflix-private",
+      product_id: "netflix",
+      product_name: "Netflix Premium",
+      product_icon_url: "",
+      variant_name: "Private Profile",
+      duration_label: "1 Bulan",
+      guarantee_text: "1 Bulan",
+      price_idr: 31000,
+      qty: 1,
+    }];
+
+    const { default: Checkout } = await import("./Checkout.jsx");
+    let unmount;
+    await act(async () => {
+      const result = render(<Checkout />);
+      unmount = result.unmount;
+    });
+
+    expect(screen.getAllByRole("button", { name: /Bayar.*31\.000/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("QRIS aman").length).toBeGreaterThan(0);
+    const promoSummary = document.body.querySelector(".checkout-extras-summary");
+    expect(promoSummary).not.toBeNull();
+    expect(promoSummary.closest("details")).not.toHaveAttribute("open");
+
+    unmount();
   });
 });

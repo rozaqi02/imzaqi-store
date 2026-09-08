@@ -50,7 +50,7 @@ function writePublicCache(key, data) {
   } catch {}
 }
 
-function clearPublicCache(key) {
+export function clearPublicCache(key) {
   publicCacheMemory.delete(key);
 
   const storage = safeStorage();
@@ -59,6 +59,11 @@ function clearPublicCache(key) {
   try {
     storage.removeItem(`${PUBLIC_CACHE_PREFIX}${key}`);
   } catch {}
+}
+
+export function invalidateTestimonialsCache() {
+  clearPublicCache("testimonials:active");
+  clearPublicCache("testimonials:all");
 }
 
 /** Drop product list / detail session caches after admin catalog writes. */

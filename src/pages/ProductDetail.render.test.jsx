@@ -170,6 +170,17 @@ describe("ProductDetail render", () => {
     expect(screen.queryByText("Paling hemat")).not.toBeInTheDocument();
   });
 
+  it("keeps variant stock and sold count visible on the compact cards", async () => {
+    renderDetail();
+    await waitFor(() => {
+      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+    });
+    expect(screen.getByText("Stok 11")).toBeInTheDocument();
+    expect(screen.getByText("Sisa 4")).toBeInTheDocument();
+    expect(screen.getByText("11 terjual")).toBeInTheDocument();
+    expect(screen.getByText("2 terjual")).toBeInTheDocument();
+  });
+
   it("shows Paling hemat on the cheapest pack when another pack is terlaris", async () => {
     const { fetchProductBySlug } = await import("../lib/api");
     fetchProductBySlug.mockResolvedValueOnce({

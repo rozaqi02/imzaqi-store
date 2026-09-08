@@ -186,6 +186,11 @@ export function calcRemainingQuota(promo) {
 
 export function isPromoExpired(promo) {
   if (!promo?.expired_at) return false;
+  const raw = String(promo.expired_at).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) {
+    const endOfDay = new Date(`${raw}T23:59:59.999`);
+    return endOfDay < new Date();
+  }
   return new Date(promo.expired_at) < new Date();
 }
 

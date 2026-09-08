@@ -11,8 +11,28 @@ export function getCompletedOrderCount() {
   }
 }
 
-export function recordCompletedOrder() {
+const RECORDED_ORDERS_KEY = "imzaqi_recorded_orders_v1";
+
+function getRecordedOrderCodes() {
   try {
+    const raw = localStorage.getItem(RECORDED_ORDERS_KEY);
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function recordCompletedOrder(orderCode) {
+  try {
+    if (orderCode) {
+      const code = String(orderCode).trim().toUpperCase();
+      const recorded = getRecordedOrderCodes();
+      if (recorded.includes(code)) {
+        return { count: getCompletedOrderCount(), unlocked: false };
+      }
+      recorded.push(code);
+      localStorage.setItem(RECORDED_ORDERS_KEY, JSON.stringify(recorded));
+    }
     const next = getCompletedOrderCount() + 1;
     localStorage.setItem(COUNT_KEY, String(next));
     if (next >= REWARD_THRESHOLD && !localStorage.getItem(REWARD_KEY)) {

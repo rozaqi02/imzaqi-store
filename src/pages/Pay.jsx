@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
+import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, TicketPercent, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -10,7 +10,7 @@ import { fetchProducts, fetchSettings } from "../lib/api";
 import { buildLiveCartItems } from "../lib/liveCartPricing";
 import { STORE_WHATSAPP } from "../lib/productCategories";
 import { getVisitorIdAsUUID } from "../lib/visitor";
-import { makeOrderCode } from "../lib/orderCode";
+import { makeOrderCode, CODE_DEFAULT } from "../lib/orderCode";
 import { buildDynamicQrisImage } from "../lib/qris";
 import CheckoutSteps from "../components/CheckoutSteps";
 import "../css/pages/Pay.css";
@@ -21,7 +21,6 @@ import WhatsAppInput from "../components/WhatsAppInput";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { addOrderToHistory } from "../lib/orderHistory";
 import { getReferralCode } from "../lib/referral";
-import { recordCompletedOrder, LOYALTY_PROMO_CODE } from "../lib/loyalty";
 import { copyToClipboard } from "../utils/clipboard";
 import { warn } from "../lib/log";
 import { saveBuyerName } from "../lib/greeting";
@@ -373,12 +372,12 @@ function useModalCountUp(active, target, duration = 520) {
 
 function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }) {
   const modalRef = React.useRef(null);
-  const [checked, setChecked] = useState([false, false, false]);
+  const [agreed, setAgreed] = useState(false);
   const animatedTotal = useModalCountUp(open && !isFree, total);
 
   useEffect(() => {
     if (open) {
-      setChecked([false, false, false]);
+      setAgreed(false);
     }
   }, [open]);
 
@@ -393,28 +392,12 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
 
   const itemCount = (items || []).reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-  const checklist = isFree ? [
-    "Promo 100% udah diterapin ke order ini",
-    "Gak perlu bayar apa-apa",
-    "Order bakal langsung diproses abis konfirmasi",
-  ] : [
-    "Udah scan QRIS pake m-banking / e-wallet",
-    "Nominal transfer sesuai total tagihan di atas",
-    "Pembayaran udah berhasil (bukan pending / gagal)",
-  ];
-
-  const handleCheck = (index) => {
-    setChecked((prev) => {
-      const next = [...prev];
-      next[index] = !next[index];
-      return next;
-    });
-  };
-
-  const isAllChecked = checked.every(Boolean);
-  const checkedCount = checked.filter(Boolean).length;
-  const remainingCount = checklist.length - checkedCount;
-  const progressPct = Math.round((checkedCount / checklist.length) * 100);
+  const declarationTitle = isFree
+    ? "Konfirmasi order promo 100%"
+    : "Saya telah scan QRIS dan transfer sukses";
+  const declarationDesc = isFree
+    ? "Order gratis tanpa transfer. Admin akan langsung menyiapkan akun Anda."
+    : `Pembayaran ${formatIDR(total)} sudah berhasil dari m-banking / e-wallet saya.`;
 
   return createPortal(
     <div className="modal-backdrop pay-overlay pay-confirmOverlay" onMouseDown={onCancel} role="presentation">
@@ -431,13 +414,11 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
             <ShieldCheck size={20} />
           </div>
           <div className="pay-confirmModalHeaderCopy">
-            <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Bayar"}</div>
+            <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Pembayaran"}</div>
             <div className="pay-confirmModalSub">
-              {isAllChecked
-                ? "Semua langkah selesai - siap dikonfirmasi"
-                : isFree
-                  ? "Centang semua detail sebelum lanjut"
-                  : "Centang semua opsi buat konfirmasi"}
+              {agreed
+                ? "Siap dikonfirmasi - ID order akan dibuat"
+                : "Centang konfirmasi di bawah untuk lanjut"}
             </div>
           </div>
           <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
@@ -448,7 +429,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
         <div className="pay-confirmModalBody">
           <aside className="pay-confirmAside" aria-label="Ringkasan pembayaran">
             <div className="pay-confirmTotalCard pay-confirmTotalCard--pulse">
-              <div className="pay-confirmTotalLabel">{isFree ? "Total setelah promo" : "Total yang harus dibayar"}</div>
+              <div className="pay-confirmTotalLabel">{isFree ? "Total setelah promo" : "Total tagihan"}</div>
               <div className="pay-confirmTotalAmount">
                 {isFree ? "Gratis" : formatIDR(animatedTotal)}
               </div>
@@ -467,60 +448,49 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
           </aside>
 
           <div className="pay-confirmMain">
-            <div className="pay-confirmProgress" aria-live="polite">
-              <div className="pay-confirmProgressCopy">
-                <span>Progress konfirmasi</span>
-                <strong>
-                  {checkedCount} dari {checklist.length} selesai
-                </strong>
-              </div>
-              <div className="pay-confirmProgressTrack" aria-hidden="true">
-                <span style={{ width: `${progressPct}%` }} />
-              </div>
-            </div>
-
-            <div className="pay-confirmChecklist" role="group" aria-label="Persyaratan Konfirmasi">
-              {checklist.map((text, i) => (
-                <label
-                  key={text}
-                  className={`pay-confirmCheckItem${checked[i] ? " is-done" : ""}`}
-                >
-                  <input
-                    type="checkbox"
-                    checked={checked[i]}
-                    onChange={() => handleCheck(i)}
-                    className="pay-confirmCheckbox-hidden"
-                  />
-                  <span className={`pay-confirmCheckDot${checked[i] ? " is-checked" : ""}`} aria-hidden="true">
-                    {checked[i] ? <Check size={11} strokeWidth={3.5} /> : null}
-                  </span>
-                  <span className="pay-confirmCheckText">{text}</span>
-                </label>
-              ))}
+            <div className="pay-confirmChecklist" role="group" aria-label="Pernyataan Konfirmasi">
+              <label
+                className={`pay-confirmCheckItem${agreed ? " is-done" : ""}`}
+                style={{ cursor: "pointer", userSelect: "none" }}
+              >
+                <input
+                  type="checkbox"
+                  checked={agreed}
+                  onChange={(e) => setAgreed(e.target.checked)}
+                  className="pay-confirmCheckbox-hidden"
+                />
+                <span className={`pay-confirmCheckDot${agreed ? " is-checked" : ""}`} aria-hidden="true">
+                  {agreed ? <Check size={12} strokeWidth={3.5} /> : null}
+                </span>
+                <span className="pay-confirmCheckText">
+                  <strong>{declarationTitle}</strong>
+                  <small style={{ display: "block", marginTop: 4, opacity: 0.85, fontSize: "0.82rem" }}>
+                    {declarationDesc}
+                  </small>
+                </span>
+              </label>
             </div>
 
             {!isFree ? (
               <div className="pay-confirmNotice">
                 <ShieldCheck size={14} />
-                <span>Konfirmasi palsu bikin order makin lambat.</span>
+                <span>Admin akan mencocokkan mutasi rekening dan langsung menyiapkan akun Anda.</span>
               </div>
             ) : null}
 
             <div className="pay-confirmActionsNew">
               <button
-                className={`pay-confirmPrimaryBtn${isAllChecked ? " is-ready" : ""}`}
+                className={`pay-confirmPrimaryBtn${agreed ? " is-ready" : ""}`}
                 type="button"
                 onClick={onConfirm}
-                disabled={!isAllChecked}
+                disabled={!agreed}
               >
                 <Check size={16} strokeWidth={2.5} />
-                {isAllChecked
+                {agreed
                   ? isFree
-                    ? "Konfirm order"
-                    : "Konfirm bayar"
-                  : isFree
-                    ? `Centang ${remainingCount} lagi`
-                    : `Centang ${remainingCount} lagi`}
+                    ? "Konfirmasi Order Sekarang"
+                    : "Konfirmasi Pembayaran Sekarang"
+                  : "Centang Pernyataan di Atas"}
               </button>
               <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
                 Belum, cek lagi
@@ -571,7 +541,7 @@ export default function Pay() {
   const nav = useNavigate();
   const location = useLocation();
   const cart = useCart();
-  const { promo, clear: clearPromo, revalidate } = usePromo();
+  const { promo, apply: applyPromo, clear: clearPromo, revalidate } = usePromo();
   const toast = useToast();
 
   usePageMeta({
@@ -580,6 +550,9 @@ export default function Pay() {
   });
 
   const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
+  const [promoCodeInput, setPromoCodeInput] = useState(() => promo?.code || "");
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
+  const [promoFeedback, setPromoFeedback] = useState({ text: "", type: "" });
 
   useEffect(() => {
     if (Array.isArray(cart.items) && cart.items.length > 0) setSnapshot(cart.items);
@@ -599,6 +572,7 @@ export default function Pay() {
         if (!alive) return;
         if (result?.ok && Number(result.percent) > 0) {
           setPromoPercent(Number(result.percent));
+          setPromoCodeInput(result.code || code);
           return;
         }
         setPromoPercent(0);
@@ -616,6 +590,49 @@ export default function Pay() {
     // Re-check once when Pay mounts with the session promo.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (promo?.code && Number(promo?.percent) > 0) {
+      setPromoPercent(Number(promo.percent));
+      setPromoCodeInput(promo.code);
+    } else {
+      setPromoPercent(0);
+    }
+  }, [promo]);
+
+  async function handleApplyPromo() {
+    const raw = String(promoCodeInput || "").trim().toUpperCase();
+    if (!raw) {
+      setPromoFeedback({ text: "Ketik kode promo dulu ya.", type: "error" });
+      return;
+    }
+    setIsApplyingPromo(true);
+    setPromoFeedback({ text: "", type: "" });
+    try {
+      const result = await applyPromo(raw);
+      if (result?.ok) {
+        setPromoPercent(Number(result.percent || 0));
+        setPromoFeedback({ text: `Berhasil! Diskon ${result.percent}% aktif.`, type: "success" });
+        toast.success(`Diskon ${result.percent}% aktif`, { title: raw });
+      } else {
+        setPromoFeedback({ text: result?.message || "Kode promo tidak valid.", type: "error" });
+        toast.error(result?.message || "Kode promo tidak valid.");
+      }
+    } catch {
+      setPromoFeedback({ text: "Gagal memproses kode promo.", type: "error" });
+      toast.error("Gagal memproses kode promo.");
+    } finally {
+      setIsApplyingPromo(false);
+    }
+  }
+
+  function handleRemovePromo() {
+    clearPromo();
+    setPromoPercent(0);
+    setPromoCodeInput("");
+    setPromoFeedback({ text: "Kode promo dilepas.", type: "info" });
+    toast.info("Kode promo dilepas.");
+  }
 
   useEffect(() => {
     let alive = true;
@@ -855,10 +872,10 @@ export default function Pay() {
       : isDynamicQris
         ? "Nominal QR sudah menyesuaikan total."
         : "QR statis aktif. Bayar sesuai total di ringkasan.";
-  const qrisLockTitle = !hasValidWhatsApp ? "QRIS terkunci" : "Butuh catatan buyer";
+  const qrisLockTitle = !hasValidWhatsApp ? "Langkah 1: Masukkan WhatsApp" : "Lengkapi Email Pembeli";
   const qrisLockDescription = !hasValidWhatsApp
-    ? "Isi nomor WhatsApp yang valid agar langkah berikutnya terbuka."
-    : `Item ${requiredEmailProductsText} memerlukan email buyer untuk aktivasi akun. Isi email buyer di catatan.`;
+    ? "Ketik nomor WhatsApp di formulir sebelah. QRIS pembayaran akan langsung muncul otomatis."
+    : `Item ${requiredEmailProductsText} butuh email pembeli untuk aktivasi akun. Lengkapi email di atas ya.`;
 
   const summaryText = useMemo(() => {
     const rows = items.map(
@@ -989,7 +1006,7 @@ export default function Pay() {
       let generatedCode = "";
 
       for (let index = 0; index < 5; index += 1) {
-        generatedCode = makeOrderCode(8);
+        generatedCode = makeOrderCode(CODE_DEFAULT);
         try {
           createdOrder = await createOrderWithStock(generatedCode, canonicalOrder);
           break;
@@ -1018,10 +1035,6 @@ export default function Pay() {
         total_idr: canonicalOrder.total,
         status: createdOrder.status || (hasPricingMismatch ? "paid_reported" : "pending"),
       });
-      const loyaltyResult = recordCompletedOrder();
-      if (loyaltyResult.unlocked) {
-        toast.success(`Promo ${LOYALTY_PROMO_CODE} terbuka! Pakai di checkout berikutnya.`, { duration: 5000 });
-      }
       if (loadingId) toast.remove(loadingId);
       toast.success("ID order berhasil dibuat.");
     } catch (error) {
@@ -1215,7 +1228,7 @@ export default function Pay() {
                   <h2 className="h3 pay-cardTitle">WhatsApp</h2>
                 </div>
                 <span className={`pay-statePill ${isFreeOrder ? "free" : canShowQris ? "live" : "locked"}`}>
-                  {isFreeOrder ? "Gratis" : canShowQris ? "Siap" : "Terkunci"}
+                  {isFreeOrder ? "Gratis" : canShowQris ? "QRIS Siap" : "Langkah 1"}
                 </span>
               </div>
 
@@ -1311,7 +1324,68 @@ export default function Pay() {
                         ? "Scan QR, selesaikan pembayaran, lalu simpan ID order."
                         : missingBuyerEmailNote
                           ? "Lengkapi email buyer di catatan agar QRIS terbuka."
-                          : "Isi WhatsApp dulu untuk membuka QR."}
+                          : "Langkah 1: Masukkan WhatsApp di formulir sebelah untuk membuka QRIS."}
+                  </div>
+
+                  <div className="pay-promoSection">
+                    <div className="pay-promoHead">
+                      <div className="pay-promoTitle">
+                        <TicketPercent size={14} aria-hidden="true" />
+                        <span>Kode Promo</span>
+                      </div>
+                      {promoPercent > 0 ? (
+                        <button
+                          type="button"
+                          className="btn btn-ghost btn-xs pay-promoClearBtn"
+                          onClick={handleRemovePromo}
+                        >
+                          Hapus
+                        </button>
+                      ) : null}
+                    </div>
+
+                    {promoPercent > 0 ? (
+                      <div className="pay-promoApplied">
+                        <span className="pay-promoTag">
+                          <Check size={12} strokeWidth={3} /> {promo?.code}
+                        </span>
+                        <span className="pay-promoDiscountBadge">Diskon {promoPercent}%</span>
+                      </div>
+                    ) : (
+                      <div className="pay-promoInputRow">
+                        <input
+                          type="text"
+                          className="input pay-promoInput"
+                          placeholder="Punya kode promo?"
+                          value={promoCodeInput}
+                          onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              if (!isApplyingPromo) handleApplyPromo();
+                            }
+                          }}
+                          disabled={isApplyingPromo}
+                          autoCapitalize="characters"
+                          autoComplete="off"
+                          spellCheck="false"
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-sm pay-promoApplyBtn"
+                          onClick={handleApplyPromo}
+                          disabled={isApplyingPromo || !promoCodeInput.trim()}
+                        >
+                          {isApplyingPromo ? "Cek..." : "Pakai"}
+                        </button>
+                      </div>
+                    )}
+
+                    {promoFeedback.text ? (
+                      <div className={`pay-promoFeedback is-${promoFeedback.type}`} role="status">
+                        {promoFeedback.text}
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="pay-stageRows">
@@ -1321,7 +1395,7 @@ export default function Pay() {
                     </div>
                     {discount > 0 ? (
                       <div className="pay-stageRow">
-                        <span>Promo</span>
+                        <span>Promo ({promo?.code || `${promoPercent}%`})</span>
                         <b>- {formatIDR(discount)}</b>
                       </div>
                     ) : null}

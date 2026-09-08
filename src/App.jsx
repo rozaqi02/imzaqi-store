@@ -202,7 +202,9 @@ function BoundedRoute({ pageName, children }) {
 
 export function useCheckoutOverlayLocation(location) {
   const isCheckout = location?.pathname === "/checkout";
-  const backgroundLocation = isCheckout ? (location.state?.backgroundLocation || null) : null;
+  const rawBackground = isCheckout ? (location.state?.backgroundLocation || null) : null;
+  const backgroundLocation =
+    rawBackground && rawBackground.pathname !== "/checkout" ? rawBackground : null;
   const useOverlay = Boolean(backgroundLocation);
   return {
     displayLocation: useOverlay ? backgroundLocation : location,
@@ -280,10 +282,16 @@ function AppRoutes() {
             <Route path="/faq" element={<BoundedRoute pageName="FAQ"><Faq /></BoundedRoute>} />
             <Route path="/testimoni" element={<BoundedRoute pageName="Testimoni"><Testimonials /></BoundedRoute>} />
             <Route path="/checkout" element={<BoundedRoute pageName="Checkout"><Checkout /></BoundedRoute>} />
+            <Route path="/cart" element={<Navigate to="/checkout" replace />} />
+            <Route path="/keranjang" element={<Navigate to="/checkout" replace />} />
             <Route path="/bayar" element={<BoundedRoute pageName="Bayar"><Pay /></BoundedRoute>} />
+            <Route path="/pay" element={<Navigate to="/bayar" replace />} />
             <Route path="/status" element={<BoundedRoute pageName="Status Order"><Status /></BoundedRoute>} />
+            <Route path="/order" element={<Navigate to="/status" replace />} />
+            <Route path="/orders" element={<Navigate to="/status" replace />} />
             <Route path="/riwayat" element={<Navigate to="/status?tab=riwayat" replace />} />
             <Route path="/admin" element={<BoundedRoute pageName="Admin Login"><AdminLogin /></BoundedRoute>} />
+            <Route path="/admin/login" element={<Navigate to="/admin" replace />} />
             <Route
               path="/admin/dashboard"
               element={

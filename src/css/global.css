@@ -1459,7 +1459,7 @@ body {
   right: 12px;
   bottom: 12px;
   padding-bottom: env(safe-area-inset-bottom);
-  z-index: 95;
+  z-index: 10002;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -1574,19 +1574,40 @@ body {
 
 @keyframes toastIn {
   from {
-    transform: translateY(8px);
-    opacity: 0
+    transform: translateY(10px) scale(0.97);
+    opacity: 0;
   }
 
   to {
-    transform: translateY(0);
-    opacity: 1
+    transform: translateY(0) scale(1);
+    opacity: 1;
   }
+}
+
+@keyframes toastOut {
+  from {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+
+  to {
+    transform: translateY(10px) scale(0.96);
+    opacity: 0;
+  }
+}
+
+.toast.is-exiting {
+  animation: toastOut 220ms cubic-bezier(0.2, 0, 0.4, 1) forwards !important;
+  pointer-events: none !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
   .toast {
     animation: none;
+  }
+  .toast.is-exiting {
+    animation: none;
+    opacity: 0;
   }
 }
 
@@ -2247,6 +2268,10 @@ html:not([data-theme="light"]) .empty-desc {
   display: block;
 }
 
+.header-mobile-left {
+  display: none;
+}
+
 .desktop-only {
   display: flex;
 }
@@ -2256,6 +2281,40 @@ html:not([data-theme="light"]) .empty-desc {
     display: none !important;
   }
 
+  .header-mobile-left {
+    display: flex !important;
+    align-items: center;
+    gap: 8px;
+    justify-self: start;
+    min-width: 0;
+  }
+
+  .header-inner,
+  .header .header-inner,
+  .header.is-shrunk .header-inner {
+    display: grid !important;
+    grid-template-columns: 1fr auto 1fr !important;
+    align-items: center !important;
+    gap: 8px !important;
+  }
+
+  .header .brand {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    justify-self: center !important;
+    margin: 0 auto !important;
+    min-width: 0 !important;
+    text-align: center;
+  }
+
+  .header .header-actions {
+    display: flex !important;
+    align-items: center;
+    justify-content: flex-end !important;
+    justify-self: end !important;
+    min-width: 0;
+  }
 }
 
 html[data-theme="light"] .header-iconAction.active {
@@ -4964,14 +5023,25 @@ select,
 }
 
 .toast-viewport {
-  bottom: max(12px, calc(12px + env(safe-area-inset-bottom)));
-  left: max(12px, calc(12px + env(safe-area-inset-left)));
-  right: max(12px, calc(12px + env(safe-area-inset-right)));
+  bottom: max(14px, calc(14px + env(safe-area-inset-bottom)));
+  left: max(14px, calc(14px + env(safe-area-inset-left)));
+  right: max(14px, calc(14px + env(safe-area-inset-right)));
+  z-index: 10002;
 }
 
 body.has-bottom-nav .toast-viewport {
-  bottom: var(--site-bottom-nav-clearance);
-  z-index: 10000;
+  bottom: calc(var(--site-bottom-nav-clearance, 88px) + 16px);
+  z-index: 10002;
+}
+
+body.has-bottom-nav:has(.with-sticky-cta) .toast-viewport {
+  bottom: calc(var(--site-bottom-nav-clearance, 88px) + 78px + 8px);
+  z-index: 10002;
+}
+
+body:has(.with-sticky-cta):not(.has-bottom-nav) .toast-viewport {
+  bottom: calc(78px + 14px + env(safe-area-inset-bottom, 0px));
+  z-index: 10002;
 }
 
 /* ── Item 7: Focus ring improvements for accessibility ── */

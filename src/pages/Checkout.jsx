@@ -2,7 +2,18 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { motion, useReducedMotion } from "framer-motion";
-import { ArrowRight, ArrowLeft, ShoppingBag, TicketPercent, X, Trash2 } from "lucide-react";
+import {
+  ArrowRight,
+  ArrowLeft,
+  BadgeCheck,
+  Clock3,
+  RefreshCw,
+  ShieldCheck,
+  ShoppingBag,
+  TicketPercent,
+  X,
+  Trash2,
+} from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
 import { formatIDR } from "../lib/format";
@@ -27,8 +38,8 @@ function calcTotal(subtotal, percent) {
 /* ── Desktop-only framer-motion variants ── */
 const backdropVariants = {
   hidden:  { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.28, ease: [0.16, 1, 0.3, 1] } },
-  exit:    { opacity: 0, transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
+  exit:    { opacity: 0, transition: { duration: 0.32, ease: [0.4, 0, 1, 1] } },
 };
 const backdropVariantsLite = {
   hidden:  { opacity: 0 },
@@ -36,9 +47,27 @@ const backdropVariantsLite = {
   exit:    { opacity: 0, transition: { duration: 0.14, ease: [0.22, 1, 0.36, 1] } },
 };
 const desktopDrawerVariants = {
-  hidden:  { x: "100%", opacity: 0 },
-  visible: { x: 0, opacity: 1, transition: { type: "spring", damping: 30, stiffness: 300, mass: 0.82 } },
-  exit:    { x: "100%", opacity: 0, transition: { type: "spring", damping: 30, stiffness: 300, mass: 0.82 } },
+  hidden:  { x: "104%", opacity: 0.72, scale: 0.992 },
+  visible: {
+    x: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      x: { duration: 0.52, ease: [0.16, 1, 0.3, 1] },
+      opacity: { duration: 0.24, ease: "easeOut" },
+      scale: { duration: 0.46, ease: [0.16, 1, 0.3, 1] },
+    },
+  },
+  exit: {
+    x: "104%",
+    opacity: 0.68,
+    scale: 0.994,
+    transition: {
+      x: { duration: 0.36, ease: [0.4, 0, 1, 1] },
+      opacity: { duration: 0.28, ease: "easeIn" },
+      scale: { duration: 0.32, ease: "easeInOut" },
+    },
+  },
 };
 const desktopDrawerVariantsLite = {
   hidden:  { x: "100%" },
@@ -206,7 +235,7 @@ export default function Checkout() {
       }
 
       nav("/", { replace: true });
-    }, isMotionOff ? 100 : isMobileSheet ? 400 : (isLiteMotion ? 190 : 280));
+    }, isMotionOff ? 100 : isMobileSheet ? 420 : (isLiteMotion ? 220 : 380));
 
     return () => window.clearTimeout(timer);
   }, [backgroundLocation, closing, isLiteMotion, isMotionOff, isMobileSheet, nav]);
@@ -272,7 +301,10 @@ export default function Checkout() {
         <div className="checkout-promo-head">
           <div className="checkout-promo-title">
             <TicketPercent size={15} />
-            <span>Kode promo</span>
+            <span>
+              <strong>Kode promo</strong>
+              <small>Masukkan kode sebelum lanjut bayar.</small>
+            </span>
           </div>
           {promoPercent ? (
             <button
@@ -285,7 +317,7 @@ export default function Checkout() {
                 toast.info("Promo di-reset.");
               }}
             >
-              Reset
+              Hapus
             </button>
           ) : null}
         </div>
@@ -297,7 +329,7 @@ export default function Checkout() {
           <input
             id="checkout-promo-code"
             className="input"
-            placeholder="Kode promo"
+            placeholder="CONTOH: HEMAT10"
             value={code}
             onChange={(e) => setCode(e.target.value.toUpperCase())}
             disabled={isVerifying}
@@ -313,7 +345,7 @@ export default function Checkout() {
             }}
           />
           <button className="btn btn-sm" type="button" onClick={onApplyPromo} disabled={isVerifying}>
-            {isVerifying ? "..." : "Pakai"}
+            {isVerifying ? "Mengecek..." : "Pakai kode"}
           </button>
         </div>
 
@@ -327,6 +359,42 @@ export default function Checkout() {
             {msg}
           </div>
         ) : null}
+        {discount > 0 ? (
+          <div className="checkout-promo-saving" role="status">
+            <BadgeCheck size={15} aria-hidden="true" />
+            Kamu hemat {formatIDR(discount)} di pesanan ini.
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  function renderTrustSignals(compact = false) {
+    return (
+      <div className={`checkout-trustSignals${compact ? " is-compact" : ""}`} aria-label="Jaminan checkout">
+        <span><ShieldCheck size={15} aria-hidden="true" />QRIS aman</span>
+        <span><Clock3 size={15} aria-hidden="true" />Proses 5–30 menit</span>
+        <span><RefreshCw size={15} aria-hidden="true" />Garansi sesuai paket</span>
+      </div>
+    );
+  }
+
+  function renderEmptyCheckout() {
+    return (
+      <div className="checkout-emptyConversion">
+        <EmptyState
+          icon={<ShoppingBag size={30} strokeWidth={2.2} />}
+          title="Keranjangmu masih kosong"
+          description="Pilih paket yang pas, lalu lanjutkan pembayaran lewat QRIS."
+          primaryAction={{ label: "Lihat produk populer", to: "/produk" }}
+          secondaryAction={{ label: "Cek status", to: "/status" }}
+        />
+        <div className="checkout-quickPicks" aria-label="Produk yang paling dicari">
+          <span>Paling dicari</span>
+          <Link to="/produk/netflix">Netflix</Link>
+          <Link to="/produk/canva">Canva</Link>
+          <Link to="/produk/capcut">CapCut</Link>
+        </div>
       </div>
     );
   }
@@ -334,8 +402,8 @@ export default function Checkout() {
   function renderSummary(extraClass = "") {
     return (
       <aside className={`card pad checkout-panel checkout-summary ${extraClass}`}>
-        <div className="checkout-summaryBadge">{total === 0 && subtotal > 0 ? "🎉 GRATIS" : discount > 0 ? `${promoPercent}% off` : "Ringkasan"}</div>
-        <div className="checkout-summaryLabel">Total saat ini</div>
+        <div className="checkout-summaryBadge">{total === 0 && subtotal > 0 ? "GRATIS" : discount > 0 ? `${promoPercent}% hemat` : "Pembayaran aman"}</div>
+        <div className="checkout-summaryLabel">Total pembayaran</div>
         <div className="checkout-summaryTotal">{formatIDR(total)}</div>
 
         <div className="checkout-summaryRows">
@@ -344,17 +412,21 @@ export default function Checkout() {
             <b>{formatIDR(subtotal)}</b>
           </div>
           {discount > 0 ? (
-            <div className="checkout-summaryRow">
+            <div className="checkout-summaryRow checkout-summaryRow--saving">
               <span>Promo</span>
               <b>- {formatIDR(discount)}</b>
             </div>
           ) : null}
         </div>
 
+        {renderTrustSignals(true)}
+
         <button className="btn btn-wide checkout-summaryBtn" type="button" onClick={goPay} disabled={cart.items.length === 0 || hasStockIssue}>
-          Lanjut ke bayar
+          <span>Bayar {formatIDR(total)}</span>
           <ArrowRight size={16} />
         </button>
+
+        <p className="checkout-summaryHint">Lanjut ke halaman QRIS untuk menyelesaikan pesanan.</p>
 
         <Link className="checkout-summaryLink" to="/status">
           Udah punya ID? Cek status
@@ -371,7 +443,8 @@ export default function Checkout() {
 
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
-            <h1 className="h1 checkout-drawerTitle">Checkout</h1>
+            <h1 className="h1 checkout-drawerTitle">Cek sebelum bayar.</h1>
+            <p className="checkout-drawerSub"><BadgeCheck size={15} aria-hidden="true" />Keranjang tersimpan otomatis</p>
           </div>
 
           <button
@@ -407,13 +480,7 @@ export default function Checkout() {
               </div>
 
               {cart.items.length === 0 ? (
-                <EmptyState
-                  icon={<ShoppingBag size={30} strokeWidth={2.2} />}
-                  title="Keranjang kosong"
-                  description="Gas dari katalog, tambah paket yang cocok."
-                  primaryAction={{ label: "Produk", to: "/produk" }}
-                  secondaryAction={{ label: "Status", to: "/status" }}
-                />
+                renderEmptyCheckout()
               ) : (
                 <>
                   <div className="checkout-item-list">
@@ -429,7 +496,7 @@ export default function Checkout() {
                   </div>
 
                   <CheckoutExtrasPanel
-                    collapsed={isMobileSheet}
+                    defaultOpen={Boolean(promoPercent)}
                     promoSection={renderPromoCard()}
                   />
                 </>
@@ -445,6 +512,7 @@ export default function Checkout() {
             <div className="checkout-floating-bar-info">
               <span className="checkout-floating-bar-label">Total</span>
               <span className="checkout-floating-bar-price">{formatIDR(total)}</span>
+              <span className="checkout-floating-bar-trust"><ShieldCheck size={12} aria-hidden="true" />QRIS aman</span>
               {stockDisabledReason ? (
                 <span className="checkout-floating-bar-reason" role="status">
                   {stockDisabledReason}
@@ -458,7 +526,7 @@ export default function Checkout() {
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-drawer-stock-reason" : undefined}
             >
-              <span>Lanjut ke bayar</span>
+              <span>Bayar {formatIDR(total)}</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (
@@ -495,8 +563,9 @@ export default function Checkout() {
               <span>Kembali</span>
             </button>
             <div className="checkout-full-title-wrap hero-anim-wrap">
-              <h1 className="h1 checkout-full-title hero-anim-title">Checkout</h1>
-              <p className="checkout-full-sub hero-anim-sub">Cek order dulu sebelum bayar.</p>
+              <span className="checkout-full-kicker">Checkout aman & cepat</span>
+              <h1 className="h1 checkout-full-title hero-anim-title">Cek pesananmu.</h1>
+              <p className="checkout-full-sub hero-anim-sub">Pastikan paket dan durasinya sudah pas sebelum bayar.</p>
             </div>
           </div>
 
@@ -508,13 +577,7 @@ export default function Checkout() {
             <main className="checkout-full-main">
               {cart.items.length === 0 ? (
                 <div className="card pad checkout-panel checkout-full-empty-card">
-                  <EmptyState
-                    icon={<ShoppingBag size={30} strokeWidth={2.2} />}
-                    title="Keranjang kosong"
-                    description="Gas dari katalog, tambah paket yang cocok."
-                    primaryAction={{ label: "Produk", to: "/produk" }}
-                    secondaryAction={{ label: "Status", to: "/status" }}
-                  />
+                  {renderEmptyCheckout()}
                 </div>
               ) : (
                 <div className="checkout-full-left-cards">
@@ -542,7 +605,7 @@ export default function Checkout() {
 
                   <section className="card pad checkout-panel checkout-full-promo-panel">
                     <CheckoutExtrasPanel
-                      collapsed={isMobileSheet}
+                      defaultOpen={Boolean(promoPercent)}
                       promoSection={renderPromoCard()}
                     />
                   </section>
@@ -564,6 +627,7 @@ export default function Checkout() {
             <div className="checkout-floating-bar-info">
               <span className="checkout-floating-bar-label">Total Pembayaran</span>
               <span className="checkout-floating-bar-price">{formatIDR(total)}</span>
+              <span className="checkout-floating-bar-trust"><ShieldCheck size={12} aria-hidden="true" />QRIS aman</span>
               {stockDisabledReason ? (
                 <span className="checkout-floating-bar-reason" role="status">
                   {stockDisabledReason}
@@ -576,7 +640,7 @@ export default function Checkout() {
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-full-stock-reason" : undefined}
             >
-              <span>Lanjut ke bayar</span>
+              <span>Bayar {formatIDR(total)}</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (
@@ -631,12 +695,12 @@ export default function Checkout() {
 
       <motion.div
         ref={drawerRef}
-        className="checkout-drawer"
+        className={`checkout-drawer ${closing ? "checkout-desktop-closing" : "checkout-desktop-open"}`}
         variants={drawerVariants}
         initial="hidden"
         animate={closing ? "exit" : "visible"}
         onMouseDown={(event) => event.stopPropagation()}
-        style={{ willChange: "transform" }}
+        style={{ willChange: "transform, opacity", transformOrigin: "right center" }}
         role="dialog"
         aria-modal="true"
         aria-label="Checkout"
@@ -717,8 +781,10 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
         <div className="checkout-item-copy">
           <div className="checkout-item-name">{item.product_name}</div>
           <div className="checkout-item-meta">
-            {item.variant_name} / {item.duration_label}
+            <span>{item.variant_name}</span>
+            <span>{item.duration_label}</span>
           </div>
+          {item.guarantee_text ? <div className="checkout-item-guarantee">Garansi: {item.guarantee_text}</div> : null}
         </div>
       </div>
 
@@ -767,7 +833,10 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
           </button>
         </div>
 
-        <div className="checkout-item-price">{formatIDR(item.price_idr * item.qty)}</div>
+        <div className="checkout-item-price">
+          <strong>{formatIDR(item.price_idr * item.qty)}</strong>
+          {item.qty > 1 ? <small>{formatIDR(item.price_idr)} / item</small> : null}
+        </div>
 
         <button
           className="checkout-item-remove"

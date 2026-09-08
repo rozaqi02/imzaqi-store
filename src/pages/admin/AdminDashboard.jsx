@@ -83,6 +83,7 @@ import {
   createFlashSale,
   updateFlashSale,
   deleteFlashSale,
+  invalidateTestimonialsCache,
 } from "../../lib/api";
 import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDisplay, calcRevenueForecast, isPromoExpired } from "../../lib/format";
 import { usePageMeta } from "../../hooks/usePageMeta";
@@ -111,6 +112,19 @@ import {
   prettyCategory,
   toDateKeyWIB,
 } from "./adminUtils";
+
+function toLocalDatetimeInput(dateValue) {
+  if (!dateValue) return "";
+  const d = new Date(dateValue);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mi = pad(d.getMinutes());
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+}
 
 const BUCKET_ICONS = "product-icons"; // public
 const BUCKET_TESTIMONIALS = "testimonials"; // public
@@ -1583,19 +1597,33 @@ export default function AdminDashboard() {
     setMsg("");
 
     try {
-      // Delete variants first to avoid FK constraint errors
+      // 1. Delete any related flash sales first to prevent FK violation
+      const { data: vars } = await supabase.from("product_variants").select("id").eq("product_id", id);
+      const varIds = (vars || []).map((v) => v.id);
+      if (varIds.length > 0) {
+        await supabase.from("flash_sales").delete().in("variant_id", varIds);
+      }
+
+      // 2. Delete variants next
       const { error: vErr } = await supabase.from("product_variants").delete().eq("product_id", id);
       if (vErr) throw vErr;
 
+      // 3. Delete product
       const { error: pErr } = await supabase.from("products").delete().eq("id", id);
       if (pErr) throw pErr;
 
+      invalidateProductCaches();
       await refreshProducts({ force: true });
       toast.remove(tid);
       toast.success("Produk dihapus", { duration: 1400 });
     } catch (e) {
       toast.remove(tid);
-      toast.error("Gagal menghapus produk");
+      const errText = String(e?.message || e || "");
+      if (e?.code === "23503" || errText.includes("foreign key") || errText.includes("violates foreign key")) {
+        toast.error("Produk memiliki riwayat order dan tidak bisa dihapus permanen. Nonaktifkan saja statusnya.");
+      } else {
+        toast.error("Gagal menghapus produk");
+      }
       setMsg(e?.message || String(e));
     }
   }
@@ -1616,6 +1644,7 @@ export default function AdminDashboard() {
       if (error) throw error;
 
       setProductForm((p) => (p ? { ...p, icon_url: url } : p));
+      invalidateProductCaches();
       await refreshProducts({ force: true });
 
       toast.remove(tid);
@@ -1766,15 +1795,25 @@ export default function AdminDashboard() {
     setMsg("");
 
     try {
+      // 1. Delete related flash sale if any
+      await supabase.from("flash_sales").delete().eq("variant_id", id);
+
+      // 2. Delete variant
       const { error } = await supabase.from("product_variants").delete().eq("id", id);
       if (error) throw error;
 
+      invalidateProductCaches();
       await refreshProducts({ force: true });
       toast.remove(tid);
       toast.success("Varian dihapus", { duration: 1400 });
     } catch (e) {
       toast.remove(tid);
-      toast.error("Gagal menghapus varian");
+      const errText = String(e?.message || e || "");
+      if (e?.code === "23503" || errText.includes("foreign key") || errText.includes("violates foreign key")) {
+        toast.error("Paket ini memiliki riwayat order dan tidak bisa dihapus permanen. Nonaktifkan saja statusnya.");
+      } else {
+        toast.error("Gagal menghapus varian");
+      }
       setMsg(e?.message || String(e));
     }
   }
@@ -1794,17 +1833,48 @@ export default function AdminDashboard() {
     return list;
   }
 
-  function handleExportCSV() {
-    const exportList = getOrdersForExport();
-    if (!exportList.length) {
-      toast.error("Tidak ada order untuk diekspor");
-      return;
+  async function handleExportCSV() {
+    const tid = toast.loading("Menyiapkan data ekspor CSV...");
+    try {
+      let exportList = [];
+      let query = supabase.from("orders").select(ORDER_SELECT_DETAIL).order("created_at", { ascending: false });
+      if (exportDateFrom) {
+        query = query.gte("created_at", `${exportDateFrom}T00:00:00`);
+      }
+      if (exportDateTo) {
+        query = query.lte("created_at", `${exportDateTo}T23:59:59.999`);
+      }
+      const { data, error } = await query;
+      if (!error && Array.isArray(data) && data.length > 0) {
+        exportList = data;
+      } else {
+        exportList = getOrdersForExport();
+      }
+
+      if (!exportList.length) {
+        toast.remove(tid);
+        toast.error("Tidak ada order untuk diekspor");
+        return;
+      }
+      const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+      const csv = buildOrdersCSV(exportList);
+      const rangeSuffix = exportDateFrom || exportDateTo ? `-${exportDateFrom || "start"}_${exportDateTo || "end"}` : "";
+      downloadCSV(csv, `orders-${today}${rangeSuffix}.csv`);
+      toast.remove(tid);
+      toast.success(`${exportList.length} order diekspor`);
+    } catch {
+      toast.remove(tid);
+      const fallbackList = getOrdersForExport();
+      if (!fallbackList.length) {
+        toast.error("Tidak ada order untuk diekspor");
+        return;
+      }
+      const today = new Date().toLocaleDateString("en-CA");
+      const csv = buildOrdersCSV(fallbackList);
+      const rangeSuffix = exportDateFrom || exportDateTo ? `-${exportDateFrom || "start"}_${exportDateTo || "end"}` : "";
+      downloadCSV(csv, `orders-${today}${rangeSuffix}.csv`);
+      toast.success(`${fallbackList.length} order diekspor`);
     }
-    const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
-    const csv = buildOrdersCSV(exportList);
-    const rangeSuffix = exportDateFrom || exportDateTo ? `-${exportDateFrom || "start"}_${exportDateTo || "end"}` : "";
-    downloadCSV(csv, `orders-${today}${rangeSuffix}.csv`);
-    toast.success(`${exportList.length} order diekspor`);
   }
 
   function buildCustomerWaUrl(order) {
@@ -1812,7 +1882,7 @@ export default function AdminDashboard() {
     if (!digits) return "";
     const statusLabel = prettyOrderStatus(order?.status);
     const text = encodeURIComponent(
-      `Halo ${order?.customer_whatsapp || ""},\n\nUpdate order kamu:\n\nID Order: ${order?.order_code || "-"}\nStatus: ${statusLabel}\nTotal: ${formatIDR(order?.total_idr || 0)}\n\nTerima kasih sudah berbelanja di Imzaqi Store.`
+      `Halo kak,\n\nUpdate order kamu:\n\nID Order: ${order?.order_code || "-"}\nStatus: ${statusLabel}\nTotal: ${formatIDR(order?.total_idr || 0)}\n\nTerima kasih sudah berbelanja di Imzaqi Store.`
     );
     return `https://wa.me/${digits}?text=${text}`;
   }
@@ -1849,6 +1919,8 @@ export default function AdminDashboard() {
           failedIds.push(id);
         }
       });
+      invalidateProductCaches();
+      await refreshProducts({ force: true });
     } else {
       // Bulk update is much more efficient using Supabase .in() operator
       const { error } = await supabase
@@ -1923,7 +1995,8 @@ export default function AdminDashboard() {
         const extra = result.restored_stock
           ? ` (stok +${result.restored_stock}${result.restored_promo ? ", promo dikembalikan" : ""})`
           : "";
-        await refreshOrders();
+        invalidateProductCaches();
+        await Promise.all([refreshOrders(), refreshProducts({ force: true })]);
         toast.remove(tid);
 
         // Toast with WA redirect button for cancellation
@@ -1932,7 +2005,7 @@ export default function AdminDashboard() {
           const orderCode = orderToUpdate?.order_code || "-";
           const total = formatIDR(orderToUpdate?.total_idr || 0);
           const text = encodeURIComponent(
-            `Halo ${customerWa},\n\nOrder kamu dengan ID ${orderCode} telah dibatalkan.\n\nTotal: ${total}\n\nJika ada pertanyaan, silakan hubungi admin.\n\nTerima kasih.`
+            `Halo kak,\n\nOrder kamu dengan ID ${orderCode} telah dibatalkan.\n\nTotal: ${total}\n\nJika ada pertanyaan, silakan hubungi admin.\n\nTerima kasih.`
           );
           const waUrl = `https://wa.me/${waDigits}?text=${text}`;
           toast.success(`Order dibatalkan${extra}`, {
@@ -1958,7 +2031,7 @@ export default function AdminDashboard() {
           const orderCode = orderToUpdate?.order_code || "-";
           const total = formatIDR(orderToUpdate?.total_idr || 0);
           const text = encodeURIComponent(
-            `Halo ${customerWa},\n\nUpdate order kamu:\n\nID Order: ${orderCode}\nStatus: ${statusLabel}\nTotal: ${total}\n\nTerima kasih sudah berbelanja di Imzaqi Store.`
+            `Halo kak,\n\nUpdate order kamu:\n\nID Order: ${orderCode}\nStatus: ${statusLabel}\nTotal: ${total}\n\nTerima kasih sudah berbelanja di Imzaqi Store.`
           );
           const waUrl = `https://wa.me/${waDigits}?text=${text}`;
           toast.success(`Status diperbarui ke ${statusLabel}`, {
@@ -2113,11 +2186,7 @@ export default function AdminDashboard() {
 
     const tid = toast.loading("Mengubah pengaturan tampilan Home...");
     try {
-      const { error } = await supabase
-        .from("site_settings")
-        .upsert({ key: "home_promos", value: { codes: nextCodes }, updated_at: new Date().toISOString() }, { onConflict: "key" });
-
-      if (error) throw error;
+      await upsertSetting("home_promos", { codes: nextCodes });
 
       setSettings((prev) => ({
         ...prev,
@@ -2142,6 +2211,10 @@ export default function AdminDashboard() {
     if (!code) return;
     const tid = toast.loading("Menghapus promo");
     try {
+      // 1. Delete associated claims if any to prevent FK violation
+      await supabase.from("promo_claims").delete().eq("code", code);
+
+      // 2. Delete promo code
       const { error } = await supabase.from("promo_codes").delete().eq("code", code);
       if (error) throw error;
       setPromos(await fetchPromoCodes());
@@ -2149,7 +2222,12 @@ export default function AdminDashboard() {
       toast.success("Promo dihapus", { duration: 1400 });
     } catch (e) {
       toast.remove(tid);
-      toast.error("Gagal hapus promo");
+      const errText = String(e?.message || e || "");
+      if (e?.code === "23503" || errText.includes("foreign key") || errText.includes("violates foreign key")) {
+        toast.error("Kode promo memiliki riwayat klaim/order. Nonaktifkan status promo saja.");
+      } else {
+        toast.error("Gagal hapus promo");
+      }
       setMsg(e?.message || String(e));
     }
   }
@@ -2212,6 +2290,7 @@ export default function AdminDashboard() {
       const { error } = await supabase.from("testimonials").insert(payload);
       if (error) throw error;
 
+      invalidateTestimonialsCache();
       setTestimonials(await fetchTestimonials({ includeInactive: true }));
 
       e.target.reset();
@@ -2229,6 +2308,7 @@ export default function AdminDashboard() {
     try {
       const { error } = await supabase.from("testimonials").update(patch).eq("id", id);
       if (error) throw error;
+      invalidateTestimonialsCache();
       setTestimonials(await fetchTestimonials({ includeInactive: true }));
       toast.remove(tid);
     } catch (e) {
@@ -2255,6 +2335,7 @@ export default function AdminDashboard() {
     try {
       const { error } = await supabase.from("testimonials").delete().eq("id", id);
       if (error) throw error;
+      invalidateTestimonialsCache();
       setTestimonials(await fetchTestimonials({ includeInactive: true }));
       toast.remove(tid);
       toast.success("Dihapus", { duration: 1200 });
@@ -2791,6 +2872,7 @@ export default function AdminDashboard() {
                                             return;
                                           }
                                           toast.success(`Stok ${variant.name} → ${n}`);
+                                          invalidateProductCaches();
                                           refreshProducts({ force: true });
                                         });
                                     },
@@ -4094,6 +4176,11 @@ export default function AdminDashboard() {
                               toast.error("Lengkapi semua field");
                               return;
                             }
+                            const disc = Math.floor(Number(flashForm.discount_percent));
+                            if (!Number.isFinite(disc) || disc < 1 || disc > 99) {
+                              toast.error("Diskon flash sale harus antara 1% – 99%");
+                              return;
+                            }
                             if (new Date(flashForm.ends_at) <= new Date(flashForm.starts_at)) {
                               toast.error("Tanggal selesai harus setelah tanggal mulai");
                               return;
@@ -4103,14 +4190,14 @@ export default function AdminDashboard() {
                               if (flashForm.id) {
                                 await updateFlashSale(flashForm.id, {
                                   variant_id: flashForm.variant_id,
-                                  discount_percent: Number(flashForm.discount_percent),
+                                  discount_percent: disc,
                                   starts_at: new Date(flashForm.starts_at).toISOString(),
                                   ends_at: new Date(flashForm.ends_at).toISOString(),
                                 });
                               } else {
                                 await createFlashSale({
                                   variant_id: flashForm.variant_id,
-                                  discount_percent: Number(flashForm.discount_percent),
+                                  discount_percent: disc,
                                   starts_at: new Date(flashForm.starts_at).toISOString(),
                                   ends_at: new Date(flashForm.ends_at).toISOString(),
                                 });
@@ -4174,8 +4261,8 @@ export default function AdminDashboard() {
                                     id: fs.id,
                                     variant_id: fs.variant_id,
                                     discount_percent: String(fs.discount_percent),
-                                    starts_at: new Date(fs.starts_at).toISOString().slice(0, 16),
-                                    ends_at: new Date(fs.ends_at).toISOString().slice(0, 16),
+                                    starts_at: toLocalDatetimeInput(fs.starts_at),
+                                    ends_at: toLocalDatetimeInput(fs.ends_at),
                                   });
                                   setFlashFormOpen(true);
                                 }}

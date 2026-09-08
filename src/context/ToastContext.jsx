@@ -48,11 +48,15 @@ function ToastIcon({ type }) {
 }
 
 function ToastItem({ toast, onClose }) {
-  const { id, type, title, message, actionLabel, onAction, duration } = toast;
-  const showProgress = duration > 0 && type !== "loading";
+  const { id, type, title, message, actionLabel, onAction, duration, exiting } = toast;
+  const showProgress = duration > 0 && type !== "loading" && !exiting;
 
   return (
-    <div className={`toast toast-${type || "info"}`} role="status" aria-live="polite">
+    <div
+      className={`toast toast-${type || "info"}${exiting ? " is-exiting" : ""}`}
+      role="status"
+      aria-live="polite"
+    >
       <ToastIcon type={type} />
 
       <div className="toast-body">
@@ -91,15 +95,52 @@ function ToastItem({ toast, onClose }) {
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([]);
   const timers = useRef(new Map());
+  const exitTimers = useRef(new Map());
 
-  const remove = useCallback((id) => {
-    setToasts((prev) => prev.filter((t) => t.id !== id));
+  // Cleanup all timers on unmount
+  React.useEffect(() => {
+    const tMap = timers.current;
+    const eMap = exitTimers.current;
+    return () => {
+      tMap.forEach((t) => clearTimeout(t));
+      tMap.clear();
+      eMap.forEach((t) => clearTimeout(t));
+      eMap.clear();
+    };
+  }, []);
+
+  const remove = useCallback((id, { immediate = false } = {}) => {
     const timer = timers.current.get(id);
-
     if (timer) {
       clearTimeout(timer);
       timers.current.delete(id);
     }
+
+    setToasts((prev) => {
+      const target = prev.find((t) => t.id === id);
+      if (!target || immediate || target.type === "loading") {
+        const exitTimer = exitTimers.current.get(id);
+        if (exitTimer) {
+          clearTimeout(exitTimer);
+          exitTimers.current.delete(id);
+        }
+        return prev.filter((t) => t.id !== id);
+      }
+
+      if (target.exiting) return prev;
+
+      return prev.map((t) => (t.id === id ? { ...t, exiting: true } : t));
+    });
+
+    if (immediate) return;
+
+    if (exitTimers.current.has(id)) return;
+
+    const exitTimer = setTimeout(() => {
+      exitTimers.current.delete(id);
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 220);
+    exitTimers.current.set(id, exitTimer);
   }, []);
 
   const push = useCallback(
@@ -109,8 +150,9 @@ export function ToastProvider({ children }) {
       const next = { id, type: "info", ...toast, duration };
 
       setToasts((prev) => {
-        const trimmed = prev.slice(-2);
-        return [...trimmed, next];
+        const active = prev.filter((t) => !t.exiting).slice(-2);
+        const exiting = prev.filter((t) => t.exiting);
+        return [...exiting, ...active, next];
       });
 
       if (duration > 0 && next.type !== "loading") {

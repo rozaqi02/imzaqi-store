@@ -1164,3 +1164,122 @@ html[data-theme="light"] .pay-qrisTimer.is-expired {
   color: #c81e3c;
 }
 
+/* Promo Code Section on Pay Page */
+.pay-promoSection {
+  margin: 14px 0 16px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px dashed var(--brand-line, rgba(255, 255, 255, 0.14));
+  background: var(--surface-2, rgba(255, 255, 255, 0.03));
+}
+
+.pay-promoHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text-muted, #94a3b8);
+}
+
+.pay-promoTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pay-promoClearBtn {
+  font-size: 0.76rem;
+  padding: 2px 8px;
+  height: auto;
+  color: #ff5a7a;
+}
+
+.pay-promoInputRow {
+  display: flex;
+  gap: 8px;
+}
+
+.pay-promoInput {
+  flex: 1;
+  min-height: 38px;
+  font-size: 0.88rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.pay-promoApplyBtn {
+  min-height: 38px;
+  padding: 0 16px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.pay-promoApplied {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: rgba(0, 214, 180, 0.1);
+  border: 1px solid rgba(0, 214, 180, 0.25);
+}
+
+.pay-promoTag {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: 0.9rem;
+  color: var(--brand-icon, #00d6b4);
+  letter-spacing: 0.04em;
+}
+
+.pay-promoDiscountBadge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--brand-icon, #00d6b4);
+  color: #051410;
+}
+
+.pay-promoFeedback {
+  margin-top: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.pay-promoFeedback.is-success {
+  color: #00d6b4;
+}
+
+.pay-promoFeedback.is-error {
+  color: #ff5a7a;
+}
+
+.pay-promoFeedback.is-info {
+  color: var(--text-muted, #94a3b8);
+}
+
+.pay-qrisStepPrompt {
+  text-align: center;
+  padding: 24px 16px;
+}
+
+.pay-qrisStepIcon {
+  width: 46px;
+  height: 46px;
+  margin: 0 auto 12px;
+  border-radius: 50%;
+  background: rgba(0, 214, 180, 0.12);
+  color: var(--brand-icon, #00d6b4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+

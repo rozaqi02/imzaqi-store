@@ -40,6 +40,7 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { warn } from "../lib/log";
 import { copyToClipboard } from "../utils/clipboard";
+import { recordCompletedOrder } from "../lib/loyalty";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
@@ -107,13 +108,13 @@ function sanitizeOrderInput(value) {
 // Kode pesanan baru selalu memakai 8 karakter acak. Jangan memotong input karena
 // itu dapat mengubah kode panjang menjadi kode lain yang valid.
 function normalizeOrderCode(value) {
-  // Strip semua karakter non-alphanumeric kecuali dash sementara
+  // Strip semua karakter non-alphanumeric
   const cleaned = String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (!cleaned) return "";
   // Cek apakah sudah ada prefix IMZ
   const withoutPrefix = cleaned.startsWith("IMZ") ? cleaned.slice(3) : cleaned;
-  if (withoutPrefix.length === 8) return `IMZ-${withoutPrefix}`;
-  // Kode belum lengkap, kembalikan mentah untuk ditampilkan error
+  if (withoutPrefix.length >= 4 && withoutPrefix.length <= 8) return `IMZ-${withoutPrefix}`;
+  // Kode belum lengkap atau di luar format, kembalikan mentah untuk ditampilkan error
   return cleaned;
 }
 
@@ -312,13 +313,16 @@ function TabCekStatus({ settings }) {
     lookup(normalized);
   }, [initialParam, lookup]);
 
-  // Trigger celebration when status becomes "done"
+  // Trigger celebration and record loyalty reward when status becomes "done"
   useEffect(() => {
     if (!order) return;
     const prev = prevStatusRef.current;
     const curr = order.status;
-    if (curr === "done" && prev && prev !== "done") {
-      setShowCelebration(true);
+    if (curr === "done") {
+      recordCompletedOrder(order.order_code);
+      if (prev && prev !== "done") {
+        setShowCelebration(true);
+      }
     }
     prevStatusRef.current = curr;
   }, [order]);
@@ -421,6 +425,24 @@ function TabCekStatus({ settings }) {
     const text = encodeURIComponent(lines.join("\n"));
     return `https://wa.me/${waNumber}?text=${text}`;
   }, [input, order?.order_code, order?.items, order?.status, order?.total_idr, waNumber]);
+
+  const claimWarrantyUrl = useMemo(() => {
+    const code = order?.order_code || "";
+    const itemLines = (order?.items || [])
+      .map((item) => `• ${item.product_name || "-"} / ${item.variant_name || "-"}`)
+      .join("\n");
+    const lines = [
+      "Halo Admin Imzaqi Store, saya ingin klaim garansi / kendala akun:",
+      "",
+      `• ID Order: ${code}`,
+      itemLines ? `• Paket:\n${itemLines}` : null,
+      "• Kendala Akun: [Tuliskan kendala di sini, misal: login kena limit / password berubah]",
+      "",
+      "Mohon dibantu ya admin. Terima kasih!",
+    ].filter(Boolean);
+    const text = encodeURIComponent(lines.join("\n"));
+    return `https://wa.me/${waNumber}?text=${text}`;
+  }, [order?.order_code, order?.items, waNumber]);
 
   async function copyOrderCode() {
     try {
@@ -913,6 +935,18 @@ function TabCekStatus({ settings }) {
                   <span>Hubungi Admin WA</span>
                   <ArrowUpRight size={15} />
                 </a>
+                {order && order.status === "done" ? (
+                  <a
+                    className="btn btn-ghost btn-wide st-warrantyBtn"
+                    href={claimWarrantyUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ marginTop: 8, borderColor: "rgba(0, 214, 180, 0.35)", color: "var(--brand-icon, #00d6b4)" }}
+                  >
+                    <ShieldCheck size={15} />
+                    <span>Klaim Garansi / Kendala Akun</span>
+                  </a>
+                ) : null}
               </div>
             </article>
           </aside>

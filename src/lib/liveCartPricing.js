@@ -19,7 +19,10 @@ export async function buildLiveCartItems(items) {
   const flashSaleMap = new Map();
   if (activeFlashSales !== null) {
     (activeFlashSales || []).forEach((sale) => {
-      flashSaleMap.set(String(sale.variant_id), sale.discount_percent);
+      const vid = String(sale.variant_id);
+      if (!flashSaleMap.has(vid)) {
+        flashSaleMap.set(vid, sale.discount_percent);
+      }
     });
   }
 

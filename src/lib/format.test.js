@@ -7,6 +7,7 @@ import {
   getTimeline,
   normalizeProductRecord,
   packDisplayName,
+  isPromoExpired,
 } from "./format";
 
 describe("getCatalogPriceRange", () => {
@@ -99,5 +100,26 @@ describe("getTimeline", () => {
       ),
       { numRuns: 50 }
     );
+  });
+});
+
+describe("isPromoExpired", () => {
+  it("returns false if expired_at is null or undefined", () => {
+    expect(isPromoExpired(null)).toBe(false);
+    expect(isPromoExpired({})).toBe(false);
+    expect(isPromoExpired({ expired_at: null })).toBe(false);
+  });
+
+  it("considers YYYY-MM-DD valid until end of day", () => {
+    const today = new Date().toLocaleDateString("en-CA"); // YYYY-MM-DD
+    expect(isPromoExpired({ expired_at: today })).toBe(false);
+  });
+
+  it("marks past date as expired", () => {
+    expect(isPromoExpired({ expired_at: "2020-01-01" })).toBe(true);
+  });
+
+  it("marks future date as active", () => {
+    expect(isPromoExpired({ expired_at: "2099-12-31" })).toBe(false);
   });
 });

@@ -100,4 +100,35 @@ describe("storefront popups on admin", () => {
     });
     expect(document.getElementById("root")?.inert).toBe(true);
   });
+
+  it("marks session done and closes popup when dismissed via close button", async () => {
+    document.body.className = "";
+    renderPopup(<FlashSalePopup />, "/");
+    await waitFor(() => {
+      expect(document.querySelector(".fsp-backdrop")).not.toBeNull();
+    });
+
+    const closeBtn = document.querySelector(".fsp-closeFloat");
+    expect(closeBtn).not.toBeNull();
+
+    await act(async () => {
+      closeBtn.click();
+    });
+
+    expect(sessionStorage.getItem("imzaqi_flash_sale_popup_done")).toBe("true");
+    expect(document.querySelector(".fsp-backdrop")).toBeNull();
+  });
+
+  it("does not reopen flash-sale popup when already handled in this session", async () => {
+    document.body.className = "";
+    sessionStorage.setItem("imzaqi_flash_sale_popup_done", "true");
+    renderPopup(<FlashSalePopup />, "/");
+
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 50));
+    });
+
+    expect(document.querySelector(".fsp-backdrop")).toBeNull();
+  });
 });
+

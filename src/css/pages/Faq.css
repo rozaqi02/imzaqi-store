@@ -1,6 +1,6 @@
 /* FAQ owns its palette so legacy storefront card overrides cannot bleed in. */
-.help-page { --help-bg:#101715; --help-panel:#18211e; --help-soft:#202d27; --help-text:#f3f8f5; --help-muted:#b0c1b7; --help-line:#34463b; --help-accent:#69e6ae; background:var(--help-bg); color:var(--help-text); padding:38px 24px 72px; }
-html[data-theme="light"] .help-page { --help-bg:#f5f7f4; --help-panel:#fff; --help-soft:#edf3ee; --help-text:#172c23; --help-muted:#586b60; --help-line:#dce5dc; --help-accent:#087b4e; }
+.help-page { --help-panel:#18211e; --help-soft:#202d27; --help-text:#f3f8f5; --help-muted:#b0c1b7; --help-line:#34463b; --help-accent:#69e6ae; background:transparent; color:var(--help-text); padding:38px 24px 72px; }
+html[data-theme="light"] .help-page { --help-panel:#fff; --help-soft:#edf3ee; --help-text:#172c23; --help-muted:#586b60; --help-line:#dce5dc; --help-accent:#087b4e; }
 .help-page *, .help-page *::before, .help-page *::after { box-sizing:border-box; }
 .help-wrap { max-width:1160px; margin:0 auto; }
 .help-page h1,.help-page h2,.help-page h3,.help-page p { margin:0; }

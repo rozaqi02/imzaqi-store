@@ -41,7 +41,7 @@ async function sumLast7DaysUniqueViews() {
     const { data: rows, error } = await supabase
       .from("daily_stats")
       .select("unique_views")
-      .gte("stat_date", startDate);
+      .gte("date", startDate);
 
     if (!error && Array.isArray(rows)) {
       return rows.reduce((sum, row) => sum + Number(row.unique_views || 0), 0);

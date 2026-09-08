@@ -28,7 +28,9 @@ export default function Layout({ children, routeKey }) {
 
   const hideFooter = isAdminDashboardRoute || (isCheckoutRoute && isMobile);
   const hideStoreChrome = isAdminDashboardRoute; // full-screen admin app shell
-  const isFunnel = isFunnelPath(location.pathname);
+  // A checkout drawer still sits on top of the storefront, so keep the
+  // storefront chrome (including the promo ticker) visible behind it.
+  const isFunnel = isFunnelPath(location.pathname) && !isCheckoutOverlay;
 
   React.useEffect(() => {
     if (typeof document === "undefined") return undefined;

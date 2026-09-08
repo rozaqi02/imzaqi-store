@@ -143,7 +143,7 @@ export function useGlobalShortcuts() {
         if (map[e.key]) {
           e.preventDefault();
           navigate(map[e.key]);
-          window.__lastGKey = 0;
+          lastGKeyRef.current = 0;
         }
       }
     }

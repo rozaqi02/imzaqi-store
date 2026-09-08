@@ -128,7 +128,11 @@ export default function AcademicPopup() {
       return;
     }
 
-    if (!settingsReady || isSuppressed || !isEnabled || wasHandledThisSession()) {
+    if (!settingsReady) {
+      return;
+    }
+
+    if (isSuppressed || !isEnabled || wasHandledThisSession()) {
       notifyAcademicPopupClosed();
       return;
     }

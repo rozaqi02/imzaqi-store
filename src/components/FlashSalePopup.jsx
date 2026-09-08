@@ -9,9 +9,24 @@ import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 
 const SUPPRESS_DATE_KEY = "imzaqi_flash_sale_suppress_date_v1";
+const SESSION_DONE_KEY = "imzaqi_flash_sale_popup_done";
 
 function getTodayString() {
   return new Date().toDateString();
+}
+
+function wasHandledThisSession() {
+  try {
+    return sessionStorage.getItem(SESSION_DONE_KEY) === "true";
+  } catch {
+    return false;
+  }
+}
+
+function markSessionDone() {
+  try {
+    sessionStorage.setItem(SESSION_DONE_KEY, "true");
+  } catch {}
 }
 
 export default function FlashSalePopup() {
@@ -21,6 +36,7 @@ export default function FlashSalePopup() {
   const [salesItems, setSalesItems] = useState([]);
   const [closestEndTime, setClosestEndTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
+  const [sessionDismissed, setSessionDismissed] = useState(() => wasHandledThisSession());
   const [isSuppressed, setIsSuppressed] = useState(() => {
     try {
       return localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
@@ -93,9 +109,20 @@ export default function FlashSalePopup() {
 
   useEffect(() => {
     const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
-    if (suppressedToday || overlayBlocked || salesItems.length === 0) return undefined;
+    if (
+      suppressedToday ||
+      sessionDismissed ||
+      wasHandledThisSession() ||
+      overlayBlocked ||
+      salesItems.length === 0
+    ) {
+      return undefined;
+    }
+
+    let queuedTimer = null;
 
     const checkAndOpenFlashSale = () => {
+      if (wasHandledThisSession()) return;
       const isAcademicActive = Boolean(
         window.__imzaqi_academic_popup_active || document.querySelector(".ac-popup-backdrop")
       );
@@ -103,9 +130,21 @@ export default function FlashSalePopup() {
       setIsOpen(true);
     };
 
+    const handleAcademicPopupClosed = () => {
+      if (wasHandledThisSession()) return;
+      if (queuedTimer) clearTimeout(queuedTimer);
+      queuedTimer = setTimeout(checkAndOpenFlashSale, 400);
+    };
+
     const initialTimer = setTimeout(checkAndOpenFlashSale, OVERLAY_TIMING.flashSaleMs);
-    return () => clearTimeout(initialTimer);
-  }, [overlayBlocked, salesItems.length]);
+    window.addEventListener("imzaqi_academic_popup_closed", handleAcademicPopupClosed);
+
+    return () => {
+      clearTimeout(initialTimer);
+      if (queuedTimer) clearTimeout(queuedTimer);
+      window.removeEventListener("imzaqi_academic_popup_closed", handleAcademicPopupClosed);
+    };
+  }, [overlayBlocked, salesItems.length, sessionDismissed]);
 
   useEffect(() => {
     if (overlayBlocked) setIsOpen(false);
@@ -137,7 +176,11 @@ export default function FlashSalePopup() {
     return () => clearInterval(interval);
   }, [isOpen, closestEndTime]);
 
-  const handleClose = () => setIsOpen(false);
+  const handleClose = () => {
+    markSessionDone();
+    setSessionDismissed(true);
+    setIsOpen(false);
+  };
 
   useDialogA11y({
     open: isOpen && !overlayBlocked,
@@ -163,11 +206,23 @@ export default function FlashSalePopup() {
       (typeof document !== "undefined" && document.querySelector(".ac-popup-backdrop"))
   );
 
-  if (overlayBlocked || !isOpen || !featured || isAcademicActive || isSuppressed) return null;
+  if (
+    overlayBlocked ||
+    !isOpen ||
+    !featured ||
+    isAcademicActive ||
+    isSuppressed ||
+    sessionDismissed ||
+    wasHandledThisSession()
+  ) {
+    return null;
+  }
 
   const featuredIcon = String(featured.productIconUrl || "").trim();
 
   function goProduct(slug) {
+    markSessionDone();
+    setSessionDismissed(true);
     setIsOpen(false);
     navigate(`/produk/${slug}`);
   }
@@ -244,7 +299,11 @@ export default function FlashSalePopup() {
               <button
                 type="button"
                 onClick={() => {
-                  localStorage.setItem(SUPPRESS_DATE_KEY, getTodayString());
+                  try {
+                    localStorage.setItem(SUPPRESS_DATE_KEY, getTodayString());
+                  } catch {}
+                  markSessionDone();
+                  setSessionDismissed(true);
                   setIsSuppressed(true);
                   setIsOpen(false);
                 }}

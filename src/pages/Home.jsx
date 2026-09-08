@@ -12,6 +12,7 @@ import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { isAcademicProduct } from "../lib/productCategories";
+import { isPromoExpired } from "../lib/format";
 
 import { useToast } from "../context/ToastContext";
 import { copyToClipboard } from "../utils/clipboard";
@@ -211,7 +212,7 @@ export default function Home() {
           .filter((p) => {
             if (!p.is_active) return false;
             if (!allowedCodes.includes(p.code)) return false;
-            if (p.expired_at && new Date(p.expired_at) < new Date()) return false;
+            if (isPromoExpired(p)) return false;
             if (p.max_uses != null && p.used_count >= p.max_uses) return false;
             return true;
           })
@@ -462,12 +463,6 @@ export default function Home() {
                     onClick={() => setActiveStep(isOpen ? null : i)}
                     aria-expanded={isOpen}
                     aria-label={`Langkah ${step.step}: ${step.title}. ${isOpen ? "Tutup" : "Buka"} detail tambahan.`}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setActiveStep(isOpen ? null : i);
-                      }
-                    }}
                   >
                     <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
                     <div className="home-howCard-content">

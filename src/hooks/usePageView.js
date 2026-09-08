@@ -42,6 +42,13 @@ function markToday(dayISO) {
   } catch {}
 }
 
+function unmarkToday(dayISO) {
+  try {
+    if (typeof window === "undefined") return;
+    window.localStorage.removeItem(getVisitKey(dayISO));
+  } catch {}
+}
+
 export function usePageView() {
   const location = useLocation();
   const lastTrackedPath = useRef(null);
@@ -113,6 +120,7 @@ export function usePageView() {
         }
 
       } catch (e) {
+        unmarkToday(day);
         console.error("Gagal update unique visit", e);
       }
     }

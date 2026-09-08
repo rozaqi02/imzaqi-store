@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { X } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts, fetchPromoCodes, fetchSettings } from "../lib/api";
 import { copyToClipboard } from "../utils/clipboard";
-import { isKnownOutOfStock } from "../lib/format";
+import { isKnownOutOfStock, isPromoExpired } from "../lib/format";
 
 const FLASH_ROTATE_MS = 6000;
 const PROMO_DISMISS_KEY = "imzaqi_ticker_promo_dismissed";
@@ -17,7 +17,7 @@ const DEFAULT_FLASH = {
 
 function isPromoLive(promo) {
   if (!promo?.is_active) return false;
-  if (promo.expired_at && new Date(promo.expired_at) < new Date()) return false;
+  if (isPromoExpired(promo)) return false;
   if (promo.max_uses != null && Number(promo.used_count || 0) >= Number(promo.max_uses)) return false;
   return true;
 }
