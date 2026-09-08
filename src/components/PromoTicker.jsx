@@ -105,7 +105,7 @@ export default function PromoTicker() {
   }, [flashItems.length]);
 
   const flash = flashItems[flashIndex] || DEFAULT_FLASH;
-  const showPromo = Boolean(promo) && !promoDismissed;
+  const showPromo = Boolean(promo) && !promoDismissed && flashItems.length === 0;
 
   function dismissPromo(event) {
     event.preventDefault();

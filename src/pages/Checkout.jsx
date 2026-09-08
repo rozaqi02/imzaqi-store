@@ -11,6 +11,7 @@ import {
   ShieldCheck,
   ShoppingBag,
   TicketPercent,
+  Mail,
   X,
   Trash2,
 } from "lucide-react";
@@ -29,6 +30,9 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import WhatsAppInput from "../components/WhatsAppInput";
+import { loadBuyerDetails, saveBuyerDetails } from "../lib/buyerDetails";
+import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
@@ -99,6 +103,9 @@ export default function Checkout() {
   const [msg, setMsg] = useState("");
   const [closing, setClosing] = useState(false);
   const [stockWarnings, setStockWarnings] = useState({});
+  const [customerWhatsApp, setCustomerWhatsApp] = useState(() => loadBuyerDetails().whatsapp);
+  const [buyerEmail, setBuyerEmail] = useState(() => loadBuyerDetails().email);
+  const [isWaValid, setIsWaValid] = useState(false);
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(max-width: 720px)").matches : false
   );
@@ -202,6 +209,15 @@ export default function Checkout() {
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
   const hasStockIssue = useMemo(() => cart.items.some((item) => stockWarnings[item.variant_id]), [cart.items, stockWarnings]);
   const stockDisabledReason = hasStockIssue ? "Ada item yang stoknya abis atau kurang" : null;
+  const requiresBuyerEmail = useMemo(
+    () => cart.items.some((item) => Boolean(item.requires_buyer_email)),
+    [cart.items]
+  );
+  const hasValidEmail = !requiresBuyerEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail.trim());
+
+  useEffect(() => {
+    saveBuyerDetails({ whatsapp: customerWhatsApp, email: buyerEmail });
+  }, [buyerEmail, customerWhatsApp]);
 
   const requestClose = useCallback(() => {
     setClosing((prev) => (prev ? prev : true));
@@ -292,7 +308,63 @@ export default function Checkout() {
       return;
     }
 
-    nav("/bayar");
+    if (!isWaValid) {
+      const text = "Isi nomor WhatsApp yang valid sebelum lanjut.";
+      setMsg(text);
+      toast.error(text);
+      document.getElementById("whatsapp-input")?.focus();
+      return;
+    }
+
+    if (!hasValidEmail) {
+      const text = "Paket ini memerlukan email pembeli yang valid.";
+      setMsg(text);
+      toast.error(text);
+      document.getElementById("checkout-buyer-email")?.focus();
+      return;
+    }
+
+    const buyerDetails = saveBuyerDetails({ whatsapp: customerWhatsApp, email: buyerEmail });
+    trackFunnelEvent("begin_checkout", { metadata: { itemCount, total } });
+    nav("/bayar", { state: { buyerDetails } });
+  }
+
+  function renderBuyerContact() {
+    return (
+      <div className="checkout-contactBlock">
+        <div className="checkout-contactHead">
+          <div>
+            <div className="checkout-main-kicker">Kontak pengiriman</div>
+            <h3>Siapkan tujuan pesanan</h3>
+          </div>
+          <span>Wajib</span>
+        </div>
+        <WhatsAppInput
+          value={customerWhatsApp}
+          onChange={setCustomerWhatsApp}
+          onValidChange={setIsWaValid}
+          compact
+          rememberLast
+          label="WhatsApp"
+          helperText="Dipakai untuk mengirim akun dan memulihkan riwayat order."
+        />
+        {requiresBuyerEmail ? (
+          <div className="checkout-emailField">
+            <label htmlFor="checkout-buyer-email"><Mail size={14} /> Email aktivasi <span>Wajib untuk paket ini</span></label>
+            <input
+              id="checkout-buyer-email"
+              className="input"
+              type="email"
+              value={buyerEmail}
+              onChange={(event) => setBuyerEmail(event.target.value)}
+              placeholder="pembeli@email.com"
+              autoComplete="email"
+              aria-invalid={!hasValidEmail || undefined}
+            />
+          </div>
+        ) : null}
+      </div>
+    );
   }
 
   function renderPromoCard() {
@@ -422,7 +494,7 @@ export default function Checkout() {
         {renderTrustSignals(true)}
 
         <button className="btn btn-wide checkout-summaryBtn" type="button" onClick={goPay} disabled={cart.items.length === 0 || hasStockIssue}>
-          <span>Bayar {formatIDR(total)}</span>
+          <span>Lanjut bayar {formatIDR(total)}</span>
           <ArrowRight size={16} />
         </button>
 
@@ -495,6 +567,8 @@ export default function Checkout() {
                     ))}
                   </div>
 
+                  {renderBuyerContact()}
+
                   <CheckoutExtrasPanel
                     defaultOpen={Boolean(promoPercent)}
                     promoSection={renderPromoCard()}
@@ -526,7 +600,7 @@ export default function Checkout() {
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-drawer-stock-reason" : undefined}
             >
-              <span>Bayar {formatIDR(total)}</span>
+              <span>Lanjut bayar {formatIDR(total)}</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (
@@ -603,6 +677,10 @@ export default function Checkout() {
                     </div>
                   </section>
 
+                  <section className="card pad checkout-panel checkout-full-contact-panel">
+                    {renderBuyerContact()}
+                  </section>
+
                   <section className="card pad checkout-panel checkout-full-promo-panel">
                     <CheckoutExtrasPanel
                       defaultOpen={Boolean(promoPercent)}
@@ -640,7 +718,7 @@ export default function Checkout() {
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-full-stock-reason" : undefined}
             >
-              <span>Bayar {formatIDR(total)}</span>
+              <span>Lanjut bayar {formatIDR(total)}</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (

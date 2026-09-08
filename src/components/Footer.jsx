@@ -105,7 +105,7 @@ export default function Footer() {
 
           <div className="site-footerGoLegal">
             <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
-            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v5.7.0</p>
+            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v6.0.0</p>
           </div>
         </div>
       </div>

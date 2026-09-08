@@ -26,8 +26,8 @@ const FAQ_ITEMS = [
     category: "payment",
     question: "Gimana cara bayarnya?",
     answer: [
-      "Pilih produk + varian, lanjut ke halaman bayar.",
-      "Scan QRIS sesuai total, konfirmasi, dapet ID order.",
+      "Pilih produk + varian, isi kontak di checkout, lalu lanjut ke QRIS.",
+      "Stok dikunci 30 menit. Setelah bayar, masukkan nomor referensi transaksi untuk diverifikasi admin.",
     ],
     tags: ["qris", "bayar", "payment", "scan"],
   },
@@ -36,8 +36,8 @@ const FAQ_ITEMS = [
     category: "payment",
     question: "QRIS-nya kok gak muncul?",
     answer: [
-      "Biasanya karena nomor WA belum valid atau ada varian yang minta email buyer.",
-      "Lengkapi data di halaman bayar - QRIS bakal kebuka otomatis.",
+      "Biasanya karena kontak belum valid, email aktivasi belum lengkap, atau reservasi stok gagal.",
+      "Lengkapi data di checkout. QRIS terbuka setelah stok berhasil dikunci untukmu.",
     ],
     tags: ["qris", "locked", "email", "catatan"],
   },
@@ -56,8 +56,8 @@ const FAQ_ITEMS = [
     category: "order",
     question: "Udah bayar, terus gimana?",
     answer: [
-      "Simpen ID order yang muncul abis konfirmasi.",
-      "Buka halaman Status, masukin ID buat pantau progres.",
+      "ID order dibuat saat stok berhasil direservasi dan tetap tersedia setelah konfirmasi.",
+      "Buka Status, lalu masukkan ID dan 4 digit terakhir WhatsApp pembeli.",
     ],
     tags: ["id order", "status", "setelah bayar"],
   },
@@ -66,8 +66,8 @@ const FAQ_ITEMS = [
     category: "order",
     question: "Format ID order kayak gimana?",
     answer: [
-      "Format utama: IMZ-ABCD.",
-      "Di halaman status bisa tempel kode pendek (ABCD) - sistem otomatis normalisasi.",
+      "Format baru memakai 8 karakter acak, misalnya IMZ-ABCD1234.",
+      "Untuk keamanan, pengecekan status juga meminta 4 digit terakhir WhatsApp pembeli.",
     ],
     tags: ["format", "id", "imz"],
   },
@@ -96,10 +96,20 @@ const FAQ_ITEMS = [
     category: "product",
     question: "Stok di website real-time gak?",
     answer: [
-      "Iya, stok berkurang pas order berhasil diproses.",
-      "Kalo stok berubah pas checkout, sistem bakal notifikasi buat review ulang.",
+      "Stok dikunci selama 30 menit ketika ID order dan QRIS dibuat.",
+      "Kalau pembayaran tidak dikonfirmasi sampai waktunya habis, reservasi dibatalkan dan stok dikembalikan.",
     ],
     tags: ["stok", "real-time", "checkout"],
+  },
+  {
+    id: "warranty-policy",
+    category: "support",
+    question: "Garansi berlaku seperti apa?",
+    answer: [
+      "Masa garansi mengikuti label pada varian dan melindungi kendala akun sebelum masa paket berakhir.",
+      "Laporkan kendala maksimal 24 jam setelah ditemukan, sertakan ID order, dan jangan mengubah data login untuk akun sharing.",
+    ],
+    tags: ["garansi", "replace", "kendala", "24 jam"],
   },
   {
     id: "buyer-email",
@@ -161,7 +171,7 @@ const HOWTO_STEPS = [
     num: "03",
     icon: ClipboardList,
     title: "Simpen ID",
-    desc: "Abis bayar, catat ID order (IMZ-XXXX) yang muncul.",
+    desc: "Simpan ID aman seperti IMZ-ABCD1234 yang muncul saat stok dikunci.",
     to: "/status",
   },
   {
@@ -184,7 +194,9 @@ function faqMatches(item, query) {
   return blob.includes(q);
 }
 
-function FaqItem({ item, open, onToggle }) {
+function FaqItem({ item, open, onToggle, idPrefix = "faq" }) {
+  const questionId = `${idPrefix}-question-${item.id}`;
+  const answerId = `${idPrefix}-answer-${item.id}`;
   const categoryLabel = CATEGORY_LABELS[item.category] || "FAQ";
 
   return (
@@ -192,8 +204,8 @@ function FaqItem({ item, open, onToggle }) {
       <button
         type="button"
         className="help-itemHead"
-        id={`faq-question-${item.id}`}
-        aria-controls={`faq-answer-${item.id}`}
+        id={questionId}
+        aria-controls={answerId}
         aria-expanded={open}
         onClick={() => onToggle(item.id)}
       >
@@ -204,7 +216,7 @@ function FaqItem({ item, open, onToggle }) {
         <ChevronDown size={17} />
       </button>
 
-      <div id={`faq-answer-${item.id}`} className="help-itemBodyWrap" hidden={!open} role="region" aria-labelledby={`faq-question-${item.id}`}>
+      <div id={answerId} className="help-itemBodyWrap" hidden={!open} role="region" aria-labelledby={questionId}>
         <div className="help-itemBody">
           {item.answer.map((line) => (
             <p key={line}>{line}</p>
@@ -289,7 +301,8 @@ export default function FaqPageContent() {
   };
 
   const waUrl = useMemo(() => {
-    const message = encodeURIComponent("Halo Admin Imzaqi Store, saya mau tanya terkait order/produk.");
+    const context = query.trim() ? ` Saya tadi mencari: “${query.trim()}”.` : "";
+    const message = encodeURIComponent(`Halo Admin Imzaqi Store, saya mau tanya terkait order/produk.${context}`);
     return `https://wa.me/${waNumber}?text=${message}`;
   }, [waNumber]);
 
@@ -317,6 +330,13 @@ export default function FaqPageContent() {
           </div>
         </header>
 
+        {!query.trim() && activeCategory === "all" ? (
+          <section className="help-popularAnswers" aria-labelledby="help-popular-title">
+            <div className="help-listHead"><div><span className="help-eyebrow">PALING SERING DIBUTUHKAN</span><h2 id="help-popular-title">Jawaban cepat.</h2></div></div>
+            <div className="help-list">{FAQ_ITEMS.slice(0, 3).map(item => <FaqItem key={item.id} item={item} idPrefix="popular-faq" open={item.id === openId} onToggle={handleToggle} />)}</div>
+          </section>
+        ) : null}
+
         <div className="help-workspace">
           <aside className="help-sidebar">
             <span className="help-eyebrow">JELAJAHI TOPIK</span>
@@ -327,7 +347,7 @@ export default function FaqPageContent() {
           </aside>
           <section className="help-answers" aria-labelledby="help-results-title">
             <div className="help-listHead"><div><span className="help-eyebrow">JAWABAN UNTUKMU</span><h2 id="help-results-title">{query.trim() ? "Hasil pencarian" : activeCategory === "all" ? "Pertanyaan yang sering ditanya" : CATEGORY_LABELS[activeCategory]}</h2></div><span className="help-resultCount" role="status">{filteredFaq.length} pertanyaan</span></div>
-            {filteredFaq.length ? <div className="help-list">{filteredFaq.map(item => <FaqItem key={item.id} item={item} open={item.id === openId} onToggle={handleToggle} />)}</div> : <div className="help-empty"><PackageSearch size={38} /><h3>Jawabannya belum ketemu</h3><p>Coba kata kunci lain atau tampilkan semua topik.</p><button className="help-button" type="button" onClick={() => { handleQueryChange(""); setActiveCategory("all"); }}>Lihat semua pertanyaan</button></div>}
+            {filteredFaq.length ? <div className="help-list">{filteredFaq.map(item => <FaqItem key={item.id} item={item} open={item.id === openId} onToggle={handleToggle} />)}</div> : <div className="help-empty"><PackageSearch size={38} /><h3>Jawabannya belum ketemu</h3><p>Coba kata kunci lain atau kirim pencarian ini ke admin.</p><button className="help-button" type="button" onClick={() => { handleQueryChange(""); setActiveCategory("all"); }}>Lihat semua pertanyaan</button><a className="help-button help-button--secondary" href={waUrl} target="_blank" rel="noreferrer">Tanya admin</a></div>}
           </section>
         </div>
 

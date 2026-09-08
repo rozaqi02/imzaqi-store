@@ -73,7 +73,7 @@ const HOW_IT_WORKS = [
     step: "03",
     title: "Gas & Pantau",
     desc: "Akun aktif dalam hitungan menit. Pake ID order buat pantau status di halaman Status.",
-    details: "Detail login dikirim instan. Garansi hangus/replace bisa diklaim 24 jam lewat WhatsApp Admin.",
+    details: "Umumnya diproses 5–30 menit pada jam operasional; varian email maksimal 2 jam. Kendala bisa dilaporkan lewat WhatsApp Admin.",
   },
 ];
 

@@ -128,6 +128,7 @@ describe("Status Page - Property 1: No horizontal overflow at minimum viewport",
   beforeEach(() => {
     jest.clearAllMocks();
     mockSearchParamsValue = new URLSearchParams();
+    localStorage.setItem("imzaqi_buyer_details_v1", JSON.stringify({ whatsapp: "6281234567890", email: "" }));
   });
 
   /**

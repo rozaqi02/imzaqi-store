@@ -15,6 +15,7 @@ import {
   Sparkles,
   UserRound,
   Users,
+  Bell,
 } from "lucide-react";
 
 import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts, fetchTopSellingData } from "../lib/api";
@@ -38,6 +39,9 @@ import ProductTile from "../components/ProductTile";
 import AccountTypeStrip from "../components/AccountTypeStrip";
 import RecentlyViewed from "../components/RecentlyViewed";
 import { addRecentlyViewed } from "../lib/recentlyViewed";
+import { supabase } from "../lib/supabaseClient";
+import { getVisitorIdAsUUID } from "../lib/visitor";
+import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
 function normalizeInlineText(text) {
   return String(text || "")
@@ -111,7 +115,30 @@ function VariantBenefitList({ rawText }) {
   }, [sections]);
   if (!summary) return null;
 
-  return <p className="pdx-packBlurb pdx-packBlurb--summary" title={summary}>{summary}</p>;
+  return <div className="pdx-packDetails"><p className="pdx-packBlurb pdx-packBlurb--summary" title={summary}>{summary}</p>{summary.length > 105 ? <details><summary>Lihat rincian paket</summary><p>{summary}</p></details> : null}</div>;
+}
+
+function RestockRequest({ variant, adminUrl }) {
+  const [open, setOpen] = useState(false);
+  const [phone, setPhone] = useState("");
+  const [state, setState] = useState("idle");
+
+  async function submit(event) {
+    event.preventDefault();
+    const digits = phone.replace(/\D/g, "");
+    if (digits.length < 10) { setState("invalid"); return; }
+    setState("loading");
+    const { error } = await supabase.from("restock_requests").insert({
+      visitor_id: getVisitorIdAsUUID(), product_id: variant.product_id,
+      variant_id: variant.id, customer_whatsapp: digits,
+    });
+    if (error && error.code !== "23505") { setState("error"); return; }
+    setState("done");
+    trackFunnelEvent("restock_request", { productId: variant.product_id, variantId: variant.id });
+  }
+
+  if (state === "done") return <div className="pdx-restockDone"><Bell size={14} /> Siap, kami kabari saat stok kembali.</div>;
+  return <div className="pdx-restock"><div className="pdx-packActions"><button className="btn btn-sm pdx-restockBtn" type="button" onClick={(event) => { event.stopPropagation(); setOpen(value => !value); }}><Bell size={14} /> Kabari saat ready</button>{adminUrl ? <a className="btn btn-sm btn-ghost" href={adminUrl} target="_blank" rel="noreferrer" onClick={event => event.stopPropagation()}>Tanya admin</a> : null}</div>{open ? <form onSubmit={submit} onClick={event => event.stopPropagation()}><input className="input" inputMode="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="WhatsApp 08xxxxxxxxxx" aria-label="WhatsApp untuk notifikasi restock"/><button className="btn btn-sm" disabled={state === "loading"}>{state === "loading" ? "Menyimpan…" : "Ingatkan saya"}</button>{state === "invalid" ? <small>Masukkan nomor WhatsApp yang valid.</small> : state === "error" ? <small>Belum bisa disimpan. Coba lagi.</small> : null}</form> : null}</div>;
 }
 
 function parseDays(label) {
@@ -257,7 +284,8 @@ const VariantCard = React.memo(({
   maxVariantStock,
   onSelect,
   onAdd,
-  onBuy
+  onBuy,
+  adminUrl,
 }) => {
   const stock = Number(variant.stock ?? 0);
   const soldCount = Math.max(0, Number(variant.sold_count || 0));
@@ -352,7 +380,7 @@ const VariantCard = React.memo(({
         rawText={descriptionBody}
       />
 
-      <div className="pdx-packActions">
+      {out ? <RestockRequest variant={variant} adminUrl={adminUrl} /> : <div className="pdx-packActions">
         <button
           className={`btn btn-sm btn-ghost pdx-addBtn ${out ? "btn-disabled" : ""}`}
           type="button"
@@ -376,7 +404,7 @@ const VariantCard = React.memo(({
         >
           {out ? "Stok habis" : "Beli sekarang"}
         </button>
-      </div>
+      </div>}
     </>
   );
 
@@ -426,7 +454,7 @@ function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
             </li>
             <li>
               <span className="pdx-termNum">3</span>
-              <span className="pdx-termText">Garansi replace (ganti akun) hanya berlaku jika akun mengalami kendala atau mati sebelum masa aktif durasi paket berakhir.</span>
+              <span className="pdx-termText">Garansi replace berlaku selama masa garansi pada label varian. Laporkan kendala maksimal 24 jam setelah ditemukan dan sebelum masa paket berakhir.</span>
             </li>
             <li>
               <span className="pdx-termNum">4</span>
@@ -840,6 +868,11 @@ export default function ProductDetail() {
     });
   }, [product, summary.minPrice]);
 
+  useEffect(() => {
+    if (!product?.id) return;
+    trackFunnelEvent("view_product", { productId: product.id, metadata: { slug: product.slug } });
+  }, [product?.id, product?.slug]);
+
   function handleAdd(variant, qty = 1, event) {
     const stock = Number(variant?.stock ?? 999);
     const requestedQty = Math.max(1, Math.floor(Number(qty) || 1));
@@ -887,6 +920,7 @@ export default function ProductDetail() {
       actionLabel: "Intip keranjang",
       onAction: goCheckout,
     });
+    trackFunnelEvent("add_to_cart", { productId: product.id, variantId: variant.id, metadata: { qty: requestedQty, price: effectivePrice } });
 
     setSelectedVariantId(variant.id);
     setAddedVariantId(variant.id);
@@ -1153,11 +1187,18 @@ export default function ProductDetail() {
                           isMotionOff={isMotionOff}
                           motionMode={motionMode}
                           maxVariantStock={maxVariantStock}
-                          onSelect={setSelectedVariantId}
+                          onSelect={(variantId) => {
+                            setSelectedVariantId(variantId);
+                            trackFunnelEvent("select_variant", { productId: product.id, variantId });
+                          }}
                           onAdd={handleAdd}
                           onBuy={(v, q, e) => {
-                            if (handleAdd(v, q, e)) nav("/bayar");
+                            if (handleAdd(v, q, e)) {
+                              trackFunnelEvent("buy_now", { productId: product.id, variantId: v.id });
+                              nav("/checkout");
+                            }
                           }}
+                          adminUrl={adminWhatsAppUrl}
                         />
                       );
                     })

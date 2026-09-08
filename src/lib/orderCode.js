@@ -1,7 +1,7 @@
 const ALPHABET = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const CODE_MIN = 2;
 const CODE_MAX = 10;
-const CODE_DEFAULT = 4;
+const CODE_DEFAULT = 8;
 
 export function makeOrderCode(len = CODE_DEFAULT) {
   let out = "";
@@ -18,7 +18,8 @@ export function normalizeOrderCode(value) {
   const cleaned = String(value || "").trim().toUpperCase().replace(/[^A-Z0-9]/g, "");
   if (!cleaned) return "";
   const withoutPrefix = cleaned.startsWith("IMZ") ? cleaned.slice(3) : cleaned;
-  if (withoutPrefix.length >= 4 && withoutPrefix.length <= 8) return `IMZ-${withoutPrefix}`;
+  // Empat karakter tetap diterima untuk order lama. Semua order baru memakai 8 karakter.
+  if (withoutPrefix.length === 4 || (withoutPrefix.length >= 8 && withoutPrefix.length <= 10)) return `IMZ-${withoutPrefix}`;
   return cleaned;
 }
 

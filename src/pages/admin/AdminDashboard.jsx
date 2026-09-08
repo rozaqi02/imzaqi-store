@@ -189,6 +189,8 @@ export default function AdminDashboard() {
   const [topPages, setTopPages] = useState([]);
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [cohortReturn, setCohortReturn] = useState(0);
+  const [funnelSummary, setFunnelSummary] = useState({ days: 7, steps: [] });
+  const [restockRequests, setRestockRequests] = useState([]);
 
   // ── Bulk Actions state ──
   const [selectedOrderIds, setSelectedOrderIds] = useState(new Set());
@@ -450,7 +452,7 @@ export default function AdminDashboard() {
         total,
         live,
         done: Number(byStatus.done || 0),
-        cancelled: Number(byStatus.cancelled || 0),
+        cancelled: Number(byStatus.cancelled || 0) + Number(byStatus.expired || 0),
         paidReported: Number(byStatus.paid_reported || 0),
         byStatus,
         loaded: true,
@@ -583,11 +585,12 @@ export default function AdminDashboard() {
     }
     setAnalyticsLoading(true);
     try {
-      const [dailyResult, visitorResult, pagesResult, cohortResult] = await Promise.allSettled([
+      const [dailyResult, visitorResult, pagesResult, cohortResult, funnelResult] = await Promise.allSettled([
         fetchDailyStats({ days }),
         fetchVisitorStats({ days }),
         fetchTopPages({ days, limit: 10 }),
         fetchCohortReturn({ days: 7 }),
+        supabase.rpc("get_funnel_summary", { p_days: days }),
       ]);
 
       if (dailyResult.status === "fulfilled") {
@@ -612,6 +615,11 @@ export default function AdminDashboard() {
         setCohortReturn(cohortResult.value);
       } else {
         warn("fetchCohortReturn gagal:", cohortResult.reason);
+      }
+      if (funnelResult.status === "fulfilled" && !funnelResult.value?.error) {
+        setFunnelSummary(funnelResult.value.data || { days, steps: [] });
+      } else if (funnelResult.status === "rejected") {
+        warn("get_funnel_summary gagal:", funnelResult.reason);
       }
       loadedRef.current.analytics = true;
     } catch (e) {
@@ -649,6 +657,12 @@ export default function AdminDashboard() {
       tasks.push(refreshAnalytics(days, { force: true }));
       // Counts for KPI even if orders page already loaded
       if (!orderDbStats.loaded || force) tasks.push(fetchOrderDbStats());
+      tasks.push(
+        supabase.from("restock_requests")
+          .select("id,customer_whatsapp,created_at,notified_at,product_id,variant_id,products(name),product_variants(name,duration_label)")
+          .order("created_at", { ascending: false }).limit(30)
+          .then(({ data, error }) => { if (!error) setRestockRequests(data || []); })
+      );
     }
 
     if (tabId === "promos" && (!loadedRef.current.promos || force)) {
@@ -1194,7 +1208,7 @@ export default function AdminDashboard() {
         pageCount: (orders || []).length,
       };
     }
-    const byStatus = { pending: 0, paid_reported: 0, processing: 0, done: 0, cancelled: 0 };
+    const byStatus = { pending: 0, pending_payment: 0, paid_reported: 0, processing: 0, done: 0, cancelled: 0, expired: 0 };
     for (const order of orders || []) {
       const key = String(order.status || "pending");
       byStatus[key] = (byStatus[key] || 0) + 1;
@@ -1203,7 +1217,7 @@ export default function AdminDashboard() {
       total: orders.length,
       live: orders.filter((order) => LIVE_ORDER_STATUSES.has(String(order.status || "pending"))).length,
       done: byStatus.done || 0,
-      cancelled: byStatus.cancelled || 0,
+      cancelled: (byStatus.cancelled || 0) + (byStatus.expired || 0),
       paidReported: byStatus.paid_reported || 0,
       byStatus,
       pageCount: (orders || []).length,
@@ -2262,6 +2276,10 @@ export default function AdminDashboard() {
 
     const files = Array.from(e.target.elements.files.files || []);
     const caption = e.target.elements.caption.value || "";
+    const customerName = e.target.elements.customer_name.value || "";
+    const productName = e.target.elements.product_name.value || "";
+    const purchasedAt = e.target.elements.purchased_at.value || null;
+    const isVerified = e.target.elements.is_verified.checked;
 
     if (files.length === 0) {
       toast.error("Pilih minimal 1 gambar");
@@ -2283,6 +2301,10 @@ export default function AdminDashboard() {
       const payload = urls.map((u) => ({
         image_url: u,
         caption,
+        customer_name: customerName.trim() || null,
+        product_name: productName.trim() || null,
+        purchased_at: purchasedAt ? new Date(purchasedAt).toISOString() : null,
+        is_verified: isVerified,
         is_active: true,
         sort_order: 100,
       }));
@@ -2890,7 +2912,51 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
+                  <div className="admin-panel">
+                    <div className="admin-panel-head"><div><div className="admin-panel-title">Permintaan restock</div><div className="admin-panel-sub">Calon pembeli yang menunggu stok kembali.</div></div></div>
+                    <div className="admin-panel-body admin-stack">
+                      {restockRequests.length ? restockRequests.map((request) => (
+                        <div className="admin-alertItem" key={request.id}>
+                          <div><strong>{request.products?.name || "Produk"} · {request.product_variants?.name || "Varian"}</strong><small>{request.customer_whatsapp} · {request.notified_at ? "Sudah dikabari" : "Belum dikabari"}</small></div>
+                          <div style={{ display: "flex", gap: 8 }}>
+                            <a className="btn btn-ghost btn-sm" href={`https://wa.me/${String(request.customer_whatsapp || "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp</a>
+                            {!request.notified_at ? <button className="btn btn-sm" type="button" onClick={async () => {
+                              const notifiedAt = new Date().toISOString();
+                              const { error } = await supabase.from("restock_requests").update({ notified_at: notifiedAt }).eq("id", request.id);
+                              if (error) return toast.error("Gagal menandai permintaan");
+                              setRestockRequests((current) => current.map((item) => item.id === request.id ? { ...item, notified_at: notifiedAt } : item));
+                              toast.success("Ditandai sudah dikabari");
+                            }}>Tandai dikabari</button> : null}
+                          </div>
+                        </div>
+                      )) : <div className="admin-emptyInline">Belum ada pelanggan yang meminta notifikasi restock.</div>}
+                    </div>
+                  </div>
+
                   {/* ── Panel: Visitor Analytics (dari tabel page_views) ── */}
+                  <div className="admin-panel admin-panelWide">
+                    <div className="admin-panel-head">
+                      <div>
+                        <div className="admin-panel-title">Funnel belanja</div>
+                        <div className="admin-panel-sub">Konversi sesi pada {funnelSummary.days || (analyticsWindow === "30d" ? 30 : 7)} hari terakhir.</div>
+                      </div>
+                    </div>
+                    <div className="admin-panel-body">
+                      {Array.isArray(funnelSummary.steps) && funnelSummary.steps.length ? (
+                        <div className="admin-miniGrid">
+                          {funnelSummary.steps.map((step, index) => {
+                            const labels = { view_product: "Lihat produk", add_to_cart: "Tambah keranjang", begin_checkout: "Mulai checkout", qris_opened: "QRIS terbuka", payment_reported: "Lapor bayar", order_completed: "Selesai" };
+                            return <div className="admin-miniCard" key={step.event_name}>
+                              <span>{labels[step.event_name] || step.event_name}</span>
+                              <strong>{Number(step.sessions || 0).toLocaleString("id-ID")}</strong>
+                              <small>{index === 0 ? "Sesi unik" : `${Number(step.rate_from_previous || 0).toFixed(1)}% dari tahap sebelumnya`}</small>
+                            </div>;
+                          })}
+                        </div>
+                      ) : <div className="admin-emptyInline">Funnel mulai terisi setelah migrasi checkout aktif dan pengunjung berbelanja.</div>}
+                    </div>
+                  </div>
+
                   <div className="admin-panel admin-panelWide">
                     <div className="admin-panel-head">
                       <div>
@@ -4338,6 +4404,10 @@ export default function AdminDashboard() {
                       Pilih gambar
                     </label>
                     <input name="caption" className="input" placeholder="Caption (opsional)" />
+                    <input name="customer_name" className="input" placeholder="Nama pelanggan" />
+                    <input name="product_name" className="input" placeholder="Produk yang dibeli" />
+                    <input name="purchased_at" className="input" type="date" aria-label="Tanggal pembelian" />
+                    <label className="admin-check"><input name="is_verified" type="checkbox" /> Pembelian terverifikasi</label>
                     <button className="btn btn-primary" type="submit">
                       Upload
                     </button>
@@ -4348,6 +4418,7 @@ export default function AdminDashboard() {
                       <div key={t.id} className="admin-thumb">
                         <img src={t.image_url} alt={t.caption || "testimoni"} />
                         {t.caption ? <div className="admin-thumb-caption">{t.caption}</div> : null}
+                        {(t.customer_name || t.product_name) ? <div className="admin-thumb-caption">{[t.customer_name, t.product_name].filter(Boolean).join(" · ")}</div> : null}
                         <div className="admin-thumb-actions">
                           <button
                             className={"btn btn-sm " + (t.is_active ? "btn-ghost" : "")}
@@ -4355,6 +4426,9 @@ export default function AdminDashboard() {
                             onClick={() => updateTestimonial(t.id, { is_active: !t.is_active })}
                           >
                             {t.is_active ? "Off" : "On"}
+                          </button>
+                          <button className={"btn btn-sm " + (t.is_verified ? "btn-primary" : "btn-ghost")} type="button" onClick={() => updateTestimonial(t.id, { is_verified: !t.is_verified })}>
+                            {t.is_verified ? "Verified" : "Verifikasi"}
                           </button>
                           <button
                             className="btn btn-ghost btn-sm"
@@ -4857,7 +4931,7 @@ export default function AdminDashboard() {
               <div className="admin-orderMetaCard">
                 <span>Status sekarang</span>
                 <strong>{prettyOrderStatus(activeOrder.status)}</strong>
-                <small>{activeOrder.promo_code ? `Promo ${activeOrder.promo_code}` : "Tanpa promo"}</small>
+                <small>{activeOrder.payment_reference ? `Referensi: ${activeOrder.payment_reference}` : (activeOrder.promo_code ? `Promo ${activeOrder.promo_code}` : "Tanpa promo")}</small>
               </div>
               <div className="admin-orderMetaCard">
                 <span>Update status</span>

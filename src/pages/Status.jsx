@@ -41,11 +41,14 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { warn } from "../lib/log";
 import { copyToClipboard } from "../utils/clipboard";
 import { recordCompletedOrder } from "../lib/loyalty";
+import { loadBuyerDetails, phoneSuffix } from "../lib/buyerDetails";
+import { getVisitorIdAsUUID } from "../lib/visitor";
+import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const POLL_INTERVAL_MS = 30_000;
-const TERMINAL_STATUSES = new Set(["done", "cancelled"]);
+const TERMINAL_STATUSES = new Set(["done", "cancelled", "expired"]);
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -53,10 +56,12 @@ function prettyStatus(status) {
   const value = String(status || "pending");
   const map = {
     pending: "Pending",
+    pending_payment: "Menunggu pembayaran",
     processing: "Diproses",
     done: "Selesai",
     paid_reported: "Menunggu verifikasi",
     cancelled: "Dibatalkan",
+    expired: "Kedaluwarsa",
   };
   return map[value] || value;
 }
@@ -66,28 +71,30 @@ function getStatusMeta(status) {
   if (value === "done") return { tone: "done", icon: CheckCircle2 };
   if (value === "processing") return { tone: "processing", icon: Sparkles };
   if (value === "cancelled") return { tone: "cancelled", icon: XCircle };
+  if (value === "expired") return { tone: "cancelled", icon: XCircle };
   if (value === "paid_reported") return { tone: "reported", icon: ShieldCheck };
   return { tone: "pending", icon: Clock3 };
 }
 
 function getTimeline(status) {
   const value = String(status || "pending");
-  if (value === "cancelled") {
+  if (value === "cancelled" || value === "expired") {
     return [
       { key: "pending", label: "Order masuk", active: true, done: true },
-      { key: "cancelled", label: "Dibatalkan", active: true, done: false },
+      { key: value, label: value === "expired" ? "Reservasi kedaluwarsa" : "Dibatalkan", active: true, done: false },
     ];
   }
-  const pastPending = value !== "pending";
+  const isAwaitingPayment = value === "pending_payment";
+  const pastPending = !["pending", "pending_payment"].includes(value);
   const isPaidReported = value === "paid_reported";
   const isProcessing = value === "processing";
   const isDone = value === "done";
   return [
-    { key: "pending", label: "Order masuk", active: true, done: pastPending },
+    { key: "pending_payment", label: "Menunggu pembayaran", active: true, done: pastPending },
     {
       key: "paid_reported",
       label: "Menunggu verifikasi",
-      active: isPaidReported || isProcessing || isDone,
+      active: !isAwaitingPayment && (isPaidReported || isProcessing || isDone),
       done: isProcessing || isDone,
     },
     {
@@ -113,7 +120,7 @@ function normalizeOrderCode(value) {
   if (!cleaned) return "";
   // Cek apakah sudah ada prefix IMZ
   const withoutPrefix = cleaned.startsWith("IMZ") ? cleaned.slice(3) : cleaned;
-  if (withoutPrefix.length >= 4 && withoutPrefix.length <= 8) return `IMZ-${withoutPrefix}`;
+  if (withoutPrefix.length === 4 || (withoutPrefix.length >= 8 && withoutPrefix.length <= 10)) return `IMZ-${withoutPrefix}`;
   // Kode belum lengkap atau di luar format, kembalikan mentah untuk ditampilkan error
   return cleaned;
 }
@@ -125,10 +132,12 @@ function toFriendlyStatusError() {
 function statusTone(status) {
   const map = {
     pending: "pending",
+    pending_payment: "pending",
     paid_reported: "reported",
     processing: "processing",
     done: "done",
     cancelled: "cancelled",
+    expired: "cancelled",
   };
   return map[String(status || "pending")] || "pending";
 }
@@ -228,6 +237,13 @@ function TabCekStatus({ settings }) {
   const toast = useToast();
 
   const [input, setInput] = useState(initialParam);
+  const initialHistoryEntry = useMemo(
+    () => getOrderHistory().find((entry) => entry.order_code === normalizeOrderCode(initialParam)),
+    [initialParam]
+  );
+  const [phoneLast4, setPhoneLast4] = useState(
+    () => initialHistoryEntry?.phone_suffix || phoneSuffix(loadBuyerDetails().whatsapp)
+  );
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [order, setOrder] = useState(null);
@@ -247,8 +263,9 @@ function TabCekStatus({ settings }) {
   const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6283136049987");
   const pollTimerRef = useRef(null);
 
-  const lookup = useCallback(async (rawValue) => {
+  const lookup = useCallback(async (rawValue, suffixOverride) => {
     const code = normalizeOrderCode(rawValue);
+    const suffix = String(suffixOverride ?? phoneLast4).replace(/\D/g, "").slice(-4);
     setInput(code);
 
     if (!code) {
@@ -258,13 +275,19 @@ function TabCekStatus({ settings }) {
       toast.error(text);
       return;
     }
+    if (suffix.length !== 4) {
+      const text = "Masukkan 4 digit terakhir WhatsApp pembeli.";
+      setMessage(text);
+      toast.error(text);
+      return;
+    }
 
     setLoading(true);
     setMessage("");
     setOrder(null);
 
     try {
-      const { data, error } = await supabase.rpc("get_order_public", { p_order_code: code });
+      const { data, error } = await supabase.rpc("get_order_public_secure", { p_order_code: code, p_phone_suffix: suffix, p_visitor_id: getVisitorIdAsUUID() });
       if (error) throw error;
 
       const row = Array.isArray(data) ? data[0] : data;
@@ -286,14 +309,14 @@ function TabCekStatus({ settings }) {
     } finally {
       setLoading(false);
     }
-  }, [toast]);
+  }, [phoneLast4, setSearchParams, toast]);
 
   // Silent refresh - update status di background tanpa reset UI
   const silentRefresh = useCallback(async (orderCode) => {
     if (!orderCode) return;
     setRefreshing(true);
     try {
-      const { data, error } = await supabase.rpc("get_order_public", { p_order_code: orderCode });
+      const { data, error } = await supabase.rpc("get_order_public_secure", { p_order_code: orderCode, p_phone_suffix: phoneLast4, p_visitor_id: getVisitorIdAsUUID() });
       if (error) throw error;
       const row = Array.isArray(data) ? data[0] : data;
       if (!row) return;
@@ -304,14 +327,14 @@ function TabCekStatus({ settings }) {
     } finally {
       setRefreshing(false);
     }
-  }, []);
+  }, [phoneLast4]);
 
   useEffect(() => {
     if (!initialParam) return;
     const normalized = normalizeOrderCode(initialParam);
     setInput(normalized);
-    lookup(normalized);
-  }, [initialParam, lookup]);
+    if (phoneLast4.length === 4) lookup(normalized, phoneLast4);
+  }, [initialParam, lookup, phoneLast4]);
 
   // Trigger celebration and record loyalty reward when status becomes "done"
   useEffect(() => {
@@ -320,6 +343,13 @@ function TabCekStatus({ settings }) {
     const curr = order.status;
     if (curr === "done") {
       recordCompletedOrder(order.order_code);
+      try {
+        const eventKey = `imzaqi_completed_event:${order.order_code}`;
+        if (!localStorage.getItem(eventKey)) {
+          trackFunnelEvent("order_completed", { orderCode: order.order_code, metadata: { total: order.total_idr } });
+          localStorage.setItem(eventKey, "1");
+        }
+      } catch {}
       if (prev && prev !== "done") {
         setShowCelebration(true);
       }
@@ -509,6 +539,18 @@ function TabCekStatus({ settings }) {
                 />
               </label>
 
+              <label className="st-phoneSuffixWrap">
+                <span>4 digit WA</span>
+                <input
+                  className="input st-phoneSuffix"
+                  inputMode="numeric"
+                  maxLength={4}
+                  placeholder="1234"
+                  value={phoneLast4}
+                  onChange={(event) => setPhoneLast4(event.target.value.replace(/\D/g, "").slice(0, 4))}
+                />
+              </label>
+
               <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
                 {loading ? (
                   <>
@@ -520,7 +562,7 @@ function TabCekStatus({ settings }) {
             </div>
 
             <div className={`st-searchHint${message ? " is-error" : ""}`}>
-              {message || "Bisa pakai 8 karakter terakhir."}
+              {message || "Masukkan ID lengkap dan 4 digit terakhir WhatsApp pembeli."}
             </div>
           </section>
 
@@ -538,8 +580,10 @@ function TabCekStatus({ settings }) {
                     type="button"
                     onClick={() => {
                       const code = r.order_code;
+                      const suffix = r.phone_suffix || phoneLast4;
                       setInput(code);
-                      lookup(code);
+                      setPhoneLast4(suffix);
+                      lookup(code, suffix);
                     }}
                   >
                     <span className="st-recentCode">{r.order_code}</span>
@@ -653,7 +697,7 @@ function TabCekStatus({ settings }) {
                     <WalletCards size={13} />
                     <span>Metode Bayar</span>
                   </div>
-                  <strong>QRIS Instant</strong>
+                  <strong>QRIS</strong>
                 </div>
 
                 <div className="st-orderSummaryItem st-infoCard is-total">
@@ -1018,15 +1062,20 @@ function TabRiwayat() {
 
     const errors = {};
     try {
-      const codes = history.map((h) => h.order_code);
-      const { data, error } = await supabase.rpc("get_orders_public_bulk", {
-        p_order_codes: codes,
-      });
-      if (error) throw error;
+      const results = await Promise.all(history.map(async (entry) => {
+        if (!entry.phone_suffix) return { entry, row: null };
+        const { data, error } = await supabase.rpc("get_order_public_secure", {
+          p_order_code: entry.order_code,
+          p_phone_suffix: entry.phone_suffix,
+          p_visitor_id: getVisitorIdAsUUID(),
+        });
+        if (error) throw error;
+        return { entry, row: Array.isArray(data) ? data[0] : data };
+      }));
 
       const statusMap = {};
-      (data || []).forEach((row) => {
-        statusMap[row.order_code] = row.status;
+      results.forEach(({ entry, row }) => {
+        if (row?.status) statusMap[entry.order_code] = row.status;
       });
 
       history.forEach((entry) => {

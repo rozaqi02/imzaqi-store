@@ -4795,3 +4795,11 @@ html[data-theme="light"] .detail-page-v3 .pdx-packCard.is-out .pdx-addBtn {
     box-shadow: var(--imzaqi-btn-shadow) !important;
   }
 }
+.detail-page-v3 .pdx-packDetails details { margin-top: 7px; }
+.detail-page-v3 .pdx-packDetails summary { width: fit-content; cursor: pointer; color: var(--brand-icon); font-size: 10px; font-weight: 800; }
+.detail-page-v3 .pdx-packDetails details p { margin: 8px 0 0; color: var(--brand-muted); font-size: 11px; line-height: 1.65; }
+.detail-page-v3 .pdx-restock { display: grid; gap: 10px; }
+.detail-page-v3 .pdx-restock form { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 8px; }
+.detail-page-v3 .pdx-restock form small { grid-column: 1 / -1; color: #e97474; }
+.detail-page-v3 .pdx-restockDone { display: flex; align-items: center; gap: 7px; padding: 10px 12px; border-radius: 12px; color: var(--brand-icon); background: rgba(0,158,96,.09); font-size: 11px; font-weight: 800; }
+@media (max-width: 540px) { .detail-page-v3 .pdx-restock form { grid-template-columns: 1fr; } }

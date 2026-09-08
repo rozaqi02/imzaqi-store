@@ -27,6 +27,10 @@ export default function CheckoutSteps({ current = "checkout" }) {
 
   return (
     <div className="steps steps--visual" aria-label="Progress checkout">
+      <div className="steps-mobileSummary">
+        <span>Langkah {currentIndex + 1} dari {STEPS.length}</span>
+        <strong>{STEPS[currentIndex]?.title}</strong>
+      </div>
       {STEPS.map((step, idx) => {
         const done = idx < currentIndex;
         const active = idx === currentIndex;

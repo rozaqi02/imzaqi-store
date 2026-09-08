@@ -176,6 +176,10 @@ export async function fetchProducts({ includeInactive = false, useCache = !inclu
   }
 
   const request = (async () => {
+    // Lazy cleanup keeps reserved stock accurate even without a cron worker.
+    if (typeof supabase.rpc === "function") {
+      try { await supabase.rpc("expire_order_reservations"); } catch {}
+    }
     const attempts = [
       { includeCategory: true, includeTimestamps: true },
       { includeCategory: false, includeTimestamps: true },
@@ -288,15 +292,20 @@ export async function fetchTestimonials({ includeInactive = false, useCache = !i
   const cached = useCache ? readPublicCache(cacheKey, ttlMs) : null;
   if (cached) return cached;
 
-  let q = supabase
-    .from("testimonials")
-    .select("id,image_url,caption,is_active,sort_order,created_at")
-    .order("sort_order", { ascending: true })
-    .order("created_at", { ascending: false });
-
-  if (!includeInactive) q = q.eq("is_active", true);
-
-  const { data, error } = await q;
+  const fields = [
+    "id,image_url,caption,is_active,sort_order,created_at,product_name,customer_name,is_verified,purchased_at",
+    "id,image_url,caption,is_active,sort_order,created_at",
+  ];
+  let data;
+  let error;
+  for (const selectFields of fields) {
+    let q = supabase.from("testimonials").select(selectFields)
+      .order("sort_order", { ascending: true }).order("created_at", { ascending: false });
+    if (!includeInactive) q = q.eq("is_active", true);
+    ({ data, error } = await q);
+    if (!error) break;
+    if (!/column|schema cache/i.test(String(error?.message || ""))) break;
+  }
   if (error) throw error;
   const result = data || [];
   if (useCache) writePublicCache(cacheKey, result);

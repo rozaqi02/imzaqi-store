@@ -25,15 +25,21 @@ export function getOrderHistory() {
   }
 }
 
-export function addOrderToHistory({ order_code, created_at, total_idr, status }) {
+export function addOrderToHistory({ order_code, created_at, total_idr, status, phone_suffix }) {
   const storage = safeStorage();
   if (!storage) return;
   try {
     const existing = getOrderHistory();
     const alreadyExists = existing.some((e) => e.order_code === order_code);
-    if (alreadyExists) return;
+    if (alreadyExists) {
+      const next = existing.map((entry) => entry.order_code === order_code
+        ? { ...entry, status: status || entry.status, phone_suffix: phone_suffix || entry.phone_suffix }
+        : entry);
+      storage.setItem(HISTORY_KEY, JSON.stringify(next));
+      return;
+    }
     const next = [
-      { order_code, created_at: created_at || new Date().toISOString(), total_idr: Number(total_idr || 0), status: status || "pending" },
+      { order_code, created_at: created_at || new Date().toISOString(), total_idr: Number(total_idr || 0), status: status || "pending", phone_suffix: phone_suffix || "" },
       ...existing,
     ];
     storage.setItem(HISTORY_KEY, JSON.stringify(next));

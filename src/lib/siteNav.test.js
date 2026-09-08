@@ -4,7 +4,7 @@ import { getAdminNavTarget, isNavItemActive, SITE_BOTTOM_NAV } from "./siteNav";
 describe("siteNav", () => {
   test("keeps the compact navigation at four primary routes", () => {
     const paths = SITE_BOTTOM_NAV.map((item) => item.to);
-    expect(paths).toEqual(["/", "/produk", "/testimoni", "/status"]);
+    expect(paths).toEqual(["/", "/produk", "/faq", "/status"]);
   });
 
   test("getAdminNavTarget points to dashboard or login", () => {

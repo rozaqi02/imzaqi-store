@@ -6,6 +6,7 @@ import {
   Grid2x2,
   House,
   MessageSquareQuote,
+  CircleHelp,
 } from "lucide-react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { isFunnelPath } from "../hooks/useFunnelRoute";
@@ -16,6 +17,7 @@ const ICONS = {
   "/": House,
   "/produk": Grid2x2,
   "/testimoni": MessageSquareQuote,
+  "/faq": CircleHelp,
   "/status": Activity,
 };
 

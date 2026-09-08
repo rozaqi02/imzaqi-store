@@ -1,3 +1,3 @@
 export const OVERLAY_TIMING = {
-  flashSaleMs: 4000,
+  flashSaleMs: 12000,
 };

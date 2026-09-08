@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 import { Clock, X } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
@@ -31,6 +31,7 @@ function markSessionDone() {
 
 export default function FlashSalePopup() {
   const navigate = useNavigate();
+  const location = useLocation();
   const overlayBlocked = useStorefrontOverlayBlocked();
   const [isOpen, setIsOpen] = useState(false);
   const [salesItems, setSalesItems] = useState([]);
@@ -114,6 +115,7 @@ export default function FlashSalePopup() {
       sessionDismissed ||
       wasHandledThisSession() ||
       overlayBlocked ||
+      location.pathname !== "/" ||
       salesItems.length === 0
     ) {
       return undefined;
@@ -144,7 +146,7 @@ export default function FlashSalePopup() {
       if (queuedTimer) clearTimeout(queuedTimer);
       window.removeEventListener("imzaqi_academic_popup_closed", handleAcademicPopupClosed);
     };
-  }, [overlayBlocked, salesItems.length, sessionDismissed]);
+  }, [location.pathname, overlayBlocked, salesItems.length, sessionDismissed]);
 
   useEffect(() => {
     if (overlayBlocked) setIsOpen(false);
@@ -208,6 +210,7 @@ export default function FlashSalePopup() {
 
   if (
     overlayBlocked ||
+    location.pathname !== "/" ||
     !isOpen ||
     !featured ||
     isAcademicActive ||

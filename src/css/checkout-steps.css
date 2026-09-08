@@ -139,6 +139,7 @@
   content: none;
   display: none;
 }
+.steps-mobileSummary { display: none; }
 
 .steps--visual .step.active .step-sub {
   color: rgba(159, 255, 229, 0.9);
@@ -245,22 +246,30 @@ html[data-theme="light"] .steps--visual .step.done .step-sub {
 @media (max-width: 720px) {
   .steps--visual {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    padding: 10px;
+    grid-template-columns: minmax(0, 1fr) repeat(3, 34px);
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
     overflow: visible;
   }
 
-  .steps--visual .step {
+  .steps-mobileSummary {
+    display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    align-self: stretch;
-    text-align: center;
-    gap: 8px;
-    padding: 10px 6px;
-    min-height: 0;
-    height: 100%;
+    gap: 2px;
+    padding-left: 4px;
+  }
+
+  .steps-mobileSummary span { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--brand-muted); }
+  .steps-mobileSummary strong { font-size: 13px; color: var(--brand-text); }
+
+  .steps--visual .step {
+    display: grid;
+    place-items: center;
+    padding: 0;
+    min-height: 34px;
+    height: 34px;
+    border-radius: 11px;
   }
 
   .steps--visual .step:not(:last-child)::after {
@@ -279,14 +288,14 @@ html[data-theme="light"] .steps--visual .step.done .step-sub {
   }
 
   .steps--visual .step-dot {
-    width: 40px;
-    height: 40px;
-    border-radius: 14px;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 9px;
   }
 
   .steps--visual .step-text {
-    width: 100%;
-    min-width: 0;
+    display: none;
   }
 
   .steps--visual .step-title {

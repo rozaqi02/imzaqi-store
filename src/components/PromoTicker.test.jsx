@@ -67,16 +67,13 @@ describe("PromoTicker", () => {
     });
   }
 
-  it("shows flash-sale duration and a dismissible promo-code label", async () => {
+  it("prioritizes the flash sale instead of stacking a second promo row", async () => {
     await renderTicker();
 
     expect(screen.getByText(/Flash sale/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Gemini AI Pro · 30 Hari" })).toHaveAttribute("href", "/produk/gemini-ai-pro");
     expect(screen.getByText(/-38%/)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "Salin kode promo HEMAT20" })).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole("button", { name: "Tutup kode promo" }));
-    expect(screen.queryByRole("button", { name: /HEMAT20/ })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Salin kode promo HEMAT20" })).toBeNull();
     expect(screen.getByRole("link", { name: "Gemini AI Pro · 30 Hari" })).toBeInTheDocument();
   });
 

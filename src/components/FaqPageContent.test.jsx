@@ -17,9 +17,9 @@ it("filters, expands answers accessibly, and recovers from an empty search", () 
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "nomatchxyz" } });
   expect(screen.getByText("Jawabannya belum ketemu")).toBeVisible();
   fireEvent.click(screen.getByRole("button", { name: "Lihat semua pertanyaan" }));
-  expect(screen.getByRole("status")).toHaveTextContent("11 pertanyaan");
+  expect(screen.getByRole("status")).toHaveTextContent("12 pertanyaan");
 });
 it("supports search links with surrounding spaces", () => {
   render(<MemoryRouter initialEntries={["/faq?q=%20QRIS%20"]}><FaqPageContent /></MemoryRouter>);
-  expect(screen.getByRole("status")).toHaveTextContent("2 pertanyaan");
+  expect(screen.getByRole("status")).toHaveTextContent("3 pertanyaan");
 });

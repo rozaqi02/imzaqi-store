@@ -948,6 +948,27 @@ html[data-theme="light"] .checkout-back-btn:hover {
   --checkout-green: #69e6ae;
 }
 
+/* Buyer requirements are collected before QRIS so the next step has no surprise fields. */
+.checkout-contactBlock { display: grid; gap: 14px; }
+.checkout-contactHead { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.checkout-contactHead h3 { margin: 3px 0 0; font-size: 18px; letter-spacing: -.03em; }
+.checkout-contactHead > span { padding: 5px 9px; border-radius: 999px; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--brand-icon); background: rgba(0,158,96,.1); }
+.checkout-emailField { display: grid; gap: 7px; }
+.checkout-emailField label { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; }
+.checkout-emailField label span { margin-left: auto; color: var(--brand-muted); font-size: 10px; font-weight: 600; }
+.checkout-full-contact-panel { padding: 24px 26px !important; border-radius: 24px; }
+
+@media (max-width: 720px) {
+  .checkout-full-header { align-items: center; }
+  .checkout-back-btn { width: 42px; min-width: 42px; padding: 0; }
+  .checkout-back-btn span { display: none; }
+  .checkout-full-title { font-size: 23px; }
+  .checkout-full-sub { display: none; }
+  .checkout-full-steps { margin-bottom: 16px; }
+  .checkout-full-left-cards { gap: 14px; }
+  .checkout-full-items-panel, .checkout-full-contact-panel, .checkout-full-promo-panel { padding: 18px !important; }
+}
+
 html[data-theme="light"] .checkout-overlay .checkout-drawer,
 html[data-theme="light"] .checkout-page-full {
   --checkout-page-bg: #f5f7f4;
