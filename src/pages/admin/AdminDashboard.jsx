@@ -394,7 +394,7 @@ export default function AdminDashboard() {
     );
     let { data, error } = await query;
 
-    if (error && /(notes|admin_note|payment_proof)/i.test(String(error?.message || ""))) {
+    if (error && /(notes|admin_note|payment_proof|reservation_expires_at|payment_reference|verification_status|does not exist|column|schema|42703)/i.test(String(error?.message || error?.code || ""))) {
       query = applyStatus(
         supabase
           .from("orders")
@@ -417,7 +417,7 @@ export default function AdminDashboard() {
       .select(ORDER_SELECT_DETAIL)
       .eq("id", orderId)
       .maybeSingle();
-    if (error && /(notes|admin_note|payment_proof)/i.test(String(error?.message || ""))) {
+    if (error && /(notes|admin_note|payment_proof|reservation_expires_at|payment_reference|verification_status|does not exist|column|schema|42703)/i.test(String(error?.message || error?.code || ""))) {
       ({ data, error } = await supabase
         .from("orders")
         .select(ORDER_SELECT_LIST_FALLBACK)
