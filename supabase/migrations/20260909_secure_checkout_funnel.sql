@@ -56,6 +56,7 @@ create table if not exists public.status_lookup_attempts (
 );
 create index if not exists status_lookup_attempts_rate_idx
   on public.status_lookup_attempts(visitor_id, attempted_at desc);
+alter table public.status_lookup_attempts enable row level security;
 
 alter table public.funnel_events enable row level security;
 alter table public.restock_requests enable row level security;

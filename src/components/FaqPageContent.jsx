@@ -57,7 +57,7 @@ const FAQ_ITEMS = [
     question: "Udah bayar, terus gimana?",
     answer: [
       "ID order dibuat saat stok berhasil direservasi dan tetap tersedia setelah konfirmasi.",
-      "Buka Status, lalu masukkan ID dan 4 digit terakhir WhatsApp pembeli.",
+      "Buka Status, lalu masukkan ID order 8 karakter yang muncul setelah checkout.",
     ],
     tags: ["id order", "status", "setelah bayar"],
   },
@@ -67,7 +67,7 @@ const FAQ_ITEMS = [
     question: "Format ID order kayak gimana?",
     answer: [
       "Format baru memakai 8 karakter acak, misalnya IMZ-ABCD1234.",
-      "Untuk keamanan, pengecekan status juga meminta 4 digit terakhir WhatsApp pembeli.",
+      "Ketik delapan karakter ID setelah awalan IMZ-. Contoh: IMZ-ABCD1234.",
     ],
     tags: ["format", "id", "imz"],
   },

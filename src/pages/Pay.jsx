@@ -298,7 +298,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode pay-successCode--animate">{orderCode}</div>
-            <p className="pay-successLead">Simpan ID dan 4 digit terakhir WhatsApp untuk mengecek status dari perangkat lain.</p>
+            <p className="pay-successLead">Simpan ID ini untuk mengecek status pesanan dari perangkat mana pun.</p>
           </div>
 
           {isAcademicOrder ? (
@@ -898,6 +898,10 @@ export default function Pay() {
       notes: noteText,
     }).then((created) => {
       if (!active) return;
+      // Matikan state loading sebelum setReservation memicu cleanup effect ini.
+      // Jika menunggu .finally(), cleanup membuat `active` false dan loading
+      // tertinggal selamanya walaupun reservasinya sudah berhasil.
+      setReservationBusy(false);
       setReservation(created);
       setOrderCode(created.order_code);
       addOrderToHistory({
@@ -910,13 +914,14 @@ export default function Pay() {
       trackFunnelEvent("qris_opened", { orderCode: created.order_code, metadata: { total: created.total_idr ?? total } });
     }).catch((error) => {
       if (!active) return;
+      setReservationBusy(false);
       warn("Gagal membuat reservasi:", error);
       setErrorText("Stok belum bisa direservasi. Muat ulang atau hubungi admin jika masalah berlanjut.");
-    }).finally(() => { if (active) setReservationBusy(false); });
+    });
     return () => { active = false; };
     // Reservation is intentionally created once after buyer requirements are valid.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [buyerReady, items.length, ok, reservation, reservationBusy]);
+  }, [buyerReady, items.length, ok, reservation]);
 
   // Start timer when QRIS becomes visible
   const qrisTimerActive = canShowQris && !isFreeOrder && qris.mode !== "idle";
@@ -942,9 +947,11 @@ export default function Pay() {
         ? "Sedang mengunci stok untukmu."
         : !reservation
           ? "Stok belum berhasil direservasi. Coba muat ulang."
-      : isDynamicQris
-        ? "Nominal QR sudah menyesuaikan total."
-        : "QR statis aktif. Bayar sesuai total di ringkasan.";
+          : reservation.legacy
+            ? "QRIS siap. Stok akan diverifikasi saat konfirmasi pembayaran."
+            : isDynamicQris
+              ? "Nominal QR sudah menyesuaikan total."
+              : "QR statis aktif. Bayar sesuai total di ringkasan.";
   const qrisLockTitle = !hasValidWhatsApp
     ? "Masukkan WhatsApp"
     : missingBuyerEmailNote
@@ -1017,7 +1024,7 @@ export default function Pay() {
     };
   }
 
-  async function createOrderWithStock(nextCode, orderDraft) {
+  async function createOrderWithStock(nextCode, orderDraft, paymentReference = "") {
     const visitorId = getVisitorIdAsUUID();
     const payload = {
       p_visitor_id: visitorId,
@@ -1031,7 +1038,8 @@ export default function Pay() {
       p_customer_whatsapp: customerWhatsApp,
     };
 
-    const rpcPayload = noteText ? { ...payload, p_notes: noteText } : payload;
+    const legacyNotes = [noteText, paymentReference ? `Referensi pembayaran: ${paymentReference}` : ""].filter(Boolean).join("\n");
+    const rpcPayload = legacyNotes ? { ...payload, p_notes: legacyNotes } : payload;
     const { data, error } = await supabase.rpc("create_order_with_stock_check", rpcPayload);
 
     if (error) {
@@ -1068,11 +1076,13 @@ export default function Pay() {
     try {
       if (!reservation?.order_code) throw new Error("Reservasi stok belum siap.");
       loadingId = toast.loading("Mengirim konfirmasi pembayaran...");
-      const reported = await reportOrderPayment({
-        orderCode: reservation.order_code,
-        phone: customerWhatsApp,
-        reference: paymentReference,
-      });
+      const reported = reservation.legacy
+        ? await createOrderWithStock(reservation.order_code, await buildCanonicalOrderPayload(), paymentReference)
+        : await reportOrderPayment({
+            orderCode: reservation.order_code,
+            phone: customerWhatsApp,
+            reference: paymentReference,
+          });
       setOk(true);
       cart.clear();
       clearOrderReservation();
@@ -1087,7 +1097,7 @@ export default function Pay() {
         order_code: reservation.order_code,
         created_at: new Date().toISOString(),
         total_idr: total,
-        status: reported?.status || "paid_reported",
+        status: reported?.status || (reservation.legacy ? "pending" : "paid_reported"),
         phone_suffix: String(customerWhatsApp).replace(/\D/g, "").slice(-4),
       });
       trackFunnelEvent("payment_reported", { orderCode: reservation.order_code, metadata: { total } });
@@ -1477,7 +1487,7 @@ export default function Pay() {
 
                 <div className="pay-stageVisual">
                   {reservation?.order_code ? <div className="pay-reservationId" aria-live="polite">
-                    <div><span>ID order</span><strong>{reservation.order_code}</strong><small>Stok dikunci sampai {reservation.reservation_expires_at ? new Date(reservation.reservation_expires_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "30 menit"}</small></div>
+                    <div><span>ID order</span><strong>{reservation.order_code}</strong><small>{reservation.legacy ? "Stok diverifikasi saat konfirmasi pembayaran" : `Stok dikunci sampai ${reservation.reservation_expires_at ? new Date(reservation.reservation_expires_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "30 menit"}`}</small></div>
                     <button className="btn btn-ghost btn-sm" type="button" onClick={async () => { await copyToClipboard(reservation.order_code); toast.success("ID order disalin"); }}>Salin</button>
                   </div> : null}
                   <div

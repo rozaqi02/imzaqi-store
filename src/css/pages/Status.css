@@ -2705,15 +2705,6 @@ html[data-theme="dark"] .st-discountVal {
 }
 
 
-/* Secure lookup pairs the order code with a short customer-held secret. */
-.st-phoneSuffixWrap { display: grid; gap: 5px; min-width: 104px; }
-.st-phoneSuffixWrap > span { font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--st-muted); }
-.st-phoneSuffix { text-align: center; letter-spacing: .18em; font-weight: 800; }
-.st-searchRow { grid-template-columns: minmax(0,1fr) 120px auto; align-items:end; }
-@media (max-width: 620px) {
-  .st-searchRow { grid-template-columns: minmax(0,1fr) 104px !important; }
-  .st-checkBtn { grid-column: 1 / -1; width: 100%; }
-}
 @media (max-width: 720px) {
   .status-page .st-checkoutSteps .steps.steps--visual { display:grid !important; grid-template-columns:minmax(0,1fr) repeat(3,34px) !important; gap:6px !important; padding:8px 10px !important; }
   .status-page .st-checkoutSteps .steps-mobileSummary { display:grid !important; gap:2px; line-height:1.2; }

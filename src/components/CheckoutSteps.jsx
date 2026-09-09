@@ -1,6 +1,8 @@
 import React from "react";
-import { Check, PackageSearch, QrCode, ShoppingBag } from "lucide-react";
+import { PackageSearch, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import CartIcon from "./CartIcon";
+import "../css/checkout-steps.css";
 
 /**
  * 3-step helper to reduce anxiety in checkout flow.
@@ -16,7 +18,7 @@ const STEP_ROUTES = {
 
 // Konstanta di module level agar tidak dibuat ulang tiap render
 const STEPS = [
-  { key: "checkout", title: "Keranjang", subtitle: "Cek item", icon: ShoppingBag },
+  { key: "checkout", title: "Keranjang", subtitle: "Cek item", icon: CartIcon },
   { key: "pay", title: "Bayar", subtitle: "Scan QRIS", icon: QrCode },
   { key: "status", title: "Lacak", subtitle: "ID order", icon: PackageSearch },
 ];
@@ -64,11 +66,7 @@ export default function CheckoutSteps({ current = "checkout" }) {
             title={done ? `Kembali ke ${step.title}` : undefined}
           >
             <div className="step-dot" aria-hidden="true">
-              {done ? (
-                <Check size={15} strokeWidth={2.8} />
-              ) : (
-                <Icon size={16} strokeWidth={2.2} />
-              )}
+              <Icon size={16} strokeWidth={2.2} />
             </div>
             <div className="step-text">
               <div className="step-title">{step.title}</div>

@@ -9,7 +9,6 @@ import {
   Clock3,
   RefreshCw,
   ShieldCheck,
-  ShoppingBag,
   TicketPercent,
   Mail,
   X,
@@ -33,6 +32,7 @@ import { useDialogA11y } from "../hooks/useDialogA11y";
 import WhatsAppInput from "../components/WhatsAppInput";
 import { loadBuyerDetails, saveBuyerDetails } from "../lib/buyerDetails";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
+import CartIcon from "../components/CartIcon";
 
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
@@ -455,7 +455,7 @@ export default function Checkout() {
     return (
       <div className="checkout-emptyConversion">
         <EmptyState
-          icon={<ShoppingBag size={30} strokeWidth={2.2} />}
+          icon={<CartIcon size={30} strokeWidth={2.2} />}
           title="Keranjangmu masih kosong"
           description="Pilih paket yang pas, lalu lanjutkan pembayaran lewat QRIS."
           primaryAction={{ label: "Lihat produk populer", to: "/produk" }}
@@ -511,7 +511,6 @@ export default function Checkout() {
   function renderDrawerContent() {
     return (
       <>
-        <div className="checkout-drawerHandle" aria-hidden="true" />
 
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">

@@ -2,11 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  Activity,
-  Grid2x2,
-  House,
+  BookOpen,
+  LayoutGrid,
+  PackageSearch,
+  Store,
   MessageSquareQuote,
-  CircleHelp,
 } from "lucide-react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { isFunnelPath } from "../hooks/useFunnelRoute";
@@ -14,11 +14,11 @@ import { BOTTOM_NAV_MEDIA } from "../lib/breakpoints";
 import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
 
 const ICONS = {
-  "/": House,
-  "/produk": Grid2x2,
+  "/": Store,
+  "/produk": LayoutGrid,
   "/testimoni": MessageSquareQuote,
-  "/faq": CircleHelp,
-  "/status": Activity,
+  "/faq": BookOpen,
+  "/status": PackageSearch,
 };
 
 function isBottomNavHidden(pathname) {
@@ -81,7 +81,7 @@ export default function BottomNav() {
     <nav ref={navRef} className="bottom-nav" aria-label="Navigasi utama">
       <ul className="bottom-nav-list">
         {SITE_BOTTOM_NAV.map((item) => {
-          const Icon = ICONS[item.to] || House;
+          const Icon = ICONS[item.to] || Store;
           const active = isNavItemActive(location.pathname, item.to);
 
           return (

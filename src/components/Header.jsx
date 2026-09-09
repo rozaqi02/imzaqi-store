@@ -12,27 +12,10 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { COMPACT_NAV_MEDIA } from "../lib/breakpoints";
 import { rafThrottle } from "../utils/throttle";
 import PromoTicker from "./PromoTicker";
+import CartIcon from "./CartIcon";
 
 const HEADER_SHRINK_MS = 280;
 const NAV_LINKS = SITE_DESKTOP_NAV;
-
-function CartIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M6.5 6H21l-1.6 8.2a2 2 0 0 1-2 1.6H9.1a2 2 0 0 1-2-1.6L5.2 3.5H2.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M9 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2ZM18 21a1 1 0 1 0 0-2 1 1 0 0 0 0 2Z"
-        fill="currentColor"
-      />
-    </svg>
-  );
-}
 
 function AdminHeaderLink({ to, isActive, title }) {
   return (

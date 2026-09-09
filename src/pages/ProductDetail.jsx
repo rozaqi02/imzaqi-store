@@ -16,6 +16,7 @@ import {
   UserRound,
   Users,
   Bell,
+  PackageCheck,
 } from "lucide-react";
 
 import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts, fetchTopSellingData } from "../lib/api";
@@ -367,7 +368,7 @@ const VariantCard = React.memo(({
 
       <div className="pdx-packCommerce" aria-label="Ketersediaan dan penjualan varian">
         <span className={`pdx-packSignal pdx-packStock${out ? " is-out" : lowStock ? " is-low" : ""}`}>
-          <span className="pdx-packSignalDot" aria-hidden="true" />
+          <PackageCheck className="pdx-packSignalIcon" size={12} aria-hidden="true" />
           {out ? "Habis" : lowStock ? `Sisa ${stock}` : `Stok ${stock}`}
         </span>
         <span className="pdx-packSignal pdx-packSold">

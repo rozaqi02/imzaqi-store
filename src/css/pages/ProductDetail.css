@@ -4540,13 +4540,11 @@ html[data-theme="light"] .pdx-scrollArrow {
   white-space: nowrap;
 }
 
-.detail-page-v3 .pdx-packSignalDot {
-  width: 6px;
-  height: 6px;
-  flex: 0 0 6px;
-  border-radius: 999px;
-  background: #42ca91;
-  box-shadow: 0 0 0 3px rgba(66, 202, 145, 0.1);
+.detail-page-v3 .pdx-packSignalIcon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  color: #42ca91;
 }
 
 .detail-page-v3 .pdx-packStock.is-low {
@@ -4555,9 +4553,8 @@ html[data-theme="light"] .pdx-scrollArrow {
   color: #f2ba58;
 }
 
-.detail-page-v3 .pdx-packStock.is-low .pdx-packSignalDot {
-  background: #f2ad32;
-  box-shadow: 0 0 0 3px rgba(242, 173, 50, 0.1);
+.detail-page-v3 .pdx-packStock.is-low .pdx-packSignalIcon {
+  color: #f2ad32;
 }
 
 .detail-page-v3 .pdx-packStock.is-out {
@@ -4566,9 +4563,8 @@ html[data-theme="light"] .pdx-scrollArrow {
   color: #858f89;
 }
 
-.detail-page-v3 .pdx-packStock.is-out .pdx-packSignalDot {
-  background: #77817c;
-  box-shadow: none;
+.detail-page-v3 .pdx-packStock.is-out .pdx-packSignalIcon {
+  color: #77817c;
 }
 
 .detail-page-v3 .pdx-packBlurb--summary {

@@ -41,7 +41,6 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { warn } from "../lib/log";
 import { copyToClipboard } from "../utils/clipboard";
 import { recordCompletedOrder } from "../lib/loyalty";
-import { loadBuyerDetails, phoneSuffix } from "../lib/buyerDetails";
 import { getVisitorIdAsUUID } from "../lib/visitor";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
@@ -120,13 +119,29 @@ function normalizeOrderCode(value) {
   if (!cleaned) return "";
   // Cek apakah sudah ada prefix IMZ
   const withoutPrefix = cleaned.startsWith("IMZ") ? cleaned.slice(3) : cleaned;
-  if (withoutPrefix.length === 4 || (withoutPrefix.length >= 8 && withoutPrefix.length <= 10)) return `IMZ-${withoutPrefix}`;
+  if (withoutPrefix.length === 8) return `IMZ-${withoutPrefix}`;
   // Kode belum lengkap atau di luar format, kembalikan mentah untuk ditampilkan error
   return cleaned;
 }
 
 function toFriendlyStatusError() {
   return "Status belum bisa diambil. Coba lagi nanti.";
+}
+
+function isMissingPublicLookup(error) {
+  return error?.code === "PGRST202" || /get_order_public_by_code.*(not find|does not exist|schema cache)/i.test(String(error?.message || ""));
+}
+
+async function fetchOrderByCode(orderCode) {
+  let result = await supabase.rpc("get_order_public_by_code", {
+    p_order_code: orderCode,
+    p_visitor_id: getVisitorIdAsUUID(),
+  });
+  if (result.error && isMissingPublicLookup(result.error)) {
+    result = await supabase.rpc("get_order_public", { p_order_code: orderCode });
+  }
+  if (result.error) throw result.error;
+  return Array.isArray(result.data) ? result.data[0] : result.data;
 }
 
 function statusTone(status) {
@@ -237,13 +252,6 @@ function TabCekStatus({ settings }) {
   const toast = useToast();
 
   const [input, setInput] = useState(initialParam);
-  const initialHistoryEntry = useMemo(
-    () => getOrderHistory().find((entry) => entry.order_code === normalizeOrderCode(initialParam)),
-    [initialParam]
-  );
-  const [phoneLast4, setPhoneLast4] = useState(
-    () => initialHistoryEntry?.phone_suffix || phoneSuffix(loadBuyerDetails().whatsapp)
-  );
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [order, setOrder] = useState(null);
@@ -263,9 +271,8 @@ function TabCekStatus({ settings }) {
   const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6283136049987");
   const pollTimerRef = useRef(null);
 
-  const lookup = useCallback(async (rawValue, suffixOverride) => {
+  const lookup = useCallback(async (rawValue) => {
     const code = normalizeOrderCode(rawValue);
-    const suffix = String(suffixOverride ?? phoneLast4).replace(/\D/g, "").slice(-4);
     setInput(code);
 
     if (!code) {
@@ -275,22 +282,12 @@ function TabCekStatus({ settings }) {
       toast.error(text);
       return;
     }
-    if (suffix.length !== 4) {
-      const text = "Masukkan 4 digit terakhir WhatsApp pembeli.";
-      setMessage(text);
-      toast.error(text);
-      return;
-    }
-
     setLoading(true);
     setMessage("");
     setOrder(null);
 
     try {
-      const { data, error } = await supabase.rpc("get_order_public_secure", { p_order_code: code, p_phone_suffix: suffix, p_visitor_id: getVisitorIdAsUUID() });
-      if (error) throw error;
-
-      const row = Array.isArray(data) ? data[0] : data;
+      const row = await fetchOrderByCode(code);
       if (!row) {
         const text = "Order tidak ditemukan.";
         setMessage(text);
@@ -309,16 +306,14 @@ function TabCekStatus({ settings }) {
     } finally {
       setLoading(false);
     }
-  }, [phoneLast4, setSearchParams, toast]);
+  }, [setSearchParams, toast]);
 
   // Silent refresh - update status di background tanpa reset UI
   const silentRefresh = useCallback(async (orderCode) => {
     if (!orderCode) return;
     setRefreshing(true);
     try {
-      const { data, error } = await supabase.rpc("get_order_public_secure", { p_order_code: orderCode, p_phone_suffix: phoneLast4, p_visitor_id: getVisitorIdAsUUID() });
-      if (error) throw error;
-      const row = Array.isArray(data) ? data[0] : data;
+      const row = await fetchOrderByCode(orderCode);
       if (!row) return;
       setOrder(row);
       setLastUpdated(new Date());
@@ -327,14 +322,14 @@ function TabCekStatus({ settings }) {
     } finally {
       setRefreshing(false);
     }
-  }, [phoneLast4]);
+  }, []);
 
   useEffect(() => {
     if (!initialParam) return;
     const normalized = normalizeOrderCode(initialParam);
     setInput(normalized);
-    if (phoneLast4.length === 4) lookup(normalized, phoneLast4);
-  }, [initialParam, lookup, phoneLast4]);
+    lookup(normalized);
+  }, [initialParam, lookup]);
 
   // Trigger celebration and record loyalty reward when status becomes "done"
   useEffect(() => {
@@ -539,18 +534,6 @@ function TabCekStatus({ settings }) {
                 />
               </label>
 
-              <label className="st-phoneSuffixWrap">
-                <span>4 digit WA</span>
-                <input
-                  className="input st-phoneSuffix"
-                  inputMode="numeric"
-                  maxLength={4}
-                  placeholder="1234"
-                  value={phoneLast4}
-                  onChange={(event) => setPhoneLast4(event.target.value.replace(/\D/g, "").slice(0, 4))}
-                />
-              </label>
-
               <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
                 {loading ? (
                   <>
@@ -562,7 +545,7 @@ function TabCekStatus({ settings }) {
             </div>
 
             <div className={`st-searchHint${message ? " is-error" : ""}`}>
-              {message || "Masukkan ID lengkap dan 4 digit terakhir WhatsApp pembeli."}
+              {message || "Masukkan ID order 8 karakter yang kamu dapat setelah checkout."}
             </div>
           </section>
 
@@ -580,10 +563,8 @@ function TabCekStatus({ settings }) {
                     type="button"
                     onClick={() => {
                       const code = r.order_code;
-                      const suffix = r.phone_suffix || phoneLast4;
                       setInput(code);
-                      setPhoneLast4(suffix);
-                      lookup(code, suffix);
+                      lookup(code);
                     }}
                   >
                     <span className="st-recentCode">{r.order_code}</span>
@@ -1063,14 +1044,8 @@ function TabRiwayat() {
     const errors = {};
     try {
       const results = await Promise.all(history.map(async (entry) => {
-        if (!entry.phone_suffix) return { entry, row: null };
-        const { data, error } = await supabase.rpc("get_order_public_secure", {
-          p_order_code: entry.order_code,
-          p_phone_suffix: entry.phone_suffix,
-          p_visitor_id: getVisitorIdAsUUID(),
-        });
-        if (error) throw error;
-        return { entry, row: Array.isArray(data) ? data[0] : data };
+        const row = await fetchOrderByCode(entry.order_code);
+        return { entry, row };
       }));
 
       const statusMap = {};

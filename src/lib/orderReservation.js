@@ -9,6 +9,11 @@ function signatureOf({ items, promoCode, whatsapp }) {
   return `${lines}::${String(promoCode || "").toUpperCase()}::${String(whatsapp || "").replace(/\D/g, "")}`;
 }
 
+function isMissingReservationRpc(error) {
+  const message = String(error?.message || "");
+  return error?.code === "PGRST202" || /create_pending_order_reservation.*(not find|does not exist|schema cache)/i.test(message);
+}
+
 export function clearOrderReservation() {
   try { sessionStorage.removeItem(RESERVATION_KEY); } catch {}
 }
@@ -34,6 +39,17 @@ export async function createOrderReservation({ items, promoCode, whatsapp, notes
       const created = { ...(Array.isArray(data) ? data[0] : data), signature };
       try { sessionStorage.setItem(RESERVATION_KEY, JSON.stringify(created)); } catch {}
       return created;
+    }
+    if (isMissingReservationRpc(error)) {
+      const fallback = {
+        order_code: code,
+        status: "legacy_checkout",
+        reservation_expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+        legacy: true,
+        signature,
+      };
+      try { sessionStorage.setItem(RESERVATION_KEY, JSON.stringify(fallback)); } catch {}
+      return fallback;
     }
     lastError = error;
     if (error.code !== "23505") break;
