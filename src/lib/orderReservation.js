@@ -10,8 +10,18 @@ function signatureOf({ items, promoCode, whatsapp }) {
 }
 
 function isMissingReservationRpc(error) {
+  const code = String(error?.code || "");
   const message = String(error?.message || "");
-  return error?.code === "PGRST202" || /create_pending_order_reservation.*(not find|does not exist|schema cache)/i.test(message);
+  if (/insufficient_stock|out_of_stock/i.test(message)) return false;
+  return (
+    code === "PGRST202" ||
+    code === "PGRST200" ||
+    code === "42883" ||
+    code === "42P01" ||
+    code === "42501" ||
+    /create_pending_order_reservation.*(not find|does not exist|schema cache|permission)/i.test(message) ||
+    /function.*does not exist/i.test(message)
+  );
 }
 
 export function clearOrderReservation() {
@@ -54,6 +64,20 @@ export async function createOrderReservation({ items, promoCode, whatsapp, notes
     lastError = error;
     if (error.code !== "23505") break;
   }
+
+  // Gracefully fallback for non-stock errors so customer checkout is never blocked
+  if (lastError && !/insufficient_stock|out_of_stock/i.test(String(lastError?.message || ""))) {
+    const fallback = {
+      order_code: makeOrderCode(),
+      status: "legacy_checkout",
+      reservation_expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+      legacy: true,
+      signature,
+    };
+    try { sessionStorage.setItem(RESERVATION_KEY, JSON.stringify(fallback)); } catch {}
+    return fallback;
+  }
+
   throw lastError || new Error("Gagal mereservasi stok.");
 }
 

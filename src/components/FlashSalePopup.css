@@ -271,42 +271,112 @@ html[data-theme="dark"] .fsp-shop {
 @media (max-width: 720px) {
   .fsp-backdrop {
     align-items: center;
-    padding: 22px 18px;
+    padding: 18px 14px;
     backdrop-filter: blur(10px);
   }
 
-  .fsp-stage { width: min(430px, 100%); }
+  .fsp-stage {
+    width: min(420px, 100%);
+  }
 
   .fsp-billboard {
-    grid-template-columns: minmax(104px, .35fr) minmax(0, .65fr);
-    max-height: 72dvh;
+    grid-template-columns: 1fr;
+    max-height: min(88dvh, 640px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     border-radius: 24px;
+    scrollbar-width: thin;
   }
 
   .fsp-visual {
-    min-height: 0;
-    padding: 22px 12px;
+    min-height: 170px;
+    padding: 28px 16px 20px;
+  }
+
+  .fsp-off {
+    top: 14px;
+    left: 14px;
+    padding: 5px 11px;
+    font-size: 12px;
   }
 
   .fsp-visualIcon {
-    width: 76px !important;
-    height: 76px !important;
+    width: 112px !important;
+    height: 112px !important;
     aspect-ratio: 1 / 1 !important;
-    border-radius: 20px;
+    border-radius: 24px;
   }
 
   .fsp-copy {
-    gap: 7px;
-    padding: 22px 18px 16px;
+    gap: 9px;
+    padding: 22px 20px 18px;
+  }
+
+  .fsp-label {
+    font-size: 11px;
   }
 
   .fsp-closeFloat {
-    top: -12px;
-    right: -8px;
+    top: -10px;
+    right: -6px;
+    width: 38px;
+    height: 38px;
   }
 
-  .fsp-headline { font-size: clamp(22px, 7vw, 30px); }
-  .fsp-more { display: none; }
+  .fsp-headline {
+    font-size: clamp(22px, 5.5vw, 28px);
+    line-height: 1.15;
+  }
+
+  .fsp-meta {
+    font-size: 13.5px;
+  }
+
+  .fsp-priceRow {
+    gap: 10px;
+    margin-top: 2px;
+  }
+
+  .fsp-now {
+    font-size: clamp(24px, 5.5vw, 30px);
+  }
+
+  .fsp-was {
+    font-size: 14px;
+  }
+
+  .fsp-timer {
+    font-size: 12.5px;
+    margin: 2px 0 0;
+  }
+
+  .fsp-shop {
+    min-height: 48px;
+    font-size: 14.5px;
+    border-radius: 13px;
+    margin-top: 6px;
+  }
+
+  .fsp-more {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-top: 4px;
+  }
+
+  .fsp-moreChip {
+    min-height: 30px;
+    padding: 0 10px;
+    font-size: 11.5px;
+  }
+
+  .fsp-quiet {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 6px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

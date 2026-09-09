@@ -53,13 +53,13 @@ function qrisReducer(state, action) {
     case "RESET":
       return { ...QRIS_INITIAL };
     case "FREE":
-      return { ...state, mode: "free" };
+      return { ...state, mode: "free", loaded: true };
     case "DYNAMIC":
-      return { ...state, url: action.url, mode: "dynamic" };
+      return { ...state, url: action.url, notice: action.notice || "", mode: "dynamic", loaded: true, failed: false };
     case "FALLBACK":
-      return { ...state, url: action.url, notice: action.notice, mode: "fallback" };
+      return { ...state, url: action.url, notice: action.notice || "", mode: "fallback", loaded: true, failed: false };
     case "LOADED":
-      return { ...state, loaded: true };
+      return { ...state, loaded: true, failed: false };
     case "FAILED":
       return { ...state, failed: true, loaded: true, mode: "fallback" };
     default:
@@ -709,7 +709,11 @@ export default function Pay() {
     [location.state]
   );
   const [customerWhatsApp, setCustomerWhatsApp] = useState(() => initialBuyerDetails.whatsapp || "");
-  const [isWaValid, setIsWaValid] = useState(false);
+  const [isWaValid, setIsWaValid] = useState(() => {
+    const raw = String(initialBuyerDetails.whatsapp || "").replace(/\D/g, "");
+    return (raw.startsWith("08") && raw.length >= 10 && raw.length <= 15) ||
+           (raw.startsWith("628") && raw.length >= 11 && raw.length <= 16);
+  });
   const [buyerEmail, setBuyerEmail] = useState(() => {
     try { return initialBuyerDetails.email || localStorage.getItem(STORAGE_KEY_BUYER_EMAIL) || ""; } catch { return initialBuyerDetails.email || ""; }
   });
@@ -883,7 +887,7 @@ export default function Pay() {
   }, [requiredBuyerEmailItems]);
 
   const buyerReady = hasValidWhatsApp && !missingBuyerEmailNote;
-  const canShowQris = buyerReady && Boolean(reservation?.order_code);
+  const canShowQris = !isFreeOrder && items.length > 0;
   const isFreeOrder = total === 0 && subtotal > 0;
 
   useEffect(() => {
@@ -916,7 +920,9 @@ export default function Pay() {
       if (!active) return;
       setReservationBusy(false);
       warn("Gagal membuat reservasi:", error);
-      setErrorText("Stok belum bisa direservasi. Muat ulang atau hubungi admin jika masalah berlanjut.");
+      if (/insufficient_stock|out_of_stock/i.test(String(error?.message || ""))) {
+        setErrorText("Stok tidak mencukupi. Silakan kurangi jumlah atau pilih varian lain.");
+      }
     });
     return () => { active = false; };
     // Reservation is intentionally created once after buyer requirements are valid.
@@ -940,18 +946,16 @@ export default function Pay() {
 
   const isDynamicQris = qris.mode === "dynamic";
   const qrisFootText = !hasValidWhatsApp
-    ? "QR akan terbuka setelah nomor WhatsApp valid."
+    ? "Masukkan nomor WhatsApp di formulir sebelah untuk konfirmasi pesanan."
     : missingBuyerEmailNote
-      ? "Lengkapi catatan email buyer agar QRIS terbuka."
+      ? "Lengkapi email buyer agar aktivasi akun lancar."
       : reservationBusy
-        ? "Sedang mengunci stok untukmu."
-        : !reservation
-          ? "Stok belum berhasil direservasi. Coba muat ulang."
-          : reservation.legacy
-            ? "QRIS siap. Stok akan diverifikasi saat konfirmasi pembayaran."
-            : isDynamicQris
-              ? "Nominal QR sudah menyesuaikan total."
-              : "QR statis aktif. Bayar sesuai total di ringkasan.";
+        ? "Sedang mengunci stok untukmu..."
+        : reservation?.legacy
+          ? "QRIS siap. Stok diverifikasi saat konfirmasi pembayaran."
+          : isDynamicQris
+            ? "Nominal QR sudah otomatis sesuai total tagihan."
+            : "QR statis aktif. Bayar sesuai total di ringkasan.";
   const qrisLockTitle = !hasValidWhatsApp
     ? "Masukkan WhatsApp"
     : missingBuyerEmailNote
@@ -960,7 +964,7 @@ export default function Pay() {
         ? "Mengunci stok"
         : "Reservasi belum siap";
   const qrisLockDescription = !hasValidWhatsApp
-    ? "Ketik nomor WhatsApp di formulir sebelah. QRIS pembayaran akan langsung muncul otomatis."
+    ? "Ketik nomor WhatsApp di formulir sebelah untuk menyelesaikan order."
     : missingBuyerEmailNote
       ? `Item ${requiredEmailProductsText} butuh email pembeli untuk aktivasi akun. Lengkapi email di atas ya.`
       : reservationBusy
@@ -1205,6 +1209,11 @@ export default function Pay() {
       setShowConfirmModal(true);
       return;
     }
+    if (!hasValidWhatsApp) {
+      toast.error("Masukkan nomor WhatsApp yang valid dulu ya.");
+    } else if (missingBuyerEmailNote) {
+      toast.error("Lengkapi email pembeli untuk aktivasi akun.");
+    }
     focusBlockingField();
   }
 
@@ -1297,8 +1306,8 @@ export default function Pay() {
                   <div className="pay-cardKicker">Kontak order</div>
                   <h2 className="h3 pay-cardTitle">WhatsApp</h2>
                 </div>
-                <span className={`pay-statePill ${isFreeOrder ? "free" : canShowQris ? "live" : "locked"}`}>
-                  {isFreeOrder ? "Gratis" : canShowQris ? "QRIS Siap" : "Langkah 1"}
+                <span className={`pay-statePill ${isFreeOrder ? "free" : hasValidWhatsApp ? "live" : ""}`}>
+                  {isFreeOrder ? "Gratis" : hasValidWhatsApp ? "WA Valid" : "Kontak"}
                 </span>
               </div>
 
@@ -1314,7 +1323,7 @@ export default function Pay() {
                 helperText="Nomor buat notifikasi order ini ya."
                 placeholder="08xxxxxxxxxx"
                 className="pay-waField"
-                disabled={Boolean(reservation)}
+                disabled={busy}
               />
 
               {requiresBuyerEmailNote && (
@@ -1343,7 +1352,7 @@ export default function Pay() {
                     aria-describedby="pay-email-hint"
                     autoComplete="email"
                     inputMode="email"
-                    disabled={Boolean(reservation)}
+                    disabled={busy}
                   />
 
                   <div id="pay-email-hint" className="pay-emailHintText">
@@ -1392,11 +1401,7 @@ export default function Pay() {
                   <div className="pay-stageHint">
                     {isFreeOrder
                       ? "Promo 100% diterapkan. Tidak perlu bayar, langsung konfirmasi order."
-                      : canShowQris
-                        ? "Scan QR, selesaikan pembayaran, lalu simpan ID order."
-                        : missingBuyerEmailNote
-                          ? "Lengkapi email buyer di catatan agar QRIS terbuka."
-                          : "Langkah 1: Masukkan WhatsApp di formulir sebelah untuk membuka QRIS."}
+                      : "Scan QRIS dengan m-banking atau e-wallet (BCA, GoPay, OVO, Dana, ShopeePay), lalu konfirmasi di bawah."}
                   </div>
 
                   <div className="pay-promoSection">
@@ -1548,11 +1553,11 @@ export default function Pay() {
                                 setIsZoomed(true);
                               }
                             }}
-                            style={{ display: qris.loaded && !qris.failed ? "block" : "none" }}
+                            style={{ display: qris.failed ? "none" : "block" }}
                           >
                             <img
                               src={qris.url}
-                              alt=""
+                              alt="QRIS Pembayaran"
                               className="qris-img"
                               onLoad={() => dispatchQris({ type: "LOADED" })}
                               onError={(event) => {
@@ -1563,7 +1568,7 @@ export default function Pay() {
                           </button>
                         ) : null}
 
-                        {qris.loaded && !qris.failed && qris.url && (
+                        {!qris.failed && qris.url && (
                           <a
                             href={qris.url}
                             download="qris-pembayaran.png"
