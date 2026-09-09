@@ -886,9 +886,9 @@ export default function Pay() {
     return `${compact[0]} +${compact.length - 1} lainnya`;
   }, [requiredBuyerEmailItems]);
 
+  const isFreeOrder = total === 0 && subtotal > 0;
   const buyerReady = hasValidWhatsApp && !missingBuyerEmailNote;
   const canShowQris = !isFreeOrder && items.length > 0;
-  const isFreeOrder = total === 0 && subtotal > 0;
 
   useEffect(() => {
     if (!buyerReady || reservation || reservationBusy || !items.length || ok) return undefined;

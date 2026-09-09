@@ -153,9 +153,6 @@ export default function WhatsAppInput({
   const showSuccess = touched && validation.valid;
   const wrapperClassName = ['whatsapp-input-wrapper', compact ? 'is-compact' : '', className].filter(Boolean).join(' ');
 
-  const cleanDigits = internalValue.replace(/[^\d+]/g, '');
-  const isIndonesian = /^(08|628|\+628)/.test(cleanDigits);
-
   return (
     <div className={wrapperClassName}>
       <label className="label" htmlFor="whatsapp-input">
@@ -163,19 +160,6 @@ export default function WhatsAppInput({
       </label>
       
       <div className={`input-wrapper ${showError ? 'error' : ''} ${showSuccess ? 'success' : ''}`}>
-        {isIndonesian && (
-          <span className="wa-input-flag" aria-hidden="true" style={{
-            position: 'absolute',
-            left: '14px',
-            top: '50%',
-            transform: 'translateY(-50%)',
-            fontSize: '18px',
-            pointerEvents: 'none',
-            zIndex: 3
-          }}>
-            🇮🇩
-          </span>
-        )}
         <input
           id="whatsapp-input"
           className="input"
@@ -189,10 +173,9 @@ export default function WhatsAppInput({
           required={required}
           aria-invalid={showError || undefined}
           aria-describedby="whatsapp-hint"
-          style={isIndonesian ? { paddingLeft: '44px' } : undefined}
         />
-        {showSuccess && <span className="input-icon" style={{ right: isIndonesian ? '14px' : undefined }}><Check size={16} strokeWidth={2.5} /></span>}
-        {showError && <span className="input-icon" style={{ right: isIndonesian ? '14px' : undefined }}><X size={16} strokeWidth={2.5} /></span>}
+        {showSuccess && <span className="input-icon"><Check size={16} strokeWidth={2.5} /></span>}
+        {showError && <span className="input-icon"><X size={16} strokeWidth={2.5} /></span>}
       </div>
 
       {showError && (
