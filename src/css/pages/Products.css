@@ -850,7 +850,7 @@ html[data-theme="dark"] .catalog-rangeInput::-moz-range-thumb {
   padding: 0 32px 0 10px;
   border-radius: 12px;
   font-size: 12px;
-  font-weight: 600;
+  font-weight: 500;
   appearance: none;
   -webkit-appearance: none;
   background-image:
@@ -3014,6 +3014,10 @@ html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardFoot {
     width: auto !important;
     font-size: 11.5px !important;
     white-space: nowrap !important;
+  }
+
+  .catalog-contentSort {
+    font-weight: 500 !important;
   }
 
   .catalog-activeState {
