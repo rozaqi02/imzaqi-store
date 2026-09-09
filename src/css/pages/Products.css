@@ -3267,16 +3267,22 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
   min-width: 44px !important;
   max-width: 44px !important;
   height: 44px !important;
-  padding: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
   border-radius: 14px;
   background: var(--skeu-control-bg, rgba(255, 255, 255, 0.08));
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
   color: var(--brand-text, #fff);
-  position: relative;
-  transition: transform 0.15s ease, background 0.15s ease;
+  position: relative !important;
+  overflow: visible !important;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+
+.catalog-heroFilterBtn svg {
+  flex-shrink: 0;
+  margin: 0 auto;
 }
 
 .catalog-heroFilterBtn:active {
@@ -3284,22 +3290,50 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
 }
 
 .catalog-heroFilterBtn.active {
-  border-color: var(--surface-accent, #00d6b4);
-  background: rgba(0, 214, 180, 0.12);
-  color: var(--surface-accent, #00d6b4);
+  border-color: var(--surface-accent, #00d6b4) !important;
+  background: rgba(0, 214, 180, 0.12) !important;
+  color: var(--surface-accent, #00d6b4) !important;
 }
 
 html[data-theme="light"] .catalog-heroFilterBtn {
-  background: #ffffff;
-  border: 1px solid rgba(0, 138, 148, 0.22);
-  color: #0d2b30;
-  box-shadow: 0 4px 12px rgba(0, 138, 148, 0.08);
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 138, 148, 0.22) !important;
+  color: #0d2b30 !important;
+  box-shadow: 0 4px 12px rgba(0, 138, 148, 0.08) !important;
 }
 
 html[data-theme="light"] .catalog-heroFilterBtn.active {
-  background: rgba(0, 138, 148, 0.10);
-  border-color: #008a94;
-  color: #008a94;
+  background: rgba(0, 138, 148, 0.10) !important;
+  border-color: #008a94 !important;
+  color: #008a94 !important;
+}
+
+.catalog-heroFilterBtn .catalog-filterBtnCount {
+  position: absolute !important;
+  top: -4px !important;
+  right: -4px !important;
+  min-width: 18px !important;
+  height: 18px !important;
+  padding: 0 4px !important;
+  border-radius: 999px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  z-index: 5 !important;
+  background: #00d6b4 !important;
+  color: #032235 !important;
+  border: 2px solid #0a0a0a !important;
+  box-shadow: 0 2px 6px rgba(0, 214, 180, 0.4) !important;
+}
+
+html[data-theme="light"] .catalog-heroFilterBtn .catalog-filterBtnCount {
+  background: #008a94 !important;
+  color: #ffffff !important;
+  border: 2px solid #ffffff !important;
+  box-shadow: 0 2px 6px rgba(0, 138, 148, 0.3) !important;
 }
 
 @media (min-width: 721px) {
