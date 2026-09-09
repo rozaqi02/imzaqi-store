@@ -494,7 +494,32 @@ html[data-theme="light"] .st-recentPrice {
   border: 1px solid var(--st-line);
   background: var(--st-inset);
   box-shadow: var(--st-inset-shadow);
-  color: rgba(145, 223, 255, 0.98);
+  color: var(--st-muted);
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  transition: all 0.2s ease;
+}
+
+.st-flowStep.is-active .st-flowNumber {
+  border-color: rgba(0, 158, 96, 0.45);
+  background: rgba(0, 158, 96, 0.12);
+  color: #009e60;
+  font-weight: 900;
+  box-shadow: 0 0 10px rgba(0, 158, 96, 0.2);
+}
+
+.st-flowStep.is-done .st-flowNumber {
+  border-color: #009e60;
+  background: #009e60;
+  color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 158, 96, 0.25);
+}
+
+.st-flowStep.is-cancelled .st-flowNumber {
+  border-color: #e11d3a;
+  background: #e11d3a;
+  color: #ffffff;
 }
 
 .st-flowDot span {
@@ -525,8 +550,13 @@ html[data-theme="light"] .st-recentPrice {
   align-self: center;
   height: 2px;
   flex-shrink: 0;
-  background: linear-gradient(90deg, rgba(90, 190, 255, 0.12), rgba(90, 190, 255, 0.64), rgba(90, 190, 255, 0.12));
+  background: var(--st-line);
   border-radius: 999px;
+  transition: background 0.2s ease;
+}
+
+.st-flowLine.is-done {
+  background: #009e60 !important;
 }
 
 .st-items {
@@ -813,7 +843,7 @@ html[data-theme="light"] .status-shell::before {
     width: 1px;
     height: 16px;
     margin-left: 16px;
-    background: linear-gradient(180deg, rgba(90, 190, 255, 0.18), rgba(90, 190, 255, 0.52), rgba(90, 190, 255, 0.18));
+    background: var(--st-line);
   }
 
   .st-itemRow {
@@ -1832,7 +1862,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
 
   .st-flowLine {
     /* override to vertical dashed */
-    background: linear-gradient(180deg, rgba(90, 190, 255, 0.18), rgba(90, 190, 255, 0.6), rgba(90, 190, 255, 0.18));
+    background: var(--st-line);
     height: 18px;
     width: 2px;
   }
@@ -2175,8 +2205,16 @@ html[data-theme="dark"] .st-statePill.is-processing {
   color: #009e60 !important;
 }
 
-.st-flowLine {
+.st-flowLine.is-done {
   background: #009e60 !important;
+}
+
+.st-spin {
+  animation: stSpin 0.75s linear infinite;
+}
+@keyframes stSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
 .st-payTrack,

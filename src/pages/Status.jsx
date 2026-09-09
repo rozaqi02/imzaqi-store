@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   BadgePercent,
   Calendar,
+  Check,
   CheckCircle2,
   Clock3,
   Copy,
@@ -23,6 +24,7 @@ import {
   Sparkles,
   Trash2,
   WalletCards,
+  X,
   XCircle,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
@@ -169,11 +171,20 @@ function formatRelativeTime(date) {
 
 // ─── Sub-components ──────────────────────────────────────────────────────────
 
-function FlowStep({ step }) {
-  const stateText = step.done ? "Selesai" : step.active ? "Aktif" : "Menunggu";
+function FlowStep({ step, index }) {
+  const isCancelled = step.key === "cancelled";
+  const stateText = step.done ? "Selesai" : step.active ? (isCancelled ? "Batal" : "Aktif") : "Menunggu";
   return (
-    <div className={`st-flowStep${step.active ? " is-active" : ""}${step.done ? " is-done" : ""}`}>
-      <div className="st-flowDot">{step.done ? <CheckCircle2 size={14} /> : <span />}</div>
+    <div className={`st-flowStep${step.active ? " is-active" : ""}${step.done ? " is-done" : ""}${isCancelled ? " is-cancelled" : ""}`}>
+      <div className="st-flowNumber" aria-hidden="true">
+        {step.done ? (
+          <Check size={14} strokeWidth={3} />
+        ) : isCancelled ? (
+          <X size={14} strokeWidth={3} />
+        ) : (
+          <span>{index}</span>
+        )}
+      </div>
       <div className="st-flowCopy">
         <strong>{step.label}</strong>
         <small>{stateText}</small>
@@ -406,15 +417,6 @@ function TabCekStatus({ settings }) {
     [order?.items]
   );
 
-  const etaHint = useMemo(() => {
-    const val = order?.status;
-    if (val === "pending") return "Estimasi: Selesaikan pembayaran via QRIS dalam 30 menit agar pesanan tidak kedaluwarsa.";
-    if (val === "paid_reported") return "Estimasi: Pembayaran sedang diverifikasi admin (~15 menit).";
-    if (val === "processing") return "Estimasi: Admin sedang menyiapkan akun pesanan Anda (~5 menit).";
-    if (val === "done") return "Pesanan selesai — Detail akun telah dikirim. Selamat menikmati layanan kami!";
-    if (val === "cancelled") return "Pesanan ini telah dibatalkan.";
-    return null;
-  }, [order?.status]);
 
   const createdDateLabel = useMemo(() => formatDate(order?.created_at), [order?.created_at]);
 
@@ -630,7 +632,6 @@ function TabCekStatus({ settings }) {
                     <span>{prettyStatus(order.status)}</span>
                   </div>
                   <div className="st-lastUpdated">
-                    {refreshing ? <span className="st-refreshingDot" aria-hidden="true" /> : null}
                     {lastUpdatedLabel ? <span>Diperbarui {lastUpdatedLabel}</span> : null}
                     {!isTerminal ? (
                       <button
@@ -641,7 +642,7 @@ function TabCekStatus({ settings }) {
                         aria-label="Perbarui status"
                         title="Perbarui status"
                       >
-                        <RefreshCw size={13} />
+                        <RefreshCw size={13} className={refreshing ? "st-spin" : ""} />
                       </button>
                     ) : null}
                   </div>
@@ -674,16 +675,9 @@ function TabCekStatus({ settings }) {
                 </div>
               </div>
 
-              {etaHint ? (
-                <div className={`st-orderEtaCallout is-${statusMeta.tone}`} role="status">
-                  <Clock3 size={15} />
-                  <span>{etaHint}</span>
-                </div>
-              ) : null}
-
               {isLiveStatus ? (
                 <div className="st-liveHint">
-                  <span className="st-livePulse" />
+                  <Clock3 size={13} style={{ opacity: 0.7 }} />
                   <span>Status diperbarui otomatis setiap 30 detik</span>
                 </div>
               ) : null}
@@ -704,8 +698,8 @@ function TabCekStatus({ settings }) {
               <div className="st-flowRail">
                 {timeline.map((step, index) => (
                   <React.Fragment key={step.key}>
-                    <FlowStep step={step} />
-                    {index < timeline.length - 1 ? <div className="st-flowLine" /> : null}
+                    <FlowStep step={step} index={index + 1} />
+                    {index < timeline.length - 1 ? <div className={`st-flowLine${step.done ? " is-done" : ""}`} /> : null}
                   </React.Fragment>
                 ))}
               </div>
