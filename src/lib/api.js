@@ -176,10 +176,6 @@ export async function fetchProducts({ includeInactive = false, useCache = !inclu
   }
 
   const request = (async () => {
-    // Lazy cleanup keeps reserved stock accurate even without a cron worker.
-    if (typeof supabase.rpc === "function") {
-      try { await supabase.rpc("expire_order_reservations"); } catch {}
-    }
     const attempts = [
       { includeCategory: true, includeTimestamps: true },
       { includeCategory: false, includeTimestamps: true },

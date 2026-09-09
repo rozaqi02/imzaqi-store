@@ -25,7 +25,6 @@ import { copyToClipboard } from "../utils/clipboard";
 import { warn } from "../lib/log";
 import { saveBuyerName } from "../lib/greeting";
 import { loadBuyerDetails, saveBuyerDetails } from "../lib/buyerDetails";
-import { clearOrderReservation, createOrderReservation, reportOrderPayment } from "../lib/orderReservation";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
 const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
@@ -376,13 +375,11 @@ function useModalCountUp(active, target, duration = 520) {
 function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }) {
   const modalRef = React.useRef(null);
   const [agreed, setAgreed] = useState(false);
-  const [paymentReference, setPaymentReference] = useState("");
   const animatedTotal = useModalCountUp(open && !isFree, total);
 
   useEffect(() => {
     if (open) {
       setAgreed(false);
-      setPaymentReference("");
     }
   }, [open]);
 
@@ -422,7 +419,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
             <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Pembayaran"}</div>
             <div className="pay-confirmModalSub">
               {agreed
-                ? "Siap dikirim untuk verifikasi admin"
+                ? "Siap dikonfirmasi - ID order akan dibuat"
                 : "Centang konfirmasi di bawah untuk lanjut"}
             </div>
           </div>
@@ -476,34 +473,12 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
               </label>
             </div>
 
-            {!isFree ? (
-              <div className="pay-paymentEvidence">
-                <label htmlFor="pay-reference">Nomor referensi transaksi</label>
-                <input
-                  id="pay-reference"
-                  className="input"
-                  value={paymentReference}
-                  onChange={(event) => setPaymentReference(event.target.value.replace(/\s/g, "").slice(0, 40))}
-                  placeholder="Contoh: 1234567890"
-                  autoComplete="off"
-                />
-                <small>Salin dari detail transaksi QRIS agar admin bisa mencocokkan pembayaran.</small>
-              </div>
-            ) : null}
-
-            {!isFree ? (
-              <div className="pay-confirmNotice">
-                <ShieldCheck size={14} />
-                <span>Admin mencocokkan nomor referensi dengan mutasi sebelum menyiapkan akun.</span>
-              </div>
-            ) : null}
-
             <div className="pay-confirmActionsNew">
               <button
                 className={`pay-confirmPrimaryBtn${agreed ? " is-ready" : ""}`}
                 type="button"
-                onClick={() => onConfirm(isFree ? "FREE" : paymentReference)}
-                disabled={!agreed || (!isFree && paymentReference.trim().length < 6)}
+                onClick={onConfirm}
+                disabled={!agreed}
               >
                 <Check size={16} strokeWidth={2.5} />
                 {agreed
@@ -621,10 +596,6 @@ export default function Pay() {
   }, [promo]);
 
   async function handleApplyPromo() {
-    if (reservation) {
-      setPromoFeedback({ text: "Reservasi sudah dibuat. Ubah promo dari checkout.", type: "info" });
-      return;
-    }
     const raw = String(promoCodeInput || "").trim().toUpperCase();
     if (!raw) {
       setPromoFeedback({ text: "Ketik kode promo dulu ya.", type: "error" });
@@ -652,10 +623,6 @@ export default function Pay() {
   }
 
   function handleRemovePromo() {
-    if (reservation) {
-      setPromoFeedback({ text: "Reservasi sudah dibuat. Kembali ke checkout untuk mengubah promo.", type: "info" });
-      return;
-    }
     clearPromo();
     setPromoPercent(0);
     setPromoCodeInput("");
@@ -724,8 +691,6 @@ export default function Pay() {
   const [errorText, setErrorText] = useState("");
   const [ok, setOk] = useState(false);
   const [orderCode, setOrderCode] = useState("");
-  const [reservation, setReservation] = useState(null);
-  const [reservationBusy, setReservationBusy] = useState(false);
   const [qris, dispatchQris] = useReducer(qrisReducer, QRIS_INITIAL);
   const [productIconLookup, setProductIconLookup] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
@@ -890,45 +855,6 @@ export default function Pay() {
   const buyerReady = hasValidWhatsApp && !missingBuyerEmailNote;
   const canShowQris = !isFreeOrder && items.length > 0;
 
-  useEffect(() => {
-    if (!buyerReady || reservation || reservationBusy || !items.length || ok) return undefined;
-    let active = true;
-    setReservationBusy(true);
-    setErrorText("");
-    createOrderReservation({
-      items,
-      promoCode: promo?.code || null,
-      whatsapp: customerWhatsApp,
-      notes: noteText,
-    }).then((created) => {
-      if (!active) return;
-      // Matikan state loading sebelum setReservation memicu cleanup effect ini.
-      // Jika menunggu .finally(), cleanup membuat `active` false dan loading
-      // tertinggal selamanya walaupun reservasinya sudah berhasil.
-      setReservationBusy(false);
-      setReservation(created);
-      setOrderCode(created.order_code);
-      addOrderToHistory({
-        order_code: created.order_code,
-        created_at: new Date().toISOString(),
-        total_idr: Number(created.total_idr ?? total),
-        status: "pending_payment",
-        phone_suffix: String(customerWhatsApp).replace(/\D/g, "").slice(-4),
-      });
-      trackFunnelEvent("qris_opened", { orderCode: created.order_code, metadata: { total: created.total_idr ?? total } });
-    }).catch((error) => {
-      if (!active) return;
-      setReservationBusy(false);
-      warn("Gagal membuat reservasi:", error);
-      if (/insufficient_stock|out_of_stock/i.test(String(error?.message || ""))) {
-        setErrorText("Stok tidak mencukupi. Silakan kurangi jumlah atau pilih varian lain.");
-      }
-    });
-    return () => { active = false; };
-    // Reservation is intentionally created once after buyer requirements are valid.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [buyerReady, items.length, ok, reservation]);
-
   // Start timer when QRIS becomes visible
   const qrisTimerActive = canShowQris && !isFreeOrder && qris.mode !== "idle";
   const qrisTimer = useQrisTimer(qrisTimerActive);
@@ -949,27 +875,19 @@ export default function Pay() {
     ? "Masukkan nomor WhatsApp di formulir sebelah untuk konfirmasi pesanan."
     : missingBuyerEmailNote
       ? "Lengkapi email buyer agar aktivasi akun lancar."
-      : reservationBusy
-        ? "Sedang mengunci stok untukmu..."
-        : reservation?.legacy
-          ? "QRIS siap. Stok diverifikasi saat konfirmasi pembayaran."
-          : isDynamicQris
-            ? "Nominal QR sudah otomatis sesuai total tagihan."
-            : "QR statis aktif. Bayar sesuai total di ringkasan.";
+      : isDynamicQris
+        ? "Nominal QR sudah otomatis sesuai total tagihan."
+        : "QR statis aktif. Bayar sesuai total di ringkasan.";
   const qrisLockTitle = !hasValidWhatsApp
     ? "Masukkan WhatsApp"
     : missingBuyerEmailNote
       ? "Lengkapi Email Pembeli"
-      : reservationBusy
-        ? "Mengunci stok"
-        : "Reservasi belum siap";
+      : "Menyiapkan QRIS";
   const qrisLockDescription = !hasValidWhatsApp
     ? "Ketik nomor WhatsApp di formulir sebelah untuk menyelesaikan order."
     : missingBuyerEmailNote
       ? `Item ${requiredEmailProductsText} butuh email pembeli untuk aktivasi akun. Lengkapi email di atas ya.`
-      : reservationBusy
-        ? "Kami sedang mengunci stok selama 30 menit agar tidak diambil pembeli lain."
-        : "Reservasi belum dapat dibuat. Muat ulang halaman atau kembali ke checkout.";
+      : "Pastikan data pesanan sudah sesuai sebelum membayar.";
 
   const summaryText = useMemo(() => {
     const rows = items.map(
@@ -1028,7 +946,7 @@ export default function Pay() {
     };
   }
 
-  async function createOrderWithStock(nextCode, orderDraft, paymentReference = "") {
+  async function createOrderWithStock(nextCode, orderDraft) {
     const visitorId = getVisitorIdAsUUID();
     const payload = {
       p_visitor_id: visitorId,
@@ -1042,8 +960,7 @@ export default function Pay() {
       p_customer_whatsapp: customerWhatsApp,
     };
 
-    const legacyNotes = [noteText, paymentReference ? `Referensi pembayaran: ${paymentReference}` : ""].filter(Boolean).join("\n");
-    const rpcPayload = legacyNotes ? { ...payload, p_notes: legacyNotes } : payload;
+    const rpcPayload = noteText ? { ...payload, p_notes: noteText } : payload;
     const { data, error } = await supabase.rpc("create_order_with_stock_check", rpcPayload);
 
     if (error) {
@@ -1058,7 +975,7 @@ export default function Pay() {
     return data[0];
   }
 
-  async function onConfirmPaid(paymentReference) {
+  async function onConfirmPaid() {
     setErrorText("");
 
     if (!customerWhatsApp || !isWaValid) {
@@ -1078,18 +995,45 @@ export default function Pay() {
     let loadingId = "";
 
     try {
-      if (!reservation?.order_code) throw new Error("Reservasi stok belum siap.");
-      loadingId = toast.loading("Mengirim konfirmasi pembayaran...");
-      const reported = reservation.legacy
-        ? await createOrderWithStock(reservation.order_code, await buildCanonicalOrderPayload(), paymentReference)
-        : await reportOrderPayment({
-            orderCode: reservation.order_code,
-            phone: customerWhatsApp,
-            reference: paymentReference,
-          });
+      const canonicalOrder = await buildCanonicalOrderPayload();
+      const hasPricingMismatch =
+        Number(canonicalOrder.subtotal) !== Number(subtotal) ||
+        Number(canonicalOrder.discountPercent) !== Number(promoPercent) ||
+        Number(canonicalOrder.total) !== Number(total);
+
+      if (hasPricingMismatch) {
+        setSnapshot(canonicalOrder.items);
+        if (!canonicalOrder.promoCode && promo?.code) {
+          clearPromo();
+        }
+
+        const syncMessage = "Harga atau promo berubah. Data terbaru sudah disinkronkan, cek ulang lalu konfirmasi lagi.";
+        setErrorText(syncMessage);
+        toast.info(syncMessage, { duration: 4200 });
+        return;
+      }
+
+      loadingId = toast.loading("Bikin ID order...");
+      let createdOrder = null;
+      let generatedCode = "";
+
+      for (let index = 0; index < 5; index += 1) {
+        generatedCode = makeOrderCode(CODE_DEFAULT);
+        try {
+          createdOrder = await createOrderWithStock(generatedCode, canonicalOrder);
+          break;
+        } catch (error) {
+          if (error?.code === "23505") continue;
+          throw error;
+        }
+      }
+
+      if (!createdOrder) throw new Error("Gagal membuat ID order.");
+
+      setOrderCode(generatedCode);
       setOk(true);
+      setSnapshot(canonicalOrder.items);
       cart.clear();
-      clearOrderReservation();
       // Save buyer name from WA number prefix for greeting
       if (customerWhatsApp) {
         try {
@@ -1098,15 +1042,14 @@ export default function Pay() {
         } catch {}
       }
       addOrderToHistory({
-        order_code: reservation.order_code,
+        order_code: generatedCode,
         created_at: new Date().toISOString(),
-        total_idr: total,
-        status: reported?.status || (reservation.legacy ? "pending" : "paid_reported"),
+        total_idr: canonicalOrder.total,
+        status: createdOrder.status || (hasPricingMismatch ? "paid_reported" : "pending"),
         phone_suffix: String(customerWhatsApp).replace(/\D/g, "").slice(-4),
       });
-      trackFunnelEvent("payment_reported", { orderCode: reservation.order_code, metadata: { total } });
       if (loadingId) toast.remove(loadingId);
-      toast.success("Pembayaran dikirim untuk verifikasi.");
+      toast.success("ID order berhasil dibuat.");
     } catch (error) {
       const message = toFriendlyPayError(error, { hasNotes: Boolean(noteText) });
       warn("Gagal memproses order:", error);
@@ -1173,16 +1116,12 @@ export default function Pay() {
     );
   }
 
-  const canSubmit = !busy && buyerReady && Boolean(reservation?.order_code);
+  const canSubmit = !busy && hasValidWhatsApp && !missingBuyerEmailNote;
 
   const payCtaHint = !hasValidWhatsApp
     ? "Isi WhatsApp dulu"
     : missingBuyerEmailNote
       ? "Lengkapi email buyer"
-      : reservationBusy
-        ? "Mengunci stok..."
-        : !reservation
-          ? "Reservasi stok belum siap"
       : null;
 
   function focusBlockingField() {
@@ -1491,10 +1430,6 @@ export default function Pay() {
                 </div>
 
                 <div className="pay-stageVisual">
-                  {reservation?.order_code ? <div className="pay-reservationId" aria-live="polite">
-                    <div><span>ID order</span><strong>{reservation.order_code}</strong><small>{reservation.legacy ? "Stok diverifikasi saat konfirmasi pembayaran" : `Stok dikunci sampai ${reservation.reservation_expires_at ? new Date(reservation.reservation_expires_at).toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" }) : "30 menit"}`}</small></div>
-                    <button className="btn btn-ghost btn-sm" type="button" onClick={async () => { await copyToClipboard(reservation.order_code); toast.success("ID order disalin"); }}>Salin</button>
-                  </div> : null}
                   <div
                     className={`qris-wrap pay-qrisFrame ${canShowQris && !isFreeOrder ? "" : "is-locked"}${qrisJustUnlocked ? " is-unlocking" : ""}`}
                   >

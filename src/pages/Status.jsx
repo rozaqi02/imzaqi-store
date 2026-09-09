@@ -47,7 +47,7 @@ import { trackFunnelEvent } from "../lib/funnelAnalytics";
 // ─── Constants ───────────────────────────────────────────────────────────────
 
 const POLL_INTERVAL_MS = 30_000;
-const TERMINAL_STATUSES = new Set(["done", "cancelled", "expired"]);
+const TERMINAL_STATUSES = new Set(["done", "cancelled"]);
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 
@@ -55,12 +55,10 @@ function prettyStatus(status) {
   const value = String(status || "pending");
   const map = {
     pending: "Pending",
-    pending_payment: "Menunggu pembayaran",
     processing: "Diproses",
     done: "Selesai",
     paid_reported: "Menunggu verifikasi",
     cancelled: "Dibatalkan",
-    expired: "Kedaluwarsa",
   };
   return map[value] || value;
 }
@@ -70,30 +68,28 @@ function getStatusMeta(status) {
   if (value === "done") return { tone: "done", icon: CheckCircle2 };
   if (value === "processing") return { tone: "processing", icon: Sparkles };
   if (value === "cancelled") return { tone: "cancelled", icon: XCircle };
-  if (value === "expired") return { tone: "cancelled", icon: XCircle };
   if (value === "paid_reported") return { tone: "reported", icon: ShieldCheck };
   return { tone: "pending", icon: Clock3 };
 }
 
 function getTimeline(status) {
   const value = String(status || "pending");
-  if (value === "cancelled" || value === "expired") {
+  if (value === "cancelled") {
     return [
       { key: "pending", label: "Order masuk", active: true, done: true },
-      { key: value, label: value === "expired" ? "Reservasi kedaluwarsa" : "Dibatalkan", active: true, done: false },
+      { key: "cancelled", label: "Dibatalkan", active: true, done: false },
     ];
   }
-  const isAwaitingPayment = value === "pending_payment";
-  const pastPending = !["pending", "pending_payment"].includes(value);
+  const pastPending = value !== "pending";
   const isPaidReported = value === "paid_reported";
   const isProcessing = value === "processing";
   const isDone = value === "done";
   return [
-    { key: "pending_payment", label: "Menunggu pembayaran", active: true, done: pastPending },
+    { key: "pending", label: "Order masuk", active: true, done: pastPending },
     {
       key: "paid_reported",
       label: "Menunggu verifikasi",
-      active: !isAwaitingPayment && (isPaidReported || isProcessing || isDone),
+      active: isPaidReported || isProcessing || isDone,
       done: isProcessing || isDone,
     },
     {
@@ -128,18 +124,8 @@ function toFriendlyStatusError() {
   return "Status belum bisa diambil. Coba lagi nanti.";
 }
 
-function isMissingPublicLookup(error) {
-  return error?.code === "PGRST202" || /get_order_public_by_code.*(not find|does not exist|schema cache)/i.test(String(error?.message || ""));
-}
-
 async function fetchOrderByCode(orderCode) {
-  let result = await supabase.rpc("get_order_public_by_code", {
-    p_order_code: orderCode,
-    p_visitor_id: getVisitorIdAsUUID(),
-  });
-  if (result.error && isMissingPublicLookup(result.error)) {
-    result = await supabase.rpc("get_order_public", { p_order_code: orderCode });
-  }
+  const result = await supabase.rpc("get_order_public", { p_order_code: orderCode });
   if (result.error) throw result.error;
   return Array.isArray(result.data) ? result.data[0] : result.data;
 }
@@ -147,12 +133,10 @@ async function fetchOrderByCode(orderCode) {
 function statusTone(status) {
   const map = {
     pending: "pending",
-    pending_payment: "pending",
     paid_reported: "reported",
     processing: "processing",
     done: "done",
     cancelled: "cancelled",
-    expired: "cancelled",
   };
   return map[String(status || "pending")] || "pending";
 }

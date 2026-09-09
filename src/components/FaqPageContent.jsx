@@ -26,8 +26,8 @@ const FAQ_ITEMS = [
     category: "payment",
     question: "Gimana cara bayarnya?",
     answer: [
-      "Pilih produk + varian, isi kontak di checkout, lalu lanjut ke QRIS.",
-      "Stok dikunci 30 menit. Setelah bayar, masukkan nomor referensi transaksi untuk diverifikasi admin.",
+      "Pilih produk + varian, lanjut ke halaman bayar.",
+      "Scan QRIS sesuai total, konfirmasi, dapet ID order.",
     ],
     tags: ["qris", "bayar", "payment", "scan"],
   },
@@ -36,8 +36,8 @@ const FAQ_ITEMS = [
     category: "payment",
     question: "QRIS-nya kok gak muncul?",
     answer: [
-      "Biasanya karena kontak belum valid, email aktivasi belum lengkap, atau reservasi stok gagal.",
-      "Lengkapi data di checkout. QRIS terbuka setelah stok berhasil dikunci untukmu.",
+      "Biasanya karena kontak belum valid atau email aktivasi belum lengkap.",
+      "Lengkapi nomor WhatsApp & email buyer (kalo paket butuh email) di halaman bayar, nanti QRIS kebuka otomatis.",
     ],
     tags: ["qris", "locked", "email", "catatan"],
   },
@@ -56,10 +56,10 @@ const FAQ_ITEMS = [
     category: "order",
     question: "Udah bayar, terus gimana?",
     answer: [
-      "ID order dibuat saat stok berhasil direservasi dan tetap tersedia setelah konfirmasi.",
-      "Buka Status, lalu masukkan ID order 8 karakter yang muncul setelah checkout.",
+      "Klik tombol 'Saya Sudah Bayar' setelah scan QRIS, lalu simpan ID order yang muncul.",
+      "Kalo mau lebih cepet diproses, kirim bukti transfer ke WhatsApp admin.",
     ],
-    tags: ["id order", "status", "setelah bayar"],
+    tags: ["id order", "status", "setelah bayar", "qris"],
   },
   {
     id: "id-format",
@@ -96,8 +96,8 @@ const FAQ_ITEMS = [
     category: "product",
     question: "Stok di website real-time gak?",
     answer: [
-      "Stok dikunci selama 30 menit ketika ID order dan QRIS dibuat.",
-      "Kalau pembayaran tidak dikonfirmasi sampai waktunya habis, reservasi dibatalkan dan stok dikembalikan.",
+      "Iya, stok berkurang otomatis setiap ada order baru.",
+      "Kalo varian yang kamu mau habis, tunggu restock atau tanyain ke admin via WhatsApp.",
     ],
     tags: ["stok", "real-time", "checkout"],
   },
