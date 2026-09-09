@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "react-router-dom";
 import {
   ArrowUpRight, Check, ClipboardList, History,
   Layers3, PackageCheck, Search,
@@ -80,9 +79,6 @@ export function StatusHero({ history = false, hasOrder = false }) {
       </div>
 
       <div className="store-heroAside">
-        <Link className="hx-btn-primary store-statusBtn" to="/faq">
-          Panduan order <ArrowUpRight size={14} />
-        </Link>
         <div className="store-statusTip">
           <ClipboardList size={14} />
           <span>
