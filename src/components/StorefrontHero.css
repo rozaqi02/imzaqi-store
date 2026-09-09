@@ -112,8 +112,8 @@
   position: absolute;
   right: -20px;
   top: 50%;
-  width: 350px;
-  height: 190px;
+  width: 375px;
+  height: 260px;
   transform: translateY(-50%) scale(0.95);
   transform-origin: center right;
   opacity: .35;
@@ -140,11 +140,11 @@
   border-radius: 0;
   filter: drop-shadow(0 12px 18px #173b282e);
 }
-.catalog-stackCard--1 { left: 0; top: 38px; transform: rotate(-24deg); z-index: 1; }
-.catalog-stackCard--2 { left: 57px; top: -38px; transform: rotate(-13deg); z-index: 2; }
-.catalog-stackCard--3 { left: 115px; top: 44px; transform: rotate(-3deg); z-index: 5; }
-.catalog-stackCard--4 { left: 174px; top: -30px; transform: rotate(12deg); z-index: 3; }
-.catalog-stackCard--5 { left: 231px; top: 45px; transform: rotate(24deg); z-index: 4; }
+.catalog-stackCard--1 { left: 0; top: 76px; transform: rotate(-24deg); z-index: 1; }
+.catalog-stackCard--2 { left: 57px; top: 0px; transform: rotate(-13deg); z-index: 2; }
+.catalog-stackCard--3 { left: 115px; top: 82px; transform: rotate(-3deg); z-index: 5; }
+.catalog-stackCard--4 { left: 174px; top: 8px; transform: rotate(12deg); z-index: 3; }
+.catalog-stackCard--5 { left: 231px; top: 83px; transform: rotate(24deg); z-index: 4; }
 
 @media (max-width: 1150px) {
   .catalog-productStack {
@@ -163,8 +163,8 @@
     transform-origin: bottom right;
     transform: scale(.72);
     opacity: .32;
-    mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%);
+    mask-image: none;
+    -webkit-mask-image: none;
   }
 }
 @media (max-width: 720px) {
@@ -172,11 +172,13 @@
     top: auto !important;
     bottom: -10px !important;
     right: -10px !important;
+    width: 375px !important;
+    height: 260px !important;
     transform-origin: bottom right !important;
     transform: scale(.62) !important;
     opacity: .32 !important;
-    mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%) !important;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 20%, #000 85%, transparent 100%) !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
   }
 }
 @media (max-width: 380px) {
@@ -184,9 +186,13 @@
     top: auto !important;
     bottom: -10px !important;
     right: -10px !important;
+    width: 375px !important;
+    height: 260px !important;
     transform: scale(.54) !important;
     transform-origin: bottom right !important;
     opacity: .30 !important;
+    mask-image: none !important;
+    -webkit-mask-image: none !important;
   }
 }
 
