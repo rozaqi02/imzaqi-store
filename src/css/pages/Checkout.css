@@ -1203,10 +1203,23 @@ html[data-theme="light"] .checkout-page-full {
 
 .checkout-extras-collapsible {
   display: block;
-  border-color: var(--checkout-line);
+  border: 1px solid rgba(0, 194, 208, 0.25) !important;
   border-radius: 16px;
   background: var(--checkout-soft);
   box-shadow: inset 2px 2px 6px rgba(0,0,0,.08), inset -2px -2px 6px rgba(255,255,255,.25);
+  transition: border-color 0.2s ease;
+}
+
+html[data-theme="light"] .checkout-extras-collapsible {
+  border-color: rgba(0, 168, 140, 0.35) !important;
+}
+
+.checkout-extras-collapsible[open] {
+  border-color: rgba(0, 214, 180, 0.45) !important;
+}
+
+html[data-theme="light"] .checkout-extras-collapsible[open] {
+  border-color: rgba(0, 168, 140, 0.55) !important;
 }
 
 .checkout-extras-summary {

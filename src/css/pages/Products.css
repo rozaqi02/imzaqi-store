@@ -1017,17 +1017,17 @@ html[data-theme="light"] .catalog-contentBar {
   color: #0b9a8f !important;
 }
 
-/* Jasa Akademik — indigo/violet accent for contrast */
+/* Jasa Akademik — teal accent matching App Premium */
 .catalog-page .catalog-quickChip.catalog-quickChip--academic {
-  border-color: rgba(99, 102, 241, 0.4) !important;
+  border-color: rgba(0, 180, 170, 0.42) !important;
   background:
-    linear-gradient(165deg, rgba(129, 140, 248, 0.2) 0%, rgba(165, 180, 252, 0.08) 48%, rgba(255, 255, 255, 0.92) 100%),
-    linear-gradient(180deg, #ffffff, #f4f5ff) !important;
-  color: #3730a3 !important;
+    linear-gradient(165deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.06) 48%, rgba(255, 255, 255, 0.9) 100%),
+    linear-gradient(180deg, #ffffff, #eef9fb) !important;
+  color: #0a5c66 !important;
 }
 
 .catalog-page .catalog-quickChip.catalog-quickChip--academic svg {
-  color: #4f46e5 !important;
+  color: #0b9a8f !important;
 }
 
 html[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--app_premium,
@@ -1044,12 +1044,12 @@ html[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--app_
 
 html[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--academic,
 :root[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--academic {
-  border-color: rgba(129, 140, 248, 0.45) !important;
+  border-color: rgba(0, 214, 180, 0.45) !important;
   background:
-    linear-gradient(165deg, rgba(129, 140, 248, 0.28) 0%, rgba(67, 56, 140, 0.4) 55%, rgba(14, 16, 36, 0.95) 100%) !important;
-  color: #e0e7ff !important;
+    linear-gradient(165deg, rgba(0, 214, 180, 0.28) 0%, rgba(0, 100, 110, 0.35) 55%, rgba(12, 24, 40, 0.95) 100%) !important;
+  color: #b8fff4 !important;
   box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14),
     inset 0 -2px 0 rgba(0, 0, 0, 0.45),
     0 1px 2px rgba(0, 0, 0, 0.28) !important;
 }
@@ -1110,9 +1110,9 @@ html[data-theme="dark"] .catalog-page .catalog-quickChip.catalog-quickChip--acad
 }
 
 .catalog-page .catalog-quickChip.catalog-quickChip--academic .catalog-quickChipCount {
-  background: linear-gradient(165deg, #818cf8, #4f46e5) !important;
-  color: #fff !important;
-  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3) !important;
+  background: linear-gradient(165deg, #2de8c8, #00a896) !important;
+  color: #032235 !important;
+  box-shadow: 0 2px 6px rgba(0, 160, 140, 0.28) !important;
 }
 
 .catalog-page .catalog-quickChip.catalog-quickChip--line.active .catalog-quickChipCount {
@@ -1654,7 +1654,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   display: flex;
   flex-direction: column;
   transform: translate3d(0, 100%, 0);
-  transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform;
   touch-action: pan-y;
 }
@@ -3224,6 +3224,7 @@ html[data-theme="light"] .catalog-page .catalog-viewBtn.active {
 .catalog-heroSearch:focus-within {
   transform: scale(0.992);
   border-color: rgba(0, 138, 148, 0.4) !important;
+  background: var(--skeu-control-bg, #161c24) !important;
   box-shadow:
     inset 0 5px 14px rgba(0, 0, 0, 0.22),
     inset 0 -1px 0 rgba(255, 255, 255, 0.04),
@@ -3232,6 +3233,7 @@ html[data-theme="light"] .catalog-page .catalog-viewBtn.active {
 
 html[data-theme="light"] .catalog-heroSearch:focus-within {
   border-color: rgba(0, 138, 148, 0.4) !important;
+  background: #ffffff !important;
   box-shadow:
     inset 0 5px 14px rgba(67, 111, 129, 0.22),
     inset 0 -1px 0 rgba(255, 255, 255, 0.6),
@@ -3252,6 +3254,12 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
   width: 100%;
   position: relative;
   min-width: 0;
+}
+
+@media (max-width: 720px) {
+  .catalog-heroSearchRow {
+    margin-top: 12px;
+  }
 }
 
 .catalog-heroSearchWrap {

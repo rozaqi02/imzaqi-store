@@ -787,74 +787,6 @@ function TabCekStatus({ settings }) {
                 })}
               </div>
             </article>
-
-            {/* Pencarian Order Lain di Bagian Bawah */}
-            <section className="st-search st-search--bottom">
-              <div className="st-searchHead">
-                <div>
-                  <div className="st-kicker">Pencarian</div>
-                  <h2 className="st-searchTitle">Cari Order Lain</h2>
-                </div>
-                <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
-                  Tempel
-                </button>
-              </div>
-
-              <div className="st-searchRow">
-                <label className="st-inputWrap">
-                  <Search size={16} />
-                  <input
-                    className="input st-input"
-                    inputMode="search"
-                    autoCapitalize="characters"
-                    autoCorrect="off"
-                    autoComplete="off"
-                    spellCheck={false}
-                    placeholder="IMZ-ABCD1234"
-                    value={input}
-                    onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter") lookup(input);
-                    }}
-                  />
-                </label>
-
-                <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
-                  {loading ? (
-                    <>
-                      <span className="st-checkSpinner" aria-hidden="true" />
-                      Nyari...
-                    </>
-                  ) : "Cek status"}
-                </button>
-              </div>
-
-              {otherRecentOrders.length > 0 ? (
-                <div className="st-recentOther">
-                  <div className="st-recentHead">
-                    <History size={13} />
-                    <span>Pesanan lain yang tersimpan di perangkat ini:</span>
-                  </div>
-                  <div className="st-recentList">
-                    {otherRecentOrders.map((r) => (
-                      <button
-                        key={r.order_code}
-                        className="st-recentChip"
-                        type="button"
-                        onClick={() => {
-                          const code = r.order_code;
-                          setInput(code);
-                          lookup(code);
-                        }}
-                      >
-                        <span className="st-recentCode">{r.order_code}</span>
-                        {r.total_idr ? <span className="st-recentPrice">{formatIDR(r.total_idr)}</span> : null}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
-            </section>
           </main>
 
           <aside className="st-aside">
@@ -953,6 +885,74 @@ function TabCekStatus({ settings }) {
               </div>
             </article>
           </aside>
+
+          {/* Pencarian Order Lain di Bagian Paling Bawah */}
+          <section className="st-search st-search--bottom">
+            <div className="st-searchHead">
+              <div>
+                <div className="st-kicker">Pencarian</div>
+                <h2 className="st-searchTitle">Cari Order Lain</h2>
+              </div>
+              <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
+                Tempel
+              </button>
+            </div>
+
+            <div className="st-searchRow">
+              <label className="st-inputWrap">
+                <Search size={16} />
+                <input
+                  className="input st-input"
+                  inputMode="search"
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  autoComplete="off"
+                  spellCheck={false}
+                  placeholder="IMZ-ABCD1234"
+                  value={input}
+                  onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") lookup(input);
+                  }}
+                />
+              </label>
+
+              <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
+                {loading ? (
+                  <>
+                    <span className="st-checkSpinner" aria-hidden="true" />
+                    Nyari...
+                  </>
+                ) : "Cek status"}
+              </button>
+            </div>
+
+            {otherRecentOrders.length > 0 ? (
+              <div className="st-recentOther">
+                <div className="st-recentHead">
+                  <History size={13} />
+                  <span>Pesanan lain yang tersimpan di perangkat ini:</span>
+                </div>
+                <div className="st-recentList">
+                  {otherRecentOrders.map((r) => (
+                    <button
+                      key={r.order_code}
+                      className="st-recentChip"
+                      type="button"
+                      onClick={() => {
+                        const code = r.order_code;
+                        setInput(code);
+                        lookup(code);
+                      }}
+                    >
+                      <span className="st-recentCode">{r.order_code}</span>
+                      {r.total_idr ? <span className="st-recentPrice">{formatIDR(r.total_idr)}</span> : null}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </section>
         </div>
       )}
     </>

@@ -23,7 +23,7 @@ export const PRODUCT_CATEGORIES = [
 
 /** Storefront catalog pills — only two shop lines */
 export const CATALOG_LINE_FILTERS = [
-  { key: "app_premium", label: "Aplikasi Premium", icon: Smartphone },
+  { key: "app_premium", label: "App Premium", icon: Smartphone },
   { key: "academic", label: "Jasa Akademik", icon: BookOpen },
 ];
 

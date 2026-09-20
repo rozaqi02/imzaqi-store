@@ -1599,11 +1599,11 @@ html[data-theme="light"] .home-page .hx-stat-item {
 }
 
 .catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) {
-  border-color: rgba(129, 140, 248, 0.45) !important;
+  border-color: rgba(0, 180, 170, 0.45) !important;
   background:
-    linear-gradient(165deg, rgba(129, 140, 248, 0.24) 0%, rgba(99, 102, 241, 0.1) 50%, transparent 100%),
+    linear-gradient(165deg, rgba(0, 214, 180, 0.22) 0%, rgba(0, 194, 208, 0.08) 50%, transparent 100%),
     var(--skeu-control-bg, rgba(20, 34, 64, 0.92)) !important;
-  color: #e0e7ff !important;
+  color: #9fffea !important;
 }
 
 html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active) {
@@ -1615,23 +1615,17 @@ html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--app
 }
 
 html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) {
-  border-color: rgba(99, 102, 241, 0.4) !important;
+  border-color: rgba(0, 160, 150, 0.42) !important;
   background:
-    linear-gradient(165deg, rgba(129, 140, 248, 0.22) 0%, rgba(255, 255, 255, 0.95) 55%),
-    #f4f5ff !important;
-  color: #3730a3 !important;
+    linear-gradient(165deg, rgba(0, 214, 180, 0.2) 0%, rgba(255, 255, 255, 0.95) 55%),
+    #eefbfa !important;
+  color: #0a5c66 !important;
 }
 
-.catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active) .catalog-quickChipCount {
+.catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active) .catalog-quickChipCount,
+.catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) .catalog-quickChipCount {
   background: linear-gradient(165deg, #2de8c8, #00a896) !important;
   color: #032235 !important;
-  opacity: 1 !important;
-  font-weight: 900 !important;
-}
-
-.catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) .catalog-quickChipCount {
-  background: linear-gradient(165deg, #818cf8, #4f46e5) !important;
-  color: #fff !important;
   opacity: 1 !important;
   font-weight: 900 !important;
 }

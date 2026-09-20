@@ -516,7 +516,7 @@ html[data-theme="light"][data-motion="full"] .pay-card:active {
     0 0 0 1px rgba(0, 214, 180, 0.35),
     0 0 12px rgba(0, 214, 180, 0.15) !important;
   border-color: rgba(0, 214, 180, 0.45) !important;
-  background: rgba(4, 7, 20, 0.6) !important;
+  background: var(--skeu-control-bg, #161c24) !important;
   transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
 }
 
@@ -536,7 +536,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
     0 0 0 1px rgba(6, 123, 136, 0.35),
     0 0 10px rgba(6, 123, 136, 0.15) !important;
   border-color: rgba(6, 123, 136, 0.45) !important;
-  background: rgba(255, 255, 255, 0.8) !important;
+  background: #ffffff !important;
 }
 
 /* BUG-12: Reset will-change di mobile/touch agar tidak drain GPU mid-range Android */

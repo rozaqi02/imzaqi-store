@@ -997,7 +997,7 @@ export default function Products() {
         },
       });
     }
-    chips.push({ key: "app_premium", label: "Aplikasi Premium", onClick: () => setSoloCategory("app_premium") });
+    chips.push({ key: "app_premium", label: "App Premium", onClick: () => setSoloCategory("app_premium") });
     chips.push({ key: "academic", label: "Jasa Akademik", onClick: () => setSoloCategory("academic") });
     chips.push({ key: "reset-all", label: "Reset semua", onClick: resetFilters });
     return chips.slice(0, 5);

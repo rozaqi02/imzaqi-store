@@ -4931,7 +4931,7 @@ export default function AdminDashboard() {
               <div className="admin-orderMetaCard">
                 <span>Status sekarang</span>
                 <strong>{prettyOrderStatus(activeOrder.status)}</strong>
-                <small>{activeOrder.payment_reference ? `Referensi: ${activeOrder.payment_reference}` : (activeOrder.promo_code ? `Promo ${activeOrder.promo_code}` : "Tanpa promo")}</small>
+                <small>{activeOrder.promo_code ? `Promo ${activeOrder.promo_code}` : "Tanpa promo"}</small>
               </div>
               <div className="admin-orderMetaCard">
                 <span>Update status</span>

@@ -78,13 +78,14 @@ html[data-theme="light"] .home-page .home-body {
 .hero-search-shell:focus-within {
   transform: scale(0.992);
   border-color: rgba(0, 214, 180, 0.4);
+  background: var(--skeu-control-bg, #161c24) !important;
   box-shadow:
     var(--skeu-inset-shadow),
     0 0 0 4px rgba(0, 214, 180, 0.14);
 }
 
 html[data-theme="light"] .hero-search-shell {
-  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.94));
+  background: var(--skeu-control-bg, #ffffff);
   border-color: var(--brand-line, rgba(0, 138, 148, 0.14));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 1),
@@ -94,6 +95,7 @@ html[data-theme="light"] .hero-search-shell {
 
 html[data-theme="light"] .hero-search-shell:focus-within {
   border-color: rgba(0, 138, 148, 0.4);
+  background: #ffffff !important;
   box-shadow:
     inset 0 4px 10px rgba(67, 111, 129, 0.18),
     inset 0 -1px 0 rgba(255, 255, 255, 0.6),

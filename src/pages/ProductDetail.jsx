@@ -474,37 +474,93 @@ function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
 
 function ProductDetailSkeleton() {
   return (
-    <div className="page detail-page detail-page-v3" aria-busy="true" aria-live="polite" aria-label="Memuat detail produk">
+    <div className="page detail-page detail-page-v3 pdx-skeletonPage" aria-busy="true" aria-live="polite" aria-label="Memuat detail produk">
       <section className="section">
         <div className="container">
           <div className="pdx-layout">
             <div className="pdx-mainGrid pdx-skeletonGrid">
               <div className="pdx-leftCol">
-                <div className="pdx-skeletonBillboard">
-                  <div className="pdx-skel pdx-skeletonIcon" />
-                  <div className="pdx-skeletonCopy">
-                    <div className="pdx-skel pdx-skelLine w-24" />
-                    <div className="pdx-skel pdx-skelLine w-70" />
-                    <div className="pdx-skel pdx-skelLine w-44" />
-                    <div className="pdx-skel pdx-skelLine w-36" />
+                <header className="pdx-topCard pdx-billboard pdx-skeletonHero">
+                  <div className="pdx-visual pdx-skeletonVisual">
+                    <div className="pdx-visualIcon pdx-skeletonVisualIcon">
+                      <div className="pdx-skel pdx-skelHeroIcon" />
+                    </div>
+                  </div>
+
+                  <div className="pdx-copy pdx-skeletonCopy">
+                    <div className="pdx-toolbar">
+                      <div className="pdx-skel pdx-skelToolbarBtn" />
+                      <div className="pdx-skel pdx-skelToolbarIcon" />
+                    </div>
+
+                    <div className="pdx-skel pdx-skelBadge" />
+                    <div className="pdx-skel pdx-skelTitle" />
+
+                    <div className="pdx-statsStrip pdx-skeletonStats">
+                      <div className="pdx-skel pdx-skelPriceBox" />
+                      <div className="pdx-skeletonChipsRow">
+                        <div className="pdx-skel pdx-skelStatChip" />
+                        <div className="pdx-skel pdx-skelStatChip" />
+                      </div>
+                    </div>
+                  </div>
+                </header>
+
+                <div className="pdx-infoTabsCard pdx-skeletonTabsCard">
+                  <div className="pdx-skeletonTabNav">
+                    <div className="pdx-skel pdx-skelTabBtn is-active" />
+                    <div className="pdx-skel pdx-skelTabBtn" />
+                    <div className="pdx-skel pdx-skelTabBtn" />
+                  </div>
+                  <div className="pdx-skeletonTabBody">
+                    <div className="pdx-skel pdx-skelLine" style={{ width: "92%", height: 16, borderRadius: 6 }} />
+                    <div className="pdx-skel pdx-skelLine" style={{ width: "84%", height: 16, borderRadius: 6, marginTop: 10 }} />
+                    <div className="pdx-skel pdx-skelLine" style={{ width: "68%", height: 16, borderRadius: 6, marginTop: 10 }} />
                   </div>
                 </div>
-                <div className="pdx-skeletonTabs">
-                  <div className="pdx-skel pdx-skelChip" />
-                  <div className="pdx-skel pdx-skelChip" />
-                </div>
-                <div className="pdx-skel pdx-skelBlock" />
               </div>
+
               <div className="pdx-rightCol">
-                <div className="pdx-skel pdx-skelLine w-28" />
-                <div className="pdx-skeletonChips">
-                  <div className="pdx-skel pdx-skelChip" />
-                  <div className="pdx-skel pdx-skelChip" />
-                  <div className="pdx-skel pdx-skelChip" />
-                </div>
-                <div className="pdx-skel pdx-skelPack" />
-                <div className="pdx-skel pdx-skelPack" />
-                <div className="pdx-skel pdx-skelPack" />
+                <section className="pdx-variantsSection pdx-skeletonVariants">
+                  <div className="pdx-variantsHead">
+                    <div className="pdx-variantsTitleRow">
+                      <div className="pdx-skel pdx-skelLine" style={{ width: 80, height: 26, borderRadius: 8 }} />
+                      <div className="pdx-skel pdx-skelLine" style={{ width: 140, height: 26, borderRadius: 8 }} />
+                    </div>
+                  </div>
+
+                  <div className="pdx-skeletonFilterRow">
+                    <div className="pdx-skel pdx-skelChip" style={{ width: 110, height: 36 }} />
+                    <div className="pdx-skel pdx-skelChip" style={{ width: 90, height: 36 }} />
+                    <div className="pdx-skel pdx-skelChip" style={{ width: 90, height: 36 }} />
+                  </div>
+
+                  <div className="pdx-packList">
+                    {[1, 2].map((idx) => (
+                      <div key={idx} className="pdx-packCard pdx-skeletonPackCard">
+                        <div className="pdx-packHead">
+                          <div className="pdx-packTitleRow">
+                            <div className="pdx-skel pdx-skelLine" style={{ width: "55%", height: 22, borderRadius: 6 }} />
+                            <div className="pdx-skel pdx-skelLine" style={{ width: 85, height: 24, borderRadius: 6 }} />
+                          </div>
+                          <div className="pdx-skel pdx-skelLine" style={{ width: "38%", height: 14, marginTop: 8, borderRadius: 4 }} />
+                        </div>
+
+                        <div className="pdx-packCommerce" style={{ marginTop: 12 }}>
+                          <div className="pdx-skel pdx-skelLine" style={{ width: 68, height: 20, borderRadius: 999 }} />
+                          <div className="pdx-skel pdx-skelLine" style={{ width: 78, height: 20, borderRadius: 999 }} />
+                        </div>
+
+                        <div className="pdx-skel pdx-skelLine" style={{ width: "85%", height: 14, marginTop: 14, borderRadius: 4 }} />
+
+                        <div className="pdx-packActions" style={{ marginTop: 16 }}>
+                          <div className="pdx-skel pdx-skelActionBtn pdx-skelActionBtn--cart" />
+                          <div className="pdx-skel pdx-skelActionBtn pdx-skelActionBtn--buy" />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
               </div>
             </div>
           </div>
@@ -993,7 +1049,7 @@ export default function ProductDetail() {
   const icon = product.icon_url;
 
   return (
-    <div className="page detail-page detail-page-v3">
+    <div className="page detail-page detail-page-v3 pdx-contentLoaded">
       <section className="section">
         <div className="container">
           {/* On mobile, a plain div is used (no Framer Motion) to reduce JS overhead.

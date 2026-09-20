@@ -1,7 +1,7 @@
 import React from "react";
 import {
   ArrowUpRight, Check, ClipboardList, History,
-  Layers3, PackageCheck, Search,
+  PackageCheck, Search,
 } from "lucide-react";
 import "../css/support-surfaces.css";
 import "./StorefrontHero.css";
@@ -34,7 +34,6 @@ export function CatalogHero({
   return (
     <header className="store-hero store-hero--catalog">
       <div className="store-heroCopy">
-        <span className="store-heroEyebrow"><Layers3 size={16} /> KATALOG</span>
         <h1>Pilih paket <span>andalanmu.</span></h1>
         <p>Aplikasi premium & layanan untuk kebutuhanmu.</p>
         <div className="store-heroFacts" aria-label="Ringkasan katalog">

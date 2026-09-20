@@ -296,7 +296,7 @@ function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onClose, on
               </div>
             </div>
             <div className="pay-successKicker">ID ORDER</div>
-            <div className="pay-successCode pay-successCode--animate">{orderCode}</div>
+            <div className="pay-successCode pay-successCode--animate" style={{ whiteSpace: "nowrap" }}>{orderCode}</div>
             <p className="pay-successLead">Simpan ID ini untuk mengecek status pesanan dari perangkat mana pun.</p>
           </div>
 
@@ -374,20 +374,13 @@ function useModalCountUp(active, target, duration = 520) {
 
 function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }) {
   const modalRef = React.useRef(null);
-  const [agreed, setAgreed] = useState(false);
   const animatedTotal = useModalCountUp(open && !isFree, total);
-
-  useEffect(() => {
-    if (open) {
-      setAgreed(false);
-    }
-  }, [open]);
 
   useDialogA11y({
     open,
     containerRef: modalRef,
     onClose: onCancel,
-    initialFocusSelector: ".pay-confirmCloseBtn",
+    initialFocusSelector: ".pay-confirmPrimaryBtn",
   });
 
   if (!open || typeof document === "undefined") return null;
@@ -418,9 +411,7 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
           <div className="pay-confirmModalHeaderCopy">
             <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Pembayaran"}</div>
             <div className="pay-confirmModalSub">
-              {agreed
-                ? "Siap dikonfirmasi - ID order akan dibuat"
-                : "Centang konfirmasi di bawah untuk lanjut"}
+              Siap dikonfirmasi - ID order akan dibuat
             </div>
           </div>
           <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
@@ -450,42 +441,19 @@ function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, isFree }
           </aside>
 
           <div className="pay-confirmMain">
-            <div className="pay-confirmChecklist" role="group" aria-label="Pernyataan Konfirmasi">
-              <label
-                className={`pay-confirmCheckItem${agreed ? " is-done" : ""}`}
-                style={{ cursor: "pointer", userSelect: "none" }}
-              >
-                <input
-                  type="checkbox"
-                  checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
-                  className="pay-confirmCheckbox-hidden"
-                />
-                <span className={`pay-confirmCheckDot${agreed ? " is-checked" : ""}`} aria-hidden="true">
-                  {agreed ? <Check size={12} strokeWidth={3.5} /> : null}
-                </span>
-                <span className="pay-confirmCheckText">
-                  <strong>{declarationTitle}</strong>
-                  <small style={{ display: "block", marginTop: 4, opacity: 0.85, fontSize: "0.82rem" }}>
-                    {declarationDesc}
-                  </small>
-                </span>
-              </label>
+            <div className="pay-confirmDeclarationTextOnly" aria-label="Pernyataan Konfirmasi">
+              <strong className="pay-confirmDeclarationTitle">{declarationTitle}</strong>
+              <span className="pay-confirmDeclarationDesc">{declarationDesc}</span>
             </div>
 
             <div className="pay-confirmActionsNew">
               <button
-                className={`pay-confirmPrimaryBtn${agreed ? " is-ready" : ""}`}
+                className="pay-confirmPrimaryBtn is-ready"
                 type="button"
                 onClick={onConfirm}
-                disabled={!agreed}
               >
                 <Check size={16} strokeWidth={2.5} />
-                {agreed
-                  ? isFree
-                    ? "Konfirmasi Order Sekarang"
-                    : "Konfirmasi Pembayaran Sekarang"
-                  : "Centang Pernyataan di Atas"}
+                {isFree ? "Konfirmasi Order Sekarang" : "Konfirmasi Pembayaran Sekarang"}
               </button>
               <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
                 Belum, cek lagi
@@ -1255,7 +1223,6 @@ export default function Pay() {
                 onChange={setCustomerWhatsApp}
                 onValidChange={setIsWaValid}
                 required
-                autoFocus
                 rememberLast
                 compact
                 label="WhatsApp"
@@ -1455,7 +1422,7 @@ export default function Pay() {
                           </div>
                           <div className="pay-freePanelCheck">
                             <Check size={12} strokeWidth={3} />
-                            <span>Konfirmasi untuk lanjut</span>
+                            <span>Konfirmasi pesanan</span>
                           </div>
                         </div>
                       </div>

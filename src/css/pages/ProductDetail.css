@@ -931,9 +931,14 @@
   width: 100%;
 }
 
+.pdx-skeletonPage {
+  pointer-events: none;
+  user-select: none;
+}
+
 .pdx-skel {
   position: relative;
-  overflow: hidden;
+  overflow: hidden; /* ── Skeleton loader fitting real desktop & mobile layout ── */
   background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
 }
@@ -946,74 +951,176 @@ html[data-theme="light"] .pdx-skel {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.22) 42%, transparent 100%);
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.18) 42%, transparent 100%);
   transform: translateX(-100%);
   animation: pdxShimmer 1.4s ease-in-out infinite;
 }
 
-.pdx-skeletonBillboard {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 16px;
-  align-items: center;
-  padding: 18px;
+html[data-theme="light"] .pdx-skel::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.6) 42%, transparent 100%);
+}
+
+.pdx-skeletonVisualIcon {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+.pdx-skelHeroIcon {
+  width: 100%;
+  height: 100%;
   border-radius: 28px;
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background: var(--pdx-panel, var(--skeu-panel-bg, rgba(255, 255, 255, 0.04)));
+  background: rgba(255, 255, 255, 0.18) !important;
 }
 
-.pdx-skeletonIcon {
-  width: 96px;
-  height: 96px;
-  border-radius: 24px;
+.pdx-skelHeroIcon::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.42) 42%, transparent 100%) !important;
 }
 
-.pdx-skeletonCopy {
-  display: grid;
-  gap: 10px;
-}
-
-.pdx-skelLine {
-  height: 14px;
-}
-
-.pdx-skelLine.w-24 { width: 24%; }
-.pdx-skelLine.w-28 { width: 28%; }
-.pdx-skelLine.w-36 { width: 36%; }
-.pdx-skelLine.w-44 { width: 44%; }
-.pdx-skelLine.w-70 { width: 70%; }
-
-.pdx-skeletonTabs,
-.pdx-skeletonChips {
+.pdx-skeletonCopy .pdx-toolbar {
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.pdx-skelChip {
+.pdx-skelToolbarBtn {
+  width: 90px;
   height: 32px;
-  width: 88px;
   border-radius: 999px;
 }
 
-.pdx-skelBlock {
-  height: 120px;
+.pdx-skelToolbarIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+}
+
+.pdx-skelBadge {
+  width: 96px;
+  height: 20px;
+  border-radius: 6px;
+  margin: 12px 0 8px;
+}
+
+.pdx-skelTitle {
+  width: min(85%, 280px);
+  height: 32px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.pdx-skeletonStats {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.pdx-skelPriceBox {
+  width: 120px;
+  height: 42px;
+  border-radius: 10px;
+}
+
+.pdx-skeletonChipsRow {
+  display: flex;
+  gap: 8px;
+}
+
+.pdx-skelStatChip {
+  width: 80px;
+  height: 26px;
+  border-radius: 999px;
+}
+
+.pdx-skeletonTabsCard {
+  margin-top: 12px;
+  padding: 16px;
+  border-radius: 24px;
+  background: var(--pdx-panel, var(--skeu-panel-bg, rgba(255, 255, 255, 0.04)));
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+}
+
+.pdx-skeletonTabNav {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.pdx-skelTabBtn {
+  height: 38px;
+  flex: 1;
+  border-radius: 12px;
+}
+
+.pdx-skelTabBtn.is-active {
+  background: rgba(0, 196, 138, 0.22);
+}
+
+.pdx-skeletonTabBody {
+  padding: 8px 4px;
+}
+
+.pdx-skeletonFilterRow {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 16px;
+}
+
+.pdx-skeletonPackCard {
+  pointer-events: none;
+  padding: 16px 18px;
   border-radius: 22px;
 }
 
-.pdx-skelPack {
-  height: 132px;
-  border-radius: 20px;
+.pdx-skelPackTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
-@media (max-width: 720px) {
-  .pdx-skeletonBillboard {
-    grid-template-columns: 1fr;
-  }
+.pdx-skelPackBottom {
+  display: flex;
+  gap: 8px;
+}
 
-  .pdx-skeletonIcon {
-    width: 72px;
-    height: 72px;
+.pdx-skelActionBtn {
+  border-radius: 12px;
+}
+
+.pdx-skelActionBtn--cart {
+  width: 44px;
+  height: 44px;
+}
+
+.pdx-skelActionBtn--buy {
+  flex: 1;
+  height: 44px;
+}
+
+/* ── Smooth Fade Transition from Skeleton to Loaded Content ── */
+.pdx-contentLoaded {
+  animation: pdxContentFadeIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes pdxContentFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pdx-contentLoaded {
+    animation: pdxContentFadeSimple 0.2s ease both;
+  }
+  @keyframes pdxContentFadeSimple {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
   }
 }
 

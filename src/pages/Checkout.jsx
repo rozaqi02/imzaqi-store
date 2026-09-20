@@ -375,7 +375,7 @@ export default function Checkout() {
             <TicketPercent size={15} />
             <span>
               <strong>Kode promo</strong>
-              <small>Masukkan kode sebelum lanjut bayar.</small>
+              <small>Masukkan kode sebelum bayar.</small>
             </span>
           </div>
           {promoPercent ? (
@@ -494,11 +494,11 @@ export default function Checkout() {
         {renderTrustSignals(true)}
 
         <button className="btn btn-wide checkout-summaryBtn" type="button" onClick={goPay} disabled={cart.items.length === 0 || hasStockIssue}>
-          <span>Lanjut bayar {formatIDR(total)}</span>
+          <span>Bayar {formatIDR(total)}</span>
           <ArrowRight size={16} />
         </button>
 
-        <p className="checkout-summaryHint">Lanjut ke halaman QRIS untuk menyelesaikan pesanan.</p>
+        <p className="checkout-summaryHint">Menuju halaman QRIS untuk menyelesaikan pesanan.</p>
 
         <Link className="checkout-summaryLink" to="/status">
           Udah punya ID? Cek status
@@ -599,7 +599,7 @@ export default function Checkout() {
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-drawer-stock-reason" : undefined}
             >
-              <span>Lanjut bayar {formatIDR(total)}</span>
+              <span>Bayar {formatIDR(total)}</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (
@@ -717,7 +717,7 @@ export default function Checkout() {
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-full-stock-reason" : undefined}
             >
-              <span>Lanjut bayar {formatIDR(total)}</span>
+              <span>Bayar {formatIDR(total)}</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (

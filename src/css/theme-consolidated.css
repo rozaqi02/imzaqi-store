@@ -3771,8 +3771,7 @@ html[data-theme="dark"] .home-page .product-tile::after {
 
 .home-page .hero-search-shell:focus-within {
   border-color: rgba(79, 255, 200, 0.5) !important;
-  background: rgba(7, 10, 18, 0.4) !important;
-  backdrop-filter: blur(24px) saturate(180%);
+  background: var(--skeu-control-bg, #141c2b) !important;
   box-shadow:
     0 0 0 4px rgba(79, 255, 200, 0.15),
     var(--home-neo-inset-shadow),
@@ -3781,7 +3780,7 @@ html[data-theme="dark"] .home-page .product-tile::after {
 
 html[data-theme="light"] .home-page .hero-search-shell:focus-within {
   border-color: rgba(0, 214, 180, 0.5) !important;
-  background: rgba(255, 255, 255, 0.8) !important;
+  background: #ffffff !important;
   box-shadow:
     0 0 0 4px rgba(0, 214, 180, 0.15),
     var(--home-neo-inset-shadow),

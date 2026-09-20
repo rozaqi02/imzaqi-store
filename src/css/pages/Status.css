@@ -1500,6 +1500,10 @@ html[data-theme="light"] .st-itemDescText {
   .st-layout .st-aside {
     grid-column: 2;
   }
+
+  .st-layout .st-search--bottom {
+    grid-column: 1 / -1;
+  }
 }
 
 @media (max-width: 720px) {
