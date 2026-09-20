@@ -72,17 +72,17 @@ async function main() {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 60px 80px;
+      padding: 60px 85px;
     }
 
     /* Radiant Imzaqi Green Ambient Glows */
     .bg-ambient-1 {
       position: absolute;
       top: -80px;
-      right: 40px;
-      width: 680px;
-      height: 680px;
-      background: radial-gradient(circle, rgba(0, 214, 180, 0.32) 0%, rgba(0, 168, 107, 0.18) 40%, rgba(4, 30, 24, 0.05) 70%, transparent 80%);
+      right: 30px;
+      width: 700px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(0, 214, 180, 0.35) 0%, rgba(0, 168, 107, 0.18) 42%, rgba(4, 30, 24, 0.05) 70%, transparent 80%);
       filter: blur(55px);
       pointer-events: none;
     }
@@ -125,19 +125,19 @@ async function main() {
       max-width: 530px;
       display: flex;
       flex-direction: column;
-      gap: 22px;
+      gap: 24px;
     }
 
     .brand-title {
       font-family: 'Outfit', sans-serif;
-      font-size: 72px;
+      font-size: 74px;
       font-weight: 900;
       line-height: 1.02;
       letter-spacing: -0.025em;
       background: linear-gradient(180deg, #ffffff 0%, #f1f5f9 60%, #cbd5e1 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      filter: drop-shadow(0 6px 24px rgba(0, 0, 0, 0.8));
+      filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.8));
     }
 
     .brand-tagline {
@@ -158,7 +158,7 @@ async function main() {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
-      margin-top: 10px;
+      margin-top: 6px;
     }
 
     .trust-pill {
@@ -184,72 +184,54 @@ async function main() {
       color: #00f5c4;
     }
 
-    /* Right Column (Apps Grid) */
+    /* Right Column (Pure Floating App Icons) */
     .right-col {
       position: relative;
       z-index: 10;
       display: grid;
-      grid-template-columns: repeat(3, 144px);
-      gap: 18px;
+      grid-template-columns: repeat(3, 120px);
+      gap: 24px;
       transform: perspective(1000px) rotateY(-7deg) rotateX(3deg);
       filter: drop-shadow(0 26px 50px rgba(0, 0, 0, 0.8));
     }
 
-    .app-card {
-      width: 144px;
-      height: 144px;
-      border-radius: 30px;
-      padding: 14px;
-      background: 
-        linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.02) 40%, rgba(0, 0, 0, 0.3) 100%),
-        #111928;
-      border: 1px solid rgba(255, 255, 255, 0.16);
-      box-shadow: 
-        0 18px 36px rgba(0, 0, 0, 0.55),
-        inset 0 3px 0 rgba(255, 255, 255, 0.3),
-        inset 0 -3px 0 rgba(0, 0, 0, 0.65);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      gap: 9px;
-      position: relative;
-    }
-
-    .app-card img {
-      width: 74px;
-      height: 74px;
-      border-radius: 18px;
+    .app-icon {
+      width: 120px;
+      height: 120px;
+      border-radius: 28px;
       object-fit: cover;
-      box-shadow: 0 8px 22px rgba(0, 0, 0, 0.5);
-    }
-
-    .app-card span {
-      font-size: 12.5px;
-      font-weight: 800;
-      color: #e2e8f0;
-      text-align: center;
-      letter-spacing: -0.01em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      max-width: 100%;
+      box-shadow: 
+        0 18px 36px rgba(0, 0, 0, 0.6),
+        0 4px 12px rgba(0, 0, 0, 0.4);
+      display: block;
+      transition: all 0.2s;
     }
 
     /* Staggered offsets for lively 3D floating look */
-    .app-card:nth-child(1) { transform: translateY(8px); }
-    .app-card:nth-child(2) { transform: translateY(-12px); }
-    .app-card:nth-child(3) { transform: translateY(6px); }
-    .app-card:nth-child(4) { transform: translateY(16px); }
-    .app-card:nth-child(5) { transform: translateY(-4px); }
-    .app-card:nth-child(6) { transform: translateY(12px); }
-
-    /* Subtle brand glow on specific cards */
-    .app-card.card-netflix { box-shadow: 0 16px 36px rgba(229, 9, 20, 0.28), inset 0 3px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.65); }
-    .app-card.card-spotify { box-shadow: 0 16px 36px rgba(29, 185, 84, 0.28), inset 0 3px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.65); }
-    .app-card.card-canva { box-shadow: 0 16px 36px rgba(0, 196, 204, 0.28), inset 0 3px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.65); }
-    .app-card.card-gemini { box-shadow: 0 16px 36px rgba(99, 102, 241, 0.3), inset 0 3px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.65); }
-    .app-card.card-turnitin { box-shadow: 0 16px 36px rgba(2, 132, 199, 0.28), inset 0 3px 0 rgba(255, 255, 255, 0.3), inset 0 -3px 0 rgba(0, 0, 0, 0.65); }
+    .app-icon:nth-child(1) { 
+      transform: translateY(8px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(229, 9, 20, 0.35);
+    }
+    .app-icon:nth-child(2) { 
+      transform: translateY(-12px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6), 0 0 20px rgba(255, 255, 255, 0.25);
+    }
+    .app-icon:nth-child(3) { 
+      transform: translateY(6px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(29, 185, 84, 0.35);
+    }
+    .app-icon:nth-child(4) { 
+      transform: translateY(16px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(99, 102, 241, 0.35);
+    }
+    .app-icon:nth-child(5) { 
+      transform: translateY(-4px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(0, 196, 204, 0.35);
+    }
+    .app-icon:nth-child(6) { 
+      transform: translateY(12px);
+      box-shadow: 0 18px 36px rgba(0, 0, 0, 0.6), 0 0 24px rgba(2, 132, 199, 0.35);
+    }
 
     /* Bottom Decorative Glow Line */
     .bottom-bar {
@@ -294,30 +276,12 @@ async function main() {
   </div>
 
   <div class="right-col">
-    <div class="app-card card-netflix">
-      <img src="${netflixData}" alt="Netflix">
-      <span>Netflix</span>
-    </div>
-    <div class="app-card">
-      <img src="${chatgptData}" alt="ChatGPT">
-      <span>ChatGPT</span>
-    </div>
-    <div class="app-card card-spotify">
-      <img src="${spotifyData}" alt="Spotify">
-      <span>Spotify</span>
-    </div>
-    <div class="app-card card-gemini">
-      <img src="${geminiData}" alt="Gemini">
-      <span>Gemini AI</span>
-    </div>
-    <div class="app-card card-canva">
-      <img src="${canvaData}" alt="Canva">
-      <span>Canva Pro</span>
-    </div>
-    <div class="app-card card-turnitin">
-      <img src="${turnitinData}" alt="Turnitin">
-      <span>Turnitin</span>
-    </div>
+    <img class="app-icon" src="${netflixData}" alt="Netflix">
+    <img class="app-icon" src="${chatgptData}" alt="ChatGPT">
+    <img class="app-icon" src="${spotifyData}" alt="Spotify">
+    <img class="app-icon" src="${geminiData}" alt="Gemini AI">
+    <img class="app-icon" src="${canvaData}" alt="Canva Pro">
+    <img class="app-icon" src="${turnitinData}" alt="Turnitin">
   </div>
 
   <div class="bottom-bar"></div>
