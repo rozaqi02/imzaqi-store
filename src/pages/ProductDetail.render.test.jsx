@@ -138,15 +138,15 @@ describe("ProductDetail render", () => {
     expect(screen.getByRole("button", { name: "Bandingkan paket" })).toBeInTheDocument();
   });
 
-  it("links Hubungi Admin to the premium WhatsApp number with a prefilled message", async () => {
+  it("links Tanya Admin to the premium WhatsApp number with a prefilled message", async () => {
     renderDetail();
-    const contact = await screen.findByRole("link", { name: "Hubungi Admin" });
+    const contact = await screen.findByRole("link", { name: "Tanya admin? klik disini" });
     expect(contact).toHaveAttribute("href", expect.stringContaining("https://wa.me/6283136049987?text="));
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Netflix Premium");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("App Premium");
   });
 
-  it("links Hubungi Admin to the academic WhatsApp number for jasa akademik", async () => {
+  it("links Tanya Admin to the academic WhatsApp number for jasa akademik", async () => {
     const { fetchProductBySlug } = await import("../lib/api");
     fetchProductBySlug.mockResolvedValueOnce({
       ...mockProduct,
@@ -155,7 +155,7 @@ describe("ProductDetail render", () => {
       category: "academic",
     });
     renderDetail();
-    const contact = await screen.findByRole("link", { name: "Hubungi Admin" });
+    const contact = await screen.findByRole("link", { name: "Tanya admin? klik disini" });
     expect(contact.getAttribute("href")).toContain("https://wa.me/6281232742374?text=");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Jasa Akademik");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Turnitin Check");

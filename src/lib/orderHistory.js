@@ -33,7 +33,7 @@ export function addOrderToHistory({ order_code, created_at, total_idr, status, p
     const alreadyExists = existing.some((e) => e.order_code === order_code);
     if (alreadyExists) {
       const next = existing.map((entry) => entry.order_code === order_code
-        ? { ...entry, status: status || entry.status, phone_suffix: phone_suffix || entry.phone_suffix }
+        ? { ...entry, total_idr: Number(total_idr ?? entry.total_idr), status: status || entry.status, phone_suffix: phone_suffix || entry.phone_suffix }
         : entry);
       storage.setItem(HISTORY_KEY, JSON.stringify(next));
       return;

@@ -396,6 +396,8 @@ export async function checkStockAvailability(cartItems) {
     const variantStock = stockMap[item.variant_id];
     if (!variantStock || variantStock.is_active === false) {
       outOfStock.push(item);
+    } else if (Number(variantStock.stock) <= 0) {
+      outOfStock.push(item);
     } else if (variantStock.stock < item.qty) {
       insufficient.push({
         ...item,

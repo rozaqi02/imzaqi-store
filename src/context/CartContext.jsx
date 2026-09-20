@@ -176,7 +176,10 @@ export function CartProvider({ children }) {
           if (!live) return item;
           if (Number(item.price_idr) === Number(live.price_idr)
             && item.product_name === live.product_name
-            && item.variant_name === live.variant_name) {
+            && item.variant_name === live.variant_name
+            && item.duration_label === live.duration_label
+            && Number(item.stock) === Number(live.stock)
+            && Boolean(item.requires_buyer_email) === Boolean(live.requires_buyer_email)) {
             return item;
           }
           changed = true;

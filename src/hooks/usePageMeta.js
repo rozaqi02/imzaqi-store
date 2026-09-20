@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 const SITE_URL = "https://imzaqi.store";
-const DEFAULT_OG_IMAGE = `${SITE_URL}/imzaqistore_logo.png`;
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
 
 function resolveAbsoluteUrl(url) {
   if (!url) return DEFAULT_OG_IMAGE;
@@ -45,6 +45,9 @@ function upsertLink(rel, attrs) {
 export function usePageMeta({ title, description, ogImage } = {}) {
   useEffect(() => {
     if (typeof document === "undefined") return;
+    if (!/^\/produk\/[^/]+\/?$/.test(window.location.pathname)) {
+      document.getElementById("jsonld-product")?.remove();
+    }
 
     const base = "Imzaqi Store";
     const nextTitle = title ? `${title} - ${base}` : `${base} - Langganan Premium, Harga Pelajar`;
@@ -68,7 +71,7 @@ export function usePageMeta({ title, description, ogImage } = {}) {
     upsertMeta('meta[property="og:url"]', { property: "og:url", content: nextUrl });
     upsertMeta('meta[property="og:image"]', { property: "og:image", content: nextImage });
     upsertMeta('meta[property="og:image:width"]', { property: "og:image:width", content: "1200" });
-    upsertMeta('meta[property="og:image:height"]', { property: "og:image:height", content: "630" });
+    upsertMeta('meta[property="og:image:height"]', { property: "og:image:height", content: "675" });
 
     // Twitter Card
     upsertMeta('meta[name="twitter:card"]', { name: "twitter:card", content: "summary_large_image" });

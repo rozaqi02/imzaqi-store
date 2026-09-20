@@ -31,7 +31,6 @@
   inset: -120px -10% auto;
   height: 460px;
   background:
-    radial-gradient(560px 280px at 16% 12%, rgba(79, 160, 255, 0.2), rgba(79, 160, 255, 0) 70%),
     radial-gradient(620px 320px at 84% 6%, rgba(71, 233, 225, 0.18), rgba(71, 233, 225, 0) 72%);
   pointer-events: none;
   opacity: 0.95;

@@ -2,11 +2,11 @@ import React, { useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import {
-  BookOpen,
-  LayoutGrid,
-  PackageSearch,
-  Store,
+  CircleHelp,
+  House,
   MessageSquareQuote,
+  ReceiptText,
+  ShoppingBag,
 } from "lucide-react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { isFunnelPath } from "../hooks/useFunnelRoute";
@@ -14,11 +14,11 @@ import { BOTTOM_NAV_MEDIA } from "../lib/breakpoints";
 import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
 
 const ICONS = {
-  "/": Store,
-  "/produk": LayoutGrid,
+  "/": House,
+  "/produk": ShoppingBag,
+  "/faq": CircleHelp,
+  "/status": ReceiptText,
   "/testimoni": MessageSquareQuote,
-  "/faq": BookOpen,
-  "/status": PackageSearch,
 };
 
 function isBottomNavHidden(pathname) {
@@ -81,7 +81,7 @@ export default function BottomNav() {
     <nav ref={navRef} className="bottom-nav" aria-label="Navigasi utama">
       <ul className="bottom-nav-list">
         {SITE_BOTTOM_NAV.map((item) => {
-          const Icon = ICONS[item.to] || Store;
+          const Icon = ICONS[item.to] || House;
           const active = isNavItemActive(location.pathname, item.to);
 
           return (
@@ -97,10 +97,9 @@ export default function BottomNav() {
                 }}
               >
                 <span className="bottom-nav-icon" aria-hidden="true">
-                  <Icon size={20} strokeWidth={active ? 2.4 : 2.1} />
+                  <Icon size={20} strokeWidth={active ? 2.3 : 2} />
                 </span>
                 <span className="bottom-nav-label">{item.shortLabel || item.label}</span>
-                {active ? <span className="bottom-nav-activeDot" aria-hidden="true" /> : null}
               </NavLink>
             </li>
           );

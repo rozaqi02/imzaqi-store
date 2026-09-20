@@ -13,7 +13,6 @@
 
 html,body{
   background:
-    radial-gradient(1200px 620px at 14% -4%, rgba(0,214,180,.18) 0%, rgba(0,214,180,0) 54%),
     radial-gradient(980px 520px at 88% 6%, rgba(0,138,148,.22) 0%, rgba(0,138,148,0) 56%),
     linear-gradient(180deg, #020611 0%, #040714 100%) !important;
 }
@@ -33,10 +32,8 @@ code{
 
 .global-bg{
   background:
-    radial-gradient(1200px 700px at 18% 10%, rgba(0, 255, 209, 0.16), rgba(0, 0, 0, 0) 62%),
     radial-gradient(980px 650px at 84% 22%, rgba(120, 112, 255, 0.14), rgba(0, 0, 0, 0) 60%),
     radial-gradient(900px 620px at 50% 105%, rgba(0, 194, 208, 0.10), rgba(0, 0, 0, 0) 58%),
-    radial-gradient(1150px 560px at 12% -2%, var(--brand-aurora-a), rgba(0, 214, 180, 0) 56%),
     radial-gradient(980px 540px at 84% 8%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
     linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-mid, var(--brand-bg-end)) 40%, var(--brand-bg-end) 100%) !important;
 }
@@ -238,7 +235,6 @@ code{
 .about-minimal-hero::before,
 .testi-minimal-hero::before{
   background:
-    radial-gradient(700px 360px at 14% 16%, rgba(0,214,180,.18), rgba(0,214,180,0) 68%),
     radial-gradient(700px 380px at 86% 18%, rgba(0,138,148,.2), rgba(0,138,148,0) 70%) !important;
 }
 
@@ -460,7 +456,6 @@ code{
 html,
 body {
   background:
-    radial-gradient(1200px 620px at 14% -4%, var(--brand-aurora-a) 0%, rgba(0, 214, 180, 0) 54%),
     radial-gradient(980px 520px at 88% 6%, var(--brand-aurora-b) 0%, rgba(0, 138, 148, 0) 56%),
     linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-end) 100%) !important;
   color: var(--brand-text) !important;
@@ -478,10 +473,8 @@ body,
 
 .global-bg {
   background:
-    radial-gradient(1200px 700px at 18% 10%, rgba(0, 255, 209, 0.14), rgba(0, 0, 0, 0) 62%),
     radial-gradient(980px 650px at 84% 22%, rgba(120, 112, 255, 0.12), rgba(0, 0, 0, 0) 60%),
     radial-gradient(900px 620px at 50% 105%, rgba(0, 194, 208, 0.09), rgba(0, 0, 0, 0) 58%),
-    radial-gradient(1150px 560px at 12% -2%, var(--brand-aurora-a), rgba(0, 214, 180, 0) 56%),
     radial-gradient(980px 540px at 84% 8%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
     linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-mid, var(--brand-bg-end)) 40%, var(--brand-bg-end) 100%) !important;
 }
@@ -491,7 +484,6 @@ body,
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(circle at 18% 14%, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
     radial-gradient(circle at 84% 18%, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 24%);
   pointer-events: none;
 }
@@ -3866,7 +3858,6 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
   inset: -10% -8% auto !important;
   height: 580px !important;
   background:
-    radial-gradient(620px 300px at 16% 12%, rgba(79, 160, 255, 0.2), rgba(79, 160, 255, 0) 70%),
     radial-gradient(620px 300px at 84% 12%, rgba(71, 233, 225, 0.17), rgba(71, 233, 225, 0) 72%) !important;
 }
 
@@ -3973,7 +3964,6 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
   inset: -12% -8% auto !important;
   height: 560px !important;
   background:
-    radial-gradient(580px 300px at 18% 14%, rgba(79, 160, 255, 0.2), rgba(79, 160, 255, 0) 70%),
     radial-gradient(580px 300px at 82% 14%, rgba(71, 233, 225, 0.17), rgba(71, 233, 225, 0) 72%) !important;
 }
 
@@ -3998,7 +3988,6 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
 .pay-page .pay-shell-hero::before {
   inset: -16% -8% !important;
   background:
-    radial-gradient(700px 340px at 12% 10%, rgba(79, 160, 255, 0.18), rgba(79, 160, 255, 0) 66%),
     radial-gradient(700px 340px at 86% 14%, rgba(71, 233, 225, 0.16), rgba(71, 233, 225, 0) 68%) !important;
   filter: none !important;
 }

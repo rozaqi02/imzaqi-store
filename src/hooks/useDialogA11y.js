@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 
 const FOCUSABLE_SELECTOR = [
   "a[href]",
@@ -11,6 +11,7 @@ const FOCUSABLE_SELECTOR = [
 ].join(",");
 
 let appInertLocks = 0;
+const dialogs = [];
 
 function setAppInert(active) {
   if (typeof document === "undefined") return;
@@ -57,6 +58,8 @@ function getFocusableElements(container) {
 }
 
 export function useDialogA11y({ open, containerRef, onClose, initialFocusSelector }) {
+  const onCloseRef = useRef(onClose);
+  onCloseRef.current = onClose;
   useEffect(() => {
     if (!open || typeof document === "undefined") return undefined;
 
@@ -64,6 +67,7 @@ export function useDialogA11y({ open, containerRef, onClose, initialFocusSelecto
     if (!isDisplayedDialog(container)) return undefined;
 
     setAppInert(true);
+    dialogs.push(container);
     container.setAttribute("tabindex", "-1");
 
     const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
@@ -78,12 +82,12 @@ export function useDialogA11y({ open, containerRef, onClose, initialFocusSelecto
     const raf = window.requestAnimationFrame(focusInitial);
 
     const onKeyDownInternal = (event) => {
-      if (!open) return;
+      if (dialogs.at(-1) !== container) return;
 
       if (event.key === "Escape") {
-        if (typeof onClose === "function") {
+        if (typeof onCloseRef.current === "function") {
           event.preventDefault();
-          onClose();
+          onCloseRef.current();
         }
         return;
       }
@@ -121,10 +125,12 @@ export function useDialogA11y({ open, containerRef, onClose, initialFocusSelecto
     return () => {
       window.cancelAnimationFrame(raf);
       window.removeEventListener("keydown", onKeyDownInternal, true);
+      const index = dialogs.lastIndexOf(container);
+      if (index >= 0) dialogs.splice(index, 1);
       setAppInert(false);
       if (previousFocus && typeof previousFocus.focus === "function") {
         previousFocus.focus({ preventScroll: true });
       }
     };
-  }, [containerRef, initialFocusSelector, onClose, open]);
+  }, [containerRef, initialFocusSelector, open]);
 }

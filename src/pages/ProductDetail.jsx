@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import "../css/pages/ProductDetail.css";
+import { productStructuredData } from "../lib/productStructuredData.mjs";
 import {
   ArrowDown,
   ArrowLeft,
@@ -13,6 +14,7 @@ import {
   ShoppingBag,
   ShoppingCart,
   Sparkles,
+  ThumbsUp,
   UserRound,
   Users,
   Bell,
@@ -37,7 +39,6 @@ import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
 import { buildCatalogAdminWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
 import ProductTile from "../components/ProductTile";
-import AccountTypeStrip from "../components/AccountTypeStrip";
 import RecentlyViewed from "../components/RecentlyViewed";
 import { addRecentlyViewed } from "../lib/recentlyViewed";
 import { supabase } from "../lib/supabaseClient";
@@ -106,17 +107,17 @@ function parseDescriptionToSections(rawText) {
 }
 
 function VariantBenefitList({ rawText }) {
-  const sections = useMemo(() => parseDescriptionToSections(rawText), [rawText]);
-  const summary = useMemo(() => {
-    const items = [];
-    sections.forEach((section) => {
-      (section.items || []).forEach((item) => items.push(item));
-    });
-    return items.join(" · ");
-  }, [sections]);
-  if (!summary) return null;
+  const text = String(rawText || "").trim();
+  if (!text) return null;
 
-  return <div className="pdx-packDetails"><p className="pdx-packBlurb pdx-packBlurb--summary" title={summary}>{summary}</p>{summary.length > 105 ? <details><summary>Lihat rincian paket</summary><p>{summary}</p></details> : null}</div>;
+  return (
+    <div className="pdx-packDetails">
+      <details className="pdx-packDetailsToggle">
+        <summary>Lihat rincian paket</summary>
+        <p className="pdx-packDetailsText">{text}</p>
+      </details>
+    </div>
+  );
 }
 
 function RestockRequest({ variant, adminUrl }) {
@@ -138,8 +139,62 @@ function RestockRequest({ variant, adminUrl }) {
     trackFunnelEvent("restock_request", { productId: variant.product_id, variantId: variant.id });
   }
 
-  if (state === "done") return <div className="pdx-restockDone"><Bell size={14} /> Siap, kami kabari saat stok kembali.</div>;
-  return <div className="pdx-restock"><div className="pdx-packActions"><button className="btn btn-sm pdx-restockBtn" type="button" onClick={(event) => { event.stopPropagation(); setOpen(value => !value); }}><Bell size={14} /> Kabari saat ready</button>{adminUrl ? <a className="btn btn-sm btn-ghost" href={adminUrl} target="_blank" rel="noreferrer" onClick={event => event.stopPropagation()}>Tanya admin</a> : null}</div>{open ? <form onSubmit={submit} onClick={event => event.stopPropagation()}><input className="input" inputMode="tel" value={phone} onChange={event => setPhone(event.target.value)} placeholder="WhatsApp 08xxxxxxxxxx" aria-label="WhatsApp untuk notifikasi restock"/><button className="btn btn-sm" disabled={state === "loading"}>{state === "loading" ? "Menyimpan…" : "Ingatkan saya"}</button>{state === "invalid" ? <small>Masukkan nomor WhatsApp yang valid.</small> : state === "error" ? <small>Belum bisa disimpan. Coba lagi.</small> : null}</form> : null}</div>;
+  if (state === "done") {
+    return (
+      <div className="pdx-restockDone">
+        <Bell size={14} /> Siap, kami kabari saat stok kembali.
+      </div>
+    );
+  }
+
+  return (
+    <div className="pdx-restock">
+      <div className="pdx-restockActions">
+        <button
+          className="btn btn-sm pdx-restockBtn"
+          type="button"
+          onClick={(event) => {
+            event.stopPropagation();
+            setOpen((value) => !value);
+          }}
+        >
+          <Bell size={14} />
+          <span>Kabari saat ready</span>
+        </button>
+        {adminUrl ? (
+          <a
+            className="btn btn-sm btn-ghost pdx-restockAdminBtn"
+            href={adminUrl}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(event) => event.stopPropagation()}
+          >
+            Tanya admin
+          </a>
+        ) : null}
+      </div>
+      {open ? (
+        <form onSubmit={submit} onClick={(event) => event.stopPropagation()}>
+          <input
+            className="input"
+            inputMode="tel"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            placeholder="WhatsApp 08xxxxxxxxxx"
+            aria-label="WhatsApp untuk notifikasi restock"
+          />
+          <button className="btn btn-sm pdx-restockSubmitBtn" disabled={state === "loading"}>
+            {state === "loading" ? "Menyimpan…" : "Ingatkan saya"}
+          </button>
+          {state === "invalid" ? (
+            <small>Masukkan nomor WhatsApp yang valid.</small>
+          ) : state === "error" ? (
+            <small>Belum bisa disimpan. Coba lagi.</small>
+          ) : null}
+        </form>
+      ) : null}
+    </div>
+  );
 }
 
 function parseDays(label) {
@@ -177,7 +232,7 @@ function pickTopSellerVariant(variants) {
 }
 
 const VARIANT_SORTS = [
-  { id: "reco", label: "Rekomendasi", icon: Sparkles },
+  { id: "reco", label: "Rekomendasi", icon: ThumbsUp },
   { id: "price_asc", label: "Termurah", icon: ArrowDown },
   { id: "popular", label: "Terlaris", icon: Flame },
 ];
@@ -416,14 +471,9 @@ VariantCard.displayName = "VariantCard";
 
 function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
   const [activeInfoTab, setActiveInfoTab] = useState("description");
-  // 0 = description tab (left), 1 = terms tab (right)
-  const tabIndex = activeInfoTab === "description" ? 0 : 1;
 
   return (
     <div className="pdx-infoTabsCard">
-      {/* Tab header with a pure-CSS sliding indicator (no Framer Motion layoutId).
-          The indicator is a single element that translates via a CSS custom property,
-          which composites on the GPU with zero layout work. */}
       <div className="pdx-infoTabsHeader">
         <button
           type="button"
@@ -447,23 +497,23 @@ function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
           <ol className="pdx-termsList">
             <li>
               <span className="pdx-termNum">1</span>
-              <span className="pdx-termText">Transaksi hanya dianggap sah setelah pembayaran terverifikasi secara otomatis oleh sistem QRIS, dan pembeli wajib menyimpan ID Order (IMZ-XXXX) sebagai bukti pembelian.</span>
+              <span className="pdx-termText">Pembayaran diverifikasi otomatis via QRIS. Simpan ID Order (IMZ-XXXX) sebagai bukti sah.</span>
             </li>
             <li>
               <span className="pdx-termNum">2</span>
-              <span className="pdx-termText">Pengiriman pesanan dilakukan secara manual ke WhatsApp terdaftar dengan waktu proses 5–30 menit (maksimal 2 jam untuk varian email) khusus pada jam operasional 08.00–22.00 WIB.</span>
+              <span className="pdx-termText">Pengiriman dilakukan via WhatsApp dalam 5 sampai 30 menit pada jam operasional 08.00 sampai 22.00 WIB.</span>
             </li>
             <li>
               <span className="pdx-termNum">3</span>
-              <span className="pdx-termText">Garansi replace berlaku selama masa garansi pada label varian. Laporkan kendala maksimal 24 jam setelah ditemukan dan sebelum masa paket berakhir.</span>
+              <span className="pdx-termText">Akun Sharing: Akun digunakan oleh 2-4 user. Dilarang otak-atik, jika ketahuan denda &amp; garansi hangus.</span>
             </li>
             <li>
               <span className="pdx-termNum">4</span>
-              <span className="pdx-termText">Dilarang keras mengubah password, email, profil, PIN, atau data login lainnya pada akun bertipe sharing untuk menghindari hangusnya garansi.</span>
+              <span className="pdx-termText">Akun Private: 1 akun/profil penuh milikmu. Bebas login tanpa kendala tertabrak dan tanpa takut privasi tersebar.</span>
             </li>
             <li>
               <span className="pdx-termNum">5</span>
-              <span className="pdx-termText">Segala aduan kendala wajib menyertakan ID Order valid agar dapat diproses lebih lanjut oleh admin WhatsApp.</span>
+              <span className="pdx-termText">Garansi replace berlaku sesuai durasi paket. Klaim kendala wajib menyertakan ID Order ke WhatsApp admin.</span>
             </li>
           </ol>
         )}
@@ -620,7 +670,7 @@ export default function ProductDetail() {
     ogImage: product?.icon_url || undefined,
   });
 
-  // JSON-LD structured data for Google rich results
+  // Shared with build-time metadata; replace the same script on SPA navigation.
   useEffect(() => {
     if (!product) return;
     const existing = document.getElementById("jsonld-product");
@@ -632,24 +682,9 @@ export default function ProductDetail() {
     const maxPrice = range.maxPrice;
     const totalStock = activeVariants.reduce((s, v) => s + Number(v.stock || 0), 0);
 
-    const jsonld = {
-      "@context": "https://schema.org",
-      "@type": "Product",
-      "name": product.name,
-      "description": product.description || "",
-      "image": product.icon_url || "",
-      "brand": { "@type": "Brand", "name": "Imzaqi Store" },
-      "offers": {
-        "@type": "AggregateOffer",
-        "priceCurrency": "IDR",
-        "lowPrice": minPrice,
-        "highPrice": maxPrice,
-        "offerCount": activeVariants.length,
-        "availability": totalStock > 0
-          ? "https://schema.org/InStock"
-          : "https://schema.org/OutOfStock",
-      },
-    };
+    const jsonld = productStructuredData(product, {
+      min: minPrice, max: maxPrice, count: activeVariants.length, stock: totalStock,
+    });
 
     const script = document.createElement("script");
     script.id = "jsonld-product";
@@ -1052,8 +1087,6 @@ export default function ProductDetail() {
     <div className="page detail-page detail-page-v3 pdx-contentLoaded">
       <section className="section">
         <div className="container">
-          {/* On mobile, a plain div is used (no Framer Motion) to reduce JS overhead.
-              The route-transition CSS class from Layout.jsx handles the page enter animation. */}
           <div className="pdx-layout">
             <div className="pdx-mainGrid">
               <div className="pdx-leftCol">
@@ -1118,7 +1151,7 @@ export default function ProductDetail() {
                         rel="noopener noreferrer"
                       >
                         <MessageCircle size={16} aria-hidden="true" />
-                        <span>Hubungi Admin</span>
+                        <span>Tanya admin? klik disini</span>
                       </a>
                     ) : null}
                   </div>
@@ -1133,8 +1166,6 @@ export default function ProductDetail() {
 
             <div className="pdx-rightCol">
               <section id="paket-tersedia" className="pdx-variantsSection">
-                <AccountTypeStrip variants={variants} />
-
                 <div className="pdx-variantsHead">
                   <div className="pdx-variantsTitleRow">
                     <h2 className="pdx-sectionTitle">Paket</h2>
@@ -1225,9 +1256,7 @@ export default function ProductDetail() {
                           (out
                             ? "Slot lagi abis. Cek lagi kalo stok udah kebuka."
                             : "Varian siap diproses abis pembayaran diverifikasi.")
-                      )
-                        .replace(/\r\n/g, " ")
-                        .trim();
+                      ).trim();
 
                       return (
                         <VariantCard

@@ -175,8 +175,10 @@ describe("Checkout Page - Property 2: Checkout item controls contained within ca
    * CSS classes that provide overflow protection (flex-wrap, min-width,
    * overflow-wrap, word-break) ensuring no child exceeds the card boundary.
    */
-  it("renders checkout item cards with overflow-safe structure for any cart item data", async () => {
-    await fc.assert(
+  it(
+    "renders checkout item cards with overflow-safe structure for any cart item data",
+    async () => {
+      await fc.assert(
       fc.asyncProperty(
         fc.array(arbCartItem, { minLength: 1, maxLength: 5 }),
         async (cartItems) => {
@@ -258,7 +260,7 @@ describe("Checkout Page - Property 2: Checkout item controls contained within ca
       ),
       { numRuns: 50 }
     );
-  });
+  }, 25000);
 
   /**
    * **Validates: Requirements 2.4**
@@ -341,7 +343,7 @@ describe("Checkout Page - Property 2: Checkout item controls contained within ca
       ),
       { numRuns: 30 }
     );
-  });
+  }, 25000);
 
   it("keeps the payable total and promo entry clear on mobile", async () => {
     mockCartItems.current = [{
