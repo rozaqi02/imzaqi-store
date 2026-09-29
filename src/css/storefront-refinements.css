@@ -1,3 +1,18 @@
+/* Banner dismissal is an unframed icon, including hover and pressed states. */
+html[data-theme] body .header .promo-ticker .promo-tickerClose,
+html[data-theme] body .header .promo-ticker .promo-tickerClose:hover,
+html[data-theme] body .header .promo-ticker .promo-tickerClose:active {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: inherit !important;
+}
+
+html[data-theme] body .header .promo-ticker .promo-tickerClose::before,
+html[data-theme] body .header .promo-ticker .promo-tickerClose::after {
+  content: none !important;
+}
+
 /* Shared raised icon controls: preserve the white cart finish in light mode. */
 :root {
   --store-icon-face: #fff;

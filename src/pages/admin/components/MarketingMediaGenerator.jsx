@@ -16,14 +16,18 @@ async function prepareCanvas(options, pageOverride) {
   const canvas = document.createElement("canvas");
   const catalog = options.mode === "catalog", page = pageOverride ?? options.page;
   const products = catalog ? options.pages[page] || [] : [options.product];
+  const withoutLogo = products.find(product => !String(product.icon_url || "").trim());
+  if (withoutLogo) throw new Error(`Logo ${withoutLogo.name} belum tersedia di database. Tambahkan logo di menu Produk.`);
   const url = catalog ? "https://imzaqi.store/produk" : options.offer.url;
   const [images, qr] = await Promise.all([
-    Promise.all(products.map(p => loadMediaImage(p.icon_url))),
+    Promise.all(products.map(p => loadMediaImage(String(p.icon_url).trim()))),
     QRCode.toDataURL(url, { margin: 4, width: 320, errorCorrectionLevel: "M" }).then(loadMediaImage),
   ]);
+  const missingLogo = images.findIndex(image => !image);
+  if (missingLogo !== -1) throw new Error(`Logo ${products[missingLogo].name} dari database gagal dimuat. Periksa URL logo di menu Produk, lalu coba lagi.`);
   if (catalog) drawCatalogPoster(canvas, { products, discounts: options.discounts, theme: options.catalogTheme, page: page + 1, pageCount: options.pages.length, total: options.total, images, qr, phone: options.phone });
   else drawProductPoster(canvas, { offer: options.offer, styleId: options.styleId, format: options.format, variation: options.variation, headline: options.headline, badge: options.badge, image: images[0], qr, phone: options.phone });
-  return { canvas, missingImages: images.some(image => !image) };
+  return { canvas };
 }
 
 export default function MarketingMediaGenerator({ products = [], settings = {} }) {
@@ -45,7 +49,7 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   const [now, setNow] = useState(Date.now());
   const [saleError, setSaleError] = useState(false);
   const [salesPending, setSalesPending] = useState(true);
-  const [renderState, setRenderState] = useState({ busy: true, error: "", missingImages: false });
+  const [renderState, setRenderState] = useState({ busy: true, error: "" });
   const [exporting, setExporting] = useState(false);
   const [copied, setCopied] = useState(false);
   const [retry, setRetry] = useState(0);
@@ -96,18 +100,18 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   useEffect(() => {
     const request = ++requestRef.current;
     readyRef.current = null; setCopied(false);
-    setRenderState({ busy: !empty && !invalid, error: invalid, missingImages: false });
+    setRenderState({ busy: !empty && !invalid, error: invalid });
     if (empty || invalid || salesPending) return;
     const timer = setTimeout(() => {
-      prepareCanvas(options).then(({ canvas, missingImages }) => {
+      prepareCanvas(options).then(({ canvas }) => {
         if (requestRef.current !== request || !canvasRef.current) return;
         const target = canvasRef.current;
         target.width = canvas.width; target.height = canvas.height;
         target.getContext("2d").drawImage(canvas, 0, 0);
         readyRef.current = { options, canvas };
-        setRenderState({ busy: false, error: "", missingImages });
+        setRenderState({ busy: false, error: "" });
       }).catch(error => {
-        if (requestRef.current === request) setRenderState({ busy: false, error: error.message || "Preview gagal dibuat. Coba lagi.", missingImages: false });
+        if (requestRef.current === request) setRenderState({ busy: false, error: error.message || "Preview gagal dibuat. Coba lagi." });
       });
     }, 160);
     return () => { clearTimeout(timer); requestRef.current++; };
@@ -188,7 +192,6 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
           <canvas ref={canvasRef} className={`mmg-canvasPreview ${!ready ? "is-pending" : ""}`} role="img" aria-label={mode === "single" ? `Poster ${product?.name || "produk"}` : `Katalog halaman ${page + 1}`}/>
           {!ready && <div className="mmg-previewStatus" role="status">{empty ? "Belum ada produk untuk ditampilkan." : renderState.error || <><LoaderCircle className="mmg-spinner" size={22}/>Menyiapkan desain…</>}{renderState.error && !invalid && <button type="button" onClick={() => setRetry(v => v + 1)}>Coba lagi</button>}</div>}
         </div>
-        {renderState.missingImages && <p className="mmg-warning">Sebagian logo tidak berhasil dimuat. Poster memakai inisial produk sebagai pengganti.</p>}
         {mode === "catalog" && pages.length > 1 && <div className="mmg-pagination"><button type="button" aria-label="Halaman sebelumnya" disabled={page === 0 || exporting} onClick={() => setCatalogPage(page - 1)}><ChevronLeft size={18}/></button><span>Halaman {page + 1} dari {pages.length}</span><button type="button" aria-label="Halaman berikutnya" disabled={page === pages.length - 1 || exporting} onClick={() => setCatalogPage(page + 1)}><ChevronRight size={18}/></button></div>}
         <div className="mmg-actionsBar"><button type="button" className="mmg-btnDownload" disabled={!ready || exporting} onClick={() => exportImage("download")}><Download size={18}/>{exporting ? "Menyiapkan…" : "Download PNG"}</button><button type="button" className="mmg-btnCopy" disabled={!ready || exporting} onClick={() => exportImage("copy")}><Copy size={18}/>{copied ? "Gambar tersalin" : "Salin gambar"}</button>{mode === "catalog" && pages.length > 1 && <button type="button" className="mmg-secondary" disabled={!ready || exporting} onClick={exportCatalog}><Download size={17}/>Semua halaman (ZIP)</button>}</div>
         <p className="mmg-note">PNG resolusi penuh, siap untuk WhatsApp, Instagram, dan Telegram.</p>

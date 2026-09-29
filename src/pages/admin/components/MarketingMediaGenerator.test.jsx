@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor, act, cleanup } from "@testing-libra
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
 import MarketingMediaGenerator from "./MarketingMediaGenerator";
 import { loadMediaImage } from "./marketingMediaExport";
-import { drawProductPoster } from "./marketingMediaRenderer";
+import { drawProductPoster, drawCatalogPoster } from "./marketingMediaRenderer";
 
 const spies = vi.hoisted(() => ({ draw: vi.fn(), toast: { success: vi.fn(), error: vi.fn() } }));
 vi.mock("../../../context/ToastContext", () => ({ useToast: () => spies.toast }));
@@ -60,5 +60,19 @@ describe("marketing generator preview", () => {
     expect(screen.getByRole("option", { name: "Design" })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Kategori"), { target: { value: "design" } });
     expect(screen.getByText(/1 produk aktif/)).toBeInTheDocument();
+  });
+  it("loads each catalogue logo from the corresponding database product", async () => {
+    render(<MarketingMediaGenerator products={products}/>);
+    fireEvent.click(screen.getByRole("button", { name: /Katalog harga/ }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Download PNG" })).toBeEnabled());
+    expect(drawCatalogPoster.mock.calls.at(-1)[1].images.map(image => image.src)).toEqual(["icon-1", "icon-2"]);
+  });
+  it("blocks export instead of substituting an initial when a database logo fails", async () => {
+    loadMediaImage.mockImplementation(src => Promise.resolve(src === "icon-1" ? null : { src }));
+    render(<MarketingMediaGenerator products={products}/>);
+    await waitFor(() => expect(screen.getByText(/Logo Netflix dari database gagal dimuat/)).toBeInTheDocument());
+    expect(screen.getByRole("button", { name: "Download PNG" })).toBeDisabled();
+    expect(drawProductPoster).not.toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "Coba lagi" })).toBeInTheDocument();
   });
 });
