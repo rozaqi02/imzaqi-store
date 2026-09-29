@@ -8,6 +8,7 @@ import { isKnownOutOfStock, isPromoExpired } from "../lib/format";
 const FLASH_ROTATE_MS = 6000;
 const PROMO_DISMISS_KEY = "imzaqi_ticker_promo_dismissed";
 const FLASH_DISMISS_KEY = "imzaqi_ticker_flash_dismissed";
+const NEW_PRODUCT_DISMISS_KEY = "imzaqi_ticker_new_product_dismissed";
 
 const DEFAULT_FLASH = {
   name: "",
@@ -69,6 +70,7 @@ export default function PromoTicker() {
   const [flashItems, setFlashItems] = useState([]);
   const [flashIndex, setFlashIndex] = useState(0);
   const [promo, setPromo] = useState(null);
+  const [newProductBanner, setNewProductBanner] = useState(null);
   const [flashDismissed, setFlashDismissed] = useState(() => {
     try {
       return sessionStorage.getItem(FLASH_DISMISS_KEY) === "1";
@@ -79,6 +81,13 @@ export default function PromoTicker() {
   const [promoDismissed, setPromoDismissed] = useState(() => {
     try {
       return sessionStorage.getItem(PROMO_DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [newProductDismissed, setNewProductDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem(NEW_PRODUCT_DISMISS_KEY) === "1";
     } catch {
       return false;
     }
@@ -97,6 +106,12 @@ export default function PromoTicker() {
       if (!alive) return;
       setFlashItems(buildFlashItems(sales, products));
       setPromo(pickHomePromo(promos, settings?.home_promos?.codes));
+      const np = settings?.new_product_banner;
+      if (np && np.enabled && (np.text || np.product_id)) {
+        setNewProductBanner(np);
+      } else {
+        setNewProductBanner(null);
+      }
     });
 
     return () => {
@@ -114,6 +129,7 @@ export default function PromoTicker() {
 
   const flash = flashItems[flashIndex] || DEFAULT_FLASH;
   const showPromo = Boolean(promo) && !promoDismissed;
+  const showNewProduct = Boolean(newProductBanner) && !newProductDismissed;
 
   function dismissFlash() {
     try {
@@ -131,6 +147,17 @@ export default function PromoTicker() {
     setPromoDismissed(true);
   }
 
+  function dismissNewProduct(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    try {
+      sessionStorage.setItem(NEW_PRODUCT_DISMISS_KEY, "1");
+    } catch {}
+    setNewProductDismissed(true);
+  }
+
   async function copyPromo() {
     if (!promo?.code) return;
     try {
@@ -144,6 +171,25 @@ export default function PromoTicker() {
 
   return (
     <div className="promo-tickerStack">
+      {showNewProduct ? (
+        <div className="promo-ticker promo-ticker--newProduct" role="region" aria-label="Produk baru">
+          <p className="promo-tickerItem">
+            <span className="promo-tickerBadge">{newProductBanner.badge || "BARU"}</span>{" "}
+            <Link className="promo-tickerLink" to={newProductBanner.link || "/produk"}>
+              {newProductBanner.text || "Produk baru tersedia! Cek sekarang"}
+            </Link>
+          </p>
+          <button
+            type="button"
+            className="promo-tickerClose"
+            aria-label="Tutup banner produk baru"
+            onClick={dismissNewProduct}
+          >
+            <X size={12} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+        </div>
+      ) : null}
+
       {!flashDismissed ? <div className="promo-ticker promo-ticker--flash" role="region" aria-label="Flash sale">
         <p className="promo-tickerItem">
           {flash.name ? (

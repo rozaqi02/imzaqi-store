@@ -155,6 +155,39 @@ html[data-theme="dark"] .promo-ticker--flash {
   color: #04140e;
 }
 
+.promo-ticker--newProduct {
+  background: linear-gradient(90deg, #009e60 0%, #00b870 50%, #008f56 100%) !important;
+  color: #ffffff !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .promo-ticker--newProduct {
+  background: linear-gradient(90deg, #00a86b 0%, #00c77f 50%, #009961 100%) !important;
+  color: #04140e !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+}
+
+.promo-tickerBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1px 7px;
+  font-size: 9.5px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border-radius: 999px;
+  background: #ffffff;
+  color: #008751;
+  margin-right: 6px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.14);
+}
+
+html[data-theme="dark"] .promo-tickerBadge {
+  background: #04140e;
+  color: #00ffb3;
+}
+
 .promo-ticker--code {
   background: #0a0a0a !important;
   color: #ffffff !important;
