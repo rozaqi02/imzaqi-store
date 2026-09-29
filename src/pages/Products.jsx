@@ -1009,7 +1009,7 @@ export default function Products() {
     <div className="page catalog-page">
       <section className="section catalog-hero">
         <div className="container">
-          <FlashSaleBanner />
+          <FlashSaleBanner products={products} />
 
           <CatalogHero
             products={products}
