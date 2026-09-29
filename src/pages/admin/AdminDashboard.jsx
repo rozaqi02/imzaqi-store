@@ -24,6 +24,7 @@ import {
   Plus,
   Search,
   Settings2,
+  Sparkles,
   Star,
   Tags,
   Trash2,
@@ -46,6 +47,7 @@ import {
 import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
 import VirtualList from "./components/VirtualList";
 import AdminOrderListItem from "./components/AdminOrderListItem";
+import MarketingMediaGenerator from "./components/MarketingMediaGenerator";
 import {
   ADMIN_PRODUCTS_CACHE_TTL_MS,
   EMPTY_ANALYTICS_SUMMARY,
@@ -138,12 +140,13 @@ const TAB_ICONS = {
   orders: ClipboardList,
   promos: Tags,
   flashsale: TrendingUp,
+  marketing: Sparkles,
   testimonials: Star,
   settings: Settings2,
 };
 
 /** Tabs that need products in memory (stock / variants / category map). */
-const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders"]);
+const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders", "marketing"]);
 /** Tabs that need orders list. */
 const TABS_NEED_ORDERS = new Set(["overview", "orders"]);
 
@@ -2472,6 +2475,7 @@ export default function AdminDashboard() {
     { id: "orders", label: "Pesanan", hint: "Antrean bayar & proses" },
     { id: "promos", label: "Promo", hint: "Kode diskon pelanggan" },
     { id: "flashsale", label: "Flash Sale", hint: "Diskon kilat per varian" },
+    { id: "marketing", label: "Media Promosi", hint: "Poster produk & pamflet harga" },
     { id: "testimonials", label: "Testimoni", hint: "Bukti sosial di etalase" },
     { id: "settings", label: "Pengaturan", hint: "WA, QRIS, operasional" },
   ];
@@ -4496,6 +4500,22 @@ export default function AdminDashboard() {
                       </div>
                     ))}
                   </div>
+                </div>
+              </div>
+            ) : null}
+
+            {tab === "marketing" ? (
+              <div className="admin-panel admin-panel--fill admin-marketingPanel">
+                <div className="admin-panel-head">
+                  <div>
+                    <div className="admin-panel-title">Media & Generator Promosi</div>
+                    <div className="admin-panel-sub">
+                      Studio poster produk dan katalog harga. Pilih desain, sesuaikan paket, lalu download PNG atau salin gambar.
+                    </div>
+                  </div>
+                </div>
+                <div className="admin-panel-body admin-panel-body--scroll">
+                  <MarketingMediaGenerator products={products} settings={settings} />
                 </div>
               </div>
             ) : null}

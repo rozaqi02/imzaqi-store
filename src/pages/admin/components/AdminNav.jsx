@@ -22,8 +22,8 @@ export const ADMIN_NAV_GROUPS = [
   },
   {
     key: "growth",
-    label: "Growth",
-    tabIds: ["promos", "flashsale", "testimonials"],
+    label: "Growth & Promosi",
+    tabIds: ["promos", "flashsale", "marketing", "testimonials"],
   },
   {
     key: "system",
@@ -33,13 +33,14 @@ export const ADMIN_NAV_GROUPS = [
 ];
 
 export const MOBILE_PRIMARY_TAB_IDS = ["overview", "orders", "products", "promos"];
-export const MOBILE_MORE_TAB_IDS = ["flashsale", "testimonials", "settings"];
+export const MOBILE_MORE_TAB_IDS = ["flashsale", "marketing", "testimonials", "settings"];
 
 const MOBILE_SHORT_LABELS = {
   overview: "Home",
   orders: "Order",
   products: "Produk",
   promos: "Promo",
+  marketing: "Media",
 };
 
 const TAB_HINTS = {
@@ -48,6 +49,7 @@ const TAB_HINTS = {
   products: "Katalog & stok paket",
   promos: "Kode diskon aktif",
   flashsale: "Diskon kilat per varian",
+  marketing: "Poster produk & pamflet harga",
   testimonials: "Bukti sosial di etalase",
   settings: "WA, QRIS, operasional",
 };
@@ -378,6 +380,7 @@ export const ADMIN_NAV_ICONS_FALLBACK = {
   products: Box,
   promos: Tags,
   flashsale: Zap,
+  marketing: Sparkles,
   testimonials: Star,
   settings: Settings2,
   sparkles: Sparkles,
