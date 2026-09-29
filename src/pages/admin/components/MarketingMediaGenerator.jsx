@@ -1,13 +1,14 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
 import { Download, Copy, Sparkles, FileText, Shuffle, ChevronLeft, ChevronRight, LoaderCircle, RotateCcw } from "lucide-react";
 import QRCode from "qrcode";
-import { formatIDR, getVariantEffectivePrice } from "../../../lib/format";
+import { formatIDR, getVariantEffectivePrice, isKnownOutOfStock } from "../../../lib/format";
 import { fetchActiveFlashSales } from "../../../lib/api";
 import { resolveProductCategory, resolveCatalogLine, STORE_WHATSAPP } from "../../../lib/productCategories";
 import { useToast } from "../../../context/ToastContext";
 import { MEDIA_FORMATS, MEDIA_STYLES, activeVariants, chooseVariant, liveDiscounts, posterOffer, paginateCatalog, normalizeMediaPhone } from "./marketingMediaModel";
 import { drawProductPoster, drawCatalogPoster } from "./marketingMediaRenderer";
 import { loadMediaImage, canvasPng, downloadMedia, mediaZip } from "./marketingMediaExport";
+import AdminPicker from "./AdminPicker";
 import "./MarketingMediaGenerator.css";
 
 async function prepareCanvas(options, pageOverride) {
@@ -165,8 +166,8 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
     <div className="mmg-layout">
       <div className="mmg-controlsCard">
         {mode === "single" ? <>
-          <label className="mmg-field">Produk<select value={product?.id || ""} onChange={e => { setProductId(e.target.value); setVariantId(""); resetCopy(); }} disabled={!activeProducts.length}>{!activeProducts.length && <option value="">Belum ada produk aktif</option>}{activeProducts.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}</select></label>
-          <label className="mmg-field">Paket / varian<select value={variantId} onChange={e => { setVariantId(e.target.value); setPrice(""); setDuration(""); }} disabled={!variants.length}><option value="">Otomatis · harga terendah yang tersedia</option>{variants.map(v => <option key={v.id} value={v.id}>{v.name} · {formatIDR(getVariantEffectivePrice(v, discounts))}{discounts.has(v.id) ? " · Promo" : ""}{v.stock != null && Number(v.stock) <= 0 ? " · Habis" : ""}</option>)}</select></label>
+          <AdminPicker label="Produk" value={product?.id || ""} onChange={id => { setProductId(String(id)); setVariantId(""); resetCopy(); }} disabled={!activeProducts.length} placeholder="Belum ada produk aktif" options={activeProducts.map(p => ({ value: p.id, label: p.name, icon: p.icon_url, description: `${resolveProductCategory(p).label} · ${activeVariants(p).length} paket` }))}/>
+          <AdminPicker label="Paket / varian" value={variantId} onChange={id => { setVariantId(String(id)); setPrice(""); setDuration(""); }} disabled={!variants.length} options={[{ value: "", label: "Otomatis", description: "Harga terendah yang tersedia", meta: variant ? formatIDR(getVariantEffectivePrice(variant, discounts)) : "", icon: product?.icon_url }, ...variants.map(v => ({ value: v.id, label: v.name, icon: product?.icon_url, description: [v.duration_label, v.guarantee_text].filter(Boolean).join(" · "), meta: formatIDR(getVariantEffectivePrice(v, discounts)), searchText: String(getVariantEffectivePrice(v, discounts)), status: [isKnownOutOfStock(v) ? "Stok habis" : v.stock == null || v.stock === "" ? "Stok belum diisi" : `Stok ${v.stock}`, discounts.has(v.id) ? "Promo" : ""].filter(Boolean).join(" · "), statusTone: isKnownOutOfStock(v) ? "muted" : "" }))]}/>
           {variant && <p className="mmg-note">Paket terpilih: <strong>{variant.name}</strong>{offerResult.offer?.outOfStock && " · stok habis"}</p>}
           <fieldset className="mmg-fieldset"><legend>Arah desain</legend><div className="mmg-presetGrid">{MEDIA_STYLES.map(s => <button type="button" key={s.id} className={`mmg-style ${s.id === styleId ? "is-selected" : ""}`} aria-pressed={s.id === styleId} onClick={() => setStyleId(s.id)}><span className="mmg-swatches" aria-hidden="true"><i style={{ background: s.bg }}/><i style={{ background: s.ink }}/><i style={{ background: s.accent }}/></span><strong>{s.name}</strong><small>{s.detail}</small></button>)}</div></fieldset>
           <fieldset className="mmg-fieldset"><legend>Ukuran gambar</legend><div className="mmg-formats">{Object.entries(MEDIA_FORMATS).map(([id, f]) => <button type="button" key={id} aria-pressed={format === id} className={format === id ? "is-selected" : ""} onClick={() => setFormat(id)}><strong>{f.ratio}</strong><small>{f.label}</small></button>)}</div></fieldset>
@@ -179,7 +180,7 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
             <button type="button" className="mmg-secondary" onClick={resetCopy}><RotateCcw size={15}/>Kembalikan teks & harga</button>
           </div></details>
         </> : <>
-          <label className="mmg-field">Kategori<select value={catalogCategory} onChange={e => { setCatalogCategory(e.target.value); setCatalogPage(0); }}><option value="all">Semua kategori</option>{categories.map(c => <option key={c.key} value={c.key}>{c.label}</option>)}</select></label>
+          <AdminPicker label="Kategori" value={catalogCategory} onChange={key => { setCatalogCategory(key); setCatalogPage(0); }} options={[{ value: "all", label: "Semua kategori", meta: `${activeProducts.length} produk` }, ...categories.map(c => ({ value: c.key, label: c.label, meta: `${activeProducts.filter(p => resolveProductCategory(p).key === c.key).length} produk` }))]}/>
           <fieldset className="mmg-fieldset"><legend>Tema katalog</legend><div className="mmg-formats">{[{ id: "emerald", name: "Kertas & hijau" }, { id: "dark", name: "Onyx & lime" }].map(s => <button type="button" key={s.id} className={catalogTheme === s.id ? "is-selected" : ""} aria-pressed={catalogTheme === s.id} onClick={() => setCatalogTheme(s.id)}>{s.name}</button>)}</div></fieldset>
           <p className="mmg-note">{filtered.length} produk aktif · {pages.length} halaman. Maksimal 10 produk per halaman agar nama dan harga nyaman dibaca.</p>
         </>}

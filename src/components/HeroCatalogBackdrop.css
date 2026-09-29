@@ -76,7 +76,7 @@
 .hx-catalog-tile {
   flex: 0 0 auto;
   width: clamp(76px, 7.5vw, 96px);
-  padding: 7px 7px 6px;
+  padding: 7px;
   border-radius: 12px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background:
@@ -95,7 +95,7 @@
   display: grid;
   place-items: center;
   background: rgba(255, 255, 255, 0.06);
-  margin-bottom: 5px;
+  margin-bottom: 0;
 }
 
 .hx-catalog-tile-icon img {
@@ -131,19 +131,6 @@
   color: rgba(255, 255, 255, 0.72);
 }
 
-.hx-catalog-tile-name {
-  margin: 0;
-  font-size: 8px;
-  font-weight: 800;
-  line-height: 1.25;
-  color: rgba(234, 255, 245, 0.78);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-height: 2.3em;
-}
 
 .hx-hero-scrim {
   position: absolute;
@@ -190,9 +177,6 @@ html[data-theme="light"] .hx-hero-scrim {
     );
 }
 
-html[data-theme="light"] .hx-catalog-tile-name {
-  color: #2f4d58;
-}
 
 @keyframes hx-catalog-drift {
   from {
@@ -257,12 +241,12 @@ html[data-theme="light"] .hx-catalog-tile-name {
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-tile {
   width: 104px;
-  padding: 8px 8px 7px;
+  padding: 8px;
   border-radius: 14px;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-tile-icon {
-  margin-bottom: 5px;
+  margin-bottom: 0;
   border-radius: 11px;
 }
 
@@ -275,10 +259,6 @@ html[data-theme="light"] .hx-catalog-tile-name {
   font-size: 22px;
 }
 
-.hx-catalog-backdrop.is-mobile .hx-catalog-tile-name {
-  font-size: 9.5px;
-  min-height: 2.3em;
-}
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-row {
   margin-inline: 0;

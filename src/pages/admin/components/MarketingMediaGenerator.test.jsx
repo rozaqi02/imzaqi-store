@@ -38,7 +38,8 @@ describe("marketing generator preview", () => {
     loadMediaImage.mockImplementation(src => src === "icon-1" ? new Promise(resolve => { resolveOld = resolve; }) : Promise.resolve({ src }));
     render(<MarketingMediaGenerator products={products}/>);
     await waitFor(() => expect(resolveOld).toBeTypeOf("function"));
-    fireEvent.change(screen.getByLabelText("Produk"), { target: { value: "2" } });
+    fireEvent.click(screen.getByRole("combobox", { name: "Produk" }));
+    fireEvent.click(screen.getByRole("option", { name: /Canva/ }));
     await waitFor(() => expect(screen.getByRole("button", { name: "Download PNG" })).toBeEnabled());
     expect(spies.draw.mock.calls.at(-1)[0].posterName).toBe("Canva");
     await act(async () => { resolveOld({ src: "icon-1" }); await Promise.resolve(); });
@@ -57,8 +58,8 @@ describe("marketing generator preview", () => {
   it("includes real design categories in catalogue filtering", async () => {
     render(<MarketingMediaGenerator products={products}/>);
     fireEvent.click(screen.getByRole("button", { name: /Katalog harga/ }));
-    expect(screen.getByRole("option", { name: "Design" })).toBeInTheDocument();
-    fireEvent.change(screen.getByLabelText("Kategori"), { target: { value: "design" } });
+    fireEvent.click(screen.getByRole("combobox", { name: "Kategori" }));
+    fireEvent.click(screen.getByRole("option", { name: /Design/ }));
     expect(screen.getByText(/1 produk aktif/)).toBeInTheDocument();
   });
   it("loads each catalogue logo from the corresponding database product", async () => {
@@ -74,5 +75,18 @@ describe("marketing generator preview", () => {
     expect(screen.getByRole("button", { name: "Download PNG" })).toBeDisabled();
     expect(drawProductPoster).not.toHaveBeenCalled();
     expect(screen.getByRole("button", { name: "Coba lagi" })).toBeInTheDocument();
+  });
+  it("distinguishes same-name packages by duration and updates the chosen offer", async () => {
+    const catalogue = [{ ...products[0], product_variants: [
+      { id: "short", name: "Private", duration_label: "1 Bulan", price_idr: 31000, stock: 5 },
+      { id: "long", name: "Private", duration_label: "3 Bulan", price_idr: 85000, stock: 0 },
+    ] }];
+    render(<MarketingMediaGenerator products={catalogue}/>);
+    fireEvent.click(screen.getByRole("combobox", { name: "Paket / varian" }));
+    fireEvent.change(screen.getByRole("combobox", { name: "Cari paket / varian" }), { target: { value: "3 Bulan" } });
+    const option = screen.getByRole("option", { name: /Private 3 Bulan Stok habis/ });
+    fireEvent.click(option);
+    await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(85000));
+    expect(drawProductPoster.mock.calls.at(-1)[1].offer.outOfStock).toBe(true);
   });
 });

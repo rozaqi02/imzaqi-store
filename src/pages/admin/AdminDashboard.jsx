@@ -48,6 +48,7 @@ import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
 import VirtualList from "./components/VirtualList";
 import AdminOrderListItem from "./components/AdminOrderListItem";
 import MarketingMediaGenerator from "./components/MarketingMediaGenerator";
+import AdminPicker from "./components/AdminPicker";
 import {
   ADMIN_PRODUCTS_CACHE_TTL_MS,
   EMPTY_ANALYTICS_SUMMARY,
@@ -952,6 +953,18 @@ export default function AdminDashboard() {
   const allVariants = useMemo(() => {
     return (products || []).flatMap((product) => product.product_variants || []);
   }, [products]);
+  const flashVariantOptions = useMemo(() => (products || []).flatMap(product =>
+    (product.product_variants || []).filter(variant => variant.is_active).map(variant => ({
+      value: variant.id,
+      label: product.name,
+      icon: product.icon_url,
+      description: [variant.name, variant.duration_label].filter(Boolean).join(" · "),
+      meta: formatIDR(variant.price_idr),
+      searchText: String(variant.price_idr),
+      status: variant.stock == null || variant.stock === "" ? "Stok belum diisi" : Number(variant.stock) <= 0 ? "Stok habis" : `Stok ${variant.stock}`,
+      statusTone: variant.stock != null && Number(variant.stock) <= 0 ? "muted" : "",
+    }))
+  ), [products]);
 
   const analyticsDays = analyticsWindow === "30d" ? 30 : 7;
   /** Heavy overview rollup only when needed (overview tab or sidebar stock/live). */
@@ -4206,23 +4219,9 @@ export default function AdminDashboard() {
                         {flashForm.id ? "Edit Flash Sale" : "Buat Flash Sale Baru"}
                       </div>
                       <div className="admin-form-grid">
-                        <label className="admin-field admin-field-full">
-                          <span>Varian (pilih dari daftar)</span>
-                          <select
-                            className="input"
-                            value={flashForm.variant_id}
-                            onChange={(e) => setFlashForm((f) => ({ ...f, variant_id: e.target.value }))}
-                          >
-                            <option value="">-- Pilih varian --</option>
-                            {(products || []).map((p) =>
-                              (p.product_variants || []).filter((v) => v.is_active).map((v) => (
-                                <option key={v.id} value={v.id}>
-                                  {p.name} - {v.name} ({formatIDR(v.price_idr)})
-                                </option>
-                              ))
-                            )}
-                          </select>
-                        </label>
+                        <div className="admin-field-full">
+                          <AdminPicker label="Varian flash sale" placeholder="Pilih produk dan paket" value={flashForm.variant_id} options={flashVariantOptions} onChange={id => setFlashForm(f => ({ ...f, variant_id: id }))}/>
+                        </div>
                         <label className="admin-field">
                           <span>Diskon (%)</span>
                           <input

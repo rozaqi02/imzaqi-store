@@ -40,7 +40,7 @@ function buildProductPool(products, config) {
   const active = (products || []).filter(
     (product) =>
       product?.is_active !== false &&
-      (product?.icon_url || product?.name)
+      product?.icon_url
   );
 
   if (!active.length) return [];
@@ -75,14 +75,10 @@ function buildRows(pool, config) {
   });
 }
 
-function CatalogTile({ product, compact = false, eager = false }) {
-  const name = product?.name || "Produk";
-  const initial = String(name).slice(0, 1).toUpperCase();
-
+function CatalogTile({ product, eager = false }) {
   return (
-    <article className={`hx-catalog-tile${compact ? " is-compact" : ""}`} aria-hidden="true">
+    <article className="hx-catalog-tile" aria-hidden="true">
       <div className="hx-catalog-tile-icon">
-        {product?.icon_url ? (
           <img
             src={product.icon_url}
             alt=""
@@ -91,11 +87,7 @@ function CatalogTile({ product, compact = false, eager = false }) {
             fetchPriority={eager ? "high" : "low"}
             draggable={false}
           />
-        ) : (
-          <span>{initial}</span>
-        )}
       </div>
-      {compact ? null : <p className="hx-catalog-tile-name">{name}</p>}
     </article>
   );
 }

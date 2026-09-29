@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 
 const SITE_URL = "https://imzaqi.store";
-const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image.jpg`;
+const DEFAULT_OG_IMAGE = `${SITE_URL}/og-image-v2.jpg`;
 
 function resolveAbsoluteUrl(url) {
   if (!url) return DEFAULT_OG_IMAGE;
@@ -40,7 +40,7 @@ function upsertLink(rel, attrs) {
  * @param {object} options
  * @param {string} [options.title]
  * @param {string} [options.description]
- * @param {string} [options.ogImage] - Full URL. Falls back to site logo if not provided.
+ * @param {string} [options.ogImage] - Full URL. Falls back to the site social preview.
  */
 export function usePageMeta({ title, description, ogImage } = {}) {
   useEffect(() => {
@@ -70,14 +70,27 @@ export function usePageMeta({ title, description, ogImage } = {}) {
     upsertMeta('meta[property="og:description"]', { property: "og:description", content: nextDesc });
     upsertMeta('meta[property="og:url"]', { property: "og:url", content: nextUrl });
     upsertMeta('meta[property="og:image"]', { property: "og:image", content: nextImage });
-    upsertMeta('meta[property="og:image:width"]', { property: "og:image:width", content: "1200" });
-    upsertMeta('meta[property="og:image:height"]', { property: "og:image:height", content: "675" });
+    const imageAlt = nextImage === DEFAULT_OG_IMAGE
+      ? "Imzaqi Store — Premium. Budget aman. Langganan premium, harga pelajar."
+      : nextTitle;
+    upsertMeta('meta[property="og:image:alt"]', { property: "og:image:alt", content: imageAlt });
+    if (nextImage === DEFAULT_OG_IMAGE) {
+      upsertMeta('meta[property="og:image:width"]', { property: "og:image:width", content: "1200" });
+      upsertMeta('meta[property="og:image:height"]', { property: "og:image:height", content: "630" });
+      upsertMeta('meta[property="og:image:type"]', { property: "og:image:type", content: "image/jpeg" });
+    } else {
+      // Product logos can have different dimensions and formats.
+      for (const property of ["og:image:width", "og:image:height", "og:image:type"]) {
+        document.head.querySelector(`meta[property="${property}"]`)?.remove();
+      }
+    }
 
     // Twitter Card
     upsertMeta('meta[name="twitter:card"]', { name: "twitter:card", content: "summary_large_image" });
     upsertMeta('meta[name="twitter:title"]', { name: "twitter:title", content: nextTitle });
     upsertMeta('meta[name="twitter:description"]', { name: "twitter:description", content: nextDesc });
     upsertMeta('meta[name="twitter:image"]', { name: "twitter:image", content: nextImage });
+    upsertMeta('meta[name="twitter:image:alt"]', { name: "twitter:image:alt", content: imageAlt });
 
     // Canonical
     upsertLink("canonical", { rel: "canonical", href: canonicalUrl });
