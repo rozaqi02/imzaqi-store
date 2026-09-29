@@ -1,0 +1,123 @@
+/* Shared raised icon controls: preserve the white cart finish in light mode. */
+:root {
+  --store-icon-face: #fff;
+  --store-icon-border: #fff;
+  --store-icon-ink: #0a0a0a;
+}
+
+html[data-theme="dark"] {
+  --store-icon-face: var(--skeu-control-bg);
+  --store-icon-border: rgba(255, 255, 255, 0.18);
+  --store-icon-ink: #f2f5f7;
+}
+
+html[data-theme] body .header .header-cart,
+html[data-theme] body .header .header-iconAction:not(.active),
+html[data-theme] body .detail-page.detail-page-v3 .pdx-iconBtn,
+html[data-theme] body .detail-page.detail-page-v3 .pdx-addBtn,
+html[data-theme] body .catalog-page .catalog-viewBtn:not(.active),
+html[data-theme] body .catalog-page .catalog-heroFilterBtn:not(.active) {
+  background: var(--store-icon-face) !important;
+  border: 1px solid var(--store-icon-border) !important;
+  color: var(--store-icon-ink) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* Compact, downward shadows keep chips clear of their scroll containers. */
+html body .catalog-page .catalog-quickFilters .catalog-quickChip.catalog-quickChip--line:not(.active),
+html body .detail-page.detail-page-v3 .pdx-filterChip:not(.is-active),
+html body .detail-page.detail-page-v3 .pdx-heroStat,
+html body .detail-page.detail-page-v3 .pdx-contactAdmin {
+  box-shadow: 0 3px 4px -3px rgba(20, 45, 50, 0.28) !important;
+}
+
+html[data-theme="dark"] body .catalog-page .catalog-quickFilters .catalog-quickChip.catalog-quickChip--line:not(.active),
+html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-filterChip:not(.is-active),
+html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-heroStat,
+html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-contactAdmin {
+  box-shadow: 0 3px 4px -3px rgba(0, 0, 0, 0.65) !important;
+}
+
+html body .detail-page.detail-page-v3 .pdx-packSignal {
+  border: 0 !important;
+  background: #2c3035 !important;
+  color: #c1c6cc !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-packSignal {
+  background: #e8eaed !important;
+  color: #5b6570 !important;
+}
+
+html body .detail-page.detail-page-v3 .pdx-packSignal .pdx-packSignalIcon {
+  color: inherit !important;
+}
+
+/* Keep the global inset 3D finish with a compact outer shadow on chips. */
+html[data-theme] body .detail-page.detail-page-v3 .pdx-filterChip.is-active,
+html[data-theme] body .catalog-page .catalog-quickFilters .catalog-quickChip.active {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow-compact) !important;
+}
+
+html[data-theme] body .header .theme-toggle {
+  border-radius: var(--hdr-action-radius, 10px) !important;
+}
+
+/* Use the global 3D finish, including its inset highlights and lower edge. */
+html[data-theme] body .header .theme-toggle .theme-toggleThumb {
+  background: var(--imzaqi-btn-face) !important;
+  color: var(--imzaqi-btn-text) !important;
+  border: 1px solid var(--imzaqi-btn-border) !important;
+  border-radius: var(--hdr-action-radius, 10px) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+html[data-theme] body .header .header-cart {
+  width: calc(var(--hdr-action, 32px) - 4px) !important;
+  height: calc(var(--hdr-action, 32px) - 4px) !important;
+  min-width: calc(var(--hdr-action, 32px) - 4px) !important;
+  min-height: calc(var(--hdr-action, 32px) - 4px) !important;
+  flex-basis: calc(var(--hdr-action, 32px) - 4px) !important;
+}
+
+.site-footer.site-footer--gopay .site-footerGoIntro {
+  min-width: 0;
+}
+
+.site-footer.site-footer--gopay .site-footerGoContact {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  width: 100%;
+  max-width: 560px;
+  gap: 10px;
+}
+
+.site-footer.site-footer--gopay .site-footerGoContact a {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  min-height: 60px;
+  padding: 12px;
+  gap: 10px;
+  box-shadow: 0 3px 4px -3px rgba(20, 45, 50, 0.22) !important;
+}
+
+.site-footer.site-footer--gopay .site-footerGoContactCopy {
+  flex: 1;
+  gap: 4px;
+}
+
+.site-footer.site-footer--gopay .site-footerGoContactCopy strong {
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .site-footer.site-footer--gopay .site-footerGoContact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

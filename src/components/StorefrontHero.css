@@ -103,18 +103,20 @@
 @media (max-width: 720px) {
   .store-hero.store-hero--catalog {
     grid-template-columns: 1fr;
-    gap: 28px;
+    gap: 14px;
     padding: 16px;
     border-radius: 18px;
   }
   .store-hero--catalog h1 { font-size: 24px; }
   .store-hero--catalog .store-heroActions {
     width: 100%;
-    margin-top: 24px !important;
+    margin-top: 0 !important;
   }
   .store-hero--catalog .store-heroFacts {
-    margin-top: 8px;
-    margin-bottom: 6px;
+    display: none;
+  }
+  .store-hero--catalog .store-heroCopy > p {
+    margin-bottom: 0;
   }
 }
 

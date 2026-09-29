@@ -979,14 +979,14 @@ html[data-theme="light"] .catalog-contentBar {
 }
 
 /* Store line chips — 3D tactile neumorphic pills without outlines using web design tokens */
-.catalog-page .catalog-quickChip.catalog-quickChip--line {
-  min-height: 46px !important;
-  gap: 10px !important;
-  padding: 0 18px 0 16px !important;
+.catalog-page .catalog-quickFilters .catalog-quickChip.catalog-quickChip--line {
+  min-height: 34px !important;
+  gap: 6px !important;
+  padding: 0 10px !important;
   border-radius: 9999px !important;
   border: none !important;
   outline: none !important;
-  font-size: 13.5px !important;
+  font-size: 11.5px !important;
   font-weight: 800 !important;
   letter-spacing: -0.01em !important;
   background:
@@ -999,8 +999,8 @@ html[data-theme="light"] .catalog-contentBar {
 
 .catalog-page .catalog-quickChip.catalog-quickChip--line svg {
   flex-shrink: 0 !important;
-  width: 18px !important;
-  height: 18px !important;
+  width: 14px !important;
+  height: 14px !important;
   opacity: 1 !important;
   stroke-width: 2.35 !important;
   color: var(--brand-icon) !important;
@@ -1043,13 +1043,13 @@ html[data-theme="light"] .catalog-contentBar {
 
 /* Count badge on line chips — pill from web design tokens */
 .catalog-page .catalog-quickChip.catalog-quickChip--line .catalog-quickChipCount {
-  min-width: 24px;
-  min-height: 22px;
-  padding: 0 8px !important;
+  min-width: 20px;
+  min-height: 18px;
+  padding: 0 5px !important;
   display: inline-flex !important;
   align-items: center !important;
   justify-content: center !important;
-  font-size: 11.5px !important;
+  font-size: 10px !important;
   font-weight: 900 !important;
   opacity: 1 !important;
   border-radius: 999px !important;

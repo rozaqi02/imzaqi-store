@@ -33,4 +33,8 @@
 @import "./components/SwUpdateToast.css";
 @import "./components/TrustStrip.css";
 @import "./css/storefront-chrome.css";
+@import "./css/mobile-chrome.css";
+@import "./css/storefront-spacing.css";
+@import "./css/storefront-refinements.css";
+@import "./css/background-texture.css";
 

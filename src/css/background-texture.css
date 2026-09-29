@@ -1,0 +1,23 @@
+/* Static raster grain avoids live SVG filter work while scrolling on mobile. */
+:root {
+  --store-background-grain: url('/textures/grain-dark.png?v=2');
+}
+
+html[data-theme="light"] {
+  --store-background-grain: url('/textures/grain-light.png?v=2');
+}
+
+/* Paint only the backdrop, keeping cards, text, and controls crisp. */
+html[data-theme] body,
+html[data-theme] .global-bg,
+html[data-theme] .home-page .home-body,
+html[data-theme] .home-page .home-section {
+  background-image: var(--store-background-grain) !important;
+  background-size: 192px 192px !important;
+  background-repeat: repeat !important;
+}
+
+/* Replace the old foreground noise overlay with the backdrop texture. */
+html[data-theme] body::before {
+  content: none !important;
+}

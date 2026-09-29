@@ -7,6 +7,7 @@ import { isKnownOutOfStock, isPromoExpired } from "../lib/format";
 
 const FLASH_ROTATE_MS = 6000;
 const PROMO_DISMISS_KEY = "imzaqi_ticker_promo_dismissed";
+const FLASH_DISMISS_KEY = "imzaqi_ticker_flash_dismissed";
 
 const DEFAULT_FLASH = {
   name: "",
@@ -68,6 +69,13 @@ export default function PromoTicker() {
   const [flashItems, setFlashItems] = useState([]);
   const [flashIndex, setFlashIndex] = useState(0);
   const [promo, setPromo] = useState(null);
+  const [flashDismissed, setFlashDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem(FLASH_DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
   const [promoDismissed, setPromoDismissed] = useState(() => {
     try {
       return sessionStorage.getItem(PROMO_DISMISS_KEY) === "1";
@@ -105,7 +113,14 @@ export default function PromoTicker() {
   }, [flashItems.length]);
 
   const flash = flashItems[flashIndex] || DEFAULT_FLASH;
-  const showPromo = Boolean(promo) && !promoDismissed && flashItems.length === 0;
+  const showPromo = Boolean(promo) && !promoDismissed;
+
+  function dismissFlash() {
+    try {
+      sessionStorage.setItem(FLASH_DISMISS_KEY, "1");
+    } catch {}
+    setFlashDismissed(true);
+  }
 
   function dismissPromo(event) {
     event.preventDefault();
@@ -129,7 +144,7 @@ export default function PromoTicker() {
 
   return (
     <div className="promo-tickerStack">
-      <div className="promo-ticker promo-ticker--flash" role="region" aria-label="Flash sale">
+      {!flashDismissed ? <div className="promo-ticker promo-ticker--flash" role="region" aria-label="Flash sale">
         <p className="promo-tickerItem">
           {flash.name ? (
             <>
@@ -145,10 +160,13 @@ export default function PromoTicker() {
             </Link>
           )}
         </p>
-      </div>
+        <button type="button" className="promo-tickerClose promo-tickerClose--flash" aria-label="Tutup banner flash sale" onClick={dismissFlash}>
+          <X size={12} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+      </div> : null}
 
       {showPromo ? (
-        <div className="promo-ticker promo-ticker--code" role="region" aria-label="Kode promo">
+        <div className={`promo-ticker promo-ticker--code${flashItems.length ? " promo-ticker--mobileStack" : ""}`} role="region" aria-label="Kode promo">
           <p className="promo-tickerItem">
             Kode promo{" "}
             <button

@@ -450,16 +450,9 @@ html[data-theme="dark"] .brand {
   position: relative;
 }
 
-.header-cart .pill::after,
 .catalog-status.hot::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  border: 1px solid currentColor;
-  opacity: 0;
-  animation: polishPulse 2.4s ease-out infinite;
-  pointer-events: none;
+  content: none;
+  animation: none;
 }
 
 @keyframes polishPulse {
@@ -476,7 +469,6 @@ html[data-theme="dark"] .brand {
 
 /* No infinite Hot pulse on mobile / lite / reduced motion — saves compositor work while scrolling */
 @media (prefers-reduced-motion: reduce) {
-  .header-cart .pill::after,
   .catalog-status.hot::after {
     animation: none;
     display: none;

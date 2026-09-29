@@ -1,0 +1,72 @@
+/* One header clearance and gutter system for browsing and purchasing pages. */
+html {
+  --storefront-top-gap: 24px;
+  --storefront-gutter: 24px;
+  --storefront-section-gap: 24px;
+}
+
+.route-transition > .page:is(.catalog-page, .detail-page-v3, .checkout-page-full, .pay-page) {
+  padding-top: calc(var(--site-header-offset, 64px) + var(--storefront-top-gap)) !important;
+  padding-bottom: 32px !important;
+  padding-inline: 0 !important;
+}
+
+.route-transition > .page:is(.catalog-page, .detail-page-v3, .pay-page) > .section:first-child {
+  padding-top: 0 !important;
+}
+
+.route-transition > .page:is(.catalog-page, .detail-page-v3, .pay-page) > .section {
+  padding-bottom: 0;
+}
+
+.route-transition > .page.catalog-page > .catalog-hero {
+  padding-bottom: var(--storefront-section-gap);
+}
+
+.route-transition > .page:is(.catalog-page, .detail-page-v3, .checkout-page-full, .pay-page) .container {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-left: calc(var(--storefront-gutter) + env(safe-area-inset-left, 0px)) !important;
+  padding-right: calc(var(--storefront-gutter) + env(safe-area-inset-right, 0px)) !important;
+}
+
+.route-transition > .page.checkout-page-full .checkout-full-header {
+  margin-bottom: var(--storefront-section-gap);
+}
+
+.route-transition > .page.pay-page .pay-shell-kicker {
+  margin: 0;
+}
+
+.route-transition > .page.pay-page .pay-shell-title {
+  margin: 12px 0 0;
+}
+
+body.has-bottom-nav .route-transition > .page:is(.catalog-page, .detail-page-v3) {
+  padding-bottom: calc(24px + var(--site-bottom-nav-clearance, 82px)) !important;
+}
+
+@media (max-width: 720px) {
+  html {
+    --storefront-top-gap: 16px;
+    --storefront-gutter: 16px;
+    --storefront-section-gap: 16px;
+  }
+
+  .route-transition > .page:is(.catalog-page, .detail-page-v3, .checkout-page-full, .pay-page) {
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .detail-page.detail-page-v3 .pdx-billboard .pdx-visual {
+    min-height: 200px;
+    aspect-ratio: auto;
+    padding: 24px 20px;
+  }
+
+  .detail-page.detail-page-v3 .pdx-billboard .pdx-visualIcon {
+    width: 112px !important;
+    height: 112px !important;
+  }
+}

@@ -40,6 +40,7 @@ import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory"
 import { buildCatalogAdminWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
 import ProductTile from "../components/ProductTile";
 import RecentlyViewed from "../components/RecentlyViewed";
+import MobileProductBar from "../components/MobileProductBar";
 import { addRecentlyViewed } from "../lib/recentlyViewed";
 import { supabase } from "../lib/supabaseClient";
 import { getVisitorIdAsUUID } from "../lib/visitor";
@@ -1087,6 +1088,7 @@ export default function ProductDetail() {
     <div className="page detail-page detail-page-v3 pdx-contentLoaded">
       <section className="section">
         <div className="container">
+          <MobileProductBar name={product.name} onBack={goBackToCatalog} />
           <div className="pdx-layout">
             <div className="pdx-mainGrid">
               <div className="pdx-leftCol">

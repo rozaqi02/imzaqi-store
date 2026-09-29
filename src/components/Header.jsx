@@ -54,7 +54,7 @@ function ThemeToggleButton({ onToggle, isDark }) {
 }
 
 export default function Header() {
-  const { items, bumpToken } = useCart();
+  const { items } = useCart();
   useHeaderShrink();
   const { isDark, toggleTheme } = useTheme();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
@@ -113,17 +113,6 @@ export default function Header() {
     const timer = window.setTimeout(updatePill, HEADER_SHRINK_MS + 20);
     return () => window.clearTimeout(timer);
   }, [updatePill]);
-  const [pillBump, setPillBump] = useState(false);
-  const pillBumpTimerRef = useRef(null);
-
-  useEffect(() => {
-    if (!bumpToken) return undefined;
-    setPillBump(true);
-    window.clearTimeout(pillBumpTimerRef.current);
-    pillBumpTimerRef.current = window.setTimeout(() => setPillBump(false), 450);
-    return () => window.clearTimeout(pillBumpTimerRef.current);
-  }, [bumpToken]);
-
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
@@ -210,7 +199,7 @@ export default function Header() {
               >
                 <CartIcon />
                 {cartCount > 0 ? (
-                  <span className={`pill${pillBump ? " is-bumping" : ""}`} key={bumpToken}>
+                  <span className="pill">
                     {cartCount}
                   </span>
                 ) : null}

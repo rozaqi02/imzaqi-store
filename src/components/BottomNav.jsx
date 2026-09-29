@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { isFunnelPath } from "../hooks/useFunnelRoute";
-import { BOTTOM_NAV_MEDIA } from "../lib/breakpoints";
+import { BOTTOM_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
 import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
 
 const ICONS = {
@@ -37,8 +37,25 @@ function scrollActiveNavToTop() {
 export default function BottomNav() {
   const location = useLocation();
   const showBottomNav = useIsMobile(BOTTOM_NAV_MEDIA);
+  const isPhone = useIsMobile(PHONE_LAYOUT_MEDIA);
+  const [shrunk, setShrunk] = useState(false);
   const navRef = useRef(null);
   const hidden = !showBottomNav || isBottomNavHidden(location.pathname);
+
+  useEffect(() => {
+    setShrunk(false);
+    if (hidden || !isPhone) return undefined;
+    let lastY = Math.max(0, window.scrollY);
+    const onScroll = () => {
+      const y = Math.max(0, window.scrollY);
+      if (y <= 32) setShrunk(false);
+      else if (Math.abs(y - lastY) < 8) return;
+      else setShrunk(y > lastY);
+      lastY = y;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, [hidden, isPhone, location.pathname]);
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
@@ -78,7 +95,7 @@ export default function BottomNav() {
   if (hidden || typeof document === "undefined") return null;
 
   return createPortal(
-    <nav ref={navRef} className="bottom-nav" aria-label="Navigasi utama">
+    <nav ref={navRef} className={`bottom-nav${isPhone && shrunk ? " is-shrunk" : ""}`} aria-label="Navigasi utama">
       <ul className="bottom-nav-list">
         {SITE_BOTTOM_NAV.map((item) => {
           const Icon = ICONS[item.to] || House;
@@ -90,6 +107,7 @@ export default function BottomNav() {
                 to={item.to}
                 className={`bottom-nav-item${active ? " is-active" : ""}`}
                 aria-current={active ? "page" : undefined}
+                aria-label={item.shortLabel || item.label}
                 onClick={(event) => {
                   if (!active) return;
                   event.preventDefault();

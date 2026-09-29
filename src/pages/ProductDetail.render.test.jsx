@@ -93,14 +93,14 @@ describe("ProductDetail render", () => {
   it("renders product without crashing", async () => {
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
   });
 
   it("sorts variant cards from the filter chips", async () => {
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
 
     expect(screen.getByRole("button", { name: "Rekomendasi" })).toBeInTheDocument();
@@ -123,7 +123,7 @@ describe("ProductDetail render", () => {
     });
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
     fireEvent.click(await screen.findByRole("button", { name: "Termurah" }));
     const packNames = [...document.querySelectorAll(".pdx-packName")].map((el) => el.textContent);
@@ -133,7 +133,7 @@ describe("ProductDetail render", () => {
   it("shows Bandingkan paket on the compare button", async () => {
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
     expect(screen.getByRole("button", { name: "Bandingkan paket" })).toBeInTheDocument();
   });
@@ -164,7 +164,7 @@ describe("ProductDetail render", () => {
   it("labels the top-selling pack as Paling Laris instead of a cheapest-pack fake", async () => {
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
     expect(screen.getByText("Paling Laris")).toBeInTheDocument();
     expect(screen.queryByText("Paling hemat")).not.toBeInTheDocument();
@@ -173,7 +173,7 @@ describe("ProductDetail render", () => {
   it("keeps variant stock and sold count visible on the compact cards", async () => {
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
     expect(screen.getByText("Stok 11")).toBeInTheDocument();
     expect(screen.getByText("Sisa 4")).toBeInTheDocument();
@@ -192,7 +192,7 @@ describe("ProductDetail render", () => {
     });
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
     expect(screen.getByText("Paling Laris")).toBeInTheDocument();
     expect(screen.getByText("Paling hemat")).toBeInTheDocument();
@@ -213,7 +213,7 @@ describe("ProductDetail render", () => {
 
     resolveProduct(mockProduct);
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
     });
     expect(document.querySelector(".pdx-skeletonGrid")).toBeNull();
   });
@@ -226,7 +226,7 @@ describe("ProductDetail render", () => {
     });
     renderDetail();
     await waitFor(() => {
-      expect(screen.getByText("Netflix Premium")).toBeInTheDocument();
+      expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
       expect(screen.getByText("Belum ada paket")).toBeInTheDocument();
     });
   });
