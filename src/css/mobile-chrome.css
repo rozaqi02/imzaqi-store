@@ -11,8 +11,7 @@ html[data-theme] body .header .header-cart::after {
   content: none !important;
 }
 
-.pdx-mobileProductBar,
-.header .promo-tickerClose--flash {
+.pdx-mobileProductBar {
   display: none;
 }
 

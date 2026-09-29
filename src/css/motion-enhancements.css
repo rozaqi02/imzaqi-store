@@ -322,36 +322,27 @@
       padding-top: var(--hdr-py);
       padding-bottom: var(--hdr-py);
       gap: var(--hdr-inner-gap);
-      transition:
-        padding 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        gap 0.28s ease;
     }
 
     html[data-motion="full"] .header .brand-img,
     html[data-motion="lite"] .header .brand-img {
       height: var(--hdr-logo);
-      transition: height 0.28s ease;
     }
 
     html[data-motion="full"] .header .nav,
     html[data-motion="lite"] .header .nav {
       gap: var(--hdr-nav-gap);
-      transition: gap 0.28s ease;
     }
 
     html[data-motion="full"] .header .nav a,
     html[data-motion="lite"] .header .nav a {
       padding: var(--hdr-nav-py) var(--hdr-nav-px);
       font-size: var(--hdr-nav-size);
-      transition:
-        padding 0.28s ease,
-        font-size 0.28s ease;
     }
 
     html[data-motion="full"] .header .header-actions,
     html[data-motion="lite"] .header .header-actions {
       gap: calc(var(--hdr-inner-gap) * 0.65);
-      transition: gap 0.28s ease;
     }
 
     html[data-motion="full"] .header .header-cart,
@@ -364,12 +355,6 @@
       min-height: var(--hdr-action) !important;
       flex: 0 0 var(--hdr-action) !important;
       border-radius: var(--hdr-action-radius) !important;
-      transition:
-        width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        min-width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        min-height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        border-radius 0.28s ease !important;
     }
 
     html[data-motion="full"] .header .header-cart svg,
@@ -378,27 +363,19 @@
     html[data-motion="lite"] .header .header-iconAction svg {
       width: var(--hdr-action-icon) !important;
       height: var(--hdr-action-icon) !important;
-      transition: width 0.28s ease, height 0.28s ease !important;
     }
 
     html[data-motion="full"] .header .theme-toggle,
     html[data-motion="lite"] .header .theme-toggle {
       width: var(--hdr-toggle-w) !important;
       height: var(--hdr-toggle-h) !important;
-      transition:
-        width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.28s ease !important;
     }
 
     html[data-motion="full"] .header .theme-toggleThumb,
     html[data-motion="lite"] .header .theme-toggleThumb {
       width: var(--hdr-toggle-thumb) !important;
       height: var(--hdr-toggle-thumb) !important;
-      transition:
-        width 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        height 0.28s cubic-bezier(0.22, 1, 0.36, 1),
-        transform 0.28s ease !important;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1) !important;
     }
 
     /* Shrink cart badge with the icon button */

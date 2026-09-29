@@ -49,7 +49,6 @@ export function useIsMobile(breakpoint = "(max-width: 720px), (pointer: coarse)"
 }
 
 export function useDeviceCapability() {
-  // BUG-07: tambah reaktivitas saat orientasi berubah
   const [caps, setCaps] = useState(() => {
     if (typeof window === "undefined") {
       return { isMobile: false, isReducedMotion: false, saveData: false, lowMemory: false };
@@ -67,27 +66,39 @@ export function useDeviceCapability() {
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
+    const mqMobile = window.matchMedia("(max-width: 720px)");
+    const mqCoarse = window.matchMedia("(pointer: coarse)");
+    const mqReduced = window.matchMedia("(prefers-reduced-motion: reduce)");
+
     const update = () => {
-      setCaps({
-        isMobile:
-          window.matchMedia("(pointer: coarse)").matches ||
-          window.matchMedia("(max-width: 720px)").matches,
-        isReducedMotion: window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-        saveData: Boolean(navigator.connection && navigator.connection.saveData),
-        lowMemory: typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 2,
+      const isMobile = mqCoarse.matches || mqMobile.matches;
+      const isReducedMotion = mqReduced.matches;
+      const saveData = Boolean(navigator.connection && navigator.connection.saveData);
+      const lowMemory = typeof navigator.deviceMemory === "number" && navigator.deviceMemory <= 2;
+
+      setCaps((prev) => {
+        if (
+          prev.isMobile === isMobile &&
+          prev.isReducedMotion === isReducedMotion &&
+          prev.saveData === saveData &&
+          prev.lowMemory === lowMemory
+        ) {
+          return prev;
+        }
+        return { isMobile, isReducedMotion, saveData, lowMemory };
       });
     };
 
-    // BUG-14: subscribe prefers-reduced-motion changes
-    const reducedMotionMq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    reducedMotionMq.addEventListener("change", update);
-
+    mqMobile.addEventListener("change", update);
+    mqCoarse.addEventListener("change", update);
+    mqReduced.addEventListener("change", update);
     window.addEventListener("orientationchange", update);
-    window.addEventListener("resize", update);
+
     return () => {
-      reducedMotionMq.removeEventListener("change", update);
+      mqMobile.removeEventListener("change", update);
+      mqCoarse.removeEventListener("change", update);
+      mqReduced.removeEventListener("change", update);
       window.removeEventListener("orientationchange", update);
-      window.removeEventListener("resize", update);
     };
   }, []);
 

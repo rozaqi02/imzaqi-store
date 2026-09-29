@@ -1559,7 +1559,6 @@ html[data-theme="light"] .home-page .hx-stat-item {
 .catalog-page .catalog-sheetClose,
 .catalog-page .catalog-cardCover,
 .catalog-page .catalog-cardIcon,
-.catalog-page .catalog-cardPrice,
 .catalog-page .catalog-cardMeta > span,
 .catalog-page .catalog-cardFoot {
   border-color: var(--brand-line) !important;
@@ -1883,13 +1882,13 @@ html[data-theme="light"] .catalog-page .catalog-activeReset {
   html[data-theme="light"] .catalog-page .catalog-card,
   html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2 {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 32%),
-      var(--skeu-panel-bg) !important;
+      linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 35%),
+      linear-gradient(180deg, #ffffff 0%, #ffffff 50%, #f0f9f5 78%, #e4f5ed 100%) !important;
+    border-color: rgba(0, 158, 96, 0.12) !important;
     box-shadow:
       0 8px 20px rgba(40, 94, 117, 0.14),
       inset 0 2px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -2px 0 rgba(24, 96, 122, 0.08),
-      0 0 0 1px rgba(13, 124, 144, 0.1) !important;
+      inset 0 -2px 0 rgba(0, 120, 80, 0.05) !important;
   }
 }
 
@@ -1952,7 +1951,6 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   }
 
   .catalog-page .catalog-cardIcon,
-  .catalog-page .catalog-cardPrice,
   .catalog-page .catalog-cardMeta > span,
   .catalog-page .catalog-cardFoot,
   .catalog-page .catalog-cardCover,
@@ -2005,12 +2003,10 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 }
 
 [data-motion="lite"] .catalog-page .catalog-cardIcon,
-[data-motion="lite"] .catalog-page .catalog-cardPrice,
 [data-motion="lite"] .catalog-page .catalog-cardMeta > span,
 [data-motion="lite"] .catalog-page .catalog-cardFoot,
 [data-motion="lite"] .catalog-page .catalog-status,
 [data-motion="off"] .catalog-page .catalog-cardIcon,
-[data-motion="off"] .catalog-page .catalog-cardPrice,
 [data-motion="off"] .catalog-page .catalog-cardMeta > span,
 [data-motion="off"] .catalog-page .catalog-cardFoot,
 [data-motion="off"] .catalog-page .catalog-status {

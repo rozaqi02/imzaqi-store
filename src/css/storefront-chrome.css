@@ -199,22 +199,26 @@ html[data-theme="dark"] .promo-ticker--flash {
 
 .promo-tickerClose {
   position: absolute;
-  right: 10px;
+  right: 12px;
   top: 50%;
   transform: translateY(-50%);
-  width: 22px;
-  height: 22px;
-  display: grid;
-  place-items: center;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: 0;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.15);
   color: #fff;
   cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease;
+  z-index: 2;
 }
 
 .promo-tickerClose:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: rgba(255, 255, 255, 0.28);
+  transform: translateY(-50%) scale(1.08);
 }
 
 body.is-funnel .promo-tickerStack,
@@ -400,8 +404,11 @@ html[data-theme="light"] .pdx-packHot,
 }
 
 html[data-theme="light"] .product-tile {
-  background: #ffffff !important;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(10, 10, 10, 0.06) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 35%),
+    linear-gradient(180deg, #ffffff 0%, #ffffff 50%, #f0f9f5 78%, #e4f5ed 100%) !important;
+  border-color: rgba(0, 158, 96, 0.12) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 158, 96, 0.1) !important;
 }
 
 html[data-theme="light"] .product-tile-pill {

@@ -10,11 +10,12 @@ export default function MobileProductBar({ name, onBack }) {
     const sync = rafThrottle(() => {
       const bar = barRef.current;
       if (!bar || !bar.offsetHeight) {
-        setStuck(false);
+        setStuck((prev) => (prev ? false : prev));
         return;
       }
-      const stickyTop = parseFloat(getComputedStyle(bar).top);
-      setStuck(window.scrollY > 0 && bar.getBoundingClientRect().top <= stickyTop + 0.5);
+      const stickyTop = parseFloat(getComputedStyle(bar).top) || 0;
+      const nextStuck = window.scrollY > 0 && bar.getBoundingClientRect().top <= stickyTop + 0.5;
+      setStuck((prev) => (prev === nextStuck ? prev : nextStuck));
     });
 
     sync();

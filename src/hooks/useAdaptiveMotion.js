@@ -39,7 +39,10 @@ export function useAdaptiveMotion() {
       window.matchMedia("(max-width: 920px)"),
     ];
 
-    const sync = () => setMotionMode(detectMotionMode());
+    const sync = () => {
+      const next = detectMotionMode();
+      setMotionMode((prev) => (prev === next ? prev : next));
+    };
     sync();
 
     mediaQueries.forEach((query) => {
@@ -57,7 +60,9 @@ export function useAdaptiveMotion() {
 
   useEffect(() => {
     if (typeof document === "undefined") return;
-    document.documentElement.setAttribute("data-motion", motionMode);
+    if (document.documentElement.getAttribute("data-motion") !== motionMode) {
+      document.documentElement.setAttribute("data-motion", motionMode);
+    }
   }, [motionMode]);
 
   return motionMode;

@@ -118,10 +118,13 @@ export default function Header() {
 
     const root = document.documentElement;
     let observer;
-
+    let lastHeight = 0;
     const syncHeaderOffset = rafThrottle(() => {
       const nextHeight = Math.ceil(headerRef.current?.getBoundingClientRect().height || 0);
-      root.style.setProperty("--site-header-offset", `${nextHeight}px`);
+      if (nextHeight && nextHeight !== lastHeight) {
+        lastHeight = nextHeight;
+        root.style.setProperty("--site-header-offset", `${nextHeight}px`);
+      }
     });
 
     syncHeaderOffset();
