@@ -24,7 +24,7 @@ import {
 import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts, fetchTopSellingData } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-import { asVariantList, formatGuaranteeLabel, formatIDR, getCatalogPriceRange, normalizeProductRecord, packDisplayName } from "../lib/format";
+import { asVariantList, formatGuaranteeLabel, formatIDR, getCatalogPriceRange, isKnownOutOfStock, normalizeProductRecord, packDisplayName } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
@@ -65,11 +65,12 @@ const CATEGORY_KEYWORDS = [
 ];
 
 function parseDescriptionToSections(rawText) {
-  const text = String(rawText || "").replace(/\r\n/g, " ").trim();
+  const text = String(rawText || "").replace(/\r\n/g, "\n").trim();
   if (!text) return [];
 
   const tokens = text
-    .split(/\s*-\s*/)
+    .replace(/^[-•]\s*/, "")
+    .split(/\s+[-•]\s+/)
     .map((t) => t.trim())
     .filter(Boolean);
 
@@ -108,14 +109,25 @@ function parseDescriptionToSections(rawText) {
 }
 
 function VariantBenefitList({ rawText }) {
-  const text = String(rawText || "").trim();
-  if (!text) return null;
+  const sections = parseDescriptionToSections(rawText);
+  if (!sections.length) return null;
 
   return (
     <div className="pdx-packDetails">
       <details className="pdx-packDetailsToggle">
         <summary>Lihat rincian paket</summary>
-        <p className="pdx-packDetailsText">{text}</p>
+        <div className="pdx-packDetailsContent">
+          {sections.map((section, index) => (
+            <section className="pdx-detailGroup" key={`${section.label || "rincian"}-${index}`}>
+              {section.label ? <h4>{section.label}</h4> : null}
+              {section.items.length === 1 && !section.label ? (
+                <p>{normalizeInlineText(section.items[0])}</p>
+              ) : (
+                <ul>{section.items.map((item, itemIndex) => <li key={`${itemIndex}-${item}`}>{normalizeInlineText(item)}</li>)}</ul>
+              )}
+            </section>
+          ))}
+        </div>
       </details>
     </div>
   );
@@ -204,7 +216,7 @@ function parseDays(label) {
 }
 
 function pickRecommendedVariant(variants, flashSaleMap) {
-  const source = variants.filter((variant) => Number(variant?.stock || 0) > 0);
+  const source = variants.filter((variant) => !isKnownOutOfStock(variant));
   const target = source.length ? source : variants;
   if (!target.length) return null;
 
@@ -222,7 +234,7 @@ function pickRecommendedVariant(variants, flashSaleMap) {
 }
 
 function pickTopSellerVariant(variants) {
-  const source = variants.filter((variant) => Number(variant?.stock || 0) > 0);
+  const source = variants.filter((variant) => !isKnownOutOfStock(variant));
   const target = source.length ? source : variants;
   if (!target.length) return null;
   const ranked = target
@@ -262,16 +274,14 @@ function getVariantEffectivePrice(variant, flashSaleMap) {
 
 function classifyVariant(name) {
   const n = String(name || "").toLowerCase();
-  if (n.match(/sharing|share/)) return "sharing";
-  if (n.match(/private|privat|prem|pro|standart|ultimate|diamond/)) return "private";
-  if (n.match(/fam|family|business/)) return "family";
-  if (n.match(/pass|member|starlight/)) return "membership";
-  if (n.match(/koin|coin|uc|cp|vp/)) return "topup";
-  if (n.match(/promo|diskon|flash/)) return "promo";
-  if (n.match(/akun|buyer|seller/)) return "akun";
-  if (n.match(/lifetime|selamanya/)) return "lifetime";
-  if (n.match(/bulan/)) return "bulanan";
-  if (n.match(/tahun/)) return "tahunan";
+  if (/\b(sharing|share)\b/.test(n)) return "sharing";
+  if (/\b(private|privat)\b/.test(n)) return "private";
+  if (/\b(family|keluarga)\b/.test(n)) return "family";
+  if (/\b(membership|member)\b/.test(n)) return "membership";
+  if (/\b(topup|top up)\b/.test(n)) return "topup";
+  if (/\b(lifetime|selamanya)\b/.test(n)) return "lifetime";
+  if (/\b(bulanan|\d+\s*bulan)\b/.test(n)) return "bulanan";
+  if (/\b(tahunan|\d+\s*tahun)\b/.test(n)) return "tahunan";
   return "lainnya";
 }
 
@@ -329,49 +339,28 @@ function LazyProductImage({ src, alt, className, fetchPriority }) {
 const VariantCard = React.memo(({
   variant,
   siblingVariants,
-  isSelected,
-  isAdded,
   isRecommended,
   isTopSeller,
   flashDiscount,
   effectivePrice,
   descriptionBody,
-  isMotionOff,
-  motionMode,
-  maxVariantStock,
-  onSelect,
   onAdd,
   onBuy,
   adminUrl,
 }) => {
-  const stock = Number(variant.stock ?? 0);
+  const stock = variant.stock == null || variant.stock === "" ? null : Number(variant.stock);
   const soldCount = Math.max(0, Number(variant.sold_count || 0));
-  const out = stock <= 0;
-  const lowStock = !out && stock <= 5;
-  const disableEntranceAnim = isMotionOff || motionMode === "lite";
+  const out = isKnownOutOfStock(variant);
+  const lowStock = !out && Number.isFinite(stock) && stock <= 5;
 
   const cardProps = {
-    role: "button",
-    tabIndex: 0,
     className: [
       "pdx-packCard",
       out ? "is-out" : "",
-      isSelected ? "is-selected" : "",
       isRecommended ? "is-recommended" : "",
     ]
       .filter(Boolean)
       .join(" "),
-    "aria-disabled": out || undefined,
-    onClick: () => {
-      if (out) return;
-      onSelect(variant.id);
-    },
-    onKeyDown: (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        if (!out) onSelect(variant.id);
-      }
-    },
   };
 
   const guaranteeLabel = formatGuaranteeLabel(variant.guarantee_text);
@@ -425,7 +414,7 @@ const VariantCard = React.memo(({
       <div className="pdx-packCommerce" aria-label="Ketersediaan dan penjualan varian">
         <span className={`pdx-packSignal pdx-packStock${out ? " is-out" : lowStock ? " is-low" : ""}`}>
           <PackageCheck className="pdx-packSignalIcon" size={12} aria-hidden="true" />
-          {out ? "Habis" : lowStock ? `Sisa ${stock}` : `Stok ${stock}`}
+          {out ? "Habis" : stock == null || !Number.isFinite(stock) ? "Tersedia" : lowStock ? `Sisa ${stock}` : `Stok ${stock}`}
         </span>
         <span className="pdx-packSignal pdx-packSold">
           <ShoppingBag size={12} aria-hidden="true" />
@@ -446,7 +435,7 @@ const VariantCard = React.memo(({
             onAdd(variant, 1, e);
           }}
           disabled={out}
-          aria-label="Tambah ke keranjang"
+          aria-label={`Tambah ${packDisplayName(variant, siblingVariants)} ke keranjang`}
         >
           <ShoppingCart size={14} />
         </button>
@@ -470,15 +459,16 @@ const VariantCard = React.memo(({
 
 VariantCard.displayName = "VariantCard";
 
-function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
+function ProductInfoTabs({ productDescriptionText }) {
   const [activeInfoTab, setActiveInfoTab] = useState("description");
 
   return (
     <div className="pdx-infoTabsCard">
-      <div className="pdx-infoTabsHeader">
+      <div className="pdx-infoTabsHeader" role="group" aria-label="Informasi produk">
         <button
           type="button"
           className={`pdx-infoTabBtn ${activeInfoTab === "description" ? "is-active" : ""}`}
+          aria-pressed={activeInfoTab === "description"}
           onClick={() => setActiveInfoTab("description")}
         >
           <span className="pdx-infoTabLabel">Deskripsi</span>
@@ -486,12 +476,13 @@ function ProductInfoTabs({ productDescriptionText, isMotionOff }) {
         <button
           type="button"
           className={`pdx-infoTabBtn ${activeInfoTab === "terms" ? "is-active" : ""}`}
+          aria-pressed={activeInfoTab === "terms"}
           onClick={() => setActiveInfoTab("terms")}
         >
           <span className="pdx-infoTabLabel">Syarat &amp; Ketentuan</span>
         </button>
       </div>
-      <div className="pdx-infoTabContent">
+      <div className="pdx-infoTabContent" role="region" aria-label={activeInfoTab === "description" ? "Deskripsi produk" : "Syarat dan ketentuan"}>
         {activeInfoTab === "description" ? (
           <ProductDescription text={productDescriptionText} />
         ) : (
@@ -660,10 +651,7 @@ export default function ProductDetail() {
   const [topSalesMap, setTopSalesMap] = useState({});
   const [activeTab, setActiveTab] = useState("semua");
   const [variantSort, setVariantSort] = useState("reco");
-  const [selectedVariantId, setSelectedVariantId] = useState(null);
-  const [addedVariantId, setAddedVariantId] = useState(null);
   const [compareOpen, setCompareOpen] = useState(false);
-  const addedFlashTimerRef = useRef(null);
 
   usePageMeta({
     title: product?.name ? `${product.name} | Detail Produk` : "Detail Produk",
@@ -790,7 +778,7 @@ export default function ProductDetail() {
         ? variants.slice()
         : variants.filter((v) => classifyVariant(v.name) === activeTab);
 
-    const inStockRank = (variant) => (Number(variant?.stock || 0) <= 0 ? 1 : 0);
+    const inStockRank = (variant) => (isKnownOutOfStock(variant) ? 1 : 0);
     const byOrder = (a, b) => (a.sort_order || 0) - (b.sort_order || 0);
 
     return [...filtered].sort((a, b) => {
@@ -842,38 +830,10 @@ export default function ProductDetail() {
     return allVars.reduce((sum, v) => sum + Math.max(0, Number(v?.sold_count || 0)), 0);
   }, [product, topSalesMap]);
 
-  const maxVariantStock = useMemo(
-    () => variants.length > 0 ? Math.max(1, ...variants.map((v) => Number(v.stock || 0))) : 1,
-    [variants]
-  );
-
   useEffect(() => {
     setActiveTab("semua");
     setVariantSort("reco");
   }, [slug]);
-
-  useEffect(() => {
-    if (!displayedVariants.length) {
-      setSelectedVariantId(null);
-      return;
-    }
-    setSelectedVariantId((current) => {
-      if (current && displayedVariants.some((variant) => variant.id === current)) return current;
-      return (
-        displayedVariants.find((variant) => variant.id === topSellerVariantId)?.id ??
-        displayedVariants.find((variant) => variant.id === recommendedVariantId)?.id ??
-        displayedVariants[0]?.id ??
-        null
-      );
-    });
-  }, [displayedVariants, recommendedVariantId, topSellerVariantId]);
-
-  useEffect(
-    () => () => {
-      if (addedFlashTimerRef.current) window.clearTimeout(addedFlashTimerRef.current);
-    },
-    []
-  );
 
   const brandColor = useMemo(() => {
     const name = String(product?.name || "").toLowerCase();
@@ -899,23 +859,10 @@ export default function ProductDetail() {
   const productCategory = useMemo(() => resolveProductCategory(product), [product]);
   const CategoryIcon = productCategory.icon;
 
-  const selectedVariant = useMemo(
-    () => displayedVariants.find((variant) => variant.id === selectedVariantId) || displayedVariants[0] || null,
-    [displayedVariants, selectedVariantId]
-  );
-  const selectedEffectivePrice = useMemo(() => {
-    if (!selectedVariant) return 0;
-    return getVariantEffectivePrice(selectedVariant, flashSaleMap);
-  }, [selectedVariant, flashSaleMap]);
-  const recommendedVariant = useMemo(
-    () => variants.find((variant) => variant.id === recommendedVariantId) || variants[0] || null,
-    [variants, recommendedVariantId]
-  );
   const guaranteePreview = useMemo(() => {
-    const raw = String(recommendedVariant?.guarantee_text || "").trim();
-    if (!raw) return "Garansi replace";
-    return raw.toLowerCase().startsWith("garansi") ? raw : `Garansi ${raw}`;
-  }, [recommendedVariant]);
+    const labels = [...new Set(variants.map((variant) => formatGuaranteeLabel(variant.guarantee_text)).filter(Boolean))];
+    return labels.length === 1 ? labels[0] : "Garansi sesuai paket";
+  }, [variants]);
 
   const recommendations = useMemo(() => {
     if (!product || !allProducts.length) return [];
@@ -1015,11 +962,6 @@ export default function ProductDetail() {
     });
     trackFunnelEvent("add_to_cart", { productId: product.id, variantId: variant.id, metadata: { qty: requestedQty, price: effectivePrice } });
 
-    setSelectedVariantId(variant.id);
-    setAddedVariantId(variant.id);
-    if (addedFlashTimerRef.current) window.clearTimeout(addedFlashTimerRef.current);
-    addedFlashTimerRef.current = window.setTimeout(() => setAddedVariantId(null), 600);
-
     if (event?.currentTarget) {
       const rect = event.currentTarget.getBoundingClientRect();
       if (!caps.isMobile && !isMotionOff) {
@@ -1111,7 +1053,7 @@ export default function ProductDetail() {
                     </button>
 
                     <div className="pdx-topActions">
-                      <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan">
+                      <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan" aria-label="Bagikan produk">
                         <Share2 size={16} />
                       </button>
                     </div>
@@ -1145,6 +1087,11 @@ export default function ProductDetail() {
                         {guaranteePreview}
                       </span>
                     </div>
+                    {variants.length ? (
+                      <a className="pdx-jumpToPacks" href="#paket-tersedia">
+                        Lihat {variants.length} pilihan paket <ArrowDown size={15} aria-hidden="true" />
+                      </a>
+                    ) : null}
                     {adminWhatsAppUrl ? (
                       <a
                         className="pdx-contactAdmin"
@@ -1162,7 +1109,6 @@ export default function ProductDetail() {
 
                 <ProductInfoTabs
                   productDescriptionText={productDescriptionText}
-                  isMotionOff={isMotionOff}
                 />
               </div>
 
@@ -1181,8 +1127,9 @@ export default function ProductDetail() {
                 </div>
 
                 {variants.length > 1 ? (
-                  <div className="pdx-sortBar">
-                    <div className="pdx-filters pdx-sortFilters" role="toolbar" aria-label="Urutkan paket">
+                  <div className="pdx-packControls" aria-label="Atur tampilan paket">
+                    <div className="pdx-controlGroup" role="group" aria-label="Urutkan paket">
+                      <span className="pdx-controlLabel">Urutkan</span>
                       {VARIANT_SORTS.map((sort) => {
                         const active = variantSort === sort.id;
                         const Icon = sort.icon;
@@ -1200,52 +1147,51 @@ export default function ProductDetail() {
                         );
                       })}
                     </div>
+                    {categoryTabs.length > 2 ? (
+                      <div className="pdx-controlGroup" role="group" aria-label="Jenis paket">
+                        <span className="pdx-controlLabel">Jenis</span>
+                        {categoryTabs.map((tab) => {
+                          const active = activeTab === tab.id;
+                          const Icon = tab.icon;
+                          return (
+                            <button
+                              key={tab.id}
+                              type="button"
+                              onClick={() => setActiveTab(tab.id)}
+                              className={`pdx-filterChip ${active ? "is-active" : ""}`}
+                              aria-pressed={active}
+                            >
+                              {active && Icon ? <Icon size={14} strokeWidth={2.2} aria-hidden="true" /> : null}
+                              {tab.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
 
-                {categoryTabs.length > 2 ? (
-                  <div className="pdx-filters" role="toolbar" aria-label="Kategori paket">
-                    {categoryTabs.map((tab) => {
-                      const active = activeTab === tab.id;
-                      const Icon = tab.icon;
-                      return (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          onClick={() => setActiveTab(tab.id)}
-                          className={`pdx-filterChip ${active ? "is-active" : ""}`}
-                          aria-pressed={active}
-                        >
-                          {active && Icon ? <Icon size={14} strokeWidth={2.2} aria-hidden="true" /> : null}
-                          {tab.label}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : null}
-
-                <div className="pdx-packList" key={variantSort}>
+                <div className="pdx-packList">
                   {displayedVariants.length === 0 ? (
                     <div className="pdx-emptyCard">
                       <EmptyState
                         icon="-"
-                        title={variants.length === 0 ? "Belum ada paket" : "Gak ada paket di kategori ini"}
+                        title={variants.length === 0 ? "Belum ada paket" : "Tidak ada paket di kategori ini"}
                         description={
                           variants.length === 0
-                            ? "Admin belum nambahin varian buat produk ini."
-                            : "Coba pilih kategori lain atau intip semua paket."
+                            ? "Paket untuk produk ini belum tersedia."
+                            : "Pilih kategori lain atau tampilkan semua paket."
                         }
                         primaryAction={
                           variants.length > 0
-                            ? { label: "Intip semua", onClick: () => setActiveTab("semua") }
-                            : { label: "Balik ke katalog", onClick: goBackToCatalog }
+                            ? { label: "Lihat semua", onClick: () => setActiveTab("semua") }
+                            : { label: "Kembali ke katalog", onClick: goBackToCatalog }
                         }
                       />
                     </div>
                   ) : (
                     displayedVariants.map((variant) => {
-                      const stock = Number(variant.stock ?? 0);
-                      const out = stock <= 0;
+                      const out = isKnownOutOfStock(variant);
                       // Same card UI for 1-variant and multi-variant
                       const isRecommended = variant.id === recommendedVariantId || variant.id === topSellerVariantId;
                       const flashDiscount = flashSaleMap.get(variant.id);
@@ -1265,20 +1211,11 @@ export default function ProductDetail() {
                           key={variant.id}
                           variant={variant}
                           siblingVariants={variants}
-                          isSelected={selectedVariantId === variant.id}
-                          isAdded={addedVariantId === variant.id}
                           isRecommended={isRecommended}
                           isTopSeller={variant.id === topSellerVariantId}
                           flashDiscount={flashDiscount}
                           effectivePrice={effectivePrice}
                           descriptionBody={descriptionBody}
-                          isMotionOff={isMotionOff}
-                          motionMode={motionMode}
-                          maxVariantStock={maxVariantStock}
-                          onSelect={(variantId) => {
-                            setSelectedVariantId(variantId);
-                            trackFunnelEvent("select_variant", { productId: product.id, variantId });
-                          }}
                           onAdd={handleAdd}
                           onBuy={(v, q, e) => {
                             if (handleAdd(v, q, e)) {

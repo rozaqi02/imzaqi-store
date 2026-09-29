@@ -1,5 +1,5 @@
 import React from "react";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { MemoryRouter, Route, Routes } from "react-router-dom";
 import { vi } from "vitest";
 import ProductDetail from "./ProductDetail";
@@ -229,5 +229,53 @@ describe("ProductDetail render", () => {
       expect(screen.getByRole("heading", { name: "Netflix Premium", level: 1 })).toBeInTheDocument();
       expect(screen.getByText("Belum ada paket")).toBeInTheDocument();
     });
+  });
+
+  it("keeps unknown stock available across the card and comparison, with an honest guarantee summary", async () => {
+    const { fetchProductBySlug } = await import("../lib/api");
+    fetchProductBySlug.mockResolvedValueOnce({
+      ...mockProduct,
+      product_variants: [
+        { ...mockProduct.product_variants[0], stock: null },
+        { ...mockProduct.product_variants[1], stock: 0 },
+      ],
+    });
+    renderDetail();
+    await screen.findByRole("heading", { name: "Netflix Premium", level: 1 });
+    expect(screen.getByText("Garansi sesuai paket")).toBeInTheDocument();
+    expect(screen.getByText("Tersedia")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Tambah Sharing 1 Profil 1 User ke keranjang/ })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Bandingkan paket" }));
+    expect(within(screen.getByRole("dialog", { name: "Bandingkan" })).getByText("Tersedia")).toBeInTheDocument();
+  });
+
+  it("keeps expanded package details open when sorting and uses explicit controls", async () => {
+    renderDetail();
+    await screen.findByRole("heading", { name: "Netflix Premium", level: 1 });
+    const card = document.querySelector(".pdx-packCard");
+    expect(card).not.toHaveAttribute("role", "button");
+    const disclosure = card.querySelector("summary");
+    fireEvent.click(disclosure);
+    expect(disclosure.closest("details")).toHaveAttribute("open");
+    expect(card.querySelector(".pdx-detailGroup h4")).toHaveTextContent("Benefit");
+    fireEvent.click(screen.getByRole("button", { name: "Termurah" }));
+    expect(disclosure.closest("details")).toHaveAttribute("open");
+    expect(screen.getByRole("link", { name: /Lihat 2 pilihan paket/ })).toHaveAttribute("href", "#paket-tersedia");
+  });
+
+  it("does not present a generic Pro package as Private", async () => {
+    const { fetchProductBySlug } = await import("../lib/api");
+    fetchProductBySlug.mockResolvedValueOnce({
+      ...mockProduct,
+      product_variants: [
+        { ...mockProduct.product_variants[0], name: "Sharing" },
+        { ...mockProduct.product_variants[1], name: "Private" },
+        { ...mockProduct.product_variants[0], id: "pro-package", name: "Plan Pro", sort_order: 40 },
+      ],
+    });
+    renderDetail();
+    await screen.findByRole("heading", { name: "Netflix Premium", level: 1 });
+    fireEvent.click(within(screen.getByRole("group", { name: "Jenis paket" })).getByRole("button", { name: "Private" }));
+    expect([...document.querySelectorAll(".pdx-packName")].map((node) => node.textContent)).toEqual(["Private"]);
   });
 });

@@ -8,16 +8,16 @@ import {
   ShieldCheck,
   X,
 } from "lucide-react";
-import { formatGuaranteeLabel, formatIDR, packDisplayName } from "../lib/format";
+import { formatGuaranteeLabel, formatIDR, isKnownOutOfStock, packDisplayName } from "../lib/format";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 
 function classifyType(name) {
   const n = String(name || "").toLowerCase();
-  if (n.match(/sharing|share/)) return "Sharing";
-  if (n.match(/fam|family/)) return "Family";
-  if (n.match(/private|privat|prem|\bpro\b|standart|ultimate|diamond/)) return "Private";
-  if (n.match(/student/)) return "Student";
-  if (n.match(/basic/)) return "Basic";
+  if (/\b(sharing|share)\b/.test(n)) return "Sharing";
+  if (/\b(family|keluarga)\b/.test(n)) return "Family";
+  if (/\b(private|privat)\b/.test(n)) return "Private";
+  if (/\bstudent\b/.test(n)) return "Student";
+  if (/\bbasic\b/.test(n)) return "Basic";
   return "Lainnya";
 }
 
@@ -29,7 +29,8 @@ function getEffectivePrice(variant, flashSaleMap) {
 }
 
 function stockTone(stock) {
-  const safe = Number(stock ?? 0);
+  if (stock == null || stock === "" || !Number.isFinite(Number(stock))) return "mid";
+  const safe = Number(stock);
   if (safe <= 0) return "out";
   if (safe <= 5) return "low";
   if (safe <= 20) return "mid";
@@ -37,13 +38,14 @@ function stockTone(stock) {
 }
 
 function stockLabel(stock) {
-  const safe = Number(stock ?? 0);
+  if (stock == null || stock === "" || !Number.isFinite(Number(stock))) return "Tersedia";
+  const safe = Number(stock);
   if (safe <= 0) return "Habis";
   return String(safe);
 }
 
 function normalizeGuarantee(text) {
-  return formatGuaranteeLabel(text || "Replace 24 Jam");
+  return formatGuaranteeLabel(text) || "Belum dicantumkan";
 }
 
 function normalizeDuration(text) {
@@ -89,12 +91,12 @@ export default function VariantCompareModal({
         type: classifyType(variant.name),
         duration: normalizeDuration(variant.duration_label),
         guarantee: normalizeGuarantee(variant.guarantee_text),
-        stock: Number(variant.stock ?? 0),
+        stock: variant.stock == null || variant.stock === "" ? null : Number(variant.stock),
         requiresEmail: Boolean(variant.requires_buyer_email),
       };
     });
 
-    const inStock = items.filter((item) => item.stock > 0);
+    const inStock = items.filter((item) => !isKnownOutOfStock(item.variant));
     const pricePool = inStock.length ? inStock : items;
     const minPrice = Math.min(...pricePool.map((item) => item.price));
     const bestPriceId = pricePool.find((item) => item.price === minPrice)?.variant.id ?? null;
@@ -121,7 +123,7 @@ export default function VariantCompareModal({
 
   const renderCell = (rowKey, item) => {
     const { variant, flash, price, type, duration, guarantee, stock, requiresEmail } = item;
-    const isBest = bestPriceId === variant.id && stock > 0;
+    const isBest = bestPriceId === variant.id && !isKnownOutOfStock(variant);
 
     switch (rowKey) {
       case "price":
@@ -200,14 +202,14 @@ export default function VariantCompareModal({
                 <tr>
                   <th className="vcm-labelCol" scope="col">Detail</th>
                   {items.map((item) => {
-                    const isBest = bestPriceId === item.variant.id && item.stock > 0;
+                    const isBest = bestPriceId === item.variant.id && !isKnownOutOfStock(item.variant);
                     return (
                       <th
                         key={item.variant.id}
                         className={[
                           "vcm-valCol",
                           isBest ? "is-best" : "",
-                          item.stock <= 0 ? "is-out" : "",
+                          isKnownOutOfStock(item.variant) ? "is-out" : "",
                         ].filter(Boolean).join(" ")}
                         scope="col"
                       >
