@@ -2,6 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PromoTicker from "./PromoTicker";
+import { fetchSettings } from "../lib/api";
 
 vi.mock("../lib/api", () => ({
   fetchActiveFlashSales: vi.fn(async () => [
@@ -99,5 +100,17 @@ describe("PromoTicker", () => {
     });
 
     expect(screen.getByRole("link", { name: "Netflix Premium · 28 Hari" })).toHaveAttribute("href", "/produk/netflix-premium");
+  });
+  it("uses automatic product copy, destination, and selected color for a new-product banner", async () => {
+    fetchSettings.mockResolvedValueOnce({ new_product_banner: { enabled: true, product_id: "p1", color: "yellow" } });
+    await renderTicker();
+    const banner = screen.getByRole("region", { name: "Produk baru" });
+    expect(banner).toHaveClass("promo-ticker--color-yellow");
+    expect(screen.getByRole("link", { name: "Gemini AI Pro sekarang tersedia. Lihat paketnya!" })).toHaveAttribute("href", "/produk/gemini-ai-pro");
+  });
+  it("supports an external announcement destination without treating it as a router path", async () => {
+    fetchSettings.mockResolvedValueOnce({ new_product_banner: { enabled: true, text: "Hubungi toko", link: "https://example.com/contact" } });
+    await renderTicker();
+    expect(screen.getByRole("link", { name: "Hubungi toko" })).toHaveAttribute("href", "https://example.com/contact");
   });
 });

@@ -49,6 +49,7 @@ import VirtualList from "./components/VirtualList";
 import AdminOrderListItem from "./components/AdminOrderListItem";
 import MarketingMediaGenerator from "./components/MarketingMediaGenerator";
 import AdminPicker from "./components/AdminPicker";
+import StorefrontPromotionSettings from "./components/StorefrontPromotionSettings";
 import {
   ADMIN_PRODUCTS_CACHE_TTL_MS,
   EMPTY_ANALYTICS_SUMMARY,
@@ -256,12 +257,7 @@ export default function AdminDashboard() {
   const [settingsWhatsApp, setSettingsWhatsApp] = useState("");
   const [settingsQrisBase, setSettingsQrisBase] = useState("");
   const [settingsQrisImageUrl, setSettingsQrisImageUrl] = useState("");
-  const [settingsAcademicPopupEnabled, setSettingsAcademicPopupEnabled] = useState(false);
-  const [settingsNewProductEnabled, setSettingsNewProductEnabled] = useState(false);
-  const [settingsNewProductText, setSettingsNewProductText] = useState("");
-  const [settingsNewProductBadge, setSettingsNewProductBadge] = useState("BARU");
-  const [settingsNewProductId, setSettingsNewProductId] = useState("");
-  const [settingsNewProductLink, setSettingsNewProductLink] = useState("");
+  const promotionDraftCache = useRef({});
   const [newOrderCount, setNewOrderCount] = useState(0);
   const [exportDateFrom, setExportDateFrom] = useState("");
   const [exportDateTo, setExportDateTo] = useState("");
@@ -373,29 +369,7 @@ export default function AdminDashboard() {
     const qris = settings?.qris || {};
     setSettingsQrisBase(String(qris.base_payload || ""));
     setSettingsQrisImageUrl(String(qris.image_url || ""));
-
-    const ac = settings?.academic_popup;
-    if (ac && typeof ac === "object" && typeof ac.enabled === "boolean") {
-      setSettingsAcademicPopupEnabled(ac.enabled);
-    } else {
-      setSettingsAcademicPopupEnabled(false);
-    }
-
-    const np = settings?.new_product_banner;
-    if (np && typeof np === "object") {
-      setSettingsNewProductEnabled(Boolean(np.enabled));
-      setSettingsNewProductText(String(np.text || ""));
-      setSettingsNewProductBadge(String(np.badge || "BARU"));
-      setSettingsNewProductId(String(np.product_id || ""));
-      setSettingsNewProductLink(String(np.link || ""));
-    } else {
-      setSettingsNewProductEnabled(false);
-      setSettingsNewProductText("");
-      setSettingsNewProductBadge("BARU");
-      setSettingsNewProductId("");
-      setSettingsNewProductLink("");
-    }
-  }, [settings]);
+  }, [settings?.qris]);
 
   async function fetchOrdersPage(offset = 0, { bucket = orderBucket, detail = false } = {}) {
     const end = offset + ORDERS_PAGE_SIZE - 1;
@@ -2439,44 +2413,6 @@ export default function AdminDashboard() {
     } catch (e) {
       toast.remove(tid);
       toast.error("Gagal simpan QRIS");
-      setMsg(e?.message || String(e));
-    }
-  }
-
-  async function saveAcademicPopupSettings(enabled) {
-    const tid = toast.loading("Simpan setting pop-up akademik");
-    try {
-      await upsertSetting("academic_popup", { enabled: Boolean(enabled) });
-      const nextSettings = await fetchSettings({ useCache: false });
-      setSettings(nextSettings);
-      setSettingsAcademicPopupEnabled(Boolean(enabled));
-      toast.remove(tid);
-      toast.success("Status Pop-Up Akademik disimpan", { duration: 1200 });
-    } catch (e) {
-      toast.remove(tid);
-      toast.error("Gagal menyimpan status pop-up");
-      setMsg(e?.message || String(e));
-    }
-  }
-
-  async function saveNewProductBannerSettings() {
-    const tid = toast.loading("Simpan banner produk baru");
-    try {
-      const bannerData = {
-        enabled: Boolean(settingsNewProductEnabled),
-        text: String(settingsNewProductText || "").trim(),
-        badge: String(settingsNewProductBadge || "BARU").trim(),
-        product_id: String(settingsNewProductId || "").trim(),
-        link: String(settingsNewProductLink || "").trim(),
-      };
-      await upsertSetting("new_product_banner", bannerData);
-      const nextSettings = await fetchSettings({ useCache: false });
-      setSettings(nextSettings);
-      toast.remove(tid);
-      toast.success("Banner produk baru disimpan", { duration: 1200 });
-    } catch (e) {
-      toast.remove(tid);
-      toast.error("Gagal menyimpan banner produk baru");
       setMsg(e?.message || String(e));
     }
   }
@@ -4577,130 +4513,15 @@ export default function AdminDashboard() {
                     </div>
                   </div>
 
-                  {/* Section 2: Pop-up Promosi & Jasa Akademik */}
-                  <div className="admin-panel-head" style={{ borderTop: "1px solid var(--admin-border, rgba(255,255,255,0.08))", paddingTop: 20 }}>
-                    <div>
-                      <div className="admin-panel-title">Pop-up Promosi & Jasa Akademik</div>
-                      <div className="admin-panel-sub">Kontrol tayang pop-up penawaran layanan kampus di storefront</div>
-                    </div>
-                  </div>
-
-                  <div className="admin-panel-body">
-                    <label className="admin-checkboxLabel" style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14, fontWeight: 700, margin: "4px 0 12px" }}>
-                      <input
-                        type="checkbox"
-                        checked={settingsAcademicPopupEnabled}
-                        onChange={(e) => setSettingsAcademicPopupEnabled(e.target.checked)}
-                        style={{ width: 18, height: 18, accentColor: "#10b981", cursor: "pointer" }}
-                      />
-                      <span>Aktifkan Pop-up Jasa Akademik di Storefront</span>
-                    </label>
-                    <div className="hint subtle" style={{ marginBottom: 16 }}>
-                      Jika diaktifkan, pop-up hanya muncul sekali per sesi setelah katalog layanan berhasil dimuat. Jika dimatikan, storefront tidak menjadwalkannya.
-                    </div>
-
-                    <div className="admin-form-actions">
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={() => saveAcademicPopupSettings(settingsAcademicPopupEnabled)}
-                      >
-                        Simpan Status Pop-up Akademik
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Section: Banner Produk Baru */}
-                  <div className="admin-panel-head" style={{ borderTop: "1px solid var(--admin-border, rgba(255,255,255,0.08))", paddingTop: 20 }}>
-                    <div>
-                      <div className="admin-panel-title">Banner Produk Baru</div>
-                      <div className="admin-panel-sub">Pengumuman produk terbaru di baris atas storefront (dapat diaktifkan / dinonaktifkan)</div>
-                    </div>
-                  </div>
-
-                  <div className="admin-panel-body">
-                    <label className="admin-checkboxLabel" style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", fontSize: 14, fontWeight: 700, margin: "4px 0 16px" }}>
-                      <input
-                        type="checkbox"
-                        checked={settingsNewProductEnabled}
-                        onChange={(e) => setSettingsNewProductEnabled(e.target.checked)}
-                        style={{ width: 18, height: 18, accentColor: "#10b981", cursor: "pointer" }}
-                      />
-                      <span>Aktifkan Banner Produk Baru di Storefront</span>
-                    </label>
-
-                    <div className="admin-form-grid admin-form-grid--settings" style={{ opacity: settingsNewProductEnabled ? 1 : 0.65 }}>
-                      <label className="admin-field admin-field-full">
-                        <span>Pilih Produk Katalog (Opsional)</span>
-                        <select
-                          className="input"
-                          value={settingsNewProductId}
-                          onChange={(e) => {
-                            const pId = e.target.value;
-                            setSettingsNewProductId(pId);
-                            const found = (products || []).find((p) => String(p.id) === String(pId));
-                            if (found) {
-                              setSettingsNewProductLink(`/produk/${found.slug || found.id}`);
-                              if (!settingsNewProductText) {
-                                setSettingsNewProductText(`🔥 Produk Baru: ${found.name} sekarang tersedia!`);
-                              }
-                            }
-                          }}
-                        >
-                          <option value="">-- Pilih produk dari katalog untuk auto-fill link --</option>
-                          {(products || []).map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.name} {p.category ? `(${p.category})` : ""}
-                            </option>
-                          ))}
-                        </select>
-                        <div className="hint subtle">Memilih produk akan otomatis menyetel URL link tujuan.</div>
-                      </label>
-
-                      <label className="admin-field">
-                        <span>Label Badge</span>
-                        <input
-                          className="input"
-                          value={settingsNewProductBadge}
-                          placeholder="BARU"
-                          onChange={(e) => setSettingsNewProductBadge(e.target.value)}
-                        />
-                        <div className="hint subtle">Teks badge kecil, contoh: BARU, NEW, HOT.</div>
-                      </label>
-
-                      <label className="admin-field">
-                        <span>Tautan Tujuan (Link / URL)</span>
-                        <input
-                          className="input"
-                          value={settingsNewProductLink}
-                          placeholder="/produk/chatgpt-plus"
-                          onChange={(e) => setSettingsNewProductLink(e.target.value)}
-                        />
-                        <div className="hint subtle">Contoh: /produk/nama-produk atau /produk</div>
-                      </label>
-
-                      <label className="admin-field admin-field-full">
-                        <span>Teks Pengumuman Banner</span>
-                        <input
-                          className="input"
-                          value={settingsNewProductText}
-                          placeholder="Produk baru telah hadir! Klik untuk melihat paket..."
-                          onChange={(e) => setSettingsNewProductText(e.target.value)}
-                        />
-                        <div className="hint subtle">Teks yang akan muncul di banner atas halaman.</div>
-                      </label>
-                    </div>
-
-                    <div className="admin-form-actions" style={{ marginTop: 14 }}>
-                      <button
-                        className="btn btn-primary"
-                        type="button"
-                        onClick={saveNewProductBannerSettings}
-                      >
-                        Simpan Banner Produk Baru
-                      </button>
-                    </div>
-                  </div>
+                  <StorefrontPromotionSettings
+                    settings={settings}
+                    draftCache={promotionDraftCache}
+                    products={products}
+                    flashSales={flashSales}
+                    onSaved={(key, value) => setSettings(current => ({ ...current, [key]: value }))}
+                    onManageFlashSales={() => handleSelectTab("flashsale")}
+                    onManageProducts={() => handleSelectTab("products")}
+                  />
 
                   {/* Section 3: Catatan sistem */}
                   <div className="admin-panel-head" style={{ borderTop: "1px solid var(--admin-border, rgba(255,255,255,0.08))", paddingTop: 20 }}>

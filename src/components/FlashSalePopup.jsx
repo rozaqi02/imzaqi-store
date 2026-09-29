@@ -3,10 +3,11 @@ import { createPortal } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 import { Clock, X } from "lucide-react";
-import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
+import { fetchActiveFlashSales, fetchProducts, fetchSettings } from "../lib/api";
 import { formatIDR, isKnownOutOfStock } from "../lib/format";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import { readyFlashPromotions } from "../lib/storefrontPromotions";
 
 const SUPPRESS_DATE_KEY = "imzaqi_flash_sale_suppress_date_v1";
 const SESSION_DONE_KEY = "imzaqi_flash_sale_popup_done";
@@ -38,6 +39,8 @@ export default function FlashSalePopup() {
   const [closestEndTime, setClosestEndTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
   const [sessionDismissed, setSessionDismissed] = useState(() => wasHandledThisSession());
+  const [isEnabled, setIsEnabled] = useState(false);
+  const [settingsReady, setSettingsReady] = useState(false);
   const [isSuppressed, setIsSuppressed] = useState(() => {
     try {
       return localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
@@ -53,22 +56,28 @@ export default function FlashSalePopup() {
 
     async function loadPromoData() {
       try {
-        const [flashSales, products] = await Promise.all([
-          fetchActiveFlashSales({ useCache: true }),
-          fetchProducts({ includeInactive: false }),
+        const [flashSales, products, settings] = await Promise.all([
+          fetchActiveFlashSales({ useCache: true }).catch(() => []),
+          fetchProducts({ includeInactive: false }).catch(() => []),
+          fetchSettings({ useCache: true }).catch(() => ({})),
         ]);
 
         if (!active) return;
+
+        const fsSetting = settings?.flash_sale_popup;
+        const enabled = fsSetting?.enabled === true;
+        setIsEnabled(enabled);
+
         if (!flashSales || !flashSales.length || !products || !products.length) return;
 
         const enriched = [];
         let minEndTime = null;
 
-        flashSales.forEach((sale) => {
+        readyFlashPromotions(flashSales, products).forEach((sale) => {
           for (const product of products) {
             const variant = (product.product_variants || []).find((v) => v.id === sale.variant_id);
 
-            if (variant && variant.is_active) {
+            if (variant && variant.is_active !== false) {
               const promoPrice = Math.round(variant.price_idr * (1 - sale.discount_percent / 100));
 
               enriched.push({
@@ -83,7 +92,7 @@ export default function FlashSalePopup() {
                 discountPercent: sale.discount_percent,
                 promoPrice,
                 endsAt: sale.ends_at,
-                stock: Number.isFinite(Number(variant.stock)) ? Number(variant.stock) : null,
+                stock: variant.stock == null || variant.stock === "" ? null : Number.isFinite(Number(variant.stock)) ? Number(variant.stock) : null,
               });
 
               const saleEndTime = new Date(sale.ends_at).getTime();
@@ -99,6 +108,8 @@ export default function FlashSalePopup() {
         }
       } catch (err) {
         console.warn("[FlashSalePopup] Gagal memuat data flash sale:", err);
+      } finally {
+        if (active) setSettingsReady(true);
       }
     }
 
@@ -111,6 +122,8 @@ export default function FlashSalePopup() {
   useEffect(() => {
     const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
     if (
+      !settingsReady ||
+      !isEnabled ||
       suppressedToday ||
       sessionDismissed ||
       wasHandledThisSession() ||
@@ -126,7 +139,7 @@ export default function FlashSalePopup() {
     const checkAndOpenFlashSale = () => {
       if (wasHandledThisSession()) return;
       const isAcademicActive = Boolean(
-        window.__imzaqi_academic_popup_active || document.querySelector(".ac-popup-backdrop")
+        window.__imzaqi_academic_popup_active || document.querySelector(".ac-popup-backdrop, .np-popup-backdrop")
       );
       if (isAcademicActive) return;
       setIsOpen(true);
@@ -140,13 +153,15 @@ export default function FlashSalePopup() {
 
     const initialTimer = setTimeout(checkAndOpenFlashSale, OVERLAY_TIMING.flashSaleMs);
     window.addEventListener("imzaqi_academic_popup_closed", handleAcademicPopupClosed);
+    window.addEventListener("imzaqi_new_product_popup_closed", handleAcademicPopupClosed);
 
     return () => {
       clearTimeout(initialTimer);
       if (queuedTimer) clearTimeout(queuedTimer);
       window.removeEventListener("imzaqi_academic_popup_closed", handleAcademicPopupClosed);
+      window.removeEventListener("imzaqi_new_product_popup_closed", handleAcademicPopupClosed);
     };
-  }, [location.pathname, overlayBlocked, salesItems.length, sessionDismissed]);
+  }, [location.pathname, overlayBlocked, salesItems.length, sessionDismissed, isEnabled, settingsReady]);
 
   useEffect(() => {
     if (overlayBlocked) setIsOpen(false);
@@ -211,6 +226,8 @@ export default function FlashSalePopup() {
   if (
     overlayBlocked ||
     location.pathname !== "/" ||
+    !settingsReady ||
+    !isEnabled ||
     !isOpen ||
     !featured ||
     isAcademicActive ||

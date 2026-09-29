@@ -3,7 +3,7 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import FlashSalePopup from "./FlashSalePopup";
 import AcademicPopup from "./AcademicPopup";
-import { fetchActiveFlashSales } from "../lib/api";
+import { fetchActiveFlashSales, fetchSettings } from "../lib/api";
 
 vi.mock("../lib/overlayScheduler", () => ({
   OVERLAY_TIMING: { flashSaleMs: 0 },
@@ -15,6 +15,7 @@ vi.mock("../lib/api", () => ({
       id: "s1",
       variant_id: "v1",
       discount_percent: 40,
+      starts_at: new Date(Date.now() - 86400000).toISOString(),
       ends_at: new Date(Date.now() + 86400000).toISOString(),
     },
   ]),
@@ -43,6 +44,7 @@ vi.mock("../lib/api", () => ({
   ]),
   fetchSettings: vi.fn(async () => ({
     academic_popup: { enabled: true },
+    flash_sale_popup: { enabled: true },
   })),
 }));
 
@@ -54,6 +56,7 @@ function renderPopup(ui, path) {
 
 describe("storefront popups on admin", () => {
   beforeEach(() => {
+    fetchSettings.mockResolvedValue({ academic_popup: { enabled: true }, flash_sale_popup: { enabled: true } });
     document.body.innerHTML = "";
     document.body.className = "is-admin is-admin-app";
     const root = document.createElement("div");
@@ -99,6 +102,14 @@ describe("storefront popups on admin", () => {
       expect(document.querySelector(".fsp-backdrop")).not.toBeNull();
     });
     expect(document.getElementById("root")?.inert).toBe(true);
+  });
+  it("does not open flash sale unless its setting is explicitly enabled", async () => {
+    document.body.className = "";
+    fetchSettings.mockResolvedValueOnce({ storefront_popups: { flash_sale: true }, flash_sale_popup: { enabled: false } });
+    renderPopup(<FlashSalePopup/>, "/");
+    await act(async () => { await new Promise(resolve => setTimeout(resolve, 50)); });
+    expect(document.querySelector(".fsp-backdrop")).toBeNull();
+    expect(document.getElementById("root")?.inert).toBeFalsy();
   });
 
   it("marks session done and closes popup when dismissed via close button", async () => {

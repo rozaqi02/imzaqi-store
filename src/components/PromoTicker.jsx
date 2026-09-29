@@ -4,6 +4,7 @@ import { X } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts, fetchPromoCodes, fetchSettings } from "../lib/api";
 import { copyToClipboard } from "../utils/clipboard";
 import { isKnownOutOfStock, isPromoExpired } from "../lib/format";
+import { normalizePromotion, resolvePromotionCopy } from "../lib/storefrontPromotions";
 
 const FLASH_ROTATE_MS = 6000;
 const PROMO_DISMISS_KEY = "imzaqi_ticker_promo_dismissed";
@@ -106,9 +107,11 @@ export default function PromoTicker() {
       if (!alive) return;
       setFlashItems(buildFlashItems(sales, products));
       setPromo(pickHomePromo(promos, settings?.home_promos?.codes));
-      const np = settings?.new_product_banner;
-      if (np && np.enabled && (np.text || np.product_id)) {
-        setNewProductBanner(np);
+      const np = normalizePromotion("new_product_banner", settings?.new_product_banner);
+      const product = products.find(p => String(p.id) === np.product_id && p.is_active !== false);
+      if (np.enabled && (np.text || product)) {
+        const copy = resolvePromotionCopy(np, product);
+        setNewProductBanner({ ...np, text: copy.text, link: copy.link, badge: copy.badge });
       } else {
         setNewProductBanner(null);
       }
@@ -172,12 +175,16 @@ export default function PromoTicker() {
   return (
     <div className="promo-tickerStack">
       {showNewProduct ? (
-        <div className="promo-ticker promo-ticker--newProduct" role="region" aria-label="Produk baru">
+        <div
+          className={`promo-ticker promo-ticker--newProduct promo-ticker--color-${newProductBanner.color || "green"}`}
+          role="region"
+          aria-label="Produk baru"
+        >
           <p className="promo-tickerItem">
             <span className="promo-tickerBadge">{newProductBanner.badge || "BARU"}</span>{" "}
-            <Link className="promo-tickerLink" to={newProductBanner.link || "/produk"}>
-              {newProductBanner.text || "Produk baru tersedia! Cek sekarang"}
-            </Link>
+            {/^https?:\/\//i.test(newProductBanner.link)
+              ? <a className="promo-tickerLink" href={newProductBanner.link}>{newProductBanner.text}</a>
+              : <Link className="promo-tickerLink" to={newProductBanner.link}>{newProductBanner.text}</Link>}
           </p>
           <button
             type="button"

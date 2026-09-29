@@ -9,6 +9,7 @@ import PolishEffects from "./components/PolishEffects";
 import Confetti from "./components/Confetti";
 import FlashSalePopup from "./components/FlashSalePopup";
 import AcademicPopup from "./components/AcademicPopup";
+import NewProductPopup from "./components/NewProductPopup";
 
 const DEFER_POLISH_MS = 2000;
 
@@ -118,6 +119,7 @@ function StorefrontOverlays() {
     <>
       <FlashSalePopup />
       <AcademicPopup />
+      <NewProductPopup />
     </>
   );
 }
