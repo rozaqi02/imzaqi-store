@@ -4,6 +4,7 @@ import { ShoppingCart, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { shouldShowAbandonedCartReminder, dismissAbandonedCartReminder } from "../lib/cartReminder";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
+import BannerGraphic from "./BannerGraphic";
 
 export default function AbandonedCartBanner() {
   const location = useLocation();
@@ -16,7 +17,7 @@ export default function AbandonedCartBanner() {
 
   return (
     <div className="abandoned-cart-banner" role="status">
-      <ShoppingCart size={16} />
+      <BannerGraphic name="rocket_speed" height={22} className="abandoned-cart-mascot" />
       <div className="abandoned-cart-copy">
         <strong>Masih ada {count} item di keranjang</strong>
         <span>Lanjut checkout sebelum kehabisan stok.</span>

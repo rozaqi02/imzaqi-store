@@ -19,6 +19,7 @@ import {
 import { fetchSettings } from "../lib/api";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "./EmptyState";
+import BannerGraphic from "./BannerGraphic";
 
 const FAQ_ITEMS = [
   {
@@ -311,7 +312,10 @@ export default function FaqPageContent() {
       <div className="help-wrap">
         <header className="help-hero">
           <div className="help-heroCopy">
-            <span className="help-eyebrow"><CircleHelp size={16} /> PUSAT BANTUAN</span>
+            <span className="help-eyebrow">
+              <BannerGraphic name="headset_support" height={22} className="help-mascot" />
+              <CircleHelp size={16} /> PUSAT BANTUAN
+            </span>
             <h1>Biar jelas.<br /><span>Biar tenang.</span></h1>
             <p>Dari pilih paket sampai akun aktif. Temukan jawabanmu dan lanjut belanja tanpa bingung.</p>
             <div className="help-search">

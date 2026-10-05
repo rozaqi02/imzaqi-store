@@ -8,6 +8,7 @@ import { formatIDR, isKnownOutOfStock } from "../lib/format";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { readyFlashPromotions } from "../lib/storefrontPromotions";
+import BannerGraphic from "./BannerGraphic";
 
 const SUPPRESS_DATE_KEY = "imzaqi_flash_sale_suppress_date_v1";
 const SESSION_DONE_KEY = "imzaqi_flash_sale_popup_done";
@@ -274,7 +275,10 @@ export default function FlashSalePopup() {
           </div>
 
           <div className="fsp-copy">
-            <p className="fsp-label">Flash sale</p>
+            <p className="fsp-label">
+              <BannerGraphic name="flash_lightning" height={22} className="fsp-mascot" />
+              <span>Flash sale</span>
+            </p>
             <h2 id="flash-sale-title" className="fsp-headline">
               {featured.productName}
             </h2>

@@ -19,7 +19,7 @@ export default function BannerGraphic({ name, className = "", style = {}, height
   const mascot = MASCOT_MAP[name];
   if (!mascot) return null;
 
-  const combinedClass = `promo-tickerMascot ${className}`.trim();
+  const combinedClass = `promo-tickerMascot mascot-flow ${className}`.trim();
   const aspectStyle = {
     height,
     width: "auto",

@@ -13,6 +13,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { warn } from "../lib/log";
+import BannerGraphic from "../components/BannerGraphic";
 
 function ReviewImage({ src, alt, eager = false }) {
   const [failed, setFailed] = useState(false);
@@ -87,7 +88,10 @@ export default function Testimonials() {
       <div className="reviews-wrap">
         <header className="reviews-hero">
           <div className="reviews-heroCopy">
-            <span className="reviews-eyebrow"><MessageSquareText size={16} /> CERITA PELANGGAN</span>
+            <span className="reviews-eyebrow">
+              <BannerGraphic name="sparkle_celebration" height={22} className="reviews-mascot" />
+              <MessageSquareText size={16} /> CERITA PELANGGAN
+            </span>
             <h1>Mereka sudah coba.<br /><span>Sekarang giliranmu.</span></h1>
             <p>Kenali pengalaman pelanggan lewat galeri testimoni. Lihat lebih dekat, lalu pilih paket yang pas buat kamu.</p>
             <Link className="hx-btn-primary" to="/produk">Temukan paketmu <ArrowUpRight size={18} /></Link>

@@ -455,6 +455,7 @@ export default function Checkout() {
     return (
       <div className="checkout-emptyConversion">
         <EmptyState
+          mascot="rocket_speed"
           icon={<CartIcon size={30} strokeWidth={2.2} />}
           title="Keranjangmu masih kosong"
           description="Pilih paket yang pas, lalu lanjutkan pembayaran lewat QRIS."

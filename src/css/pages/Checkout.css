@@ -733,7 +733,11 @@ html[data-theme="light"] .checkout-back-btn:hover {
 /* Mobile Media Queries for Full Page */
 @media (max-width: 720px) {
   .checkout-page-full {
-    padding: calc(var(--site-header-offset, 64px) + 16px) 0 120px;
+    padding: calc(var(--site-header-offset, 64px) + 16px) 0 calc(140px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .checkout-full-promo-panel {
+    scroll-margin-bottom: 110px;
   }
 
   .checkout-full-header {

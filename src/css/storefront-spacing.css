@@ -55,8 +55,12 @@ body.has-bottom-nav .route-transition > .page:is(.catalog-page, .detail-page-v3)
     --storefront-section-gap: 16px;
   }
 
-  .route-transition > .page:is(.catalog-page, .detail-page-v3, .checkout-page-full, .pay-page) {
+  .route-transition > .page:is(.catalog-page, .detail-page-v3, .pay-page) {
     padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .route-transition > .page.checkout-page-full {
+    padding-bottom: calc(140px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
   .detail-page.detail-page-v3 .pdx-billboard .pdx-visual {

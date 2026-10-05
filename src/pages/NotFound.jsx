@@ -14,6 +14,7 @@ import {
 import { usePageMeta } from "../hooks/usePageMeta";
 import { fetchProducts } from "../lib/api";
 import ProductTile from "../components/ProductTile";
+import BannerGraphic from "../components/BannerGraphic";
 
 const QUICK_LINKS = [
   { to: "/", label: "Beranda", icon: Home, desc: "Kembali ke halaman utama" },
@@ -73,7 +74,7 @@ export default function NotFound() {
                 <div className="nf-orbit nf-orbit--outer" />
                 <div className="nf-orbit nf-orbit--inner" />
                 <div className="nf-visualCore">
-                  <MapPinOff size={28} strokeWidth={2.1} />
+                  <BannerGraphic name="rocket_speed" height={52} className="nf-mascot" />
                 </div>
               </div>
 

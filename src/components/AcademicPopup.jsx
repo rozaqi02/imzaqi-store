@@ -7,6 +7,7 @@ import { fetchProducts, fetchSettings } from "../lib/api";
 import { isAcademicProduct } from "../lib/productCategories";
 import { formatIDR, getCatalogPriceRange, summarizeCatalogCopy } from "../lib/format";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import BannerGraphic from "./BannerGraphic";
 
 const SUPPRESS_DATE_KEY = "imzaqi_academic_suppress_date_v1";
 const SESSION_DONE_KEY = "imzaqi_academic_popup_done";
@@ -245,7 +246,10 @@ export default function AcademicPopup() {
             </div>
           </div>
           <div className="ac-copy">
-            <p className="ac-label">Jasa akademik</p>
+            <p className="ac-label">
+              <BannerGraphic name="academic_grad" height={22} className="ac-mascot" />
+              <span>Jasa akademik</span>
+            </p>
             <h2 id="academic-popup-title" className="ac-headline">{featured.name}</h2>
             <p className="ac-meta">Mulai {featured.formattedPrice}</p>
             <button type="button" className="ac-shop" onClick={() => goProduct(featured.slug)}>

@@ -5,6 +5,7 @@ import { Check, CheckCircle2, Phone, ShieldCheck, X } from "lucide-react";
 import { useDialogA11y } from "../../../hooks/useDialogA11y";
 import { copyToClipboard } from "../../../utils/clipboard";
 import { formatIDR } from "../../../lib/format";
+import BannerGraphic from "../../../components/BannerGraphic";
 
 const COPY_TIMEOUT_MS = 1800;
 const QRIS_EXPIRY_MS = 30 * 60 * 1000; // 30 menit
@@ -176,9 +177,11 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
           <div className="pay-successHero">
             <div className="pay-successIconWrap">
               <div className="pay-successGlow" aria-hidden="true" />
-              <div className="pay-successIcon pay-successIcon--animate">
-                <CheckCircle2 size={34} />
-              </div>
+              <BannerGraphic
+                name={isAcademicOrder ? "academic_grad" : "sparkle_celebration"}
+                height={54}
+                className="pay-successMascot"
+              />
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode pay-successCode--animate" style={{ whiteSpace: "nowrap" }}>{orderCode}</div>
@@ -290,7 +293,7 @@ export function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, i
       >
         <div className="pay-confirmModalHeader">
           <div className="pay-confirmModalHeaderIcon">
-            <ShieldCheck size={20} />
+            <BannerGraphic name={isFree ? "gift_box" : "shield_star"} height={26} className="pay-confirmMascot" />
           </div>
           <div className="pay-confirmModalHeaderCopy">
             <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Pembayaran"}</div>

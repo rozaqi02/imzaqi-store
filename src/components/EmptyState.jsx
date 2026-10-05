@@ -1,22 +1,27 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import BannerGraphic from "./BannerGraphic";
 
 export default function EmptyState({
   title,
   description,
   icon,
+  mascot,
   primaryAction,
   secondaryAction,
   suggestions = [],
 }) {
-  // Support both string icons and React elements (e.g. lucide icons)
-  const iconContent = icon ?? "[]";
-  const isElement = React.isValidElement(iconContent);
+  // Support mascot, string icons, and React elements (e.g. lucide icons)
+  const isElement = React.isValidElement(icon);
 
   return (
     <div className="empty empty--animated">
-      <div className={`empty-icon${isElement ? " empty-icon-component" : ""}`} aria-hidden="true">
-        {iconContent}
+      <div className={`empty-icon${isElement ? " empty-icon-component" : ""}${mascot ? " empty-icon-mascot" : ""}`} aria-hidden="true">
+        {mascot ? (
+          <BannerGraphic name={mascot} height={56} className="empty-mascotGraphic" />
+        ) : (
+          icon ?? "[]"
+        )}
       </div>
       {title ? <div className="empty-title">{title}</div> : null}
       {description ? <div className="empty-desc">{description}</div> : null}
