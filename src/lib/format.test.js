@@ -8,6 +8,9 @@ import {
   normalizeProductRecord,
   packDisplayName,
   isPromoExpired,
+  formatWhatsAppNumber,
+  normalizeWhatsApp,
+  validateWhatsApp,
 } from "./format";
 
 describe("getCatalogPriceRange", () => {
@@ -121,5 +124,26 @@ describe("isPromoExpired", () => {
 
   it("marks future date as active", () => {
     expect(isPromoExpired({ expired_at: "2099-12-31" })).toBe(false);
+  });
+});
+
+describe("WhatsApp Utilities", () => {
+  it("normalizes Indonesian numbers to +62 format", () => {
+    expect(normalizeWhatsApp("08123456789")).toBe("+628123456789");
+    expect(normalizeWhatsApp("628123456789")).toBe("+628123456789");
+    expect(normalizeWhatsApp("+628123456789")).toBe("+628123456789");
+  });
+
+  it("formats numbers with proper spacing and dashes", () => {
+    expect(formatWhatsAppNumber("081234567890")).toBe("0812-3456-7890");
+    expect(formatWhatsAppNumber("+6281234567890")).toBe("+62 812-3456-7890");
+  });
+
+  it("validates mobile numbers correctly", () => {
+    expect(validateWhatsApp("08123456789").valid).toBe(true);
+    expect(validateWhatsApp("+6281234567890").valid).toBe(true);
+    expect(validateWhatsApp("").valid).toBe(false);
+    expect(validateWhatsApp("123").valid).toBe(false);
+    expect(validateWhatsApp("021123456").valid).toBe(false); // Jakarta landline not mobile
   });
 });

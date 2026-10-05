@@ -1748,15 +1748,16 @@ html[data-theme="light"] {
 .header-cart,
 .header-iconAction {
   /* Use shrink tokens so desktop header shrink scales these icons too */
-  width: var(--hdr-action, 44px) !important;
-  height: var(--hdr-action, 44px) !important;
-  min-width: var(--hdr-action, 44px) !important;
-  min-height: var(--hdr-action, 44px) !important;
+  width: var(--hdr-action, 32px) !important;
+  height: var(--hdr-action, 32px) !important;
+  min-width: var(--hdr-action, 32px) !important;
+  min-height: var(--hdr-action, 32px) !important;
   padding: 0 !important;
-  display: grid !important;
-  place-items: center !important;
-  flex: 0 0 var(--hdr-action, 44px);
-  border-radius: var(--hdr-action-radius, 16px) !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  flex: 0 0 var(--hdr-action, 32px);
+  border-radius: var(--hdr-action-radius, 10px) !important;
   overflow: hidden;
   text-decoration: none !important;
   transition:

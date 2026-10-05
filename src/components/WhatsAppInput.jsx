@@ -4,68 +4,8 @@ import { Check, X } from 'lucide-react';
 
 const STORAGE_KEY = 'imzaqi_last_whatsapp';
 
-function formatWhatsAppNumber(value) {
-  let clean = value.replace(/[^\d+]/g, '');
-  
-  if (clean.startsWith('+62')) {
-    let rest = clean.slice(3).replace(/\D/g, '');
-    let formatted = '+62';
-    if (rest.length > 0) {
-      formatted += ' ' + rest.slice(0, 3);
-    }
-    if (rest.length > 3) {
-      formatted += '-' + rest.slice(3, 7);
-    }
-    if (rest.length > 7) {
-      formatted += '-' + rest.slice(7, 12);
-    }
-    return formatted;
-  } else if (clean.startsWith('62')) {
-    let rest = clean.slice(2).replace(/\D/g, '');
-    let formatted = '+62';
-    if (rest.length > 0) {
-      formatted += ' ' + rest.slice(0, 3);
-    }
-    if (rest.length > 3) {
-      formatted += '-' + rest.slice(3, 7);
-    }
-    if (rest.length > 7) {
-      formatted += '-' + rest.slice(7, 12);
-    }
-    return formatted;
-  } else {
-    let rest = clean.replace(/\D/g, '');
-    let formatted = '';
-    if (rest.length > 0) {
-      formatted += rest.slice(0, 4);
-    }
-    if (rest.length > 4) {
-      formatted += '-' + rest.slice(4, 8);
-    }
-    if (rest.length > 8) {
-      formatted += '-' + rest.slice(8, 13);
-    }
-    return formatted;
-  }
-}
+import { formatWhatsAppNumber, normalizeWhatsApp, validateWhatsApp } from '../lib/format';
 
-function normalizeWhatsApp(value) {
-  let clean = value.replace(/[^\d+]/g, '');
-  if (clean.startsWith('0')) clean = '+62' + clean.slice(1);
-  if (clean.startsWith('62') && !clean.startsWith('+62')) clean = '+' + clean;
-  return clean;
-}
-
-function validateWhatsApp(value) {
-  if (!value) return { valid: false, message: 'Nomor WhatsApp wajib diisi' };
-  const normalized = normalizeWhatsApp(value);
-  if (normalized.length < 12) return { valid: false, message: 'Nomor terlalu pendek' };
-  if (normalized.length > 16) return { valid: false, message: 'Nomor terlalu panjang' };
-  const rawClean = value.replace(/[^\d]/g, '');
-  const isValid = /^08\d{8,13}$/.test(rawClean) || /^(\+?62)8\d{8,13}$/.test(normalized);
-  if (!isValid) return { valid: false, message: 'Format: 08xxx atau +62xxx' };
-  return { valid: true, message: '' };
-}
 
 export default function WhatsAppInput({
   value = '',

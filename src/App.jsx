@@ -329,51 +329,70 @@ export default function App() {
   // Rage Click Detector
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const RAGE_SELECTOR = "button:disabled, button[disabled], .btn-disabled, [disabled]"
+    const RAGE_SELECTOR = "button:disabled, button[disabled], .btn-disabled, [disabled]";
     const clicks = [];
-    let toastShown = false;
+    let activeToast = null;
 
     function handleRageClick(e) {
       const target = e.target.closest(RAGE_SELECTOR);
       if (!target) return;
       const now = Date.now();
       clicks.push(now);
-      // Keep only clicks within last 2 seconds
       while (clicks.length > 0 && now - clicks[0] > 2000) clicks.shift();
-      if (clicks.length >= 3 && !toastShown) {
-        toastShown = true;
-        // Show a fun toast via custom event (ToastContext not available here)
+      if (clicks.length >= 3 && !activeToast) {
         const el = document.createElement("div");
         el.className = "rage-toast";
         el.setAttribute("role", "status");
-        el.innerHTML = `<span class="rage-toast-char">😅</span><span>Sabar ya, lagi diproses...</span>`;
+
+        const icon = document.createElement("span");
+        icon.className = "rage-toast-char";
+        icon.textContent = "😅";
+
+        const text = document.createElement("span");
+        text.textContent = "Sabar ya, lagi diproses...";
+
+        el.appendChild(icon);
+        el.appendChild(text);
         document.body.appendChild(el);
-        setTimeout(() => { el.remove(); toastShown = false; clicks.length = 0; }, 2800);
+        activeToast = el;
+
+        setTimeout(() => {
+          if (activeToast) {
+            activeToast.remove();
+            activeToast = null;
+          }
+          clicks.length = 0;
+        }, 2800);
       }
     }
 
     document.addEventListener("click", handleRageClick, { passive: true });
-    return () => document.removeEventListener("click", handleRageClick);
+    return () => {
+      document.removeEventListener("click", handleRageClick);
+      if (activeToast) activeToast.remove();
+    };
   }, []);
 
+  // Targeted Haptic Feedback (only on key interactive controls, never on text input / typing)
   useEffect(() => {
     if (typeof window === "undefined" || !navigator.vibrate) return;
+    let lastVibrate = 0;
 
-    function handleGlobalClick(e) {
+    function handleInteractiveClick(e) {
       const target = e.target.closest(
-        "button, a, input, select, textarea, .btn, .btn-ghost, .pdx-variantCard, .hc-statCard, .ai-chip, .st-tab, .suggestion-item, .st-pasteBtn, .oh-cekBtn"
+        "button:not([disabled]), .btn, .pdx-variantCard, .hc-statCard, .ai-chip, .st-tab, .st-pasteBtn, .oh-cekBtn, [role='switch'], [role='tab']"
       );
-      if (target) {
-        try {
-          navigator.vibrate(10);
-        } catch (err) {
-          // Ignore potential browser safety restrictions
-        }
-      }
+      if (!target) return;
+      const now = Date.now();
+      if (now - lastVibrate < 120) return; // Prevent excessive rapid vibration
+      lastVibrate = now;
+      try {
+        navigator.vibrate(10);
+      } catch {}
     }
 
-    document.addEventListener("click", handleGlobalClick, { passive: true });
-    return () => document.removeEventListener("click", handleGlobalClick);
+    document.addEventListener("click", handleInteractiveClick, { passive: true });
+    return () => document.removeEventListener("click", handleInteractiveClick);
   }, []);
 
   return (

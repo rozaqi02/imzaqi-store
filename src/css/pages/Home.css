@@ -591,7 +591,6 @@ html[data-theme="light"] .hx-live-eye {
   color: var(--text);
   font-family: var(--font-display, Outfit, sans-serif);
   text-align: center;
-  perspective: 800px;
 }
 
 .hx-headline-line {
@@ -612,7 +611,6 @@ html[data-theme="light"] .hx-live-eye {
 
 .hx-headline-word {
   display: inline-block;
-  will-change: transform, opacity, filter;
   line-height: 1.08;
   /* Safe box for descenders + background-clip text */
   padding-bottom: 0.12em;
@@ -628,6 +626,16 @@ html[data-theme="light"] .hx-live-eye {
   /* Safari: prevent gradient text clipping descenders */
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+}
+
+html[data-theme="dark"] .hx-headline-gradient,
+.home-page[data-theme="dark"] .hx-headline-gradient {
+  background: linear-gradient(135deg, #00ffb3 0%, #00e676 48%, #7ee8d8 100%) !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  color: #00ffb3 !important;
+  filter: drop-shadow(0 2px 10px rgba(0, 255, 179, 0.28));
 }
 
 /* Entrance without mask-clip (so "j" never gets cut) — one shot only */
@@ -933,15 +941,14 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 */
 @media (max-width: 720px) {
   .hx-hero {
-    min-height: 100svh;
-    min-height: 100dvh;
+    min-height: auto !important;
     box-sizing: border-box;
-    padding-top: calc(var(--site-header-offset, 64px) + 14px) !important;
-    padding-bottom: calc(var(--site-bottom-nav-clearance, 82px) + 12px) !important;
+    padding-top: calc(var(--site-header-offset, 64px) + 20px) !important;
+    padding-bottom: clamp(36px, 6vh, 52px) !important;
     padding-left: max(14px, env(safe-area-inset-left, 0px));
     padding-right: max(14px, env(safe-area-inset-right, 0px));
     display: flex;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
     overflow: visible;
   }
@@ -957,7 +964,7 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
   .hx-hero .container {
     max-width: 100%;
     width: 100%;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -969,13 +976,13 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 
   .hx-stage {
     width: 100%;
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
     /* Space between: (1) copy  (2) actions  is inside main; (3) stats is sibling */
-    gap: clamp(22px, 4.2vh, 36px);
+    gap: clamp(20px, 3.8vh, 32px);
     min-height: 0;
     padding: 10px 2px 6px;
   }
@@ -1006,7 +1013,7 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 
   .hx-headline,
   .home-page .hx-hero .hx-headline {
-    /* Balanced mobile title — tight line gap */
+    /* Balanced mobile title — tight line gap, static flow without parallax */
     font-size: clamp(34px, 9.5vw, 42px) !important;
     line-height: 1.1 !important;
     letter-spacing: -0.038em !important;
@@ -1016,6 +1023,8 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
     padding: 2px 4px 12px !important;
     box-sizing: border-box !important;
     overflow: visible !important;
+    perspective: none !important;
+    transform: none !important;
   }
 
   .home-page .hx-hero .hx-headline-line {
@@ -1024,12 +1033,14 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
     padding-bottom: 0 !important;
     margin: 0 !important;
     overflow: visible !important;
+    transform: none !important;
   }
 
   .home-page .hx-hero .hx-headline-mask {
     overflow: visible !important;
     padding: 0 !important;
     margin: 0 !important;
+    transform: none !important;
   }
 
   .home-page .hx-hero .hx-headline-word {
@@ -1037,6 +1048,8 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
     line-height: 1.1 !important;
     padding-bottom: 0.1em !important;
     margin-bottom: -0.02em !important;
+    transform: none !important;
+    will-change: auto !important;
   }
 
   .hx-subtitle {

@@ -1,22 +1,37 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { X } from "lucide-react";
+import { Bell, Megaphone, ShieldCheck, Sparkles, Tag, X, Zap } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts, fetchPromoCodes, fetchSettings } from "../lib/api";
 import { copyToClipboard } from "../utils/clipboard";
 import { isKnownOutOfStock, isPromoExpired } from "../lib/format";
-import { normalizePromotion, resolvePromotionCopy } from "../lib/storefrontPromotions";
+import { normalizePromotion, resolveBannerCopy } from "../lib/storefrontPromotions";
+import BannerGraphic from "./BannerGraphic";
+
+function BannerIcon({ name }) {
+  if (!name || name === "none") return null;
+  switch (name) {
+    case "bell":
+      return <Bell size={13} className="promo-tickerGlyph" aria-hidden="true" />;
+    case "megaphone":
+      return <Megaphone size={13} className="promo-tickerGlyph" aria-hidden="true" />;
+    case "zap":
+      return <Zap size={13} className="promo-tickerGlyph" aria-hidden="true" />;
+    case "sparkles":
+      return <Sparkles size={13} className="promo-tickerGlyph" aria-hidden="true" />;
+    case "shield":
+      return <ShieldCheck size={13} className="promo-tickerGlyph" aria-hidden="true" />;
+    case "tag":
+      return <Tag size={13} className="promo-tickerGlyph" aria-hidden="true" />;
+    default:
+      return null;
+  }
+}
 
 const FLASH_ROTATE_MS = 6000;
 const PROMO_DISMISS_KEY = "imzaqi_ticker_promo_dismissed";
 const FLASH_DISMISS_KEY = "imzaqi_ticker_flash_dismissed";
 const NEW_PRODUCT_DISMISS_KEY = "imzaqi_ticker_new_product_dismissed";
-
-const DEFAULT_FLASH = {
-  name: "",
-  duration: "",
-  discount: 0,
-  to: "/produk",
-};
+const SERVICE_DISMISS_KEY = "imzaqi_ticker_service_dismissed";
 
 function isPromoLive(promo) {
   if (!promo?.is_active) return false;
@@ -71,10 +86,21 @@ export default function PromoTicker() {
   const [flashItems, setFlashItems] = useState([]);
   const [flashIndex, setFlashIndex] = useState(0);
   const [promo, setPromo] = useState(null);
-  const [newProductBanner, setNewProductBanner] = useState(null);
+  const [bannerConfig, setBannerConfig] = useState(null);
+  const [serviceBannerConfig, setServiceBannerConfig] = useState(null);
+  const [bannerProducts, setBannerProducts] = useState([]);
+  const [bannerSales, setBannerSales] = useState([]);
+  const [now, setNow] = useState(Date.now());
   const [flashDismissed, setFlashDismissed] = useState(() => {
     try {
       return sessionStorage.getItem(FLASH_DISMISS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [serviceDismissed, setServiceDismissed] = useState(() => {
+    try {
+      return sessionStorage.getItem(SERVICE_DISMISS_KEY) === "1";
     } catch {
       return false;
     }
@@ -107,19 +133,20 @@ export default function PromoTicker() {
       if (!alive) return;
       setFlashItems(buildFlashItems(sales, products));
       setPromo(pickHomePromo(promos, settings?.home_promos?.codes));
-      const np = normalizePromotion("new_product_banner", settings?.new_product_banner);
-      const product = products.find(p => String(p.id) === np.product_id && p.is_active !== false);
-      if (np.enabled && (np.text || product)) {
-        const copy = resolvePromotionCopy(np, product);
-        setNewProductBanner({ ...np, text: copy.text, link: copy.link, badge: copy.badge });
-      } else {
-        setNewProductBanner(null);
-      }
+      setBannerConfig(normalizePromotion("new_product_banner", settings?.new_product_banner));
+      setServiceBannerConfig(normalizePromotion("service_banner", settings?.service_banner));
+      setBannerProducts(products);
+      setBannerSales(sales);
     });
 
     return () => {
       alive = false;
     };
+  }, []);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 30000);
+    return () => window.clearInterval(timer);
   }, []);
 
   useEffect(() => {
@@ -130,15 +157,30 @@ export default function PromoTicker() {
     return () => window.clearInterval(timer);
   }, [flashItems.length]);
 
-  const flash = flashItems[flashIndex] || DEFAULT_FLASH;
+  const flash = flashItems[flashIndex];
   const showPromo = Boolean(promo) && !promoDismissed;
-  const showNewProduct = Boolean(newProductBanner) && !newProductDismissed;
+  const bannerCopy = bannerConfig ? resolveBannerCopy(bannerConfig, bannerProducts, bannerSales, now) : null;
+  const showBanner = Boolean(bannerConfig?.enabled && bannerCopy?.available) && !newProductDismissed;
+  const showFlash = Boolean(flash) && !flashDismissed && !(showBanner && bannerConfig?.type === "flash");
+  const showService = Boolean(serviceBannerConfig?.enabled) && !serviceDismissed;
+  const bannerLabel = { product: "Produk baru", flash: "Flash sale pilihan", academic: "Jasa akademik", custom: "Pengumuman toko" }[bannerConfig?.type] || "Pengumuman toko";
 
   function dismissFlash() {
     try {
       sessionStorage.setItem(FLASH_DISMISS_KEY, "1");
     } catch {}
     setFlashDismissed(true);
+  }
+
+  function dismissService(event) {
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+    try {
+      sessionStorage.setItem(SERVICE_DISMISS_KEY, "1");
+    } catch {}
+    setServiceDismissed(true);
   }
 
   function dismissPromo(event) {
@@ -170,56 +212,88 @@ export default function PromoTicker() {
     } catch {}
   }
 
-  const flashLabel = flash.duration ? `${flash.name} · ${flash.duration}` : flash.name;
+  const flashLabel = flash ? (flash.duration ? `${flash.name} · ${flash.duration}` : flash.name) : "";
 
   return (
     <div className="promo-tickerStack">
-      {showNewProduct ? (
+      {showBanner ? (
         <div
-          className={`promo-ticker promo-ticker--newProduct promo-ticker--color-${newProductBanner.color || "green"}`}
+          className={`promo-ticker promo-ticker--newProduct promo-ticker--color-${bannerConfig.color || "orange"} promo-ticker--style-${bannerConfig.banner_style || "minimal_border"}`}
           role="region"
-          aria-label="Produk baru"
+          aria-label={bannerLabel}
         >
           <p className="promo-tickerItem">
-            <span className="promo-tickerBadge">{newProductBanner.badge || "BARU"}</span>{" "}
-            {/^https?:\/\//i.test(newProductBanner.link)
-              ? <a className="promo-tickerLink" href={newProductBanner.link}>{newProductBanner.text}</a>
-              : <Link className="promo-tickerLink" to={newProductBanner.link}>{newProductBanner.text}</Link>}
+            <BannerIcon name={bannerConfig.icon} />
+            {bannerCopy.badge ? (
+              <span className="promo-tickerBadge">{bannerCopy.badge}</span>
+            ) : null}
+            {/^https?:\/\//i.test(bannerCopy.link)
+              ? <a className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} href={bannerCopy.link}>{bannerCopy.text}</a>
+              : <Link className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} to={bannerCopy.link}>{bannerCopy.text}</Link>}
+            <BannerGraphic name={bannerConfig.graphic || "bell_megaphone"} height={22} />
           </p>
           <button
             type="button"
             className="promo-tickerClose"
-            aria-label="Tutup banner produk baru"
+            aria-label={`Tutup banner ${bannerLabel.toLowerCase()}`}
             onClick={dismissNewProduct}
           >
-            <X size={12} strokeWidth={2.4} aria-hidden="true" />
+            <X size={15} strokeWidth={2.4} aria-hidden="true" />
           </button>
         </div>
       ) : null}
 
-      {!flashDismissed ? <div className="promo-ticker promo-ticker--flash" role="region" aria-label="Flash sale">
-        <p className="promo-tickerItem">
-          {flash.name ? (
-            <>
-              Flash sale{" "}
-              <Link className="promo-tickerLink" to={flash.to}>
-                {flashLabel}
-              </Link>
-              {` · -${flash.discount}%`}
-            </>
-          ) : (
-            <Link className="promo-tickerLink" to={DEFAULT_FLASH.to}>
-              Proses 5–30 menit · Garansi replace · Checkout QRIS
+      {showFlash ? (
+        <div className="promo-ticker promo-ticker--flash" role="region" aria-label="Flash sale">
+          <p className="promo-tickerItem">
+            <BannerGraphic name="flash_lightning" height={20} />
+            Flash sale{" "}
+            <Link className="promo-tickerLink promo-tickerLink--underline" to={flash.to}>
+              {flashLabel}
             </Link>
-          )}
-        </p>
-        <button type="button" className="promo-tickerClose promo-tickerClose--flash" aria-label="Tutup banner flash sale" onClick={dismissFlash}>
-          <X size={12} strokeWidth={2.4} aria-hidden="true" />
-        </button>
-      </div> : null}
+            {` · -${flash.discount}%`}
+          </p>
+          <button type="button" className="promo-tickerClose promo-tickerClose--flash" aria-label="Tutup banner flash sale" onClick={dismissFlash}>
+            <X size={15} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+        </div>
+      ) : null}
+
+      {showService ? (
+        <div
+          className={`promo-ticker promo-ticker--service promo-ticker--color-${serviceBannerConfig.color || "green"} promo-ticker--style-${serviceBannerConfig.banner_style || "minimal_border"}`}
+          role="region"
+          aria-label="Info layanan"
+        >
+          <p className="promo-tickerItem">
+            <BannerIcon name={serviceBannerConfig.icon} />
+            {serviceBannerConfig.badge ? (
+              <span className="promo-tickerBadge">{serviceBannerConfig.badge}</span>
+            ) : null}
+            {/^https?:\/\//i.test(serviceBannerConfig.link) ? (
+              <a className={`promo-tickerLink promo-tickerLink--${serviceBannerConfig.link_style || "underline"}`} href={serviceBannerConfig.link}>
+                {serviceBannerConfig.text}
+              </a>
+            ) : (
+              <Link className={`promo-tickerLink promo-tickerLink--${serviceBannerConfig.link_style || "underline"}`} to={serviceBannerConfig.link || "/produk"}>
+                {serviceBannerConfig.text}
+              </Link>
+            )}
+            <BannerGraphic name={serviceBannerConfig.graphic || "shield_star"} height={22} />
+          </p>
+          <button
+            type="button"
+            className="promo-tickerClose promo-tickerClose--flash"
+            aria-label="Tutup banner info layanan"
+            onClick={dismissService}
+          >
+            <X size={15} strokeWidth={2.4} aria-hidden="true" />
+          </button>
+        </div>
+      ) : null}
 
       {showPromo ? (
-        <div className={`promo-ticker promo-ticker--code${flashItems.length ? " promo-ticker--mobileStack" : ""}`} role="region" aria-label="Kode promo">
+        <div className={`promo-ticker promo-ticker--code${(flashItems.length || showService || showBanner) ? " promo-ticker--mobileStack" : ""}`} role="region" aria-label="Kode promo">
           <p className="promo-tickerItem">
             Kode promo{" "}
             <button
@@ -233,7 +307,7 @@ export default function PromoTicker() {
             {copied ? " tersalin" : ` · ${promo.percent}%`}
           </p>
           <button type="button" className="promo-tickerClose" aria-label="Tutup kode promo" onClick={dismissPromo}>
-            <X size={12} strokeWidth={2.4} aria-hidden="true" />
+            <X size={15} strokeWidth={2.4} aria-hidden="true" />
           </button>
         </div>
       ) : null}

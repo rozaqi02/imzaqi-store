@@ -226,7 +226,7 @@ html[data-theme="light"] .hx-hero-scrim {
   width: 156%;
   top: calc(var(--site-header-offset, 56px) - 6px);
   gap: 10px;
-  transform: translate(-50%, 0) perspective(1000px) rotateX(12deg) scale(0.74);
+  transform: translate(-50%, 0) scale(0.74);
   transform-origin: center top;
 }
 
@@ -288,7 +288,7 @@ html[data-theme="light"] .hx-hero-scrim {
 }
 
 [data-motion="lite"] .hx-catalog-backdrop.is-mobile .hx-catalog-stage {
-  transform: translate(-50%, 0) perspective(1000px) rotateX(8deg) scale(0.78);
+  transform: translate(-50%, 0) scale(0.78);
 }
 
 [data-motion="lite"] .hx-catalog-track {

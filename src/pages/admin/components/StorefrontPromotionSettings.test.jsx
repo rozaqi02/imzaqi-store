@@ -41,6 +41,7 @@ describe("storefront promotion setup", () => {
   });
   it("saving flash sale preserves a different announcement's unsaved draft", async () => {
     render(<Host/>);
+    fireEvent.click(screen.getByRole("radio", { name: /Pengumuman bebas/ }));
     fireEvent.change(screen.getByLabelText("Pesan pengumuman"), { target: { value: "Promo akhir pekan!" } });
     fireEvent.click(screen.getByRole("switch", { name: "Aktifkan pop-up flash sale" }));
     fireEvent.click(screen.getByRole("button", { name: "Simpan flash sale" }));
@@ -78,8 +79,8 @@ describe("storefront promotion setup", () => {
     choose("Produk untuk banner", "Canva");
     const preview = screen.getByRole("complementary", { name: "Pratinjau banner" });
     expect(within(preview).getByText("Canva sekarang tersedia. Lihat paketnya!")).toBeInTheDocument();
-    expect(within(preview).getByText("/produk/canva")).toBeInTheDocument();
-    fireEvent.click(screen.getByRole("button", { name: "Kuning" }));
+    const bannerSection = screen.getByRole("heading", { name: "Banner atas toko" }).closest("article");
+    fireEvent.click(within(bannerSection).getByRole("button", { name: "Kuning" }));
     expect(within(preview).getByText("Canva sekarang tersedia. Lihat paketnya!").closest(".promo-ticker")).toHaveClass("promo-ticker--color-yellow");
     fireEvent.change(screen.getByLabelText("Pesan pengumuman"), { target: { value: "Pesan khusus" } });
     fireEvent.click(screen.getByRole("button", { name: "Batalkan perubahan banner" }));
@@ -105,10 +106,26 @@ describe("storefront promotion setup", () => {
         : <button type="button" onClick={() => setPage("settings")}>Kembali ke pengaturan</button>;
     }
     render(<NavigationHost/>);
+    fireEvent.click(screen.getByRole("radio", { name: /Pengumuman bebas/ }));
     fireEvent.change(screen.getByLabelText("Pesan pengumuman"), { target: { value: "Pesan belum disimpan" } });
     fireEvent.click(screen.getByRole("button", { name: "Kelola flash sale →" }));
     fireEvent.click(screen.getByRole("button", { name: "Kembali ke pengaturan" }));
     expect(screen.getByLabelText("Pesan pengumuman")).toHaveValue("Pesan belum disimpan");
     expect(screen.getByRole("button", { name: "Simpan banner" })).toBeEnabled();
+  });
+  it("saves an automatic flash banner without requiring a manual message", async () => {
+    render(<Host/>);
+    fireEvent.click(screen.getByRole("radio", { name: /Flash sale Ikuti diskon aktif/ }));
+    fireEvent.click(screen.getByRole("switch", { name: "Aktifkan banner atas toko" }));
+    expect(screen.getByText(/Banner akan muncul saat promo tersedia/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Simpan banner" }));
+    await waitFor(() => expect(upsertSetting).toHaveBeenCalledWith("new_product_banner", expect.objectContaining({ enabled: true, type: "flash" })));
+  });
+  it("toggles and saves the service banner setting", async () => {
+    render(<Host/>);
+    fireEvent.click(screen.getByRole("switch", { name: "Aktifkan banner info layanan" }));
+    expect(screen.getByRole("button", { name: "Simpan banner info layanan" })).toBeEnabled();
+    fireEvent.click(screen.getByRole("button", { name: "Simpan banner info layanan" }));
+    await waitFor(() => expect(upsertSetting).toHaveBeenCalledWith("service_banner", expect.objectContaining({ enabled: true, color: "green" })));
   });
 });

@@ -148,45 +148,49 @@ export default function Header() {
       <header ref={headerRef} className="header is-shrunk">
         <PromoTicker />
         <div className="container header-inner">
-          <div className="header-mobile-left">
-            <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-            {canAccessAdmin ? (
-              <AdminHeaderLink
-                to="/admin/dashboard"
-                isActive={isOnAdminRoute}
-                title="Admin Dashboard"
-              />
-            ) : null}
-          </div>
+          {isCompactNav ? (
+            <div className="header-mobile-left">
+              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+              {canAccessAdmin ? (
+                <AdminHeaderLink
+                  to="/admin/dashboard"
+                  isActive={isOnAdminRoute}
+                  title="Admin Dashboard"
+                />
+              ) : null}
+            </div>
+          ) : null}
 
           <Link to="/" className="brand" aria-label="Beranda Imzaqi Store">
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
           </Link>
 
-          <nav ref={navRef} className="nav desktop-only" aria-label="Navigasi utama">
-            <div
-              className="nav-active-pill"
-              style={{
-                transform: `translate(${pillStyle.left}px, ${pillStyle.top}px)`,
-                width: `${pillStyle.width}px`,
-                height: `${pillStyle.height}px`,
-                opacity: pillStyle.opacity,
-              }}
-            />
-            {NAV_LINKS.map((link) => {
-              const isActive = isNavItemActive(location.pathname, link.to);
-              return (
-                <Link
-                  key={link.to}
-                  to={link.to}
-                  className={isActive ? "active" : ""}
-                  aria-current={isActive ? "page" : undefined}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-          </nav>
+          {!isCompactNav ? (
+            <nav ref={navRef} className="nav desktop-only" aria-label="Navigasi utama">
+              <div
+                className="nav-active-pill"
+                style={{
+                  transform: `translate(${pillStyle.left}px, ${pillStyle.top}px)`,
+                  width: `${pillStyle.width}px`,
+                  height: `${pillStyle.height}px`,
+                  opacity: pillStyle.opacity,
+                }}
+              />
+              {NAV_LINKS.map((link) => {
+                const isActive = isNavItemActive(location.pathname, link.to);
+                return (
+                  <Link
+                    key={link.to}
+                    to={link.to}
+                    className={isActive ? "active" : ""}
+                    aria-current={isActive ? "page" : undefined}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          ) : null}
 
           <div className="header-actions">
             <div className="header-cart-container">
@@ -209,16 +213,18 @@ export default function Header() {
               </Link>
             </div>
 
-            <div className="desktop-only header-desktop-toggles">
-              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-              {canAccessAdmin ? (
-                <AdminHeaderLink
-                  to="/admin/dashboard"
-                  isActive={isOnAdminRoute}
-                  title="Admin Dashboard"
-                />
-              ) : null}
-            </div>
+            {!isCompactNav ? (
+              <div className="desktop-only header-desktop-toggles">
+                <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+                {canAccessAdmin ? (
+                  <AdminHeaderLink
+                    to="/admin/dashboard"
+                    isActive={isOnAdminRoute}
+                    title="Admin Dashboard"
+                  />
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
       </header>

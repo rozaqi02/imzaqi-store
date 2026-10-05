@@ -2,7 +2,7 @@ import { act, fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import PromoTicker from "./PromoTicker";
-import { fetchSettings } from "../lib/api";
+import { fetchActiveFlashSales, fetchSettings } from "../lib/api";
 
 vi.mock("../lib/api", () => ({
   fetchActiveFlashSales: vi.fn(async () => [
@@ -112,5 +112,26 @@ describe("PromoTicker", () => {
     fetchSettings.mockResolvedValueOnce({ new_product_banner: { enabled: true, text: "Hubungi toko", link: "https://example.com/contact" } });
     await renderTicker();
     expect(screen.getByRole("link", { name: "Hubungi toko" })).toHaveAttribute("href", "https://example.com/contact");
+  });
+  it("shows an active flash announcement once and hides the duplicate flash row", async () => {
+    fetchActiveFlashSales.mockResolvedValueOnce([{ variant_id: "v1", discount_percent: 38, starts_at: new Date(Date.now() - 60000).toISOString(), ends_at: new Date(Date.now() + 60000).toISOString() }]);
+    fetchSettings.mockResolvedValueOnce({ new_product_banner: { enabled: true, type: "flash", color: "red" } });
+    await renderTicker();
+    expect(screen.getByRole("region", { name: "Flash sale pilihan" })).toHaveClass("promo-ticker--color-red");
+    expect(screen.getByRole("link", { name: "Flash sale Gemini AI Pro · -38%" })).toHaveAttribute("href", "/produk/gemini-ai-pro");
+    expect(screen.queryByRole("region", { name: "Flash sale" })).toBeNull();
+  });
+  it("shows service banner when enabled in admin settings and hides it when disabled", async () => {
+    fetchActiveFlashSales.mockResolvedValueOnce([]);
+    fetchSettings.mockResolvedValueOnce({ service_banner: { enabled: true, text: "Proses 5–30 menit · Garansi replace · Checkout QRIS", color: "green" } });
+    await renderTicker();
+    expect(screen.getByRole("region", { name: "Info layanan" })).toBeInTheDocument();
+    expect(screen.getByText("Proses 5–30 menit · Garansi replace · Checkout QRIS")).toBeInTheDocument();
+  });
+  it("does not show service banner when disabled in settings", async () => {
+    fetchActiveFlashSales.mockResolvedValueOnce([]);
+    fetchSettings.mockResolvedValueOnce({ service_banner: { enabled: false } });
+    await renderTicker();
+    expect(screen.queryByRole("region", { name: "Info layanan" })).toBeNull();
   });
 });

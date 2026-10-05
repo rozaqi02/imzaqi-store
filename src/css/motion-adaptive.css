@@ -478,9 +478,9 @@
     backdrop-filter: none !important;
   }
 
-  /* Isolate Hero repaint boundaries */
+  /* Standard document flow on mobile — matching desktop */
   .hx-hero {
-    contain: layout paint style;
+    contain: none !important;
   }
 }
 

@@ -1,13 +1,18 @@
-/* Cart geometry; its theme-aware surface is shared with other icon controls. */
+/* Cart and Admin button geometry; theme-aware surface is shared with other icon controls. */
 html[data-theme] body .header .header-cart,
 html[data-theme] body .header .header-cart:hover,
-html[data-theme] body .header .header-cart:active {
+html[data-theme] body .header .header-cart:active,
+html[data-theme] body .header .header-iconAction,
+html[data-theme] body .header .header-iconAction:hover,
+html[data-theme] body .header .header-iconAction:active {
   border-radius: var(--hdr-action-radius, 10px) !important;
   transform: none !important;
 }
 
 html[data-theme] body .header .header-cart::before,
-html[data-theme] body .header .header-cart::after {
+html[data-theme] body .header .header-cart::after,
+html[data-theme] body .header .header-iconAction::before,
+html[data-theme] body .header .header-iconAction::after {
   content: none !important;
 }
 
