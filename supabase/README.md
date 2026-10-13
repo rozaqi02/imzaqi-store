@@ -16,21 +16,28 @@ Cek sudah masuk:
 SELECT * FROM public.admin_users;
 ```
 
-## Migration opsional
+## Struktur migration (source of truth)
 
-1. `migrations/002_admin_users_table.sql` — `is_admin()` + RLS baca baris sendiri
-2. `migrations/001_admin_rls.sql` — kebijakan RLS tabel operasional (order, produk, dll.)
-3. `migrations/003_products_category.sql` — kolom `products.category` + izinkan nilai `ai` / `design`
+| File | Isi | Status |
+|---|---|---|
+| `migrations/0001_baseline.sql` | Skema tabel + **15 RPC** persis seperti dipanggil frontend (`create_order_with_stock_check`, `get_order_public`, `validate_promo`, analytics, `is_admin`, dll.) | ⚠️ RECONSTRUCTED — verifikasi vs `supabase db dump` sebelum menimpa fungsi live |
+| `migrations/0002_hardening.sql` | Unique `promo_claims(visitor_id, promo_code)` + index pendukung | Aditif, idempotent, aman di produksi |
+| `migrations/_archived/20260909_secure_checkout_funnel.sql` | Redesign "secure checkout" yang **ditinggalkan** | ❌ JANGAN diterapkan (me-REVOKE `get_order_public`) |
+| `migrations/_archived/20260910_order_lookup_by_id.sql` | Varian `get_order_public_by_code` yang tak dipakai frontend | ❌ JANGAN diterapkan |
 
-   **Wajib** jika admin dapat `400 Bad Request` saat ganti kategori ke AI/Design  
-   (biasanya ENUM/CHECK lama hanya mengizinkan streaming/music/tools/learning/other).
+> Catatan: migration lama bernomor `001`–`004` yang dulu tercantum di dokumen
+> ini **tidak pernah ada** di repo, jadi referensinya dihapus.
 
-4. `migrations/004_products_category_academic.sql` — izinkan kategori `academic` (Jasa Akademik)
+### Verifikasi sebelum menerapkan ke produksi
 
-   **Wajib** sebelum simpan produk dengan kategori Jasa Akademik di admin,
-   jika CHECK constraint masih menolak nilai `academic`.
+```bash
+supabase db dump --schema public -f prod_schema.sql
+# bandingkan definisi fungsi di prod_schema.sql vs 0001_baseline.sql
+```
 
-   Setelah dijalankan di SQL Editor, reload schema cache PostgREST bila perlu  
-   (Dashboard → Settings → API → Reload schema).
+Baseline memakai `CREATE TABLE IF NOT EXISTS` (no-op di produksi) tetapi
+`CREATE OR REPLACE FUNCTION` (AKAN menimpa body fungsi live). Jadi jalankan
+baseline hanya setelah diff, atau hanya pada environment baru / disaster
+recovery.
 
 Setelah insert ke `admin_users`, **logout lalu login ulang** di `/admin`.

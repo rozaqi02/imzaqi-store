@@ -47,9 +47,10 @@ import {
 import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
 import VirtualList from "./components/VirtualList";
 import AdminOrderListItem from "./components/AdminOrderListItem";
-import MarketingMediaGenerator from "./components/MarketingMediaGenerator";
 import AdminPicker from "./components/AdminPicker";
-import StorefrontPromotionSettings from "./components/StorefrontPromotionSettings";
+import TestimonialsPane from "./panes/TestimonialsPane";
+import SettingsPane from "./panes/SettingsPane";
+import MarketingPane from "./panes/MarketingPane";
 import {
   ADMIN_PRODUCTS_CACHE_TTL_MS,
   EMPTY_ANALYTICS_SUMMARY,
@@ -115,20 +116,8 @@ import {
   normalizeWhatsApp,
   prettyCategory,
   toDateKeyWIB,
+  toLocalDatetimeInput,
 } from "./adminUtils";
-
-function toLocalDatetimeInput(dateValue) {
-  if (!dateValue) return "";
-  const d = new Date(dateValue);
-  if (isNaN(d.getTime())) return "";
-  const pad = (n) => String(n).padStart(2, "0");
-  const yyyy = d.getFullYear();
-  const mm = pad(d.getMonth() + 1);
-  const dd = pad(d.getDate());
-  const hh = pad(d.getHours());
-  const mi = pad(d.getMinutes());
-  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
-}
 
 const BUCKET_ICONS = "product-icons"; // public
 const BUCKET_TESTIMONIALS = "testimonials"; // public
@@ -4370,186 +4359,42 @@ export default function AdminDashboard() {
             ) : null}
 
             {tab === "testimonials" ? (
-              <div className="admin-panel admin-panel--fill admin-testimonialsPanel admin-workspacePane">
-                <div className="admin-panel-head">
-                  <div>
-                    <div className="admin-panel-title">Testimoni</div>
-                    <div className="admin-panel-sub">{analyticsSummary.activeTestimonials} tayang</div>
-                  </div>
-                </div>
-
-                <div className="admin-panel-body admin-panel-body--scroll">
-                  <form className="admin-testimonial-form admin-stickyTools" onSubmit={addTestimonials}>
-                    <label className="admin-fileBtn">
-                      <input name="files" type="file" accept="image/*" multiple />
-                      Pilih gambar
-                    </label>
-                    <input name="caption" className="input" placeholder="Caption (opsional)" />
-                    <input name="customer_name" className="input" placeholder="Nama pelanggan" />
-                    <input name="product_name" className="input" placeholder="Produk yang dibeli" />
-                    <input name="purchased_at" className="input" type="date" aria-label="Tanggal pembelian" />
-                    <label className="admin-check"><input name="is_verified" type="checkbox" /> Pembelian terverifikasi</label>
-                    <button className="btn btn-primary" type="submit">
-                      Upload
-                    </button>
-                  </form>
-
-                  <div className="admin-grid" style={{ marginTop: 14 }}>
-                    {testimonials.map((t) => (
-                      <div key={t.id} className="admin-thumb">
-                        <img src={t.image_url} alt={t.caption || "testimoni"} />
-                        {t.caption ? <div className="admin-thumb-caption">{t.caption}</div> : null}
-                        {(t.customer_name || t.product_name) ? <div className="admin-thumb-caption">{[t.customer_name, t.product_name].filter(Boolean).join(" · ")}</div> : null}
-                        <div className="admin-thumb-actions">
-                          <button
-                            className={"btn btn-sm " + (t.is_active ? "btn-ghost" : "")}
-                            type="button"
-                            onClick={() => updateTestimonial(t.id, { is_active: !t.is_active })}
-                          >
-                            {t.is_active ? "Off" : "On"}
-                          </button>
-                          <button className={"btn btn-sm " + (t.is_verified ? "btn-primary" : "btn-ghost")} type="button" onClick={() => updateTestimonial(t.id, { is_verified: !t.is_verified })}>
-                            {t.is_verified ? "Verified" : "Verifikasi"}
-                          </button>
-                          <button
-                            className="btn btn-ghost btn-sm"
-                            type="button"
-                            onClick={() => {
-                              openConfirm({
-                                title: "Edit caption",
-                                prompt: true,
-                                promptDefault: t.caption || "",
-                                promptLabel: "Caption",
-                                confirmLabel: "Simpan",
-                                onConfirm: (newCaption) =>
-                                  updateTestimonial(t.id, { caption: String(newCaption || "") }),
-                              });
-                            }}
-                          >
-                            Caption
-                          </button>
-                          <button className="btn btn-danger btn-sm" type="button" onClick={() => deleteTestimonial(t.id)}>
-                            Hapus
-                          </button>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              <TestimonialsPane
+                activeCount={analyticsSummary.activeTestimonials}
+                testimonials={testimonials}
+                onAddTestimonials={addTestimonials}
+                onUpdateTestimonial={updateTestimonial}
+                onDeleteTestimonial={deleteTestimonial}
+                openConfirm={openConfirm}
+              />
             ) : null}
 
             {tab === "marketing" ? (
-              <div className="admin-panel admin-panel--fill admin-marketingPanel">
-                <div className="admin-panel-head">
-                  <div>
-                    <div className="admin-panel-title">Media & Generator Promosi</div>
-                    <div className="admin-panel-sub">
-                      Studio poster produk dan katalog harga. Pilih desain, sesuaikan paket, lalu download PNG atau salin gambar.
-                    </div>
-                  </div>
-                </div>
-                <div className="admin-panel-body admin-panel-body--scroll">
-                  <MarketingMediaGenerator products={products} settings={settings} />
-                </div>
-              </div>
+              <MarketingPane products={products} settings={settings} />
             ) : null}
 
             {tab === "settings" ? (
-              <div className="admin-settingsGrid admin-workspaceScroll">
-                <div className="admin-panel">
-                  {/* Section 1: Kontak & Pembayaran */}
-                  <div className="admin-panel-head">
-                    <div>
-                      <div className="admin-panel-title">Kontak & pembayaran</div>
-                      <div className="admin-panel-sub">WA admin + payload QRIS checkout</div>
-                    </div>
-                  </div>
-
-                  <div className="admin-panel-body">
-                    <div className="admin-form-grid admin-form-grid--settings">
-                      <label className="admin-field admin-field-full">
-                        <span>WhatsApp Admin</span>
-                        <input
-                          className="input"
-                          value={settingsWhatsApp}
-                          placeholder="62813..."
-                          onChange={(e) => setSettingsWhatsApp(e.target.value)}
-                        />
-                        <div className="hint subtle">Format angka saja, contoh 62813…</div>
-                      </label>
-
-                      <label className="admin-field admin-field-full">
-                        <span>QRIS Base Payload</span>
-                        <textarea
-                          className="input admin-textarea"
-                          rows={4}
-                          value={settingsQrisBase}
-                          placeholder="000201..."
-                          onChange={(e) => setSettingsQrisBase(e.target.value)}
-                        />
-                        <div className="hint subtle">Dipakai generate QR dengan nominal otomatis.</div>
-                      </label>
-
-                      <label className="admin-field admin-field-full">
-                        <span>Fallback QR Image URL</span>
-                        <input
-                          className="input"
-                          value={settingsQrisImageUrl}
-                          placeholder="https://..."
-                          onChange={(e) => setSettingsQrisImageUrl(e.target.value)}
-                        />
-                        <div className="hint subtle">Opsional jika generator QR gagal.</div>
-                      </label>
-                    </div>
-
-                    <div className="admin-form-actions">
-                      <button className="btn btn-primary" type="button" onClick={() => saveWhatsApp(settingsWhatsApp)}>
-                        Simpan WhatsApp
-                      </button>
-                      <button className="btn btn-ghost" type="button" onClick={() => saveQrisSettings(settingsQrisBase, settingsQrisImageUrl)}>
-                        Simpan QRIS
-                      </button>
-                    </div>
-                  </div>
-
-                  <StorefrontPromotionSettings
-                    settings={settings}
-                    draftCache={promotionDraftCache}
-                    products={products}
-                    flashSales={flashSales}
-                    onSaved={(key, value) => setSettings(current => ({ ...current, [key]: value }))}
-                    onManageFlashSales={() => handleSelectTab("flashsale")}
-                    onManageProducts={() => handleSelectTab("products")}
-                  />
-
-                  {/* Section 3: Catatan sistem */}
-                  <div className="admin-panel-head" style={{ borderTop: "1px solid var(--admin-border, rgba(255,255,255,0.08))", paddingTop: 20 }}>
-                    <div>
-                      <div className="admin-panel-title">Catatan sistem</div>
-                      <div className="admin-panel-sub">Status operasional singkat</div>
-                    </div>
-                  </div>
-
-                  <div className="admin-panel-body admin-stack">
-                    <div className="admin-miniCard">
-                      <span>Last sync</span>
-                      <strong>{lastSyncedAt ? formatAdminDate(lastSyncedAt) : "-"}</strong>
-                      <small>Refresh manual bila data belum terbaru</small>
-                    </div>
-                    <div className="admin-miniCard">
-                      <span>QRIS</span>
-                      <strong>{qrisModeLabel}</strong>
-                      <small>{qrisModeCopy}</small>
-                    </div>
-                    <div className="admin-miniCard">
-                      <span>Traffic hari ini</span>
-                      <strong>{formatCompactNumber(storePulse.today_views)} views</strong>
-                      <small>{storePulse.today_orders || analyticsSummary.todayOrders} order masuk</small>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <SettingsPane
+                settingsWhatsApp={settingsWhatsApp}
+                setSettingsWhatsApp={setSettingsWhatsApp}
+                settingsQrisBase={settingsQrisBase}
+                setSettingsQrisBase={setSettingsQrisBase}
+                settingsQrisImageUrl={settingsQrisImageUrl}
+                setSettingsQrisImageUrl={setSettingsQrisImageUrl}
+                saveWhatsApp={saveWhatsApp}
+                saveQrisSettings={saveQrisSettings}
+                settings={settings}
+                promotionDraftCache={promotionDraftCache}
+                products={products}
+                flashSales={flashSales}
+                setSettings={setSettings}
+                handleSelectTab={handleSelectTab}
+                lastSyncedAt={lastSyncedAt}
+                qrisModeLabel={qrisModeLabel}
+                qrisModeCopy={qrisModeCopy}
+                storePulse={storePulse}
+                analyticsSummary={analyticsSummary}
+              />
             ) : null}
           </main>
         </div>

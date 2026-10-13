@@ -1,3 +1,16 @@
+-- ============================================================================
+-- ⚠️  ABANDONED / NOT DEPLOYED — JANGAN DITERAPKAN KE PRODUKSI
+-- ----------------------------------------------------------------------------
+-- Migration ini adalah redesign "secure checkout funnel" yang TIDAK PERNAH
+-- di-deploy dan TIDAK dipakai frontend. Menerapkannya akan:
+--   1. Me-REVOKE EXECUTE get_order_public(text) dari anon  -> halaman /status MATI.
+--   2. Membuat get_order_public_secure / get_order_public_by_code yang tidak
+--      dipanggil kode mana pun (kontrak live: get_order_public(p_order_code)).
+--   3. Membuat tabel funnel_events / restock_requests yang belum ada di produksi.
+-- Kontrak live yang benar ada di supabase/migrations/0001_baseline.sql.
+-- File ini disimpan hanya sebagai referensi historis.
+-- ============================================================================
+
 -- Secure checkout foundation: reservations, payment reports, restock demand and funnel analytics.
 -- Apply once in Supabase SQL editor before deploying the matching frontend.
 

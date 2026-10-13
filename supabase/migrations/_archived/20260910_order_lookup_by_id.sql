@@ -1,3 +1,12 @@
+-- ============================================================================
+-- ⚠️  ABANDONED / NOT DEPLOYED — JANGAN DITERAPKAN KE PRODUKSI
+-- ----------------------------------------------------------------------------
+-- Mendefinisikan get_order_public_by_code(p_order_code, p_visitor_id) yang TIDAK
+-- cocok dengan kontrak live get_order_public(p_order_code) yang dipakai
+-- Status.jsx. Tabel status_lookup_attempts-nya tetap berguna dan sudah
+-- dimasukkan ke 0001_baseline.sql. File ini hanya referensi historis.
+-- ============================================================================
+
 -- Status lookup v6: ID order 8 karakter tanpa suffix WhatsApp.
 
 create table if not exists public.status_lookup_attempts (

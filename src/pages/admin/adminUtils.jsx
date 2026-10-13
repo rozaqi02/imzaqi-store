@@ -2,6 +2,19 @@
 import { formatIDR } from "../../lib/format";
 import { getOrderStatusTone, prettyOrderStatus } from "../../lib/orderStatus";
 
+export function toLocalDatetimeInput(dateValue) {
+  if (!dateValue) return "";
+  const d = new Date(dateValue);
+  if (isNaN(d.getTime())) return "";
+  const pad = (n) => String(n).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const mm = pad(d.getMonth() + 1);
+  const dd = pad(d.getDate());
+  const hh = pad(d.getHours());
+  const mi = pad(d.getMinutes());
+  return `${yyyy}-${mm}-${dd}T${hh}:${mi}`;
+}
+
 export const CATEGORY_OPTIONS = [
   { value: "streaming", label: "Streaming" },
   { value: "music", label: "Music" },
