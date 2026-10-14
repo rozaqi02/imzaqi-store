@@ -39,6 +39,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import EmptyState from "../../components/EmptyState";
 import FlowAssist from "../../components/FlowAssist";
 import { checkAdminAccess } from "../../lib/adminAuth";
+import { isFunnelBackendAvailable } from "../../lib/funnelAnalytics";
 import {
   ORDER_STATUS_OPTIONS,
   LIVE_ORDER_STATUSES,
@@ -184,6 +185,7 @@ export default function AdminDashboard() {
   const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [cohortReturn, setCohortReturn] = useState(0);
   const [funnelSummary, setFunnelSummary] = useState({ days: 7, steps: [] });
+  const [funnelUnavailable, setFunnelUnavailable] = useState(false);
   const [restockRequests, setRestockRequests] = useState([]);
 
   // ── Bulk Actions state ──
@@ -577,7 +579,9 @@ export default function AdminDashboard() {
         fetchVisitorStats({ days }),
         fetchTopPages({ days, limit: 10 }),
         fetchCohortReturn({ days: 7 }),
-        supabase.rpc("get_funnel_summary", { p_days: days }),
+        isFunnelBackendAvailable()
+          ? supabase.rpc("get_funnel_summary", { p_days: days })
+          : Promise.resolve({ data: null, error: null, skipped: true }),
       ]);
 
       if (dailyResult.status === "fulfilled") {
@@ -603,10 +607,14 @@ export default function AdminDashboard() {
       } else {
         warn("fetchCohortReturn gagal:", cohortResult.reason);
       }
-      if (funnelResult.status === "fulfilled" && !funnelResult.value?.error) {
+      if (funnelResult.status === "fulfilled" && funnelResult.value?.skipped) {
+        setFunnelUnavailable(true);
+      } else if (funnelResult.status === "fulfilled" && !funnelResult.value?.error) {
         setFunnelSummary(funnelResult.value.data || { days, steps: [] });
-      } else if (funnelResult.status === "rejected") {
-        warn("get_funnel_summary gagal:", funnelResult.reason);
+        setFunnelUnavailable(false);
+      } else if (funnelResult.status === "rejected" || funnelResult.value?.error) {
+        setFunnelUnavailable(true);
+        warn("get_funnel_summary gagal:", funnelResult.reason || funnelResult.value?.error);
       }
       loadedRef.current.analytics = true;
     } catch (e) {
@@ -2937,7 +2945,7 @@ export default function AdminDashboard() {
                             </div>;
                           })}
                         </div>
-                      ) : <div className="admin-emptyInline">Funnel mulai terisi setelah migrasi checkout aktif dan pengunjung berbelanja.</div>}
+                      ) : <div className="admin-emptyInline">{funnelUnavailable ? "Objek funnel belum ada di database. Jalankan supabase/migrations/0002_funnel_objects.sql di Supabase SQL Editor, lalu muat ulang halaman ini." : "Funnel mulai terisi setelah pengunjung berbelanja."}</div>}
                     </div>
                   </div>
 

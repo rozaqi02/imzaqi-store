@@ -1,9 +1,9 @@
 /* A campaign and a perforated offer ticket, with no shared storefront overrides. */
 .flash-drop {
-  --fsd-ink: #173d2b;
-  --fsd-muted: #58695b;
-  --fsd-paper: #f5f5e9;
-  --fsd-acid: #dbff83;
+  --fsd-ink: #12382a;
+  --fsd-muted: #5b6f64;
+  --fsd-paper: #ffffff;
+  --fsd-acid: #3ee6c0;
   --fsd-seam: rgba(35, 65, 40, .22);
   position: relative;
   isolation: isolate;
@@ -14,14 +14,14 @@
   padding: 18px;
   border-radius: 22px;
   background: radial-gradient(ellipse at 5% 0%, #1c6646, transparent 65%), #103d2b;
-  color: #f4f7e9;
+  color: #eefaf4;
   box-shadow: 0 5px 12px -6px rgba(10, 44, 31, .3);
 }
 .fsd-campaign { position: relative; min-width: 0; padding: 12px 12px 8px; }
-.fsd-watermark { position: absolute; right: -5px; top: 12px; z-index: -1; color: #b6ffc0; opacity: .09; transform: rotate(12deg); pointer-events: none; }
+.fsd-watermark { position: absolute; right: -5px; top: 12px; z-index: -1; color: #7ef0d4; opacity: .09; transform: rotate(12deg); pointer-events: none; }
 .fsd-eyebrow { display: flex; align-items: center; gap: 6px; color: var(--fsd-acid); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
 .fsd-eyebrow > span { margin-left: auto; color: #b4d1bf; font-size: 8px; letter-spacing: .09em; }
-.fsd-headline { margin: 18px 0 10px; font-family: "Outfit", var(--font-sans), sans-serif; font-size: clamp(36px, 4.3vw, 58px); font-weight: 700; line-height: .99; letter-spacing: -.055em; color: #f5f6e9; }
+.fsd-headline { margin: 18px 0 10px; font-family: "Outfit", var(--font-sans), sans-serif; font-size: clamp(36px, 4.3vw, 58px); font-weight: 700; line-height: .99; letter-spacing: -.055em; color: #eefaf4; }
 .fsd-headline em { color: var(--fsd-acid); font-style: normal; }
 .fsd-intro { max-width: 28ch; margin: 0 0 20px; font-size: 12px; line-height: 1.6; color: #c2d7c8; }
 .fsd-clock { display: grid; gap: 8px; }
@@ -33,7 +33,7 @@
 .fsd-unit small { font-size: 9px; color: #c2d7c8; }
 .fsd-unit:last-child strong { color: var(--fsd-acid); }
 
-.fsd-ticket { position: relative; align-self: stretch; display: flex; flex-direction: column; min-width: 0; padding: 17px 22px; border-radius: 6px 14px 14px 6px; background: var(--fsd-paper); color: var(--fsd-ink); }
+.fsd-ticket { position: relative; align-self: stretch; display: flex; flex-direction: column; min-width: 0; padding: 17px 22px; border-radius: 14px; background: var(--fsd-paper); color: var(--fsd-ink); }
 .fsd-ticket::before { content: ""; position: absolute; inset: 15px auto 15px -11px; border-left: 1px dashed rgba(220, 255, 210, .3); }
 .fsd-ticketTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 8px; font-weight: 700; letter-spacing: .12em; color: var(--fsd-muted); }
 .fsd-ticketBrand { font-size: 11px; font-weight: 800; letter-spacing: -.02em; }
@@ -42,7 +42,7 @@
 .fsd-logo { position: absolute; inset: 0 auto auto 0; display: grid; place-items: center; width: 100px; height: 100px; background: #fff; border-radius: 24px; transform: rotate(-8deg); box-shadow: 0 5px 9px -6px rgba(13, 34, 22, .45); overflow: hidden; }
 .fsd-logo img { width: 100%; height: 100%; object-fit: contain; }
 .fsd-logo > span { font-family: "Outfit", sans-serif; font-size: 45px; font-weight: 700; color: #123d2c; }
-.fsd-seal { position: absolute; right: -7px; bottom: -2px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 83px; height: 83px; background: var(--fsd-acid); color: #173d2b; transform: rotate(10deg); clip-path: polygon(50% 0%,61% 10%,75% 7%,79% 22%,93% 25%,90% 39%,100% 50%,90% 61%,93% 75%,79% 78%,75% 93%,61% 90%,50% 100%,39% 90%,25% 93%,21% 78%,7% 75%,10% 61%,0% 50%,10% 39%,7% 25%,21% 22%,25% 7%,39% 10%); }
+.fsd-seal { position: absolute; right: -6px; bottom: -6px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 78px; height: 78px; border-radius: 50%; background: var(--fsd-acid); color: #0b3a2a; box-shadow: 0 10px 22px rgba(0, 0, 0, .3), inset 0 0 0 3px rgba(255, 255, 255, .4); }
 .fsd-seal small { font-size: 8px; font-weight: 800; letter-spacing: .06em; }
 .fsd-seal strong { font-family: "Outfit", sans-serif; font-size: 32px; letter-spacing: -.06em; line-height: 1.1; font-weight: 700; }
 .fsd-seal strong span { font-size: 17px; }
@@ -60,7 +60,7 @@
 .fsd-ticketBottom::before { left: -28px; }
 .fsd-ticketBottom::after { right: -28px; }
 .fsd-stock { display: flex; align-items: center; gap: 5px; color: var(--fsd-muted); font-size: 11px; }
-.flash-drop .fsd-cta { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 44px; padding: 0 15px; border-radius: 9px; background: var(--imzaqi-btn-face, linear-gradient(165deg, #14c77f, #009e60)); color: var(--imzaqi-btn-text, #fff); box-shadow: var(--imzaqi-btn-shadow, inset 0 2px 0 #ffffff50, inset 0 -2px 0 #00000020); font-size: 12px; font-weight: 800; text-decoration: none; transition: transform .15s ease; }
+.flash-drop .fsd-cta { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; background: var(--imzaqi-btn-face, linear-gradient(165deg, #14c77f, #009e60)); color: var(--imzaqi-btn-text, #fff); box-shadow: var(--imzaqi-btn-shadow, inset 0 2px 0 #ffffff50, inset 0 -2px 0 #00000020); font-size: 12px; font-weight: 800; text-decoration: none; transition: transform .15s ease; }
 .fsd-cta:hover { transform: translateY(-1px); }
 .fsd-cta:active { transform: translateY(1px); }
 
@@ -80,9 +80,9 @@
 .fsd-choiceCopy strong { font-size: 11px; font-weight: 800; }
 .fsd-choiceCopy small { font-size: 9px; max-width: 190px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; opacity: .8; }
 .fsd-choiceDiscount { margin-left: 8px; font-family: "Outfit", sans-serif; font-size: 17px; font-weight: 600; white-space: nowrap; }
-.flash-drop :is(a, button):focus-visible { outline: 2px solid #f6bb66; outline-offset: 3px; }
+.flash-drop :is(a, button):focus-visible { outline: 2px solid #3ee6c0; outline-offset: 3px; }
 
-html[data-theme="dark"] .flash-drop { --fsd-paper: #1b372d; --fsd-ink: #eff6df; --fsd-muted: #b0c4b7; --fsd-seam: #b3d3b138; background: radial-gradient(ellipse at 5% 0%, #20583c, transparent 65%), #102d22; box-shadow: 0 5px 12px -6px #00000070; }
+html[data-theme="dark"] .flash-drop { --fsd-paper: #1b372d; --fsd-ink: #eafaf2; --fsd-muted: #b0c4b7; --fsd-seam: #b3d3b138; background: radial-gradient(ellipse at 5% 0%, #20583c, transparent 65%), #102d22; box-shadow: 0 5px 12px -6px #00000070; }
 html[data-theme="dark"] .fsd-ticketBottom::before, html[data-theme="dark"] .fsd-ticketBottom::after { background: #102d22; }
 
 @media (max-width: 900px) and (min-width: 721px) {

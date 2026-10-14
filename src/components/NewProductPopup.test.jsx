@@ -4,18 +4,24 @@ import { MemoryRouter } from "react-router-dom";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import NewProductPopup from "./NewProductPopup";
 import { fetchSettings, fetchProducts } from "../lib/api";
+import { releaseOverlaySlot, requestOverlaySlot } from "../lib/overlayScheduler";
 
 vi.mock("../lib/api", () => ({ fetchSettings: vi.fn(), fetchProducts: vi.fn() }));
 const product = { id: "n", slug: "netflix", name: "Netflix", icon_url: "/netflix.png", product_variants: [{ price_idr: 31000, stock: 4 }] };
 beforeEach(() => {
   vi.useFakeTimers();
   localStorage.clear(); sessionStorage.clear();
-  window.__imzaqi_academic_popup_active = false;
   document.body.innerHTML = '<div id="root"></div>';
   fetchSettings.mockResolvedValue({ new_product_popup: { enabled: true, product_id: "n", show_on: "home" } });
   fetchProducts.mockResolvedValue([product]);
 });
-afterEach(() => { cleanup(); vi.useRealTimers(); });
+afterEach(() => {
+  cleanup();
+  // Jaga-jaga: scheduler adalah singleton level modul, jangan bocor antar test.
+  releaseOverlaySlot("flashSalePopup");
+  releaseOverlaySlot("newProductPopup");
+  vi.useRealTimers();
+});
 async function start(path = "/") {
   render(<MemoryRouter initialEntries={[path]}><NewProductPopup/></MemoryRouter>, { container: document.getElementById("root") });
   await act(async () => { await Promise.resolve(); await Promise.resolve(); });
@@ -45,14 +51,14 @@ describe("new product popup", () => {
     await start("/produk/netflix");
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
-  it("waits for another popup instead of dropping or stacking the announcement", async () => {
-    const existing = document.createElement("div");
-    existing.className = "ac-popup-backdrop";
-    document.body.appendChild(existing);
+  it("waits for a higher-priority overlay instead of dropping or stacking the announcement", async () => {
+    // Kontrak baru: penundaan diatur scheduler terpusat (satu slot eksklusif),
+    // bukan lagi dengan memeriksa class DOM popup lain.
+    const releaseFlashSale = requestOverlaySlot("flashSalePopup", { ready: true });
     await start();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    existing.remove();
-    await act(async () => { vi.advanceTimersByTime(800); });
+
+    await act(async () => { releaseFlashSale(); });
     expect(screen.getByRole("dialog")).toBeInTheDocument();
   });
   it("does not open for an inactive product or for a disabled setting", async () => {

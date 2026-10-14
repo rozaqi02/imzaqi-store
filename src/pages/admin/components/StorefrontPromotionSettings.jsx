@@ -5,9 +5,22 @@ import { upsertSetting } from "../../../lib/api";
 import { isAcademicProduct, resolveProductCategory } from "../../../lib/productCategories";
 import { BANNER_COLORS, BANNER_GRAPHICS, BANNER_ICONS, BANNER_LINK_STYLES, BANNER_STYLES, BANNER_TYPES, normalizePromotion, productPromotionCopy, readyFlashPromotions, resolveBannerCopy, resolvePromotionCopy, validatePromotion } from "../../../lib/storefrontPromotions";
 import BannerGraphic from "../../../components/BannerGraphic";
+import { MASCOTS_ENABLED } from "../../../lib/featureFlags";
 import AdminPicker from "./AdminPicker";
 import NewProductPopupContent from "../../../components/NewProductPopupContent";
 import "./StorefrontPromotionSettings.css";
+
+function MascotPausedNote() {
+  if (MASCOTS_ENABLED) return null;
+  return (
+    <div className="sps-readiness is-waiting">
+      <span />
+      Maskot sedang disembunyikan sementara di seluruh toko. Pilihan di bawah tetap
+      tersimpan, tapi belum tampil ke pelanggan sampai saklar{" "}
+      <code>src/lib/featureFlags.js</code> diubah kembali ke <code>true</code>.
+    </div>
+  );
+}
 
 function BannerIcon({ name }) {
   if (!name || name === "none") return null;
@@ -193,6 +206,7 @@ export default function StorefrontPromotionSettings({ settings = {}, products = 
         </div>
 
         <div className="sps-step"><span>3</span><h4>Karakter grafis maskot</h4></div>
+        <MascotPausedNote />
         <div className="sps-graphicChoices" role="group" aria-label="Karakter grafis maskot banner info layanan">
           {BANNER_GRAPHICS.map(item => (
             <button
@@ -308,6 +322,7 @@ export default function StorefrontPromotionSettings({ settings = {}, products = 
         </div>
 
         <div className="sps-step"><span>4</span><h4>Karakter grafis maskot</h4></div>
+        <MascotPausedNote />
         <div className="sps-graphicChoices" role="group" aria-label="Karakter grafis maskot banner atas toko">
           {BANNER_GRAPHICS.map(item => (
             <button

@@ -103,29 +103,13 @@ html[data-theme="dark"] {
     inset 0 2px 0 rgba(255, 255, 255, 0.56),
     inset 0 -4px 0 rgba(3, 66, 74, 0.54);
 
-  --imzaqi-btn-face:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 34%),
-    #00a86b;
+  /* Flat modern primary button — no inset bevels (design review: reduce gloss) */
+  --imzaqi-btn-face: #00a86b;
   --imzaqi-btn-border: rgba(4, 20, 14, 0.22);
   --imzaqi-btn-text: #04140e;
-  --imzaqi-btn-shadow:
-    inset 0 3px 0 rgba(255, 255, 255, 0.5),
-    inset 1px 0 0 rgba(255, 255, 255, 0.2),
-    inset 0 -4px 0 rgba(0, 60, 40, 0.42),
-    inset 0 2px 10px rgba(0, 60, 40, 0.16),
-    0 10px 18px rgba(0, 0, 0, 0.28);
-  --imzaqi-btn-shadow-compact:
-    inset 0 3px 0 rgba(255, 255, 255, 0.5),
-    inset 1px 0 0 rgba(255, 255, 255, 0.2),
-    inset 0 -4px 0 rgba(0, 60, 40, 0.42),
-    inset 0 2px 10px rgba(0, 60, 40, 0.16),
-    0 3px 4px -2px rgba(0, 0, 0, 0.28);
-  --imzaqi-btn-shadow-hover:
-    inset 0 3px 0 rgba(255, 255, 255, 0.58),
-    inset 1px 0 0 rgba(255, 255, 255, 0.24),
-    inset 0 -4px 0 rgba(0, 60, 40, 0.5),
-    inset 0 2px 10px rgba(0, 60, 40, 0.2),
-    0 12px 22px rgba(0, 0, 0, 0.32);
+  --imzaqi-btn-shadow: 0 6px 16px rgba(0, 168, 107, 0.28);
+  --imzaqi-btn-shadow-compact: 0 3px 8px rgba(0, 168, 107, 0.24);
+  --imzaqi-btn-shadow-hover: 0 10px 22px rgba(0, 168, 107, 0.36);
 
   /* ── Unified Layout Design Tokens (Dark Mode) ── */
   --uni-panel:
@@ -242,29 +226,13 @@ html[data-theme="light"] {
     inset 0 1px 0 rgba(255, 255, 255, 0.56),
     inset 0 -3px 0 rgba(0, 122, 130, 0.18);
 
-  --imzaqi-btn-face:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 34%),
-    #009e60;
-  --imzaqi-btn-border: rgba(0, 80, 50, 0.28);
+  /* Flat modern primary button — AA contrast white-on-green (design review) */
+  --imzaqi-btn-face: #00875a;
+  --imzaqi-btn-border: rgba(0, 60, 40, 0.2);
   --imzaqi-btn-text: #ffffff;
-  --imzaqi-btn-shadow:
-    inset 0 3px 0 rgba(255, 255, 255, 0.62),
-    inset 1px 0 0 rgba(255, 255, 255, 0.35),
-    inset 0 -4px 0 rgba(0, 80, 50, 0.34),
-    inset 0 2px 10px rgba(0, 80, 50, 0.12),
-    8px 12px 18px rgba(0, 80, 50, 0.18);
-  --imzaqi-btn-shadow-compact:
-    inset 0 3px 0 rgba(255, 255, 255, 0.62),
-    inset 1px 0 0 rgba(255, 255, 255, 0.35),
-    inset 0 -4px 0 rgba(0, 80, 50, 0.34),
-    inset 0 2px 10px rgba(0, 80, 50, 0.12),
-    0 3px 4px -2px rgba(0, 80, 50, 0.18);
-  --imzaqi-btn-shadow-hover:
-    inset 0 3px 0 rgba(255, 255, 255, 0.72),
-    inset 1px 0 0 rgba(255, 255, 255, 0.4),
-    inset 0 -4px 0 rgba(0, 80, 50, 0.4),
-    inset 0 2px 10px rgba(0, 80, 50, 0.14),
-    10px 14px 22px rgba(0, 80, 50, 0.22);
+  --imzaqi-btn-shadow: 0 6px 16px rgba(0, 135, 90, 0.24);
+  --imzaqi-btn-shadow-compact: 0 3px 8px rgba(0, 135, 90, 0.2);
+  --imzaqi-btn-shadow-hover: 0 10px 22px rgba(0, 135, 90, 0.3);
 
   /* ── Unified Layout Design Tokens (Light Mode) ── */
   --uni-panel: #ffffff;

@@ -5,9 +5,15 @@ import FlashSalePopup from "./FlashSalePopup";
 import AcademicPopup from "./AcademicPopup";
 import { fetchActiveFlashSales, fetchSettings } from "../lib/api";
 
-vi.mock("../lib/overlayScheduler", () => ({
-  OVERLAY_TIMING: { flashSaleMs: 0 },
-}));
+// Partial mock: scheduler ASLI tetap dipakai agar kontrak slot ikut teruji.
+// Hanya jeda flash sale yang dinolkan supaya test tidak menunggu 12 detik.
+vi.mock("../lib/overlayScheduler", async (importOriginal) => {
+  const actual = await importOriginal();
+  return {
+    ...actual,
+    OVERLAY_TIMING: { ...actual.OVERLAY_TIMING, flashSaleMs: 0 },
+  };
+});
 
 vi.mock("../lib/api", () => ({
   fetchActiveFlashSales: vi.fn(async () => [
@@ -62,14 +68,12 @@ describe("storefront popups on admin", () => {
     const root = document.createElement("div");
     root.id = "root";
     document.body.appendChild(root);
-    window.__imzaqi_academic_popup_active = false;
     localStorage.clear();
     sessionStorage.clear();
   });
 
   afterEach(() => {
     document.body.className = "";
-    window.__imzaqi_academic_popup_active = false;
   });
 
   it("does not open the flash-sale popup or mark #root inert on /admin/dashboard", async () => {

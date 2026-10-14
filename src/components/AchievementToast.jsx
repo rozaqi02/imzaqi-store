@@ -2,11 +2,14 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { getOrderHistory } from "../lib/orderHistory";
 import { getNewAchievements } from "../lib/achievements";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
+import { useOverlayBusy } from "../hooks/useOverlaySlot";
 
 const ACHIEVEMENT_CHECK_KEY = "imzaqi_achievement_last_check";
 
 export default function AchievementToast() {
   const overlayBlocked = useStorefrontOverlayBlocked();
+  // Toast bukan modal: tidak berebut slot, hanya menunda selama popup eksklusif tampil.
+  const overlayBusy = useOverlayBusy();
   const [queue, setQueue] = useState([]);
   const [current, setCurrent] = useState(null);
   const timerRef = useRef(null);
@@ -32,8 +35,9 @@ export default function AchievementToast() {
     return () => clearInterval(interval);
   }, [check]);
 
+  // Tunda promosi toast selama rute sensitif atau ada overlay eksklusif aktif.
   useEffect(() => {
-    if (current || queue.length === 0) return;
+    if (current || queue.length === 0 || overlayBlocked || overlayBusy) return undefined;
     const next = queue[0];
     setCurrent(next);
     setQueue((prev) => prev.slice(1));
@@ -41,9 +45,17 @@ export default function AchievementToast() {
       setCurrent(null);
     }, 4000);
     return () => clearTimeout(timerRef.current);
-  }, [current, queue]);
+  }, [current, queue, overlayBlocked, overlayBusy]);
 
-  if (overlayBlocked || !current) return null;
+  // Bila popup eksklusif naik saat toast sedang tayang, kembalikan toast ke
+  // antrean supaya tidak habis tanpa terlihat; ia tayang lagi setelah slot bebas.
+  useEffect(() => {
+    if (!overlayBusy || !current) return;
+    setCurrent(null);
+    setQueue((prev) => [current, ...prev]);
+  }, [overlayBusy, current]);
+
+  if (overlayBlocked || overlayBusy || !current) return null;
 
   return (
     <div className="achievement-toast" role="status" aria-live="polite">

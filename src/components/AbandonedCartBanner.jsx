@@ -4,16 +4,20 @@ import { ShoppingCart, X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { shouldShowAbandonedCartReminder, dismissAbandonedCartReminder } from "../lib/cartReminder";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
+import { useOverlayBusy } from "../hooks/useOverlaySlot";
 import BannerGraphic from "./BannerGraphic";
 
 export default function AbandonedCartBanner() {
   const location = useLocation();
   const overlayBlocked = useStorefrontOverlayBlocked();
+  // Banner ini bukan modal, jadi tidak ikut berebut slot. Ia hanya menunda diri
+  // selama ada popup eksklusif agar tidak menumpuk di atas modal.
+  const overlayBusy = useOverlayBusy();
   const cart = useCart();
   const [dismissed, setDismissed] = useState(false);
   const count = (cart?.items || []).reduce((sum, item) => sum + Number(item?.qty || 0), 0);
 
-  if (dismissed || overlayBlocked || !shouldShowAbandonedCartReminder(count)) return null;
+  if (dismissed || overlayBlocked || overlayBusy || !shouldShowAbandonedCartReminder(count)) return null;
 
   return (
     <div className="abandoned-cart-banner" role="status">

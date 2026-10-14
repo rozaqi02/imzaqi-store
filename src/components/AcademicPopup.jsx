@@ -1,12 +1,13 @@
 import React, { useEffect, useState, useRef } from "react";
 import { createPortal } from "react-dom";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 import { X } from "lucide-react";
 import { fetchProducts, fetchSettings } from "../lib/api";
 import { isAcademicProduct } from "../lib/productCategories";
 import { formatIDR, getCatalogPriceRange, summarizeCatalogCopy } from "../lib/format";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import useOverlaySlot from "../hooks/useOverlaySlot";
 import BannerGraphic from "./BannerGraphic";
 
 const SUPPRESS_DATE_KEY = "imzaqi_academic_suppress_date_v1";
@@ -18,7 +19,6 @@ function getTodayString() {
 
 function notifyAcademicPopupClosed() {
   try {
-    window.__imzaqi_academic_popup_active = false;
     sessionStorage.setItem(SESSION_DONE_KEY, "true");
     window.dispatchEvent(new CustomEvent("imzaqi_academic_popup_closed"));
   } catch {}
@@ -34,9 +34,9 @@ function wasHandledThisSession() {
 
 export default function AcademicPopup() {
   const navigate = useNavigate();
-  const location = useLocation();
   const overlayBlocked = useStorefrontOverlayBlocked();
-  const [isOpen, setIsOpen] = useState(false);
+  const [sessionDismissed, setSessionDismissed] = useState(wasHandledThisSession);
+  const [warmedUp, setWarmedUp] = useState(false);
   const [academicItems, setAcademicItems] = useState([]);
   // Default aman: pop-up tidak boleh muncul sebelum setting admin berhasil dibaca.
   const [isEnabled, setIsEnabled] = useState(false);
@@ -49,20 +49,7 @@ export default function AcademicPopup() {
     }
   });
 
-  const prevPathnameRef = useRef(location.pathname);
   const modalRef = useRef(null);
-
-  // Sync global active status flag
-  useEffect(() => {
-    if (isOpen) {
-      window.__imzaqi_academic_popup_active = true;
-    } else {
-      window.__imzaqi_academic_popup_active = false;
-    }
-    return () => {
-      window.__imzaqi_academic_popup_active = false;
-    };
-  }, [isOpen]);
 
   // 1. Fetch admin setting & products
   useEffect(() => {
@@ -119,46 +106,34 @@ export default function AcademicPopup() {
     };
   }, []);
 
-  // 2. Schedule only after the persisted admin setting and product data are ready.
+  // 2. Kelayakan tampil. Scheduler terpusat yang menggilir overlay, jadi popup ini
+  //    tidak lagi mengumumkan diri lewat window.__imzaqi_academic_popup_active
+  //    maupun memeriksa DOM popup lain. Rute sensitif ditangani overlayBlocked.
+  const eligible = Boolean(
+    !overlayBlocked &&
+    settingsReady &&
+    isEnabled &&
+    !isSuppressed &&
+    !sessionDismissed &&
+    academicItems.length > 0
+  );
+
+  // Jeda 1.5s sebelum ikut antrean agar tidak menyambar slot saat render awal.
   useEffect(() => {
-    if (overlayBlocked) {
-      setIsOpen(false);
-      try {
-        window.__imzaqi_academic_popup_active = false;
-      } catch {}
-      return;
+    if (!eligible) {
+      setWarmedUp(false);
+      return undefined;
     }
-
-    if (!settingsReady) {
-      return;
-    }
-
-    if (isSuppressed || !isEnabled || wasHandledThisSession()) {
-      notifyAcademicPopupClosed();
-      return;
-    }
-
-    // Jangan tampilkan fallback generik saat katalog gagal dimuat.
-    if (academicItems.length === 0) return undefined;
-
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-    }, 1500);
-
+    const timer = setTimeout(() => setWarmedUp(true), 1500);
     return () => clearTimeout(timer);
-  }, [academicItems.length, isEnabled, overlayBlocked, isSuppressed, settingsReady]);
+  }, [eligible]);
 
-  useEffect(() => {
-    if (!overlayBlocked) return;
-    setIsOpen(false);
-    try {
-      window.__imzaqi_academic_popup_active = false;
-    } catch {}
-  }, [overlayBlocked]);
+  // Slot eksklusif: otomatis dilepas saat ditutup / unmount / pindah rute sensitif.
+  const isOpen = useOverlaySlot("academicPopup", { ready: eligible && warmedUp });
 
   // 3. Lock scroll when open
   useEffect(() => {
-    if (!isOpen) return;
+    if (!isOpen) return undefined;
     const originalStyle = window.getComputedStyle(document.body).overflow;
     document.body.style.overflow = "hidden";
     return () => {
@@ -166,19 +141,10 @@ export default function AcademicPopup() {
     };
   }, [isOpen]);
 
-  // 4. Handle route changes
-  useEffect(() => {
-    if (prevPathnameRef.current !== location.pathname) {
-      prevPathnameRef.current = location.pathname;
-      if (isOpen) {
-        setIsOpen(false);
-        notifyAcademicPopupClosed();
-      }
-    }
-  }, [location.pathname, isOpen]);
-
+  // Menutup = membuat popup tidak eligible lagi sehingga scheduler melepas slot
+  // dan popup berikutnya di antrean boleh naik.
   const handleClose = () => {
-    setIsOpen(false);
+    setSessionDismissed(true);
     notifyAcademicPopupClosed();
   };
 
@@ -189,8 +155,14 @@ export default function AcademicPopup() {
     } catch (e) {
       console.warn("Gagal menyimpan preferensi pop-up:", e);
     }
-    setIsOpen(false);
+    setSessionDismissed(true);
     notifyAcademicPopupClosed();
+  };
+
+  const goProduct = (slug) => {
+    setSessionDismissed(true);
+    notifyAcademicPopupClosed();
+    navigate(`/produk/${slug}`);
   };
 
   useDialogA11y({
@@ -214,12 +186,6 @@ export default function AcademicPopup() {
   const featured = academicItems[0];
   const extras = academicItems.slice(1, 4);
   const featuredIcon = String(featured?.iconUrl || "").trim();
-
-  function goProduct(slug) {
-    setIsOpen(false);
-    notifyAcademicPopupClosed();
-    navigate(`/produk/${slug}`);
-  }
 
   return createPortal(
     <div className="ac-popup-backdrop" onMouseDown={handleClose} role="presentation">

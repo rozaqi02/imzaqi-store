@@ -6,6 +6,7 @@ import { fetchProducts, fetchSettings } from "../lib/api";
 import { normalizePromotion, promotionDestination } from "../lib/storefrontPromotions";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import useOverlaySlot from "../hooks/useOverlaySlot";
 import NewProductPopupContent from "./NewProductPopupContent";
 
 const SUPPRESS_DATE_KEY = "imzaqi_new_product_suppress_date_v1";
@@ -19,7 +20,8 @@ function wasHandled() {
 export default function NewProductPopup() {
   const navigate = useNavigate(), location = useLocation();
   const blocked = useStorefrontOverlayBlocked();
-  const [open, setOpen] = useState(false), [config, setConfig] = useState(null), [product, setProduct] = useState(null);
+  const [config, setConfig] = useState(null), [product, setProduct] = useState(null);
+  const [warmedUp, setWarmedUp] = useState(false);
   const [handled, setHandled] = useState(wasHandled);
   const modalRef = useRef(null);
 
@@ -34,22 +36,24 @@ export default function NewProductPopup() {
     return () => { alive = false; };
   }, []);
 
+  // Kelayakan tampil: setting admin aktif, produk tersedia, belum ditangani,
+  // rute sesuai, dan bukan rute sensitif (blocked).
+  const eligible = Boolean(
+    !blocked && config?.enabled && product && !handled && !wasHandled() &&
+    !(config?.show_on === "home" && location.pathname !== "/")
+  );
+
+  // Jeda 1.8s sebelum ikut antrean agar tidak menyambar slot tepat saat render
+  // awal. Menggantikan polling DOM 800ms lama: kini scheduler yang menggilir.
   useEffect(() => {
-    setOpen(false);
-    if (blocked || !config?.enabled || !product || handled || wasHandled() || (config.show_on === "home" && location.pathname !== "/")) return;
-    let timer;
-    const tryOpen = () => {
-      if (wasHandled()) return;
-      // Wait for another storefront popup to close rather than stacking dialogs.
-      if (document.querySelector(".ac-popup-backdrop, .fsp-backdrop") || window.__imzaqi_academic_popup_active) {
-        timer = setTimeout(tryOpen, 800);
-        return;
-      }
-      setOpen(true);
-    };
-    timer = setTimeout(tryOpen, 1800);
+    if (!eligible) { setWarmedUp(false); return undefined; }
+    const timer = setTimeout(() => setWarmedUp(true), 1800);
     return () => clearTimeout(timer);
-  }, [blocked, config, product, handled, location.pathname]);
+  }, [eligible]);
+
+  // Slot eksklusif dari scheduler terpusat: hanya satu overlay storefront
+  // (flash sale / produk baru / akademik) yang boleh tampil pada satu waktu.
+  const open = useOverlaySlot("newProductPopup", { ready: eligible && warmedUp });
 
   useEffect(() => {
     if (!open) return;
@@ -60,7 +64,7 @@ export default function NewProductPopup() {
 
   const close = () => {
     try { sessionStorage.setItem(SESSION_DONE_KEY, "true"); } catch {}
-    setHandled(true); setOpen(false);
+    setHandled(true);
     window.dispatchEvent(new CustomEvent("imzaqi_new_product_popup_closed"));
   };
   const suppress = () => {

@@ -7,6 +7,7 @@ import { fetchActiveFlashSales, fetchProducts, fetchSettings } from "../lib/api"
 import { formatIDR, isKnownOutOfStock } from "../lib/format";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import useOverlaySlot from "../hooks/useOverlaySlot";
 import { readyFlashPromotions } from "../lib/storefrontPromotions";
 import BannerGraphic from "./BannerGraphic";
 
@@ -35,7 +36,7 @@ export default function FlashSalePopup() {
   const navigate = useNavigate();
   const location = useLocation();
   const overlayBlocked = useStorefrontOverlayBlocked();
-  const [isOpen, setIsOpen] = useState(false);
+  const [warmedUp, setWarmedUp] = useState(false);
   const [salesItems, setSalesItems] = useState([]);
   const [closestEndTime, setClosestEndTime] = useState(null);
   const [timeLeft, setTimeLeft] = useState(null);
@@ -120,53 +121,33 @@ export default function FlashSalePopup() {
     };
   }, []);
 
+  // Kelayakan tampil. Dulu popup ini memeriksa window.__imzaqi_academic_popup_active
+  // serta DOM popup lain, lalu menunggu event "closed" untuk naik. Kini scheduler
+  // terpusat yang menggilir overlay, jadi tidak ada lagi tumpukan popup.
+  const eligible = Boolean(
+    !overlayBlocked &&
+    settingsReady &&
+    isEnabled &&
+    !isSuppressed &&
+    !sessionDismissed &&
+    !wasHandledThisSession() &&
+    location.pathname === "/" &&
+    salesItems.length > 0
+  );
+
+  // Jeda bawaan (OVERLAY_TIMING.flashSaleMs) sebelum ikut antrean.
   useEffect(() => {
-    const suppressedToday = localStorage.getItem(SUPPRESS_DATE_KEY) === getTodayString();
-    if (
-      !settingsReady ||
-      !isEnabled ||
-      suppressedToday ||
-      sessionDismissed ||
-      wasHandledThisSession() ||
-      overlayBlocked ||
-      location.pathname !== "/" ||
-      salesItems.length === 0
-    ) {
+    if (!eligible) {
+      setWarmedUp(false);
       return undefined;
     }
+    const timer = setTimeout(() => setWarmedUp(true), OVERLAY_TIMING.flashSaleMs);
+    return () => clearTimeout(timer);
+  }, [eligible]);
 
-    let queuedTimer = null;
-
-    const checkAndOpenFlashSale = () => {
-      if (wasHandledThisSession()) return;
-      const isAcademicActive = Boolean(
-        window.__imzaqi_academic_popup_active || document.querySelector(".ac-popup-backdrop, .np-popup-backdrop")
-      );
-      if (isAcademicActive) return;
-      setIsOpen(true);
-    };
-
-    const handleAcademicPopupClosed = () => {
-      if (wasHandledThisSession()) return;
-      if (queuedTimer) clearTimeout(queuedTimer);
-      queuedTimer = setTimeout(checkAndOpenFlashSale, 400);
-    };
-
-    const initialTimer = setTimeout(checkAndOpenFlashSale, OVERLAY_TIMING.flashSaleMs);
-    window.addEventListener("imzaqi_academic_popup_closed", handleAcademicPopupClosed);
-    window.addEventListener("imzaqi_new_product_popup_closed", handleAcademicPopupClosed);
-
-    return () => {
-      clearTimeout(initialTimer);
-      if (queuedTimer) clearTimeout(queuedTimer);
-      window.removeEventListener("imzaqi_academic_popup_closed", handleAcademicPopupClosed);
-      window.removeEventListener("imzaqi_new_product_popup_closed", handleAcademicPopupClosed);
-    };
-  }, [location.pathname, overlayBlocked, salesItems.length, sessionDismissed, isEnabled, settingsReady]);
-
-  useEffect(() => {
-    if (overlayBlocked) setIsOpen(false);
-  }, [overlayBlocked]);
+  // Prioritas tertinggi: bila flash sale siap, ia memenangkan slot eksklusif dan
+  // popup produk baru / akademik menunggu sampai slot dilepas.
+  const isOpen = useOverlaySlot("flashSalePopup", { ready: eligible && warmedUp });
 
   useEffect(() => {
     if (!isOpen || !closestEndTime) return undefined;
@@ -177,7 +158,9 @@ export default function FlashSalePopup() {
 
       if (diff <= 0) {
         setTimeLeft({ expired: true, hours: "00", minutes: "00", seconds: "00" });
-        setIsOpen(false);
+        // Flash sale berakhir: lepaskan slot agar overlay lain boleh naik.
+        markSessionDone();
+        setSessionDismissed(true);
         return;
       }
 
@@ -197,7 +180,6 @@ export default function FlashSalePopup() {
   const handleClose = () => {
     markSessionDone();
     setSessionDismissed(true);
-    setIsOpen(false);
   };
 
   useDialogA11y({
@@ -219,11 +201,6 @@ export default function FlashSalePopup() {
     [salesItems, featured]
   );
 
-  const isAcademicActive = Boolean(
-    window.__imzaqi_academic_popup_active ||
-      (typeof document !== "undefined" && document.querySelector(".ac-popup-backdrop"))
-  );
-
   if (
     overlayBlocked ||
     location.pathname !== "/" ||
@@ -231,7 +208,6 @@ export default function FlashSalePopup() {
     !isEnabled ||
     !isOpen ||
     !featured ||
-    isAcademicActive ||
     isSuppressed ||
     sessionDismissed ||
     wasHandledThisSession()
@@ -244,7 +220,6 @@ export default function FlashSalePopup() {
   function goProduct(slug) {
     markSessionDone();
     setSessionDismissed(true);
-    setIsOpen(false);
     navigate(`/produk/${slug}`);
   }
 
@@ -329,7 +304,6 @@ export default function FlashSalePopup() {
                   markSessionDone();
                   setSessionDismissed(true);
                   setIsSuppressed(true);
-                  setIsOpen(false);
                 }}
               >
                 Jangan tampilkan hari ini

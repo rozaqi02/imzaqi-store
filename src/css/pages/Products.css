@@ -1220,12 +1220,9 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   display: flex;
   gap: 14px;
   padding: 16px;
-  border-radius: 26px;
+  border-radius: 16px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
-    radial-gradient(circle at top right, rgba(75, 98, 255, 0.1), rgba(75, 98, 255, 0) 44%),
-    var(--skeu-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)));
+  background: var(--skeu-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)));
   box-shadow: var(--skeu-panel-shadow, 0 24px 70px rgba(0, 0, 0, 0.2));
   color: var(--text);
   contain: layout paint style;
@@ -1237,16 +1234,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
     box-shadow 0.3s var(--ease-out);
 }
 
-.catalog-card::before {
-  content: "";
-  position: absolute;
-  inset: 1px 1px auto;
-  height: 40%;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
-  opacity: 0.7;
-  pointer-events: none;
-}
+/* card sheen removed — flat face, better scroll perf */
 
 .catalog-card > * {
   position: relative;
@@ -1255,7 +1243,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 
 @media (hover: hover) {
   .catalog-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-3px);
     border-color: rgba(79, 255, 200, 0.28);
     box-shadow:
       var(--skeu-panel-shadow, 0 34px 80px rgba(0, 0, 0, 0.26)),
@@ -1264,9 +1252,9 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 }
 
 .catalog-card:focus-visible {
-  outline: 2px solid rgba(85, 188, 255, 0.82);
+  outline: 2px solid rgba(62, 230, 192, 0.75);
   outline-offset: 2px;
-  border-color: rgba(85, 188, 255, 0.44);
+  border-color: rgba(62, 230, 192, 0.4);
 }
 
 .catalog-card.grid {
@@ -1803,26 +1791,20 @@ html[data-theme="light"] .catalog-sheetSub {
 
 html[data-theme="light"] .catalog-sheetClose {
   border-color: rgba(0, 138, 148, 0.16);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 26%),
-    var(--skeu-control-bg);
-  box-shadow: var(--skeu-control-shadow);
+  background: var(--skeu-control-bg);
+  box-shadow: none;
   color: rgba(15, 49, 64, 0.88);
 }
 
 html[data-theme="light"] .catalog-sheetClose:hover {
-  border-color: rgba(255, 79, 114, 0.3);
-  color: #e0315a;
+  border-color: rgba(200, 30, 58, 0.35);
+  color: var(--danger, #e0315a);
 }
 
 html[data-theme="light"] .catalog-sheetFoot {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 28%),
-    var(--skeu-panel-bg);
+  background: var(--skeu-panel-bg);
   border-top-color: rgba(0, 138, 148, 0.12);
-  box-shadow:
-    0 -8px 20px rgba(67, 111, 129, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 1);
+  box-shadow: 0 -8px 20px rgba(67, 111, 129, 0.08);
 }
 
 /* ── Disable animasi di reduced motion + data-motion off/lite ── */
@@ -1895,14 +1877,8 @@ html[data-theme="light"] .catalog-sheetFoot {
 @media (max-width: 900px) and (min-width: 721px) {
   /* Tablet: keep neumorphic face, lighter composite shadow for scroll perf */
   .catalog-card {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
-      var(--skeu-panel-bg, var(--card, rgba(255, 255, 255, 0.04))) !important;
-    box-shadow:
-      0 10px 24px rgba(0, 0, 0, 0.22),
-      inset 0 2px 0 rgba(255, 255, 255, 0.16),
-      inset 0 -3px 0 rgba(0, 0, 0, 0.28),
-      0 0 0 1px rgba(0, 194, 208, 0.12) !important;
+    background: var(--skeu-panel-bg, var(--card, rgba(255, 255, 255, 0.04))) !important;
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22) !important;
   }
   .catalog-card::before {
     display: none !important;
@@ -1967,7 +1943,7 @@ html[data-theme="light"] .catalog-sheetFoot {
   .catalog-card {
     gap: 12px;
     padding: 14px;
-    border-radius: 22px;
+    border-radius: 16px;
   }
 
   .catalog-cardIcon {
@@ -2126,12 +2102,8 @@ html[data-theme="light"] .catalog-sheetFoot {
 
   /* Mobile: lighter neumorphic paint — no will-change mass promotion */
   .catalog-card {
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
-      var(--skeu-panel-bg, var(--card, rgba(255, 255, 255, 0.04))) !important;
-    box-shadow:
-      0 6px 16px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+    background: var(--skeu-panel-bg, var(--card, rgba(255, 255, 255, 0.04))) !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
     will-change: auto;
     transform: none;
     content-visibility: auto;
@@ -2846,50 +2818,30 @@ html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardPrice {
 /* Don't blanket-color all status pills — each variant owns its hue */
 
 html[data-theme="light"] .catalog-status.hot {
-  border-color: rgba(255, 120, 30, 0.3);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(255, 180, 80, 0.35), rgba(255, 140, 50, 0.14));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -1px 0 rgba(140, 60, 0, 0.12),
-    0 3px 8px rgba(255, 120, 30, 0.12);
+  border-color: rgba(255, 120, 30, 0.35);
+  background: rgba(255, 150, 60, 0.14);
+  box-shadow: none;
   color: #b05500;
 }
 
 html[data-theme="light"] .catalog-status.warn {
-  border-color: rgba(212, 160, 23, 0.34);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(255, 220, 120, 0.4), rgba(255, 190, 60, 0.14));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -1px 0 rgba(140, 100, 0, 0.12),
-    0 3px 8px rgba(212, 160, 23, 0.12);
+  border-color: rgba(212, 160, 23, 0.4);
+  background: rgba(255, 190, 60, 0.16);
+  box-shadow: none;
   color: #8a6200;
 }
 
 html[data-theme="light"] .catalog-status.soldout {
-  border-color: rgba(202, 74, 97, 0.32);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(255, 200, 210, 0.55), rgba(255, 140, 160, 0.16));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.85),
-    inset 0 -1px 0 rgba(140, 30, 50, 0.12),
-    0 3px 8px rgba(200, 40, 70, 0.1);
+  border-color: rgba(202, 74, 97, 0.35);
+  background: rgba(255, 140, 160, 0.14);
+  box-shadow: none;
   color: #a12d48;
 }
 
 html[data-theme="light"] .catalog-status.ok {
-  border-color: rgba(0, 138, 148, 0.32);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.12));
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(0, 100, 110, 0.12),
-    0 3px 8px rgba(0, 138, 148, 0.14);
+  border-color: rgba(0, 138, 148, 0.35);
+  background: rgba(0, 214, 180, 0.16);
+  box-shadow: none;
   color: var(--accent, #067b88);
 }
 
@@ -3048,33 +3000,28 @@ html[data-theme="light"] .catalog-activeTag {
 }
 
 html[data-theme="light"] .catalog-activeReset {
-  border-color: rgba(202, 74, 97, 0.32);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, #ffe4ea, #ffd0d8);
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(180, 40, 70, 0.12),
-    4px 6px 12px rgba(200, 40, 70, 0.1);
+  border-color: rgba(202, 74, 97, 0.35);
+  background: #ffe4ea;
+  box-shadow: none;
   color: #8f2c42;
 }
 
 html[data-theme="light"] .catalog-toggleUi {
   border-color: rgba(41, 98, 121, 0.34);
-  background: linear-gradient(180deg, rgba(232, 241, 246, 0.98), rgba(221, 234, 241, 0.96));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.78);
+  background: #e8f1f6;
+  box-shadow: none;
 }
 
 html[data-theme="light"] .catalog-toggleUi::after {
-  background: linear-gradient(180deg, #ffffff, #f4f9fc);
+  background: #ffffff;
   border: 1px solid rgba(54, 103, 124, 0.28);
   box-shadow: 0 1px 3px rgba(29, 76, 95, 0.2);
 }
 
 html[data-theme="light"] .catalog-toggle input:checked + .catalog-toggleUi {
   border-color: rgba(15, 133, 140, 0.56);
-  background: linear-gradient(180deg, rgba(191, 246, 232, 0.98), rgba(144, 226, 205, 0.95));
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.55);
+  background: #bff6e8;
+  box-shadow: none;
 }
 
 html[data-theme="light"] .catalog-toggle input:checked + .catalog-toggleUi::after {

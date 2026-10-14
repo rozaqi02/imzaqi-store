@@ -1,4 +1,5 @@
 import React from "react";
+import { MASCOTS_ENABLED } from "../lib/featureFlags";
 
 const MASCOT_MAP = {
   bell_megaphone: { src: "/mascots/bell_megaphone.png", alt: "Maskot Lonceng & Megafon" },
@@ -14,6 +15,12 @@ const MASCOT_MAP = {
 };
 
 export default function BannerGraphic({ name, className = "", style = {}, height = 24 }) {
+  // Saklar maskot (lihat lib/featureFlags.js). Komponen ini adalah satu-satunya
+  // titik render maskot, jadi menonaktifkannya di sini sudah menyembunyikan
+  // maskot di seluruh UI tanpa perlu mengedit tiap call site.
+  // Aset di public/mascots/ tetap dipertahankan agar mudah diaktifkan kembali.
+  if (!MASCOTS_ENABLED) return null;
+
   if (!name || name === "none") return null;
 
   const mascot = MASCOT_MAP[name];

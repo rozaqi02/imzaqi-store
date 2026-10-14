@@ -1062,7 +1062,14 @@ export default function Pay() {
                         {qrisTimer.expired && (
                           <div className="pay-qrisTimer is-expired" role="alert">
                             <Clock size={13} />
-                            <span>QR kedaluwarsa - refresh halaman untuk QR baru</span>
+                            <span>QR kedaluwarsa - buat QR baru untuk melanjutkan pembayaran</span>
+                            <button
+                              type="button"
+                              className="btn btn-sm pay-qrisRefreshBtn"
+                              onClick={() => window.location.reload()}
+                            >
+                              Buat QR Baru
+                            </button>
                           </div>
                         )}
 
@@ -1094,7 +1101,7 @@ export default function Pay() {
                           </button>
                         ) : null}
 
-                        {!qris.failed && qris.url && (
+                        {!qris.failed && qris.url && !qrisTimer.expired && (
                           <a
                             href={qris.url}
                             download="qris-pembayaran.png"
@@ -1104,7 +1111,18 @@ export default function Pay() {
                           </a>
                         )}
 
-                        {qris.failed ? <div className="hint subtle">QRIS gagal dimuat. Refresh lalu coba lagi.</div> : null}
+                        {qris.failed ? (
+                          <div className="hint subtle pay-qrisFailedHint">
+                            <span>QRIS gagal dimuat. Refresh lalu coba lagi.</span>
+                            <button
+                              type="button"
+                              className="btn btn-sm pay-qrisRefreshBtn"
+                              onClick={() => window.location.reload()}
+                            >
+                              Coba Lagi
+                            </button>
+                          </div>
+                        ) : null}
                       </div>
                     ) : (
                       <div className="pay-qrisLocked">
