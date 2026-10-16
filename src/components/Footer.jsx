@@ -1,6 +1,5 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { GraduationCap, Smartphone } from "lucide-react";
 import { STORE_WHATSAPP } from "../lib/productCategories";
 
 const footerColumns = [
@@ -56,23 +55,6 @@ export default function Footer() {
               <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
               <span>imzaqi.store</span>
             </Link>
-
-            <div className="site-footerGoContact">
-              <a href={`https://wa.me/${STORE_WHATSAPP.app_premium}`} target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
-                <span className="site-footerGoContactIcon" aria-hidden="true"><Smartphone size={16} /></span>
-                <span className="site-footerGoContactCopy">
-                  <strong>+62 831-3604-9987</strong>
-                  <small>Khusus App Premium</small>
-                </span>
-              </a>
-              <a href={`https://wa.me/${STORE_WHATSAPP.academic}`} target="_blank" rel="noreferrer" className="site-footerGoContact-wa">
-                <span className="site-footerGoContactIcon" aria-hidden="true"><GraduationCap size={16} /></span>
-                <span className="site-footerGoContactCopy">
-                  <strong>+62 812-3274-2374</strong>
-                  <small>Khusus Jasa Akademik</small>
-                </span>
-              </a>
-            </div>
           </div>
 
           <div className="site-footerGoColumns">
@@ -99,6 +81,14 @@ export default function Footer() {
                 <Link className="site-footerGoLink" to="/faq">
                   FAQ Lengkap
                 </Link>
+                <a
+                  className="site-footerGoLink"
+                  href={`https://wa.me/${STORE_WHATSAPP.app_premium}?text=${encodeURIComponent("Halo Admin imzaqi.store, saya butuh bantuan.")}`}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Hubungi Admin
+                </a>
               </div>
             </div>
           </div>

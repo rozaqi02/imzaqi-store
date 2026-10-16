@@ -363,16 +363,34 @@ html[data-theme] body .catalog-page .catalog-quickFilters .catalog-quickChip.act
 }
 
 html[data-theme] body .header .theme-toggle {
-  border-radius: var(--hdr-action-radius, 10px) !important;
+  border-radius: 999px !important;
 }
 
-/* Use the global 3D finish, including its inset highlights and lower edge. */
+/* Clean flat toggle thumb without glossy highlight */
 html[data-theme] body .header .theme-toggle .theme-toggleThumb {
-  background: var(--imzaqi-btn-face) !important;
-  color: var(--imzaqi-btn-text) !important;
-  border: 1px solid var(--imzaqi-btn-border) !important;
-  border-radius: var(--hdr-action-radius, 10px) !important;
-  box-shadow: var(--imzaqi-btn-shadow) !important;
+  background: #009e60 !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 999px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16) !important;
+}
+
+html[data-theme] body .header .theme-toggle .theme-toggleThumb svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+html[data-theme="dark"] body .header .theme-toggle .theme-toggleThumb {
+  background: #00b46e !important;
+  color: #0b1220 !important;
+  border: none !important;
+  border-radius: 999px !important;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+html[data-theme="dark"] body .header .theme-toggle .theme-toggleThumb svg {
+  color: #0b1220 !important;
+  stroke: #0b1220 !important;
 }
 
 html[data-theme] body .header .header-cart,

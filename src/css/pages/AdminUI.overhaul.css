@@ -617,7 +617,7 @@ html[data-theme="light"] .admin-page .adm-navItem.is-active .adm-navItemIcon {
 .admin-page .btn.btn-primary {
   background: var(--imzaqi-btn-face, linear-gradient(135deg, #4effda, #008a94)) !important;
   border: 1px solid var(--imzaqi-btn-border, rgba(0, 138, 148, 0.4)) !important;
-  color: var(--imzaqi-btn-text, #032235) !important;
+  color: var(--imzaqi-btn-text, #ffffff) !important;
   box-shadow: var(--imzaqi-btn-shadow, 0 8px 18px rgba(0, 138, 148, 0.25)) !important;
 }
 

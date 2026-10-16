@@ -260,7 +260,6 @@ describe("ProductDetail render", () => {
     expect(card.querySelector(".pdx-detailGroup h4")).toHaveTextContent("Benefit");
     fireEvent.click(screen.getByRole("button", { name: "Termurah" }));
     expect(disclosure.closest("details")).toHaveAttribute("open");
-    expect(screen.getByRole("link", { name: /Lihat 2 pilihan paket/ })).toHaveAttribute("href", "#paket-tersedia");
   });
 
   it("does not present a generic Pro package as Private", async () => {

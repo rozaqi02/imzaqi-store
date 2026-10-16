@@ -161,8 +161,9 @@
 }
 
 .oh-orderCode {
-  font-size: 16px;
-  font-weight: 1000;
+  font-family: var(--font-mono);
+  font-size: 15px;
+  font-weight: 800;
   letter-spacing: 0.02em;
 }
 

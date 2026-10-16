@@ -17,7 +17,7 @@ html[data-theme="light"] .help-page { --help-panel:#fff; --help-soft:#edf3ee; --
 .help-heroCopy>p { max-width:420px; color:var(--help-muted); font-size:14px; line-height:1.8; }
 .help-search { display:flex; align-items:center; gap:12px; padding:0 16px; min-height:58px; margin-top:26px; background:var(--help-soft); border:1px solid var(--help-line); border-radius:14px; color:var(--help-accent); }
 .help-search:focus-within { border-color:var(--help-accent); }
-.help-search input { width:100%; min-width:0; padding:16px 0; background:transparent; border:0; color:var(--help-text); font-size:14px; outline:none; }
+.help-search input { width:100%; min-width:0; padding:16px 0; background:transparent; border:0; color:var(--help-text); font-size:16px; outline:none; }
 .help-search input::placeholder { color:var(--help-muted); opacity:1; }
 .help-search input::-webkit-search-cancel-button { display:none; }
 .help-search button { display:grid; place-items:center; flex-shrink:0; width:32px; height:36px; background:transparent; border:0; color:var(--help-muted); }

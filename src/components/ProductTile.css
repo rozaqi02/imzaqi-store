@@ -616,10 +616,11 @@ html[data-theme="light"] .product-typeBadge {
     4px 6px 12px rgba(60, 100, 120, 0.1);
 }
 
-/* ── Delivery ETA Badge ── */
+/* ── Delivery ETA & Secondary Badges in Mobile Grid ── */
 @media (max-width: 560px) {
-  .home-deliveryPill {
-    display: none;
+  .home-deliveryPill,
+  .product-tile--grid .home-popularSold {
+    display: none !important;
   }
 }
 

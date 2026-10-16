@@ -1402,10 +1402,10 @@ html[data-theme="light"] .admin-advancedToggle {
 }
 
 .admin-chip.active {
-  border-color: var(--imzaqi-btn-border, rgba(0, 214, 180, 0.3));
+  border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.3));
   background: var(--imzaqi-btn-face);
   box-shadow: var(--imzaqi-btn-shadow);
-  color: var(--imzaqi-btn-text, #032235);
+  color: var(--imzaqi-btn-text, #ffffff);
 }
 
 .admin-miniGrid {

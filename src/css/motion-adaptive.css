@@ -389,19 +389,20 @@
   /* Backdrop */
   .checkout-backdrop-mobile {
     opacity: 0;
-    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-    /* No backdrop-filter — expensive during animation */
+    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    /* No backdrop-filter — pure clean translucent dimming */
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
   .checkout-backdrop-mobile.checkout-mobile-open {
     opacity: 1;
-    transition: opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   .checkout-backdrop-mobile.checkout-mobile-closing {
     opacity: 0;
-    transition: opacity 0.36s cubic-bezier(0.4, 0, 1, 1);
+    transition: opacity 0.46s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
   /* Drawer: only transform animates — compositor-only, zero paint */
@@ -410,20 +411,23 @@
     transition: none;
     /* Strip all expensive properties during animation */
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
   }
 
   .checkout-drawer.checkout-mobile-open {
     transform: translate3d(0, 0, 0) scale(1);
-    transition: transform 0.54s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.2) !important;
   }
 
   .checkout-drawer.checkout-mobile-closing {
     transform: translate3d(0, 104%, 0) scale(0.99);
-    transition: transform 0.4s cubic-bezier(0.4, 0, 1, 1);
+    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
     backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
     box-shadow: none !important;
   }
 
@@ -439,7 +443,8 @@
   .checkout-backdrop,
   .checkout-backdrop-mobile {
     backdrop-filter: none !important;
-    background: var(--brand-overlay, rgba(3, 8, 18, 0.5)) !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--brand-overlay, rgba(3, 8, 18, 0.55)) !important;
     will-change: opacity;
     contain: paint;
   }
@@ -646,8 +651,6 @@
     backdrop-filter: blur(16px) saturate(130%) !important;
   }
 
-  .checkout-backdrop,
-  .checkout-backdrop-mobile,
   .mini-cart-sheet-backdrop,
   .catalog-sheetBackdrop.is-open {
     backdrop-filter: blur(18px) saturate(140%) !important;

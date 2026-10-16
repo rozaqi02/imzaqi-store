@@ -239,6 +239,7 @@ html[data-theme="light"] .steps--visual .step.done .step-sub {
 .checkout-drawer .steps.steps--visual,
 .checkout-full .steps.steps--visual,
 .st-checkoutSteps .steps.steps--visual,
+.pay-successFunnelSteps .steps.steps--visual,
 .status-shell .steps.steps--visual {
   backdrop-filter: none;
 }

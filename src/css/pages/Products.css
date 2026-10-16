@@ -895,11 +895,11 @@ html[data-theme="light"] .catalog-viewBtn {
 }
 
 .catalog-viewBtn.active {
-  background: var(--imzaqi-btn-face, linear-gradient(165deg, #00d6b4, #00a896)) !important;
-  border-color: var(--imzaqi-btn-border, rgba(0, 214, 180, 0.5)) !important;
-  color: var(--imzaqi-btn-text, #032235) !important;
+  background: var(--imzaqi-btn-face, #009e60) !important;
+  border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
+  color: var(--imzaqi-btn-text, #ffffff) !important;
   box-shadow:
-    var(--imzaqi-btn-shadow, 0 4px 12px rgba(0, 196, 159, 0.35)),
+    var(--imzaqi-btn-shadow, 0 4px 12px rgba(0, 158, 96, 0.35)),
     inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
 }
 

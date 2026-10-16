@@ -78,12 +78,11 @@ export default function FlashSaleBanner({ products = [] }) {
   return (
     <section className="flash-drop" aria-labelledby={titleId}>
       <div className="fsd-campaign">
-        <Zap className="fsd-watermark" size={250} strokeWidth={0.8} aria-hidden="true" />
-        <div className="fsd-eyebrow"><Zap size={14} fill="currentColor" aria-hidden="true" /> Flash sale <span>IMZAQI / PILIHAN HEMAT</span></div>
-        <h2 id={titleId} className="fsd-headline">Premium.<br /><em>Harga miring.</em></h2>
-        <p className="fsd-intro">Paket favoritmu, dengan harga yang lebih ringan.</p>
+        <div className="fsd-eyebrow"><Zap size={13} fill="currentColor" aria-hidden="true" /> Flash Sale</div>
+        <h2 id={titleId} className="fsd-headline">Penawaran Kilat.<br /><em>Waktu terbatas.</em></h2>
+        <p className="fsd-intro">Paket andalanmu dengan penawaran harga lebih hemat.</p>
         <div className="fsd-clock">
-          <span className="fsd-clockLabel"><Clock3 size={13} aria-hidden="true" /> Promo ini berakhir dalam</span>
+          <span className="fsd-clockLabel"><Clock3 size={13} aria-hidden="true" /> Berakhir dalam:</span>
           <div className="fsd-digits" role="timer" aria-live="off" aria-label={units.map(unit => `${unit.value} ${unit.label}`).join(" ")}>
             {units.map(unit => <span className="fsd-unit" key={unit.label}>
               <strong>{String(unit.value).padStart(2, "0")}</strong><small>{unit.label}</small>
@@ -93,7 +92,6 @@ export default function FlashSaleBanner({ products = [] }) {
       </div>
 
       <div className="fsd-ticket" id={offerId}>
-        <div className="fsd-ticketTop"><span>HARGA SPESIAL / {String(selectedIndex + 1).padStart(2, "0")}</span><span className="fsd-ticketBrand">imzaqi.store</span></div>
         <div className="fsd-offer">
           <div className="fsd-art" aria-hidden="true">
             <div className="fsd-logo" key={`${offer.product.id}-${offer.product.icon_url}`}><ProductLogo product={offer.product} /></div>

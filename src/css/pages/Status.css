@@ -1562,7 +1562,7 @@ html[data-theme="light"] .st-itemDescText {
   border-color: var(--imzaqi-btn-border, var(--st-line-strong));
   background: var(--imzaqi-btn-face);
   box-shadow: var(--imzaqi-btn-shadow, var(--st-shadow-soft));
-  color: var(--imzaqi-btn-text, #032235);
+  color: var(--imzaqi-btn-text, #ffffff);
 }
 
 html[data-theme="light"] .st-tab.is-active {
@@ -2522,9 +2522,10 @@ html[data-theme="dark"] .status-page .st-checkoutSteps .steps--visual .step.acti
 }
 
 .st-orderCodeText {
+  font-family: var(--font-mono);
   font-size: clamp(20px, 3vw, 26px);
-  font-weight: 900;
-  letter-spacing: -0.03em;
+  font-weight: 800;
+  letter-spacing: -0.01em;
   color: var(--st-text);
   line-height: 1.1;
   overflow-wrap: anywhere;

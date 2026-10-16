@@ -1,164 +1,799 @@
-/* A campaign and a perforated offer ticket, with no shared storefront overrides. */
+/* ── Apple-Grade Refined Flash Sale Banner (Harmonized with ImZaqi Visual Language) ── */
 .flash-drop {
-  --fsd-ink: #12382a;
-  --fsd-muted: #5b6f64;
-  --fsd-paper: #ffffff;
-  --fsd-acid: #3ee6c0;
-  --fsd-seam: rgba(35, 65, 40, .22);
+  --fsd-surface: linear-gradient(135deg, rgba(238, 247, 242, 0.95) 0%, rgba(246, 252, 249, 0.98) 50%, #ffffff 100%);
+  --fsd-border: rgba(0, 158, 96, 0.16);
+  --fsd-text: #142e22;
+  --fsd-muted: #556e61;
+  --fsd-accent: #00875a;
+  --fsd-accent-light: rgba(0, 158, 96, 0.09);
+  --fsd-card-bg: #ffffff;
+  --fsd-card-border: rgba(0, 158, 96, 0.14);
+  --fsd-card-shadow: 0 10px 26px -6px rgba(18, 48, 34, 0.07), 0 2px 8px -2px rgba(18, 48, 34, 0.03);
+  --fsd-unit-bg: #ffffff;
+  --fsd-unit-border: rgba(0, 158, 96, 0.15);
+  --fsd-unit-shadow: 0 2px 8px rgba(18, 48, 34, 0.05), inset 0 1px 0 #ffffff;
+  --fsd-divider: rgba(0, 158, 96, 0.12);
+  --fsd-chip-bg: rgba(255, 255, 255, 0.9);
+  --fsd-chip-border: rgba(0, 158, 96, 0.14);
+
   position: relative;
   isolation: isolate;
   display: grid;
-  grid-template-columns: minmax(0, .9fr) minmax(0, 1.25fr);
-  gap: 0 20px;
-  margin: 0 0 22px;
-  padding: 18px;
-  border-radius: 22px;
-  background: radial-gradient(ellipse at 5% 0%, #1c6646, transparent 65%), #103d2b;
-  color: #eefaf4;
-  box-shadow: 0 5px 12px -6px rgba(10, 44, 31, .3);
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 1.35fr);
+  align-items: stretch;
+  gap: 24px;
+  margin: 0 0 24px;
+  padding: 24px 28px;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(0, 168, 107, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 0% 100%, rgba(0, 214, 180, 0.05) 0%, transparent 45%),
+    var(--fsd-surface);
+  border: 1px solid var(--fsd-border);
+  color: var(--fsd-text);
+  box-shadow:
+    0 12px 32px -8px rgba(18, 48, 34, 0.07),
+    0 2px 8px -2px rgba(18, 48, 34, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  overflow: hidden;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-.fsd-campaign { position: relative; min-width: 0; padding: 12px 12px 8px; }
-.fsd-watermark { position: absolute; right: -5px; top: 12px; z-index: -1; color: #7ef0d4; opacity: .09; transform: rotate(12deg); pointer-events: none; }
-.fsd-eyebrow { display: flex; align-items: center; gap: 6px; color: var(--fsd-acid); font-size: 11px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
-.fsd-eyebrow > span { margin-left: auto; color: #b4d1bf; font-size: 8px; letter-spacing: .09em; }
-.fsd-headline { margin: 18px 0 10px; font-family: "Outfit", var(--font-sans), sans-serif; font-size: clamp(36px, 4.3vw, 58px); font-weight: 700; line-height: .99; letter-spacing: -.055em; color: #eefaf4; }
-.fsd-headline em { color: var(--fsd-acid); font-style: normal; }
-.fsd-intro { max-width: 28ch; margin: 0 0 20px; font-size: 12px; line-height: 1.6; color: #c2d7c8; }
-.fsd-clock { display: grid; gap: 8px; }
-.fsd-clockLabel { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: #c2d7c8; }
-.fsd-digits { display: flex; gap: 12px; }
-.fsd-unit { position: relative; display: grid; gap: 3px; }
-.fsd-unit + .fsd-unit::before { content: ":"; position: absolute; left: -9px; top: 2px; font-size: 20px; color: #93b29d; }
-.fsd-unit strong { font-family: "Outfit", var(--font-sans), sans-serif; font-size: 27px; line-height: 1; font-weight: 600; font-variant-numeric: tabular-nums; }
-.fsd-unit small { font-size: 9px; color: #c2d7c8; }
-.fsd-unit:last-child strong { color: var(--fsd-acid); }
 
-.fsd-ticket { position: relative; align-self: stretch; display: flex; flex-direction: column; min-width: 0; padding: 17px 22px; border-radius: 14px; background: var(--fsd-paper); color: var(--fsd-ink); }
-.fsd-ticket::before { content: ""; position: absolute; inset: 15px auto 15px -11px; border-left: 1px dashed rgba(220, 255, 210, .3); }
-.fsd-ticketTop { display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 8px; font-weight: 700; letter-spacing: .12em; color: var(--fsd-muted); }
-.fsd-ticketBrand { font-size: 11px; font-weight: 800; letter-spacing: -.02em; }
-.fsd-offer { display: flex; align-items: center; gap: 26px; flex: 1; padding: 25px 0 22px; }
-.fsd-art { position: relative; flex: 0 0 114px; height: 130px; }
-.fsd-logo { position: absolute; inset: 0 auto auto 0; display: grid; place-items: center; width: 100px; height: 100px; background: #fff; border-radius: 24px; transform: rotate(-8deg); box-shadow: 0 5px 9px -6px rgba(13, 34, 22, .45); overflow: hidden; }
-.fsd-logo img { width: 100%; height: 100%; object-fit: contain; }
-.fsd-logo > span { font-family: "Outfit", sans-serif; font-size: 45px; font-weight: 700; color: #123d2c; }
-.fsd-seal { position: absolute; right: -6px; bottom: -6px; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 78px; height: 78px; border-radius: 50%; background: var(--fsd-acid); color: #0b3a2a; box-shadow: 0 10px 22px rgba(0, 0, 0, .3), inset 0 0 0 3px rgba(255, 255, 255, .4); }
-.fsd-seal small { font-size: 8px; font-weight: 800; letter-spacing: .06em; }
-.fsd-seal strong { font-family: "Outfit", sans-serif; font-size: 32px; letter-spacing: -.06em; line-height: 1.1; font-weight: 700; }
-.fsd-seal strong span { font-size: 17px; }
-.fsd-details { min-width: 0; flex: 1; overflow-wrap: anywhere; }
-.fsd-details h3 { margin: 0 0 7px; color: var(--fsd-ink); font-size: clamp(19px, 2.3vw, 27px); line-height: 1.12; letter-spacing: -.045em; font-weight: 800; }
-.fsd-package { margin: 0 0 14px; font-size: 11px; color: var(--fsd-muted); line-height: 1.5; }
-.fsd-package span { display: inline-block; }
-.fsd-package span::before { content: " · "; white-space: pre; }
-.fsd-price { display: grid; gap: 2px; }
-.fsd-price del { font-size: 12px; color: var(--fsd-muted); text-decoration-thickness: 1px; }
-.fsd-price strong { color: var(--fsd-ink); font-family: "Outfit", var(--font-sans), sans-serif; font-size: clamp(28px, 3.2vw, 40px); line-height: 1.15; letter-spacing: -.05em; font-variant-numeric: tabular-nums; font-weight: 700; }
-.fsd-saving { display: inline-block; margin-top: 5px; font-size: 10px; font-weight: 800; color: var(--fsd-ink); }
-.fsd-ticketBottom { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 14px; border-top: 1px dashed var(--fsd-seam); }
-.fsd-ticketBottom::before, .fsd-ticketBottom::after { content: ""; position: absolute; top: -7px; width: 13px; height: 13px; border-radius: 50%; background: #103d2b; }
-.fsd-ticketBottom::before { left: -28px; }
-.fsd-ticketBottom::after { right: -28px; }
-.fsd-stock { display: flex; align-items: center; gap: 5px; color: var(--fsd-muted); font-size: 11px; }
-.flash-drop .fsd-cta { display: inline-flex; align-items: center; justify-content: center; gap: 14px; min-height: 44px; padding: 0 16px; border-radius: 12px; background: var(--imzaqi-btn-face, linear-gradient(165deg, #14c77f, #009e60)); color: var(--imzaqi-btn-text, #fff); box-shadow: var(--imzaqi-btn-shadow, inset 0 2px 0 #ffffff50, inset 0 -2px 0 #00000020); font-size: 12px; font-weight: 800; text-decoration: none; transition: transform .15s ease; }
-.fsd-cta:hover { transform: translateY(-1px); }
-.fsd-cta:active { transform: translateY(1px); }
+/* ── Campaign Left Column ── */
+.fsd-campaign {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  z-index: 1;
+}
 
-.fsd-switcher { grid-column: 1 / -1; display: flex; gap: 15px; min-width: 0; margin-top: 17px; padding-top: 13px; border-top: 1px solid rgba(213, 240, 220, .15); }
-.fsd-switchLabel { flex: 0 0 auto; display: grid; align-content: center; gap: 5px; }
-.fsd-switchLabel > span { font-size: 8px; font-weight: 700; letter-spacing: .12em; color: #bad4c4; }
-.fsd-arrows { display: flex; gap: 4px; }
-.flash-drop .fsd-arrows button { display: grid; place-items: center; width: 36px; height: 34px; padding: 0; border: 0; border-radius: 6px; background: #ffffff12; color: #e3f4de; box-shadow: none; cursor: pointer; }
-.fsd-arrows button:hover { background: #ffffff24; }
-.fsd-rail { position: relative; display: flex; gap: 8px; min-width: 0; overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x proximity; scrollbar-width: thin; scrollbar-color: #669a78 transparent; padding: 3px 3px 6px; margin: -3px -3px -6px; }
-.flash-drop .fsd-choice { display: flex; align-items: center; gap: 9px; flex: 0 0 auto; max-width: 310px; min-height: 48px; padding: 7px 10px; border: 0; border-radius: 8px; background: #ffffff0d; color: #e3f4de; box-shadow: none; text-align: left; cursor: pointer; scroll-snap-align: start; }
-.flash-drop .fsd-choice:hover { background: #ffffff19; }
-.flash-drop .fsd-choice[data-selected="true"] { background: var(--fsd-acid); color: #173d2b; }
-.fsd-choiceLogo { flex: 0 0 29px; width: 29px; height: 29px; display: grid; place-items: center; border-radius: 7px; background: #fff; color: #173d2b; overflow: hidden; font-weight: 800; }
-.fsd-choiceLogo img { width: 100%; height: 100%; object-fit: contain; }
-.fsd-choiceCopy { display: grid; gap: 2px; min-width: 0; }
-.fsd-choiceCopy strong { font-size: 11px; font-weight: 800; }
-.fsd-choiceCopy small { font-size: 9px; max-width: 190px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap; opacity: .8; }
-.fsd-choiceDiscount { margin-left: 8px; font-family: "Outfit", sans-serif; font-size: 17px; font-weight: 600; white-space: nowrap; }
-.flash-drop :is(a, button):focus-visible { outline: 2px solid #3ee6c0; outline-offset: 3px; }
+.fsd-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  width: fit-content;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--fsd-accent-light);
+  border: 1px solid rgba(0, 158, 96, 0.2);
+  color: var(--fsd-accent);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
 
-html[data-theme="dark"] .flash-drop { --fsd-paper: #1b372d; --fsd-ink: #eafaf2; --fsd-muted: #b0c4b7; --fsd-seam: #b3d3b138; background: radial-gradient(ellipse at 5% 0%, #20583c, transparent 65%), #102d22; box-shadow: 0 5px 12px -6px #00000070; }
-html[data-theme="dark"] .fsd-ticketBottom::before, html[data-theme="dark"] .fsd-ticketBottom::after { background: #102d22; }
+.fsd-eyebrow svg {
+  flex-shrink: 0;
+  color: var(--fsd-accent);
+}
 
+.fsd-headline {
+  margin: 14px 0 8px;
+  font-family: var(--font-display, "Outfit", -apple-system, sans-serif);
+  font-size: clamp(26px, 3.2vw, 36px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.035em;
+  color: var(--fsd-text);
+}
+
+.fsd-headline em {
+  color: var(--fsd-accent);
+  font-style: normal;
+  font-weight: 800;
+}
+
+.fsd-intro {
+  max-width: 34ch;
+  margin: 0 0 18px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--fsd-muted);
+}
+
+/* ── Countdown Clock ── */
+.fsd-clock {
+  display: grid;
+  gap: 8px;
+  margin-top: auto;
+}
+
+.fsd-clockLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--fsd-muted);
+}
+
+.fsd-clockLabel svg {
+  color: var(--fsd-accent);
+}
+
+.fsd-digits {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fsd-unit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 50px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: var(--fsd-unit-bg);
+  border: 1px solid var(--fsd-unit-border);
+  box-shadow: var(--fsd-unit-shadow);
+  transition: transform 0.15s ease;
+}
+
+.fsd-unit strong {
+  font-family: var(--font-mono, "SF Mono", monospace);
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--fsd-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.fsd-unit small {
+  margin-top: 3px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--fsd-muted);
+  letter-spacing: 0.04em;
+  opacity: 0.85;
+}
+
+.fsd-unit:last-child strong {
+  color: var(--fsd-accent);
+}
+
+/* ── Product Showcase Ticket Card ── */
+.fsd-ticket {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-width: 0;
+  padding: 22px 24px;
+  border-radius: 20px;
+  background: var(--fsd-card-bg);
+  color: var(--fsd-text);
+  border: 1px solid var(--fsd-card-border);
+  box-shadow: var(--fsd-card-shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fsd-offer {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex: 1;
+  padding: 2px 0 16px;
+}
+
+.fsd-art {
+  position: relative;
+  flex: 0 0 82px;
+  width: 82px;
+  height: 82px;
+}
+
+.fsd-logo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  background: #f4faf6;
+  border-radius: 18px;
+  border: 1px solid rgba(0, 158, 96, 0.12);
+  box-shadow: 0 4px 14px rgba(18, 48, 34, 0.06);
+  overflow: hidden;
+}
+
+.fsd-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fsd-logo > span {
+  font-family: var(--font-display, "Outfit", sans-serif);
+  font-size: 36px;
+  font-weight: 800;
+  color: var(--fsd-accent);
+}
+
+/* Apple-style floating discount pill */
+.fsd-seal {
+  position: absolute;
+  top: -7px;
+  right: -7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ff3366 0%, #e6004c 100%);
+  color: #ffffff;
+  border: 2px solid var(--fsd-card-bg);
+  box-shadow: 0 3px 10px rgba(230, 0, 76, 0.32);
+  z-index: 2;
+}
+
+.fsd-seal small {
+  display: none;
+}
+
+.fsd-seal strong {
+  font-family: var(--font-display, "Outfit", sans-serif);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+.fsd-seal strong::before {
+  content: "−";
+}
+
+.fsd-seal strong span {
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.fsd-details {
+  min-width: 0;
+  flex: 1;
+}
+
+.fsd-details h3 {
+  margin: 0 0 4px;
+  color: var(--fsd-text);
+  font-size: clamp(19px, 2.2vw, 24px);
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+}
+
+.fsd-package {
+  margin: 0 0 10px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--fsd-muted);
+  line-height: 1.4;
+}
+
+.fsd-package span {
+  display: inline-block;
+}
+
+.fsd-package span::before {
+  content: " · ";
+  white-space: pre;
+}
+
+.fsd-price {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.fsd-price del {
+  font-size: 13px;
+  color: var(--fsd-muted);
+  text-decoration: line-through;
+  opacity: 0.8;
+}
+
+.fsd-price strong {
+  color: var(--fsd-accent);
+  font-family: var(--font-display, "Outfit", sans-serif);
+  font-size: clamp(22px, 2.5vw, 29px);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.fsd-saving {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  background: var(--fsd-accent-light);
+  color: var(--fsd-accent);
+  border: 1px solid rgba(0, 158, 96, 0.16);
+}
+
+.fsd-ticketBottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1px solid var(--fsd-divider);
+}
+
+.fsd-stock {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--fsd-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.fsd-stock svg {
+  color: var(--fsd-accent);
+}
+
+/* Premium Apple-style CTA Pill Button */
+.flash-drop .fsd-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 42px;
+  padding: 0 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #009e60 0%, #00875a 100%);
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 4px 14px rgba(0, 158, 96, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.fsd-cta:hover {
+  transform: translateY(-1.5px);
+  box-shadow: 0 6px 18px rgba(0, 158, 96, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.fsd-cta:active {
+  transform: scale(0.98);
+}
+
+/* ── Multi-offer Switcher Rail ── */
+.fsd-switcher {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--fsd-divider);
+}
+
+.fsd-switchLabel {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fsd-switchLabel > span {
+  font-size: 9.5px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--fsd-muted);
+}
+
+.fsd-arrows {
+  display: flex;
+  gap: 5px;
+}
+
+.flash-drop .fsd-arrows button {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 1px solid var(--fsd-card-border);
+  border-radius: 9px;
+  background: var(--fsd-unit-bg);
+  color: var(--fsd-text);
+  box-shadow: 0 2px 5px rgba(18, 48, 34, 0.05);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.flash-drop .fsd-arrows button:hover {
+  background: #f0f7f3;
+  color: var(--fsd-accent);
+  border-color: rgba(0, 158, 96, 0.3);
+}
+
+.flash-drop .fsd-arrows button:active {
+  transform: scale(0.95);
+}
+
+.fsd-rail {
+  position: relative;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 158, 96, 0.25) transparent;
+  padding: 2px 2px 6px;
+}
+
+.flash-drop .fsd-choice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+  min-height: 42px;
+  padding: 5px 12px 5px 6px;
+  border: 1px solid var(--fsd-chip-border);
+  border-radius: 12px;
+  background: var(--fsd-chip-bg);
+  color: var(--fsd-text);
+  box-shadow: 0 2px 6px rgba(18, 48, 34, 0.04);
+  text-align: left;
+  cursor: pointer;
+  scroll-snap-align: start;
+  transition: all 0.15s ease;
+}
+
+.flash-drop .fsd-choice:hover {
+  background: #ffffff;
+  border-color: rgba(0, 158, 96, 0.32);
+}
+
+.flash-drop .fsd-choice[data-selected="true"] {
+  background: #ffffff;
+  border: 1.5px solid var(--fsd-accent);
+  box-shadow: 0 4px 12px rgba(0, 158, 96, 0.15);
+  color: var(--fsd-accent);
+}
+
+.fsd-choiceLogo {
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: #f0f7f3;
+  color: var(--fsd-accent);
+  border: 1px solid rgba(0, 158, 96, 0.1);
+  overflow: hidden;
+  font-weight: 800;
+}
+
+.fsd-choiceLogo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fsd-choiceCopy {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+
+.fsd-choiceCopy strong {
+  font-size: 11px;
+  font-weight: 800;
+  color: inherit;
+}
+
+.fsd-choiceCopy small {
+  font-size: 9.5px;
+  max-width: 160px;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--fsd-muted);
+}
+
+.fsd-choiceDiscount {
+  margin-left: 6px;
+  font-family: var(--font-display, "Outfit", sans-serif);
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #e6004c;
+  background: rgba(255, 51, 102, 0.1);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+
+.flash-drop :is(a, button):focus-visible {
+  outline: 2px solid var(--fsd-accent);
+  outline-offset: 3px;
+}
+
+/* ── Dark Mode Overrides (Obsidian Mint & Sleek Micro-Borders) ── */
+html[data-theme="dark"] .flash-drop {
+  --fsd-surface: linear-gradient(145deg, #15271f 0%, #0d1a14 100%);
+  --fsd-border: rgba(78, 255, 218, 0.18);
+  --fsd-text: #f0f8f3;
+  --fsd-muted: #8ea89b;
+  --fsd-accent: #4effda;
+  --fsd-accent-light: rgba(78, 255, 218, 0.12);
+  --fsd-card-bg: rgba(16, 32, 24, 0.9);
+  --fsd-card-border: rgba(78, 255, 218, 0.16);
+  --fsd-card-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+  --fsd-unit-bg: rgba(14, 28, 21, 0.85);
+  --fsd-unit-border: rgba(78, 255, 218, 0.16);
+  --fsd-unit-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.07);
+  --fsd-divider: rgba(255, 255, 255, 0.09);
+  --fsd-chip-bg: rgba(0, 0, 0, 0.3);
+  --fsd-chip-border: rgba(255, 255, 255, 0.1);
+
+  background:
+    radial-gradient(circle at 100% 0%, rgba(78, 255, 218, 0.08) 0%, transparent 45%),
+    var(--fsd-surface);
+  border: 1px solid var(--fsd-border);
+  box-shadow:
+    0 16px 40px -10px rgba(0, 0, 0, 0.55),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
+}
+
+html[data-theme="dark"] .fsd-logo {
+  background: #11261d;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+html[data-theme="dark"] .fsd-logo > span {
+  color: #4effda;
+}
+
+html[data-theme="dark"] .fsd-seal {
+  border-color: #162c21;
+  box-shadow: 0 3px 10px rgba(255, 51, 102, 0.45);
+}
+
+html[data-theme="dark"] .fsd-choice[data-selected="true"] {
+  background: rgba(78, 255, 218, 0.15);
+  border-color: #4effda;
+  color: #ffffff;
+}
+
+html[data-theme="dark"] .fsd-choiceLogo {
+  background: #11261d;
+  color: #4effda;
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+html[data-theme="dark"] .fsd-choiceDiscount {
+  background: rgba(255, 77, 109, 0.2);
+  color: #ff6b8b;
+}
+
+/* ── Tablet Optimization (721px - 900px) ── */
 @media (max-width: 900px) and (min-width: 721px) {
-  .flash-drop { grid-template-columns: minmax(0, .75fr) minmax(0, 1.25fr); gap: 0 16px; padding: 14px; }
-  .fsd-eyebrow > span { display: none; }
-  .fsd-campaign { padding: 10px 4px; }
-  .fsd-offer { gap: 16px; }
-  .fsd-art { flex-basis: 85px; height: 105px; }
-  .fsd-logo { width: 76px; height: 76px; border-radius: 19px; }
-  .fsd-seal { width: 67px; height: 67px; }
-  .fsd-seal strong { font-size: 27px; }
-  .fsd-ticket { padding-inline: 16px; }
-  .fsd-ticketBottom::before { left: -22px; }
-  .fsd-ticketBottom::after { right: -22px; }
-  .fsd-ticket::before { left: -9px; }
+  .flash-drop {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    gap: 18px;
+    padding: 18px 20px;
+  }
+  .fsd-art {
+    flex-basis: 74px;
+    width: 74px;
+    height: 74px;
+  }
+  .fsd-ticket {
+    padding: 16px 18px;
+  }
 }
+
+/* ── Mobile Optimization (≤ 720px) ── */
 @media (max-width: 720px) {
-  .flash-drop { grid-template-columns: minmax(0, 1fr); gap: 12px; padding: 13px; border-radius: 18px; margin-bottom: 16px; }
-  .fsd-campaign { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 9px 12px; align-items: end; padding: 4px 3px 0; }
-  .fsd-eyebrow { grid-column: 1 / -1; font-size: 10px; }
-  .fsd-eyebrow > span { font-size: 7px; }
-  .fsd-headline { margin: 0; font-size: clamp(25px, 6.6vw, 37px); }
-  .fsd-intro { display: none; }
-  .fsd-watermark { top: -20px; right: 60px; width: 140px; height: 140px; }
-  .fsd-clock { gap: 6px; padding-bottom: 2px; }
-  .fsd-clockLabel { gap: 4px; font-size: 8px; }
-  .fsd-clockLabel svg { width: 10px; height: 10px; }
-  .fsd-digits { gap: 10px; }
-  .fsd-unit strong { font-size: 20px; }
-  .fsd-unit small { font-size: 8px; }
-  .fsd-unit + .fsd-unit::before { left: -7px; top: 1px; font-size: 16px; }
-  .fsd-ticket { padding: 12px 16px; border-radius: 8px; }
-  .fsd-ticket::before { display: none; }
-  .fsd-ticketTop { font-size: 7px; letter-spacing: .08em; }
-  .fsd-ticketBrand { font-size: 9px; }
-  .fsd-offer { padding: 16px 0 14px; gap: 16px; }
-  .fsd-art { flex-basis: 77px; height: 97px; }
-  .fsd-logo { width: 70px; height: 70px; border-radius: 18px; }
-  .fsd-logo > span { font-size: 32px; }
-  .fsd-seal { width: 63px; height: 63px; right: -5px; }
-  .fsd-seal small { font-size: 6px; }
-  .fsd-seal strong { font-size: 25px; }
-  .fsd-seal strong span { font-size: 13px; }
-  .fsd-details h3 { font-size: 20px; margin-bottom: 4px; }
-  .fsd-package { font-size: 10px; margin-bottom: 7px; }
-  .fsd-price del { font-size: 10px; }
-  .fsd-price strong { font-size: clamp(27px, 7.3vw, 33px); }
-  .fsd-saving { font-size: 9px; margin-top: 3px; }
-  .fsd-ticketBottom { padding-top: 10px; }
-  .fsd-ticketBottom::before { left: -22px; }
-  .fsd-ticketBottom::after { right: -22px; }
-  .fsd-stock { font-size: 10px; }
-  .flash-drop .fsd-cta { font-size: 11px; min-height: 42px; gap: 12px; padding-inline: 13px; }
-  .fsd-switcher { gap: 10px; margin-top: 0; padding-top: 10px; }
-  .fsd-switchLabel > span { font-size: 7px; }
-  .flash-drop .fsd-arrows button { width: 32px; height: 32px; }
-  .flash-drop .fsd-choice { max-width: 255px; padding: 6px 9px; }
-  .fsd-choiceCopy small { max-width: 145px; }
+  .flash-drop {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    padding: 16px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+
+  .fsd-campaign {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px 14px;
+    padding: 0;
+  }
+
+  .fsd-eyebrow {
+    font-size: 10px;
+    padding: 3px 9px;
+  }
+
+  .fsd-headline {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.02em;
+  }
+
+  .fsd-headline br {
+    display: none;
+  }
+
+  .fsd-headline em {
+    margin-left: 5px;
+  }
+
+  .fsd-intro {
+    display: none;
+  }
+
+  .fsd-clock {
+    margin-top: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .fsd-clockLabel {
+    display: none;
+  }
+
+  .fsd-digits {
+    gap: 5px;
+  }
+
+  .fsd-unit {
+    min-width: 38px;
+    padding: 5px 6px;
+    border-radius: 9px;
+  }
+
+  .fsd-unit strong {
+    font-size: 14px;
+  }
+
+  .fsd-unit small {
+    font-size: 8px;
+  }
+
+  .fsd-ticket {
+    padding: 14px 16px;
+    border-radius: 16px;
+  }
+
+  .fsd-offer {
+    padding: 4px 0 12px;
+    gap: 14px;
+  }
+
+  .fsd-art {
+    flex: 0 0 64px;
+    width: 64px;
+    height: 64px;
+  }
+
+  .fsd-logo {
+    border-radius: 14px;
+  }
+
+  .fsd-logo > span {
+    font-size: 26px;
+  }
+
+  .fsd-seal {
+    top: -5px;
+    right: -5px;
+    padding: 2px 7px;
+  }
+
+  .fsd-seal strong {
+    font-size: 11px;
+  }
+
+  .fsd-details h3 {
+    font-size: 16.5px;
+    margin-bottom: 2px;
+  }
+
+  .fsd-package {
+    font-size: 11.5px;
+    margin-bottom: 6px;
+  }
+
+  .fsd-price strong {
+    font-size: 21px;
+  }
+
+  .fsd-price del {
+    font-size: 11.5px;
+  }
+
+  .fsd-saving {
+    margin-top: 4px;
+    font-size: 9.5px;
+  }
+
+  .fsd-ticketBottom {
+    padding-top: 11px;
+  }
+
+  .fsd-stock {
+    font-size: 11px;
+  }
+
+  .flash-drop .fsd-cta {
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .fsd-switcher {
+    margin-top: 4px;
+    padding-top: 10px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .fsd-switchLabel {
+    justify-content: space-between;
+  }
+
+  .flash-drop .fsd-choice {
+    max-width: 230px;
+    padding: 4px 10px 4px 5px;
+    min-height: 38px;
+  }
 }
+
+/* ── Small Mobile (≤ 360px) ── */
 @media (max-width: 360px) {
-  .fsd-eyebrow > span { display: none; }
-  .fsd-campaign { gap: 8px; }
-  .fsd-headline { font-size: 23px; }
-  .fsd-clockLabel { font-size: 7px; }
-  .fsd-unit strong { font-size: 18px; }
-  .fsd-digits { gap: 8px; }
-  .fsd-unit + .fsd-unit::before { left: -6px; font-size: 14px; }
-  .fsd-ticket { padding-inline: 12px; }
-  .fsd-offer { gap: 12px; }
-  .fsd-art { flex-basis: 64px; height: 87px; }
-  .fsd-logo { width: 60px; height: 60px; border-radius: 15px; }
-  .fsd-seal { width: 55px; height: 55px; }
-  .fsd-seal strong { font-size: 22px; }
-  .fsd-details h3 { font-size: 18px; }
-  .fsd-price strong { font-size: 25px; }
-  .fsd-ticketBottom::before { left: -18px; }
-  .fsd-ticketBottom::after { right: -18px; }
+  .flash-drop {
+    padding: 12px;
+  }
+  .fsd-art {
+    flex: 0 0 54px;
+    width: 54px;
+    height: 54px;
+  }
+  .fsd-logo > span {
+    font-size: 22px;
+  }
+  .fsd-details h3 {
+    font-size: 15px;
+  }
+  .fsd-price strong {
+    font-size: 18px;
+  }
+  .fsd-ticket {
+    padding: 10px 12px;
+  }
 }
-@media (prefers-reduced-motion: reduce) { .flash-drop .fsd-cta { transition: none; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .flash-drop .fsd-cta,
+  .flash-drop .fsd-choice,
+  .flash-drop .fsd-unit {
+    transition: none;
+  }
+}

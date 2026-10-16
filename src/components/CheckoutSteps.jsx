@@ -23,7 +23,7 @@ const STEPS = [
   { key: "status", title: "Lacak", subtitle: "ID order", icon: PackageSearch },
 ];
 
-export default function CheckoutSteps({ current = "checkout" }) {
+export default function CheckoutSteps({ current = "checkout", readOnly = false }) {
   const navigate = useNavigate();
   const currentIndex = STEPS.findIndex((s) => s.key === current);
 
@@ -36,17 +36,18 @@ export default function CheckoutSteps({ current = "checkout" }) {
       {STEPS.map((step, idx) => {
         const done = idx < currentIndex;
         const active = idx === currentIndex;
-        const cls = done ? "step done step--clickable" : active ? "step active" : "step";
+        const isClickable = done && !readOnly;
+        const cls = isClickable ? "step done step--clickable" : done ? "step done" : active ? "step active" : "step";
         const Icon = step.icon;
 
         const handleClick = () => {
-          if (done && STEP_ROUTES[step.key]) {
+          if (isClickable && STEP_ROUTES[step.key]) {
             navigate(STEP_ROUTES[step.key]);
           }
         };
 
         const handleKeyDown = (e) => {
-          if (done && (e.key === "Enter" || e.key === " ")) {
+          if (isClickable && (e.key === "Enter" || e.key === " ")) {
             e.preventDefault();
             handleClick();
           }
@@ -59,18 +60,18 @@ export default function CheckoutSteps({ current = "checkout" }) {
             aria-current={active ? "step" : undefined}
             aria-posinset={idx + 1}
             aria-setsize={STEPS.length}
-            role={done ? "button" : undefined}
-            tabIndex={done ? 0 : undefined}
-            onClick={done ? handleClick : undefined}
-            onKeyDown={done ? handleKeyDown : undefined}
-            title={done ? `Kembali ke ${step.title}` : undefined}
+            role={isClickable ? "button" : undefined}
+            tabIndex={isClickable ? 0 : undefined}
+            onClick={isClickable ? handleClick : undefined}
+            onKeyDown={isClickable ? handleKeyDown : undefined}
+            title={isClickable ? `Kembali ke ${step.title}` : undefined}
           >
             <div className="step-dot" aria-hidden="true">
               <Icon size={16} strokeWidth={2.2} />
             </div>
             <div className="step-text">
               <div className="step-title">{step.title}</div>
-              <div className="step-sub">{done ? "← kembali" : step.subtitle}</div>
+              <div className="step-sub">{isClickable ? "← kembali" : step.subtitle}</div>
             </div>
           </div>
         );

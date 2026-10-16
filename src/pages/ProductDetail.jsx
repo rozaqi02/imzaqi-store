@@ -5,6 +5,7 @@ import { productStructuredData } from "../lib/productStructuredData.mjs";
 import {
   ArrowDown,
   ArrowLeft,
+  ChevronLeft,
   Clock3,
   Flame,
   LayoutGrid,
@@ -1030,7 +1031,7 @@ export default function ProductDetail() {
     <div className="page detail-page detail-page-v3 pdx-contentLoaded">
       <section className="section">
         <div className="container">
-          <MobileProductBar name={product.name} onBack={goBackToCatalog} />
+          <MobileProductBar name={product.name} icon={icon} onBack={goBackToCatalog} />
           <div className="pdx-layout">
             <div className="pdx-mainGrid">
               <div className="pdx-leftCol">
@@ -1046,11 +1047,11 @@ export default function ProductDetail() {
                   </div>
 
                   <div className="pdx-copy">
-                  <div className="pdx-toolbar">
-                    <button type="button" className="pdx-backLink" onClick={goBackToCatalog}>
-                      <ArrowLeft size={15} />
-                      <span>Katalog</span>
-                    </button>
+                    <div className="pdx-toolbar">
+                      <button type="button" className="pdx-backLink" onClick={goBackToCatalog} aria-label="Kembali ke katalog">
+                        <ChevronLeft size={18} strokeWidth={2.4} aria-hidden="true" />
+                        <span>Katalog</span>
+                      </button>
 
                     <div className="pdx-topActions">
                       <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan" aria-label="Bagikan produk">
@@ -1087,11 +1088,6 @@ export default function ProductDetail() {
                         {guaranteePreview}
                       </span>
                     </div>
-                    {variants.length ? (
-                      <a className="pdx-jumpToPacks" href="#paket-tersedia">
-                        Lihat {variants.length} pilihan paket <ArrowDown size={15} aria-hidden="true" />
-                      </a>
-                    ) : null}
                     {adminWhatsAppUrl ? (
                       <a
                         className="pdx-contactAdmin"
@@ -1253,6 +1249,7 @@ export default function ProductDetail() {
         </div>
       </div>
     </section>
+
 
     <VariantCompareModal
       open={compareOpen}

@@ -26,7 +26,7 @@ html {
 .route-transition > .page:is(.catalog-page, .detail-page-v3, .checkout-page-full, .pay-page) .container {
   box-sizing: border-box;
   width: 100%;
-  max-width: 1120px;
+  max-width: min(1200px, 100%);
   margin-inline: auto;
   padding-left: calc(var(--storefront-gutter) + env(safe-area-inset-left, 0px)) !important;
   padding-right: calc(var(--storefront-gutter) + env(safe-area-inset-right, 0px)) !important;
@@ -64,13 +64,15 @@ body.has-bottom-nav .route-transition > .page:is(.catalog-page, .detail-page-v3)
   }
 
   .detail-page.detail-page-v3 .pdx-billboard .pdx-visual {
-    min-height: 200px;
-    aspect-ratio: auto;
-    padding: 24px 20px;
+    min-height: 260px;
+    aspect-ratio: 1.25 / 1;
+    max-height: 330px;
+    padding: 36px 24px;
   }
 
   .detail-page.detail-page-v3 .pdx-billboard .pdx-visualIcon {
-    width: 112px !important;
-    height: 112px !important;
+    width: 124px !important;
+    height: 124px !important;
+    border-radius: 26px !important;
   }
 }

@@ -5,6 +5,7 @@ import { Check, CheckCircle2, Phone, ShieldCheck, X } from "lucide-react";
 import { useDialogA11y } from "../../../hooks/useDialogA11y";
 import { copyToClipboard } from "../../../utils/clipboard";
 import { formatIDR } from "../../../lib/format";
+import CheckoutSteps from "../../../components/CheckoutSteps";
 import BannerGraphic from "../../../components/BannerGraphic";
 
 const COPY_TIMEOUT_MS = 1800;
@@ -141,6 +142,8 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
         aria-label="Order berhasil"
         onMouseDown={(e) => e.stopPropagation()}
       >
+        <div className="pay-sheetGrabBar" aria-hidden="true" />
+
         <div className="pay-celebrationParticles" aria-hidden="true">
           {Array.from({ length: 18 }).map((_, i) => (
             <span key={i} className={`pay-celebrationDot pay-celebrationDot--${i % 6}`} />
@@ -149,7 +152,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
 
         <div className="modal-head pay-successHead">
           <div>
-            <p className="pay-successLabel">Order</p>
+            <p className="pay-successLabel">Order Berhasil</p>
             <div className="modal-title">Pembayaran dilaporkan</div>
             <div className="modal-sub">Admin sedang memverifikasi pembayaranmu. Biasanya selesai dalam 5–30 menit.</div>
           </div>
@@ -159,29 +162,13 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
         </div>
 
         <div className="modal-body">
-          <div className="pay-successSteps" aria-label="Langkah selanjutnya">
-            <div className="pay-successStep is-done">
-              <span>1</span>
-              Order tersimpan
-            </div>
-            <div className="pay-successStep is-active">
-              <span>2</span>
-              Lapor bayar
-            </div>
-            <div className="pay-successStep">
-              <span>3</span>
-              Tunggu verifikasi
-            </div>
+          <div className="pay-successFunnelSteps" aria-label="Langkah checkout">
+            <CheckoutSteps current="status" readOnly={true} />
           </div>
 
           <div className="pay-successHero">
-            <div className="pay-successIconWrap">
-              <div className="pay-successGlow" aria-hidden="true" />
-              <BannerGraphic
-                name={isAcademicOrder ? "academic_grad" : "sparkle_celebration"}
-                height={54}
-                className="pay-successMascot"
-              />
+            <div className="pay-appleSuccessBadge" aria-hidden="true">
+              <CheckCircle2 size={36} strokeWidth={2.2} />
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode pay-successCode--animate" style={{ whiteSpace: "nowrap" }}>{orderCode}</div>
@@ -191,31 +178,35 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
           {isAcademicOrder ? (
             <div className="pay-successActions">
               <a
-                className="btn btn-wide btn-primary"
+                className="btn btn-wide btn-primary pay-successBtnPrimary"
                 href={academicWaUrl}
                 target="_blank"
                 rel="noreferrer"
               >
                 Hubungi Admin WA
               </a>
-              <Link className="btn btn-ghost" to={statusUrl}>
-                Cek Status Order
-              </Link>
-              <button className="btn btn-ghost" type="button" onClick={copyCode}>
-                {copied ? "✓ ID tersalin" : "Salin ID"}
-              </button>
+              <div className="pay-successSecondaryGrid">
+                <Link className="btn btn-ghost pay-successBtnGhost" to={statusUrl}>
+                  Cek Status Order
+                </Link>
+                <button className="btn btn-ghost pay-successBtnGhost" type="button" onClick={copyCode}>
+                  {copied ? "✓ ID tersalin" : "Salin ID"}
+                </button>
+              </div>
             </div>
           ) : (
             <div className="pay-successActions">
-              <Link className="btn btn-wide btn-primary" to={statusUrl}>
+              <Link className="btn btn-wide btn-primary pay-successBtnPrimary" to={statusUrl}>
                 Cek Status Order
               </Link>
-              <button className="btn btn-ghost" type="button" onClick={copyCode}>
-                {copied ? "✓ ID tersalin" : "Salin ID"}
-              </button>
-              <a className="btn btn-ghost" href={adminWaUrl} target="_blank" rel="noreferrer">
-                Chat Admin
-              </a>
+              <div className="pay-successSecondaryGrid">
+                <button className="btn btn-ghost pay-successBtnGhost" type="button" onClick={copyCode}>
+                  {copied ? "✓ ID tersalin" : "Salin ID"}
+                </button>
+                <a className="btn btn-ghost pay-successBtnGhost" href={adminWaUrl} target="_blank" rel="noreferrer">
+                  Chat Admin
+                </a>
+              </div>
             </div>
           )}
         </div>
@@ -291,18 +282,24 @@ export function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, i
         aria-label="Konfirmasi Pembayaran"
         onMouseDown={(e) => e.stopPropagation()}
       >
+        <div className="pay-sheetGrabBar" aria-hidden="true" />
+
         <div className="pay-confirmModalHeader">
           <div className="pay-confirmModalHeaderIcon">
-            <BannerGraphic name={isFree ? "gift_box" : "shield_star"} height={26} className="pay-confirmMascot" />
+            {isFree ? (
+              <CheckCircle2 size={18} strokeWidth={2.4} />
+            ) : (
+              <ShieldCheck size={18} strokeWidth={2.4} />
+            )}
           </div>
           <div className="pay-confirmModalHeaderCopy">
             <div className="pay-confirmModalTitle">{isFree ? "Konfirm Order Gratis" : "Konfirmasi Pembayaran"}</div>
             <div className="pay-confirmModalSub">
-              Siap dikonfirmasi - ID order akan dibuat
+              Siap dikonfirmasi · ID order akan dibuat
             </div>
           </div>
           <button className="pay-confirmCloseBtn" type="button" onClick={onCancel} aria-label="Tutup">
-            <X size={16} />
+            <X size={16} strokeWidth={2.4} />
           </button>
         </div>
 

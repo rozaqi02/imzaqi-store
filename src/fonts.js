@@ -11,6 +11,9 @@ import "@fontsource/plus-jakarta-sans/latin-700.css";
 import "@fontsource/outfit/latin-600.css";
 import "@fontsource/outfit/latin-700.css";
 
+import "@fontsource/jetbrains-mono/latin-500.css";
+import "@fontsource/jetbrains-mono/latin-700.css";
+
 function preloadCriticalFont(href) {
   if (typeof document === "undefined" || !href) return;
   if (document.querySelector(`link[rel="preload"][href="${href}"]`)) return;

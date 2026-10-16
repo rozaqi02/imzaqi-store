@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, TicketPercent, X } from "lucide-react";
+import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -128,7 +128,7 @@ export default function Pay() {
   const nav = useNavigate();
   const location = useLocation();
   const cart = useCart();
-  const { promo, apply: applyPromo, clear: clearPromo, revalidate } = usePromo();
+  const { promo, clear: clearPromo, revalidate } = usePromo();
   const toast = useToast();
 
   usePageMeta({
@@ -137,9 +137,6 @@ export default function Pay() {
   });
 
   const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
-  const [promoCodeInput, setPromoCodeInput] = useState(() => promo?.code || "");
-  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
-  const [promoFeedback, setPromoFeedback] = useState({ text: "", type: "" });
 
   useEffect(() => {
     if (Array.isArray(cart.items) && cart.items.length > 0) setSnapshot(cart.items);
@@ -159,7 +156,6 @@ export default function Pay() {
         if (!alive) return;
         if (result?.ok && Number(result.percent) > 0) {
           setPromoPercent(Number(result.percent));
-          setPromoCodeInput(result.code || code);
           return;
         }
         setPromoPercent(0);
@@ -181,46 +177,10 @@ export default function Pay() {
   useEffect(() => {
     if (promo?.code && Number(promo?.percent) > 0) {
       setPromoPercent(Number(promo.percent));
-      setPromoCodeInput(promo.code);
     } else {
       setPromoPercent(0);
     }
   }, [promo]);
-
-  async function handleApplyPromo() {
-    const raw = String(promoCodeInput || "").trim().toUpperCase();
-    if (!raw) {
-      setPromoFeedback({ text: "Ketik kode promo dulu ya.", type: "error" });
-      return;
-    }
-    setIsApplyingPromo(true);
-    setPromoFeedback({ text: "", type: "" });
-    try {
-      const result = await applyPromo(raw);
-      if (result?.ok) {
-        setPromoPercent(Number(result.percent || 0));
-        setPromoFeedback({ text: `Berhasil! Diskon ${result.percent}% aktif.`, type: "success" });
-        toast.success(`Diskon ${result.percent}% aktif`, { title: raw });
-        trackFunnelEvent("apply_promo", { metadata: { code: raw, percent: Number(result.percent || 0) } });
-      } else {
-        setPromoFeedback({ text: result?.message || "Kode promo tidak valid.", type: "error" });
-        toast.error(result?.message || "Kode promo tidak valid.");
-      }
-    } catch {
-      setPromoFeedback({ text: "Gagal memproses kode promo.", type: "error" });
-      toast.error("Gagal memproses kode promo.");
-    } finally {
-      setIsApplyingPromo(false);
-    }
-  }
-
-  function handleRemovePromo() {
-    clearPromo();
-    setPromoPercent(0);
-    setPromoCodeInput("");
-    setPromoFeedback({ text: "Kode promo dilepas.", type: "info" });
-    toast.info("Kode promo dilepas.");
-  }
 
   useEffect(() => {
     let alive = true;
@@ -805,8 +765,9 @@ export default function Pay() {
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
           <div className="pay-shell-copy hero-anim-wrap">
-            <p className="pay-shell-kicker">QRIS</p>
-            <h1 className="h1 pay-shell-title hero-anim-title">Bayar</h1>
+            <span className="pay-shell-kicker">QRIS aman & instan</span>
+            <h1 className="h1 pay-shell-title hero-anim-title">Selesaikan pembayaran.</h1>
+            <p className="pay-shell-sub hero-anim-sub">Scan QRIS dengan aplikasi m-banking atau e-wallet pilihanmu.</p>
           </div>
         </div>
 
@@ -819,7 +780,7 @@ export default function Pay() {
             <aside className="card pad pay-card pay-orderMobileCard reveal">
               <div className="pay-orderHead">
                 <div>
-                  <div className="pay-orderKicker">Order</div>
+                  <div className="pay-orderKicker">Ringkasan pesanan</div>
                   <div className="pay-orderTitle">{itemCount} item</div>
                 </div>
                 {promoPercent ? <span className="pay-orderPromo">{promo?.code}</span> : null}
@@ -834,11 +795,11 @@ export default function Pay() {
             <section ref={contactCardRef} className="card pad pay-card pay-contactCard reveal" style={{ transitionDelay: "90ms" }}>
               <div className="pay-cardHead">
                 <div>
-                  <div className="pay-cardKicker">Kontak order</div>
-                  <h2 className="h3 pay-cardTitle">WhatsApp</h2>
+                  <div className="pay-cardKicker">Tujuan pengiriman</div>
+                  <h2 className="h3 pay-cardTitle">Nomor WhatsApp</h2>
                 </div>
                 <span className={`pay-statePill ${isFreeOrder ? "free" : hasValidWhatsApp ? "live" : ""}`}>
-                  {isFreeOrder ? "Gratis" : hasValidWhatsApp ? "WA Valid" : "Kontak"}
+                  {isFreeOrder ? "Gratis" : hasValidWhatsApp ? "WA Valid" : "Wajib"}
                 </span>
               </div>
 
@@ -926,7 +887,7 @@ export default function Pay() {
             <section className="card pad pay-card pay-stageCard reveal" style={{ transitionDelay: "160ms" }}>
               <div className="pay-stageGrid">
                 <div className="pay-stageMeta">
-                  <div className="pay-stageLabel">Total bayar</div>
+                  <div className="pay-stageLabel">Total pembayaran</div>
                   <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
                   <div className="pay-stageHint">
                     {isFreeOrder
@@ -934,66 +895,7 @@ export default function Pay() {
                       : "Scan QRIS dengan m-banking atau e-wallet (BCA, GoPay, OVO, Dana, ShopeePay), lalu konfirmasi di bawah."}
                   </div>
 
-                  <div className="pay-promoSection">
-                    <div className="pay-promoHead">
-                      <div className="pay-promoTitle">
-                        <TicketPercent size={14} aria-hidden="true" />
-                        <span>Kode Promo</span>
-                      </div>
-                      {promoPercent > 0 ? (
-                        <button
-                          type="button"
-                          className="btn btn-ghost btn-xs pay-promoClearBtn"
-                          onClick={handleRemovePromo}
-                        >
-                          Hapus
-                        </button>
-                      ) : null}
-                    </div>
 
-                    {promoPercent > 0 ? (
-                      <div className="pay-promoApplied">
-                        <span className="pay-promoTag">
-                          <Check size={12} strokeWidth={3} /> {promo?.code}
-                        </span>
-                        <span className="pay-promoDiscountBadge">Diskon {promoPercent}%</span>
-                      </div>
-                    ) : (
-                      <div className="pay-promoInputRow">
-                        <input
-                          type="text"
-                          className="input pay-promoInput"
-                          placeholder="Punya kode promo?"
-                          value={promoCodeInput}
-                          onChange={(e) => setPromoCodeInput(e.target.value.toUpperCase())}
-                          onKeyDown={(e) => {
-                            if (e.key === "Enter") {
-                              e.preventDefault();
-                              if (!isApplyingPromo) handleApplyPromo();
-                            }
-                          }}
-                          disabled={isApplyingPromo}
-                          autoCapitalize="characters"
-                          autoComplete="off"
-                          spellCheck="false"
-                        />
-                        <button
-                          type="button"
-                          className="btn btn-sm pay-promoApplyBtn"
-                          onClick={handleApplyPromo}
-                          disabled={isApplyingPromo || !promoCodeInput.trim()}
-                        >
-                          {isApplyingPromo ? "Cek..." : "Pakai"}
-                        </button>
-                      </div>
-                    )}
-
-                    {promoFeedback.text ? (
-                      <div className={`pay-promoFeedback is-${promoFeedback.type}`} role="status">
-                        {promoFeedback.text}
-                      </div>
-                    ) : null}
-                  </div>
 
                   <div className="pay-stageRows">
                     <div className="pay-stageRow">
@@ -1148,7 +1050,7 @@ export default function Pay() {
             <aside className="card pad pay-card pay-orderDesktop reveal" style={{ transitionDelay: "120ms" }}>
               <div className="pay-orderHead">
                 <div>
-                  <div className="pay-orderKicker">Order</div>
+                  <div className="pay-orderKicker">Ringkasan pesanan</div>
                   <div className="pay-orderTitle">{itemCount} item</div>
                 </div>
                 {promoPercent ? <span className="pay-orderPromo">{promo?.code}</span> : null}

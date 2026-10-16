@@ -20,28 +20,34 @@ html[data-theme] body .header .header-iconAction::after {
   display: none;
 }
 
-@media (min-width: 721px) {
+@media (min-width: 861px) {
   .header .promo-ticker--mobileStack {
     display: none;
   }
 }
 
-@media (max-width: 720px) {
+@media (max-width: 860px) {
   body:has(.pdx-mobileProductBar) {
     overflow-x: clip;
     overflow-y: visible;
   }
 
-  .header .promo-ticker {
-    --promo-ticker-size: 10.5px;
+  .header .promo-ticker,
+  .promo-ticker {
+    --promo-ticker-size: 8px !important;
     --promo-ticker-tracking: 0.01em;
-    --promo-ticker-leading: 1.2;
-    min-height: 28px;
-    padding: 3px 30px 3px 10px;
+    --promo-ticker-leading: 1.15;
+    min-height: 20px !important;
+    height: 20px !important;
+    padding: 1px 26px 1px 8px !important;
     overflow: hidden;
+    font-size: 8px !important;
   }
 
-  .header .promo-tickerItem {
+  .header .promo-tickerItem,
+  .promo-tickerItem {
+    font-size: 8px !important;
+    line-height: 1.15 !important;
     max-width: 100%;
     flex-wrap: nowrap !important;
     white-space: nowrap !important;
@@ -53,45 +59,68 @@ html[data-theme] body .header .header-iconAction::after {
     gap: 4px;
   }
 
-  .header .promo-tickerLink {
+  .header .promo-tickerLink,
+  .promo-tickerLink,
+  .header .promo-tickerCode,
+  .promo-tickerCode {
+    font-size: 8px !important;
+    font-weight: 650 !important;
+    line-height: 1.15 !important;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: min(62vw, 240px);
+    max-width: min(80vw, 360px) !important;
     display: inline-block;
     vertical-align: middle;
   }
 
-  .header .promo-tickerMascot {
-    height: 18px !important;
-    margin-left: 4px;
+
+  .header .promo-tickerMascot,
+  .promo-tickerMascot,
+  .promo-ticker .mascot-flow {
+    height: 13px !important;
+    max-height: 13px !important;
+    width: auto !important;
+    margin-left: 3px;
     margin-right: 0;
     flex-shrink: 0;
   }
 
-  .header .promo-tickerBadge {
-    padding: 1px 5px !important;
-    font-size: 8px !important;
+  .header .promo-tickerBadge,
+  .promo-tickerBadge {
+    padding: 0.5px 4px !important;
+    font-size: 6.5px !important;
     margin-right: 2px !important;
+    line-height: 11px !important;
     flex-shrink: 0;
   }
 
-  .header .promo-tickerGlyph {
+  .header .promo-tickerGlyph,
+  .promo-tickerGlyph {
+    width: 11px !important;
+    height: 11px !important;
     margin-right: 2px;
     flex-shrink: 0;
   }
 
-  .header .promo-tickerClose {
+  .header .promo-tickerClose,
+  .promo-tickerClose {
     display: flex;
     align-items: center;
     justify-content: center;
-    right: 4px;
-    width: 24px;
-    height: 24px;
+    right: 3px;
+    width: 20px !important;
+    height: 20px !important;
     border-radius: 4px;
     background: transparent !important;
     color: inherit;
     opacity: 0.75;
+  }
+
+  .header .promo-tickerClose svg,
+  .promo-tickerClose svg {
+    width: 12px !important;
+    height: 12px !important;
   }
 
   .bottom-nav .bottom-nav-item {
@@ -115,49 +144,119 @@ html[data-theme] body .header .header-iconAction::after {
     opacity: 0;
   }
 
-  .detail-page.detail-page-v3 .pdx-mobileProductBar {
-    position: sticky;
+  body > .pdx-mobileProductBar,
+  .detail-page.detail-page-v3 .pdx-mobileProductBar,
+  .pdx-mobileProductBar {
+    position: fixed !important;
     top: calc(var(--site-header-offset, 64px) + 8px);
-    z-index: 30;
-    display: flex;
-    align-items: center;
-    gap: 12px;
+    left: 12px;
+    right: 12px;
+    z-index: 998 !important;
+    display: grid !important;
+    grid-template-columns: 40px minmax(0, 1fr) 40px !important;
+    align-items: center !important;
     min-height: 48px;
-    padding: 4px 14px 4px 6px;
-    border: 1px solid var(--brand-line);
-    border-bottom: 0;
-    border-radius: 18px 18px 0 0;
-    background: var(--nav-shell-surface);
-    color: var(--pdx-text-1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    padding: 4px 6px;
+    margin: 0 !important;
+    border: 1px solid rgba(154, 191, 203, 0.45) !important;
+    border-radius: 16px !important;
+    background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+    color: var(--pdx-text-1, #0f172a);
+    box-shadow:
+      0 12px 28px rgba(67, 111, 129, 0.16),
+      0 4px 10px rgba(80, 115, 130, 0.08),
+      inset 0 1.5px 0 rgba(255, 255, 255, 1),
+      inset 0 -2.5px 0 rgba(154, 191, 203, 0.35) !important;
+    backdrop-filter: blur(20px) saturate(140%);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(-16px);
+    transition:
+      opacity 0.22s ease,
+      transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+      visibility 0.22s ease,
+      box-shadow 0.2s ease;
   }
 
-  .detail-page.detail-page-v3 .pdx-mobileProductBar.is-stuck {
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16), inset 0 -1px 0 var(--brand-line);
+  body > .pdx-mobileProductBar.is-stuck,
+  body > .pdx-mobileProductBar.is-scrolled,
+  .detail-page.detail-page-v3 .pdx-mobileProductBar.is-stuck,
+  .detail-page.detail-page-v3 .pdx-mobileProductBar.is-scrolled,
+  .pdx-mobileProductBar.is-stuck,
+  .pdx-mobileProductBar.is-scrolled {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+    border: 1px solid rgba(154, 191, 203, 0.5) !important;
+    background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+    box-shadow:
+      0 14px 34px rgba(67, 111, 129, 0.22),
+      0 6px 14px rgba(80, 115, 130, 0.12),
+      inset 0 2px 0 rgba(255, 255, 255, 1),
+      inset 0 -3px 0 rgba(154, 191, 203, 0.35) !important;
+  }
+
+  html[data-theme="dark"] body > .pdx-mobileProductBar,
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-mobileProductBar,
+  html[data-theme="dark"] .pdx-mobileProductBar {
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    background: linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
+    color: #f1f5f9 !important;
+    box-shadow:
+      0 16px 36px rgba(0, 0, 0, 0.5),
+      0 6px 16px rgba(0, 10, 28, 0.36),
+      inset 0 1.5px 0 rgba(255, 255, 255, 0.2),
+      inset 0 -3px 0 rgba(0, 0, 0, 0.42) !important;
+  }
+
+  html[data-theme="dark"] body > .pdx-mobileProductBar.is-stuck,
+  html[data-theme="dark"] body > .pdx-mobileProductBar.is-scrolled,
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-mobileProductBar.is-stuck,
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-mobileProductBar.is-scrolled,
+  html[data-theme="dark"] .pdx-mobileProductBar.is-stuck,
+  html[data-theme="dark"] .pdx-mobileProductBar.is-scrolled {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+    border: 1px solid rgba(255, 255, 255, 0.14) !important;
+    background: linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
+    box-shadow:
+      0 20px 44px rgba(0, 0, 0, 0.6),
+      0 8px 20px rgba(0, 10, 28, 0.4),
+      inset 0 2px 0 rgba(255, 255, 255, 0.25),
+      inset 0 -3.5px 0 rgba(0, 0, 0, 0.45) !important;
   }
 
   .pdx-mobileBack {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 5px;
-    min-height: 40px;
-    min-width: 40px;
-    padding: 0 8px;
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    min-height: 34px;
+    padding: 0;
+    margin-left: 2px;
     flex-shrink: 0;
-    border: 0;
-    border-radius: 10px;
-    background: transparent;
-    color: inherit;
-    font: inherit;
-    font-size: 12px;
-    font-weight: 700;
+    border: 1px solid rgba(154, 191, 203, 0.4) !important;
+    border-radius: 11px;
+    background: rgba(255, 255, 255, 0.85);
+    color: var(--pdx-text-1, #0f172a);
+    box-shadow: 0 1.5px 4px rgba(67, 111, 129, 0.12), inset 0 1px 0 #ffffff;
     cursor: pointer;
+    transition: transform 0.15s ease, background 0.15s ease;
   }
 
   .pdx-mobileBack:hover {
-    background: var(--pdx-soft);
+    background: #ffffff;
+  }
+
+  .pdx-mobileBack:active {
+    transform: scale(0.92);
   }
 
   .pdx-mobileBack:focus-visible {
@@ -165,28 +264,305 @@ html[data-theme] body .header .header-iconAction::after {
     outline-offset: 2px;
   }
 
+  html[data-theme="dark"] .pdx-mobileBack {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.12) !important;
+    color: #f1f5f9;
+    box-shadow: 0 1.5px 4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.12);
+  }
+
+  .pdx-mobileProductInfo {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 8px;
+    min-width: 0;
+    width: 100%;
+    text-align: center;
+    margin: 0 auto;
+  }
+
+  .pdx-mobileBarSpacer {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    pointer-events: none;
+  }
+
+  .pdx-mobileProductIcon {
+    display: none;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    object-fit: cover;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+
+  body > .pdx-mobileProductBar.is-stuck .pdx-mobileProductIcon,
+  body > .pdx-mobileProductBar.is-scrolled .pdx-mobileProductIcon,
+  .pdx-mobileProductBar.is-stuck .pdx-mobileProductIcon,
+  .pdx-mobileProductBar.is-scrolled .pdx-mobileProductIcon,
+  .detail-page.detail-page-v3 .pdx-mobileProductBar.is-stuck .pdx-mobileProductIcon,
+  .detail-page.detail-page-v3 .pdx-mobileProductBar.is-scrolled .pdx-mobileProductIcon {
+    display: block;
+    animation: pdxMobileIconFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  @keyframes pdxMobileIconFadeIn {
+    from {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  html[data-theme="dark"] .pdx-mobileProductIcon {
+    border-color: rgba(255, 255, 255, 0.12);
+  }
+
   .pdx-mobileProductName {
     min-width: 0;
-    flex: 1;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    text-align: right;
-    font-size: 13px;
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 14.5px;
     font-weight: 800;
+    letter-spacing: -0.01em;
   }
 
   .detail-page.detail-page-v3 .pdx-billboard.pdx-topCard {
-    border-top: 0 !important;
-    border-radius: 0 0 28px 28px !important;
+    position: relative !important;
+    border-radius: 24px !important;
+    margin-top: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(154, 191, 203, 0.28) !important;
+    box-shadow: 0 6px 24px rgba(67, 111, 129, 0.07), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
   }
 
-  .detail-page-v3 .pdx-copy .pdx-backLink {
-    display: none;
+  .detail-page.detail-page-v3 .pdx-billboard .pdx-visual {
+    position: relative !important;
+    min-height: 260px !important;
+    aspect-ratio: 1.25 / 1 !important;
+    max-height: 330px !important;
+    padding: 36px 24px !important;
+    background:
+      radial-gradient(circle at 50% 32%, rgba(255, 255, 255, 0.24) 0%, transparent 68%),
+      linear-gradient(160deg, #00b87a 0%, #009e60 55%, #057d4f 100%) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06) !important;
   }
 
+  .detail-page.detail-page-v3 .pdx-billboard .pdx-visualIcon {
+    width: 124px !important;
+    height: 124px !important;
+    border-radius: 26px !important;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.08) !important;
+  }
+
+  /* Clean Apple-style toolbar row in normal flow (no overlap) */
   .detail-page-v3 .pdx-copy .pdx-toolbar {
-    justify-content: flex-end !important;
+    position: static !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    margin-bottom: 12px !important;
+    padding: 0 !important;
+  }
+
+  .detail-page-v3 .pdx-copy .pdx-backLink,
+  .detail-page-v3 .pdx-copy .pdx-topActions .pdx-iconBtn {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 36px !important;
+    height: 36px !important;
+    min-height: 36px !important;
+    min-width: 36px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    border: 1px solid rgba(0, 0, 0, 0.06) !important;
+    background: rgba(0, 0, 0, 0.04) !important;
+    color: var(--pdx-text-1, #1d1d1f) !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    transition: transform 0.15s ease, background 0.15s ease !important;
+  }
+
+  .detail-page-v3 .pdx-copy .pdx-backLink:active,
+  .detail-page-v3 .pdx-copy .pdx-topActions .pdx-iconBtn:active {
+    transform: scale(0.92) !important;
+    background: rgba(0, 0, 0, 0.08) !important;
+  }
+
+  .detail-page-v3 .pdx-copy .pdx-backLink span {
+    display: none !important;
+  }
+
+  /* Apple-inspired text typography & hierarchy */
+  .detail-page.detail-page-v3 .pdx-billboard .pdx-copy {
+    padding: 16px 18px 20px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 0 !important;
+  }
+
+  /* Category Eyebrow: refined, borderless, tracked */
+  .detail-page.detail-page-v3 .pdx-label {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    padding: 3.5px 10px !important;
+    border-radius: 999px !important;
+    font-size: 11px !important;
+    font-weight: 750 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    background: rgba(0, 158, 96, 0.09) !important;
+    border: none !important;
+    color: #008751 !important;
+    width: fit-content !important;
+    margin-bottom: 6px !important;
+    text-decoration: none !important;
+  }
+
+  /* Product Title: Apple Large Title bold & crisp */
+  .detail-page.detail-page-v3 .pdx-title {
+    font-family: var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif) !important;
+    font-size: 23px !important;
+    font-weight: 850 !important;
+    line-height: 1.18 !important;
+    letter-spacing: -0.025em !important;
+    margin: 0 0 10px 0 !important;
+    color: var(--pdx-text-1, #0f172a) !important;
+  }
+
+  /* Hero Price row: prominent, clear baseline */
+  .detail-page.detail-page-v3 .pdx-statsStrip {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    margin-top: 0 !important;
+    width: 100% !important;
+  }
+
+  .detail-page.detail-page-v3 .pdx-heroPrice {
+    display: flex !important;
+    align-items: baseline !important;
+    gap: 7px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .detail-page.detail-page-v3 .pdx-priceLabel {
+    font-size: 12px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    letter-spacing: -0.01em !important;
+    color: var(--pdx-text-3, #64748b) !important;
+  }
+
+  .detail-page.detail-page-v3 .pdx-heroPrice .pdx-priceValue {
+    font-family: var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif) !important;
+    font-size: 24px !important;
+    font-weight: 850 !important;
+    letter-spacing: -0.025em !important;
+    color: var(--pdx-text-1, #0f172a) !important;
+  }
+
+  /* Borderless soft capsules for metadata */
+  .detail-page.detail-page-v3 .pdx-statsChips {
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+    margin-bottom: 12px !important;
+  }
+
+  .detail-page.detail-page-v3 .pdx-heroStat {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    min-height: 28px !important;
+    padding: 4px 11px !important;
+    border-radius: 999px !important;
+    font-size: 11.5px !important;
+    font-weight: 600 !important;
+    background: rgba(0, 0, 0, 0.045) !important;
+    border: none !important;
+    color: var(--pdx-text-2, #475569) !important;
+    box-shadow: none !important;
+  }
+
+  .detail-page.detail-page-v3 .pdx-heroStat svg {
+    opacity: 0.7 !important;
+    stroke-width: 2.2 !important;
+  }
+
+  /* Polished Apple-style action capsule */
+  .detail-page.detail-page-v3 .pdx-contactAdmin {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-height: 32px !important;
+    padding: 5px 14px !important;
+    border-radius: 999px !important;
+    font-size: 11.5px !important;
+    font-weight: 650 !important;
+    background: rgba(0, 158, 96, 0.08) !important;
+    border: none !important;
+    color: #008751 !important;
+    width: fit-content !important;
+    box-shadow: none !important;
+    transition: background 0.15s ease, transform 0.15s ease !important;
+    text-decoration: none !important;
+  }
+
+  .detail-page.detail-page-v3 .pdx-contactAdmin:active {
+    transform: scale(0.96) !important;
+    background: rgba(0, 158, 96, 0.16) !important;
+  }
+
+  /* Dark mode adjustments */
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-billboard.pdx-topCard {
+    background: #141716 !important;
+    border-color: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  html[data-theme="dark"] .detail-page-v3 .pdx-copy .pdx-backLink,
+  html[data-theme="dark"] .detail-page-v3 .pdx-copy .pdx-topActions .pdx-iconBtn {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    color: #f1f5f9 !important;
+  }
+
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-label {
+    background: rgba(0, 214, 180, 0.12) !important;
+    border: none !important;
+    color: #38efbd !important;
+  }
+
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-heroStat {
+    background: rgba(255, 255, 255, 0.07) !important;
+    border: none !important;
+    color: #cbd5e1 !important;
+  }
+
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-contactAdmin {
+    background: rgba(0, 214, 180, 0.1) !important;
+    border: none !important;
+    color: #00e5a3 !important;
+  }
+
+  html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-contactAdmin:active {
+    background: rgba(0, 214, 180, 0.18) !important;
   }
 }
 

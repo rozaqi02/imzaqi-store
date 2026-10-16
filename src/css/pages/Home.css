@@ -320,7 +320,7 @@ html[data-theme="light"] .hero-search-shell:focus-within {
 
   .hero-search-input {
     min-width: 0;
-    font-size: 15px;
+    font-size: 16px;
   }
 
   .hero-search-clear {
@@ -1107,7 +1107,7 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
   }
 
   .hero-search-input {
-    font-size: 15px !important;
+    font-size: 16px !important;
     min-height: 44px;
   }
 
@@ -1287,7 +1287,7 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
   }
 
   .hero-search-input {
-    font-size: 14.5px !important;
+    font-size: 16px !important;
     min-height: 42px;
   }
 
@@ -2879,11 +2879,7 @@ html[data-theme="light"] .home-page .home-faqSection .faq-searchWrap {
 
 html[data-theme="light"] .home-page .home-sectionCta .btn,
 html[data-theme="light"] .hx-btn-primary {
-  box-shadow:
-    inset 0 3px 0 rgba(255, 255, 255, 0.62),
-    inset 0 -4px 0 rgba(0, 105, 112, 0.34),
-    0 11px 22px rgba(0, 126, 134, 0.25),
-    -3px -3px 10px rgba(255, 255, 255, 0.82) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
 html[data-theme="light"] .home-page .home-sectionCta .btn-ghost {

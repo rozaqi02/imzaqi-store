@@ -42,13 +42,13 @@ function calcTotal(subtotal, percent) {
 /* ── Desktop-only framer-motion variants ── */
 const backdropVariants = {
   hidden:  { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4, ease: [0.16, 1, 0.3, 1] } },
-  exit:    { opacity: 0, transition: { duration: 0.32, ease: [0.4, 0, 1, 1] } },
+  visible: { opacity: 1, transition: { duration: 0.52, ease: [0.22, 1, 0.36, 1] } },
+  exit:    { opacity: 0, transition: { duration: 0.44, ease: [0.32, 0.72, 0, 1] } },
 };
 const backdropVariantsLite = {
   hidden:  { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] } },
-  exit:    { opacity: 0, transition: { duration: 0.14, ease: [0.22, 1, 0.36, 1] } },
+  visible: { opacity: 1, transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] } },
+  exit:    { opacity: 0, transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] } },
 };
 const desktopDrawerVariants = {
   hidden:  { x: "104%", opacity: 0.72, scale: 0.992 },
@@ -57,9 +57,9 @@ const desktopDrawerVariants = {
     opacity: 1,
     scale: 1,
     transition: {
-      x: { duration: 0.52, ease: [0.16, 1, 0.3, 1] },
-      opacity: { duration: 0.24, ease: "easeOut" },
-      scale: { duration: 0.46, ease: [0.16, 1, 0.3, 1] },
+      x: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+      opacity: { duration: 0.3, ease: "easeOut" },
+      scale: { duration: 0.52, ease: [0.22, 1, 0.36, 1] },
     },
   },
   exit: {
@@ -67,9 +67,9 @@ const desktopDrawerVariants = {
     opacity: 0.68,
     scale: 0.994,
     transition: {
-      x: { duration: 0.36, ease: [0.4, 0, 1, 1] },
-      opacity: { duration: 0.28, ease: "easeIn" },
-      scale: { duration: 0.32, ease: "easeInOut" },
+      x: { duration: 0.46, ease: [0.32, 0.72, 0, 1] },
+      opacity: { duration: 0.34, ease: "easeIn" },
+      scale: { duration: 0.38, ease: "easeInOut" },
     },
   },
 };
@@ -149,22 +149,17 @@ export default function Checkout() {
   }, [cart.items]);
 
   useEffect(() => {
-    if (!isDrawerCheckout) {
-      markCheckoutVisited();
-      return undefined;
-    }
-    const scrollY = window.scrollY;
-    document.body.classList.add("checkout-open");
-    document.body.style.top = `-${scrollY}px`;
     markCheckoutVisited();
+    if (!isDrawerCheckout) return undefined;
+
+    document.documentElement.classList.add("checkout-open");
+    document.body.classList.add("checkout-open");
+
     return () => {
+      document.documentElement.classList.remove("checkout-open");
       document.body.classList.remove("checkout-open");
-      document.body.style.top = "";
-      if (window.location.pathname === (backgroundLocation?.pathname || "")) {
-        window.scrollTo(0, scrollY);
-      }
     };
-  }, [backgroundLocation?.pathname, isDrawerCheckout]);
+  }, [isDrawerCheckout]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -251,7 +246,7 @@ export default function Checkout() {
       }
 
       nav("/", { replace: true });
-    }, isMotionOff ? 100 : isMobileSheet ? 420 : (isLiteMotion ? 220 : 380));
+    }, isMotionOff ? 100 : isMobileSheet ? 520 : (isLiteMotion ? 220 : 480));
 
     return () => window.clearTimeout(timer);
   }, [backgroundLocation, closing, isLiteMotion, isMotionOff, isMobileSheet, nav]);
@@ -512,11 +507,11 @@ export default function Checkout() {
   function renderDrawerContent() {
     return (
       <>
-
+        <div className="checkout-drawerHandle" aria-hidden="true" />
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
             <h1 className="h1 checkout-drawerTitle">Cek sebelum bayar.</h1>
-            <p className="checkout-drawerSub"><BadgeCheck size={15} aria-hidden="true" />Keranjang tersimpan otomatis</p>
+            <p className="checkout-drawerSub"><BadgeCheck size={14} aria-hidden="true" /><span>Keranjang tersimpan otomatis</span></p>
           </div>
 
           <button

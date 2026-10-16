@@ -148,18 +148,16 @@ export default function Header() {
       <header ref={headerRef} className="header is-shrunk">
         <PromoTicker />
         <div className="container header-inner">
-          {isCompactNav ? (
-            <div className="header-mobile-left">
-              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-              {canAccessAdmin ? (
-                <AdminHeaderLink
-                  to="/admin/dashboard"
-                  isActive={isOnAdminRoute}
-                  title="Admin Dashboard"
-                />
-              ) : null}
-            </div>
-          ) : null}
+          <div className="header-mobile-left">
+            <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+            {canAccessAdmin ? (
+              <AdminHeaderLink
+                to="/admin/dashboard"
+                isActive={isOnAdminRoute}
+                title="Admin Dashboard"
+              />
+            ) : null}
+          </div>
 
           <Link to="/" className="brand" aria-label="Beranda Imzaqi Store">
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
@@ -213,18 +211,16 @@ export default function Header() {
               </Link>
             </div>
 
-            {!isCompactNav ? (
-              <div className="desktop-only header-desktop-toggles">
-                <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-                {canAccessAdmin ? (
-                  <AdminHeaderLink
-                    to="/admin/dashboard"
-                    isActive={isOnAdminRoute}
-                    title="Admin Dashboard"
-                  />
-                ) : null}
-              </div>
-            ) : null}
+            <div className="desktop-only header-desktop-toggles">
+              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+              {canAccessAdmin ? (
+                <AdminHeaderLink
+                  to="/admin/dashboard"
+                  isActive={isOnAdminRoute}
+                  title="Admin Dashboard"
+                />
+              ) : null}
+            </div>
           </div>
         </div>
       </header>
