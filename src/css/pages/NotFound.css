@@ -58,7 +58,7 @@ html[data-theme="light"] .nf-card {
   align-items: center;
   min-height: 28px;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid rgba(0, 194, 208, 0.28);
   background:
     linear-gradient(180deg, rgba(0, 214, 180, 0.18), rgba(0, 194, 208, 0.08));
@@ -175,7 +175,7 @@ html[data-theme="light"] .nf-sub {
   gap: 8px !important;
   min-height: 44px !important;
   padding: 0 16px !important;
-  border-radius: 999px !important;
+  border-radius: 14px !important;
   font-weight: 800 !important;
   text-decoration: none !important;
 }

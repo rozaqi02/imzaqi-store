@@ -130,7 +130,7 @@
   align-items: center;
   gap: 8px;
   padding: 0 14px;
-  border-radius: 999px;
+  border-radius: 12px;
   border: 1px solid var(--faq-line);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 24%),
@@ -195,7 +195,7 @@
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 40%),
@@ -204,7 +204,7 @@
     inset 0 1px 0 rgba(255, 255, 255, 0.12),
     inset 0 -1px 0 rgba(0, 0, 0, 0.22);
   font-size: 10px;
-  font-weight: 1000;
+  font-weight: 800;
   display: inline-grid;
   place-items: center;
 }
@@ -223,7 +223,7 @@
   height: 30px;
   flex: 0 0 30px;
   border: 1px solid var(--brand-line, transparent);
-  border-radius: 999px;
+  border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
     var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
@@ -302,7 +302,7 @@
   max-width: 100%;
   min-height: 22px;
   padding: 0 8px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--faq-line);
   background: var(--faq-inset);
   color: var(--faq-muted);
@@ -594,7 +594,7 @@ html[data-theme="light"] .faq-shell::before {
   margin: 0;
   color: var(--faq-text);
   font-size: clamp(22px, 3vw, 28px);
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.03em;
 }
 

@@ -34,6 +34,16 @@ html {
   box-sizing: border-box;
 }
 
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
 html,
 body {
   margin: 0;
@@ -233,7 +243,7 @@ html[data-theme="light"] body {
   color: #fff;
 }
 
-/* Global headings typography — Display font (Outfit) */
+/* Global headings typography — Plus Jakarta Sans display font */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   font-family: var(--font-display);
@@ -266,7 +276,7 @@ a {
   text-decoration: none;
 }
 
-/* Global technical & data typography — Monospace (JetBrains Mono) */
+/* Technical and data typography — Monospace (JetBrains Mono) */
 code,
 kbd,
 samp,
@@ -545,7 +555,7 @@ body.checkout-open {
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: #ff4d6d;
   border: 1px solid rgba(255, 255, 255, .28);
   color: #fff;
@@ -619,7 +629,7 @@ body.checkout-open {
   padding: 0
     /**/
     8px;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(29, 131, 255, .18);
   border: 1px
     /**/
@@ -1187,7 +1197,7 @@ html[data-theme="light"] .whatsapp-input-wrapper .error-hint {
   padding: 0
     /**/
     14px;
-  border-radius: 999px;
+  border-radius: 12px;
   border: 1px
     /**/
     solid
@@ -1478,7 +1488,7 @@ body {
   padding: 6px
     /**/
     10px;
-  border-radius: 999px;
+  border-radius: 10px;
   background: rgba(255, 255, 255, .04);
   border: 1px
     /**/
@@ -1629,7 +1639,7 @@ body {
 }
 
 .toast-title {
-  font-weight: 1000;
+  font-weight: 800;
   margin-bottom: 2px;
 }
 
@@ -1776,7 +1786,7 @@ body {
 
 .empty-title {
   font-size: 18px;
-  font-weight: 1000;
+  font-weight: 800;
   margin-bottom: 4px;
 }
 
@@ -1877,7 +1887,7 @@ html:not([data-theme="light"]) .empty-desc {
 .flow-assist-title {
   max-width: 20ch;
   font-size: clamp(20px, 3vw, 28px);
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -.045em;
   line-height: 1.04;
   overflow-wrap: anywhere;
@@ -1906,7 +1916,7 @@ html:not([data-theme="light"]) .empty-desc {
   min-height: 34px;
   max-width: 100%;
   padding: 0 12px;
-  border-radius: 14px 999px 999px 14px;
+  border-radius: 14px 10px 10px 14px;
   border: 1px solid rgba(255, 255, 255, .1);
   background: linear-gradient(180deg, rgba(255, 255, 255, .07), rgba(255, 255, 255, .03));
   color: rgba(234, 255, 245, .88);
@@ -2033,7 +2043,7 @@ html:not([data-theme="light"]) .empty-desc {
   background: rgba(255, 255, 255, .04);
   display: grid;
   place-items: center;
-  font-weight: 1000;
+  font-weight: 800;
   color: rgba(255, 255, 255, .92);
   flex: 0
     /**/
@@ -2360,7 +2370,7 @@ html:not([data-theme="light"]) .empty-desc {
   padding: 6px
     /**/
     10px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px
     /**/
     solid
@@ -2488,6 +2498,17 @@ html[data-theme="light"] .header-iconAction.active {
   border: 1px solid var(--brand-line);
   box-shadow: var(--skeu-control-shadow);
   z-index: 0;
+  transition:
+    transform 0.28s cubic-bezier(0.2, 0, 0, 1),
+    width 0.26s cubic-bezier(0.2, 0, 0, 1),
+    height 0.26s cubic-bezier(0.2, 0, 0, 1),
+    opacity 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-active-pill {
+    transition: none !important;
+  }
 }
 
 .nav-hover-pill {
@@ -2550,7 +2571,7 @@ html[data-theme="light"] .nav-hover-pill {
   display: inline-flex;
   align-items: center;
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
@@ -4103,7 +4124,7 @@ body {
 
 .nf-code {
   font-size: clamp(80px, 18vw, 120px);
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.06em;
   line-height: 1;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.3));
@@ -4115,7 +4136,7 @@ body {
 
 .nf-title {
   font-size: clamp(20px, 4vw, 28px);
-  font-weight: 1000;
+  font-weight: 800;
   margin: 0 0 12px;
 }
 
@@ -4374,11 +4395,11 @@ html[data-theme="light"] .site-header {
   min-width: 20px;
   height: 20px;
   padding: 0 5px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: #9cddff;
   color: #041832;
   font-size: 11px;
-  font-weight: 1000;
+  font-weight: 800;
   display: grid;
   place-items: center;
   box-shadow: 0 10px 22px rgba(29, 131, 255, .24);
@@ -4433,7 +4454,7 @@ html[data-theme="light"] .site-header {
   width: max-content;
   height: 30px;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, .10);
   background: rgba(255, 255, 255, .04);
   font-size: 11px;
@@ -4523,7 +4544,7 @@ html[data-theme="light"] .site-header {
   align-items: center;
   height: 34px;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(255, 255, 255, .08);
   background: rgba(255, 255, 255, .03);
   font-size: 12px;
@@ -5295,7 +5316,7 @@ html[data-theme="light"] .input:focus-visible {
 
 .aeb-title {
   font-size: clamp(24px, 5vw, 32px);
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.04em;
   margin: 0;
   color: #f8fafc;
@@ -5933,7 +5954,7 @@ html[data-theme="light"] .idle-tease-toast {
   align-items: center;
   gap: 10px;
   padding: 12px 20px;
-  border-radius: 999px;
+  border-radius: 14px;
   background: linear-gradient(135deg, #1a1a2e, #16213e);
   border: 1px solid rgba(255,200,50,0.28);
   box-shadow: 0 8px 32px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
@@ -6064,7 +6085,7 @@ html[data-theme="light"] .st-doneCelebration-text span { color: #4a6a5a; }
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  border-radius: 999px;
+  border-radius: 12px;
   background: linear-gradient(135deg, rgba(0,214,180,0.18), rgba(0,194,208,0.1));
   border: 1px solid rgba(0,214,180,0.28);
   color: var(--brand-text, #fff);

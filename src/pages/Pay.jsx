@@ -13,8 +13,6 @@ import { getVisitorIdAsUUID } from "../lib/visitor";
 import { makeOrderCode, CODE_DEFAULT } from "../lib/orderCode";
 import { buildDynamicQrisImage } from "../lib/qris";
 import CheckoutSteps from "../components/CheckoutSteps";
-import "../css/pages/Pay.css";
-import "../css/checkout-steps.css";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
@@ -512,8 +510,29 @@ export default function Pay() {
       p_customer_whatsapp: customerWhatsApp,
     };
 
-    const rpcPayload = noteText ? { ...payload, p_notes: noteText } : payload;
-    const { data, error } = await supabase.rpc("create_order_with_stock_check", rpcPayload);
+    const trimmedBuyerEmail = String(buyerEmail || "").trim();
+    const basePayload = noteText ? { ...payload, p_notes: noteText } : payload;
+    const rpcPayload = trimmedBuyerEmail
+      ? { ...basePayload, p_buyer_email: trimmedBuyerEmail }
+      : basePayload;
+
+    let res = await supabase.rpc("create_order_with_stock_check", rpcPayload);
+
+    // Fallback: if database function has not been re-deployed with p_buyer_email yet,
+    // retry with base payload so checkout never breaks
+    if (res.error && trimmedBuyerEmail) {
+      const errLower = String(res.error?.message || "").toLowerCase();
+      if (
+        errLower.includes("p_buyer_email") ||
+        errLower.includes("parameter") ||
+        errLower.includes("schema cache") ||
+        errLower.includes("could not find")
+      ) {
+        res = await supabase.rpc("create_order_with_stock_check", basePayload);
+      }
+    }
+
+    const { data, error } = res;
 
     if (error) {
       const message = error?.message || String(error);
@@ -524,7 +543,19 @@ export default function Pay() {
     }
 
     if (!data || data.length === 0) throw new Error("Gagal membuat order.");
-    return data[0];
+    const created = data[0];
+
+    // Best-effort direct update to orders.buyer_email in case RPC did not set it
+    if (created?.id && trimmedBuyerEmail) {
+      try {
+        await supabase
+          .from("orders")
+          .update({ buyer_email: trimmedBuyerEmail })
+          .eq("id", created.id);
+      } catch {}
+    }
+
+    return created;
   }
 
   async function onConfirmPaid() {
@@ -585,6 +616,7 @@ export default function Pay() {
       setOrderCode(generatedCode);
       setOk(true);
       setSnapshot(canonicalOrder.items);
+      cart.backup(canonicalOrder.items);
       cart.clear();
       // Save buyer name from WA number prefix for greeting
       if (customerWhatsApp) {
@@ -593,12 +625,21 @@ export default function Pay() {
           if (!waLabel) saveBuyerName(customerWhatsApp.replace(/^62/, "0"));
         } catch {}
       }
+      const firstItem = canonicalOrder.items?.[0];
+      const otherCount = (canonicalOrder.items?.length || 1) - 1;
+      const itemsSummary = firstItem
+        ? `${firstItem.product_name || firstItem.name || "Produk"} · ${firstItem.variant_name || firstItem.duration_label || ""}${otherCount > 0 ? ` (+${otherCount} item lain)` : ""}`
+        : "";
+      const iconUrl = firstItem?.product_icon_url || firstItem?.icon_url || "";
+
       addOrderToHistory({
         order_code: generatedCode,
         created_at: new Date().toISOString(),
         total_idr: canonicalOrder.total,
         status: createdOrder.status || (hasPricingMismatch ? "paid_reported" : "pending"),
         phone_suffix: String(customerWhatsApp).replace(/\D/g, "").slice(-4),
+        items_summary: itemsSummary,
+        icon_url: iconUrl,
       });
       if (loadingId) toast.remove(loadingId);
       toast.success("ID order berhasil dibuat.");

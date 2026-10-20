@@ -1026,14 +1026,6 @@ html[data-theme="light"] .pay-orderItem {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-.floating-order-dismiss {
-  border: 1px solid var(--brand-line) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
-    var(--skeu-control-bg) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
-}
-
 /* Admin status / chip flats commonly used on dashboard */
 .admin-status.pending,
 .admin-status.processing,
@@ -1531,7 +1523,7 @@ html[data-theme="light"] .home-page .hx-stat-item {
 .catalog-page .catalog-chip,
 .catalog-page .catalog-chip:not(.active),
 .catalog-page .catalog-chip.active {
-  border-radius: 999px !important;
+  border-radius: 12px !important;
 }
 
 .catalog-page .catalog-toggleGroup {
@@ -1547,7 +1539,7 @@ html[data-theme="light"] .home-page .hx-stat-item {
 }
 
 .catalog-page .catalog-filterHeadReset {
-  border-radius: 999px !important;
+  border-radius: 10px !important;
 }
 
 .catalog-page .catalog-commandClear,
@@ -1584,7 +1576,7 @@ html[data-theme="light"] .home-page .hx-stat-item {
   min-height: 46px !important;
   border: none !important;
   outline: none !important;
-  border-radius: 9999px !important;
+  border-radius: 12px !important;
   font-size: 13.5px !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
@@ -2284,7 +2276,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   gap: 6px !important;
   min-height: 28px !important;
   padding: 4px 12px !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.18)) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
@@ -2308,7 +2300,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
     0 4px 12px rgba(249, 115, 22, 0.18),
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     inset 0 -1.5px 0 rgba(194, 65, 12, 0.3) !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
 }
 
 :root[data-theme="dark"] .pdx-packMetaItem--emailRequired,
@@ -2322,7 +2314,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
     0 4px 12px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 180, 130, 0.25),
     inset 0 -1.5px 0 rgba(0, 0, 0, 0.5) !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
 }
 
 /* Terlaris & Rank #1-4 Badges — 3D Neumorphic Gloss */
@@ -2331,7 +2323,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   display: inline-flex !important;
   align-items: center !important;
   gap: 5px !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   padding: 4px 12px !important;
   font-size: 11px !important;
   font-weight: 900 !important;
@@ -2362,7 +2354,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 .product-tile-rankBadge--2 {
   display: inline-flex !important;
   align-items: center !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   padding: 3px 10px !important;
   font-size: 11px !important;
   font-weight: 900 !important;
@@ -2388,7 +2380,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 .product-tile-rankBadge--3 {
   display: inline-flex !important;
   align-items: center !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   padding: 3px 10px !important;
   font-size: 11px !important;
   font-weight: 900 !important;
@@ -2414,7 +2406,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 .product-tile-rankBadge--4 {
   display: inline-flex !important;
   align-items: center !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   padding: 3px 10px !important;
   font-size: 11px !important;
   font-weight: 900 !important;
@@ -2435,4 +2427,59 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 32%),
     linear-gradient(155deg, rgba(0, 214, 180, 0.3), rgba(0, 80, 90, 0.4)) !important;
+}
+
+
+/* ── Tactile Micro-Interactions: Physics-based button depression ── */
+.btn:active,
+.btn-primary:active,
+.btn-ghost:active,
+.btn-secondary:active,
+.hx-btn-primary:active,
+.hx-btn-secondary:active,
+.hero-cta-primary:active,
+.hero-cta-secondary:active,
+.catalog-viewBtn:active,
+.tab-btn:active,
+.toggle-btn:active {
+  transform: scale(0.975) translateY(1px) !important;
+  box-shadow:
+    inset 0 2px 6px rgba(0, 0, 0, 0.4),
+    0 2px 4px rgba(0, 0, 0, 0.15) !important;
+  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+}
+
+html[data-theme="light"] .btn:active,
+html[data-theme="light"] .btn-primary:active,
+html[data-theme="light"] .hx-btn-primary:active,
+html[data-theme="light"] .hero-cta-primary:active {
+  box-shadow:
+    inset 0 2px 6px rgba(0, 80, 50, 0.35),
+    0 2px 4px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Tactile press response on chips, tabs, and interactive variant cards */
+.catalog-chip:active,
+.pdx-filterChip:active,
+.pdx-chip:active,
+.pdx-variantCard:active,
+.admin-chip:active,
+.admin-chipRow button:active,
+.st-tab:active,
+.faq-categoryChip:active {
+  transform: scale(0.98) translateY(1px) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+}
+
+html[data-theme="light"] .catalog-chip:active,
+html[data-theme="light"] .pdx-filterChip:active,
+html[data-theme="light"] .pdx-chip:active,
+html[data-theme="light"] .pdx-variantCard:active,
+html[data-theme="light"] .admin-chip:active,
+html[data-theme="light"] .st-tab:active,
+html[data-theme="light"] .faq-categoryChip:active {
+  box-shadow:
+    inset 0 2px 4px rgba(67, 111, 129, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }

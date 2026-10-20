@@ -2,7 +2,7 @@
 html[data-theme="light"] :is(.admin-picker, .ap-popover) { --ap-bg: #fff; --ap-ink: #0d2d39; --ap-muted: #617a85; --ap-line: #d6e5e8; --ap-accent: #008e63; --ap-selected: #edf8f3; }
 .admin-picker { min-width: 0; display: grid; gap: 7px; }
 .admin-picker .ap-label { font-size: 12px; font-weight: 700; color: var(--adm-text-3, var(--ap-muted)); }
-.admin-picker .ap-trigger { box-sizing: border-box; width: 100%; min-width: 0; min-height: 54px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--ap-line); border-radius: 10px; background: var(--ap-bg); color: var(--ap-ink); font: inherit; text-align: left; cursor: pointer; box-shadow: inset 0 1px 2px rgba(0,0,0,.04); }
+.admin-picker .ap-trigger { box-sizing: border-box; width: 100%; min-width: 0; min-height: 54px; padding: 9px 12px; display: flex; align-items: center; gap: 10px; border: 1px solid var(--ap-line); border-radius: 10px; background: var(--ap-bg); color: var(--ap-ink); font: inherit; text-align: left; cursor: pointer; box-shadow: inset 0 1px 2px rgba(0,0,0,.04); touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .admin-picker .ap-trigger.is-open { border-color: var(--ap-accent); }
 .admin-picker .ap-trigger:disabled { opacity: .5; cursor: default; }
 .ap-triggerCopy { flex: 1; min-width: 0; display: grid; gap: 3px; }
@@ -12,15 +12,15 @@ html[data-theme="light"] :is(.admin-picker, .ap-popover) { --ap-bg: #fff; --ap-i
 .ap-trigger > svg { flex-shrink: 0; color: var(--ap-muted); }
 .ap-icon { display: grid; place-items: center; width: 34px; height: 34px; flex: 0 0 34px; border-radius: 8px; overflow: hidden; background: var(--ap-selected); color: var(--ap-accent); font-size: 14px; font-weight: 700; }
 .ap-icon img { display: block; width: 100%; height: 100%; object-fit: contain; }
-.ap-backdrop { position: fixed; inset: 0; z-index: 30000; background: rgba(0,15,11,.35); }
-.ap-popover { box-sizing: border-box; position: fixed; z-index: 30001; display: flex; flex-direction: column; border: 1px solid var(--ap-line); border-radius: 14px; background: var(--ap-bg); color: var(--ap-ink); box-shadow: 0 12px 36px rgba(0,20,12,.16); font-family: "Plus Jakarta Sans", sans-serif; overflow: hidden; }
+.ap-backdrop { position: fixed; inset: 0; z-index: 30000; background: rgba(0,15,11,.45); -webkit-backdrop-filter: blur(2px); backdrop-filter: blur(2px); touch-action: none; }
+.ap-popover { box-sizing: border-box; position: fixed; z-index: 30001; display: flex; flex-direction: column; border: 1px solid var(--ap-line); border-radius: 14px; background: var(--ap-bg); color: var(--ap-ink); box-shadow: 0 12px 36px rgba(0,20,12,.16); font-family: var(--font-sans); overflow: hidden; }
 .ap-searchRow { flex: 0 0 auto; display: flex; align-items: center; gap: 9px; min-height: 52px; padding: 5px 12px; border-bottom: 1px solid var(--ap-line); }
 .ap-searchRow > svg { color: var(--ap-muted); flex-shrink: 0; }
-.ap-searchRow input { box-sizing: border-box; min-width: 0; width: 100%; padding: 10px 0; border: 0 !important; box-shadow: none !important; outline: none; background: transparent !important; color: var(--ap-ink) !important; font: inherit; font-size: 12px; }
+.ap-searchRow input { box-sizing: border-box; min-width: 0; width: 100%; padding: 10px 0; border: 0 !important; box-shadow: none !important; outline: none; background: transparent !important; color: var(--ap-ink) !important; font: inherit; font-size: 14px; }
 .ap-searchRow input::placeholder { color: var(--ap-muted); }
-.ap-searchRow .ap-close { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; color: var(--ap-muted); background: transparent; cursor: pointer; }
-.ap-list { flex: 1 1 auto; min-height: 0; padding: 6px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
-.ap-option { display: flex; align-items: center; gap: 11px; min-height: 62px; padding: 9px 10px; border-radius: 8px; cursor: pointer; }
+.ap-searchRow .ap-close { display: grid; place-items: center; flex: 0 0 30px; width: 30px; height: 30px; padding: 0; border: 0; border-radius: 6px; color: var(--ap-muted); background: transparent; cursor: pointer; touch-action: manipulation; }
+.ap-list { flex: 1 1 auto; min-height: 0; padding: 6px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.ap-option { display: flex; align-items: center; gap: 11px; min-height: 62px; padding: 9px 10px; border-radius: 8px; cursor: pointer; touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .ap-option:hover, .ap-option.is-highlighted { background: var(--ap-selected); }
 .ap-option[aria-selected="true"] { color: var(--ap-accent); }
 .ap-optionCopy { display: grid; gap: 4px; flex: 1; min-width: 0; }
@@ -33,7 +33,7 @@ html[data-theme="light"] :is(.admin-picker, .ap-popover) { --ap-bg: #fff; --ap-i
 .ap-status.is-muted { color: var(--ap-muted); }
 .ap-empty { padding: 18px 12px; font-size: 12px; text-align: center; color: var(--ap-muted); line-height: 1.6; }
 .ap-footer { flex: 0 0 auto; display: flex; justify-content: space-between; gap: 10px; padding: 9px 14px; border-top: 1px solid var(--ap-line); font-size: 10px; color: var(--ap-muted); }
-.ap-popover.is-mobile { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom)); max-height: min(480px, 68dvh); border-radius: 16px; }
-.ap-popover.is-mobile .ap-searchRow input { font-size: 16px; }
+.ap-popover.is-mobile { left: 12px; right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0px)); max-height: min(480px, 68dvh); border-radius: 16px; overscroll-behavior: contain; }
+.ap-popover.is-mobile .ap-searchRow input { font-size: 16px !important; }
 .ap-popover.is-mobile .ap-footer span { display: none; }
 .admin-picker .ap-trigger:focus-visible, .ap-close:focus-visible { outline: 2px solid var(--ap-accent); outline-offset: 3px; }

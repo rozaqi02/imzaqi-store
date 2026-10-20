@@ -43,7 +43,7 @@ html[data-theme="light"] .abandoned-cart-banner {
   width: 30px;
   height: 30px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
-  border-radius: 999px;
+  border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
     var(--skeu-control-bg, rgba(255, 255, 255, 0.08));

@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { Check, CheckCircle2, Phone, ShieldCheck, X } from "lucide-react";
+import { Check, CheckCircle2, MessageCircle, Phone, ShieldCheck, X } from "lucide-react";
 import { useDialogA11y } from "../../../hooks/useDialogA11y";
 import { copyToClipboard } from "../../../utils/clipboard";
 import { formatIDR } from "../../../lib/format";
@@ -183,11 +183,12 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
                 target="_blank"
                 rel="noreferrer"
               >
-                Hubungi Admin WA
+                <MessageCircle size={18} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />
+                <span>Hubungi Admin WA</span>
               </a>
               <div className="pay-successSecondaryGrid">
                 <Link className="btn btn-ghost pay-successBtnGhost" to={statusUrl}>
-                  Cek Status Order
+                  Cek Status Pesanan
                 </Link>
                 <button className="btn btn-ghost pay-successBtnGhost" type="button" onClick={copyCode}>
                   {copied ? "✓ ID tersalin" : "Salin ID"}
@@ -197,14 +198,15 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
           ) : (
             <div className="pay-successActions">
               <Link className="btn btn-wide btn-primary pay-successBtnPrimary" to={statusUrl}>
-                Cek Status Order
+                Cek Status Pesanan
               </Link>
               <div className="pay-successSecondaryGrid">
                 <button className="btn btn-ghost pay-successBtnGhost" type="button" onClick={copyCode}>
                   {copied ? "✓ ID tersalin" : "Salin ID"}
                 </button>
                 <a className="btn btn-ghost pay-successBtnGhost" href={adminWaUrl} target="_blank" rel="noreferrer">
-                  Chat Admin
+                  <MessageCircle size={16} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />
+                  <span>Hubungi Admin</span>
                 </a>
               </div>
             </div>

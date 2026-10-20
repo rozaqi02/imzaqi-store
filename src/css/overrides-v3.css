@@ -132,7 +132,7 @@ pointer-events:none;}
 .footer-brand{font-weight:1200;letter-spacing:-.3px;font-size:18px;}
 
 .footer-trust{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
-.footer-trust span{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-weight:1000;font-size:12px;}
+.footer-trust span{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-weight:1000;font-size:12px;}
 
 .footer-social{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
 .footer-social a{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);}

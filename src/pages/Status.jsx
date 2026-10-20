@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import "../css/pages/Status.css";
-import "../css/pages/OrderHistory.css";
 import { fireConfetti } from "../components/Confetti";
 import {
   Activity,
@@ -16,12 +14,15 @@ import {
   History,
   Info,
   Mail,
+  MessageCircle,
   MessageSquareText,
   Package,
   RefreshCw,
   Search,
+  Send,
   ShieldCheck,
   Sparkles,
+  Star,
   Trash2,
   WalletCards,
   X,
@@ -33,6 +34,7 @@ import { fetchSettings, fetchProducts } from "../lib/api";
 import {
   getOrderHistory,
   updateOrderHistoryStatus,
+  updateOrderHistoryEntry,
   removeOrderFromHistory,
   clearOrderHistory,
 } from "../lib/orderHistory";
@@ -235,6 +237,257 @@ function InfoCard({ label, value, hint, tone = "", icon: Icon }) {
       </div>
       <strong>{value}</strong>
       <small>{hint}</small>
+    </article>
+  );
+}
+
+function PostTransactionReview({ order, waUrl, toast }) {
+  const [rating, setRating] = useState(5);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [reviewText, setReviewText] = useState("");
+  const [authorName, setAuthorName] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [existingReview, setExistingReview] = useState(() => {
+    try {
+      const saved = typeof window !== "undefined" && window.localStorage
+        ? localStorage.getItem(`imzaqi_review_${order?.order_code}`)
+        : null;
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const RATING_LABELS = {
+    5: "Sangat Puas! ⭐⭐⭐⭐⭐",
+    4: "Puas & Lancar 👍",
+    3: "Cukup Baik 🙂",
+    2: "Kurang Puas 🙁",
+    1: "Perlu Peningkatan 😞",
+  };
+
+  const QUICK_CHIPS = [
+    "⚡ Akun Kilat",
+    "🔒 Garansi Aman",
+    "💬 Admin Responsif",
+    "💰 Harga Pas",
+    "✨ Rekomen",
+  ];
+
+  const handleAddChip = (chip) => {
+    setReviewText((prev) => {
+      const trimmed = prev.trim();
+      if (!trimmed) return chip;
+      if (trimmed.includes(chip)) return prev;
+      return `${trimmed}, ${chip}`;
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (submitting) return;
+    setSubmitting(true);
+
+    const effectiveText = reviewText.trim() || "Pelayanan memuaskan, pesanan cepat sampai dan akun berfungsi lancar!";
+    const effectiveAuthor = authorName.trim() || "Pelanggan Terverifikasi";
+    const reviewData = {
+      orderCode: order.order_code,
+      rating,
+      reviewText: effectiveText,
+      authorName: effectiveAuthor,
+      submittedAt: new Date().toISOString(),
+    };
+
+    try {
+      if (typeof window !== "undefined" && window.localStorage) {
+        localStorage.setItem(`imzaqi_review_${order.order_code}`, JSON.stringify(reviewData));
+      }
+      trackFunnelEvent("order_reviewed", {
+        orderCode: order.order_code,
+        rating,
+        text: effectiveText,
+      });
+      fireConfetti();
+
+      // Safely attempt DB insertion into testimonials
+      if (typeof supabase?.from === "function") {
+        const firstItem = order?.items?.[0];
+        const iconUrl = firstItem?.product_icon_url || "https://imzaqistore.com/favicon.ico";
+        await supabase.from("testimonials").insert([
+          {
+            image_url: iconUrl,
+            caption: `[⭐ ${rating}/5] "${effectiveText}" — ${effectiveAuthor} (#${order.order_code})`,
+            is_active: false,
+            sort_order: 100,
+          },
+        ]);
+      }
+
+      setExistingReview(reviewData);
+      toast?.success?.("Terima kasih atas ulasanmu! ⭐");
+    } catch {
+      setExistingReview(reviewData);
+      toast?.success?.("Terima kasih atas ulasanmu! ⭐");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const activeStarCount = hoverRating || rating;
+
+  const buildWaReviewUrl = (rev) => {
+    if (!waUrl) return "";
+    const msg = encodeURIComponent(
+      `Halo Admin Imzaqi Store! Saya ingin memberikan ulasan untuk pesanan #${order.order_code}:\n\n` +
+      `⭐ Rating: ${rev.rating}/5 (${RATING_LABELS[rev.rating] || "Puas"})\n` +
+      `💬 Ulasan: "${rev.reviewText}"\n` +
+      `👤 Oleh: ${rev.authorName}\n\n` +
+      `Terima kasih banyak atas pelayanannya!`
+    );
+    const baseUrl = waUrl.split("?")[0];
+    return `${baseUrl}?text=${msg}`;
+  };
+
+  if (existingReview) {
+    const waShareUrl = buildWaReviewUrl(existingReview);
+    return (
+      <article className="st-card st-reviewCard st-reviewCard--completed">
+        <div className="st-cardHead">
+          <div>
+            <div className="st-kicker" style={{ color: "var(--accent, #00d6b4)" }}>Feedback Terkirim</div>
+            <h2 className="st-cardTitle">Ulasan Pesanan Kamu</h2>
+          </div>
+          <div className="st-cardIcon" style={{ color: "#f5a623" }}>
+            <Star size={18} fill="#f5a623" />
+          </div>
+        </div>
+
+        <div className="st-reviewSubmitted">
+          <div className="st-reviewSubmittedStars" aria-label={`Rating ${existingReview.rating} dari 5 bintang`}>
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star
+                key={star}
+                size={20}
+                fill={star <= existingReview.rating ? "#f5a623" : "transparent"}
+                color={star <= existingReview.rating ? "#f5a623" : "var(--st-muted, #7c9eb0)"}
+              />
+            ))}
+            <span className="st-reviewRatingBadge">{existingReview.rating}.0 / 5.0</span>
+          </div>
+
+          <blockquote className="st-reviewSubmittedQuote">
+            "{existingReview.reviewText}"
+          </blockquote>
+
+          <div className="st-reviewSubmittedAuthor">
+            <span>— {existingReview.authorName}</span>
+            <span className="st-reviewVerifiedPill">✓ Pembeli Terverifikasi</span>
+          </div>
+
+          {waShareUrl ? (
+            <div className="st-reviewShareRow">
+              <a
+                className="btn btn-ghost btn-sm st-reviewWaBtn"
+                href={waShareUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                <span>Bagikan Ulasan ke WhatsApp Admin</span>
+                <ArrowUpRight size={14} />
+              </a>
+            </div>
+          ) : null}
+        </div>
+      </article>
+    );
+  }
+
+  return (
+    <article className="st-card st-reviewCard">
+      <div className="st-cardHead">
+        <div>
+          <div className="st-kicker">Kepuasan Pelanggan</div>
+          <h2 className="st-cardTitle">Beri Rating & Ulasan</h2>
+        </div>
+        <div className="st-cardIcon">
+          <Star size={16} />
+        </div>
+      </div>
+
+      <p className="st-reviewIntro">
+        Pesananmu sudah selesai! Bagaimana pengalaman belanja kamu di Imzaqi Store?
+      </p>
+
+      <form onSubmit={handleSubmit} className="st-reviewForm">
+        <div className="st-reviewRatingGroup">
+          <div className="st-reviewStarsPicker" role="radiogroup" aria-label="Rating bintang">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <button
+                key={star}
+                type="button"
+                className={`st-reviewStarBtn${star <= activeStarCount ? " is-active" : ""}`}
+                onClick={() => setRating(star)}
+                onMouseEnter={() => setHoverRating(star)}
+                onMouseLeave={() => setHoverRating(0)}
+                aria-label={`${star} bintang`}
+              >
+                <Star
+                  size={24}
+                  fill={star <= activeStarCount ? "#f5a623" : "transparent"}
+                  color={star <= activeStarCount ? "#f5a623" : "var(--st-muted, #7c9eb0)"}
+                />
+              </button>
+            ))}
+          </div>
+          <div className="st-reviewRatingFeedback">
+            {RATING_LABELS[activeStarCount] || "Pilih rating bintang"}
+          </div>
+        </div>
+
+        <div className="st-reviewChips">
+          <span className="st-reviewChipsLabel">Saran cepat:</span>
+          <div className="st-reviewChipsRow">
+            {QUICK_CHIPS.map((chip) => (
+              <button
+                key={chip}
+                type="button"
+                className="st-reviewChip"
+                onClick={() => handleAddChip(chip)}
+              >
+                {chip}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="st-reviewFields">
+          <textarea
+            className="input st-input st-reviewTextarea"
+            rows={3}
+            placeholder="Tulis ulasan pengalaman kamu (contoh: proses kilat, akun langsung aktif, recommended!)..."
+            value={reviewText}
+            onChange={(e) => setReviewText(e.target.value)}
+          />
+          <input
+            type="text"
+            className="input st-input st-reviewNameInput"
+            placeholder="Nama kamu (opsional, contoh: Rizky)"
+            value={authorName}
+            onChange={(e) => setAuthorName(e.target.value)}
+          />
+        </div>
+
+        <div className="st-reviewSubmitRow">
+          <button
+            type="submit"
+            className="btn btn-wide st-reviewSubmitBtn"
+            disabled={submitting}
+          >
+            <Send size={15} />
+            <span>{submitting ? "Mengirim..." : "Kirim Ulasan & Rating"}</span>
+          </button>
+        </div>
+      </form>
     </article>
   );
 }
@@ -569,8 +822,9 @@ function TabCekStatus({ settings }) {
               <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>
                 Tempel ID
               </button>
-              <a className="btn" href={waUrl} target="_blank" rel="noreferrer">
-                Hubungi admin
+              <a className="btn" href={waUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                <MessageCircle size={15} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />
+                <span>Hubungi admin</span>
               </a>
             </div>
           </section>
@@ -787,6 +1041,10 @@ function TabCekStatus({ settings }) {
                 })}
               </div>
             </article>
+
+            {order && order.status === "done" ? (
+              <PostTransactionReview order={order} waUrl={waUrl} toast={toast} />
+            ) : null}
           </main>
 
           <aside className="st-aside">
@@ -866,9 +1124,10 @@ function TabCekStatus({ settings }) {
               <p className="st-helpText">Ada kendala atau butuh aktivasi lebih cepat? Hubungi admin resmi via WhatsApp.</p>
 
               <div className="st-helpActions">
-                <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer">
+                <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                  <MessageCircle size={16} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />
                   <span>Hubungi Admin WA</span>
-                  <ArrowUpRight size={15} />
+                  <ArrowUpRight size={15} style={{ flexShrink: 0, marginLeft: 2 }} />
                 </a>
                 {order && order.status === "done" ? (
                   <a
@@ -1026,15 +1285,16 @@ function TabRiwayat() {
         return { entry, row };
       }));
 
-      const statusMap = {};
       results.forEach(({ entry, row }) => {
-        if (row?.status) statusMap[entry.order_code] = row.status;
-      });
-
-      history.forEach((entry) => {
-        const status = statusMap[entry.order_code];
-        if (status) {
-          updateOrderHistoryStatus(entry.order_code, status);
+        if (row?.status) {
+          const updates = { status: row.status };
+          if (!entry.items_summary && Array.isArray(row.items) && row.items.length > 0) {
+            const first = row.items[0];
+            const extra = row.items.length - 1;
+            updates.items_summary = `${first.product_name || first.name || "Produk"} · ${first.variant_name || first.duration_label || ""}${extra > 0 ? ` (+${extra} lainnya)` : ""}`;
+            updates.icon_url = first.product_icon_url || first.icon_url || "";
+          }
+          updateOrderHistoryEntry(entry.order_code, updates);
         } else {
           errors[entry.order_code] = true;
         }
@@ -1143,7 +1403,22 @@ function TabRiwayat() {
           <article key={entry.order_code} className="oh-card">
             <div className="oh-cardTop">
               <div className="oh-cardLeft">
-                <div className="oh-orderCode">{entry.order_code}</div>
+                <div className="oh-orderHeader">
+                  {entry.icon_url ? (
+                    <img
+                      src={entry.icon_url}
+                      alt=""
+                      className="oh-productIcon"
+                      onError={(e) => { e.currentTarget.style.display = "none"; }}
+                    />
+                  ) : null}
+                  <div className="oh-orderHeaderCopy">
+                    <div className="oh-orderCode">{entry.order_code}</div>
+                    {entry.items_summary ? (
+                      <div className="oh-itemSummary">{entry.items_summary}</div>
+                    ) : null}
+                  </div>
+                </div>
                 <div className="oh-orderMeta">
                   <span className="oh-orderDate">
                     <Clock3 size={12} />
@@ -1202,7 +1477,7 @@ export default function Status() {
   const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" } });
 
   usePageMeta({
-    title: activeTab === "riwayat" ? "Riwayat Order" : "Status Order",
+    title: activeTab === "riwayat" ? "Riwayat Pesanan" : "Status Pesanan",
     description:
       activeTab === "riwayat"
         ? "Semua order dari browser ini kesimpen di sini."
@@ -1248,7 +1523,7 @@ export default function Status() {
               onClick={() => switchTab("cek")}
             >
               <Activity size={15} />
-              Cek Status
+                Cek status
             </button>
             <button
               id="tab-riwayat"

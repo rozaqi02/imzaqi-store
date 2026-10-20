@@ -5,7 +5,7 @@ import { formatIDR, getVariantEffectivePrice, isKnownOutOfStock } from "../../..
 import { fetchActiveFlashSales } from "../../../lib/api";
 import { resolveProductCategory, resolveCatalogLine, STORE_WHATSAPP } from "../../../lib/productCategories";
 import { useToast } from "../../../context/ToastContext";
-import { MEDIA_FORMATS, MEDIA_STYLES, activeVariants, chooseVariant, liveDiscounts, posterOffer, paginateCatalog, normalizeMediaPhone } from "./marketingMediaModel";
+import { MEDIA_FORMATS, MEDIA_STYLES, activeVariants, chooseVariant, liveDiscounts, posterOffer, paginateCatalog, buildCatalogEntries, normalizeMediaPhone } from "./marketingMediaModel";
 import { drawProductPoster, drawCatalogPoster } from "./marketingMediaRenderer";
 import { loadMediaImage, canvasPng, downloadMedia, mediaZip } from "./marketingMediaExport";
 import AdminPicker from "./AdminPicker";
@@ -13,20 +13,20 @@ import "./MarketingMediaGenerator.css";
 
 async function prepareCanvas(options, pageOverride) {
   await document.fonts?.ready;
-  if (document.fonts?.load) await Promise.all([document.fonts.load('700 32px "Outfit"'), document.fonts.load('600 24px "Outfit"')]);
+  if (document.fonts?.load) await Promise.all([document.fonts.load('700 32px "Poppins"'), document.fonts.load('600 24px "Poppins"')]);
   const canvas = document.createElement("canvas");
   const catalog = options.mode === "catalog", page = pageOverride ?? options.page;
-  const products = catalog ? options.pages[page] || [] : [options.product];
-  const withoutLogo = products.find(product => !String(product.icon_url || "").trim());
-  if (withoutLogo) throw new Error(`Logo ${withoutLogo.name} belum tersedia di database. Tambahkan logo di menu Produk.`);
+  const items = catalog ? options.pages[page] || [] : [options.product];
+  const withoutLogo = items.find(item => !String((item.product?.icon_url || item.icon_url) || "").trim());
+  if (withoutLogo) throw new Error(`Logo ${withoutLogo.product?.name || withoutLogo.name} belum tersedia di database. Tambahkan logo di menu Produk.`);
   const url = catalog ? "https://imzaqi.store/produk" : options.offer.url;
   const [images, qr] = await Promise.all([
-    Promise.all(products.map(p => loadMediaImage(String(p.icon_url).trim()))),
+    Promise.all(items.map(item => loadMediaImage(String(item.product?.icon_url || item.icon_url).trim()))),
     QRCode.toDataURL(url, { margin: 4, width: 320, errorCorrectionLevel: "M" }).then(loadMediaImage),
   ]);
   const missingLogo = images.findIndex(image => !image);
-  if (missingLogo !== -1) throw new Error(`Logo ${products[missingLogo].name} dari database gagal dimuat. Periksa URL logo di menu Produk, lalu coba lagi.`);
-  if (catalog) drawCatalogPoster(canvas, { products, discounts: options.discounts, theme: options.catalogTheme, page: page + 1, pageCount: options.pages.length, total: options.total, images, qr, phone: options.phone });
+  if (missingLogo !== -1) throw new Error(`Logo ${(items[missingLogo].product?.name || items[missingLogo].name)} dari database gagal dimuat. Periksa URL logo di menu Produk, lalu coba lagi.`);
+  if (catalog) drawCatalogPoster(canvas, { products: items, discounts: options.discounts, theme: options.catalogTheme, page: page + 1, pageCount: options.pages.length, total: options.total, images, qr, phone: options.phone, catalogScope: options.catalogScope });
   else drawProductPoster(canvas, { offer: options.offer, styleId: options.styleId, format: options.format, variation: options.variation, headline: options.headline, badge: options.badge, image: images[0], qr, phone: options.phone });
   return { canvas };
 }
@@ -44,6 +44,8 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
   const [catalogCategory, setCatalogCategory] = useState("all");
+  const [catalogScope, setCatalogScope] = useState("products");
+  const [catalogProductFilter, setCatalogProductFilter] = useState("all");
   const [catalogTheme, setCatalogTheme] = useState("emerald");
   const [catalogPage, setCatalogPage] = useState(0);
   const [sales, setSales] = useState([]);
@@ -85,17 +87,21 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   const categories = useMemo(() => [...new Map(activeProducts.map(p => { const c = resolveProductCategory(p); return [c.key, c]; })).values()], [activeProducts]);
   useEffect(() => {
     if (catalogCategory !== "all" && !categories.some(c => c.key === catalogCategory)) {
-      setCatalogCategory("all"); setCatalogPage(0);
+      setCatalogCategory("all"); setCatalogPage(0); setCatalogProductFilter("all");
     }
   }, [categories, catalogCategory]);
   const filtered = useMemo(() => activeProducts.filter(p => catalogCategory === "all" || resolveProductCategory(p).key === catalogCategory), [activeProducts, catalogCategory]);
-  const pages = useMemo(() => paginateCatalog(filtered), [filtered]);
+  const catalogEntries = useMemo(() => {
+    return buildCatalogEntries(filtered, catalogScope, discounts, catalogProductFilter);
+  }, [filtered, catalogScope, discounts, catalogProductFilter]);
+  const pages = useMemo(() => paginateCatalog(mode === "catalog" ? catalogEntries : filtered), [mode, catalogEntries, filtered]);
   const page = Math.min(catalogPage, Math.max(0, pages.length - 1));
+  const total = mode === "catalog" ? catalogEntries.length : filtered.length;
   const line = resolveCatalogLine(product);
   const phone = mode === "single" ? normalizeMediaPhone(settings?.whatsapp?.[line] || (line === "app_premium" && settings?.whatsapp?.number) || STORE_WHATSAPP[line]) : "";
-  const options = useMemo(() => ({ mode, product, offer: offerResult.offer, styleId, format, variation, headline, badge, pages, page, total: filtered.length, catalogTheme, phone, discounts, retry }),
-    [mode, product, offerResult.offer, styleId, format, variation, headline, badge, pages, page, filtered.length, catalogTheme, phone, discounts, retry]);
-  const empty = mode === "single" ? !product : !filtered.length;
+  const options = useMemo(() => ({ mode, product, offer: offerResult.offer, styleId, format, variation, headline, badge, pages, page, total, catalogTheme, phone, discounts, retry, catalogScope }),
+    [mode, product, offerResult.offer, styleId, format, variation, headline, badge, pages, page, total, catalogTheme, phone, discounts, retry, catalogScope]);
+  const empty = mode === "single" ? !product : !catalogEntries.length;
   const invalid = mode === "single" ? offerResult.error : "";
 
   useEffect(() => {
@@ -119,7 +125,7 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   }, [options, empty, invalid, salesPending]);
 
   const ready = !empty && !invalid && !salesPending && !renderState.busy && !renderState.error && readyRef.current?.options === options;
-  const filename = mode === "single" ? `imzaqi-${product?.slug || "produk"}-${styleId}-${format}.png` : `imzaqi-katalog-${catalogCategory}-${page + 1}.png`;
+  const filename = mode === "single" ? `imzaqi-${product?.slug || "produk"}-${styleId}-${format}.png` : `imzaqi-katalog-${catalogScope === "variants" ? "varian-" : ""}${catalogCategory}-${page + 1}.png`;
   const exportImage = async action => {
     const rendered = readyRef.current;
     if (!ready || exporting || rendered?.options !== options) return;
@@ -150,9 +156,9 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
       const files = [];
       for (let i = 0; i < snapshot.pages.length; i++) {
         const { canvas } = await prepareCanvas(snapshot, i);
-        files.push({ name: `imzaqi-katalog-${i + 1}.png`, blob: await canvasPng(canvas) });
+        files.push({ name: `imzaqi-katalog-${catalogScope === "variants" ? "varian-" : ""}${i + 1}.png`, blob: await canvasPng(canvas) });
       }
-      downloadMedia(await mediaZip(files), `imzaqi-katalog-${catalogCategory}.zip`);
+      downloadMedia(await mediaZip(files), `imzaqi-katalog-${catalogScope === "variants" ? "varian-" : ""}${catalogCategory}.zip`);
       toast.success(`${files.length} halaman katalog diunduh dalam satu ZIP.`);
     } catch (error) { toast.error(error.message); }
     finally { if (mountedRef.current) setExporting(false); }
@@ -180,9 +186,52 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
             <button type="button" className="mmg-secondary" onClick={resetCopy}><RotateCcw size={15}/>Kembalikan teks & harga</button>
           </div></details>
         </> : <>
+          <fieldset className="mmg-fieldset">
+            <legend>Tingkat rincian katalog</legend>
+            <div className="mmg-formats">
+              <button
+                type="button"
+                className={catalogScope === "products" ? "is-selected" : ""}
+                aria-pressed={catalogScope === "products"}
+                onClick={() => { setCatalogScope("products"); setCatalogPage(0); }}
+              >
+                <strong>Per Produk</strong>
+                <small>Harga mulai</small>
+              </button>
+              <button
+                type="button"
+                className={catalogScope === "variants" ? "is-selected" : ""}
+                aria-pressed={catalogScope === "variants"}
+                onClick={() => { setCatalogScope("variants"); setCatalogPage(0); }}
+              >
+                <strong>Semua Varian</strong>
+                <small>Tiap paket & harga pas</small>
+              </button>
+            </div>
+          </fieldset>
           <AdminPicker label="Kategori" value={catalogCategory} onChange={key => { setCatalogCategory(key); setCatalogPage(0); }} options={[{ value: "all", label: "Semua kategori", meta: `${activeProducts.length} produk` }, ...categories.map(c => ({ value: c.key, label: c.label, meta: `${activeProducts.filter(p => resolveProductCategory(p).key === c.key).length} produk` }))]}/>
+          {catalogScope === "variants" && (
+            <AdminPicker
+              label="Filter produk (opsional)"
+              value={catalogProductFilter}
+              onChange={id => { setCatalogProductFilter(id); setCatalogPage(0); }}
+              options={[
+                { value: "all", label: "Semua produk", meta: `${filtered.length} produk` },
+                ...filtered.map(p => ({
+                  value: String(p.id),
+                  label: p.name,
+                  icon: p.icon_url,
+                  meta: `${activeVariants(p).length} paket`
+                }))
+              ]}
+            />
+          )}
           <fieldset className="mmg-fieldset"><legend>Tema katalog</legend><div className="mmg-formats">{[{ id: "emerald", name: "Kertas & hijau" }, { id: "dark", name: "Onyx & lime" }].map(s => <button type="button" key={s.id} className={catalogTheme === s.id ? "is-selected" : ""} aria-pressed={catalogTheme === s.id} onClick={() => setCatalogTheme(s.id)}>{s.name}</button>)}</div></fieldset>
-          <p className="mmg-note">{filtered.length} produk aktif · {pages.length} halaman. Maksimal 10 produk per halaman agar nama dan harga nyaman dibaca.</p>
+          <p className="mmg-note">
+            {catalogScope === "variants"
+              ? `${catalogEntries.length} paket / varian aktif · ${pages.length} halaman. Maksimal 10 paket per halaman agar nama dan harga nyaman dibaca.`
+              : `${filtered.length} produk aktif · ${pages.length} halaman. Maksimal 10 produk per halaman agar nama dan harga nyaman dibaca.`}
+          </p>
         </>}
         <p className="mmg-note">Harga dan garansi mengikuti paket. Harga coret hanya muncul bila ada potongan dari harga aslinya.</p>
         {saleError && <p className="mmg-warning">Flash sale belum berhasil dimuat. Harga mengikuti harga dasar paket.</p>}

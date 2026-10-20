@@ -515,6 +515,7 @@ export function buildOrdersCSV(orders) {
     "Tanggal Pembuatan",
     "Status",
     "WhatsApp Pelanggan",
+    "Email Buyer",
     "Subtotal (IDR)",
     "Diskon (%)",
     "Total Bayar (IDR)",
@@ -541,11 +542,19 @@ export function buildOrdersCSV(orders) {
       ? (o.customer_whatsapp.startsWith("0") || o.customer_whatsapp.startsWith("+") ? `'${o.customer_whatsapp}` : o.customer_whatsapp)
       : "";
 
+    const buyerEmail =
+      o.buyer_email ||
+      (() => {
+        const m = String(o.notes || "").match(/Email buyer:\s*([^\s\n\r]+)/i);
+        return m ? m[1] : "";
+      })();
+
     return [
       o.order_code,
       formattedDate,
       statusLabel,
       formattedWhatsapp,
+      buyerEmail,
       o.subtotal_idr,
       o.discount_percent || 0,
       o.total_idr,

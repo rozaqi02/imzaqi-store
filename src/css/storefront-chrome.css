@@ -20,6 +20,26 @@ html[data-theme="light"] body {
   color: #0a0a0a !important;
 }
 
+/* Zero Flash Theme Transitions */
+body,
+.page,
+.header,
+.bottom-nav {
+  transition:
+    background-color 0.25s ease,
+    border-color 0.25s ease,
+    color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .page,
+  .header,
+  .bottom-nav {
+    transition: none !important;
+  }
+}
+
 :focus-visible {
   outline: none;
   box-shadow:
@@ -261,7 +281,7 @@ html[data-theme="dark"] .promo-ticker--style-gradient.promo-ticker--color-blue  
   align-items: center;
   gap: 6px;
   padding: 4px 16px !important;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   border: 1.5px solid var(--banner-accent, #009e60) !important;
   background: rgba(255, 255, 255, 0.95) !important;
   color: #0f172a !important;
@@ -293,7 +313,7 @@ html[data-theme="dark"] .promo-ticker--style-pill_outline .promo-tickerItem {
   font-weight: 900;
   letter-spacing: 0.05em;
   text-transform: uppercase;
-  border-radius: 999px;
+  border-radius: 6px;
   background: #ffffff;
   color: #008751;
   margin-right: 4px;
@@ -435,7 +455,7 @@ html[data-motion="off"] .promo-tickerMascot {
   gap: 4px;
   padding: 1px 8px !important;
   margin-left: 5px;
-  border-radius: 999px !important;
+  border-radius: 6px !important;
   background: rgba(255, 255, 255, 0.28) !important;
   color: inherit !important;
   text-decoration: none !important;
@@ -504,22 +524,25 @@ body.is-admin-app .promo-ticker {
   display: none;
 }
 
-/* ── Header: white/black storefront bar ── */
+/* ── Header: Liquid Glass floating navigation shell ── */
 .header,
 .site-header {
   display: flex !important;
   flex-direction: column !important;
   padding-left: 0 !important;
   padding-right: 0 !important;
-  background: var(--paper, #0a0a0a) !important;
-  border-bottom: 1px solid var(--line, rgba(255, 255, 255, 0.1)) !important;
-  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04) !important;
+  background: var(--nav-shell-surface) !important;
+  border-bottom: 1px solid var(--nav-shell-edge, rgba(255, 255, 255, 0.12)) !important;
+  backdrop-filter: var(--liquid-glass-blur, blur(24px)) var(--liquid-glass-saturate, saturate(190%)) !important;
+  -webkit-backdrop-filter: var(--liquid-glass-blur, blur(24px)) var(--liquid-glass-saturate, saturate(190%)) !important;
+  box-shadow: var(--nav-shell-shadow-header) !important;
 }
 
 html[data-theme="light"] .header,
 html[data-theme="light"] .site-header {
-  background: #ffffff !important;
-  border-bottom-color: rgba(10, 10, 10, 0.08) !important;
+  background: var(--nav-shell-surface) !important;
+  border-bottom: 1px solid var(--nav-shell-edge, rgba(0, 158, 96, 0.14)) !important;
+  box-shadow: var(--nav-shell-shadow-header) !important;
 }
 
 .header::after,
@@ -967,20 +990,27 @@ html[data-theme="dark"] .detail-page-v3 .pdx-packHot--value {
 }
 
 .theme-toggle {
-  background: #ffffff !important;
-  border: 1px solid #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
   color: #0a0a0a !important;
   box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.08) !important;
+    inset 0 1px 3px rgba(0, 0, 0, 0.4),
+    0 1px 2px rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+html[data-theme="light"] .theme-toggle {
+  background: rgba(0, 0, 0, 0.05) !important;
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  box-shadow:
+    inset 0 1px 3px rgba(0, 0, 0, 0.12),
+    0 1px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
 .theme-toggle:hover,
 html[data-theme="light"] .theme-toggle:hover {
   transform: none !important;
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, 0.06),
-    0 1px 2px rgba(0, 0, 0, 0.08) !important;
 }
 
 .theme-toggleGlyph {
@@ -1004,15 +1034,26 @@ html[data-theme="light"] .theme-toggle:hover {
 .theme-toggleThumb,
 .theme-toggle.is-dark .theme-toggleThumb {
   z-index: 2;
-  background: #009e60 !important;
+  background: linear-gradient(135deg, #00f5c4 0%, #38bdf8 100%) !important;
+  color: #051614 !important;
+  border-radius: 9px !important;
+  box-shadow:
+    0 2px 10px rgba(0, 245, 196, 0.5),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+
+html[data-theme="light"] .theme-toggleThumb,
+html[data-theme="light"] .theme-toggle:not(.is-dark) .theme-toggleThumb {
+  background: linear-gradient(135deg, #00a86b 0%, #0284c7 100%) !important;
   color: #ffffff !important;
-  border-radius: 999px !important;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16) !important;
+  box-shadow:
+    0 2px 8px rgba(0, 168, 107, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8) !important;
 }
 
 html[data-theme="dark"] .theme-toggle {
-  background: #ffffff !important;
-  border-color: #ffffff !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
 }
 
 /* Billboard language from the flash-sale popup, applied across storefront pages */
@@ -1107,15 +1148,7 @@ html[data-theme="dark"] .detail-page-v3 .pdx-billboard.pdx-topCard {
   gap: 6px;
   width: fit-content;
   margin: 0;
-  font-size: 12px;
-  font-weight: 800;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: #009e60;
   text-decoration: none;
-  background: none;
-  border: 0;
-  box-shadow: none;
 }
 
 .catalog-page .catalog-title,
@@ -1219,10 +1252,64 @@ html[data-theme="dark"] .catalog-card.catalog-cardV2 {
 }
 
 .catalog-card.catalog-cardV2.grid .catalog-cardIcon {
-  width: 58px !important;
-  height: 58px !important;
-  flex-basis: 58px !important;
-  border-radius: 18px !important;
+  width: 58px;
+  height: 58px;
+  flex-basis: 58px;
+  border-radius: 18px;
+}
+
+@media (max-width: 640px) {
+  .catalog-card.catalog-cardV2.grid .catalog-cardBrand {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+  }
+
+  .catalog-card.catalog-cardV2.grid .catalog-cardIcon {
+    width: 44px !important;
+    height: 44px !important;
+    flex-basis: 44px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 13px !important;
+    overflow: hidden !important;
+    margin-bottom: 0 !important;
+  }
+
+  .catalog-card.catalog-cardV2.grid .catalog-cardIcon img {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    padding: 0 !important;
+    display: block !important;
+  }
+
+  .catalog-card.catalog-cardV2.grid .catalog-cardCopy {
+    width: 100% !important;
+    min-width: 0 !important;
+    display: grid !important;
+    gap: 2px !important;
+  }
+
+  .catalog-card.catalog-cardV2.grid .catalog-cardTitle {
+    font-size: 13.5px !important;
+    line-height: 1.2 !important;
+    margin: 0 !important;
+  }
+
+  .catalog-card.catalog-cardV2.grid .catalog-cardKicker {
+    display: inline-flex !important;
+    font-size: 8px !important;
+    gap: 4px !important;
+  }
+
+  .catalog-card.catalog-cardV2.grid .catalog-cardSummary {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 1 !important;
+    overflow: hidden !important;
+    font-size: 10px !important;
+  }
 }
 
 .catalog-card.catalog-cardV2.grid .catalog-cardIcon img,
@@ -1230,15 +1317,20 @@ html[data-theme="dark"] .catalog-card.catalog-cardV2 {
   width: 100%;
   height: 100%;
   margin: 0;
-  padding: 6px;
+  padding: 0 !important;
+  object-fit: cover !important;
   background: transparent;
   border-radius: 0;
   box-shadow: none;
 }
 
 .product-tile {
-  border-radius: 28px !important;
-  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.08) !important;
+  border-radius: 24px !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+html[data-theme="light"] .product-tile {
+  box-shadow: var(--skeu-panel-shadow) !important;
 }
 
 .testi-card,
@@ -1353,7 +1445,7 @@ html[data-theme="dark"] .rv-icon {
   }
 
   .promo-ticker {
-    --promo-ticker-size: 8px !important;
+    --promo-ticker-size: 11px !important;
     --promo-ticker-tracking: 0.01em;
   }
 
@@ -1465,7 +1557,7 @@ html[data-theme="dark"] .vcm-subtitle {
   display: grid !important;
   place-items: center !important;
   border: 0 !important;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   background: #0a0a0a !important;
   color: #fff !important;
   cursor: pointer !important;
@@ -1661,7 +1753,7 @@ html[data-theme="dark"] .checkout-drawerSub {
 .checkout-drawerClose {
   width: 40px !important;
   height: 40px !important;
-  border-radius: 999px !important;
+  border-radius: 12px !important;
   border: 0 !important;
   background: #0a0a0a !important;
   color: #fff !important;
@@ -1852,8 +1944,8 @@ html[data-theme="dark"] .checkout-drawer .steps.steps--visual {
 
 .pay-shell-title {
   margin-top: 6px !important;
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif) !important;
-  font-weight: 850 !important;
+  font-family: var(--font-display) !important;
+  font-weight: 800 !important;
   letter-spacing: -0.025em !important;
   color: inherit !important;
 }
@@ -2054,7 +2146,7 @@ html[data-theme="dark"] .pay-confirmModal {
   display: grid !important;
   place-items: center !important;
   border: 0 !important;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   background: rgba(0, 0, 0, 0.06) !important;
   color: #1d1d1f !important;
   box-shadow: none !important;
@@ -2108,7 +2200,7 @@ html[data-theme="dark"] .pay-sheetGrabBar {
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-radius: 24px !important;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14) !important;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif !important;
+  font-family: var(--font-sans) !important;
 }
 
 html[data-theme="dark"] .pay-successModal {
@@ -2223,7 +2315,7 @@ html[data-theme="dark"] .pay-appleSuccessBadge {
 
 .pay-successCode {
   color: #1d1d1f !important;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Mono", monospace !important;
+  font-family: var(--font-mono) !important;
   font-size: clamp(22px, 5.5vw, 28px) !important;
   line-height: 1.15 !important;
   font-weight: 800 !important;
@@ -2295,6 +2387,7 @@ html[data-theme="dark"] .pay-successCode {
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
+  gap: 7px !important;
   box-shadow: none !important;
   background: #f5f5f7 !important;
   color: #1d1d1f !important;
@@ -2329,7 +2422,7 @@ html[data-theme="dark"] .pay-successBtnGhost:hover {
   border: 1px solid rgba(0, 0, 0, 0.08) !important;
   border-radius: 24px !important;
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.14) !important;
-  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", sans-serif !important;
+  font-family: var(--font-sans) !important;
 }
 
 html[data-theme="dark"] .pay-confirmModal {
@@ -2450,7 +2543,7 @@ html[data-theme="dark"] .pay-confirmTotalMeta {
 .pay-confirmTotalBadge {
   background: rgba(0, 158, 96, 0.12) !important;
   border: 0 !important;
-  border-radius: 999px !important;
+  border-radius: 8px !important;
   color: #008751 !important;
   font-size: 11px !important;
   font-weight: 600 !important;
@@ -2719,12 +2812,12 @@ html[data-theme="dark"] .checkout-main .empty-desc {
 
 .header,
 .header.is-shrunk {
-  box-shadow: 0 10px 28px rgba(10, 10, 10, 0.06) !important;
+  box-shadow: var(--nav-shell-shadow-header) !important;
 }
 
 html[data-theme="dark"] .header,
 html[data-theme="dark"] .header.is-shrunk {
-  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35) !important;
+  box-shadow: var(--nav-shell-shadow-header) !important;
 }
 
 .header-cart,
@@ -2974,7 +3067,7 @@ html[data-theme="light"] .theme-toggle:hover {
 .theme-toggle.is-dark .theme-toggleThumb {
   background: #009e60 !important;
   color: #ffffff !important;
-  border-radius: 999px !important;
+  border-radius: 9px !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16) !important;
 }
 
@@ -3003,7 +3096,7 @@ html[data-theme="dark"] .theme-toggleThumb,
 html[data-theme="dark"] .theme-toggle.is-dark .theme-toggleThumb {
   background: #00b46e !important;
   color: #0b1220 !important;
-  border-radius: 999px !important;
+  border-radius: 9px !important;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3) !important;
 }
 

@@ -1,7 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import "../css/support-surfaces.css";
-import "../css/pages/Faq.css";
 import {
   ChevronDown,
   CircleCheck,
@@ -230,7 +228,7 @@ function FaqItem({ item, open, onToggle, idPrefix = "faq" }) {
 
 export default function FaqPageContent() {
   usePageMeta({
-    title: "FAQ",
+    title: "Bantuan",
     description: "Jawaban cepet soal bayar, order, varian, & aktivasi - biar gak bingung.",
   });
 

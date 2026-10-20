@@ -3,7 +3,6 @@ import { ArrowRight, Sparkles } from "lucide-react";
 import { formatIDR } from "../lib/format";
 import { resolvePromotionCopy } from "../lib/storefrontPromotions";
 import BannerGraphic from "./BannerGraphic";
-import "./NewProductPopup.css";
 
 export default function NewProductPopupContent({ config, product, onNavigate, onSuppress, preview = false, titleId }) {
   const copy = resolvePromotionCopy(config, product);

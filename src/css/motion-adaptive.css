@@ -63,7 +63,6 @@
 
 [data-motion="lite"] .card,
 [data-motion="lite"] .btn,
-[data-motion="lite"] .checkout-drawer,
 [data-motion="lite"] .checkout-panel,
 [data-motion="lite"] .checkout-summary,
 [data-motion="lite"] .status-mainCard,
@@ -86,7 +85,6 @@
 
 [data-motion="lite"] .btn,
 [data-motion="lite"] .card,
-[data-motion="lite"] .checkout-drawer,
 [data-motion="lite"] .checkout-panel,
 [data-motion="lite"] .checkout-summary,
 [data-motion="lite"] .product-card-modern,
@@ -389,7 +387,7 @@
   /* Backdrop */
   .checkout-backdrop-mobile {
     opacity: 0;
-    transition: opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1);
     /* No backdrop-filter — pure clean translucent dimming */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
@@ -402,12 +400,13 @@
 
   .checkout-backdrop-mobile.checkout-mobile-closing {
     opacity: 0;
-    transition: opacity 0.46s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: opacity 0.44s cubic-bezier(0.32, 0.72, 0, 1);
   }
 
-  /* Drawer: only transform animates — compositor-only, zero paint */
+  /* Drawer: matches desktop timing & physics: 0.6s entry, 0.46s exit, matching scale & opacity */
   .checkout-drawer.checkout-mobile-entering {
-    transform: translate3d(0, 104%, 0) scale(0.985);
+    transform: translate3d(0, 100%, 0) scale(0.992);
+    opacity: 0.72;
     transition: none;
     /* Strip all expensive properties during animation */
     backdrop-filter: none !important;
@@ -417,15 +416,23 @@
 
   .checkout-drawer.checkout-mobile-open {
     transform: translate3d(0, 0, 0) scale(1);
-    transition: transform 0.62s cubic-bezier(0.22, 1, 0.36, 1);
+    opacity: 1;
+    transition:
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      scale 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease-out;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.2) !important;
   }
 
   .checkout-drawer.checkout-mobile-closing {
-    transform: translate3d(0, 104%, 0) scale(0.99);
-    transition: transform 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+    transform: translate3d(0, 100%, 0) scale(0.994);
+    opacity: 0.68;
+    transition:
+      transform 0.46s cubic-bezier(0.32, 0.72, 0, 1),
+      scale 0.38s ease-in-out,
+      opacity 0.34s ease-in;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
     box-shadow: none !important;

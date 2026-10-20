@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import "../css/pages/NotFound.css";
 import {
   Activity,
   ArrowRight,
@@ -20,7 +19,7 @@ import { MASCOTS_ENABLED } from "../lib/featureFlags";
 const QUICK_LINKS = [
   { to: "/", label: "Beranda", icon: Home, desc: "Kembali ke halaman utama" },
   { to: "/produk", label: "Katalog", icon: Grid2x2, desc: "Browse semua produk" },
-  { to: "/status", label: "Status Order", icon: Activity, desc: "Cek progress pesanan" },
+  { to: "/status", label: "Status Pesanan", icon: Activity, desc: "Cek progres pesanan" },
   { to: "/status?tab=riwayat", label: "Riwayat", icon: History, desc: "Order di browser ini" },
 ];
 

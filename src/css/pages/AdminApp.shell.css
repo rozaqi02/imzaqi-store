@@ -282,7 +282,7 @@ html[data-theme="light"] .admin-page .adm-nextFocus--ok {
 
 .admin-page .adm-syncLabel {
   font-size: 10.5px !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
   color: var(--adm-text-3) !important;
   padding: 0 4px 4px !important;
   letter-spacing: 0.01em;
@@ -531,7 +531,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
 
 .admin-page .admin-priorityCard > span:not(.admin-priorityIcon) {
   font-size: 12.5px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   color: var(--adm-text-2) !important;
 }
 
@@ -693,7 +693,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
 
 .admin-page .admin-orderStat span {
   font-size: 10.5px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   text-transform: uppercase !important;
   letter-spacing: 0.04em !important;
   color: var(--adm-text-3) !important;
@@ -817,7 +817,7 @@ html[data-theme="light"] .admin-page .admin-product-row.active {
 
 .admin-page .admin-product-name {
   font-size: 13.5px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   color: var(--adm-text) !important;
   letter-spacing: -0.02em !important;
   overflow: hidden !important;
@@ -968,7 +968,7 @@ html[data-theme="light"] .admin-page .admin-product-row.active {
   gap: 5px !important;
   min-height: 30px !important;
   padding: 0 10px !important;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   border: 1px solid var(--adm-line, rgba(120, 165, 180, 0.22)) !important;
   background: var(--adm-surface-soft, rgba(255, 255, 255, 0.7)) !important;
   box-shadow: var(--adm-shadow-soft, none) !important;
@@ -1777,7 +1777,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     min-height: 40px !important;
     margin: 0 !important;
     padding: 0 14px 0 12px !important;
-    border-radius: 999px !important;
+    border-radius: 12px !important;
     border: 1px solid var(--adm-line, rgba(120, 165, 180, 0.22)) !important;
     background: var(--adm-surface-soft, rgba(255, 255, 255, 0.06)) !important;
     box-shadow: none !important;
@@ -2241,7 +2241,7 @@ html[data-theme="light"] .admin-page .admin-priorityBoard {
   font-weight: 800 !important;
   opacity: 0.85 !important;
   padding: 1px 6px !important;
-  border-radius: 999px !important;
+  border-radius: 6px !important;
   background: rgba(0, 138, 148, 0.12) !important;
 }
 

@@ -20,8 +20,8 @@ SELECT * FROM public.admin_users;
 
 | File | Isi | Status |
 |---|---|---|
-| `migrations/0001_baseline.sql` | Skema tabel + **15 RPC** persis seperti dipanggil frontend (`create_order_with_stock_check`, `get_order_public`, `validate_promo`, analytics, `is_admin`, dll.) | ⚠️ RECONSTRUCTED — verifikasi vs `supabase db dump` sebelum menimpa fungsi live |
-| `migrations/0002_hardening.sql` | Unique `promo_claims(visitor_id, promo_code)` + index pendukung | Aditif, idempotent, aman di produksi |
+| `migrations/0001_baseline.sql` | Skema tabel (17 tabel) + **15 RPC** sinkron dengan database produksi live (`create_order_with_stock_check`, `get_order_public`, `validate_promo`, analytics, `is_admin`, dll.) | ✅ SYNCHRONIZED dengan schema live |
+| `migrations/0002_hardening.sql` | Unique `promo_claims(visitor_id, code)` + index pendukung & `buyer_email` | Aditif, idempotent, aman di produksi |
 | `migrations/_archived/20260909_secure_checkout_funnel.sql` | Redesign "secure checkout" yang **ditinggalkan** | ❌ JANGAN diterapkan (me-REVOKE `get_order_public`) |
 | `migrations/_archived/20260910_order_lookup_by_id.sql` | Varian `get_order_public_by_code` yang tak dipakai frontend | ❌ JANGAN diterapkan |
 

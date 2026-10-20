@@ -166,6 +166,59 @@ export function CartProvider({ children }) {
       setItems([]);
     },
 
+    backup(overrideItems = null) {
+      const storage = safeStorage();
+      if (!storage) return;
+      try {
+        const payload = {
+          items: overrideItems || items,
+          saved_at: Date.now(),
+        };
+        storage.setItem("imzaqi_store_cart_backup_v1", JSON.stringify(payload));
+      } catch {}
+    },
+
+    restoreFromBackup() {
+      const storage = safeStorage();
+      if (!storage) return false;
+      try {
+        const raw = storage.getItem("imzaqi_store_cart_backup_v1");
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        const list = Array.isArray(parsed) ? parsed : parsed?.items;
+        if (Array.isArray(list) && list.length > 0) {
+          setItems(list);
+          return true;
+        }
+      } catch {}
+      return false;
+    },
+
+    hasBackup() {
+      const storage = safeStorage();
+      if (!storage) return false;
+      try {
+        const raw = storage.getItem("imzaqi_store_cart_backup_v1");
+        if (!raw) return false;
+        const parsed = JSON.parse(raw);
+        const savedAt = parsed?.saved_at || 0;
+        // Backup valid up to 24 hours
+        if (Date.now() - savedAt > 24 * 60 * 60 * 1000) return false;
+        const list = Array.isArray(parsed) ? parsed : parsed?.items;
+        return Array.isArray(list) && list.length > 0;
+      } catch {
+        return false;
+      }
+    },
+
+    clearBackup() {
+      const storage = safeStorage();
+      if (!storage) return;
+      try {
+        storage.removeItem("imzaqi_store_cart_backup_v1");
+      } catch {}
+    },
+
     syncPrices(nextItems) {
       if (!Array.isArray(nextItems) || nextItems.length === 0) return;
       const byId = new Map(nextItems.map((item) => [String(item.variant_id), item]));
@@ -227,6 +280,17 @@ export function CartProvider({ children }) {
 
 export function useCart() {
   const ctx = useContext(CartContext);
-  if (!ctx) throw new Error("useCart must be used within CartProvider");
+  if (!ctx) {
+    return {
+      items: [],
+      bumpToken: 0,
+      lastAddedVariantId: null,
+      addItem: () => {},
+      removeItem: () => {},
+      updateQty: () => {},
+      clearCart: () => {},
+      checkStockForVariant: async () => null,
+    };
+  }
   return ctx;
 }

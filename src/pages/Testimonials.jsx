@@ -6,8 +6,6 @@ import {
   Images, LayoutGrid, MessageSquareText, Search, X, ZoomIn,
   BadgeCheck,
 } from "lucide-react";
-import "../css/support-surfaces.css";
-import "../css/pages/Testimonials.css";
 import { fetchTestimonials } from "../lib/api";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useDialogA11y } from "../hooks/useDialogA11y";
@@ -98,7 +96,7 @@ export default function Testimonials() {
           </div>
           <div className="reviews-heroArt" aria-hidden="true">
             <div className="reviews-note reviews-note--back"><Images size={36} /><span>Setiap gambar,<br />punya cerita.</span></div>
-            <div className="reviews-note reviews-note--front"><span className="reviews-quote">“</span><strong>Pengalaman mereka.<br />Referensi buat kamu.</strong><span className="reviews-noteLine" /><small>IMZAQI STORE · TESTIMONI</small></div>
+            <div className="reviews-note reviews-note--front"><span className="reviews-quote">“</span><strong>Pengalaman mereka.<br />Referensi buat kamu.</strong><span className="reviews-noteLine" /><small>IMZAQI STORE · ULASAN</small></div>
             <span className="reviews-artBadge"><MessageSquareText size={16} /> Dari pelanggan</span>
           </div>
         </header>

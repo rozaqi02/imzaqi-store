@@ -46,8 +46,8 @@ html {
   align-items: center;
   gap: 8px;
   height: 40px;
-  padding: 0 16px 0 12px;
-  border-radius: 999px;
+  padding: 0 10px 0 14px;
+  border-radius: 14px;
   border: 1px solid var(--brand-line, rgba(0, 214, 180, 0.3));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
@@ -72,44 +72,84 @@ html {
   transform: scale(0.97);
 }
 
-.floating-order-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: #00a88c;
-  animation: floatingOrderPulse 2s ease-in-out infinite;
+.floating-order-label {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.78);
+  white-space: nowrap;
 }
 
-@keyframes floatingOrderPulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.6; transform: scale(0.85); }
+html[data-theme="light"] .floating-order-label {
+  color: rgba(13, 45, 57, 0.72);
 }
 
 .floating-order-code {
   letter-spacing: 0.04em;
+  font-weight: 800;
+}
+
+.floating-order-arrow {
+  display: grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: none !important;
+  color: #ffffff !important;
+  background: #0284c7 !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.4);
+  flex-shrink: 0;
+  transition: transform 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+.floating-order-arrow svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
+}
+
+.floating-order-btn:hover .floating-order-arrow {
+  transform: translateX(2px);
+  background: #0369a1 !important;
+  box-shadow: 0 3px 10px rgba(2, 132, 199, 0.55);
+}
+
+html[data-theme="light"] .floating-order-arrow {
+  border: none !important;
+  color: #ffffff !important;
+  background: #0284c7 !important;
+  box-shadow: 0 2px 6px rgba(2, 132, 199, 0.35);
 }
 
 .floating-order-dismiss {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
-    var(--skeu-control-bg, rgba(255, 255, 255, 0.1));
-  box-shadow: var(--skeu-control-shadow, none);
-  color: rgba(255, 255, 255, 0.5);
+  border: none !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 8px rgba(239, 68, 68, 0.35);
   cursor: pointer;
   margin-left: 6px;
   flex-shrink: 0;
-  transition: background 0.15s, filter 0.15s, color 0.15s;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.floating-order-dismiss svg {
+  color: #ffffff !important;
+  stroke: #ffffff !important;
 }
 
 .floating-order-dismiss:hover {
-  filter: brightness(1.1);
-  color: #fff;
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  box-shadow: 0 3px 10px rgba(220, 38, 38, 0.5);
+  transform: scale(1.08);
+}
+
+.floating-order-dismiss:active {
+  transform: scale(0.92);
 }
 
 html[data-theme="light"] .floating-order-btn {
@@ -122,17 +162,15 @@ html[data-theme="light"] .floating-order-btn {
 }
 
 html[data-theme="light"] .floating-order-dismiss {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 36%),
-    var(--skeu-control-bg, rgba(0, 0, 0, 0.06));
-  border-color: rgba(13, 124, 144, 0.14);
-  color: rgba(0, 0, 0, 0.35);
-  box-shadow: var(--skeu-control-shadow, none);
+  border: none !important;
+  background: #ef4444 !important;
+  color: #ffffff !important;
+  box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
 }
 
 html[data-theme="light"] .floating-order-dismiss:hover {
-  filter: brightness(1.03);
-  color: rgba(0, 0, 0, 0.6);
+  background: #dc2626 !important;
+  color: #ffffff !important;
 }
 
 @media (max-width: 720px) {
@@ -145,7 +183,16 @@ html[data-theme="light"] .floating-order-dismiss:hover {
 
   .floating-order-btn {
     height: 36px;
-    padding: 0 12px 0 10px;
+    padding: 0 8px 0 12px;
     font-size: 12px;
+  }
+
+  .floating-order-label {
+    font-size: 11.5px;
+  }
+
+  .floating-order-arrow {
+    width: 20px;
+    height: 20px;
   }
 }

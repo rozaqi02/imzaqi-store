@@ -111,7 +111,7 @@
 
 .oh-emptyTitle {
   font-size: 18px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.02em;
   margin-bottom: 10px;
 }
@@ -160,11 +160,48 @@
   flex: 1;
 }
 
+.oh-orderHeader {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.oh-productIcon {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  object-fit: cover;
+  background: var(--uni-neo-control, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--uni-line, rgba(255, 255, 255, 0.12));
+  flex-shrink: 0;
+}
+
+.oh-orderHeaderCopy {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
 .oh-orderCode {
   font-family: var(--font-mono);
   font-size: 15px;
   font-weight: 800;
   letter-spacing: 0.02em;
+}
+
+.oh-itemSummary {
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.72);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 320px;
+}
+
+html[data-theme="light"] .oh-itemSummary {
+  color: rgba(13, 45, 57, 0.78);
 }
 
 .oh-orderMeta {
@@ -202,7 +239,7 @@
   align-items: center;
   min-height: 26px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   box-shadow: var(--uni-neo-control-shadow);
   font-size: 11px;
@@ -591,5 +628,5 @@ html[data-theme="dark"] .oh-cardActions {
   color: var(--imzaqi-btn-text) !important;
   border: 1px solid var(--imzaqi-btn-border) !important;
   box-shadow: var(--imzaqi-btn-shadow) !important;
-  border-radius: 999px !important;
+  border-radius: 14px !important;
 }

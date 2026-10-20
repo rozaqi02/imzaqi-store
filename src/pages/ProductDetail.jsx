@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
-import "../css/pages/ProductDetail.css";
 import { productStructuredData } from "../lib/productStructuredData.mjs";
 import {
   ArrowDown,
@@ -1062,7 +1061,7 @@ export default function ProductDetail() {
 
                       <Link
                         to={`/produk?cats=${productCategory.key}`}
-                        className="pdx-label"
+                        className="pdx-label pdx-categoryPill"
                         data-category={productCategory.key}
                         aria-label={`Lihat produk kategori ${productCategory.label}`}
                       >

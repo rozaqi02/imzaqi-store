@@ -159,9 +159,9 @@ function FloatingOrderStatus() {
           window.location.href = `/status?order=${encodeURIComponent(order.order_code)}`;
         }}
       >
-        <span className="floating-order-dot" />
+        <span className="floating-order-label">Order terbaru Anda:</span>
         <span className="floating-order-code">{order.order_code}</span>
-        <ArrowRight size={14} />
+        <span className="floating-order-arrow"><ArrowRight size={13} /></span>
       </button>
       <button
         className="floating-order-dismiss"
@@ -169,7 +169,7 @@ function FloatingOrderStatus() {
         onClick={() => setDismissed(true)}
         aria-label="Tutup"
       >
-        <X size={12} />
+        <X size={13} strokeWidth={2.4} />
       </button>
     </div>
   );
@@ -281,14 +281,14 @@ function AppRoutes() {
             <Route path="/produk/:slug" element={<BoundedRoute pageName="Detail Produk"><ProductDetail /></BoundedRoute>} />
             <Route path="/produk" element={<BoundedRoute pageName="Katalog"><Products /></BoundedRoute>} />
             <Route path="/tentang" element={<BoundedRoute pageName="Tentang"><About /></BoundedRoute>} />
-            <Route path="/faq" element={<BoundedRoute pageName="FAQ"><Faq /></BoundedRoute>} />
-            <Route path="/testimoni" element={<BoundedRoute pageName="Testimoni"><Testimonials /></BoundedRoute>} />
+            <Route path="/faq" element={<BoundedRoute pageName="Bantuan"><Faq /></BoundedRoute>} />
+            <Route path="/testimoni" element={<BoundedRoute pageName="Ulasan"><Testimonials /></BoundedRoute>} />
             <Route path="/checkout" element={<BoundedRoute pageName="Checkout"><Checkout /></BoundedRoute>} />
             <Route path="/cart" element={<Navigate to="/checkout" replace />} />
             <Route path="/keranjang" element={<Navigate to="/checkout" replace />} />
             <Route path="/bayar" element={<BoundedRoute pageName="Bayar"><Pay /></BoundedRoute>} />
             <Route path="/pay" element={<Navigate to="/bayar" replace />} />
-            <Route path="/status" element={<BoundedRoute pageName="Status Order"><Status /></BoundedRoute>} />
+            <Route path="/status" element={<BoundedRoute pageName="Status Pesanan"><Status /></BoundedRoute>} />
             <Route path="/order" element={<Navigate to="/status" replace />} />
             <Route path="/orders" element={<Navigate to="/status" replace />} />
             <Route path="/riwayat" element={<Navigate to="/status?tab=riwayat" replace />} />

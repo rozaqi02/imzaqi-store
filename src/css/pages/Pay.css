@@ -17,7 +17,7 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 
 .pay-shell-top{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:16px;}
 .pay-shell-copy{max-width:560px;min-width:0;}
-.pay-shell-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:999px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-muted,rgba(255,255,255,.68));backdrop-filter:none;}
+.pay-shell-kicker{display:inline-flex;align-items:center;gap:8px;padding:7px 11px;border-radius:10px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:11px;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-muted,rgba(255,255,255,.68));backdrop-filter:none;}
 .pay-shell-title{margin-top:18px;letter-spacing:-.08em;font-weight:900;overflow-wrap:anywhere;}
 .pay-shell-sub{margin:8px 0 0;color:var(--a11y-muted, rgba(255,255,255,.62));max-width:30ch;font-size:15px;line-height:1.6;overflow-wrap:anywhere;}
 
@@ -29,7 +29,7 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-cardHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;min-width:0;}
 .pay-cardKicker{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--a11y-muted, rgba(255,255,255,.62));}
 .pay-cardTitle{margin-top:6px;letter-spacing:-.04em;overflow-wrap:anywhere;}
-.pay-statePill{display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 12px;border-radius:999px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 30%),var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:12px;font-weight:800;color:var(--brand-muted,rgba(255,255,255,.62));white-space:nowrap;}
+.pay-statePill{display:inline-flex;align-items:center;justify-content:center;height:34px;padding:0 12px;border-radius:10px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 30%),var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:12px;font-weight:800;color:var(--brand-muted,rgba(255,255,255,.62));white-space:nowrap;}
 .pay-statePill.live{border-color:var(--imzaqi-btn-border,rgba(79,255,200,.28));background:var(--imzaqi-btn-face);box-shadow:var(--imzaqi-btn-shadow);color:var(--imzaqi-btn-text,#ffffff);}
 
 .pay-waField .label{margin:0 0 6px;font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--a11y-muted, rgba(255,255,255,.62));}
@@ -46,7 +46,7 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-noteHead{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .pay-noteLabelWrap{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.74);}
 .pay-noteLabel{font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;}
-.pay-noteState{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 32%),var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-muted,rgba(255,255,255,.64));white-space:nowrap;}
+.pay-noteState{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;border-radius:8px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 32%),var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-muted,rgba(255,255,255,.64));white-space:nowrap;}
 .pay-noteState.warn{color:#ffd089;border-color:rgba(255,208,137,.4);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(255,208,137,.22),rgba(70,40,0,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(255,180,40,.14);}
 .pay-noteState.ok{color:#9ff5d9;border-color:rgba(159,245,217,.34);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(0,214,180,.22),rgba(0,50,45,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(0,180,150,.14);}
 .pay-noteInput{min-height:96px;height:auto;padding:12px 14px;resize:vertical;}
@@ -61,7 +61,7 @@ opacity:.95;pointer-events:none;filter:blur(2px);}
 .pay-emailHead{display:flex;align-items:center;justify-content:space-between;gap:10px;}
 .pay-emailLabelWrap{display:inline-flex;align-items:center;gap:8px;color:rgba(255,255,255,.74);}
 .pay-emailLabel{font-size:12px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;}
-.pay-emailState{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;border-radius:999px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 32%),var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-muted,rgba(255,255,255,.64));white-space:nowrap;}
+.pay-emailState{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 10px;border-radius:8px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:linear-gradient(180deg,rgba(255,255,255,.14),rgba(255,255,255,0) 32%),var(--skeu-control-bg,rgba(255,255,255,.03));box-shadow:var(--skeu-control-shadow,none);font-size:10px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--brand-muted,rgba(255,255,255,.64));white-space:nowrap;}
 .pay-emailState.warn{color:#ffd089;border-color:rgba(255,208,137,.4);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(255,208,137,.22),rgba(70,40,0,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(255,180,40,.14);}
 .pay-emailState.ok{color:#9ff5d9;border-color:rgba(159,245,217,.34);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(0,214,180,.22),rgba(0,50,45,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(0,180,150,.14);}
 .pay-emailInput{height:48px;border-radius:18px;background:var(--skeu-inset-bg,rgba(255,255,255,.045));box-shadow:var(--skeu-inset-shadow,none);border:1px solid var(--brand-line,rgba(255,255,255,.1));font-size:14px;padding:0 14px;}
@@ -104,7 +104,7 @@ html[data-theme="light"] .pay-stageMobileHint{color:#b45309;}
 .pay-orderHead{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;}
 .pay-orderKicker{font-size:11px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--a11y-muted, rgba(255,255,255,.62));}
 .pay-orderTitle{margin-top:6px;font-size:20px;font-weight:900;letter-spacing:-.04em;}
-.pay-orderPromo{padding:6px 10px;border-radius:999px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:rgba(0,214,180,.12);border-color:rgba(0,214,180,.35);box-shadow:none;font-size:11px;font-weight:800;color:var(--brand-muted,rgba(255,255,255,.70));}
+.pay-orderPromo{padding:6px 10px;border-radius:8px;border:1px solid var(--brand-line,rgba(255,255,255,.10));background:rgba(0,214,180,.12);border-color:rgba(0,214,180,.35);box-shadow:none;font-size:11px;font-weight:800;color:var(--brand-muted,rgba(255,255,255,.70));}
 .pay-orderList{display:flex;flex-direction:column;gap:10px;}
 .pay-orderItem{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;padding:12px;border-radius:18px;border:1px solid var(--brand-line,rgba(255,255,255,.08));background:var(--skeu-control-bg,rgba(255,255,255,.025));box-shadow:none;}
 .pay-orderItemMain{display:flex;align-items:flex-start;gap:10px;min-width:0;flex:1;}
@@ -135,9 +135,9 @@ html[data-theme="light"] .pay-stageMobileHint{color:#b45309;}
   display:grid;
   place-items:center;
   padding:16px;
-  background:rgba(4,9,20,.56);
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
+  background:rgba(4,9,20,.62);
+  backdrop-filter:blur(16px) saturate(180%) !important;
+  -webkit-backdrop-filter:blur(16px) saturate(180%) !important;
 }
 .pay-successModal{
   width:min(580px,100%);
@@ -145,10 +145,11 @@ html[data-theme="light"] .pay-stageMobileHint{color:#b45309;}
   display:flex;
   flex-direction:column;
   border-radius:28px;
-  background:rgba(8,14,26,.975);
-  border:1px solid rgba(255,255,255,.12);
-  box-shadow:0 30px 120px rgba(0,0,0,.45);
-  backdrop-filter:none;
+  background:var(--skeu-panel-bg);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow:var(--skeu-panel-shadow), 0 30px 100px rgba(0,0,0,.6);
+  backdrop-filter:var(--liquid-glass-blur, blur(24px)) var(--liquid-glass-saturate, saturate(190%));
+  -webkit-backdrop-filter:var(--liquid-glass-blur, blur(24px)) var(--liquid-glass-saturate, saturate(190%));
   position:relative;
   overflow:hidden;
 }
@@ -338,7 +339,7 @@ html[data-theme="light"] .pay-orderMobileCard{background:linear-gradient(180deg,
 html[data-theme="light"] .pay-qrisLocked{border-color:rgba(0,138,148,.14);background:linear-gradient(160deg, rgba(236,248,252,.86), rgba(247,253,255,.90));color:#3d6070;}
 html[data-theme="light"] .pay-qrisLocked strong{color:#123744;}
 html[data-theme="light"] .pay-qrisLocked p{color:#5f7781;}
-html[data-theme="light"] .pay-successModal{background:rgba(255,255,255,.98);border-color:rgba(0,138,148,.14);box-shadow:0 30px 80px rgba(72,118,138,.18);backdrop-filter:none;}
+html[data-theme="light"] .pay-successModal{background:var(--skeu-panel-bg);border-color:rgba(0,158,96,.14);box-shadow:var(--skeu-panel-shadow), 0 20px 60px rgba(45,85,100,.14);}
 html[data-theme="light"] .pay-successModal .modal-title{color:#123744;}
 html[data-theme="light"] .pay-successModal .modal-sub{color:#5f7781;}
 html[data-theme="light"] .pay-successKicker{color:#5f7781;}
@@ -606,7 +607,7 @@ html[data-theme="light"] .pay-confirmCheckItem{color:#123744;}
   gap:5px;
   min-height:24px;
   padding:0 10px;
-  border-radius:999px;
+  border-radius:8px;
   border:1px solid rgba(79,255,218,.22);
   background:rgba(0,214,180,.1);
   font-size:10px;
@@ -892,7 +893,7 @@ html[data-theme="light"] .pay-confirmCheckItem:has(:focus-visible){
   align-items: center;
   height: 24px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid rgba(79, 255, 200, 0.28);
   background: rgba(79, 255, 200, 0.1);
   color: #4effda;
@@ -1149,7 +1150,7 @@ html[data-theme="light"] .pay-zoomTip {
   gap: 6px;
   margin: 0 auto 4px auto;
   padding: 6px 14px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(0, 214, 180, 0.28);
   background: linear-gradient(180deg, rgba(0, 214, 180, 0.12), rgba(0, 214, 180, 0.04));
   font-size: 12px;
@@ -1368,7 +1369,7 @@ html[data-theme="dark"] .pay-shell {
   align-items: center !important;
   gap: 6px !important;
   font-size: 11px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   letter-spacing: 0.08em !important;
   text-transform: uppercase !important;
   color: #009e60 !important;
@@ -1380,9 +1381,9 @@ html[data-theme="dark"] .pay-shell-kicker {
 }
 
 .pay-shell-title {
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif) !important;
+  font-family: var(--font-display) !important;
   font-size: clamp(26px, 4.5vw, 34px) !important;
-  font-weight: 850 !important;
+  font-weight: 800 !important;
   letter-spacing: -0.025em !important;
   line-height: 1.2 !important;
   color: var(--pay-copy) !important;
@@ -1431,7 +1432,7 @@ html[data-theme="dark"] .pay-shell .pay-orderMobileCard {
 .pay-cardKicker,
 .pay-orderKicker {
   font-size: 11px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
   color: var(--pay-muted) !important;
@@ -1439,7 +1440,7 @@ html[data-theme="dark"] .pay-shell .pay-orderMobileCard {
 
 .pay-cardTitle,
 .pay-orderTitle {
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif) !important;
+  font-family: var(--font-display) !important;
   font-size: 17px !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
@@ -1455,9 +1456,9 @@ html[data-theme="dark"] .pay-shell .pay-orderMobileCard {
   justify-content: center !important;
   height: 28px !important;
   padding: 0 10px !important;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   font-size: 11px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   background: var(--pay-soft) !important;
   border: 1px solid var(--pay-line) !important;
   color: var(--pay-muted) !important;
@@ -1510,9 +1511,9 @@ html[data-theme="dark"] .pay-statePill.live {
 }
 
 .pay-orderItemName {
-  font-family: var(--font-display, -apple-system, sans-serif) !important;
+  font-family: var(--font-display) !important;
   font-size: 14.5px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   letter-spacing: -0.015em !important;
   line-height: 1.25 !important;
   color: var(--pay-copy) !important;
@@ -1525,7 +1526,7 @@ html[data-theme="dark"] .pay-statePill.live {
 }
 
 .pay-orderItem b {
-  font-family: var(--font-display, -apple-system, sans-serif) !important;
+  font-family: var(--font-display) !important;
   font-size: 14.5px !important;
   font-weight: 800 !important;
   letter-spacing: -0.02em !important;
@@ -1569,7 +1570,7 @@ html[data-theme="dark"] .pay-statePill.live {
 
 .pay-orderRow.strong b {
   font-size: 17px !important;
-  font-weight: 850 !important;
+  font-weight: 800 !important;
   color: var(--pay-accent) !important;
 }
 
@@ -1583,16 +1584,16 @@ html[data-theme="dark"] .pay-statePill.live {
 
 .pay-stageLabel {
   font-size: 11px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   letter-spacing: 0.06em !important;
   text-transform: uppercase !important;
   color: var(--pay-muted) !important;
 }
 
 .pay-stageTotal {
-  font-family: var(--font-display, -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif) !important;
+  font-family: var(--font-display) !important;
   font-size: 34px !important;
-  font-weight: 850 !important;
+  font-weight: 800 !important;
   letter-spacing: -0.025em !important;
   line-height: 1.15 !important;
   color: var(--pay-copy) !important;
@@ -1642,9 +1643,9 @@ html[data-theme="dark"] .pay-statePill.live {
   gap: 6px !important;
   margin: 0 auto 6px !important;
   padding: 5px 14px !important;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   font-size: 12px !important;
-  font-weight: 650 !important;
+  font-weight: 600 !important;
   border: 1px solid var(--pay-line) !important;
   background: var(--pay-soft) !important;
   color: var(--pay-muted) !important;
@@ -1691,7 +1692,7 @@ html[data-theme="dark"] .pay-statePill.live {
   background: #009e60 !important;
   color: #ffffff !important;
   font-size: 15px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   letter-spacing: -0.01em !important;
   padding: 0 20px !important;
   border: none !important;

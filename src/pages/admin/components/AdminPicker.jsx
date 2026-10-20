@@ -49,7 +49,7 @@ export default function AdminPicker({ label, value, onChange, options = [], plac
     const place = () => {
       const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      if (window.innerWidth <= 600) {
+      if (window.innerWidth <= 768) {
         const viewport = window.visualViewport;
         const keyboardInset = viewport ? Math.max(0, window.innerHeight - viewport.height - viewport.offsetTop) : 0;
         setPosition({ mobile: true, bottom: keyboardInset ? keyboardInset + 12 : undefined, maxHeight: Math.min(480, (viewport?.height || window.innerHeight) * .68) });
@@ -63,7 +63,11 @@ export default function AdminPicker({ label, value, onChange, options = [], plac
     const outside = event => {
       if (!triggerRef.current?.contains(event.target) && !popupRef.current?.contains(event.target)) close();
     };
-    const scroll = event => { if (!popupRef.current?.contains(event.target)) close(); };
+    const scroll = event => {
+      // On mobile / iOS, keyboard animation or rubber-band scrolling triggers window scroll events; do not close.
+      if (window.innerWidth <= 768) return;
+      if (!popupRef.current?.contains(event.target)) close();
+    };
     place();
     document.addEventListener("pointerdown", outside);
     document.addEventListener("focusin", outside);
@@ -76,6 +80,20 @@ export default function AdminPicker({ label, value, onChange, options = [], plac
       window.removeEventListener("scroll", scroll, true);
       window.removeEventListener("resize", place);
       window.visualViewport?.removeEventListener("resize", place);
+    };
+  }, [open]);
+
+  useEffect(() => {
+    if (!open) return;
+    const isMobile = typeof window !== "undefined" && window.innerWidth <= 768;
+    if (!isMobile) return;
+    const prevOverflow = document.body.style.overflow;
+    const prevTouchAction = document.body.style.touchAction;
+    document.body.style.overflow = "hidden";
+    document.body.style.touchAction = "none";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+      document.body.style.touchAction = prevTouchAction;
     };
   }, [open]);
   const positioned = Boolean(position);
@@ -114,7 +132,12 @@ export default function AdminPicker({ label, value, onChange, options = [], plac
       <div ref={popupRef} className={`ap-popover ${position?.mobile ? "is-mobile" : ""}`} onKeyDown={event => { if (event.key === "Escape") { event.preventDefault(); event.stopPropagation(); close(true); } }} style={position?.mobile ? { bottom: position.bottom, maxHeight: position.maxHeight } : position ? { left: position.left, top: position.top, bottom: position.bottom, width: position.width, maxHeight: position.maxHeight } : { visibility: "hidden" }}>
         <div className="ap-searchRow"><Search size={17} aria-hidden="true"/><input id={searchId} ref={searchRef} role="combobox" aria-label={`Cari ${label.toLowerCase()}`} aria-autocomplete="list" aria-expanded="true" aria-controls={listId} aria-activedescendant={filtered.length ? `${id}-option-${index}` : undefined} value={query} placeholder="Cari nama produk, paket, atau harga…" autoComplete="off" onChange={event => { setQuery(event.target.value); setActiveIndex(0); }} onKeyDown={keyboard}/><button type="button" className="ap-close" aria-label={`Tutup pilihan ${label.toLowerCase()}`} onClick={() => close(true)}><X size={17}/></button></div>
         <div id={listId} role="listbox" aria-label={label} className="ap-list">
-          {filtered.map((option, i) => <div key={String(option.value)} id={`${id}-option-${i}`} role="option" aria-label={[option.label, option.description, option.status, option.meta].filter(Boolean).join(" ")} aria-selected={String(option.value) === String(value)} className={`ap-option ${i === index ? "is-highlighted" : ""}`} onMouseDown={event => event.preventDefault()} onClick={() => choose(option)}>
+          {filtered.map((option, i) => <div key={String(option.value)} id={`${id}-option-${i}`} role="option" aria-label={[option.label, option.description, option.status, option.meta].filter(Boolean).join(" ")} aria-selected={String(option.value) === String(value)} className={`ap-option ${i === index ? "is-highlighted" : ""}`} onMouseDown={event => {
+            // Prevent search input blur only on fine pointer (mouse); on touch devices preventDefault cancels synthetic click
+            if (typeof window !== "undefined" && window.matchMedia?.("(pointer: fine)").matches) {
+              event.preventDefault();
+            }
+          }} onClick={() => choose(option)}>
             <PickerIcon option={option}/><span className="ap-optionCopy"><strong>{option.label}</strong>{option.description && <small>{option.description}</small>}{option.status && <span className={`ap-status ${option.statusTone === "muted" ? "is-muted" : ""}`}>{option.status}</span>}</span><span className="ap-optionEnd">{option.meta && <strong>{option.meta}</strong>}{String(option.value) === String(value) && <Check size={17} aria-hidden="true"/>}</span>
           </div>)}
           {!filtered.length && <p className="ap-empty">Tidak ada pilihan yang cocok. Coba kata lain.</p>}

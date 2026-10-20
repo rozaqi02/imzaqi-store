@@ -3,8 +3,8 @@
 export const SITE_PRIMARY_NAV = [
   { to: "/", label: "Beranda", shortLabel: "Beranda" },
   { to: "/produk", label: "Katalog", shortLabel: "Katalog" },
-  { to: "/faq", label: "FAQ", shortLabel: "FAQ" },
-  { to: "/testimoni", label: "Testimoni", shortLabel: "Ulasan" },
+  { to: "/faq", label: "Bantuan", shortLabel: "Bantuan" },
+  { to: "/testimoni", label: "Ulasan", shortLabel: "Ulasan" },
 ];
 
 export const SITE_DESKTOP_NAV = [
@@ -16,7 +16,7 @@ export const SITE_DESKTOP_NAV = [
 export const SITE_BOTTOM_NAV = [
   { to: "/", label: "Beranda", shortLabel: "Beranda" },
   { to: "/produk", label: "Katalog", shortLabel: "Katalog" },
-  { to: "/faq", label: "FAQ", shortLabel: "Bantuan" },
+  { to: "/faq", label: "Bantuan", shortLabel: "Bantuan" },
   { to: "/status", label: "Cek Status", shortLabel: "Status" },
 ];
 

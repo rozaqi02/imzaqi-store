@@ -19,15 +19,15 @@ export function isThinStock(stock) {
 
 /** List row: enough for cards + filters; skip heavy detail fields. */
 export const ORDER_SELECT_LIST =
-  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,customer_whatsapp,admin_note";
+  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,customer_whatsapp,admin_note,buyer_email";
 
 /** Full row for detail drawer / notes / proof. */
 export const ORDER_SELECT_DETAIL =
-  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp,notes,admin_note";
+  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,payment_proof_url,customer_whatsapp,notes,admin_note,buyer_email";
 
 /** Fallback when notes/admin_note columns missing. */
 export const ORDER_SELECT_LIST_FALLBACK =
-  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,customer_whatsapp";
+  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,customer_whatsapp,buyer_email";
 
 /** Short TTL for admin catalog (SWR-style session cache). */
 export const ADMIN_PRODUCTS_CACHE_TTL_MS = 20_000;

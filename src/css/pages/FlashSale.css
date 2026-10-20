@@ -55,7 +55,7 @@
   gap: 6px;
   width: fit-content;
   padding: 4px 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: var(--fsd-accent-light);
   border: 1px solid rgba(0, 158, 96, 0.2);
   color: var(--fsd-accent);
@@ -72,7 +72,7 @@
 
 .fsd-headline {
   margin: 14px 0 8px;
-  font-family: var(--font-display, "Outfit", -apple-system, sans-serif);
+  font-family: var(--font-display);
   font-size: clamp(26px, 3.2vw, 36px);
   font-weight: 800;
   line-height: 1.12;
@@ -135,7 +135,7 @@
 }
 
 .fsd-unit strong {
-  font-family: var(--font-mono, "SF Mono", monospace);
+  font-family: var(--font-mono);
   font-size: 20px;
   font-weight: 800;
   line-height: 1;
@@ -209,7 +209,7 @@
 }
 
 .fsd-logo > span {
-  font-family: var(--font-display, "Outfit", sans-serif);
+  font-family: var(--font-display);
   font-size: 36px;
   font-weight: 800;
   color: var(--fsd-accent);
@@ -224,7 +224,7 @@
   align-items: center;
   justify-content: center;
   padding: 3px 9px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: linear-gradient(135deg, #ff3366 0%, #e6004c 100%);
   color: #ffffff;
   border: 2px solid var(--fsd-card-bg);
@@ -237,7 +237,7 @@
 }
 
 .fsd-seal strong {
-  font-family: var(--font-display, "Outfit", sans-serif);
+  font-family: var(--font-display);
   font-size: 12px;
   font-weight: 900;
   letter-spacing: -0.02em;
@@ -300,7 +300,7 @@
 
 .fsd-price strong {
   color: var(--fsd-accent);
-  font-family: var(--font-display, "Outfit", sans-serif);
+  font-family: var(--font-display);
   font-size: clamp(22px, 2.5vw, 29px);
   font-weight: 900;
   line-height: 1;
@@ -512,7 +512,7 @@
 
 .fsd-choiceDiscount {
   margin-left: 6px;
-  font-family: var(--font-display, "Outfit", sans-serif);
+  font-family: var(--font-display);
   font-size: 12.5px;
   font-weight: 800;
   color: #e6004c;

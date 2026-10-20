@@ -54,7 +54,7 @@ where schemaname = 'public'
                     'daily_stats','visitor_daily_stats','page_visit_daily_stats','settings')
 order by tablename, indexname;
 
--- 7) CONSTRAINT pada promo_claims (khusus: cek unique (visitor_id, promo_code) dari 0002)
+-- 7) CONSTRAINT pada promo_claims (khusus: cek unique (visitor_id, code) dari 0002)
 select conname, pg_get_constraintdef(oid) as definition
 from pg_constraint
 where conrelid = 'public.promo_claims'::regclass

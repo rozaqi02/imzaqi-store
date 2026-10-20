@@ -5,10 +5,10 @@ const DESKTOP_ROW_COUNT = 4;
 // One source row must be wider than the stage. Three copies then keep both
 // directions continuously filled throughout the marquee animation.
 const DESKTOP_MIN_TILES = 18;
-const MOBILE_ROW_COUNT = 5;
-const MOBILE_MIN_TILES = 8;
+const MOBILE_ROW_COUNT = 4;
+const MOBILE_MIN_TILES = 12;
 const ROW_DURATIONS = ["88s", "104s", "96s", "112s"];
-const MOBILE_ROW_DURATIONS = ["120s", "136s", "128s", "144s", "124s"];
+const MOBILE_ROW_DURATIONS = ["56s", "66s", "60s", "70s"];
 
 function getBackdropConfig(caps, isNarrowViewport) {
   // A desktop touchscreen can report `pointer: coarse`. The backdrop should

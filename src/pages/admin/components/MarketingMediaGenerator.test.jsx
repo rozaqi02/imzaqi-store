@@ -89,4 +89,58 @@ describe("marketing generator preview", () => {
     await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(85000));
     expect(drawProductPoster.mock.calls.at(-1)[1].offer.outOfStock).toBe(true);
   });
+  it("allows switching catalogue mode to show all product variants instead of just starting price", async () => {
+    const multiVariantProducts = [
+      {
+        id: "1",
+        slug: "netflix",
+        name: "Netflix",
+        icon_url: "icon-1",
+        category: "streaming",
+        product_variants: [
+          { id: "v1-1", name: "1 Bulan Private", duration_label: "30 Hari", price_idr: 31000, stock: 5 },
+          { id: "v1-2", name: "3 Bulan Private", duration_label: "90 Hari", price_idr: 85000, stock: 3 },
+        ],
+      },
+      {
+        id: "2",
+        slug: "canva",
+        name: "Canva",
+        icon_url: "icon-2",
+        category: "design",
+        product_variants: [
+          { id: "v2-1", name: "Pro 1 Bulan", price_idr: 5000, stock: 10 },
+        ],
+      },
+    ];
+    render(<MarketingMediaGenerator products={multiVariantProducts}/>);
+    fireEvent.click(screen.getByRole("button", { name: /Katalog harga/ }));
+    await waitFor(() => expect(screen.getByRole("button", { name: "Download PNG" })).toBeEnabled());
+    expect(screen.getByText(/2 produk aktif/)).toBeInTheDocument();
+
+    // Switch to Semua Varian
+    fireEvent.click(screen.getByRole("button", { name: /Semua Varian/ }));
+    await waitFor(() => expect(screen.getByText(/3 paket \/ varian aktif/)).toBeInTheDocument());
+    await waitFor(() => expect(drawCatalogPoster.mock.calls.at(-1)[1].catalogScope).toBe("variants"));
+
+    const lastCall = drawCatalogPoster.mock.calls.at(-1)[1];
+    expect(lastCall.products).toHaveLength(3);
+    expect(lastCall.products.map(item => item.name)).toEqual(["Netflix", "Netflix", "Canva"]);
+    expect(lastCall.products.map(item => item.offer.variant)).toEqual([
+      "1 Bulan Private",
+      "3 Bulan Private",
+      "Pro 1 Bulan",
+    ]);
+
+    // Test product-level filter within variants mode
+    fireEvent.click(screen.getByRole("combobox", { name: "Filter produk (opsional)" }));
+    fireEvent.click(screen.getByRole("option", { name: /Netflix/ }));
+    await waitFor(() => expect(screen.getByText(/2 paket \/ varian aktif/)).toBeInTheDocument());
+    await waitFor(() => expect(drawCatalogPoster.mock.calls.at(-1)[1].products).toHaveLength(2));
+    const filteredCall = drawCatalogPoster.mock.calls.at(-1)[1];
+    expect(filteredCall.products.map(item => item.offer.variant)).toEqual([
+      "1 Bulan Private",
+      "3 Bulan Private",
+    ]);
+  });
 });

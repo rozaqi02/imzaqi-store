@@ -16,8 +16,6 @@ import {
   X,
 } from "lucide-react";
 
-import "../css/pages/Products.css";
-import "../css/pages/FlashSale.css";
 import { fetchProducts } from "../lib/api";
 import { warn } from "../lib/log";
 import CatalogCardSkeleton from "../components/CatalogCardSkeleton";
@@ -71,7 +69,7 @@ const SORT_LABELS = {
   name: "Nama A-Z",
   name_desc: "Nama Z-A",
   reco: "Rekomendasi",
-  popular: "Best Seller",
+  popular: "Paling laris",
   price_asc: "Termurah",
   price_desc: "Termahal",
   stock_desc: "Stok Terbanyak",
@@ -228,7 +226,7 @@ function FilterPanel({
         <div className="catalog-toggleGroup">
           <label className="catalog-toggleItem" htmlFor={readyToggleId}>
             <span className="catalog-toggleItemText">
-              <span className="catalog-toggleItemTitle">Ready</span>
+              <span className="catalog-toggleItemTitle">Tersedia</span>
               <span className="catalog-toggleItemHint">Stok aman, gas!</span>
             </span>
             <span className="catalog-toggle">
@@ -293,7 +291,7 @@ function FilterPanel({
           <option value="name">Nama A-Z</option>
           <option value="name_desc">Nama Z-A</option>
           <option value="reco">Rekomendasi</option>
-          <option value="popular">Best Seller</option>
+          <option value="popular">Paling laris</option>
           <option value="price_asc">Termurah</option>
           <option value="price_desc">Termahal</option>
           <option value="stock_desc">Stok Terbanyak</option>
@@ -499,7 +497,7 @@ export default function Products() {
   });
 
   usePageMeta({
-    title: "Produk",
+    title: "Katalog",
     description: "Katalog langganan premium - cari, bandingin, langsung checkout.",
   });
 
@@ -1430,7 +1428,15 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
         <div className="catalog-cardBrand">
           <div className="catalog-cardIcon">
             {product.icon_url ? (
-              <img src={product.icon_url} alt="" loading="lazy" decoding="async" />
+              <img
+                src={product.icon_url}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                width="48"
+                height="48"
+                style={{ aspectRatio: "1 / 1", objectFit: "cover" }}
+              />
             ) : (
               <span>{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>
             )}

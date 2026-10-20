@@ -197,57 +197,60 @@ html[data-theme="light"] .hx-hero-scrim {
   animation-play-state: paused;
 }
 
-/* Mobile: 5 rows, compact tiles, open at the top, fade at the bottom */
+/* Mobile: 4 rows, calibrated tiles, matching 3D perspective and speed */
 .hx-catalog-backdrop.is-mobile {
-  inset: 0 -18% -35%;
+  inset: 0 -18% -42%;
   opacity: 0.44;
   filter: none;
   -webkit-mask-image: linear-gradient(
     180deg,
     #000 0%,
-    #000 48%,
-    rgba(0, 0, 0, 0.48) 66%,
-    rgba(0, 0, 0, 0.14) 80%,
-    rgba(0, 0, 0, 0.02) 90%,
+    #000 56%,
+    rgba(0, 0, 0, 0.52) 74%,
+    rgba(0, 0, 0, 0.18) 88%,
+    rgba(0, 0, 0, 0.02) 96%,
     transparent 100%
   );
   mask-image: linear-gradient(
     180deg,
     #000 0%,
-    #000 48%,
-    rgba(0, 0, 0, 0.48) 66%,
-    rgba(0, 0, 0, 0.14) 80%,
-    rgba(0, 0, 0, 0.02) 90%,
+    #000 56%,
+    rgba(0, 0, 0, 0.52) 74%,
+    rgba(0, 0, 0, 0.18) 88%,
+    rgba(0, 0, 0, 0.02) 96%,
     transparent 100%
   );
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-stage {
-  width: 156%;
+  width: 132vw;
+  max-width: 1400px;
   top: calc(var(--site-header-offset, 56px) - 6px);
-  gap: 10px;
-  transform: translate(-50%, 0) scale(0.74);
+  gap: 12px;
+  /* Exact same receding wall angle and perspective as desktop */
+  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1);
   transform-origin: center top;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-row {
-  mask-image: none;
+  mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-track {
-  gap: 10px;
-  will-change: auto;
+  gap: 12px;
+  will-change: transform;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-tile {
-  width: 104px;
-  padding: 8px;
-  border-radius: 14px;
+  width: clamp(74px, 18vw, 88px);
+  padding: 7px;
+  border-radius: 12px;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-tile-icon {
   margin-bottom: 0;
-  border-radius: 11px;
+  border-radius: 10px;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-tile-icon img {
@@ -284,11 +287,11 @@ html[data-theme="light"] .hx-hero-scrim {
 }
 
 [data-motion="lite"] .hx-catalog-backdrop:not(.is-mobile) .hx-catalog-stage {
-  transform: translate(-50%, 0) scale(1);
+  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1);
 }
 
 [data-motion="lite"] .hx-catalog-backdrop.is-mobile .hx-catalog-stage {
-  transform: translate(-50%, 0) scale(0.78);
+  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1);
 }
 
 [data-motion="lite"] .hx-catalog-track {
@@ -296,7 +299,7 @@ html[data-theme="light"] .hx-hero-scrim {
 }
 
 [data-motion="lite"] .hx-catalog-backdrop.is-mobile .hx-catalog-track {
-  animation-duration: calc(var(--row-duration, 120s) * 1.7);
+  animation-duration: calc(var(--row-duration, 60s) * 1.25);
 }
 
 [data-motion="off"] .hx-catalog-track {

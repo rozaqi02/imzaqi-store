@@ -43,7 +43,7 @@
   display: grid;
   place-items: center;
   border: 0;
-  border-radius: 999px;
+  border-radius: 12px;
   background: #0a0a0a;
   color: #fff;
   cursor: pointer;
@@ -86,7 +86,7 @@ html[data-theme="dark"] .fsp-billboard {
   top: 20px;
   left: 20px;
   padding: 6px 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   background: #0a0a0a;
   color: #fff;
   font-size: 13px;
@@ -233,7 +233,7 @@ html[data-theme="dark"] .fsp-shop {
   gap: 6px;
   min-height: 34px;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid rgba(10, 10, 10, 0.1);
   background: transparent;
   color: inherit;

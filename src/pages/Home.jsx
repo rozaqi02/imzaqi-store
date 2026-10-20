@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { ArrowRight, ChevronDown, Search, X } from "lucide-react";
-import "../css/pages/Home.css";
 
 import Hero from "../components/Hero";
 

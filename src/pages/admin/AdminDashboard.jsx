@@ -52,6 +52,8 @@ import AdminPicker from "./components/AdminPicker";
 import TestimonialsPane from "./panes/TestimonialsPane";
 import SettingsPane from "./panes/SettingsPane";
 import MarketingPane from "./panes/MarketingPane";
+import FlashSalePane from "./panes/FlashSalePane";
+import { autoReleaseExpiredOrders } from "../../lib/orderExpiry";
 import {
   ADMIN_PRODUCTS_CACHE_TTL_MS,
   EMPTY_ANALYTICS_SUMMARY,
@@ -106,6 +108,7 @@ import {
   CATEGORY_OPTIONS,
   StatusBadge,
   buildWhatsAppLink,
+  buildWhatsAppActionLink,
   formatAdminDate,
   formatAdminDateTime,
   formatCompactNumber,
@@ -283,6 +286,60 @@ export default function AdminDashboard() {
   ordersRef.current = orders;
   const deferredProductQuery = useDeferredValue(productQuery);
   const deferredOrderQuery = useDeferredValue(orderQuery);
+  const [orderSearchingServer, setOrderSearchingServer] = useState(false);
+
+  // Server-side historical order search for Admin (Recommendation No. 2)
+  useEffect(() => {
+    const q = String(deferredOrderQuery || "").trim();
+    if (q.length < 2) return;
+
+    let active = true;
+    const timer = setTimeout(async () => {
+      setOrderSearchingServer(true);
+      try {
+        const clean = q.replace(/[%_]/g, "");
+        if (!clean) return;
+        const { data, error } = await supabase
+          .from("orders")
+          .select(ORDER_SELECT_DETAIL)
+          .or(`order_code.ilike.%${clean}%,customer_whatsapp.ilike.%${clean}%,buyer_email.ilike.%${clean}%,promo_code.ilike.%${clean}%`)
+          .order("created_at", { ascending: false })
+          .limit(60);
+
+        if (error) {
+          const { data: fallbackData } = await supabase
+            .from("orders")
+            .select(ORDER_SELECT_LIST_FALLBACK)
+            .or(`order_code.ilike.%${clean}%,customer_whatsapp.ilike.%${clean}%,buyer_email.ilike.%${clean}%,promo_code.ilike.%${clean}%`)
+            .order("created_at", { ascending: false })
+            .limit(60);
+          if (active && fallbackData?.length) {
+            setOrders((prev) => {
+              const existingIds = new Set((prev || []).map((o) => o.id));
+              const missing = fallbackData.filter((o) => !existingIds.has(o.id));
+              return missing.length ? [...missing, ...(prev || [])] : prev;
+            });
+          }
+        } else if (active && data?.length) {
+          setOrders((prev) => {
+            const existingIds = new Set((prev || []).map((o) => o.id));
+            const missing = data.filter((o) => !existingIds.has(o.id));
+            return missing.length ? [...missing, ...(prev || [])] : prev;
+          });
+        }
+      } catch (err) {
+        warn("Gagal pencarian server-side order:", err);
+      } finally {
+        if (active) setOrderSearchingServer(false);
+      }
+    }, 350);
+
+    return () => {
+      active = false;
+      clearTimeout(timer);
+    };
+  }, [deferredOrderQuery]);
+
   const waNumber = settings?.whatsapp?.number || "";
   const savedQrisBase = String(settings?.qris?.base_payload || "").trim();
   const envQrisBase = String(import.meta.env.VITE_QRIS_BASE || "").trim();
@@ -555,6 +612,9 @@ export default function AdminDashboard() {
     if (!force && loadedRef.current.orders && ordersBucketRef.current === orderBucket) {
       return ordersRef.current;
     }
+    // Auto-release expired reservations to eliminate ghost stock (Recommendation No. 1)
+    autoReleaseExpiredOrders().catch(() => {});
+
     const [nextOrders, nextClaims] = await Promise.all([
       loadOrdersAndPulse({ append: false, bucket: orderBucket }),
       loadedRef.current.claims && !force
@@ -1284,6 +1344,7 @@ export default function AdminDashboard() {
       const haystacks = [
         order?.order_code,
         order?.customer_whatsapp,
+        order?.buyer_email,
         order?.promo_code,
         order?.notes,
         order?.admin_note,
@@ -1997,6 +2058,20 @@ export default function AdminDashboard() {
     }
   }
 
+  async function copyBuyerEmail(email) {
+    const raw = String(email || "").trim();
+    if (!raw) {
+      toast.error("Email buyer kosong");
+      return;
+    }
+    try {
+      await copyToClipboard(raw);
+      toast.success("Email buyer disalin");
+    } catch {
+      toast.error("Gagal menyalin email");
+    }
+  }
+
   async function updateOrderStatus(orderId, status) {
     const tid = toast.loading("Update status");
     setMsg("");
@@ -2006,18 +2081,27 @@ export default function AdminDashboard() {
       const orderToUpdate = orders.find((o) => o.id === orderId);
       const customerWa = orderToUpdate?.customer_whatsapp || "";
 
+      // Optimistic update so UI reflects change immediately
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
+      if (ordersRef.current) {
+        ordersRef.current = ordersRef.current.map((o) => (o.id === orderId ? { ...o, status } : o));
+      }
+
       if (status === "cancelled") {
         // Use RPC that atomically restores stock + promo slot
         const { data, error } = await supabase.rpc("cancel_order_with_stock_restore", {
           p_order_id: orderId,
         });
-        if (error) throw error;
+        if (error) {
+          await refreshOrders({ force: true });
+          throw error;
+        }
         const result = data || {};
         const extra = result.restored_stock
           ? ` (stok +${result.restored_stock}${result.restored_promo ? ", promo dikembalikan" : ""})`
           : "";
         invalidateProductCaches();
-        await Promise.all([refreshOrders(), refreshProducts({ force: true })]);
+        await Promise.all([refreshOrders({ force: true }), refreshProducts({ force: true })]);
         toast.remove(tid);
 
         // Toast with WA redirect button for cancellation
@@ -2041,8 +2125,11 @@ export default function AdminDashboard() {
         }
       } else {
         const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
-        if (error) throw error;
-        await refreshOrders();
+        if (error) {
+          await refreshOrders({ force: true });
+          throw error;
+        }
+        await refreshOrders({ force: true });
         toast.remove(tid);
 
         const statusLabel = prettyOrderStatus(status);
@@ -2079,10 +2166,14 @@ export default function AdminDashboard() {
 
     try {
       const admin_note = String(adminNoteDrafts[orderId] || "").trim() || null;
+      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, admin_note } : o)));
+      if (ordersRef.current) {
+        ordersRef.current = ordersRef.current.map((o) => (o.id === orderId ? { ...o, admin_note } : o));
+      }
       const { error } = await supabase.from("orders").update({ admin_note }).eq("id", orderId);
       if (error) throw error;
 
-      await refreshOrders();
+      await refreshOrders({ force: true });
       toast.remove(tid);
       toast.success("Catatan admin disimpan", { duration: 1200 });
     } catch (e) {
@@ -2468,6 +2559,16 @@ export default function AdminDashboard() {
   }[activeTab.id];
 
   const activeOrderWhatsApp = activeOrder ? buildWhatsAppLink(activeOrder.customer_whatsapp) : "";
+  const activeOrderBuyerEmail = useMemo(() => {
+    if (!activeOrder) return "";
+    if (activeOrder.buyer_email && String(activeOrder.buyer_email).trim()) {
+      return String(activeOrder.buyer_email).trim();
+    }
+    const match = String(activeOrder.notes || "").match(/Email buyer:\s*([^\s\n\r]+)/i);
+    if (match && match[1]) return match[1].trim();
+    const rawMatch = String(activeOrder.notes || "").match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/);
+    return rawMatch ? rawMatch[0].trim() : "";
+  }, [activeOrder]);
   const flashSaleEndingSoon = flashSales.some((fs) => {
     const now = new Date();
     const end = new Date(fs.ends_at);
@@ -3553,6 +3654,7 @@ export default function AdminDashboard() {
                       {orderBucket === "attention"
                         ? `${orderStats.live} perlu aksi (semua di database)`
                         : `${filteredOrders.length} di halaman ini · ${orderStats.total} total di database`}
+                      {orderSearchingServer ? <span className="admin-orderSearchHint"> · Mencari di database...</span> : null}
                     </div>
                   </div>
                   <div className="admin-panel-headActions">
@@ -4132,238 +4234,21 @@ export default function AdminDashboard() {
             )}
 
             {tab === "flashsale" ? (
-              <div className="admin-panel admin-panel--fill admin-flashsalePanel admin-workspacePane">
-                <div className="admin-panel-head admin-panel-head--split">
-                  <div>
-                    <div className="admin-panel-title">Flash sale</div>
-                    <div className="admin-panel-sub">{liveFlashCount} live sekarang</div>
-                  </div>
-                  <div className="admin-panel-headActions">
-                    <button className="btn btn-sm btn-primary" type="button" onClick={() => setFlashFormOpen(true)}>
-                      <Plus size={14} /> Buat
-                    </button>
-                  </div>
-                </div>
-
-                <div className="admin-panel-body admin-panel-body--scroll">
-                  {flashFormOpen ? (
-                    <div className="admin-promo-card" style={{ marginBottom: 16, padding: 16 }}>
-                      <div className="admin-panel-title" style={{ fontSize: 14, marginBottom: 12 }}>
-                        {flashForm.id ? "Edit Flash Sale" : "Buat Flash Sale Baru"}
-                      </div>
-                      <div className="admin-form-grid">
-                        <div className="admin-field-full">
-                          <AdminPicker label="Varian flash sale" placeholder="Pilih produk dan paket" value={flashForm.variant_id} options={flashVariantOptions} onChange={id => setFlashForm(f => ({ ...f, variant_id: id }))}/>
-                        </div>
-                        <label className="admin-field">
-                          <span>Diskon (%)</span>
-                          <input
-                            className="input"
-                            type="number"
-                            min="1"
-                            max="99"
-                            placeholder="10"
-                            value={flashForm.discount_percent}
-                            onChange={(e) => setFlashForm((f) => ({ ...f, discount_percent: e.target.value }))}
-                          />
-                        </label>
-                        <label className="admin-field">
-                          <span>Mulai</span>
-                          <input
-                            className="input"
-                            type="datetime-local"
-                            value={flashForm.starts_at}
-                            onChange={(e) => setFlashForm((f) => ({ ...f, starts_at: e.target.value }))}
-                          />
-                        </label>
-                        <label className="admin-field">
-                          <span>Berakhir</span>
-                          <input
-                            className="input"
-                            type="datetime-local"
-                            value={flashForm.ends_at}
-                            onChange={(e) => setFlashForm((f) => ({ ...f, ends_at: e.target.value }))}
-                          />
-                        </label>
-                      </div>
-                      {flashForm.variant_id && flashForm.discount_percent ? (() => {
-                        const v = allVariants.find(x => x.id === flashForm.variant_id);
-                        if (!v) return null;
-                        const discounted = Math.round(v.price_idr * (1 - Number(flashForm.discount_percent) / 100));
-                        return (
-                          <div className="admin-promo-preview" style={{ marginTop: 8 }}>
-                            <span className="admin-promo-previewLabel">Preview harga</span>
-                            <div style={{ display: 'flex', gap: 8, alignItems: 'center', marginTop: 4 }}>
-                              <span style={{ textDecoration: 'line-through', color: 'var(--brand-muted)', fontSize: 13 }}>{formatIDR(v.price_idr)}</span>
-                              <span className="admin-promo-previewPrice">{formatIDR(discounted)}</span>
-                              <span style={{ fontSize: 11, color: 'var(--brand-muted)' }}>(-{flashForm.discount_percent}%)</span>
-                            </div>
-                          </div>
-                        );
-                      })() : null}
-                      <div className="admin-form-actions" style={{ marginTop: 12 }}>
-                        <button
-                          className="btn btn-ghost btn-sm"
-                          type="button"
-                          onClick={() => {
-                            setFlashFormOpen(false);
-                            setFlashForm({ variant_id: "", discount_percent: "", starts_at: "", ends_at: "" });
-                          }}
-                        >
-                          Batal
-                        </button>
-                        <button
-                          className="btn btn-sm"
-                          type="button"
-                          onClick={async () => {
-                            if (!flashForm.variant_id || !flashForm.discount_percent || !flashForm.starts_at || !flashForm.ends_at) {
-                              toast.error("Lengkapi semua field");
-                              return;
-                            }
-                            const disc = Math.floor(Number(flashForm.discount_percent));
-                            if (!Number.isFinite(disc) || disc < 1 || disc > 99) {
-                              toast.error("Diskon flash sale harus antara 1% – 99%");
-                              return;
-                            }
-                            if (new Date(flashForm.ends_at) <= new Date(flashForm.starts_at)) {
-                              toast.error("Tanggal selesai harus setelah tanggal mulai");
-                              return;
-                            }
-                            const tid = toast.loading("Menyimpan flash sale");
-                            try {
-                              if (flashForm.id) {
-                                await updateFlashSale(flashForm.id, {
-                                  variant_id: flashForm.variant_id,
-                                  discount_percent: disc,
-                                  starts_at: new Date(flashForm.starts_at).toISOString(),
-                                  ends_at: new Date(flashForm.ends_at).toISOString(),
-                                });
-                              } else {
-                                await createFlashSale({
-                                  variant_id: flashForm.variant_id,
-                                  discount_percent: disc,
-                                  starts_at: new Date(flashForm.starts_at).toISOString(),
-                                  ends_at: new Date(flashForm.ends_at).toISOString(),
-                                });
-                              }
-                              setFlashSales(await fetchAllFlashSales());
-                              setFlashFormOpen(false);
-                              setFlashForm({ variant_id: "", discount_percent: "", starts_at: "", ends_at: "" });
-                              toast.remove(tid);
-                              toast.success("Flash sale disimpan");
-                            } catch (e) {
-                              toast.remove(tid);
-                              toast.error(e?.message || "Gagal simpan flash sale");
-                            }
-                          }}
-                        >
-                          Simpan
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
-
-                  {flashSales.length === 0 ? (
-                    <div className="admin-emptyInline">Belum ada flash sale. Klik "Buat Flash Sale" untuk mulai.</div>
-                  ) : (
-                    <div className="admin-promo-grid">
-                      {flashSales.map((fs) => {
-                        const now = new Date();
-                        const isExpired = new Date(fs.ends_at) < now;
-                        const isUpcoming = new Date(fs.starts_at) > now;
-                        const isLive = !isExpired && !isUpcoming && fs.is_active;
-                        const variant = allVariants.find((v) => v.id === fs.variant_id);
-                        const product = (products || []).find((p) =>
-                          (p.product_variants || []).some((v) => v.id === fs.variant_id)
-                        );
-
-                        return (
-                          <div key={fs.id} className={`admin-promo-card ${isExpired ? "is-expired" : ""}`}>
-                            <div className="admin-promo-cardTop">
-                              <div className="admin-promo-cardLeft">
-                                <div className="admin-promo-cardCode">
-                                  <span>{product?.name || "?"} - {variant?.name || fs.variant_id.slice(0, 8)}</span>
-                                </div>
-                                <span className={`admin-promoBadge ${isLive ? "active" : isExpired ? "expired" : "off"}`}>
-                                  {isLive ? "Live" : isExpired ? "Berakhir" : isUpcoming ? "Akan datang" : "Nonaktif"}
-                                </span>
-                              </div>
-                              <div className="admin-promo-cardDiscount">{fs.discount_percent}%</div>
-                            </div>
-
-                            <div className="admin-promo-cardMeta">
-                              <span>Mulai: {new Date(fs.starts_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
-                              <span>Akhir: {new Date(fs.ends_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" })}</span>
-                            </div>
-
-                            <div className="admin-promo-cardActions">
-                              <button
-                                className="btn btn-sm btn-ghost"
-                                type="button"
-                                onClick={() => {
-                                  setFlashForm({
-                                    id: fs.id,
-                                    variant_id: fs.variant_id,
-                                    discount_percent: String(fs.discount_percent),
-                                    starts_at: toLocalDatetimeInput(fs.starts_at),
-                                    ends_at: toLocalDatetimeInput(fs.ends_at),
-                                  });
-                                  setFlashFormOpen(true);
-                                }}
-                              >
-                                Edit
-                              </button>
-                              <button
-                                className="btn btn-sm btn-danger"
-                                type="button"
-                                onClick={() => {
-                                  openConfirm({
-                                    title: "Hapus flash sale",
-                                    message: "Hapus flash sale ini?",
-                                    confirmLabel: "Ya, hapus",
-                                    danger: true,
-                                    onConfirm: async () => {
-                                      const tid = toast.loading("Menghapus");
-                                      try {
-                                        await deleteFlashSale(fs.id);
-                                        setFlashSales(await fetchAllFlashSales());
-                                        toast.remove(tid);
-                                        toast.success("Dihapus");
-                                      } catch (e) {
-                                        toast.remove(tid);
-                                        toast.error("Gagal hapus");
-                                      }
-                                    },
-                                  });
-                                }}
-                              >
-                                Hapus
-                              </button>
-                              <button
-                                className="btn btn-sm btn-ghost"
-                                type="button"
-                                onClick={async () => {
-                                  const tid = toast.loading("Update");
-                                  try {
-                                    await updateFlashSale(fs.id, { is_active: !fs.is_active });
-                                    setFlashSales(await fetchAllFlashSales());
-                                    toast.remove(tid);
-                                  } catch (e) {
-                                    toast.remove(tid);
-                                    toast.error("Gagal update");
-                                  }
-                                }}
-                              >
-                                {fs.is_active ? "Nonaktifkan" : "Aktifkan"}
-                              </button>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-                </div>
-              </div>
+              <FlashSalePane
+                flashSales={flashSales}
+                liveFlashCount={liveFlashCount}
+                allVariants={allVariants}
+                products={products}
+                flashVariantOptions={flashVariantOptions}
+                formatIDR={formatIDR}
+                toast={toast}
+                openConfirm={openConfirm}
+                fetchAllFlashSales={fetchAllFlashSales}
+                createFlashSale={createFlashSale}
+                updateFlashSale={updateFlashSale}
+                deleteFlashSale={deleteFlashSale}
+                setFlashSales={setFlashSales}
+              />
             ) : null}
 
             {tab === "testimonials" ? (
@@ -4755,6 +4640,26 @@ export default function AdminDashboard() {
                   <small>Tidak ada nomor WA</small>
                 )}
               </div>
+              {activeOrderBuyerEmail ? (
+                <div className="admin-orderMetaCard">
+                  <span>Email buyer (aktivasi)</span>
+                  <div className="admin-orderMetaValueRow">
+                    <strong style={{ wordBreak: "break-all" }}>{activeOrderBuyerEmail}</strong>
+                    <button
+                      className="btn btn-ghost btn-sm admin-copyPhoneBtn"
+                      type="button"
+                      onClick={() => copyBuyerEmail(activeOrderBuyerEmail)}
+                      title="Salin email buyer"
+                    >
+                      <Copy size={14} />
+                      Salin
+                    </button>
+                  </div>
+                  <a href={`mailto:${activeOrderBuyerEmail}`} target="_blank" rel="noreferrer">
+                    Kirim Email
+                  </a>
+                </div>
+              ) : null}
               <div className="admin-orderMetaCard">
                 <span>Status sekarang</span>
                 <strong>{prettyOrderStatus(activeOrder.status)}</strong>
@@ -4840,6 +4745,57 @@ export default function AdminDashboard() {
                     Tanpa bukti bayar
                   </span>
                 )}
+              </div>
+
+              <div className="admin-order-waQuickActions" style={{ marginTop: 12, paddingTop: 10, borderTop: "1px dashed var(--line, rgba(255, 255, 255, 0.1))" }}>
+                <div className="admin-order-notesTitle" style={{ fontSize: 12, marginBottom: 6 }}>⚡ Aksi Cepat Kirim WhatsApp:</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => {
+                      const link = buildWhatsAppActionLink(activeOrder, "credentials", adminNoteDrafts[activeOrder.id]);
+                      if (link) window.open(link, "_blank");
+                    }}
+                    disabled={!activeOrder.customer_whatsapp}
+                    title="Kirim kredensial/akun yang ditulis di catatan ke WhatsApp customer"
+                  >
+                    🔑 Kirim Akun Ready
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => {
+                      const link = buildWhatsAppActionLink(activeOrder, "processing");
+                      if (link) window.open(link, "_blank");
+                    }}
+                    disabled={!activeOrder.customer_whatsapp}
+                  >
+                    ⚡ Sedang Diproses
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => {
+                      const link = buildWhatsAppActionLink(activeOrder, "payment_reminder");
+                      if (link) window.open(link, "_blank");
+                    }}
+                    disabled={!activeOrder.customer_whatsapp}
+                  >
+                    💰 Tagihan Bayar
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => {
+                      const link = buildWhatsAppActionLink(activeOrder, "review_request");
+                      if (link) window.open(link, "_blank");
+                    }}
+                    disabled={!activeOrder.customer_whatsapp}
+                  >
+                    ⭐ Minta Review
+                  </button>
+                </div>
               </div>
             </div>
           </div>

@@ -267,7 +267,7 @@ html[data-theme="light"] .adm-sidebarGreeting {
   min-width: 16px;
   height: 16px;
   padding: 0 4px;
-  border-radius: 999px;
+  border-radius: 6px;
   display: grid;
   place-items: center;
   font-size: 9px;
@@ -563,19 +563,21 @@ html[data-theme="light"] .adm-sidebarGreeting {
     grid-auto-rows: auto;
     align-items: stretch;
     position: fixed;
-    left: 0;
-    right: 0;
-    bottom: 0;
+    left: max(14px, env(safe-area-inset-left));
+    right: max(14px, env(safe-area-inset-right));
+    bottom: calc(8px + env(safe-area-inset-bottom));
     z-index: 90;
-    width: 100%;
+    width: auto;
     max-width: 100vw;
     box-sizing: border-box;
-    padding: 6px 6px calc(6px + env(safe-area-inset-bottom));
-    gap: 2px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    background: rgba(12, 18, 26, 0.96);
-    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.28);
-    backdrop-filter: blur(12px);
+    padding: 6px 8px;
+    gap: 4px;
+    border: 1px solid var(--liquid-glass-border, rgba(255, 255, 255, 0.12));
+    border-radius: 22px;
+    background: var(--nav-shell-surface-bottom, rgba(12, 18, 26, 0.92));
+    box-shadow: var(--nav-shell-shadow-bottom, 0 20px 48px rgba(0, 0, 0, 0.55));
+    backdrop-filter: var(--liquid-glass-blur) var(--liquid-glass-saturate);
+    -webkit-backdrop-filter: var(--liquid-glass-blur) var(--liquid-glass-saturate);
     /* Prevent accidental wrap if any child grows */
     overflow: hidden;
   }
@@ -607,6 +609,30 @@ html[data-theme="light"] .adm-sidebarGreeting {
   .adm-dockBtn.is-active {
     color: #b8fff0;
     background: rgba(0, 214, 180, 0.1);
+  }
+
+  .adm-dockBtn {
+    position: relative;
+  }
+
+  .adm-dockBtn.is-active::before {
+    content: "";
+    position: absolute;
+    top: 3px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 20px;
+    height: 3px;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #00f5c4, #38bdf8);
+    box-shadow:
+      0 0 10px rgba(0, 245, 196, 0.7),
+      0 0 4px rgba(56, 189, 248, 0.9);
+  }
+
+  html[data-theme="light"] .adm-dockBtn.is-active::before {
+    background: linear-gradient(90deg, #00a86b, #0284c7);
+    box-shadow: 0 0 8px rgba(0, 168, 107, 0.5);
   }
 
   .adm-dockIcon {
@@ -782,9 +808,9 @@ html[data-theme="light"] .adm-footBtn--danger:hover {
 
 @media (max-width: 720px) {
   html[data-theme="light"] .adm-dock {
-    background: rgba(255, 255, 255, 0.96);
-    border-top-color: rgba(0, 138, 148, 0.12);
-    box-shadow: 0 -8px 24px rgba(67, 111, 129, 0.1);
+    background: var(--nav-shell-surface-bottom, rgba(255, 255, 255, 0.92));
+    border: 1px solid rgba(0, 158, 96, 0.14);
+    box-shadow: var(--nav-shell-shadow-bottom, 0 16px 40px rgba(45, 85, 100, 0.16));
   }
 
   html[data-theme="light"] .adm-dockBtn {

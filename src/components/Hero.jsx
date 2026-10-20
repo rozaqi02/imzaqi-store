@@ -1,199 +1,16 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Eye,
   Package,
-  Search,
   ShoppingBag,
-  X,
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
 import NumberCounter from "./NumberCounter";
 import { supabase } from "../lib/supabaseClient";
-import TypewriterSearchInput from "./TypewriterSearchInput";
 import { useDeviceCapability } from "../hooks/useIsMobile";
-import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
 import HeroCatalogBackdrop from "./HeroCatalogBackdrop";
-
-const SEARCH_QUERIES = [
-  "Netflix Premium",
-  "Spotify Family",
-  "YouTube Premium",
-  "Canva Pro",
-  "ChatGPT Plus",
-  "Disney+ Hotstar",
-];
-
-/* ── Search ── */
-function HeroSearch({ products = [] }) {
-  const nav = useNavigate();
-  const wrapRef = useRef(null);
-  const searchInputRef = useRef(null);
-  const listboxId = "hero-search-listbox";
-  const [q, setQ] = useState("");
-  const [open, setOpen] = useState(false);
-  const [activeIdx, setActiveIdx] = useState(-1);
-  const [historyTick, setHistoryTick] = useState(0);
-
-  const suggestions = useMemo(() => {
-    if (!q.trim()) {
-      void historyTick;
-      return open ? getSearchHistory() : [];
-    }
-    const s = q.trim().toLowerCase();
-    const words = [];
-    (products || []).forEach((p) => {
-      if (p?.name) words.push(p.name);
-      (p?.product_variants || []).forEach((v) => {
-        if (v?.name) words.push(`${p.name} \u2013 ${v.name}`);
-      });
-    });
-    return Array.from(new Set(words.filter(Boolean)))
-      .filter((x) => x.toLowerCase().includes(s))
-      .slice(0, 5);
-  }, [q, products, open, historyTick]);
-
-  useEffect(() => {
-    if (activeIdx >= suggestions.length) setActiveIdx(-1);
-  }, [activeIdx, suggestions.length]);
-
-  useEffect(() => {
-    const onDoc = (e) => {
-      if (wrapRef.current && !wrapRef.current.contains(e.target)) {
-        setOpen(false);
-        setActiveIdx(-1);
-      }
-    };
-    document.addEventListener("mousedown", onDoc);
-    return () => document.removeEventListener("mousedown", onDoc);
-  }, []);
-
-  const goSearch = useCallback(
-    (value) => {
-      const term = String(value || q || "").trim();
-      if (!term) return;
-      pushSearchHistory(term);
-      setOpen(false);
-      setActiveIdx(-1);
-      nav(`/produk?q=${encodeURIComponent(term)}`);
-    },
-    [nav, q]
-  );
-
-  return (
-    <div className="search-dropdown-anchor hx-search-wrap" ref={wrapRef}>
-      <div className="hero-search-shell">
-        <TypewriterSearchInput
-          ref={searchInputRef}
-          className="input hero-search-input"
-          words={SEARCH_QUERIES}
-          value={q}
-          aria-label="Cari produk"
-          role="combobox"
-          aria-autocomplete="list"
-          aria-expanded={open && suggestions.length > 0}
-          aria-controls={open && suggestions.length > 0 ? listboxId : undefined}
-          aria-activedescendant={
-            activeIdx >= 0 ? `${listboxId}-option-${activeIdx}` : undefined
-          }
-          onFocus={() => setOpen(true)}
-          onChange={(e) => {
-            setQ(e.target.value);
-            setOpen(true);
-            setActiveIdx(-1);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "ArrowDown" && suggestions.length > 0) {
-              e.preventDefault();
-              setOpen(true);
-              setActiveIdx((p) => (p >= suggestions.length - 1 ? 0 : p + 1));
-              return;
-            }
-            if (e.key === "ArrowUp" && suggestions.length > 0) {
-              e.preventDefault();
-              setOpen(true);
-              setActiveIdx((p) => (p <= 0 ? suggestions.length - 1 : p - 1));
-              return;
-            }
-            if (e.key === "Enter") {
-              if (open && activeIdx >= 0 && suggestions[activeIdx]) {
-                e.preventDefault();
-                goSearch(suggestions[activeIdx]);
-                return;
-              }
-              e.preventDefault();
-              goSearch();
-            }
-            if (e.key === "Escape") {
-              setOpen(false);
-              setActiveIdx(-1);
-            }
-          }}
-        />
-        {q ? (
-          <button
-            type="button"
-            className="hero-search-clear"
-            onClick={() => {
-              setQ("");
-              setOpen(false);
-              setActiveIdx(-1);
-            }}
-            aria-label="Hapus pencarian"
-          >
-            <X size={14} />
-          </button>
-        ) : null}
-        <button
-          className="hx-search-btn"
-          onClick={() => goSearch()}
-          type="button"
-          aria-label="Cari produk"
-        >
-          <Search size={16} aria-hidden="true" />
-        </button>
-      </div>
-
-      {open && suggestions.length > 0 ? (
-        <div className="suggestions suggestions--animate" role="listbox" id={listboxId}>
-          {!q.trim() ? (
-            <div className="catalog-searchHistoryHead">
-              <span className="catalog-searchHistoryLabel">Pencarian terakhir</span>
-              <button
-                type="button"
-                className="catalog-searchHistoryClear"
-                onClick={() => {
-                  clearSearchHistory();
-                  setHistoryTick((tick) => tick + 1);
-                  setActiveIdx(-1);
-                }}
-              >
-                Hapus
-              </button>
-            </div>
-          ) : null}
-          {suggestions.map((sug, idx) => (
-            <button
-              key={sug}
-              id={`${listboxId}-option-${idx}`}
-              className={`suggestion-item${idx === activeIdx ? " is-active" : ""}`}
-              style={{ "--suggest-i": idx }}
-              onClick={() => goSearch(sug)}
-              onMouseEnter={() => setActiveIdx(idx)}
-              type="button"
-              role="option"
-              aria-selected={idx === activeIdx}
-            >
-              <Search size={13} />
-              <span>{sug}</span>
-            </button>
-          ))}
-        </div>
-      ) : null}
-    </div>
-  );
-}
 
 function ActiveShoppersBadge() {
   const [activeShoppers, setActiveShoppers] = useState(1);
@@ -328,10 +145,6 @@ export default function Hero({ products = [] }) {
             <p className="hx-subtitle">
               Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
             </p>
-
-            <div className="hx-search-section">
-              <HeroSearch products={products} />
-            </div>
 
             <div className="hx-ctas-row">
               <Link className="hx-btn-primary" to="/produk">

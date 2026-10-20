@@ -21,15 +21,33 @@
 @import "./css/neumorphic-depth.css";
 @import "./css/hero-animations.css";
 
+/* Storefront route foundations. Keep these in one predictable cascade instead
+   of injecting a new stylesheet whenever a lazy route mounts. */
+@import "./css/support-surfaces.css";
+@import "./css/checkout-steps.css";
+@import "./css/pages/Home.css";
+@import "./css/pages/Products.css";
+@import "./css/pages/FlashSale.css";
+@import "./css/pages/ProductDetail.css";
+@import "./css/pages/Checkout.css";
+@import "./css/pages/Pay.css";
+@import "./css/pages/Status.css";
+@import "./css/pages/OrderHistory.css";
+@import "./css/pages/Faq.css";
+@import "./css/pages/Testimonials.css";
+@import "./css/pages/NotFound.css";
+
 /* Shared components */
 @import "./components/AcademicPopup.css";
 @import "./components/AbandonedCartBanner.css";
 @import "./components/CheckoutTrustBlock.css";
 @import "./components/FlashSalePopup.css";
 @import "./components/HeroCatalogBackdrop.css";
+@import "./components/NewProductPopup.css";
 @import "./components/ProductTile.css";
 @import "./components/RecentlyViewed.css";
 @import "./components/SocialProofStrip.css";
+@import "./components/StorefrontHero.css";
 @import "./components/SwUpdateToast.css";
 @import "./components/TrustStrip.css";
 @import "./css/storefront-chrome.css";

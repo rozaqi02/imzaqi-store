@@ -67,6 +67,39 @@ export function paginateCatalog(products, size = 10) {
   return pages;
 }
 
+export function buildCatalogEntries(products, scope = "products", discounts = new Map(), selectedProductId = "all") {
+  const active = (products || []).filter(p => p.is_active !== false);
+  const targetProducts = selectedProductId && selectedProductId !== "all"
+    ? active.filter(p => String(p.id) === String(selectedProductId))
+    : active;
+
+  if (scope === "variants") {
+    const entries = [];
+    for (const product of targetProducts) {
+      const variants = activeVariants(product);
+      for (const variant of variants) {
+        entries.push({
+          id: `${product.id}-${variant.id}`,
+          name: product.name,
+          icon_url: product.icon_url,
+          slug: product.slug,
+          product,
+          variant,
+          offer: posterOffer(product, variant, discounts),
+        });
+      }
+    }
+    return entries;
+  }
+
+  return targetProducts.map(product => ({
+    ...product,
+    product,
+    variant: chooseVariant(product, "", discounts),
+    offer: posterOffer(product, chooseVariant(product, "", discounts), discounts),
+  }));
+}
+
 export function normalizeMediaPhone(value) {
   const digits = String(value || "").replace(/\D/g, "");
   return digits.startsWith("0") ? `62${digits.slice(1)}` : digits;

@@ -183,7 +183,7 @@ html[data-theme="light"] .admin-gate-skel {
 
 .admin-gate-skel--nav {
   height: 36px;
-  border-radius: 999px;
+  border-radius: 12px;
 }
 
 .admin-gate-skelRow {

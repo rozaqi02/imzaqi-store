@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { formatIDR } from "../../lib/format";
 import { getOrderStatusTone, prettyOrderStatus } from "../../lib/orderStatus";
 
@@ -151,4 +151,70 @@ export function normalizeWhatsApp(value) {
 export function buildWhatsAppLink(number) {
   const digits = normalizeWhatsApp(number);
   return digits ? `https://wa.me/${digits}` : "";
+}
+
+export const WHATSAPP_ACTION_TEMPLATES = [
+  { id: "credentials", label: "🔑 Kirim Akun Ready", desc: "Kirim detail akun & status ke buyer" },
+  { id: "processing", label: "⚡ Sedang Diproses", desc: "Konfirmasi pembayaran diterima" },
+  { id: "payment_reminder", label: "💰 Tagihan Pembayaran", desc: "Follow up order yang belum dibayar" },
+  { id: "review_request", label: "⭐ Minta Review / Rating", desc: "Ajak buyer beri ulasan di status" },
+  { id: "chat", label: "💬 Chat Langsung", desc: "Chat WhatsApp umum dengan ID order" },
+];
+
+export function buildWhatsAppMessage({ order, type = "chat", customNote = "" }) {
+  const orderCode = order?.order_code || order?.id || "-";
+  const total = formatIDR(order?.total_idr || 0);
+  const items = getSafeOrderItems(order);
+  const itemsSummary = items.length
+    ? items.map(formatOrderItemSummary).join("\n- ")
+    : "-";
+  const note = String(customNote || order?.admin_note || "").trim();
+  const origin = typeof window !== "undefined" && window.location?.origin
+    ? window.location.origin
+    : "https://imzaqistore.com";
+  const statusUrl = `${origin}/status?order=${encodeURIComponent(orderCode)}`;
+
+  switch (type) {
+    case "credentials":
+    case "account_ready":
+      return (
+        `Halo kak! Akun pesanan kamu sudah siap digunakan 🎉\n\n` +
+        `📦 Detail Order:\n- ID: ${orderCode}\n- Paket:\n- ${itemsSummary}\n\n` +
+        `🔑 Detail Akun / Kredensial:\n${note ? note : "Silakan cek langsung di link status pesanan kamu."}\n\n` +
+        `🔗 Cek Status & Info Garansi:\n${statusUrl}\n\n` +
+        `Jika ada kendala login atau pertanyaan seputar akun, silakan balas chat ini ya kak. Terima kasih sudah belanja di Imzaqi Store! ✨`
+      );
+    case "processing":
+      return (
+        `Halo kak! Pembayaran untuk pesanan kamu sudah kami terima dan sedang diproses 👍\n\n` +
+        `📦 Detail Order:\n- ID: ${orderCode}\n- Paket:\n- ${itemsSummary}\n- Total: ${total}\n\n` +
+        `🔗 Lacak Status Pesanan:\n${statusUrl}\n\n` +
+        `Mohon ditunggu sebentar ya kak, kredensial/akun pesanan kamu sedang disiapkan admin.`
+      );
+    case "payment_reminder":
+      return (
+        `Halo kak! Mengingatkan pesanan kamu di Imzaqi Store masih menunggu pembayaran:\n\n` +
+        `📦 Detail Order:\n- ID: ${orderCode}\n- Paket:\n- ${itemsSummary}\n- Total Tagihan: ${total}\n\n` +
+        `🔗 Lanjutkan Pembayaran & Konfirmasi:\n${statusUrl}\n\n` +
+        `Silakan transfer dan upload bukti bayar di link tersebut agar pesanan langsung kami proses. Butuh bantuan? Balas chat ini ya kak!`
+      );
+    case "review_request":
+    case "completed":
+      return (
+        `Halo kak, pesanan ${orderCode} sudah selesai kami kirimkan! 🎉\n\n` +
+        `Semoga layanannya memuaskan ya kak. Kami akan sangat berterima kasih jika kakak berkenan meluangkan 1 menit untuk memberi rating & ulasan di link ini:\n` +
+        `🔗 ${statusUrl}\n\n` +
+        `Terima kasih banyak atas kepercayaannya pada Imzaqi Store! 🙏`
+      );
+    case "chat":
+    default:
+      return `Halo kak! Perihal pesanan dengan ID ${orderCode} di Imzaqi Store...`;
+  }
+}
+
+export function buildWhatsAppActionLink(order, type = "chat", customNote = "") {
+  const digits = normalizeWhatsApp(order?.customer_whatsapp || "");
+  if (!digits) return "";
+  const msg = buildWhatsAppMessage({ order, type, customNote });
+  return `https://wa.me/${digits}?text=${encodeURIComponent(msg)}`;
 }

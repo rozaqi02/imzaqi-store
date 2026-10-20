@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { NavLink, useLocation } from "react-router-dom";
 import {
@@ -12,6 +12,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { isFunnelPath } from "../hooks/useFunnelRoute";
 import { BOTTOM_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
 import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
+import { useCart } from "../context/CartContext";
 
 const ICONS = {
   "/": House,
@@ -41,6 +42,8 @@ export default function BottomNav() {
   const [shrunk, setShrunk] = useState(false);
   const navRef = useRef(null);
   const hidden = !showBottomNav || isBottomNavHidden(location.pathname);
+  const { items = [] } = useCart();
+  const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
 
   useEffect(() => {
     setShrunk(false);
@@ -100,6 +103,11 @@ export default function BottomNav() {
         {SITE_BOTTOM_NAV.map((item) => {
           const Icon = ICONS[item.to] || House;
           const active = isNavItemActive(location.pathname, item.to);
+          const isKatalog = item.to === "/produk";
+          const navLabel = item.shortLabel || item.label;
+          const ariaLabel = isKatalog && cartCount > 0
+            ? `${navLabel} (${cartCount} item di keranjang)`
+            : navLabel;
 
           return (
             <li key={item.to} className="bottom-nav-itemWrap">
@@ -107,7 +115,7 @@ export default function BottomNav() {
                 to={item.to}
                 className={`bottom-nav-item${active ? " is-active" : ""}`}
                 aria-current={active ? "page" : undefined}
-                aria-label={item.shortLabel || item.label}
+                aria-label={ariaLabel}
                 onClick={(event) => {
                   if (!active) return;
                   event.preventDefault();
@@ -116,8 +124,13 @@ export default function BottomNav() {
               >
                 <span className="bottom-nav-icon" aria-hidden="true">
                   <Icon size={20} strokeWidth={active ? 2.3 : 2} />
+                  {isKatalog && cartCount > 0 ? (
+                    <span className="bottom-nav-badge">
+                      {cartCount > 9 ? "9+" : cartCount}
+                    </span>
+                  ) : null}
                 </span>
-                <span className="bottom-nav-label">{item.shortLabel || item.label}</span>
+                <span className="bottom-nav-label">{navLabel}</span>
               </NavLink>
             </li>
           );

@@ -129,7 +129,7 @@
   align-items: center;
   gap: 8px;
   padding: 0 14px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid var(--st-line);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 26%),
@@ -280,7 +280,7 @@ html[data-theme="light"] .st-recentHead {
   gap: 6px;
   height: 34px;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
@@ -349,7 +349,7 @@ html[data-theme="light"] .st-recentPrice {
   box-shadow: var(--st-shadow-soft);
   color: var(--st-text);
   font-size: 23px;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .st-emptyTitle {
@@ -603,7 +603,7 @@ html[data-theme="light"] .st-recentPrice {
   display: inline-flex;
   align-items: center;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid var(--st-line);
   background: var(--st-inset);
   box-shadow: var(--st-inset-shadow);
@@ -710,7 +710,7 @@ html[data-theme="light"] .st-recentPrice {
   display: inline-flex;
   align-items: center;
   padding: 0 12px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--st-line);
   background: var(--st-inset);
   box-shadow: var(--st-inset-shadow);
@@ -996,7 +996,7 @@ html[data-theme="light"] .status-shell::before {
   background: linear-gradient(135deg, #4effda, #00d6b4 60%, #008a94);
   color: #032235 !important;
   font-size: 20px !important;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: 0.04em;
   display: grid;
   place-items: center;
@@ -1008,7 +1008,7 @@ html[data-theme="light"] .status-shell::before {
 
 .st-empty .st-emptyTitle {
   font-size: clamp(22px, 3.6vw, 28px);
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.03em;
   margin: 6px 0 4px;
 }
@@ -1134,7 +1134,7 @@ html[data-theme="light"] .status-shell::before {
 
 .st-noteCard.is-accent .st-kicker {
   color: #00a594 !important;
-  font-weight: 1000 !important;
+  font-weight: 800 !important;
 }
 
 .st-noteCard.is-accent .st-noteBody {
@@ -1171,7 +1171,7 @@ html[data-theme="light"] .status-shell::before {
 
 .st-payRow.is-total b {
   font-size: 20px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.02em;
   background: linear-gradient(135deg, #4effda, #00d6b4 60%, #008a94);
   -webkit-background-clip: text;
@@ -1246,7 +1246,7 @@ html[data-theme="light"] .status-shell::before {
 
 .st-itemIcon span {
   font-size: 18px;
-  font-weight: 1000;
+  font-weight: 800;
   color: var(--brand-icon, #008a94);
 }
 
@@ -1259,7 +1259,7 @@ html[data-theme="light"] .status-shell::before {
 
 .st-itemRowDetailed .st-itemName {
   font-size: 15px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--brand-text, #f8fafc);
   overflow-wrap: anywhere;
@@ -1290,7 +1290,7 @@ html[data-theme="light"] .status-shell::before {
 
 .st-itemRowDetailed .st-itemPrice b {
   font-size: 15px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.01em;
   color: var(--brand-text, #f8fafc);
   white-space: nowrap;
@@ -1317,7 +1317,7 @@ html[data-theme="light"] .status-shell::before {
   gap: 5px;
   height: 24px;
   padding: 0 8px;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid var(--brand-line, rgba(0, 138, 148, 0.16));
   background: var(--skeu-pill-bg, rgba(255, 255, 255, 0.05));
   color: var(--brand-text, rgba(234, 255, 245, 0.86));
@@ -1822,7 +1822,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
 
 .st-itemIcon span {
   font-size: 18px;
-  font-weight: 1000;
+  font-weight: 800;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0,0,0,0.18);
 }
@@ -2066,13 +2066,13 @@ html[data-theme="dark"] .st-hero {
 
 .st-tabs {
   padding: 4px !important;
-  border-radius: 999px !important;
+  border-radius: 14px !important;
   background: var(--st-inset) !important;
 }
 
 .st-tab {
   height: 40px;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   color: var(--st-muted) !important;
   background: transparent !important;
   border: 0 !important;
@@ -2154,7 +2154,7 @@ html[data-theme="light"] .st-recentChip {
   color: var(--st-text) !important;
   border: 1px solid var(--st-line) !important;
   box-shadow: none !important;
-  border-radius: 999px !important;
+  border-radius: 10px !important;
 }
 
 .st-statePill.is-done,
@@ -2537,7 +2537,7 @@ html[data-theme="dark"] .status-page .st-checkoutSteps .steps--visual .step.acti
   gap: 5px;
   height: 28px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--st-line);
   background: var(--st-panel-soft);
   color: var(--st-muted);
@@ -2755,3 +2755,207 @@ html[data-theme="dark"] .st-discountVal {
   .status-page .st-checkoutSteps .steps--visual .step-dot { width:28px !important; height:28px !important; border-radius:9px !important; }
   .status-page .st-checkoutSteps .steps--visual .step-text { display:none !important; }
 }
+
+/* ─── Post-Transaction Review Card (Neumorphic Style) ─── */
+.st-reviewCard {
+  position: relative;
+  overflow: hidden;
+  margin-top: 14px;
+}
+
+.st-reviewIntro {
+  font-size: 13.5px;
+  color: var(--st-muted, #7c9eb0);
+  line-height: 1.45;
+  margin: 0 0 14px 0;
+}
+
+.st-reviewForm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.st-reviewRatingGroup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  border-radius: 16px;
+  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--st-line, rgba(255, 255, 255, 0.08));
+}
+
+.st-reviewStarsPicker {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.st-reviewStarBtn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  transition: transform 0.18s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.st-reviewStarBtn:hover,
+.st-reviewStarBtn:focus-visible {
+  transform: scale(1.22);
+}
+
+.st-reviewStarBtn.is-active svg {
+  filter: drop-shadow(0 2px 6px rgba(245, 166, 35, 0.45));
+}
+
+.st-reviewRatingFeedback {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--st-text, #fff);
+  letter-spacing: -0.01em;
+}
+
+.st-reviewChips {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.st-reviewChipsLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--st-muted, #7c9eb0);
+}
+
+.st-reviewChipsRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.st-reviewChip {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.05));
+  border: 1px solid var(--st-line, rgba(255, 255, 255, 0.1));
+  color: var(--st-text, #fff);
+  cursor: pointer;
+  transition: background 0.18s ease, transform 0.15s ease, border-color 0.18s ease;
+}
+
+.st-reviewChip:hover {
+  background: var(--skeu-control-bg-hover, rgba(0, 214, 180, 0.12));
+  border-color: rgba(0, 214, 180, 0.3);
+  transform: translateY(-1px);
+}
+
+.st-reviewFields {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.st-reviewTextarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 72px;
+  font-size: 13px;
+  line-height: 1.45;
+  border-radius: 14px;
+}
+
+.st-reviewNameInput {
+  width: 100%;
+  font-size: 13px;
+  border-radius: 12px;
+}
+
+.st-reviewSubmitRow {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.st-reviewSubmitBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+  border-radius: 16px;
+}
+
+/* Submitted state */
+.st-reviewSubmitted {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--st-line, rgba(255, 255, 255, 0.08));
+}
+
+.st-reviewSubmittedStars {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.st-reviewRatingBadge {
+  margin-left: 8px;
+  font-size: 12px;
+  font-weight: 800;
+  color: #f5a623;
+}
+
+.st-reviewSubmittedQuote {
+  margin: 0;
+  font-size: 13.5px;
+  font-style: italic;
+  color: var(--st-text, #fff);
+  line-height: 1.5;
+  border-left: 3px solid var(--accent, #00d6b4);
+  padding-left: 10px;
+}
+
+.st-reviewSubmittedAuthor {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--st-muted, #7c9eb0);
+  font-weight: 600;
+}
+
+.st-reviewVerifiedPill {
+  font-size: 10.5px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: rgba(0, 214, 180, 0.12);
+  color: var(--accent, #00d6b4);
+  border: 1px solid rgba(0, 214, 180, 0.25);
+}
+
+.st-reviewShareRow {
+  margin-top: 4px;
+}
+
+.st-reviewWaBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  border-radius: 12px;
+}
+

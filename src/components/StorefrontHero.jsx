@@ -3,8 +3,6 @@ import {
   ArrowUpRight, Check, ClipboardList, History,
   PackageCheck, Search,
 } from "lucide-react";
-import "../css/support-surfaces.css";
-import "./StorefrontHero.css";
 
 function CatalogProductStack({ products }) {
   const preferred = ["netflix", "spotify", "canva", "youtube", "gemini"];

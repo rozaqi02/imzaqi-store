@@ -7,17 +7,17 @@ const footerColumns = [
     label: "Navigasi",
     links: [
       { label: "Beranda", to: "/" },
-      { label: "Produk", to: "/produk" },
-      { label: "Testimoni", to: "/testimoni" },
-      { label: "FAQ", to: "/faq" },
+      { label: "Katalog", to: "/produk" },
+      { label: "Ulasan", to: "/testimoni" },
+      { label: "Bantuan", to: "/faq" },
     ],
   },
   {
     label: "Order",
     links: [
-      { label: "Bayar", to: "/checkout", overlay: true },
+      { label: "Checkout", to: "/checkout", overlay: true },
       { label: "Cek Status", to: "/status" },
-      { label: "Riwayat Order", to: "/status?tab=riwayat" },
+      { label: "Riwayat Pesanan", to: "/status?tab=riwayat" },
     ],
   },
 ];
@@ -79,7 +79,7 @@ export default function Footer() {
                   Cara Bayar QRIS
                 </Link>
                 <Link className="site-footerGoLink" to="/faq">
-                  FAQ Lengkap
+                  Pusat Bantuan
                 </Link>
                 <a
                   className="site-footerGoLink"

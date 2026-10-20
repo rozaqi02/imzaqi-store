@@ -446,7 +446,7 @@
   border-radius: 18px;
   display: grid;
   place-items: center;
-  font-weight: 1000;
+  font-weight: 800;
   color: #d9fff6;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 32%),
@@ -458,7 +458,7 @@
 
 .admin-brand-title {
   font-size: 15px;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-brand-sub {
@@ -672,7 +672,7 @@
 .admin-statValue {
   margin-top: 6px;
   font-size: clamp(24px, 3vw, 30px);
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.05em;
 }
 
@@ -714,7 +714,7 @@
 
 .admin-panel-title {
   font-size: 17px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.02em;
 }
 
@@ -799,12 +799,12 @@
 .admin-product-icon-fallback {
   display: grid;
   place-items: center;
-  font-weight: 1000;
+  font-weight: 800;
   color: rgba(255, 255, 255, 0.92);
 }
 
 .admin-product-name {
-  font-weight: 1000;
+  font-weight: 800;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -827,7 +827,7 @@
   align-items: center;
   min-height: 24px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 36%),
@@ -843,7 +843,7 @@
 .admin-status {
   min-height: 26px;
   padding: 0 10px;
-  border-radius: 999px;
+  border-radius: 10px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 36%),
@@ -1066,7 +1066,7 @@ html[data-theme="light"] .admin-advancedToggle {
 .admin-order-code,
 .admin-promo-code,
 .modal-title {
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-variant-sub,
@@ -1371,7 +1371,7 @@ html[data-theme="light"] .admin-advancedToggle {
   margin-top: 10px;
   font-size: clamp(28px, 4vw, 40px);
   line-height: 1.05;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.05em;
 }
 
@@ -1384,7 +1384,7 @@ html[data-theme="light"] .admin-advancedToggle {
 .admin-chip {
   min-height: 42px;
   padding: 0 16px;
-  border-radius: 999px;
+  border-radius: 12px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
@@ -1448,7 +1448,7 @@ html[data-theme="light"] .admin-advancedToggle {
   margin-top: 8px;
   font-size: clamp(22px, 3vw, 30px);
   line-height: 1.05;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-miniCard small {
@@ -1577,7 +1577,7 @@ html[data-theme="light"] .admin-advancedToggle {
     linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 80, 0.4));
   box-shadow: var(--skeu-control-shadow, none);
   color: #a4fff0;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-rankCopy {
@@ -1885,7 +1885,7 @@ html[data-theme="light"] .admin-advancedToggle {
 .admin-sidebarPulse strong {
   margin-top: 8px;
   font-size: 18px;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-sidebarPulse small {
@@ -1897,7 +1897,7 @@ html[data-theme="light"] .admin-advancedToggle {
 .admin-nav-badge {
   margin-left: auto;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(255, 255, 255, 0.05);
   color: rgba(233, 255, 246, 0.8);
   font-size: 11px;
@@ -2341,7 +2341,7 @@ html[data-theme="light"] .admin-advancedToggle {
 
 .admin-mobileCopy strong {
   font-size: 14px;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-mobileCopy span {
@@ -2849,7 +2849,7 @@ html[data-theme="light"] .admin-advancedToggle {
 .admin-orderTag {
   min-height: 24px;
   padding: 0 9px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid rgba(80, 220, 146, 0.26);
   background: rgba(80, 220, 146, 0.12);
   color: rgba(208, 255, 224, 0.92);
@@ -2863,7 +2863,7 @@ html[data-theme="light"] .admin-advancedToggle {
 .admin-orderLink {
   min-height: 24px;
   padding: 0 9px;
-  border-radius: 999px;
+  border-radius: 8px;
   border: 1px solid rgba(0, 214, 180, 0.26);
   background: rgba(0, 214, 180, 0.12);
   color: rgba(190, 232, 255, 0.96);
@@ -3078,7 +3078,7 @@ html[data-theme="light"] .admin-advancedToggle {
     border-radius: 12px;
     display: grid;
     place-items: center;
-    font-weight: 1000;
+    font-weight: 800;
     font-size: 13px;
   }
 
@@ -3089,7 +3089,7 @@ html[data-theme="light"] .admin-advancedToggle {
 
   .admin-mobileCopy strong {
     font-size: 13px;
-    font-weight: 1000;
+    font-weight: 800;
     line-height: 1.18;
     overflow-wrap: anywhere;
     display: block;
@@ -3395,7 +3395,7 @@ html[data-theme="light"] .admin-advancedToggle {
     min-height: 32px;
     padding: 0 10px;
     font-size: 11px;
-    border-radius: 999px;
+    border-radius: 10px;
   }
 
   /* 11. Product list rows: stack price/actions below copy */
@@ -3587,7 +3587,7 @@ html[data-theme="light"] .admin-advancedToggle {
   min-width: 20px;
   height: 20px;
   padding: 0 6px;
-  border-radius: 999px;
+  border-radius: 6px;
   border: 1px solid rgba(255, 140, 160, 0.45);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 36%),
@@ -3653,7 +3653,7 @@ html[data-theme="light"] .admin-advancedToggle {
 .admin-orderStat strong {
   margin-top: 6px;
   font-size: 20px;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-orderStat small {
@@ -3698,7 +3698,7 @@ html[data-theme="light"] .admin-advancedToggle {
 
 .admin-orderTotal {
   font-size: 15px;
-  font-weight: 1000;
+  font-weight: 800;
 }
 
 .admin-orderListMeta {
@@ -3711,7 +3711,7 @@ html[data-theme="light"] .admin-advancedToggle {
 
 .admin-orderTag {
   padding: 3px 8px;
-  border-radius: 999px;
+  border-radius: 8px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 32%),
     linear-gradient(165deg, rgba(255, 191, 74, 0.28), rgba(70, 40, 0, 0.5));
@@ -3900,7 +3900,7 @@ html[data-theme="light"] .admin-advancedToggle {
   align-items: center;
   margin-left: 8px;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: 6px;
   font-size: 10px;
   font-weight: 900;
 }
@@ -3926,7 +3926,7 @@ html[data-theme="light"] .admin-advancedToggle {
   display: inline-flex;
   align-items: center;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: 6px;
   background: rgba(255, 191, 74, 0.12);
   border: 1px solid rgba(255, 191, 74, 0.24);
   color: rgba(255, 220, 120, 0.9);
@@ -4071,7 +4071,7 @@ html[data-theme="light"] .admin-advancedToggle {
 
 .admin-promo-stripItem strong {
   font-size: 22px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.04em;
   line-height: 1;
 }
@@ -4242,7 +4242,7 @@ html[data-theme="light"] .admin-promo-bulkNote {
   align-items: center;
   gap: 6px;
   font-size: 15px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: 0.06em;
   color: #fff;
 }
@@ -4279,7 +4279,7 @@ html[data-theme="light"] .admin-promo-bulkNote {
   background: linear-gradient(135deg, rgba(79, 255, 200, 0.16), rgba(0, 214, 180, 0.08));
   color: #9fffe5;
   font-size: 16px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: -0.02em;
 }
 
@@ -4364,7 +4364,7 @@ html[data-theme="light"] .admin-promo-bulkNote {
 
 .admin-promo-previewCode {
   font-size: 18px;
-  font-weight: 1000;
+  font-weight: 800;
   letter-spacing: 0.08em;
   color: #9fffe5;
 }
@@ -4593,3 +4593,68 @@ html[data-theme="light"] .admin-promo-deleteHint {
 .admin-exportDates .input {
   min-width: 150px;
 }
+
+/* ── iOS & Mobile Safari Picker / Date / Select Optimization ── */
+.admin-page input[type="date"],
+.admin-page input[type="datetime-local"],
+.admin-modal input[type="date"],
+.admin-modal input[type="datetime-local"],
+.admin-pane input[type="date"],
+.admin-pane input[type="datetime-local"] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 44px;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  font-family: inherit;
+  font-size: 16px !important;
+  box-sizing: border-box;
+}
+
+.admin-page input[type="date"]::-webkit-date-and-time-value,
+.admin-page input[type="datetime-local"]::-webkit-date-and-time-value,
+.admin-modal input[type="date"]::-webkit-date-and-time-value,
+.admin-modal input[type="datetime-local"]::-webkit-date-and-time-value,
+.admin-pane input[type="date"]::-webkit-date-and-time-value,
+.admin-pane input[type="datetime-local"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-height: 1.5em;
+  display: flex;
+  align-items: center;
+  color: inherit;
+}
+
+:root:not([data-theme="light"]) .admin-page input[type="date"],
+:root:not([data-theme="light"]) .admin-page input[type="datetime-local"],
+:root:not([data-theme="light"]) .admin-page select,
+:root:not([data-theme="light"]) .admin-modal select {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] .admin-page input[type="date"],
+html[data-theme="light"] .admin-page input[type="datetime-local"],
+html[data-theme="light"] .admin-page select,
+html[data-theme="light"] .admin-modal select {
+  color-scheme: light;
+}
+
+.admin-page select.input,
+.admin-modal select.input,
+.admin-orderInlineSelect {
+  -webkit-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+  padding-right: 36px !important;
+  font-size: 16px !important;
+}
+
+html[data-theme="light"] .admin-page select.input,
+html[data-theme="light"] .admin-modal select.input,
+html[data-theme="light"] .admin-orderInlineSelect {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='rgba(13,45,57,0.6)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+

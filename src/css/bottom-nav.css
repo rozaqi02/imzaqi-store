@@ -14,39 +14,42 @@ html {
 
 .bottom-nav {
   position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  left: max(14px, env(safe-area-inset-left));
+  right: max(14px, env(safe-area-inset-right));
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  max-width: 480px;
+  margin-inline: auto;
   z-index: 9995;
   isolation: isolate;
   contain: layout style;
-  padding:
-    6px
-    max(10px, env(safe-area-inset-right))
-    calc(6px + env(safe-area-inset-bottom))
-    max(10px, env(safe-area-inset-left));
-  border: 0;
-  border-top: 1px solid rgba(0, 214, 180, 0.18);
+  padding: 5px 8px;
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 35%),
-    linear-gradient(180deg, #1c1c1c 0%, #161616 40%, #0d261e 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 55%, rgba(0, 245, 196, 0.04) 100%),
+    rgba(14, 20, 28, 0.88);
   box-shadow:
-    0 -10px 28px rgba(0, 0, 0, 0.6),
-    0 -1px 2px rgba(0, 214, 180, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.14);
-  backdrop-filter: blur(16px) saturate(180%);
-  -webkit-backdrop-filter: blur(16px) saturate(180%);
+    0 16px 42px -6px rgba(0, 0, 0, 0.65),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.45),
+    0 0 20px -4px rgba(0, 245, 196, 0.12);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  transition: transform 0.24s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s ease;
 }
 
 html[data-theme="light"] .bottom-nav {
-  border-top: 1px solid rgba(0, 158, 96, 0.16);
+  border: 1px solid rgba(0, 158, 96, 0.16);
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0) 35%),
-    linear-gradient(180deg, #ffffff 0%, #ffffff 38%, #ddf6ec 100%);
+    linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.8) 100%),
+    rgba(255, 255, 255, 0.92);
   box-shadow:
-    0 -8px 24px rgba(0, 158, 96, 0.08),
-    0 -1px 3px rgba(0, 0, 0, 0.03),
-    inset 0 1.5px 0 #ffffff;
+    0 14px 36px -6px rgba(45, 85, 100, 0.15),
+    0 0 0 1px rgba(0, 158, 96, 0.1),
+    inset 0 1.5px 0 #ffffff,
+    inset 0 -1px 0 rgba(0, 0, 0, 0.03),
+    0 0 16px -2px rgba(0, 158, 96, 0.08);
 }
 
 /* Soft shadow bleed di atas bar — ilusi timbul tanpa dock */
@@ -111,15 +114,50 @@ html[data-theme="light"] .bottom-nav::before {
   transform: scale(0.96);
 }
 
-/* Wide inset/sunken box marker for active menu */
+/* Liquid glass active menu marker */
 .bottom-nav-item.is-active {
-  background: var(--skeu-inset-bg) !important;
-  border: 1px solid var(--brand-line) !important;
-  box-shadow: var(--skeu-inset-shadow) !important;
-  color: var(--brand-text) !important;
+  background:
+    linear-gradient(165deg, rgba(0, 245, 196, 0.16) 0%, rgba(56, 189, 248, 0.08) 100%),
+    rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(0, 245, 196, 0.28) !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.2),
+    0 4px 12px rgba(0, 245, 196, 0.12) !important;
+  color: #f7f9fa !important;
+}
+
+.bottom-nav-item.is-active::before {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 18px;
+  height: 2.5px;
+  border-radius: 4px;
+  background: linear-gradient(90deg, #00f5c4, #38bdf8);
+  box-shadow: 0 0 8px #00f5c4, 0 0 14px rgba(56, 189, 248, 0.55);
+}
+
+html[data-theme="light"] .bottom-nav-item.is-active {
+  background:
+    linear-gradient(165deg, rgba(0, 158, 96, 0.12) 0%, rgba(0, 194, 208, 0.06) 100%),
+    #ffffff !important;
+  border: 1px solid rgba(0, 158, 96, 0.22) !important;
+  box-shadow:
+    inset 0 1px 0 #ffffff,
+    0 2px 8px rgba(0, 158, 96, 0.1) !important;
+  color: #0b2520 !important;
+}
+
+html[data-theme="light"] .bottom-nav-item.is-active::before {
+  background: linear-gradient(90deg, #009e60, #00b4a4);
+  box-shadow: 0 1px 6px rgba(0, 158, 96, 0.45);
 }
 
 .bottom-nav-icon {
+  position: relative;
   display: grid;
   place-items: center;
   width: 24px;
@@ -133,6 +171,32 @@ html[data-theme="light"] .bottom-nav::before {
 
 .bottom-nav-item.is-active .bottom-nav-icon {
   color: var(--brand-icon, #009e60) !important;
+}
+
+.bottom-nav-badge {
+  position: absolute;
+  top: -4px;
+  right: -8px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: #ff3c64;
+  color: #ffffff;
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(255, 60, 100, 0.45);
+  border: 1.5px solid #141414;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+html[data-theme="light"] .bottom-nav-badge {
+  border-color: #ffffff;
 }
 
 .bottom-nav-label {
@@ -247,4 +311,28 @@ html[data-motion="off"] .bottom-nav::before {
   .bottom-nav-icon {
     transition: none;
   }
+}
+
+.bottom-nav-cartBadge {
+  position: absolute;
+  top: -5px;
+  right: -9px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #ff4365, #d90429);
+  color: #ffffff;
+  font-size: 9.5px;
+  font-weight: 900;
+  line-height: 16px;
+  text-align: center;
+  box-shadow: 0 2px 6px rgba(217, 4, 41, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+  pointer-events: none;
+  animation: cartBadgePop 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes cartBadgePop {
+  0% { transform: scale(0.6); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
 }

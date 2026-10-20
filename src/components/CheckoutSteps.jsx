@@ -2,7 +2,6 @@ import React from "react";
 import { PackageSearch, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CartIcon from "./CartIcon";
-import "../css/checkout-steps.css";
 
 /**
  * 3-step helper to reduce anxiety in checkout flow.

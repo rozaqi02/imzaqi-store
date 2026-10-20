@@ -1,6 +1,6 @@
 import { MEDIA_FORMATS, MEDIA_STYLES, chooseVariant, posterOffer } from "./marketingMediaModel.js";
 
-const FONT = '"Outfit", "Plus Jakarta Sans", sans-serif';
+const FONT = '"Poppins", sans-serif';
 const money = value => `Rp${new Intl.NumberFormat("id-ID").format(value)}`;
 
 function font(ctx, size, weight = 700) { ctx.font = `${weight} ${size}px ${FONT}`; }
@@ -192,7 +192,7 @@ export function drawProductPoster(canvas, { offer, styleId, format = "square", v
   return { width, height };
 }
 
-export function drawCatalogPoster(canvas, { products, discounts, theme = "emerald", page = 1, pageCount = 1, total, images = [], qr, phone }) {
+export function drawCatalogPoster(canvas, { products, discounts, theme = "emerald", page = 1, pageCount = 1, total, images = [], qr, phone, catalogScope = "products" }) {
   const width = 1200, height = 1600;
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext("2d");
@@ -201,25 +201,48 @@ export function drawCatalogPoster(canvas, { products, discounts, theme = "emeral
   const accent = theme === "dark" ? "#b8df75" : "#c6e983";
   ctx.fillStyle = bg; ctx.fillRect(0, 0, width, height); texture(ctx, width, height);
   ctx.fillStyle = ink; ctx.textAlign = "left"; font(ctx, 27); ctx.fillText("imzaqi.store", 64, 82);
-  ctx.textAlign = "right"; font(ctx, 19, 600); ctx.fillText(`${total} PRODUK · ${page} / ${pageCount}`, width - 64, 82); ctx.textAlign = "left";
+  ctx.textAlign = "right"; font(ctx, 19, 600);
+  const isVariantScope = catalogScope === "variants";
+  ctx.fillText(`${total} ${isVariantScope ? "PAKET" : "PRODUK"} · ${page} / ${pageCount}`, width - 64, 82); ctx.textAlign = "left";
   font(ctx, 90); ctx.fillText("KATALOG", 60, 210); ctx.fillText("PILIHANMU.", 60, 298);
   star(ctx, 1000, 220, 126, accent, -.14, 16);
   ctx.fillStyle = "#143f32"; ctx.textAlign = "center"; font(ctx, 25); ctx.fillText("PILIH.", 1000, 213); ctx.fillText("PAKAI.", 1000, 245); ctx.textAlign = "left";
-  ctx.fillStyle = ink; font(ctx, 22, 600); ctx.fillText("Aplikasi premium & layanan untuk kebutuhanmu.", 64, 351);
+  ctx.fillStyle = ink; font(ctx, 22, 600);
+  ctx.fillText(isVariantScope ? "Daftar paket & varian siap aktif untuk kebutuhanmu." : "Aplikasi premium & layanan untuk kebutuhanmu.", 64, 351);
   const columnW = 508, gap = 56, rowH = 190, startY = 412;
-  products.forEach((product, i) => {
+  products.forEach((item, i) => {
     const x = 64 + i % 2 * (columnW + gap), y = startY + Math.floor(i / 2) * rowH;
     ctx.strokeStyle = theme === "dark" ? "#41493e" : "#cad0bb"; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x + columnW, y); ctx.stroke();
-    const offer = posterOffer(product, chooseVariant(product, "", discounts), discounts);
+    const targetProduct = item.product || item;
+    const targetVariant = item.variant || chooseVariant(targetProduct, "", discounts);
+    const offer = item.offer || posterOffer(targetProduct, targetVariant, discounts);
     if (images[i]) imageContain(ctx, images[i], x, y + 25, 70);
     else { ctx.fillStyle = ink; font(ctx, 44); ctx.fillText(offer.name.slice(0, 1), x + 15, y + 76); }
     ctx.fillStyle = ink;
     textBlock(ctx, offer.name, x + 91, y + 47, columnW - 91, 29, 2);
     font(ctx, 18, 600); ctx.globalAlpha = .72;
-    const hint = offer.outOfStock ? "Stok habis · tanya admin" : offer.duration || "Lihat pilihan paket";
+    const isVariantItem = isVariantScope || Boolean(item.variant);
+    const hint = isVariantItem
+      ? (offer.outOfStock ? `${offer.variant || "Paket"} · Stok habis` : [offer.variant, offer.duration, offer.guarantee].filter(Boolean).join(" · "))
+      : (offer.outOfStock ? "Stok habis · tanya admin" : offer.duration || "Lihat pilihan paket");
     fit(ctx, hint, columnW - 91, 18, 600); ctx.fillText(hint, x + 91, y + 103); ctx.globalAlpha = 1;
-    fit(ctx, offer.price ? `Mulai ${money(offer.price)}` : "Tanya admin", columnW - 91, 31);
-    ctx.fillText(offer.price ? `Mulai ${money(offer.price)}` : "Tanya admin", x + 91, y + 150);
+    const priceText = isVariantItem
+      ? (offer.price ? money(offer.price) : "Tanya admin")
+      : (offer.price ? `Mulai ${money(offer.price)}` : "Tanya admin");
+    fit(ctx, priceText, columnW - 91, 31);
+    ctx.fillText(priceText, x + 91, y + 150);
+    if (isVariantItem && offer.original && offer.original > offer.price) {
+      font(ctx, 18, 600);
+      const originalText = money(offer.original);
+      const origX = x + 91 + ctx.measureText(priceText).width + 12;
+      if (origX + 80 < x + columnW) {
+        ctx.globalAlpha = .55;
+        ctx.fillText(originalText, origX, y + 150);
+        ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath();
+        ctx.moveTo(origX, y + 144); ctx.lineTo(origX + ctx.measureText(originalText).width, y + 144); ctx.stroke();
+        ctx.globalAlpha = 1;
+      }
+    }
   });
   font(ctx, 16, 600); ctx.fillStyle = ink; ctx.fillText("Harga & stok dapat berubah. Scan QR untuk informasi terbaru.", 64, 1390);
   footer(ctx, { width, height, ink, bg, qr, phone, catalog: true });

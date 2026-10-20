@@ -27,8 +27,8 @@ export default function EmptyState({
           icon ?? "[]"
         )}
       </div>
-      {title ? <div className="empty-title">{title}</div> : null}
-      {description ? <div className="empty-desc">{description}</div> : null}
+      {title ? <h2 className="empty-title">{title}</h2> : null}
+      {description ? <p className="empty-desc">{description}</p> : null}
 
       {suggestions.length ? (
         <div className="empty-suggestions" aria-label="Saran pencarian">

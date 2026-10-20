@@ -11,7 +11,7 @@
   --adm-radius-lg: 22px;
   --adm-radius-md: 16px;
   --adm-radius-sm: 12px;
-  --adm-radius-pill: 999px;
+  --adm-radius-pill: 10px;
   --adm-gap: 14px;
   --adm-gap-lg: 18px;
   --adm-ease: cubic-bezier(0.25, 0.8, 0.25, 1);
@@ -602,7 +602,7 @@ html[data-theme="light"] .admin-page .adm-navItem.is-active .adm-navItemIcon {
 .admin-page .btn,
 .admin-page button.btn {
   border-radius: 12px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   letter-spacing: -0.01em !important;
   min-height: 40px !important;
   transition: transform 0.15s var(--adm-ease), box-shadow 0.15s, filter 0.15s !important;
@@ -735,7 +735,7 @@ html[data-theme="light"] .admin-page .adm-navItem.is-active .adm-navItemIcon {
 .admin-page .admin-categoryTag {
   border-radius: var(--adm-radius-pill) !important;
   font-size: 11px !important;
-  font-weight: 750 !important;
+  font-weight: 700 !important;
   padding: 4px 10px !important;
   border: 1px solid var(--adm-line) !important;
   background: var(--adm-surface-inset) !important;
@@ -849,7 +849,7 @@ html[data-theme="light"] .admin-loginShell {
 }
 
 .admin-loginBadge {
-  border-radius: 999px !important;
+  border-radius: 10px !important;
   box-shadow:
     6px 8px 14px rgba(0, 0, 0, 0.15),
     inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
@@ -872,7 +872,7 @@ html[data-theme="light"] .admin-loginShell {
   color: var(--adm-text) !important;
 }
 
-/* Always inherit store fonts (Outfit / Plus Jakarta via global) */
+/* Always inherit the global Poppins font */
 .admin-page,
 .admin-page button,
 .admin-page input,

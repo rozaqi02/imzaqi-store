@@ -34,6 +34,10 @@ export const BANNER_GRAPHICS = [
   { id: "headset_support", label: "CS Siaga 24/7 🎧", description: "Maskot layanan hijau ber-headset ramah & siap bantu." },
   { id: "qris_wallet", label: "Dompet & QRIS 💳", description: "Maskot dompet hijau dengan koin & kartu scan QRIS." },
   { id: "sparkle_celebration", label: "Bintang Pesta Baru ✨", description: "Maskot bintang hijau ceria bertopi pesta & konfeti." },
+  { id: "imzaqi_mascot", label: "Imzi (Pose Branding)", description: "Karakter teal Imzi memegang tas belanja dengan centang." },
+  { id: "imzaqi_mascot_wave", label: "Imzi Menyapa 👋", description: "Imzi ceria melambai menyapa pelanggan." },
+  { id: "imzaqi_mascot_success", label: "Imzi Sukses ✅", description: "Imzi merayakan checkout & pembayaran berhasil." },
+  { id: "imzaqi_mascot_sad", label: "Imzi Sedih 😟", description: "Imzi membantu saat ada masalah atau halaman kosong." },
   { id: "none", label: "Tanpa Karakter", description: "Tampilan teks & ikon standar tanpa karakter grafis." },
 ];
 

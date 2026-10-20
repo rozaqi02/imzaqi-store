@@ -20,8 +20,6 @@ import { formatIDR } from "../lib/format";
 import { checkStockAvailability } from "../lib/api";
 import CheckoutSteps from "../components/CheckoutSteps";
 import CheckoutExtrasPanel from "../components/CheckoutExtrasPanel";
-import "../css/pages/Checkout.css";
-import "../css/checkout-steps.css";
 
 import { markCheckoutVisited } from "../lib/cartReminder";
 import EmptyState from "../components/EmptyState";
@@ -39,17 +37,13 @@ function calcTotal(subtotal, percent) {
   return { discount, total: Math.max(0, subtotal - discount) };
 }
 
-/* ── Desktop-only framer-motion variants ── */
+/* ── Unified Framer Motion Variants (Desktop & Mobile Unified Timing & Curves) ── */
 const backdropVariants = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.52, ease: [0.22, 1, 0.36, 1] } },
   exit:    { opacity: 0, transition: { duration: 0.44, ease: [0.32, 0.72, 0, 1] } },
 };
-const backdropVariantsLite = {
-  hidden:  { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.22, ease: [0.22, 1, 0.36, 1] } },
-  exit:    { opacity: 0, transition: { duration: 0.18, ease: [0.22, 1, 0.36, 1] } },
-};
+
 const desktopDrawerVariants = {
   hidden:  { x: "104%", opacity: 0.72, scale: 0.992 },
   visible: {
@@ -73,10 +67,29 @@ const desktopDrawerVariants = {
     },
   },
 };
-const desktopDrawerVariantsLite = {
-  hidden:  { x: "100%" },
-  visible: { x: 0, transition: { duration: 0.2, ease: [0.22, 1, 0.36, 1] } },
-  exit:    { x: "100%", transition: { duration: 0.16, ease: [0.22, 1, 0.36, 1] } },
+
+const mobileDrawerVariants = {
+  hidden:  { y: "100%", opacity: 0.72, scale: 0.992 },
+  visible: {
+    y: 0,
+    opacity: 1,
+    scale: 1,
+    transition: {
+      y: { duration: 0.6, ease: [0.22, 1, 0.36, 1] },
+      opacity: { duration: 0.3, ease: "easeOut" },
+      scale: { duration: 0.52, ease: [0.22, 1, 0.36, 1] },
+    },
+  },
+  exit: {
+    y: "100%",
+    opacity: 0.68,
+    scale: 0.994,
+    transition: {
+      y: { duration: 0.46, ease: [0.32, 0.72, 0, 1] },
+      opacity: { duration: 0.34, ease: "easeIn" },
+      scale: { duration: 0.38, ease: "easeInOut" },
+    },
+  },
 };
 
 export default function Checkout() {
@@ -109,9 +122,6 @@ export default function Checkout() {
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(max-width: 720px)").matches : false
   );
-  // CSS-class-based phase for mobile (no framer-motion on mobile)
-  const [mobilePhase, setMobilePhase] = useState("entering"); // entering | open | closing
-  const mobileOpenFrameRef = useRef(null);
 
   const drawerBodyRef = useRef(null);
   const [promoStatus, setPromoStatus] = useState(null); // 'success' | 'error' | null
@@ -181,26 +191,6 @@ export default function Checkout() {
     closeButtonRef.current?.focus();
   }, []);
 
-  // Mobile CSS-phase: mount → next frame → "open" (triggers CSS transition)
-  useEffect(() => {
-    if (!isMobileSheet) return undefined;
-    mobileOpenFrameRef.current = window.requestAnimationFrame(() => {
-      mobileOpenFrameRef.current = window.requestAnimationFrame(() => {
-        setMobilePhase("open");
-      });
-    });
-    return () => {
-      if (mobileOpenFrameRef.current) window.cancelAnimationFrame(mobileOpenFrameRef.current);
-    };
-  }, [isMobileSheet]);
-
-  // When closing on mobile, set phase to "closing" first, then navigate
-  useEffect(() => {
-    if (!closing || !isMobileSheet) return undefined;
-    setMobilePhase("closing");
-    return undefined;
-  }, [closing, isMobileSheet]);
-
   const itemCount = useMemo(() => cart.items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [cart.items]);
   const hasStockIssue = useMemo(() => cart.items.some((item) => stockWarnings[item.variant_id]), [cart.items, stockWarnings]);
   const stockDisabledReason = hasStockIssue ? "Ada item yang stoknya abis atau kurang" : null;
@@ -246,10 +236,10 @@ export default function Checkout() {
       }
 
       nav("/", { replace: true });
-    }, isMotionOff ? 100 : isMobileSheet ? 520 : (isLiteMotion ? 220 : 480));
+    }, isMotionOff ? 100 : 460);
 
     return () => window.clearTimeout(timer);
-  }, [backgroundLocation, closing, isLiteMotion, isMotionOff, isMobileSheet, nav]);
+  }, [backgroundLocation, closing, isMotionOff, nav]);
 
   async function onApplyPromo() {
     const raw = String(code || "").trim();
@@ -449,6 +439,26 @@ export default function Checkout() {
   function renderEmptyCheckout() {
     return (
       <div className="checkout-emptyConversion">
+        {cart.hasBackup && cart.hasBackup() ? (
+          <div className="checkout-restoreCard">
+            <div className="checkout-restoreInfo">
+              <strong>Punya pesanan yang belum diselesaikan?</strong>
+              <span>Kamu bisa memulihkan item dari checkout sebelumnya.</span>
+            </div>
+            <button
+              type="button"
+              className="btn btn-sm btn-primary checkout-restoreBtn"
+              onClick={() => {
+                const restored = cart.restoreFromBackup();
+                if (restored) {
+                  toast.success("Keranjang sebelumnya berhasil dipulihkan!");
+                }
+              }}
+            >
+              <RefreshCw size={13} /> Pulihkan Keranjang
+            </button>
+          </div>
+        ) : null}
         <EmptyState
           mascot="rocket_speed"
           icon={<CartIcon size={30} strokeWidth={2.2} />}
@@ -727,38 +737,33 @@ export default function Checkout() {
     );
   }
 
-  // ── MOBILE PORTAL: pure CSS class-swap (no framer-motion = no JS animation overhead) ──
-  if (isMobileSheet) {
-    const phaseClass = `checkout-mobile-${mobilePhase}`;
-    return createPortal(
-      <div className="checkout-overlay" role="presentation">
-        <div
-          className={`checkout-backdrop checkout-backdrop-mobile ${phaseClass}`}
-          onMouseDown={requestClose}
-          aria-hidden="true"
-        />
-        <div
-          ref={drawerRef}
-          className={`checkout-drawer ${phaseClass}`}
-          role="dialog"
-          aria-modal="true"
-          aria-label="Checkout"
-        >
-          {renderDrawerContent()}
-        </div>
-      </div>,
-      document.body
-    );
-  }
+  // ── UNIFIED PORTAL: framer-motion (Desktop & Mobile matching 1:1 physics, timing & curves) ──
+  const drawerVariants = isMotionOff
+    ? {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.1 } },
+        exit: { opacity: 0, transition: { duration: 0.1 } },
+      }
+    : isMobileSheet
+    ? mobileDrawerVariants
+    : desktopDrawerVariants;
 
-  // ── DESKTOP PORTAL: framer-motion (smooth on desktop GPU) ──
-  const drawerVariants = isLiteMotion ? desktopDrawerVariantsLite : desktopDrawerVariants;
-  const overlayVariants = isLiteMotion ? backdropVariantsLite : backdropVariants;
+  const overlayVariants = isMotionOff
+    ? {
+        hidden: { opacity: 0 },
+        visible: { opacity: 1, transition: { duration: 0.1 } },
+        exit: { opacity: 0, transition: { duration: 0.1 } },
+      }
+    : backdropVariants;
+
+  const drawerClass = isMobileSheet
+    ? `checkout-drawer ${closing ? "checkout-mobile-closing" : "checkout-mobile-open"}`
+    : `checkout-drawer ${closing ? "checkout-desktop-closing" : "checkout-desktop-open"}`;
 
   return createPortal(
     <div className="checkout-overlay" role="presentation">
       <motion.div
-        className="checkout-backdrop"
+        className={`checkout-backdrop ${isMobileSheet ? "checkout-backdrop-mobile" : ""}`}
         variants={overlayVariants}
         initial="hidden"
         animate={closing ? "exit" : "visible"}
@@ -768,12 +773,15 @@ export default function Checkout() {
 
       <motion.div
         ref={drawerRef}
-        className={`checkout-drawer ${closing ? "checkout-desktop-closing" : "checkout-desktop-open"}`}
+        className={drawerClass}
         variants={drawerVariants}
         initial="hidden"
         animate={closing ? "exit" : "visible"}
         onMouseDown={(event) => event.stopPropagation()}
-        style={{ willChange: "transform, opacity", transformOrigin: "right center" }}
+        style={{
+          willChange: "transform, opacity",
+          transformOrigin: isMobileSheet ? "center bottom" : "right center",
+        }}
         role="dialog"
         aria-modal="true"
         aria-label="Checkout"
