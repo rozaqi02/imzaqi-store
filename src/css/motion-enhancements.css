@@ -413,7 +413,7 @@
 
   /* ── Lighter route transition (non-catalog) ── */
   [data-motion="full"] .route-transition:not(:has(.catalog-page)) {
-    animation: motionRouteFadeLite 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+    /* Handled uniformly by motion-ux.css */
   }
 }
 

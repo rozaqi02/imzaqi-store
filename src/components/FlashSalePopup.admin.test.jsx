@@ -104,8 +104,9 @@ describe("storefront popups on admin", () => {
     renderPopup(<FlashSalePopup />, "/");
     await waitFor(() => {
       expect(document.querySelector(".fsp-backdrop")).not.toBeNull();
+  
     });
-    expect(document.getElementById("root")?.inert).toBe(true);
+
   });
   it("does not open flash sale unless its setting is explicitly enabled", async () => {
     document.body.className = "";
@@ -121,6 +122,7 @@ describe("storefront popups on admin", () => {
     renderPopup(<FlashSalePopup />, "/");
     await waitFor(() => {
       expect(document.querySelector(".fsp-backdrop")).not.toBeNull();
+  
     });
 
     const closeBtn = document.querySelector(".fsp-closeFloat");

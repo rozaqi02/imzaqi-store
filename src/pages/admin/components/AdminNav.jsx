@@ -121,16 +121,6 @@ export function AdminSidebar({
   const tabsById = useMemo(() => Object.fromEntries(tabs.map((t) => [t.id, t])), [tabs]);
   const alertCtx = { newOrderCount, stockAlertCount, flashSaleEndingSoon };
 
-  const nextFocus = useMemo(() => {
-    if (newOrderCount > 0) return { id: "orders", label: `${newOrderCount} order baru`, tone: "accent" };
-    if (liveOrders > 0) return { id: "orders", label: `${liveOrders} order aktif`, tone: "accent" };
-    if (stockAlertCount > 0) {
-      return { id: "products", label: `${stockAlertCount} stok tipis`, tone: "warn", opts: { lowStock: true } };
-    }
-    if (flashSaleEndingSoon) return { id: "flashsale", label: "Flash sale hampir habis", tone: "urgent" };
-    return { id: "overview", label: "Toko aman · pantau ringkasan", tone: "ok" };
-  }, [newOrderCount, liveOrders, stockAlertCount, flashSaleEndingSoon]);
-
   const greetingHello = useMemo(() => {
     const name = String(greetingName || "Admin").trim() || "Admin";
     return `Halo, ${name}`;
@@ -147,27 +137,6 @@ export function AdminSidebar({
           <span>Command Center · imzaqi.store</span>
         </div>
       </header>
-
-      <button
-        type="button"
-        className={`adm-nextFocus adm-nextFocus--${nextFocus.tone}`}
-        onClick={() => onSelectTab(nextFocus.id, nextFocus.opts)}
-      >
-        <span className="adm-nextFocusLabel">Fokus sekarang</span>
-        <strong>{nextFocus.label}</strong>
-        <span className="adm-nextFocusCta">Buka →</span>
-      </button>
-
-      <div className="adm-sidebarStats" aria-label="Snapshot hari ini">
-        <div className="adm-statPill">
-          <span>Order hari ini</span>
-          <strong>{todayOrders}</strong>
-        </div>
-        <div className="adm-statPill">
-          <span>Omzet</span>
-          <strong>{todayRevenue}</strong>
-        </div>
-      </div>
 
       <nav className="adm-sidebarNav">
         {ADMIN_NAV_GROUPS.map((group) => (

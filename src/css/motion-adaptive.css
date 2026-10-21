@@ -17,27 +17,16 @@
 }
 
 /* Catalog routes: opacity-only fade to preserve sticky sidebar (no transform) */
-@keyframes catalogRouteFadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-[data-motion="lite"] .route-transition:not(:has(.catalog-page)):not(.app-main-catalog) {
-  animation: routeInLite 180ms cubic-bezier(0.22, 1, 0.36, 1) both !important;
-}
-
-[data-motion="lite"] .route-transition:has(.catalog-page),
-.route-transition:has(.catalog-page),
-.app-main-catalog .route-transition {
-  animation: catalogRouteFadeIn 150ms ease both !important;
+/* Lite motion: gentle fade for low-power devices */
+[data-motion="lite"] .app-main:not(.app-main-admin) > .route-transition {
+  animation: uxRouteFade 0.18s ease both !important;
   transform: none !important;
   will-change: opacity !important;
 }
 
-/* Reduced motion: override catalog route transitions */
-[data-motion="off"] .route-transition:has(.catalog-page),
-[data-motion="off"] .app-main-catalog .route-transition {
+[data-motion="off"] .route-transition {
   animation: none !important;
+  transform: none !important;
 }
 
 /*

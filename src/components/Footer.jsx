@@ -10,6 +10,7 @@ const footerColumns = [
       { label: "Katalog", to: "/produk" },
       { label: "Ulasan", to: "/testimoni" },
       { label: "Bantuan", to: "/faq" },
+      { label: "Media Promosi", to: "/promosi" },
     ],
   },
   {

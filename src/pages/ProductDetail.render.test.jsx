@@ -140,7 +140,7 @@ describe("ProductDetail render", () => {
 
   it("links Tanya Admin to the premium WhatsApp number with a prefilled message", async () => {
     renderDetail();
-    const contact = await screen.findByRole("link", { name: "Tanya admin? klik disini" });
+    const contact = await screen.findByRole("link", { name: "Tanya Admin!" });
     expect(contact).toHaveAttribute("href", expect.stringContaining("https://wa.me/6283136049987?text="));
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Netflix Premium");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("App Premium");
@@ -155,7 +155,7 @@ describe("ProductDetail render", () => {
       category: "academic",
     });
     renderDetail();
-    const contact = await screen.findByRole("link", { name: "Tanya admin? klik disini" });
+    const contact = await screen.findByRole("link", { name: "Tanya Admin!" });
     expect(contact.getAttribute("href")).toContain("https://wa.me/6281232742374?text=");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Jasa Akademik");
     expect(decodeURIComponent(contact.getAttribute("href"))).toContain("Turnitin Check");

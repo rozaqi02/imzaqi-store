@@ -1,18 +1,23 @@
 /* UX motion layer — interactive polish */
 
 @keyframes uxRouteForward {
-  0% { opacity: 0; transform: translate3d(28px, 0, 0) scale(0.99); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  0% { opacity: 0; transform: translate3d(0, 10px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes uxRouteBack {
-  0% { opacity: 0; transform: translate3d(-28px, 0, 0) scale(0.99); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+  0% { opacity: 0; transform: translate3d(0, -8px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes uxRouteFade {
-  0% { opacity: 0; transform: scale(0.995); }
-  100% { opacity: 1; transform: scale(1); }
+  0% { opacity: 0; transform: translate3d(0, 6px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes uxRouteFadeOnly {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
 }
 
 @keyframes uxLoadMoreProgress {
@@ -69,19 +74,25 @@
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  html[data-motion="full"] .route-transition--forward:not(:has(.catalog-page)),
-  html[data-motion="lite"] .route-transition--forward:not(:has(.catalog-page)) {
-    animation: uxRouteForward 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  .app-main:not(.app-main-admin) > .route-transition--forward {
+
+    animation: uxRouteForward 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  html[data-motion="full"] .route-transition--back:not(:has(.catalog-page)),
-  html[data-motion="lite"] .route-transition--back:not(:has(.catalog-page)) {
-    animation: uxRouteBack 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  .app-main:not(.app-main-admin) > .route-transition--back {
+
+    animation: uxRouteBack 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
   }
 
-  html[data-motion="full"] .route-transition--fade:not(:has(.catalog-page)),
-  html[data-motion="lite"] .route-transition--fade:not(:has(.catalog-page)) {
-    animation: uxRouteFade 0.25s ease both;
+  .app-main:not(.app-main-admin) > .route-transition--fade,
+  .app-main:not(.app-main-admin) > .route-transition {
+    animation: uxRouteFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Catalog route: smooth opacity fade without vertical transform to keep sticky filters rock-solid */
+  .app-main-catalog > .route-transition {
+    animation: uxRouteFadeOnly 0.22s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    transform: none !important;
   }
 
   .catalog-contentMeta.is-filtering strong {

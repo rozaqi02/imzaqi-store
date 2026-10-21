@@ -1095,7 +1095,7 @@ export default function ProductDetail() {
                         rel="noopener noreferrer"
                       >
                         <MessageCircle size={16} aria-hidden="true" />
-                        <span>Tanya admin? klik disini</span>
+                        <span>Tanya Admin!</span>
                       </a>
                     ) : null}
                   </div>

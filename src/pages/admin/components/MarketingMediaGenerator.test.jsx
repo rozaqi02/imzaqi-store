@@ -1,6 +1,8 @@
 import React from "react";
 import { render, screen, fireEvent, waitFor, act, cleanup } from "@testing-library/react";
 import { vi, describe, it, expect, beforeEach, afterEach } from "vitest";
+import QRCode from "qrcode";
+import { fetchActiveFlashSales } from "../../../lib/api";
 import MarketingMediaGenerator from "./MarketingMediaGenerator";
 import { loadMediaImage } from "./marketingMediaExport";
 import { drawProductPoster, drawCatalogPoster } from "./marketingMediaRenderer";
@@ -184,5 +186,119 @@ describe("marketing generator preview", () => {
     await waitFor(() => expect(screen.getByText(/2 paket \/ varian ready stok/)).toBeInTheDocument());
     await waitFor(() => expect(drawCatalogPoster.mock.calls.at(-1)[1].products).toHaveLength(2));
     expect(drawCatalogPoster.mock.calls.at(-1)[1].products.map(p => p.name)).toEqual(["Netflix", "Spotify"]);
+
+    // Toggle on "Harga reseller (15%)"
+    const resellerCheckbox = screen.getByRole("checkbox", { name: /harga reseller \(15%\)/i });
+    fireEvent.click(resellerCheckbox);
+    await waitFor(() => expect(drawCatalogPoster.mock.calls.at(-1)[1].products[0].offer.price).toBe(34500)); // 30000 * 1.15 = 34500
+    expect(drawCatalogPoster.mock.calls.at(-1)[1].products[1].offer.price).toBe(23000); // 20000 * 1.15 = 23000
+  });
+
+  it("toggles flash sale prices on and off using the flash sale checkbox", async () => {
+    const flashSaleProducts = [
+      {
+        id: "p-sale",
+        slug: "chatgpt",
+        name: "ChatGPT Plus",
+        icon_url: "icon-gpt",
+        product_variants: [
+          { id: "v-sale", name: "1 Bulan", price_idr: 100000, stock: 10, is_active: true },
+        ],
+      },
+    ];
+    fetchActiveFlashSales.mockResolvedValueOnce([
+      {
+        variant_id: "v-sale",
+        discount_percent: 25,
+        starts_at: "2020-01-01T00:00:00Z",
+        ends_at: "2030-01-01T00:00:00Z",
+        is_active: true,
+      },
+    ]);
+
+    render(<MarketingMediaGenerator products={flashSaleProducts}/>);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Download PNG" })).toBeEnabled());
+
+    // By default, flash sale is enabled: 100000 - 25% = 75000
+    await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(75000));
+    expect(drawProductPoster.mock.calls.at(-1)[1].offer.original).toBe(100000);
+
+    // Toggle off "Tampilkan harga flash sale jika ada"
+    const fsCheckbox = screen.getByRole("checkbox", { name: /tampilkan harga flash sale jika ada/i });
+    fireEvent.click(fsCheckbox);
+
+    // Should now show regular price: 100000
+    await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(100000));
+    expect(drawProductPoster.mock.calls.at(-1)[1].offer.original).toBe(0);
+
+    // Toggle back on
+    fireEvent.click(fsCheckbox);
+    await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(75000));
+  });
+
+  it("supports custom reseller markup per variant (e.g. +30% for Gemini)", async () => {
+    const testProducts = [
+      {
+        id: "p-gemini",
+        slug: "gemini",
+        name: "Gemini AI",
+        icon_url: "icon-gemini",
+        product_variants: [
+          { id: "v-gem", name: "Advanced 1 Bulan", price_idr: 100000, stock: 5, is_active: true },
+        ],
+      },
+    ];
+
+    render(<MarketingMediaGenerator products={testProducts}/>);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Download PNG" })).toBeEnabled());
+
+    // Enable reseller price (+15% default) -> 100000 * 1.15 = 115000
+    const resellerCheckbox = screen.getByRole("checkbox", { name: /harga reseller \(15%\)/i });
+    fireEvent.click(resellerCheckbox);
+    await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(115000));
+
+    // Custom markup input inside the custom markups panel
+    expect(screen.getByText(/Custom markup reseller per varian \/ produk/i)).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Pilih produk"), { target: { value: "p-gemini" } });
+    fireEvent.change(screen.getByLabelText("Markup (%)"), { target: { value: "30" } });
+    fireEvent.click(screen.getByRole("button", { name: "Terapkan" }));
+
+    // Price should now be 100000 * 1.30 = 130000 (+30%)
+    await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(130000));
+    expect(screen.getByText(/Gemini AI \(Semua varian\): \+30%/)).toBeInTheDocument();
+
+    // In single poster mode, admin can also edit markup directly in customizer
+    fireEvent.click(screen.getByText("Ubah teks & harga"));
+    const singleMarkupInput = screen.getByLabelText("Markup reseller varian ini (%)");
+    expect(singleMarkupInput).toHaveValue(30);
+
+    // Change to 40%
+    fireEvent.change(singleMarkupInput, { target: { value: "40" } });
+    await waitFor(() => expect(drawProductPoster.mock.calls.at(-1)[1].offer.price).toBe(140000));
+  });
+
+  it("switches footer to reseller mode and updates QR code with custom WhatsApp number", async () => {
+    render(<MarketingMediaGenerator products={products}/>);
+    await waitFor(() => expect(screen.getByRole("button", { name: "Download PNG" })).toBeEnabled());
+
+    // Default footer is standard: QR code points to product/catalog URL
+    await waitFor(() => expect(QRCode.toDataURL).toHaveBeenCalledWith(expect.stringContaining("imzaqi.store"), expect.any(Object)));
+    expect(drawProductPoster.mock.calls.at(-1)[1].footerMode).toBe("standard");
+
+    // Switch footer to "Khusus Reseller"
+    const resellerFooterBtn = screen.getByRole("button", { name: /Khusus Reseller/i });
+    fireEvent.click(resellerFooterBtn);
+
+    // QR should point to default reseller WA: https://wa.me/6285899508251
+    await waitFor(() => expect(QRCode.toDataURL).toHaveBeenCalledWith("https://wa.me/6285899508251", expect.any(Object)));
+    expect(drawProductPoster.mock.calls.at(-1)[1].footerMode).toBe("reseller");
+
+    // Custom phone number input
+    const phoneInput = screen.getByLabelText(/Nomor WhatsApp Reseller/i);
+    expect(phoneInput).toHaveValue("+62 858-9950-8251");
+
+    // Change phone number to a custom number
+    fireEvent.change(phoneInput, { target: { value: "0812-9876-5432" } });
+    await waitFor(() => expect(QRCode.toDataURL).toHaveBeenCalledWith("https://wa.me/6281298765432", expect.any(Object)));
   });
 });

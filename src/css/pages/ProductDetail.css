@@ -5391,14 +5391,15 @@ html[data-theme="dark"] .detail-page-v3 .pdx-compareBtn:hover {
 .detail-page-v3 .pdx-contactAdmin {
   display: inline-flex !important;
   align-items: center !important;
-  gap: 7px !important;
+  justify-content: center !important;
+  gap: 8px !important;
   width: fit-content !important;
-  min-height: 34px !important;
-  margin-top: 4px !important;
-  padding: 0 14px !important;
-  border-radius: 10px !important;
-  font-size: 11.5px !important;
-  font-weight: 700 !important;
+  min-height: 44px !important;
+  margin-top: 6px !important;
+  padding: 0 20px !important;
+  border-radius: 14px !important;
+  font-size: 14px !important;
+  font-weight: 800 !important;
   text-decoration: none !important;
   transition: all 0.2s ease !important;
 }

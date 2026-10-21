@@ -2,7 +2,8 @@
 .help-page,
 .reviews-page,
 .reviews-lightbox,
-.store-hero {
+.store-hero,
+.promosi-page {
   --surface-face: #1c2923;
   --surface-well: #142019;
   --surface-line: #35493c;
@@ -13,7 +14,7 @@
   --surface-inset: inset 4px 4px 8px #00000055, inset -3px -3px 7px #8bcba110;
   --surface-glaze: linear-gradient(155deg, #ffffff0c, #ffffff00 48%);
 }
-html[data-theme="light"] :is(.help-page, .reviews-page, .reviews-lightbox, .store-hero) {
+html[data-theme="light"] :is(.help-page, .reviews-page, .reviews-lightbox, .store-hero, .promosi-page) {
   --surface-face: #f0f5ef;
   --surface-well: #eaf0e9;
   --surface-line: #d4e0d5;

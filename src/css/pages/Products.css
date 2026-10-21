@@ -304,12 +304,15 @@ html[data-theme="light"] .catalog-command:focus-within {
 .catalog-body,
 .catalog-body .catalog-layout,
 .catalog-body .container,
-.app-main-catalog .route-transition,
 .app-main-catalog .page.catalog-page,
 .app-main-catalog .catalog-body.section {
   overflow: visible !important;
   transform: none !important;
   animation: none !important;
+}
+
+.app-main-catalog .route-transition {
+  overflow: visible !important;
 }
 
 .catalog-filterShell {

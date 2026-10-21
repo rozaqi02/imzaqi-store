@@ -359,7 +359,7 @@ body.checkout-open {
 .app-main-admin>.route-transition>.page>section:first-child,
 .app-main-admin>.route-transition>.section:first-child,
 .app-main-admin>.route-transition>section:first-child {
-  padding-top: calc(var(--site-header-offset) + 20px) !important;
+  padding-top: 0 !important;
 }
 
 .app-main::before,
@@ -1339,7 +1339,6 @@ html[data-theme="light"] .whatsapp-input-wrapper .error-hint {
 */
 
 .route-transition {
-  animation: routeIn var(--dur-slow) var(--ease-out) both;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -4011,10 +4010,8 @@ body {
   }
 }
 
+/* Mobile route transition handled uniformly by motion-ux.css */
 @media (max-width: 720px) {
-  .route-transition {
-    animation: none !important;
-  }
 
   .reveal,
   .reveal.is-visible {
@@ -4809,6 +4806,16 @@ html[data-theme="light"] .site-header {
 }
 
 
+/* ── Do not show footer while page-level skeletons or loaders are active ── */
+body:has(.page-loader) .site-footer,
+body:has(.pdx-skeletonPage) .site-footer,
+body:has(.reviews-skeleton) .site-footer,
+body:has(.home-tileSkeleton) .site-footer,
+body:has(.catalog-cardSkeleton) .site-footer,
+body:has([aria-busy="true"]) .site-footer {
+  display: none !important;
+}
+
 /* ── Theme transition — single overlay fade (1 layer, no per-element repaint) ── */
 html.no-theme-transition,
 html.no-theme-transition *,
@@ -5023,29 +5030,7 @@ html.theme-fade-active * {
   }
 }
 
-.route-transition {
-  animation: routeInDirectional 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
-  will-change: transform, opacity;
-}
-
-html[data-motion="full"] .route-transition:not(:has(.catalog-page)) {
-  animation: none;
-  will-change: auto;
-}
-
-.app-main-catalog .route-transition {
-  animation: none !important;
-  transform: none !important;
-  will-change: auto !important;
-}
-
-[data-motion="lite"] .route-transition {
-  will-change: opacity;
-}
-
-[data-motion="off"] .route-transition {
-  animation: none !important;
-}
+/* Route transitions handled uniformly by motion-ux.css */
 
 
 /* ═══════════════════════════════════════════════════════════════

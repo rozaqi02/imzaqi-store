@@ -1,0 +1,118 @@
+.promosi-page {
+  background: transparent;
+  color: var(--surface-text);
+  padding: calc(var(--site-header-offset, 0px) + 38px) 24px 80px;
+  --adm-surface: var(--surface-face);
+  --adm-surface-soft: var(--surface-well);
+  --adm-surface-muted: var(--surface-well);
+  --adm-border: var(--surface-line);
+  --adm-text: var(--surface-text);
+  --adm-muted: var(--surface-muted);
+}
+
+.promosi-wrap {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.promosi-page *,
+.promosi-page *::before,
+.promosi-page *::after {
+  box-sizing: border-box;
+}
+
+.promosi-hero {
+  padding: 36px 40px;
+  border: 1px solid var(--surface-line);
+  border-radius: 28px;
+  background: var(--surface-glaze), var(--surface-face);
+  box-shadow: var(--surface-raised);
+  margin-bottom: 28px;
+}
+
+.promosi-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  color: var(--surface-accent);
+  text-transform: uppercase;
+}
+
+.promosi-hero h1 {
+  font-size: clamp(28px, 3.8vw, 44px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  margin: 14px 0 12px;
+  color: var(--surface-text);
+}
+
+.promosi-hero h1 span {
+  color: var(--surface-accent);
+}
+
+.promosi-hero p {
+  max-width: 680px;
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--surface-muted);
+  margin: 0;
+}
+
+.promosi-studio {
+  border: 1px solid var(--surface-line);
+  border-radius: 24px;
+  background: var(--surface-glaze), var(--surface-face);
+  box-shadow: var(--surface-raised);
+  padding: 24px;
+}
+
+.promosi-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  min-height: 320px;
+  color: var(--surface-muted);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.promosi-loadingSpinner {
+  width: 36px;
+  height: 36px;
+  border: 3px solid rgba(16, 185, 129, 0.2);
+  border-top-color: #10b981;
+  border-radius: 50%;
+  animation: promosi-spin 0.8s linear infinite;
+}
+
+@keyframes promosi-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 768px) {
+  .promosi-page {
+    padding: calc(var(--site-header-offset, 0px) + 16px) 12px calc(var(--site-bottom-nav-offset, 0px) + 84px);
+  }
+  .promosi-hero {
+    padding: 20px 16px;
+    border-radius: 18px;
+    margin-bottom: 16px;
+  }
+  .promosi-hero h1 {
+    font-size: clamp(24px, 6.2vw, 30px);
+    margin: 10px 0 8px;
+  }
+  .promosi-hero p {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+  .promosi-studio {
+    padding: 14px 10px;
+    border-radius: 18px;
+  }
+}

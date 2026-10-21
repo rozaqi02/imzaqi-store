@@ -1,7 +1,7 @@
 import { MEDIA_FORMATS, MEDIA_STYLES, chooseVariant, posterOffer } from "./marketingMediaModel.js";
 
 const FONT = '"Poppins", sans-serif';
-const money = value => `Rp${new Intl.NumberFormat("id-ID").format(value)}`;
+const money = value => `Rp ${new Intl.NumberFormat("id-ID").format(value)}`;
 
 function font(ctx, size, weight = 700) { ctx.font = `${weight} ${size}px ${FONT}`; }
 function fit(ctx, text, width, size, weight = 700, min = 18) {
@@ -55,6 +55,41 @@ function star(ctx, x, y, radius, color, rotation = 0, points = 14) {
   ctx.closePath(); ctx.fill(); ctx.restore();
 }
 
+function roundRect(ctx, x, y, w, h, r) {
+  if (typeof ctx.roundRect === "function") {
+    ctx.roundRect(x, y, w, h, r);
+  } else {
+    ctx.moveTo(x + r, y);
+    ctx.arcTo(x + w, y, x + w, y + h, r);
+    ctx.arcTo(x + w, y + h, x, y + h, r);
+    ctx.arcTo(x, y + h, x, y, r);
+    ctx.arcTo(x, y, x + w, y, r);
+    ctx.closePath();
+  }
+}
+
+function drawChip(ctx, text, x, y, { bg, borderColor, textColor, fontSize = 13, radius = 5, padX = 8, height = 22 }) {
+  font(ctx, fontSize, 600);
+  const textW = ctx.measureText(text).width;
+  const chipW = textW + padX * 2;
+  ctx.save();
+  ctx.beginPath();
+  roundRect(ctx, x, y, chipW, height, radius);
+  ctx.fillStyle = bg;
+  ctx.fill();
+  if (borderColor) {
+    ctx.strokeStyle = borderColor;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+  ctx.fillStyle = textColor;
+  font(ctx, fontSize, 600);
+  ctx.textAlign = "left";
+  ctx.fillText(text, x + padX, y + height - 6);
+  ctx.restore();
+  return chipW;
+}
+
 function texture(ctx, w, h) {
   ctx.save();
   let seed = 37;
@@ -104,14 +139,19 @@ function art(ctx, style, image, name, cx, cy, size, variation) {
   ctx.restore();
 }
 
-function footer(ctx, { width, height, story, ink, bg, qr, phone, catalog = false }) {
+function footer(ctx, { width, height, story, ink, bg, qr, phone, catalog = false, footerMode = "standard" }) {
   const y = story ? height - 280 : height - 162;
   ctx.fillStyle = ink; ctx.fillRect(0, y, width, height - y);
   ctx.fillStyle = bg; ctx.textAlign = "left";
   font(ctx, 19, 600); ctx.fillText(catalog ? "TEMUKAN PAKETMU DI" : "PILIH PAKET. LANJUT CHECKOUT.", 64, y + 42);
   font(ctx, 35); ctx.fillText("imzaqi.store", 64, y + 91);
   font(ctx, 19, 600);
-  ctx.fillText(phone ? `Tanya admin · +${phone}` : "Scan QR untuk lihat produk & stok terbaru", 64, y + 124);
+  if (footerMode === "reseller") {
+    fit(ctx, "scan QR untuk lihat stok terbaru & hubungi admin", width - 260, 19, 600);
+    ctx.fillText("scan QR untuk lihat stok terbaru & hubungi admin", 64, y + 124);
+  } else {
+    ctx.fillText(phone ? `Tanya admin · +${phone}` : "Scan QR untuk lihat produk & stok terbaru", 64, y + 124);
+  }
   if (qr) {
     const size = 120, x = width - size - 64;
     ctx.fillStyle = "#fff"; ctx.fillRect(x, y + 20, size, size);
@@ -120,7 +160,7 @@ function footer(ctx, { width, height, story, ink, bg, qr, phone, catalog = false
   }
 }
 
-export function drawProductPoster(canvas, { offer, styleId, format = "square", variation = 0, headline = "", badge = "", image, qr, phone }) {
+export function drawProductPoster(canvas, { offer, styleId, format = "square", variation = 0, headline = "", badge = "", image, qr, phone, footerMode = "standard" }) {
   const { width, height } = MEDIA_FORMATS[format] || MEDIA_FORMATS.square;
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext("2d");
@@ -178,21 +218,25 @@ export function drawProductPoster(canvas, { offer, styleId, format = "square", v
   font(ctx, 18, 600); ctx.fillText(offer.outOfStock ? "HARGA PAKET · KONFIRMASI STOK" : "HARGA PAKET PILIHAN", 64, priceY - (story ? 140 : 93));
   const priceText = offer.price ? money(offer.price) : "Tanya admin";
   fit(ctx, priceText, banner ? width * .56 : width - 128, story ? 132 : 110);
+  const hasSingleDiscount = Boolean(offer.original && offer.original > offer.price);
+  const singleFlashColor = s.id === "new_release" ? "#ff7b72" : s.id === "flash_sale" ? "#e93d36" : "#d92d20";
+  ctx.fillStyle = hasSingleDiscount ? singleFlashColor : s.ink;
   ctx.fillText(priceText, 60, priceY);
   if (offer.original) {
     font(ctx, 24, 600);
     const original = money(offer.original), x = 64, y = priceY + 62;
+    ctx.fillStyle = s.ink;
     ctx.globalAlpha = .65; ctx.fillText(original, x, y);
     ctx.strokeStyle = s.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y - 8); ctx.lineTo(x + ctx.measureText(original).width, y - 8); ctx.stroke(); ctx.globalAlpha = 1;
   }
   font(ctx, 20, 600);
   const note = "Detail paket & ketersediaan ada di website";
   textBlock(ctx, note, 64, story ? 1580 : 896, width - 128, 20, 1, 600);
-  footer(ctx, { width, height, story, ink: s.ink, bg: s.bg, qr, phone });
+  footer(ctx, { width, height, story, ink: s.ink, bg: s.bg, qr, phone, footerMode });
   return { width, height };
 }
 
-export function drawCatalogPoster(canvas, { products, discounts, theme = "emerald", page = 1, pageCount = 1, total, images = [], qr, phone, catalogScope = "products" }) {
+export function drawCatalogPoster(canvas, { products, discounts, theme = "emerald", page = 1, pageCount = 1, total, images = [], qr, phone, catalogScope = "products", footerMode = "standard" }) {
   const width = 1200, height = 1600;
   canvas.width = width; canvas.height = height;
   const ctx = canvas.getContext("2d");
@@ -204,9 +248,10 @@ export function drawCatalogPoster(canvas, { products, discounts, theme = "emeral
   ctx.textAlign = "right"; font(ctx, 19, 600);
   const isVariantScope = catalogScope === "variants";
   ctx.fillText(`${total} ${isVariantScope ? "PAKET" : "PRODUK"} · ${page} / ${pageCount}`, width - 64, 82); ctx.textAlign = "left";
-  font(ctx, 90); ctx.fillText("KATALOG", 60, 210); ctx.fillText("PILIHANMU.", 60, 298);
+  font(ctx, 90); ctx.fillText("PRICELIST", 60, 210); ctx.fillText("RESMI.", 60, 298);
   star(ctx, 1000, 220, 126, accent, -.14, 16);
-  ctx.fillStyle = "#143f32"; ctx.textAlign = "center"; font(ctx, 25); ctx.fillText("PILIH.", 1000, 213); ctx.fillText("PAKAI.", 1000, 245); ctx.textAlign = "left";
+  ctx.fillStyle = "#143f32"; ctx.textAlign = "center"; font(ctx, 18, 800);
+  ctx.fillText("TERPERCAYA", 1000, 212); ctx.fillText("& BERGARANSI", 1000, 238); ctx.textAlign = "left";
   ctx.fillStyle = ink; font(ctx, 22, 600);
   ctx.fillText(isVariantScope ? "Daftar paket & varian siap aktif untuk kebutuhanmu." : "Aplikasi premium & layanan untuk kebutuhanmu.", 64, 351);
   const columnW = 508, gap = 56, rowH = 190, startY = 412;
@@ -220,30 +265,103 @@ export function drawCatalogPoster(canvas, { products, discounts, theme = "emeral
     else { ctx.fillStyle = ink; font(ctx, 44); ctx.fillText(offer.name.slice(0, 1), x + 15, y + 76); }
     ctx.fillStyle = ink;
     textBlock(ctx, offer.name, x + 91, y + 47, columnW - 91, 29, 2);
-    font(ctx, 18, 600); ctx.globalAlpha = .72;
+
     const isVariantItem = isVariantScope || Boolean(item.variant);
-    const hint = isVariantItem
-      ? (offer.outOfStock ? `${offer.variant || "Paket"} · Stok habis` : [offer.variant, offer.duration].filter(Boolean).join(" · "))
-      : (offer.outOfStock ? "Stok habis · tanya admin" : offer.duration || "Lihat pilihan paket");
-    fit(ctx, hint, columnW - 91, 18, 600); ctx.fillText(hint, x + 91, y + 103); ctx.globalAlpha = 1;
+    const durationText = offer.duration ? String(offer.duration).trim() : "";
+    const variantName = isVariantItem ? String(offer.variant || "").trim() : "";
+    const isOut = Boolean(offer.outOfStock);
+
+    const chipBg = isOut
+      ? (theme === "dark" ? "rgba(233, 61, 54, 0.16)" : "rgba(217, 45, 32, 0.1)")
+      : (theme === "dark" ? "rgba(184, 223, 117, 0.14)" : "rgba(20, 63, 50, 0.08)");
+    const chipBorder = isOut
+      ? (theme === "dark" ? "rgba(233, 61, 54, 0.35)" : "rgba(217, 45, 32, 0.22)")
+      : (theme === "dark" ? "rgba(184, 223, 117, 0.3)" : "rgba(20, 63, 50, 0.18)");
+    const chipColor = isOut
+      ? (theme === "dark" ? "#ff8577" : "#b42318")
+      : (theme === "dark" ? "#b8df75" : "#143f32");
+
+    const chipLabel = isOut ? "Stok habis" : durationText;
+    const availW = columnW - 91;
+    let curX = x + 91;
+
+    if (isVariantItem && variantName && variantName.toLowerCase() !== offer.name.toLowerCase()) {
+      let chipW = 0;
+      if (chipLabel) {
+        font(ctx, 13, 600);
+        chipW = ctx.measureText(chipLabel).width + 16 + 8;
+      }
+      const maxTextW = Math.max(80, availW - chipW);
+      ctx.fillStyle = ink;
+      font(ctx, 15, 600);
+      ctx.globalAlpha = 0.72;
+      let displayVariant = variantName;
+      while (displayVariant && ctx.measureText(displayVariant).width > maxTextW && displayVariant.length > 3) {
+        displayVariant = displayVariant.slice(0, -1);
+      }
+      if (displayVariant !== variantName) displayVariant = `${displayVariant.trim()}…`;
+      ctx.fillText(displayVariant, curX, y + 101);
+      ctx.globalAlpha = 1;
+      curX += ctx.measureText(displayVariant).width + 8;
+
+      if (chipLabel) {
+        drawChip(ctx, chipLabel, curX, y + 84, {
+          bg: chipBg,
+          borderColor: chipBorder,
+          textColor: chipColor,
+          fontSize: 13,
+          radius: 5,
+        });
+      }
+    } else if (chipLabel) {
+      drawChip(ctx, chipLabel, curX, y + 84, {
+        bg: chipBg,
+        borderColor: chipBorder,
+        textColor: chipColor,
+        fontSize: 13,
+        radius: 5,
+      });
+    } else {
+      ctx.fillStyle = ink;
+      font(ctx, 15, 600);
+      ctx.globalAlpha = 0.72;
+      ctx.fillText("Lihat pilihan paket", curX, y + 101);
+      ctx.globalAlpha = 1;
+    }
+
+    const hasDiscount = Boolean(offer.original && offer.original > offer.price);
+    const flashPriceColor = theme === "dark" ? "#ff6459" : "#d92d20";
     const priceText = isVariantItem
       ? (offer.price ? money(offer.price) : "Tanya admin")
       : (offer.price ? `Mulai ${money(offer.price)}` : "Tanya admin");
-    fit(ctx, priceText, columnW - 91, 31);
+
+    const maxPriceW = hasDiscount ? (columnW - 91) * 0.58 : (columnW - 91);
+    fit(ctx, priceText, maxPriceW, 31, 700, 20);
+    const priceWidth = ctx.measureText(priceText).width;
+
+    ctx.fillStyle = hasDiscount ? flashPriceColor : ink;
     ctx.fillText(priceText, x + 91, y + 150);
-    if (isVariantItem && offer.original && offer.original > offer.price) {
-      font(ctx, 18, 600);
-      const originalText = money(offer.original);
-      const origX = x + 91 + ctx.measureText(priceText).width + 12;
-      if (origX + 80 < x + columnW) {
-        ctx.globalAlpha = .55;
+
+    if (hasDiscount) {
+      const originalText = isVariantItem ? money(offer.original) : `Mulai ${money(offer.original)}`;
+      const origX = x + 91 + priceWidth + 10;
+      const availOrigW = (x + columnW) - origX - 4;
+      if (availOrigW > 45) {
+        fit(ctx, originalText, availOrigW, 17, 600, 12);
+        const origW = ctx.measureText(originalText).width;
+        ctx.fillStyle = ink;
+        ctx.globalAlpha = 0.52;
         ctx.fillText(originalText, origX, y + 150);
-        ctx.strokeStyle = ink; ctx.lineWidth = 1.5; ctx.beginPath();
-        ctx.moveTo(origX, y + 144); ctx.lineTo(origX + ctx.measureText(originalText).width, y + 144); ctx.stroke();
+        ctx.strokeStyle = ink;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(origX, y + 144);
+        ctx.lineTo(origX + origW, y + 144);
+        ctx.stroke();
         ctx.globalAlpha = 1;
       }
     }
   });
   font(ctx, 16, 600); ctx.fillStyle = ink; ctx.fillText("Harga & stok dapat berubah. Scan QR untuk informasi terbaru.", 64, 1390);
-  footer(ctx, { width, height, ink, bg, qr, phone, catalog: true });
+  footer(ctx, { width, height, ink, bg, qr, phone, catalog: true, footerMode });
 }

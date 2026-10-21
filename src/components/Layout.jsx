@@ -36,6 +36,9 @@ export default function Layout({ children, routeKey }) {
     if (typeof document === "undefined") return undefined;
     document.body.classList.toggle("is-funnel", isFunnel);
     document.body.classList.toggle("is-admin-app", hideStoreChrome);
+    if (hideStoreChrome) {
+      document.documentElement.style.setProperty("--site-header-offset", "0px");
+    }
     return () => {
       document.body.classList.remove("is-funnel");
       document.body.classList.remove("is-admin-app");
@@ -55,7 +58,7 @@ export default function Layout({ children, routeKey }) {
           {children}
         </div>
       </main>
-      {hideFooter ? null : <Footer key={revealKey} />}
+      {hideFooter ? null : <Footer />}
       {hideStoreChrome ? null : <BottomNav />}
     </div>
   );

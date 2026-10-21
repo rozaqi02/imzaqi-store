@@ -2528,36 +2528,6 @@ export default function AdminDashboard() {
       ? `Sinkron ${formatAdminDate(lastSyncedAt)}`
       : "Belum sinkron";
 
-  const primaryWorkspaceAction = {
-    overview: {
-      label: orderStats.live > 0 ? "Proses pesanan" : "Lihat pesanan",
-      onClick: () => handleSelectTab("orders"),
-      icon: ClipboardList,
-    },
-    orders: {
-      label: "Export CSV",
-      onClick: handleExportCSV,
-      icon: ClipboardList,
-    },
-    products: {
-      label: "Tambah produk",
-      onClick: openCreateProduct,
-      icon: Plus,
-    },
-    promos: {
-      label: "Buat promo",
-      onClick: openCreatePromo,
-      icon: Plus,
-    },
-    flashsale: {
-      label: "Buat flash sale",
-      onClick: () => setFlashFormOpen(true),
-      icon: Plus,
-    },
-    testimonials: null,
-    settings: null,
-  }[activeTab.id];
-
   const activeOrderWhatsApp = activeOrder ? buildWhatsAppLink(activeOrder.customer_whatsapp) : "";
   const activeOrderBuyerEmail = useMemo(() => {
     if (!activeOrder) return "";
@@ -2599,8 +2569,6 @@ export default function AdminDashboard() {
     return "Admin";
   }, [adminEmail]);
 
-  const PrimaryActionIcon = primaryWorkspaceAction?.icon || Plus;
-
   return (
     <div className="page admin-page admin-page--app">
       <section className="section admin-section">
@@ -2623,26 +2591,6 @@ export default function AdminDashboard() {
           />
 
           <main className="admin-main">
-            {/* Slim action bar only — tab title lives inside each pane (no double header) */}
-            <div className="admin-workspaceToolbar" role="toolbar" aria-label="Aksi halaman">
-              <div className="admin-workspaceSync" title={syncCopy}>
-                <span className={`admin-syncDot${loading ? " is-loading" : ""}`} />
-                <span>{syncCopy}</span>
-              </div>
-              <div className="admin-workspaceToolbarActions">
-                <button type="button" className="btn btn-ghost btn-sm" onClick={refreshAll}>
-                  <Eye size={15} />
-                  Refresh
-                </button>
-                {primaryWorkspaceAction ? (
-                  <button type="button" className="btn btn-primary btn-sm" onClick={primaryWorkspaceAction.onClick}>
-                    <PrimaryActionIcon size={15} />
-                    {primaryWorkspaceAction.label}
-                  </button>
-                ) : null}
-              </div>
-            </div>
-
             <AdminMobileNav
               tabs={tabs}
               activeTabId={tab}

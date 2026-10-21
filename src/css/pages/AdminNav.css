@@ -572,12 +572,12 @@ html[data-theme="light"] .adm-sidebarGreeting {
     box-sizing: border-box;
     padding: 6px 8px;
     gap: 4px;
-    border: 1px solid var(--liquid-glass-border, rgba(255, 255, 255, 0.12));
+    border: 1px solid rgba(255, 255, 255, 0.14);
     border-radius: 22px;
-    background: var(--nav-shell-surface-bottom, rgba(12, 18, 26, 0.92));
-    box-shadow: var(--nav-shell-shadow-bottom, 0 20px 48px rgba(0, 0, 0, 0.55));
-    backdrop-filter: var(--liquid-glass-blur) var(--liquid-glass-saturate);
-    -webkit-backdrop-filter: var(--liquid-glass-blur) var(--liquid-glass-saturate);
+    background: #0d141e;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.75), 0 2px 8px rgba(0, 0, 0, 0.4);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
     /* Prevent accidental wrap if any child grows */
     overflow: hidden;
   }
@@ -808,9 +808,11 @@ html[data-theme="light"] .adm-footBtn--danger:hover {
 
 @media (max-width: 720px) {
   html[data-theme="light"] .adm-dock {
-    background: var(--nav-shell-surface-bottom, rgba(255, 255, 255, 0.92));
-    border: 1px solid rgba(0, 158, 96, 0.14);
-    box-shadow: var(--nav-shell-shadow-bottom, 0 16px 40px rgba(45, 85, 100, 0.16));
+    background: #ffffff;
+    border: 1px solid rgba(0, 158, 96, 0.2);
+    box-shadow: 0 16px 40px rgba(45, 85, 100, 0.2), 0 2px 8px rgba(45, 85, 100, 0.1);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 
   html[data-theme="light"] .adm-dockBtn {

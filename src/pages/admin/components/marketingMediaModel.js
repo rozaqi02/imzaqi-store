@@ -18,13 +18,27 @@ export function activeVariants(product) {
     .filter(v => v.is_active !== false);
 }
 
-export function chooseVariant(product, id, discounts = new Map()) {
+export function chooseVariant(product, id, discounts = new Map(), overrides = {}) {
   const variants = activeVariants(product);
   const selected = variants.find(v => String(v.id) === String(id));
   if (selected) return selected;
   const ready = variants.filter(v => !isKnownOutOfStock(v));
+  const { reseller = false, variantMarkups = {}, productMarkups = {} } = overrides;
+  const pId = product?.id != null ? String(product.id) : null;
+  const pSlug = product?.slug != null ? String(product.slug).toLowerCase() : null;
+
   return [...(ready.length ? ready : variants)].sort((a, b) => {
-    const price = v => getVariantEffectivePrice(v, discounts) || Infinity;
+    const price = v => {
+      const eff = getVariantEffectivePrice(v, discounts) || Infinity;
+      if (!reseller) return eff;
+      const vId = String(v.id);
+      let m = null;
+      if (variantMarkups[vId] != null) m = Number(variantMarkups[vId]);
+      else if (pId && productMarkups[pId] != null) m = Number(productMarkups[pId]);
+      else if (pSlug && productMarkups[pSlug] != null) m = Number(productMarkups[pSlug]);
+      else m = 15;
+      return m > 0 ? Math.round(eff * (1 + m / 100)) : eff;
+    };
     return price(a) - price(b);
   })[0] || null;
 }
@@ -43,11 +57,31 @@ export function liveDiscounts(sales, now = Date.now()) {
 export function posterOffer(product, variant, discounts, overrides = {}) {
   const effective = getVariantEffectivePrice(variant, discounts);
   const manual = String(overrides.price ?? "").trim();
-  const price = manual !== "" ? Number(manual) : effective;
+  const vId = variant?.id != null ? String(variant.id) : null;
+  const pId = product?.id != null ? String(product.id) : null;
+  const pSlug = product?.slug != null ? String(product.slug).toLowerCase() : null;
+
+  let customMarkup = null;
+  if (vId && overrides.variantMarkups && overrides.variantMarkups[vId] != null) {
+    customMarkup = Number(overrides.variantMarkups[vId]);
+  } else if (pId && overrides.productMarkups && overrides.productMarkups[pId] != null) {
+    customMarkup = Number(overrides.productMarkups[pId]);
+  } else if (pSlug && overrides.productMarkups && overrides.productMarkups[pSlug] != null) {
+    customMarkup = Number(overrides.productMarkups[pSlug]);
+  }
+
+  const hasCustom = customMarkup !== null && !isNaN(customMarkup);
+  const markup = overrides.reseller
+    ? (hasCustom ? customMarkup : (Number(overrides.defaultResellerPercent) || 15))
+    : 0;
+
+  const calculated = markup > 0 ? Math.round(effective * (1 + markup / 100)) : effective;
+  const price = manual !== "" ? Number(manual) : calculated;
   if (!Number.isSafeInteger(price) || price < 0 || (manual && price === 0)) {
     throw new Error("Harga manual harus berupa angka lebih dari 0.");
   }
-  const base = Number(variant?.price_idr || 0);
+  const rawBase = Number(variant?.price_idr || 0);
+  const base = markup > 0 ? Math.round(rawBase * (1 + markup / 100)) : rawBase;
   const original = base > price && price > 0 ? base : 0;
   return {
     name: String(product?.name || "Produk pilihan"),
@@ -68,7 +102,13 @@ export function paginateCatalog(products, size = 10) {
 }
 
 export function buildCatalogEntries(products, scope = "products", discounts = new Map(), selectedProductId = "all", options = {}) {
-  const { onlyActive = true, onlyInStock = false } = options;
+  const {
+    onlyActive = true,
+    onlyInStock = false,
+    resellerPrice = false,
+    variantMarkups = {},
+    productMarkups = {},
+  } = options;
   const filteredProducts = (products || []).filter(p => {
     if (onlyActive && p.is_active === false) return false;
     if (onlyInStock) {
@@ -97,7 +137,11 @@ export function buildCatalogEntries(products, scope = "products", discounts = ne
           slug: product.slug,
           product,
           variant,
-          offer: posterOffer(product, variant, discounts),
+          offer: posterOffer(product, variant, discounts, {
+            reseller: resellerPrice,
+            variantMarkups,
+            productMarkups,
+          }),
         });
       }
     }
@@ -108,12 +152,21 @@ export function buildCatalogEntries(products, scope = "products", discounts = ne
     let variants = Array.isArray(product?.product_variants) ? product.product_variants : [];
     if (onlyActive) variants = variants.filter(v => v.is_active !== false);
     if (onlyInStock) variants = variants.filter(v => !isKnownOutOfStock(v));
-    const variant = chooseVariant({ ...product, product_variants: variants }, "", discounts);
+    const variant = chooseVariant(
+      { ...product, product_variants: variants },
+      "",
+      discounts,
+      { reseller: resellerPrice, variantMarkups, productMarkups }
+    );
     return {
       ...product,
       product,
       variant,
-      offer: posterOffer(product, variant, discounts),
+      offer: posterOffer(product, variant, discounts, {
+        reseller: resellerPrice,
+        variantMarkups,
+        productMarkups,
+      }),
     };
   });
 }

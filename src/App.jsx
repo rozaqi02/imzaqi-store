@@ -64,6 +64,7 @@ const Status = React.lazy(() => import("./pages/Status"));
 const NotFound = React.lazy(() => import("./pages/NotFound"));
 const About = React.lazy(() => import("./pages/About"));
 const Testimonials = React.lazy(() => import("./pages/Testimonials"));
+const Promosi = React.lazy(() => import("./pages/Promosi"));
 const Checkout = React.lazy(() => import("./pages/Checkout"));
 const Pay = React.lazy(() => import("./pages/Pay"));
 const AdminLogin = React.lazy(() => import("./pages/admin/AdminLogin"));
@@ -239,27 +240,11 @@ function ScrollToTop() {
       history.scrollRestoration = "auto";
     }
 
-    const reduce =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    const coarse =
-      typeof window !== "undefined" &&
-      window.matchMedia &&
-      window.matchMedia("(max-width: 920px), (pointer: coarse)").matches;
-
-    // iOS Safari kadang mengabaikan scrollTo saat dipanggil terlalu awal
-    // di siklus render. Double rAF memastikan scroll terjadi setelah paint.
-    const doScroll = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: reduce || coarse ? "auto" : "smooth" });
-    };
-
-    if (coarse) {
-      // Mobile/touch: gunakan double rAF agar iOS tidak scroll ke posisi lama
-      requestAnimationFrame(() => requestAnimationFrame(doScroll));
-    } else {
-      doScroll();
-    }
+    // Scroll instan ke top tanpa animasi smooth-scroll sweep agar transisi
+    // halaman baru terasa bersih, konsisten, dan bebas flicker/jolt.
+    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    if (document.documentElement) document.documentElement.scrollTop = 0;
+    if (document.body) document.body.scrollTop = 0;
   }, [pathname, showCheckoutOverlay]);
 
   return null;
@@ -283,6 +268,7 @@ function AppRoutes() {
             <Route path="/tentang" element={<BoundedRoute pageName="Tentang"><About /></BoundedRoute>} />
             <Route path="/faq" element={<BoundedRoute pageName="Bantuan"><Faq /></BoundedRoute>} />
             <Route path="/testimoni" element={<BoundedRoute pageName="Ulasan"><Testimonials /></BoundedRoute>} />
+            <Route path="/promosi" element={<BoundedRoute pageName="Media Promosi"><Promosi /></BoundedRoute>} />
             <Route path="/checkout" element={<BoundedRoute pageName="Checkout"><Checkout /></BoundedRoute>} />
             <Route path="/cart" element={<Navigate to="/checkout" replace />} />
             <Route path="/keranjang" element={<Navigate to="/checkout" replace />} />

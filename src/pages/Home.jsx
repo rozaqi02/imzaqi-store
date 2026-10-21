@@ -184,13 +184,9 @@ export default function Home() {
     let alive = true;
     (async () => {
       try {
-        // Products first so hero backdrop paints immediately (don't wait for extras)
-        const data = await fetchProducts({ useCache: true, ttlMs: 60_000 });
-        if (!alive) return;
-        setProducts(data || []);
-        setLoading(false);
-
-        const [topData, promoData, settingsData, flashSales] = await Promise.all([
+        // Fetch all initial storefront home data in one unified pass to prevent multiple layout shifts
+        const [data, topData, promoData, settingsData, flashSales] = await Promise.all([
+          fetchProducts({ useCache: true, ttlMs: 60_000 }),
           fetchTopSellingData().catch(() => ({ topIds: [], salesMap: {} })),
           fetchPromoCodes().catch(() => []),
           fetchSettings().catch(() => ({})),
@@ -216,7 +212,9 @@ export default function Home() {
             return true;
           })
           .slice(0, 3);
+        setProducts(data || []);
         setPromos(activePromos);
+        setLoading(false);
       } catch (e) {
         warn(e);
         if (alive) {

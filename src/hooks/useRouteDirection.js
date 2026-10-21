@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 
 const FADE_ROUTES = ["/checkout", "/bayar", "/admin", "/admin/dashboard"];
 
@@ -10,26 +10,31 @@ function routeDepth(pathname) {
   return 1;
 }
 
+/**
+ * Calculates page transition direction synchronously during render.
+ * Avoids any state updates or useEffect delays that would cause class switches
+ * and animation restart flickers.
+ */
 export function useRouteDirection(pathname) {
   const prevPathRef = useRef(pathname);
-  const [direction, setDirection] = useState("fade");
+  const directionRef = useRef("fade");
 
-  useEffect(() => {
+  if (prevPathRef.current !== pathname) {
     const prevDepth = routeDepth(prevPathRef.current);
     const nextDepth = routeDepth(pathname);
 
     if (prevDepth === "fade" || nextDepth === "fade") {
-      setDirection("fade");
+      directionRef.current = "fade";
     } else if (nextDepth > prevDepth) {
-      setDirection("forward");
+      directionRef.current = "forward";
     } else if (nextDepth < prevDepth) {
-      setDirection("back");
+      directionRef.current = "back";
     } else {
-      setDirection("fade");
+      directionRef.current = "fade";
     }
 
     prevPathRef.current = pathname;
-  }, [pathname]);
+  }
 
-  return direction;
+  return directionRef.current;
 }

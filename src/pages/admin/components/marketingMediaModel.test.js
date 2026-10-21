@@ -43,6 +43,27 @@ describe("marketing product offers", () => {
   it("normalizes a local admin number for the poster", () => {
     expect(normalizeMediaPhone("0812-3274-2374")).toBe("6281232742374");
   });
+  it("applies default reseller markup (+15%) and custom markup per variant or product", () => {
+    const variant = chooseVariant(product);
+    // Standard 31000 + 15% = 35650
+    const offerReseller = posterOffer(product, variant, undefined, { reseller: true });
+    expect(offerReseller.price).toBe(35650);
+
+    // Custom markup 30% for Gemini / this variant: 31000 * 1.30 = 40300
+    const offerCustomVar = posterOffer(product, variant, undefined, {
+      reseller: true,
+      variantMarkups: { [variant.id]: 30 },
+    });
+    expect(offerCustomVar.price).toBe(40300);
+
+    // Custom markup at product level
+    const geminiProduct = { id: "p-gemini", slug: "gemini", name: "Gemini", product_variants: [{ id: "vg1", price_idr: 50000 }] };
+    const offerCustomProd = posterOffer(geminiProduct, geminiProduct.product_variants[0], undefined, {
+      reseller: true,
+      productMarkups: { "p-gemini": 30 },
+    });
+    expect(offerCustomProd.price).toBe(65000); // 50000 * 1.30 = 65000
+  });
 });
 
 describe("catalogue ZIP export", () => {

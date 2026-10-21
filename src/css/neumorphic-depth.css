@@ -1446,10 +1446,7 @@ html[data-theme="light"] .admin-orderListItem {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-.home-page .hx-stat-item {
-  border: 1px solid var(--brand-line) !important;
-  box-shadow: var(--skeu-panel-shadow) !important;
-}
+/* .hx-stat-item is borderless inside unified .hx-stats-row pill */
 
 .home-page .hx-live-badge,
 .home-page .hx-onboardBanner,
@@ -1495,9 +1492,7 @@ html[data-theme="light"] .admin-orderListItem {
 html[data-theme="light"] .home-page .home-howCard,
 html[data-theme="light"] .home-page .home-promoCard,
 html[data-theme="light"] .home-page .home-faqItem.faq-item,
-html[data-theme="light"] .home-page .hx-stat-item {
-  border-color: rgba(13, 124, 144, 0.14) !important;
-}
+/* .hx-stat-item transparent in single pill */
 
 /* ═══════════════════════════════════════════════════════════════════
    Pass 9 — Catalog page only (filter, cards, badges, search, sheet)
@@ -2024,7 +2019,6 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   .home-page .home-howCard,
   .home-page .home-promoCard,
   .home-page .home-faqItem.faq-item,
-  .home-page .hx-stat-item,
   .home-page .home-popularList .product-tile {
     box-shadow:
       0 6px 16px rgba(0, 0, 0, 0.18),
@@ -2072,12 +2066,10 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 [data-motion="lite"] .home-page .home-howCard,
 [data-motion="lite"] .home-page .home-promoCard,
 [data-motion="lite"] .home-page .home-faqItem.faq-item,
-[data-motion="lite"] .home-page .hx-stat-item,
 [data-motion="lite"] .home-page .home-popularList .product-tile,
 [data-motion="off"] .home-page .home-howCard,
 [data-motion="off"] .home-page .home-promoCard,
 [data-motion="off"] .home-page .home-faqItem.faq-item,
-[data-motion="off"] .home-page .hx-stat-item,
 [data-motion="off"] .home-page .home-popularList .product-tile {
   box-shadow:
     0 6px 16px rgba(0, 0, 0, 0.16),

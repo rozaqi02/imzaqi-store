@@ -859,34 +859,47 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
 
 /* â”€â”€ Stats dock (dipertahankan, visual neo card) â”€â”€ */
 .hx-stats-row {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: none;
-}
-
-@media (min-width: 721px) {
-  .hx-stats-row {
-    gap: 14px;
-  }
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  width: 100% !important;
+  max-width: 680px !important;
+  margin: 0 auto !important;
+  padding: 10px 20px !important;
+  gap: 0 !important;
+  border-radius: 9999px !important;
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12)) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
+    var(--home-neo-panel, var(--skeu-panel-bg)) !important;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
 }
 
 .hx-stat-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  min-width: 0;
-  padding: 14px 14px;
-  border-radius: 20px;
-  border: 1px solid var(--brand-line, transparent);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 28%),
-    var(--home-neo-panel, var(--skeu-panel-bg));
-  box-shadow: var(--home-neo-panel-shadow, var(--skeu-panel-shadow));
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+  flex: 1 1 0 !important;
+  padding: 4px 14px !important;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
   text-align: left;
+  position: relative !important;
+}
+
+.hx-stat-item:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  top: 15%;
+  bottom: 15%;
+  width: 1px;
+  background: var(--brand-line, rgba(255, 255, 255, 0.12));
+  pointer-events: none;
 }
 
 .hx-stat-icon-wrap {
@@ -1167,38 +1180,39 @@ html[data-motion="off"] .hx-headline--enter .hx-headline-word {
     height: 15px;
   }
 
-  /* ── Block 3: stats — 1 Kapsul Bar Terpadu (Unified Minimalist Dock) ── */
+  /* ── Block 3: stats — 1 Kapsul Bar Terpadu (Unified Single Pill) ── */
   .hx-stats-row {
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    width: 100%;
-    max-width: 390px;
-    margin: 0 auto;
-    padding: 8px 10px;
-    gap: 0;
-    flex: 0 0 auto;
-    box-sizing: border-box;
-    border-radius: 18px;
-    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-around !important;
+    width: 100% !important;
+    max-width: 390px !important;
+    margin: 0 auto !important;
+    padding: 7px 10px !important;
+    gap: 0 !important;
+    flex: 0 0 auto !important;
+    box-sizing: border-box !important;
+    border-radius: 9999px !important;
+    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.14)) !important;
     background:
       linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 30%),
-      var(--home-neo-panel, var(--skeu-panel-bg));
-    box-shadow: var(--home-neo-panel-shadow, var(--skeu-panel-shadow));
+      var(--home-neo-panel, var(--skeu-panel-bg)) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
   }
 
   .hx-stat-item {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 7px;
-    min-width: 0;
-    flex: 1 1 0;
-    padding: 4px 6px;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 6px !important;
+    min-width: 0 !important;
+    flex: 1 1 0 !important;
+    padding: 3px 6px !important;
     border: none !important;
     background: transparent !important;
     box-shadow: none !important;
-    position: relative;
+    border-radius: 0 !important;
+    position: relative !important;
   }
 
   .hx-stat-item:not(:last-child)::after {
@@ -3058,7 +3072,6 @@ html[data-theme="light"] .home-page {
   background: var(--home-canvas) !important;
 }
 
-html[data-theme="light"] .home-page .hx-stat-item,
 html[data-theme="light"] .home-page .home-popularList .product-tile,
 html[data-theme="light"] .home-page .home-howCard,
 html[data-theme="light"] .home-page .home-faqItem.faq-item,
@@ -3068,7 +3081,6 @@ html[data-theme="light"] .home-page .home-tileSkeleton {
   box-shadow: var(--home-shadow) !important;
 }
 
-html[data-theme="light"] .home-page .hx-stat-item,
 html[data-theme="light"] .home-page .home-popularList .product-tile,
 html[data-theme="light"] .home-page .home-howCard {
   border-radius: 18px !important;

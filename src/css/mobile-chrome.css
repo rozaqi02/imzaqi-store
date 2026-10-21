@@ -365,7 +365,7 @@ html[data-theme] body .header .header-iconAction::after {
     box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2), 0 3px 8px rgba(0, 0, 0, 0.08) !important;
   }
 
-  /* Clean Apple-style toolbar row in normal flow (no overlap) */
+  /* Clean toolbar row matching desktop */
   .detail-page-v3 .pdx-copy .pdx-toolbar {
     position: static !important;
     display: flex !important;
@@ -374,35 +374,6 @@ html[data-theme] body .header .header-iconAction::after {
     width: 100% !important;
     margin-bottom: 12px !important;
     padding: 0 !important;
-  }
-
-  .detail-page-v3 .pdx-copy .pdx-backLink,
-  .detail-page-v3 .pdx-copy .pdx-topActions .pdx-iconBtn {
-    display: inline-flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-    width: 36px !important;
-    height: 36px !important;
-    min-height: 36px !important;
-    min-width: 36px !important;
-    padding: 0 !important;
-    border-radius: 50% !important;
-    border: 1px solid rgba(0, 0, 0, 0.06) !important;
-    background: rgba(0, 0, 0, 0.04) !important;
-    color: var(--pdx-text-1, #1d1d1f) !important;
-    cursor: pointer !important;
-    box-shadow: none !important;
-    transition: transform 0.15s ease, background 0.15s ease !important;
-  }
-
-  .detail-page-v3 .pdx-copy .pdx-backLink:active,
-  .detail-page-v3 .pdx-copy .pdx-topActions .pdx-iconBtn:active {
-    transform: scale(0.92) !important;
-    background: rgba(0, 0, 0, 0.08) !important;
-  }
-
-  .detail-page-v3 .pdx-copy .pdx-backLink span {
-    display: none !important;
   }
 
   /* Apple-inspired text typography & hierarchy */
