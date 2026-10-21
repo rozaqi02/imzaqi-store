@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState, useMemo } from "react";
-import { Download, Copy, Sparkles, FileText, Shuffle, ChevronLeft, ChevronRight, LoaderCircle, RotateCcw } from "lucide-react";
+import { Download, Copy, Sparkles, FileText, Shuffle, ChevronLeft, ChevronRight, LoaderCircle, RotateCcw, Layers } from "lucide-react";
 import QRCode from "qrcode";
 import { formatIDR, getVariantEffectivePrice, isKnownOutOfStock } from "../../../lib/format";
 import { fetchActiveFlashSales } from "../../../lib/api";
@@ -15,7 +15,7 @@ async function prepareCanvas(options, pageOverride) {
   await document.fonts?.ready;
   if (document.fonts?.load) await Promise.all([document.fonts.load('700 32px "Poppins"'), document.fonts.load('600 24px "Poppins"')]);
   const canvas = document.createElement("canvas");
-  const catalog = options.mode === "catalog", page = pageOverride ?? options.page;
+  const catalog = options.mode === "catalog" || options.mode === "variants", page = pageOverride ?? options.page;
   const items = catalog ? options.pages[page] || [] : [options.product];
   const withoutLogo = items.find(item => !String((item.product?.icon_url || item.icon_url) || "").trim());
   if (withoutLogo) throw new Error(`Logo ${withoutLogo.product?.name || withoutLogo.name} belum tersedia di database. Tambahkan logo di menu Produk.`);
@@ -44,10 +44,11 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   const [price, setPrice] = useState("");
   const [duration, setDuration] = useState("");
   const [catalogCategory, setCatalogCategory] = useState("all");
-  const [catalogScope, setCatalogScope] = useState("products");
   const [catalogProductFilter, setCatalogProductFilter] = useState("all");
   const [catalogTheme, setCatalogTheme] = useState("emerald");
   const [catalogPage, setCatalogPage] = useState(0);
+  const [onlyActive, setOnlyActive] = useState(true);
+  const [onlyInStock, setOnlyInStock] = useState(false);
   const [sales, setSales] = useState([]);
   const [now, setNow] = useState(Date.now());
   const [saleError, setSaleError] = useState(false);
@@ -71,9 +72,24 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   }, []);
   const discountKey = JSON.stringify([...liveDiscounts(sales, now)]);
   const discounts = useMemo(() => new Map(JSON.parse(discountKey)), [discountKey]);
-  const activeProducts = useMemo(() => products.filter(p => p.is_active !== false), [products]);
-  const product = activeProducts.find(p => String(p.id) === productId) || activeProducts[0];
-  const variants = useMemo(() => activeVariants(product), [product]);
+  const availableProducts = useMemo(() => {
+    return products.filter(p => {
+      if (onlyActive && p.is_active === false) return false;
+      if (onlyInStock) {
+        const vars = Array.isArray(p.product_variants) ? p.product_variants : [];
+        const validVars = onlyActive ? vars.filter(v => v.is_active !== false) : vars;
+        if (!validVars.some(v => !isKnownOutOfStock(v))) return false;
+      }
+      return true;
+    });
+  }, [products, onlyActive, onlyInStock]);
+  const product = availableProducts.find(p => String(p.id) === productId) || availableProducts[0];
+  const variants = useMemo(() => {
+    let list = Array.isArray(product?.product_variants) ? product.product_variants : [];
+    if (onlyActive) list = list.filter(v => v.is_active !== false);
+    if (onlyInStock) list = list.filter(v => !isKnownOutOfStock(v));
+    return list;
+  }, [product, onlyActive, onlyInStock]);
   useEffect(() => {
     if (variantId && !variants.some(v => String(v.id) === variantId)) {
       setVariantId(""); setPrice(""); setDuration("");
@@ -84,19 +100,21 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
     try { return { offer: posterOffer(product, variant, discounts, { price, duration }), error: "" }; }
     catch (error) { return { offer: null, error: error.message }; }
   }, [product, variant, discounts, price, duration]);
-  const categories = useMemo(() => [...new Map(activeProducts.map(p => { const c = resolveProductCategory(p); return [c.key, c]; })).values()], [activeProducts]);
+  const categories = useMemo(() => [...new Map(availableProducts.map(p => { const c = resolveProductCategory(p); return [c.key, c]; })).values()], [availableProducts]);
   useEffect(() => {
     if (catalogCategory !== "all" && !categories.some(c => c.key === catalogCategory)) {
       setCatalogCategory("all"); setCatalogPage(0); setCatalogProductFilter("all");
     }
   }, [categories, catalogCategory]);
-  const filtered = useMemo(() => activeProducts.filter(p => catalogCategory === "all" || resolveProductCategory(p).key === catalogCategory), [activeProducts, catalogCategory]);
+  const filtered = useMemo(() => availableProducts.filter(p => catalogCategory === "all" || resolveProductCategory(p).key === catalogCategory), [availableProducts, catalogCategory]);
+  const isCatalog = mode === "catalog" || mode === "variants";
+  const catalogScope = mode === "variants" ? "variants" : "products";
   const catalogEntries = useMemo(() => {
-    return buildCatalogEntries(filtered, catalogScope, discounts, catalogProductFilter);
-  }, [filtered, catalogScope, discounts, catalogProductFilter]);
-  const pages = useMemo(() => paginateCatalog(mode === "catalog" ? catalogEntries : filtered), [mode, catalogEntries, filtered]);
+    return buildCatalogEntries(filtered, catalogScope, discounts, mode === "variants" ? catalogProductFilter : "all", { onlyActive, onlyInStock });
+  }, [filtered, catalogScope, discounts, mode, catalogProductFilter, onlyActive, onlyInStock]);
+  const pages = useMemo(() => paginateCatalog(isCatalog ? catalogEntries : filtered), [isCatalog, catalogEntries, filtered]);
   const page = Math.min(catalogPage, Math.max(0, pages.length - 1));
-  const total = mode === "catalog" ? catalogEntries.length : filtered.length;
+  const total = isCatalog ? catalogEntries.length : filtered.length;
   const line = resolveCatalogLine(product);
   const phone = mode === "single" ? normalizeMediaPhone(settings?.whatsapp?.[line] || (line === "app_premium" && settings?.whatsapp?.number) || STORE_WHATSAPP[line]) : "";
   const options = useMemo(() => ({ mode, product, offer: offerResult.offer, styleId, format, variation, headline, badge, pages, page, total, catalogTheme, phone, discounts, retry, catalogScope }),
@@ -125,7 +143,7 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
   }, [options, empty, invalid, salesPending]);
 
   const ready = !empty && !invalid && !salesPending && !renderState.busy && !renderState.error && readyRef.current?.options === options;
-  const filename = mode === "single" ? `imzaqi-${product?.slug || "produk"}-${styleId}-${format}.png` : `imzaqi-katalog-${catalogScope === "variants" ? "varian-" : ""}${catalogCategory}-${page + 1}.png`;
+  const filename = mode === "single" ? `imzaqi-${product?.slug || "produk"}-${styleId}-${format}.png` : `imzaqi-katalog-${mode === "variants" ? "varian-" : ""}${catalogCategory}-${page + 1}.png`;
   const exportImage = async action => {
     const rendered = readyRef.current;
     if (!ready || exporting || rendered?.options !== options) return;
@@ -152,13 +170,14 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
     if (!ready || exporting) return;
     setExporting(true);
     const snapshot = options;
+    const isVariants = snapshot.mode === "variants";
     try {
       const files = [];
       for (let i = 0; i < snapshot.pages.length; i++) {
         const { canvas } = await prepareCanvas(snapshot, i);
-        files.push({ name: `imzaqi-katalog-${catalogScope === "variants" ? "varian-" : ""}${i + 1}.png`, blob: await canvasPng(canvas) });
+        files.push({ name: `imzaqi-katalog-${isVariants ? "varian-" : ""}${i + 1}.png`, blob: await canvasPng(canvas) });
       }
-      downloadMedia(await mediaZip(files), `imzaqi-katalog-${catalogScope === "variants" ? "varian-" : ""}${catalogCategory}.zip`);
+      downloadMedia(await mediaZip(files), `imzaqi-katalog-${isVariants ? "varian-" : ""}${catalogCategory}.zip`);
       toast.success(`${files.length} halaman katalog diunduh dalam satu ZIP.`);
     } catch (error) { toast.error(error.message); }
     finally { if (mountedRef.current) setExporting(false); }
@@ -167,13 +186,38 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
 
   return <div className="mmg-container">
     <div className="mmg-modeSwitch" aria-label="Jenis media">
-      {[{ id: "single", title: "Poster produk", text: "Satu produk, satu pesan yang kuat", icon: Sparkles }, { id: "catalog", title: "Katalog harga", text: "Daftar produk dalam beberapa halaman", icon: FileText }].map(item => <button key={item.id} type="button" className={`mmg-modeCard ${mode === item.id ? "is-active" : ""}`} aria-pressed={mode === item.id} onClick={() => setMode(item.id)}><item.icon size={22}/><span><strong>{item.title}</strong><small>{item.text}</small></span></button>)}
+      {[
+        { id: "single", title: "Poster produk", text: "Satu produk, satu pesan yang kuat", icon: Sparkles },
+        { id: "catalog", title: "Katalog harga", text: "Daftar per produk dengan harga mulai", icon: FileText },
+        { id: "variants", title: "Katalog semua varian", text: "Daftar seluruh paket & varian lengkap", icon: Layers }
+      ].map(item => <button key={item.id} type="button" className={`mmg-modeCard ${mode === item.id ? "is-active" : ""}`} aria-pressed={mode === item.id} onClick={() => { setMode(item.id); setCatalogPage(0); }}><item.icon size={22}/><span><strong>{item.title}</strong><small>{item.text}</small></span></button>)}
     </div>
     <div className="mmg-layout">
       <div className="mmg-controlsCard">
-        {mode === "single" ? <>
-          <AdminPicker label="Produk" value={product?.id || ""} onChange={id => { setProductId(String(id)); setVariantId(""); resetCopy(); }} disabled={!activeProducts.length} placeholder="Belum ada produk aktif" options={activeProducts.map(p => ({ value: p.id, label: p.name, icon: p.icon_url, description: `${resolveProductCategory(p).label} · ${activeVariants(p).length} paket` }))}/>
-          <AdminPicker label="Paket / varian" value={variantId} onChange={id => { setVariantId(String(id)); setPrice(""); setDuration(""); }} disabled={!variants.length} options={[{ value: "", label: "Otomatis", description: "Harga terendah yang tersedia", meta: variant ? formatIDR(getVariantEffectivePrice(variant, discounts)) : "", icon: product?.icon_url }, ...variants.map(v => ({ value: v.id, label: v.name, icon: product?.icon_url, description: [v.duration_label, v.guarantee_text].filter(Boolean).join(" · "), meta: formatIDR(getVariantEffectivePrice(v, discounts)), searchText: String(getVariantEffectivePrice(v, discounts)), status: [isKnownOutOfStock(v) ? "Stok habis" : v.stock == null || v.stock === "" ? "Stok belum diisi" : `Stok ${v.stock}`, discounts.has(v.id) ? "Promo" : ""].filter(Boolean).join(" · "), statusTone: isKnownOutOfStock(v) ? "muted" : "" }))]}/>
+        <fieldset className="mmg-fieldset">
+          <legend>Filter ketersediaan</legend>
+          <div className="mmg-filterRow">
+            <label className="mmg-checkLabel">
+              <input
+                type="checkbox"
+                checked={onlyActive}
+                onChange={e => { setOnlyActive(e.target.checked); setCatalogPage(0); }}
+              />
+              <span>Hanya produk aktif</span>
+            </label>
+            <label className="mmg-checkLabel">
+              <input
+                type="checkbox"
+                checked={onlyInStock}
+                onChange={e => { setOnlyInStock(e.target.checked); setCatalogPage(0); }}
+              />
+              <span>Hanya ready stok</span>
+            </label>
+          </div>
+        </fieldset>
+        {mode === "single" && <>
+          <AdminPicker label="Produk" value={product?.id || ""} onChange={id => { setProductId(String(id)); setVariantId(""); resetCopy(); }} disabled={!availableProducts.length} placeholder="Belum ada produk aktif" options={availableProducts.map(p => ({ value: p.id, label: p.name, icon: p.icon_url, description: `${resolveProductCategory(p).label} · ${activeVariants(p).length} paket` }))}/>
+          <AdminPicker label="Paket / varian" value={variantId} onChange={id => { setVariantId(String(id)); setPrice(""); setDuration(""); }} disabled={!variants.length} options={[{ value: "", label: "Otomatis", description: "Harga terendah yang tersedia", meta: variant ? formatIDR(getVariantEffectivePrice(variant, discounts)) : "", icon: product?.icon_url }, ...variants.map(v => ({ value: v.id, label: v.name, icon: product?.icon_url, description: v.duration_label || "", meta: formatIDR(getVariantEffectivePrice(v, discounts)), searchText: String(getVariantEffectivePrice(v, discounts)), status: [isKnownOutOfStock(v) ? "Stok habis" : v.stock == null || v.stock === "" ? "Stok belum diisi" : `Stok ${v.stock}`, discounts.has(v.id) ? "Promo" : ""].filter(Boolean).join(" · "), statusTone: isKnownOutOfStock(v) ? "muted" : "" }))]}/>
           {variant && <p className="mmg-note">Paket terpilih: <strong>{variant.name}</strong>{offerResult.offer?.outOfStock && " · stok habis"}</p>}
           <fieldset className="mmg-fieldset"><legend>Arah desain</legend><div className="mmg-presetGrid">{MEDIA_STYLES.map(s => <button type="button" key={s.id} className={`mmg-style ${s.id === styleId ? "is-selected" : ""}`} aria-pressed={s.id === styleId} onClick={() => setStyleId(s.id)}><span className="mmg-swatches" aria-hidden="true"><i style={{ background: s.bg }}/><i style={{ background: s.ink }}/><i style={{ background: s.accent }}/></span><strong>{s.name}</strong><small>{s.detail}</small></button>)}</div></fieldset>
           <fieldset className="mmg-fieldset"><legend>Ukuran gambar</legend><div className="mmg-formats">{Object.entries(MEDIA_FORMATS).map(([id, f]) => <button type="button" key={id} aria-pressed={format === id} className={format === id ? "is-selected" : ""} onClick={() => setFormat(id)}><strong>{f.ratio}</strong><small>{f.label}</small></button>)}</div></fieldset>
@@ -185,65 +229,42 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
             <label className="mmg-field">Durasi / keterangan<input maxLength={70} value={duration} onChange={e => setDuration(e.target.value)} placeholder={variant?.duration_label || "Mengikuti paket"}/></label>
             <button type="button" className="mmg-secondary" onClick={resetCopy}><RotateCcw size={15}/>Kembalikan teks & harga</button>
           </div></details>
-        </> : <>
-          <fieldset className="mmg-fieldset">
-            <legend>Tingkat rincian katalog</legend>
-            <div className="mmg-formats">
-              <button
-                type="button"
-                className={catalogScope === "products" ? "is-selected" : ""}
-                aria-pressed={catalogScope === "products"}
-                onClick={() => { setCatalogScope("products"); setCatalogPage(0); }}
-              >
-                <strong>Per Produk</strong>
-                <small>Harga mulai</small>
-              </button>
-              <button
-                type="button"
-                className={catalogScope === "variants" ? "is-selected" : ""}
-                aria-pressed={catalogScope === "variants"}
-                onClick={() => { setCatalogScope("variants"); setCatalogPage(0); }}
-              >
-                <strong>Semua Varian</strong>
-                <small>Tiap paket & harga pas</small>
-              </button>
-            </div>
-          </fieldset>
-          <AdminPicker label="Kategori" value={catalogCategory} onChange={key => { setCatalogCategory(key); setCatalogPage(0); }} options={[{ value: "all", label: "Semua kategori", meta: `${activeProducts.length} produk` }, ...categories.map(c => ({ value: c.key, label: c.label, meta: `${activeProducts.filter(p => resolveProductCategory(p).key === c.key).length} produk` }))]}/>
-          {catalogScope === "variants" && (
-            <AdminPicker
-              label="Filter produk (opsional)"
-              value={catalogProductFilter}
-              onChange={id => { setCatalogProductFilter(id); setCatalogPage(0); }}
-              options={[
-                { value: "all", label: "Semua produk", meta: `${filtered.length} produk` },
-                ...filtered.map(p => ({
-                  value: String(p.id),
-                  label: p.name,
-                  icon: p.icon_url,
-                  meta: `${activeVariants(p).length} paket`
-                }))
-              ]}
-            />
-          )}
-          <fieldset className="mmg-fieldset"><legend>Tema katalog</legend><div className="mmg-formats">{[{ id: "emerald", name: "Kertas & hijau" }, { id: "dark", name: "Onyx & lime" }].map(s => <button type="button" key={s.id} className={catalogTheme === s.id ? "is-selected" : ""} aria-pressed={catalogTheme === s.id} onClick={() => setCatalogTheme(s.id)}>{s.name}</button>)}</div></fieldset>
-          <p className="mmg-note">
-            {catalogScope === "variants"
-              ? `${catalogEntries.length} paket / varian aktif · ${pages.length} halaman. Maksimal 10 paket per halaman agar nama dan harga nyaman dibaca.`
-              : `${filtered.length} produk aktif · ${pages.length} halaman. Maksimal 10 produk per halaman agar nama dan harga nyaman dibaca.`}
-          </p>
         </>}
-        <p className="mmg-note">Harga dan garansi mengikuti paket. Harga coret hanya muncul bila ada potongan dari harga aslinya.</p>
+        {mode === "catalog" && <>
+          <AdminPicker label="Kategori" value={catalogCategory} onChange={key => { setCatalogCategory(key); setCatalogPage(0); }} options={[{ value: "all", label: "Semua kategori", meta: `${availableProducts.length} produk` }, ...categories.map(c => ({ value: c.key, label: c.label, meta: `${availableProducts.filter(p => resolveProductCategory(p).key === c.key).length} produk` }))]}/>
+          <fieldset className="mmg-fieldset"><legend>Tema katalog</legend><div className="mmg-formats">{[{ id: "emerald", name: "Kertas & hijau" }, { id: "dark", name: "Onyx & lime" }].map(s => <button type="button" key={s.id} className={catalogTheme === s.id ? "is-selected" : ""} aria-pressed={catalogTheme === s.id} onClick={() => setCatalogTheme(s.id)}>{s.name}</button>)}</div></fieldset>
+          <p className="mmg-note">{filtered.length} produk {onlyInStock ? "ready stok" : "aktif"} · {pages.length} halaman. Maksimal 10 produk per halaman agar nama dan harga nyaman dibaca.</p>
+        </>}
+        {mode === "variants" && <>
+          <AdminPicker label="Kategori" value={catalogCategory} onChange={key => { setCatalogCategory(key); setCatalogPage(0); }} options={[{ value: "all", label: "Semua kategori", meta: `${availableProducts.length} produk` }, ...categories.map(c => ({ value: c.key, label: c.label, meta: `${availableProducts.filter(p => resolveProductCategory(p).key === c.key).length} produk` }))]}/>
+          <AdminPicker
+            label="Filter produk (opsional)"
+            value={catalogProductFilter}
+            onChange={id => { setCatalogProductFilter(id); setCatalogPage(0); }}
+            options={[
+              { value: "all", label: "Semua produk", meta: `${filtered.length} produk` },
+              ...filtered.map(p => ({
+                value: String(p.id),
+                label: p.name,
+                icon: p.icon_url,
+                meta: `${activeVariants(p).length} paket`
+              }))
+            ]}
+          />
+          <fieldset className="mmg-fieldset"><legend>Tema katalog</legend><div className="mmg-formats">{[{ id: "emerald", name: "Kertas & hijau" }, { id: "dark", name: "Onyx & lime" }].map(s => <button type="button" key={s.id} className={catalogTheme === s.id ? "is-selected" : ""} aria-pressed={catalogTheme === s.id} onClick={() => setCatalogTheme(s.id)}>{s.name}</button>)}</div></fieldset>
+          <p className="mmg-note">{catalogEntries.length} paket / varian {onlyInStock ? "ready stok" : "aktif"} · {pages.length} halaman. Maksimal 10 paket per halaman agar nama dan harga nyaman dibaca.</p>
+        </>}
+        <p className="mmg-note">Harga mengikuti paket. Harga coret hanya muncul bila ada potongan dari harga aslinya.</p>
         {saleError && <p className="mmg-warning">Flash sale belum berhasil dimuat. Harga mengikuti harga dasar paket.</p>}
       </div>
       <div className="mmg-stageWrap">
         <div className="mmg-previewHeading"><span>Preview hasil</span><small>{mode === "single" ? `${MEDIA_FORMATS[format].width} × ${MEDIA_FORMATS[format].height} px` : "1200 × 1600 px / halaman"}</small></div>
         <div className="mmg-canvasBox" aria-busy={renderState.busy}>
-          <canvas ref={canvasRef} className={`mmg-canvasPreview ${!ready ? "is-pending" : ""}`} role="img" aria-label={mode === "single" ? `Poster ${product?.name || "produk"}` : `Katalog halaman ${page + 1}`}/>
+          <canvas ref={canvasRef} className={`mmg-canvasPreview ${!ready ? "is-pending" : ""}`} role="img" aria-label={mode === "single" ? `Poster ${product?.name || "produk"}` : mode === "variants" ? `Katalog varian halaman ${page + 1}` : `Katalog halaman ${page + 1}`}/>
           {!ready && <div className="mmg-previewStatus" role="status">{empty ? "Belum ada produk untuk ditampilkan." : renderState.error || <><LoaderCircle className="mmg-spinner" size={22}/>Menyiapkan desain…</>}{renderState.error && !invalid && <button type="button" onClick={() => setRetry(v => v + 1)}>Coba lagi</button>}</div>}
         </div>
-        {mode === "catalog" && pages.length > 1 && <div className="mmg-pagination"><button type="button" aria-label="Halaman sebelumnya" disabled={page === 0 || exporting} onClick={() => setCatalogPage(page - 1)}><ChevronLeft size={18}/></button><span>Halaman {page + 1} dari {pages.length}</span><button type="button" aria-label="Halaman berikutnya" disabled={page === pages.length - 1 || exporting} onClick={() => setCatalogPage(page + 1)}><ChevronRight size={18}/></button></div>}
-        <div className="mmg-actionsBar"><button type="button" className="mmg-btnDownload" disabled={!ready || exporting} onClick={() => exportImage("download")}><Download size={18}/>{exporting ? "Menyiapkan…" : "Download PNG"}</button><button type="button" className="mmg-btnCopy" disabled={!ready || exporting} onClick={() => exportImage("copy")}><Copy size={18}/>{copied ? "Gambar tersalin" : "Salin gambar"}</button>{mode === "catalog" && pages.length > 1 && <button type="button" className="mmg-secondary" disabled={!ready || exporting} onClick={exportCatalog}><Download size={17}/>Semua halaman (ZIP)</button>}</div>
+        {isCatalog && pages.length > 1 && <div className="mmg-pagination"><button type="button" aria-label="Halaman sebelumnya" disabled={page === 0 || exporting} onClick={() => setCatalogPage(page - 1)}><ChevronLeft size={18}/></button><span>Halaman {page + 1} dari {pages.length}</span><button type="button" aria-label="Halaman berikutnya" disabled={page === pages.length - 1 || exporting} onClick={() => setCatalogPage(page + 1)}><ChevronRight size={18}/></button></div>}
+        <div className="mmg-actionsBar"><button type="button" className="mmg-btnDownload" disabled={!ready || exporting} onClick={() => exportImage("download")}><Download size={18}/>{exporting ? "Menyiapkan…" : "Download PNG"}</button><button type="button" className="mmg-btnCopy" disabled={!ready || exporting} onClick={() => exportImage("copy")}><Copy size={18}/>{copied ? "Gambar tersalin" : "Salin gambar"}</button>{isCatalog && pages.length > 1 && <button type="button" className="mmg-secondary" disabled={!ready || exporting} onClick={exportCatalog}><Download size={17}/>Semua halaman (ZIP)</button>}</div>
         <p className="mmg-note">PNG resolusi penuh, siap untuk WhatsApp, Instagram, dan Telegram.</p>
       </div>
     </div>

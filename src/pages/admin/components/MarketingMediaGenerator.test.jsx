@@ -118,8 +118,8 @@ describe("marketing generator preview", () => {
     await waitFor(() => expect(screen.getByRole("button", { name: "Download PNG" })).toBeEnabled());
     expect(screen.getByText(/2 produk aktif/)).toBeInTheDocument();
 
-    // Switch to Semua Varian
-    fireEvent.click(screen.getByRole("button", { name: /Semua Varian/ }));
+    // Switch to top-level "Katalog semua varian" mode
+    fireEvent.click(screen.getByRole("button", { name: /Katalog semua varian/ }));
     await waitFor(() => expect(screen.getByText(/3 paket \/ varian aktif/)).toBeInTheDocument());
     await waitFor(() => expect(drawCatalogPoster.mock.calls.at(-1)[1].catalogScope).toBe("variants"));
 
@@ -142,5 +142,47 @@ describe("marketing generator preview", () => {
       "1 Bulan Private",
       "3 Bulan Private",
     ]);
+  });
+  it("filters products and variants by ready stock and active status", async () => {
+    const stockTestProducts = [
+      {
+        id: "1",
+        slug: "netflix",
+        name: "Netflix",
+        icon_url: "icon-1",
+        is_active: true,
+        product_variants: [
+          { id: "v1-in", name: "In Stock", duration_label: "1 Bulan", price_idr: 30000, stock: 4, is_active: true },
+          { id: "v1-out", name: "Out of Stock", duration_label: "3 Bulan", price_idr: 80000, stock: 0, is_active: true },
+        ],
+      },
+      {
+        id: "2",
+        slug: "spotify",
+        name: "Spotify",
+        icon_url: "icon-2",
+        is_active: false,
+        product_variants: [
+          { id: "v2-in", name: "Family", duration_label: "1 Bulan", price_idr: 20000, stock: 2, is_active: true },
+        ],
+      },
+    ];
+    render(<MarketingMediaGenerator products={stockTestProducts}/>);
+    fireEvent.click(screen.getByRole("button", { name: /Katalog semua varian/ }));
+    await waitFor(() => expect(screen.getByText(/2 paket \/ varian aktif/)).toBeInTheDocument());
+
+    // Toggle "Hanya ready stok"
+    const inStockCheckbox = screen.getByRole("checkbox", { name: /Hanya ready stok/ });
+    fireEvent.click(inStockCheckbox);
+    await waitFor(() => expect(screen.getByText(/1 paket \/ varian ready stok/)).toBeInTheDocument());
+    await waitFor(() => expect(drawCatalogPoster.mock.calls.at(-1)[1].products).toHaveLength(1));
+    expect(drawCatalogPoster.mock.calls.at(-1)[1].products[0].offer.variant).toBe("In Stock");
+
+    // Toggle off "Hanya produk aktif" to show inactive products
+    const activeCheckbox = screen.getByRole("checkbox", { name: /Hanya produk aktif/ });
+    fireEvent.click(activeCheckbox);
+    await waitFor(() => expect(screen.getByText(/2 paket \/ varian ready stok/)).toBeInTheDocument());
+    await waitFor(() => expect(drawCatalogPoster.mock.calls.at(-1)[1].products).toHaveLength(2));
+    expect(drawCatalogPoster.mock.calls.at(-1)[1].products.map(p => p.name)).toEqual(["Netflix", "Spotify"]);
   });
 });

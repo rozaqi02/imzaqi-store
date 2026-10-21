@@ -67,16 +67,28 @@ export function paginateCatalog(products, size = 10) {
   return pages;
 }
 
-export function buildCatalogEntries(products, scope = "products", discounts = new Map(), selectedProductId = "all") {
-  const active = (products || []).filter(p => p.is_active !== false);
+export function buildCatalogEntries(products, scope = "products", discounts = new Map(), selectedProductId = "all", options = {}) {
+  const { onlyActive = true, onlyInStock = false } = options;
+  const filteredProducts = (products || []).filter(p => {
+    if (onlyActive && p.is_active === false) return false;
+    if (onlyInStock) {
+      const vars = Array.isArray(p.product_variants) ? p.product_variants : [];
+      const validVars = onlyActive ? vars.filter(v => v.is_active !== false) : vars;
+      if (!validVars.some(v => !isKnownOutOfStock(v))) return false;
+    }
+    return true;
+  });
+
   const targetProducts = selectedProductId && selectedProductId !== "all"
-    ? active.filter(p => String(p.id) === String(selectedProductId))
-    : active;
+    ? filteredProducts.filter(p => String(p.id) === String(selectedProductId))
+    : filteredProducts;
 
   if (scope === "variants") {
     const entries = [];
     for (const product of targetProducts) {
-      const variants = activeVariants(product);
+      let variants = Array.isArray(product?.product_variants) ? product.product_variants : [];
+      if (onlyActive) variants = variants.filter(v => v.is_active !== false);
+      if (onlyInStock) variants = variants.filter(v => !isKnownOutOfStock(v));
       for (const variant of variants) {
         entries.push({
           id: `${product.id}-${variant.id}`,
@@ -92,12 +104,18 @@ export function buildCatalogEntries(products, scope = "products", discounts = ne
     return entries;
   }
 
-  return targetProducts.map(product => ({
-    ...product,
-    product,
-    variant: chooseVariant(product, "", discounts),
-    offer: posterOffer(product, chooseVariant(product, "", discounts), discounts),
-  }));
+  return targetProducts.map(product => {
+    let variants = Array.isArray(product?.product_variants) ? product.product_variants : [];
+    if (onlyActive) variants = variants.filter(v => v.is_active !== false);
+    if (onlyInStock) variants = variants.filter(v => !isKnownOutOfStock(v));
+    const variant = chooseVariant({ ...product, product_variants: variants }, "", discounts);
+    return {
+      ...product,
+      product,
+      variant,
+      offer: posterOffer(product, variant, discounts),
+    };
+  });
 }
 
 export function normalizeMediaPhone(value) {

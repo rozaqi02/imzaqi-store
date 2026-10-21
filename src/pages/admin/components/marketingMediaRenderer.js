@@ -186,7 +186,7 @@ export function drawProductPoster(canvas, { offer, styleId, format = "square", v
     ctx.strokeStyle = s.ink; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(x, y - 8); ctx.lineTo(x + ctx.measureText(original).width, y - 8); ctx.stroke(); ctx.globalAlpha = 1;
   }
   font(ctx, 20, 600);
-  const note = offer.guarantee ? (/garansi/i.test(offer.guarantee) ? offer.guarantee : `Garansi: ${offer.guarantee}`) : "Detail paket & ketersediaan ada di website";
+  const note = "Detail paket & ketersediaan ada di website";
   textBlock(ctx, note, 64, story ? 1580 : 896, width - 128, 20, 1, 600);
   footer(ctx, { width, height, story, ink: s.ink, bg: s.bg, qr, phone });
   return { width, height };
@@ -223,7 +223,7 @@ export function drawCatalogPoster(canvas, { products, discounts, theme = "emeral
     font(ctx, 18, 600); ctx.globalAlpha = .72;
     const isVariantItem = isVariantScope || Boolean(item.variant);
     const hint = isVariantItem
-      ? (offer.outOfStock ? `${offer.variant || "Paket"} · Stok habis` : [offer.variant, offer.duration, offer.guarantee].filter(Boolean).join(" · "))
+      ? (offer.outOfStock ? `${offer.variant || "Paket"} · Stok habis` : [offer.variant, offer.duration].filter(Boolean).join(" · "))
       : (offer.outOfStock ? "Stok habis · tanya admin" : offer.duration || "Lihat pilihan paket");
     fit(ctx, hint, columnW - 91, 18, 600); ctx.fillText(hint, x + 91, y + 103); ctx.globalAlpha = 1;
     const priceText = isVariantItem
