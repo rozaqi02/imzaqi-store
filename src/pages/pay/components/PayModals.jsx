@@ -5,8 +5,8 @@ import { Check, CheckCircle2, MessageCircle, Phone, ShieldCheck, X } from "lucid
 import { useDialogA11y } from "../../../hooks/useDialogA11y";
 import { copyToClipboard } from "../../../utils/clipboard";
 import { formatIDR } from "../../../lib/format";
+import { fireConfetti } from "../../../components/Confetti";
 import CheckoutSteps from "../../../components/CheckoutSteps";
-import BannerGraphic from "../../../components/BannerGraphic";
 
 const COPY_TIMEOUT_MS = 1800;
 const QRIS_EXPIRY_MS = 30 * 60 * 1000; // 30 menit
@@ -85,33 +85,12 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
     open,
     containerRef: modalRef,
     onClose,
-    initialFocusSelector: ".icon-btn",
+    initialFocusSelector: ".pay-successClose",
   });
 
   useEffect(() => {
-    if (open && typeof window !== "undefined" && window.confetti) {
-      window.confetti({
-        particleCount: 120,
-        spread: 80,
-        origin: { y: 0.55 },
-        colors: ["#4effda", "#25ebc8", "#00d6b4", "#ffd700", "#ff6b9d", "#a78bfa"],
-      });
-      setTimeout(() => {
-        if (window.confetti) {
-          window.confetti({
-            particleCount: 60,
-            spread: 100,
-            origin: { y: 0.4, x: 0.3 },
-            colors: ["#4effda", "#ffd700", "#ff6b9d"],
-          });
-          window.confetti({
-            particleCount: 60,
-            spread: 100,
-            origin: { y: 0.4, x: 0.7 },
-            colors: ["#25ebc8", "#a78bfa", "#00d6b4"],
-          });
-        }
-      }, 400);
+    if (open) {
+      fireConfetti(window.innerWidth / 2, window.innerHeight * 0.4);
     }
   }, [open]);
 
@@ -142,8 +121,6 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
         aria-label="Order berhasil"
         onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="pay-sheetGrabBar" aria-hidden="true" />
-
         <div className="pay-celebrationParticles" aria-hidden="true">
           {Array.from({ length: 18 }).map((_, i) => (
             <span key={i} className={`pay-celebrationDot pay-celebrationDot--${i % 6}`} />
@@ -171,7 +148,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
               <CheckCircle2 size={36} strokeWidth={2.2} />
             </div>
             <div className="pay-successKicker">ID ORDER</div>
-            <div className="pay-successCode pay-successCode--animate" style={{ whiteSpace: "nowrap" }}>{orderCode}</div>
+            <div className="pay-successCode" style={{ whiteSpace: "nowrap" }}>{orderCode}</div>
             <p className="pay-successLead">Simpan ID ini untuk mengecek status pesanan dari perangkat mana pun.</p>
           </div>
 
@@ -191,7 +168,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
                   Cek Status Pesanan
                 </Link>
                 <button className="btn btn-ghost pay-successBtnGhost" type="button" onClick={copyCode}>
-                  {copied ? "✓ ID tersalin" : "Salin ID"}
+                  {copied ? <><Check size={14} strokeWidth={2.6} aria-hidden="true" /> ID tersalin</> : "Salin ID"}
                 </button>
               </div>
             </div>
@@ -202,7 +179,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
               </Link>
               <div className="pay-successSecondaryGrid">
                 <button className="btn btn-ghost pay-successBtnGhost" type="button" onClick={copyCode}>
-                  {copied ? "✓ ID tersalin" : "Salin ID"}
+                  {copied ? <><Check size={14} strokeWidth={2.6} aria-hidden="true" /> ID tersalin</> : "Salin ID"}
                 </button>
                 <a className="btn btn-ghost pay-successBtnGhost" href={adminWaUrl} target="_blank" rel="noreferrer">
                   <MessageCircle size={16} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />

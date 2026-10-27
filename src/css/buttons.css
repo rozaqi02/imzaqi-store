@@ -1,0 +1,83 @@
+/* Global storefront button system.
+   Components own placement/size only; all action surfaces, depth, colours and
+   interaction states resolve here from the shared theme tokens. Legacy action
+   names are aliases so existing pages use the same system during migration. */
+html[data-theme] body :is(.btn, .hx-btn-primary, .hx-btn-secondary, .help-button, .reviews-button, .pdx-compareBtn, .st-pasteBtn) {
+  --action-face: var(--imzaqi-btn-face);
+  --action-ink: var(--imzaqi-btn-text);
+  --action-edge: var(--imzaqi-btn-border);
+  --action-depth: var(--imzaqi-btn-shadow);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 16px;
+  border: 1px solid var(--action-edge) !important;
+  border-radius: 12px;
+  background: var(--action-face) !important;
+  color: var(--action-ink) !important;
+  box-shadow: var(--action-depth) !important;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 140ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 180ms ease, color 180ms ease;
+}
+
+html[data-theme] body :is(.btn-ghost, .hx-btn-secondary, .help-button--secondary, .reviews-button--secondary, .st-pasteBtn) {
+  --action-face: var(--skeu-control-bg);
+  --action-ink: var(--brand-text);
+  --action-edge: var(--brand-line);
+  --action-depth: var(--skeu-control-shadow);
+}
+
+html[data-theme] body :is(.btn-danger, .btn-destructive) {
+  --action-face: #b42318;
+  --action-ink: #ffffff;
+  --action-edge: #942018;
+}
+
+html[data-theme] body :is(.btn, .hx-btn-primary, .hx-btn-secondary, .help-button, .reviews-button, .pdx-compareBtn, .st-pasteBtn):hover:not(:disabled) {
+  box-shadow: var(--action-depth) !important;
+  filter: none;
+}
+html[data-theme] body :is(.btn, .hx-btn-primary, .hx-btn-secondary, .help-button, .reviews-button, .pdx-compareBtn, .st-pasteBtn):active:not(:disabled),
+html[data-theme] body .btn[aria-pressed="true"] {
+  box-shadow: var(--skeu-inset-shadow) !important;
+  transform: scale(0.972);
+}
+html[data-theme] body :is(.btn, .hx-btn-primary, .hx-btn-secondary, .help-button, .reviews-button, .pdx-compareBtn, .st-pasteBtn):focus-visible {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--bg0), 0 0 0 4px var(--accent) !important;
+}
+html[data-theme] body .btn:disabled { opacity: 0.55; cursor: not-allowed; }
+html[data-theme] body .btn-sm { font-size: 13px; padding: 8px 12px; }
+html[data-theme] body .btn-icon { width: 44px; min-width: 44px; padding: 10px; }
+html[data-theme] body .btn svg { flex-shrink: 0; }
+
+/* Compact controls share the same neutral raised/pressed treatment. Navigation
+   docks and the theme switch keep their dedicated geometry and semantics. */
+html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-viewBtn, .catalog-quickChip, .catalog-filterBtn, .catalog-sheetClose, .pdx-filterChip, .pdx-addBtn, .qty-btn, .checkout-item-remove, .reviews-iconButton, .hero-search-clear) {
+  background: var(--skeu-control-bg) !important;
+  color: var(--brand-text) !important;
+  border: 1px solid var(--brand-line) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  font-family: var(--font-sans);
+  cursor: pointer;
+  transition: box-shadow 180ms ease, transform 180ms ease;
+}
+html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-viewBtn, .catalog-quickChip, .catalog-filterBtn, .pdx-filterChip)[aria-pressed="true"],
+html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-viewBtn, .catalog-quickChip, .catalog-filterBtn, .pdx-filterChip):active {
+  background: var(--skeu-inset-bg) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  color: var(--brand-text) !important;
+}
+html[data-theme] body :where(.app-shell, .checkout-overlay) .catalog-quickChip[aria-pressed="true"] :is(svg, .catalog-quickChipCount) { color: inherit !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme] body :is(.btn, .hx-btn-primary, .hx-btn-secondary, .help-button, .reviews-button, .pdx-compareBtn, .st-pasteBtn) { transition: none; }
+}

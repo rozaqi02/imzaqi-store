@@ -25,136 +25,6 @@
   display: contents;
 }
 
-/* ── Card Flip (grid layout only, desktop hover) ─────────────────────────── */
-.product-tile--flippable {
-  perspective: 900px;
-}
-
-.product-tile--flippable .product-tile-tiltWrap {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  transform-style: preserve-3d;
-  transition: transform 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: transform;
-}
-
-.product-tile-face {
-  width: 100%;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
-.product-tile-front {
-  position: relative;
-}
-
-.product-tile-back {
-  position: absolute;
-  inset: 0;
-  transform: rotateY(180deg);
-  border-radius: inherit;
-  /* Neutral neo panel — no brand teal wash */
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 28%),
-    var(--skeu-panel-bg, var(--uni-neo-panel, var(--card)));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 16px;
-}
-
-.product-tile-back-inner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 10px;
-  text-align: center;
-  width: 100%;
-}
-
-.product-tile-back-icon {
-  width: 52px;
-  height: 52px;
-  border-radius: 16px;
-  overflow: hidden;
-  background: rgba(255,255,255,0.08);
-  border: 1px solid rgba(255,255,255,0.14);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.16);
-  display: grid;
-  place-items: center;
-  margin-bottom: 2px;
-}
-
-.product-tile-back-icon img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.product-tile-back-name {
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  color: var(--text);
-  line-height: 1.2;
-}
-
-.product-tile-back-price {
-  font-size: 20px;
-  font-weight: 900;
-  letter-spacing: -0.03em;
-  color: var(--accent);
-}
-
-.product-tile-back-stats {
-  display: flex;
-  gap: 10px;
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--muted);
-}
-
-.product-tile-back-stats span {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.product-tile-back-cta {
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--text);
-  padding: 6px 14px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.16);
-  background: rgba(255, 255, 255, 0.06);
-  margin-top: 4px;
-}
-
-html[data-theme="light"] .product-tile-back {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 32%),
-    var(--skeu-panel-bg, var(--uni-neo-panel, #f4f8fb));
-}
-
-html[data-theme="light"] .product-tile-back-icon {
-  border-color: rgba(40, 60, 75, 0.1);
-  box-shadow: 0 8px 18px rgba(60, 90, 110, 0.12);
-}
-
-html[data-theme="light"] .product-tile-back-cta {
-  color: var(--brand-text, #123744);
-  border-color: rgba(40, 60, 75, 0.14);
-  background: rgba(255, 255, 255, 0.72);
-}
-
-@media (hover: hover) and (min-width: 901px) {
-  .product-tile--flippable:hover .product-tile-tiltWrap {
-    transform: rotateY(180deg) !important;
-  }
-}
-
 /* ─────────────────────────────────────────────────────────── */
 
 .product-tile {
@@ -162,10 +32,10 @@ html[data-theme="light"] .product-tile-back-cta {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 18px;
+  gap: 16px;
   min-height: 0;
-  padding: 18px;
-  border-radius: 22px;
+  padding: 16px;
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.1);
   background: var(--skeu-panel-bg);
   box-shadow: var(--skeu-panel-shadow);
@@ -183,33 +53,20 @@ html[data-theme="light"] .product-tile-back-cta {
   z-index: 1;
 }
 
-/* GPU-accelerated hover shadow */
-.product-tile::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.35);
-  opacity: 0;
-  transition: opacity 0.24s var(--ease-out);
-  z-index: -1;
-  pointer-events: none;
-}
-
 .product-tile--grid {
   gap: 14px;
   padding: 16px;
-  border-radius: 22px;
+  border-radius: 20px;
 }
 
 .product-tile--list {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
-  gap: 18px;
+  gap: 16px;
   align-items: center;
   min-height: 0;
-  padding: 18px 18px 18px 22px;
-  border-radius: 22px;
+  padding: 16px;
+  border-radius: 20px;
 }
 
 .product-tile--list::before {
@@ -219,16 +76,9 @@ html[data-theme="light"] .product-tile-back-cta {
 
 @media (hover: hover) {
   .product-tile:hover {
-    transform: translateY(-4px) scale(1.006);
+    transform: translateY(-2px);
     border-color: rgba(0, 245, 196, 0.38);
-    box-shadow:
-      0 20px 48px -10px rgba(0, 0, 0, 0.65),
-      0 0 24px -4px rgba(0, 245, 196, 0.18),
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.32);
-  }
-
-  .product-tile:hover::after {
-    opacity: 1;
+    box-shadow: 0 16px 36px -10px rgba(0, 0, 0, 0.5);
   }
 
   .product-tile:hover .product-tile-arrow {
@@ -247,10 +97,7 @@ html[data-theme="light"] .product-tile {
 @media (hover: hover) {
   html[data-theme="light"] .product-tile:hover {
     border-color: rgba(0, 158, 96, 0.32);
-    box-shadow:
-      0 18px 44px -8px rgba(45, 85, 100, 0.18),
-      0 0 20px -2px rgba(0, 158, 96, 0.14),
-      inset 0 1.5px 0 #ffffff;
+    box-shadow: 0 14px 32px -8px rgba(45, 85, 100, 0.18);
   }
 }
 
@@ -275,41 +122,45 @@ html[data-theme="light"] .product-tile {
   align-items: center;
 }
 
-.product-tile-icon {
-  width: 60px;
-  height: 60px;
+/* Outer glow drop-shadow container — prevents clipping from icon overflow: hidden */
+.product-tile-iconWrap {
+  position: relative;
   display: grid;
   place-items: center;
-  border-radius: 18px;
+  filter: drop-shadow(0 6px 16px var(--brand-color, transparent));
+  transition: filter 0.24s var(--ease-out);
+}
+
+@media (hover: hover) {
+  .product-tile:hover .product-tile-iconWrap {
+    filter: drop-shadow(0 10px 24px var(--brand-color, transparent));
+  }
+}
+
+.product-tile-icon {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
   overflow: hidden;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
     var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
-  box-shadow:
-    var(--skeu-control-shadow, none),
-    0 8px 24px var(--brand-color, transparent);
-  transition: box-shadow 0.3s var(--ease-out);
-}
-
-@media (hover: hover) {
-  .product-tile:hover .product-tile-icon {
-    box-shadow:
-      var(--skeu-control-shadow, none),
-      0 12px 32px var(--brand-color, transparent);
-  }
+  box-shadow: var(--skeu-control-shadow, none);
 }
 
 .product-tile--grid .product-tile-icon {
   width: 48px;
   height: 48px;
-  border-radius: 16px;
+  border-radius: 14px;
 }
 
 .product-tile--list .product-tile-icon {
-  width: 62px;
-  height: 62px;
-  border-radius: 20px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
 }
 
 .product-tile-icon img {
@@ -353,92 +204,53 @@ html[data-theme="light"] .product-tile {
   flex-shrink: 0;
 }
 
-/* Rank 1: Terlaris — Neumorphic Gold 3D Badge */
+/* Rank badges — flat chips, one colour per tier (no 3D/neumorphic layers) */
 .product-tile-rankBadge--1 {
-  border: 1px solid rgba(245, 158, 11, 0.55);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 38%),
-    linear-gradient(165deg, #fef3c7 0%, #fde68a 45%, #f59e0b 100%);
-  color: #78350f;
-  box-shadow:
-    0 4px 12px rgba(245, 158, 11, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1.5px 0 rgba(180, 83, 9, 0.38);
+  border: 1px solid rgba(217, 119, 6, 0.45);
+  background: rgba(245, 158, 11, 0.14);
+  color: #b45309;
 }
 
 :root[data-theme="dark"] .product-tile-rankBadge--1 {
-  border: 1px solid rgba(255, 215, 0, 0.55);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0) 38%),
-    linear-gradient(165deg, rgba(255, 220, 80, 0.45), rgba(160, 100, 0, 0.5));
-  color: #ffe566;
-  box-shadow:
-    0 6px 16px rgba(255, 180, 0, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    inset 0 -2px 0 rgba(90, 50, 0, 0.45);
+  border-color: rgba(255, 215, 0, 0.45);
+  background: rgba(245, 158, 11, 0.16);
+  color: #fcd34d;
 }
 
-/* Rank 2: Silver/Steel Badge */
 .product-tile-rankBadge--2 {
-  border: 1px solid rgba(148, 163, 184, 0.45);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 38%),
-    linear-gradient(165deg, #f8fafc 0%, #e2e8f0 45%, #cbd5e1 100%);
-  color: #334155;
-  box-shadow:
-    0 4px 12px rgba(148, 163, 184, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1.5px 0 rgba(71, 85, 105, 0.3);
+  border: 1px solid rgba(100, 116, 139, 0.4);
+  background: rgba(148, 163, 184, 0.16);
+  color: #475569;
 }
 
 :root[data-theme="dark"] .product-tile-rankBadge--2 {
-  border-color: rgba(200, 210, 220, 0.45);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.24), rgba(255, 255, 255, 0) 32%),
-    linear-gradient(155deg, rgba(230, 236, 242, 0.26), rgba(90, 100, 110, 0.38));
-  color: #e8eef4;
+  border-color: rgba(200, 210, 220, 0.4);
+  background: rgba(148, 163, 184, 0.16);
+  color: #e2e8f0;
 }
 
-/* Rank 3: Bronze/Copper Badge */
 .product-tile-rankBadge--3 {
-  border: 1px solid rgba(217, 119, 6, 0.48);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0) 38%),
-    linear-gradient(165deg, #ffedd5 0%, #fed7aa 45%, #ea580c 100%);
-  color: #7c2d12;
-  box-shadow:
-    0 4px 12px rgba(234, 88, 12, 0.26),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1.5px 0 rgba(154, 52, 18, 0.35);
+  border: 1px solid rgba(194, 65, 12, 0.42);
+  background: rgba(234, 88, 12, 0.14);
+  color: #9a3412;
 }
 
 :root[data-theme="dark"] .product-tile-rankBadge--3 {
-  color: #f6c08a;
-  border-color: rgba(205, 127, 50, 0.48);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0) 32%),
-    linear-gradient(155deg, rgba(230, 150, 80, 0.32), rgba(100, 50, 20, 0.4));
+  border-color: rgba(205, 127, 50, 0.45);
+  background: rgba(234, 88, 12, 0.16);
+  color: #fdba74;
 }
 
-/* Rank 4: Neon Cyan Badge */
 .product-tile-rankBadge--4 {
-  border: 1px solid rgba(13, 148, 136, 0.48);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0) 38%),
-    linear-gradient(165deg, #ccfbf1 0%, #99f6e4 45%, #0d9488 100%);
-  color: #115e59;
-  box-shadow:
-    0 4px 12px rgba(13, 148, 136, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1.5px 0 rgba(15, 118, 110, 0.35);
+  border: 1px solid rgba(13, 148, 136, 0.42);
+  background: rgba(13, 148, 136, 0.14);
+  color: #0f766e;
 }
 
 :root[data-theme="dark"] .product-tile-rankBadge--4 {
-  color: #7dffd8;
-  border-color: rgba(0, 214, 180, 0.45);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0) 32%),
-    linear-gradient(155deg, rgba(0, 214, 180, 0.3), rgba(0, 80, 90, 0.4));
+  border-color: rgba(0, 214, 180, 0.4);
+  background: rgba(0, 214, 180, 0.14);
+  color: #5eead4;
 }
 
 .product-tile--grid .product-tile-name {
@@ -547,7 +359,7 @@ html[data-theme="light"] .product-tile {
 }
 
 .home-popularList .home-popularSold svg {
-  color: var(--accent, #00d6b4);
+  color: var(--accent);
   flex-shrink: 0;
 }
 
@@ -609,7 +421,7 @@ html[data-theme="light"] .home-popularList .home-popularSold {
   height: 30px;
   padding: 0 10px;
   border-radius: 8px;
-  border: 1px solid color-mix(in srgb, var(--type-color, var(--accent, #00d6b4)) 45%, transparent);
+  border: 1px solid color-mix(in srgb, var(--type-color, var(--accent)) 45%, transparent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
     color-mix(in srgb, var(--type-color, var(--accent)) 16%, var(--skeu-control-bg, transparent));
@@ -622,6 +434,19 @@ html[data-theme="light"] .home-popularList .home-popularSold {
   font-weight: 900;
   letter-spacing: 0.01em;
   line-height: 1;
+}
+
+.product-typeBadge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+  animation: tileRadarPulse 1.8s infinite ease-out;
+  flex-shrink: 0;
+  margin-right: 5px;
 }
 
 html[data-theme="light"] .product-typeBadge {
@@ -643,10 +468,11 @@ html[data-theme="light"] .product-typeBadge {
   }
 }
 
-/* ── Low Stock & Out of Stock Badges ── */
+/* ── Low Stock & Out of Stock Badges with Radar Pulse ── */
 .product-lowStockBadge {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
   height: 30px;
   padding: 0 10px;
   border-radius: 8px;
@@ -656,6 +482,33 @@ html[data-theme="light"] .product-typeBadge {
   font-size: 11px;
   font-weight: 900;
   letter-spacing: 0.01em;
+}
+
+.product-lowStockBadge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 0 currentColor;
+  animation: tileRadarPulse 1.8s infinite ease-out;
+  flex-shrink: 0;
+}
+
+@keyframes tileRadarPulse {
+  0% {
+    box-shadow: 0 0 0 0 currentColor;
+    opacity: 0.95;
+  }
+  70% {
+    box-shadow: 0 0 0 5px transparent;
+    opacity: 0.4;
+  }
+  100% {
+    box-shadow: 0 0 0 0 transparent;
+    opacity: 0.95;
+  }
 }
 
 .product-lowStockBadge.out {
@@ -677,18 +530,16 @@ html[data-theme="light"] .product-lowStockBadge.out {
 }
 
 .product-tile-price {
-  font-family: var(--font-display);
+  font-family: var(--font-sans);
   font-variant-numeric: tabular-nums;
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: #00f5c4;
-  text-shadow: 0 2px 10px rgba(0, 245, 196, 0.32);
+  color: var(--accent, #00f5c4);
 }
 
 html[data-theme="light"] .product-tile-price {
   color: #008753 !important;
-  text-shadow: 0 1px 2px rgba(0, 135, 83, 0.12);
 }
 
 .product-tile--grid .product-tile-price {
@@ -703,36 +554,25 @@ html[data-theme="light"] .product-tile-price {
 }
 
 @media (hover: hover) and (min-width: 901px) {
-  /* overflow:hidden flattens preserve-3d — only clip non-flippable tiles */
-  .product-tile:not(.product-tile--flippable) {
+  .product-tile {
     position: relative;
     overflow: hidden;
   }
 
-  .product-tile--flippable {
-    position: relative;
-    overflow: visible;
-  }
-
   .product-tile:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     border-color: rgba(79, 255, 200, 0.32) !important;
-  }
-
-  .product-tile--flippable:hover {
-    /* Lift handled by parent; keep overflow visible so rotateY isn't clipped */
-    overflow: visible;
   }
 }
 
-/* ── Realistic skeleton matching ProductTile shape ── */
+/* ── Realistic skeleton matching ProductTile shape (1:1 Zero CLS) ── */
 .home-tileSkeleton {
-  padding: 12px 14px;
-  border-radius: 18px;
+  padding: 16px;
+  border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
   display: grid;
-  gap: 10px;
+  gap: 12px;
   position: relative;
   overflow: hidden;
 }
@@ -765,8 +605,8 @@ html[data-theme="light"] .product-tile-price {
 }
 
 .home-tileSkeleton-icon {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.06);
   flex-shrink: 0;
@@ -846,10 +686,7 @@ html[data-theme="light"] .home-tileSkeleton::after {
 }
 
 @media (max-width: 560px) {
-  /* GPU acceleration and height intrinsic size settings to resolve scrollbar jumping */
   .product-tile {
-    will-change: transform;
-    transform: translate3d(0, 0, 0);
     contain-intrinsic-size: auto 216px !important;
   }
 
@@ -904,23 +741,13 @@ html[data-theme="light"] .home-tileSkeleton::after {
 }
 
 @media (max-width: 900px) and (min-width: 561px) {
-  /* Tablet optimizations for product tiles */
+  /* Tablet: stable intrinsic heights for content-visibility */
   .product-tile {
-    will-change: transform;
-    transform: translate3d(0, 0, 0);
     contain-intrinsic-size: auto 240px !important;
   }
 
   .product-tile--list {
     contain-intrinsic-size: auto 130px !important;
-  }
-}
-
-@media (max-width: 720px) {
-  /* Disable rank badge text shadows / glows on mobile */
-  .product-tile-rankBadge--1,
-  .product-tile-rankBadge--4 {
-    text-shadow: none !important;
   }
 }
 

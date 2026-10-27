@@ -53,6 +53,9 @@ html[data-theme="light"] .help-page { --help-panel:#fff; --help-soft:#edf3ee; --
 .help-item.open { background:var(--help-soft); }
 .help-item.open .help-itemHead>svg { transform:rotate(180deg); color:var(--help-accent); }
 .help-itemCategory { display:block; margin-bottom:6px; color:var(--help-accent); font-size:9px; letter-spacing:.055em; font-weight:700; }
+.help-itemBodyWrap { display: grid; grid-template-rows: 0fr; transition: grid-template-rows 0.28s cubic-bezier(0.16, 1, 0.3, 1); overflow: hidden; }
+.help-item.open .help-itemBodyWrap { grid-template-rows: 1fr; }
+.help-itemBodyWrap > .help-itemBody { min-height: 0; overflow: hidden; }
 .help-itemBody { padding:0 23px 23px; color:var(--help-muted); font-size:13px; line-height:1.85; max-width:680px; }
 .help-itemBody p+p { margin-top:7px; }
 .help-empty { padding:48px 20px; text-align:center; border:1px dashed var(--help-line); border-radius:20px; }

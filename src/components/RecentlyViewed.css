@@ -105,7 +105,7 @@ html[data-theme="light"] .rv-card:hover {
 .rv-fallback {
   font-size: 14px;
   font-weight: 800;
-  color: var(--accent, #00d6b4);
+  color: var(--accent);
 }
 
 .rv-info {

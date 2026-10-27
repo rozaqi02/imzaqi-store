@@ -20,6 +20,7 @@ export default function WhatsAppInput({
   className = '',
   compact = false,
   rememberLast = true,
+  forceError = false,
 }) {
   const [internalValue, setInternalValue] = useState(() => formatWhatsAppNumber(value));
   const [validation, setValidation] = useState({ valid: false, message: '' });
@@ -89,7 +90,7 @@ export default function WhatsAppInput({
     }
   };
 
-  const showError = touched && !validation.valid && internalValue !== '';
+  const showError = (touched || forceError) && !validation.valid && (internalValue !== '' || forceError);
   const showSuccess = touched && validation.valid;
   const wrapperClassName = ['whatsapp-input-wrapper', compact ? 'is-compact' : '', className].filter(Boolean).join(' ');
 
@@ -104,6 +105,10 @@ export default function WhatsAppInput({
           id="whatsapp-input"
           className="input"
           type="tel"
+          name="whatsapp"
+          inputMode="tel"
+          autoComplete="tel"
+          enterKeyHint="next"
           value={internalValue}
           onChange={handleChange}
           onBlur={handleBlur}

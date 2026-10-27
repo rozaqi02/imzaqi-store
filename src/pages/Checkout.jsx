@@ -118,6 +118,8 @@ export default function Checkout() {
   const [stockWarnings, setStockWarnings] = useState({});
   const [customerWhatsApp, setCustomerWhatsApp] = useState(() => loadBuyerDetails().whatsapp);
   const [buyerEmail, setBuyerEmail] = useState(() => loadBuyerDetails().email);
+  const [emailTouched, setEmailTouched] = useState(false);
+  const [contactAttempted, setContactAttempted] = useState(false);
   const [isWaValid, setIsWaValid] = useState(false);
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(max-width: 720px)").matches : false
@@ -125,6 +127,9 @@ export default function Checkout() {
 
   const drawerBodyRef = useRef(null);
   const [promoStatus, setPromoStatus] = useState(null); // 'success' | 'error' | null
+  const promoTimerRef = useRef(null);
+
+  useEffect(() => () => window.clearTimeout(promoTimerRef.current), []);
 
   usePageMeta({
     title: "Checkout",
@@ -199,6 +204,8 @@ export default function Checkout() {
     [cart.items]
   );
   const hasValidEmail = !requiresBuyerEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail.trim());
+  const showEmailError = requiresBuyerEmail && !hasValidEmail && (emailTouched || contactAttempted);
+  const showWaError = !isWaValid && contactAttempted;
 
   useEffect(() => {
     saveBuyerDetails({ whatsapp: customerWhatsApp, email: buyerEmail });
@@ -248,9 +255,8 @@ export default function Checkout() {
       setMsg(text);
       toast.error(text);
       setPromoStatus("error");
-      const t = setTimeout(() => setPromoStatus(null), 1500);
-      // eslint-disable-next-line no-underscore-dangle
-      onApplyPromo._lastTimer = t;
+      window.clearTimeout(promoTimerRef.current);
+      promoTimerRef.current = window.setTimeout(() => setPromoStatus(null), 1500);
       return;
     }
 
@@ -270,15 +276,15 @@ export default function Checkout() {
       toast.error("Gagal cek kode promo. Coba lagi ya.");
     } finally {
       setIsVerifying(false);
-      const t = setTimeout(() => setPromoStatus(null), 1500);
-      // eslint-disable-next-line no-underscore-dangle
-      onApplyPromo._lastTimer = t;
+      window.clearTimeout(promoTimerRef.current);
+      promoTimerRef.current = window.setTimeout(() => setPromoStatus(null), 1500);
     }
   }
 
 
 
   function goPay() {
+    setContactAttempted(true);
     if (cart.items.length === 0) {
       const text = "Keranjang masih kosong.";
       setMsg(text);
@@ -294,17 +300,13 @@ export default function Checkout() {
     }
 
     if (!isWaValid) {
-      const text = "Isi nomor WhatsApp yang valid sebelum lanjut.";
-      setMsg(text);
-      toast.error(text);
+      setMsg("");
       document.getElementById("whatsapp-input")?.focus();
       return;
     }
 
     if (!hasValidEmail) {
-      const text = "Paket ini memerlukan email pembeli yang valid.";
-      setMsg(text);
-      toast.error(text);
+      setMsg("");
       document.getElementById("checkout-buyer-email")?.focus();
       return;
     }
@@ -322,12 +324,13 @@ export default function Checkout() {
             <div className="checkout-main-kicker">Kontak pengiriman</div>
             <h3>Siapkan tujuan pesanan</h3>
           </div>
-          <span>Wajib</span>
+           <span>Untuk pengiriman</span>
         </div>
         <WhatsAppInput
           value={customerWhatsApp}
           onChange={setCustomerWhatsApp}
           onValidChange={setIsWaValid}
+          forceError={showWaError}
           compact
           rememberLast
           label="WhatsApp"
@@ -339,13 +342,26 @@ export default function Checkout() {
             <input
               id="checkout-buyer-email"
               className="input"
-              type="email"
+              name="email"
+               type="email"
+               required
+              inputMode="email"
               value={buyerEmail}
               onChange={(event) => setBuyerEmail(event.target.value)}
+              onBlur={() => setEmailTouched(true)}
               placeholder="pembeli@email.com"
               autoComplete="email"
-              aria-invalid={!hasValidEmail || undefined}
-            />
+              autoCapitalize="none"
+              spellCheck={false}
+              aria-invalid={showEmailError || undefined}
+               aria-describedby={showEmailError ? "checkout-buyer-email-error checkout-email-help" : "checkout-email-help"}
+             />
+             <p id="checkout-email-help" className="hint">Email ini digunakan untuk aktivasi paketmu.</p>
+            {showEmailError ? (
+              <div id="checkout-buyer-email-error" className="hint error-hint" role="alert">
+                Masukkan email yang valid, contoh: nama@email.com
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>
@@ -499,15 +515,15 @@ export default function Checkout() {
 
         {renderTrustSignals(true)}
 
-        <button className="btn btn-wide checkout-summaryBtn" type="button" onClick={goPay} disabled={cart.items.length === 0 || hasStockIssue}>
-          <span>Bayar {formatIDR(total)}</span>
+        <button className="btn btn-wide checkout-summaryBtn" type="button" aria-label={`Lanjut bayar ${formatIDR(total)}`} onClick={goPay} disabled={cart.items.length === 0 || hasStockIssue}>
+          <span>Lanjut bayar</span>
           <ArrowRight size={16} />
         </button>
 
         <p className="checkout-summaryHint">Menuju halaman QRIS untuk menyelesaikan pesanan.</p>
 
         <Link className="checkout-summaryLink" to="/status">
-          Udah punya ID? Cek status
+          Sudah punya ID? Cek status
         </Link>
       </aside>
     );
@@ -550,7 +566,7 @@ export default function Checkout() {
                 <div>
                   <div className="checkout-main-kicker">Keranjang</div>
                   <h2 className="h3 checkout-main-title">
-                    {cart.items.length === 0 ? "Belum ada pilihan" : "Isi order"}
+                    {cart.items.length === 0 ? "Belum ada pilihan" : "Pesananmu"}
                   </h2>
                 </div>
                 {cart.items.length > 0 ? <span className="checkout-main-count">x{itemCount}</span> : null}
@@ -599,13 +615,14 @@ export default function Checkout() {
               ) : null}
             </div>
             <button
-              className="btn btn-primary checkout-floating-bar-btn"
-              type="button"
+               className="btn btn-primary checkout-floating-bar-btn"
+               type="button"
+               aria-label={`Lanjut bayar ${formatIDR(total)}`}
               onClick={goPay}
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-drawer-stock-reason" : undefined}
             >
-              <span>Bayar {formatIDR(total)}</span>
+              <span>Lanjut bayar</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (
@@ -664,7 +681,7 @@ export default function Checkout() {
                     <div className="checkout-main-head">
                       <div>
                         <div className="checkout-main-kicker">Keranjang</div>
-                        <h2 className="h3 checkout-main-title">Isi Order</h2>
+                        <h2 className="h3 checkout-main-title">Pesananmu</h2>
                       </div>
                       <span className="checkout-main-count">x{itemCount}</span>
                     </div>
@@ -719,11 +736,12 @@ export default function Checkout() {
             </div>
             <button
               className="btn btn-primary checkout-floating-bar-btn"
+              aria-label={`Lanjut bayar ${formatIDR(total)}`}
               onClick={goPay}
               disabled={hasStockIssue}
               aria-describedby={stockDisabledReason ? "checkout-full-stock-reason" : undefined}
             >
-              <span>Bayar {formatIDR(total)}</span>
+              <span>Lanjut bayar</span>
               <ArrowRight size={16} />
             </button>
             {stockDisabledReason ? (
@@ -821,7 +839,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
       setPulseKind(null);
       toast.info(`${item.product_name} dihapus`, {
         title: "Keranjang",
-        actionLabel: "Batalin",
+         actionLabel: "Urungkan",
         duration: 6000,
         onAction: () =>
           cart.add(

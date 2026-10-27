@@ -151,7 +151,7 @@ function AdminOrderListItem({
     })();
 
   return (
-    <article className={`admin-orderListItem${isSelected ? " is-selected" : ""}`}>
+    <article className={`admin-orderListItem status-${order.status}${isSelected ? " is-selected" : ""}`}>
       <label className="admin-orderListCheckbox">
         <input
           type="checkbox"

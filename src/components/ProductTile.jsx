@@ -58,24 +58,25 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
   const frontContent = (
     <>
       <div className="product-tile-top">
-        <div
-          className="product-tile-icon"
-          aria-hidden="true"
-          style={{ "--brand-color": brandColor }}
-        >
-          {product?.icon_url ? (
-            <img
-              src={product.icon_url}
-              alt=""
-              loading="lazy"
-              decoding="async"
-              fetchPriority="low"
-              width="62"
-              height="62"
-            />
-          ) : (
-            <div className="product-tile-fallback">{String(product?.name || "P").slice(0, 1).toUpperCase()}</div>
-          )}
+        <div className="product-tile-iconWrap" style={{ "--brand-color": brandColor }}>
+          <div
+            className="product-tile-icon"
+            aria-hidden="true"
+          >
+            {product?.icon_url ? (
+              <img
+                src={product.icon_url}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                fetchPriority="low"
+                width="48"
+                height="48"
+              />
+            ) : (
+              <div className="product-tile-fallback">{String(product?.name || "P").slice(0, 1).toUpperCase()}</div>
+            )}
+          </div>
         </div>
 
         <div className="product-tile-main">
@@ -120,7 +121,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
             </span>
           ))}
           <span className="product-tile-pill home-deliveryPill" title="Estimasi pengiriman">
-            <span>5 Menit</span>
+            <span>~5 menit</span>
           </span>
           {classifyStock(stock) === "low" ? (
             <span className="product-lowStockBadge">Sisa {stock}</span>

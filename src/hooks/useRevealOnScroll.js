@@ -66,11 +66,14 @@ export function useRevealOnScroll(dependency) {
       }
     );
 
-    // Keep track of observed elements using a class to prevent duplicate observations
+    // Observation belongs to this observer, not to a persistent DOM class.
+    // A route/dependency change disconnects the old observer.
+    const observed = new WeakSet();
     const observeNewElements = () => {
-      const els = document.querySelectorAll(`${REVEAL_SELECTOR}:not(.is-observed)`);
+      const els = document.querySelectorAll(REVEAL_SELECTOR);
       els.forEach((el) => {
-        el.classList.add("is-observed");
+        if (observed.has(el) || el.classList.contains("is-visible")) return;
+        observed.add(el);
         io.observe(el);
       });
       markInViewportReveals();

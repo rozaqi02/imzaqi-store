@@ -113,10 +113,8 @@
     linear-gradient(170deg, rgba(72, 22, 36, 0.98), rgba(42, 12, 22, 0.96)) !important;
   color: #ffb0c0 !important;
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.45),
-    0 10px 22px rgba(80, 10, 28, 0.35),
-    0 0 0 1px rgba(255, 79, 114, 0.22) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    0 4px 12px rgba(80, 10, 28, 0.35) !important;
 }
 
 html[data-theme="light"] .btn.btn-danger,
@@ -127,10 +125,8 @@ html[data-theme="light"] .btn-danger {
   color: #b91c3c !important;
   border-color: rgba(185, 28, 60, 0.28) !important;
   box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -3px 0 rgba(180, 80, 100, 0.22),
-    6px 8px 16px rgba(120, 40, 60, 0.14),
-    0 0 0 1px rgba(185, 28, 60, 0.14) !important;
+    inset 0 1px 0 rgba(255, 255, 255, 0.8),
+    0 4px 12px rgba(185, 28, 60, 0.12) !important;
 }
 
 /* Inset fields (qty / search-like controls) */
@@ -654,34 +650,6 @@ html[data-theme="light"] .rv-card {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-/* Mini cart sheet */
-.mini-cart-item-remove,
-.mini-cart-close,
-.cart-sheet-close {
-  border: 1px solid rgba(255, 79, 114, 0.32) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
-    linear-gradient(165deg, rgba(72, 22, 36, 0.9), rgba(40, 12, 20, 0.95)) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.35),
-    0 6px 14px rgba(80, 10, 28, 0.25) !important;
-  color: #ff9ab1 !important;
-}
-
-.mini-cart-item {
-  border: 1px solid transparent;
-  border-radius: 14px;
-}
-
-.mini-cart-item:hover {
-  border-color: var(--brand-line) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0) 40%),
-    var(--skeu-control-bg) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
-}
-
 /* Order history status pills — tinted neo */
 .oh-statusPill {
   box-shadow: var(--skeu-control-shadow) !important;
@@ -943,9 +911,7 @@ html[data-theme="light"] .faq-chipCount {
 .social-proof-card,
 .checkout-trust-loyalty,
 .sw-update-toast,
-.empty-icon-component,
-.mini-cart-count,
-.mini-cart-item-fallback {
+.empty-icon-component {
   border-color: var(--brand-line) !important;
 }
 
@@ -1677,7 +1643,7 @@ html[data-theme="light"] .catalog-page .catalog-metric {
 
 /* Catalog stock/status pills — brand-aligned colors (not washed slate) */
 .catalog-page .catalog-status.ok {
-  border-color: color-mix(in srgb, var(--accent, #00d6b4) 42%, transparent) !important;
+  border-color: color-mix(in srgb, var(--accent) 42%, transparent) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
     linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 90, 0.45)) !important;

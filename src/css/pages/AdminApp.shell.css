@@ -1985,6 +1985,8 @@ html[data-theme="light"] .modal-body .admin-field-switch {
   }
 
   .admin-page .admin-orderListItem {
+    position: relative !important;
+    overflow: hidden !important;
     display: grid !important;
     grid-template-columns: 28px minmax(0, 1fr) minmax(200px, 260px) !important;
     gap: 12px 14px !important;
@@ -1997,6 +1999,33 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     box-shadow:
       0 4px 12px rgba(70, 110, 130, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  }
+
+  .admin-page .admin-orderListItem::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 4px;
+    background: transparent;
+    transition: background 0.2s ease;
+  }
+
+  .admin-page .admin-orderListItem:is(.status-pending, .status-pending_payment)::before {
+    background: #f59e0b !important;
+  }
+
+  .admin-page .admin-orderListItem:is(.status-paid, .status-paid_reported, .status-processing)::before {
+    background: #00c2d0 !important;
+  }
+
+  .admin-page .admin-orderListItem.status-done::before {
+    background: #10b981 !important;
+  }
+
+  .admin-page .admin-orderListItem:is(.status-cancelled, .status-expired)::before {
+    background: #ef4444 !important;
   }
 
   html[data-theme="dark"] .admin-page .admin-orderListItem,

@@ -539,13 +539,39 @@ html[data-theme="light"] .admin-page .adm-navItem.is-active .adm-navItemIcon {
   color: var(--adm-text-3) !important;
 }
 
-.admin-page .admin-statValue {
+.admin-page .admin-statValue,
+.admin-page :is(.admin-statValue, .adm-statPill strong, .admin-orderTotal, .admin-productPrice, .admin-kpiNumber) {
   font-size: 22px !important;
   font-weight: 800 !important;
   letter-spacing: normal !important;
-  font-family: inherit !important;
+  font-family: var(--font-mono) !important;
+  font-variant-numeric: tabular-nums lining-nums !important;
   color: var(--adm-text) !important;
   line-height: 1.1 !important;
+}
+
+.adm-liveSyncDot {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--accent, #3ee6c0);
+  box-shadow: 0 0 0 0 rgba(62, 230, 192, 0.6);
+  animation: admLiveSyncPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  flex-shrink: 0;
+  margin-right: 6px;
+}
+
+@keyframes admLiveSyncPulse {
+  0% { box-shadow: 0 0 0 0 rgba(62, 230, 192, 0.6); }
+  70% { box-shadow: 0 0 0 6px transparent; }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+
+.adm-syncLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .admin-page .admin-statHelper {

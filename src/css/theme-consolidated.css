@@ -32,9 +32,7 @@ code{
 
 .global-bg{
   background:
-    radial-gradient(980px 650px at 84% 22%, rgba(120, 112, 255, 0.14), rgba(0, 0, 0, 0) 60%),
-    radial-gradient(900px 620px at 50% 105%, rgba(0, 194, 208, 0.10), rgba(0, 0, 0, 0) 58%),
-    radial-gradient(980px 540px at 84% 8%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
+    radial-gradient(1000px 520px at 50% 0%, rgba(0, 245, 196, 0.08), rgba(0, 0, 0, 0) 70%),
     linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-mid, var(--brand-bg-end)) 40%, var(--brand-bg-end) 100%) !important;
 }
 
@@ -47,18 +45,6 @@ code{
 .app-main::after{
   content:none !important;
   display:none !important;
-}
-
-.header,
-.site-header{
-  background:linear-gradient(180deg, rgba(4,7,20,.94), rgba(4,7,20,.76)) !important;
-  border-bottom:1px solid rgba(0,194,208,.14) !important;
-  box-shadow:0 8px 28px rgba(0,0,0,.26) !important;
-}
-
-.header::after,
-.site-header::after{
-  background:linear-gradient(90deg, rgba(255,255,255,0), rgba(79,255,200,.78), rgba(0,194,208,.88), rgba(255,255,255,0)) !important;
 }
 
 .brand-img{
@@ -120,7 +106,7 @@ code{
 
 .hero-accent,
 .hero-highlight{
-  background:linear-gradient(135deg, #eafff5 0%, #9fffe5 42%, #4fffc8 68%, #00c2d0 100%) !important;
+  background:linear-gradient(135deg, #ffffff 0%, #f1fbf7 30%, #a7f3d0 70%, #6ee7b7 100%) !important;
   -webkit-background-clip:text !important;
   background-clip:text !important;
   color:transparent !important;
@@ -418,30 +404,9 @@ code{
   background:rgba(255,255,255,.05) !important;
 }
 
-@media (max-width: 920px) {
-  /* Dark mode mobile header */
-  html .header,
-  html .site-header,
-  html[data-theme="dark"] .header,
-  html[data-theme="dark"] .site-header {
-    background:
-      linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 138, 148, 0.08) 40%, rgba(0, 0, 0, 0) 70%),
-      linear-gradient(180deg, rgba(8, 12, 28, 0.96) 0%, rgba(4, 7, 20, 0.94) 100%) !important;
-    backdrop-filter: none !important;
-  }
-
-  /* Light mode mobile header */
-  html[data-theme="light"] .header,
-  html[data-theme="light"] .site-header {
-    background:
-      linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.08) 40%, rgba(255, 255, 255, 0) 70%),
-      linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(246, 252, 255, 1) 100%) !important;
-    backdrop-filter: none !important;
-  }
-}
-
-
-
+/* Mobile header shell: storefront-chrome.css (--nav-shell-surface) + motion.css
+   (backdrop-filter:none under 720px). The old 920px green-navy header block
+   here fought both and was removed. */
 
 /* ── Layer 2: Neumorphic overrides ── */
 /*
@@ -473,9 +438,7 @@ body,
 
 .global-bg {
   background:
-    radial-gradient(980px 650px at 84% 22%, rgba(120, 112, 255, 0.12), rgba(0, 0, 0, 0) 60%),
-    radial-gradient(900px 620px at 50% 105%, rgba(0, 194, 208, 0.09), rgba(0, 0, 0, 0) 58%),
-    radial-gradient(980px 540px at 84% 8%, var(--brand-aurora-b), rgba(0, 138, 148, 0) 58%),
+    radial-gradient(1000px 520px at 50% 0%, rgba(0, 245, 196, 0.08), rgba(0, 0, 0, 0) 70%),
     linear-gradient(180deg, var(--brand-bg-start) 0%, var(--brand-bg-mid, var(--brand-bg-end)) 40%, var(--brand-bg-end) 100%) !important;
 }
 
@@ -493,48 +456,7 @@ body,
   mix-blend-mode: screen !important;
 }
 
-.header,
-.site-header {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 20%, rgba(255, 255, 255, 0) 44%),
-    linear-gradient(180deg, rgba(79, 255, 200, 0.12) 0%, rgba(79, 255, 200, 0) 36%),
-    var(--uni-neo-panel) !important;
-  border-bottom: 1px solid rgba(0, 194, 208, 0.22) !important;
-  box-shadow:
-    0 16px 40px rgba(0, 0, 0, 0.58),
-    0 6px 18px rgba(0, 10, 28, 0.42),
-    -8px -8px 18px rgba(255, 255, 255, 0.05),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.32),
-    inset 0 -1.5px 0 rgba(0, 0, 0, 0.48) !important;
-  backdrop-filter: blur(16px) saturate(130%) !important;
-}
-
-html[data-theme="light"] .header,
-html[data-theme="light"] .site-header {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.72) 22%, rgba(255, 255, 255, 0) 48%),
-    linear-gradient(180deg, rgba(79, 255, 200, 0.14) 0%, rgba(79, 255, 200, 0) 40%),
-    var(--uni-neo-panel) !important;
-  border-bottom: 1px solid rgba(0, 138, 148, 0.22) !important;
-  box-shadow:
-    0 14px 34px rgba(67, 111, 129, 0.24),
-    0 6px 16px rgba(80, 115, 130, 0.16),
-    -8px -8px 18px rgba(255, 255, 255, 0.94),
-    inset 0 1.5px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.36) !important;
-  backdrop-filter: blur(16px) saturate(130%) !important;
-}
-
-.header::after,
-.site-header::after {
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0),
-    rgba(79, 255, 200, 0.78),
-    rgba(0, 194, 208, 0.88),
-    rgba(255, 255, 255, 0)
-  ) !important;
-}
+/* Header shell styling lives in storefront-chrome.css (single source). */
 
 .nav a,
 .site-nav a,
@@ -700,7 +622,7 @@ select.input {
 .hm-title-accent,
 .hm-title-glow {
   display: inline-block;
-  background: linear-gradient(135deg, #5cf0d5 0%, #3fe8c8 34%, #00a88c 66%, #006b75 100%) !important;
+  background: linear-gradient(135deg, #ffffff 0%, #f1fbf7 30%, #a7f3d0 70%, #6ee7b7 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -711,7 +633,7 @@ html[data-theme="light"] .hero-accent,
 html[data-theme="light"] .hero-highlight,
 html[data-theme="light"] .hm-title-accent,
 html[data-theme="light"] .hm-title-glow {
-  background: linear-gradient(135deg, #1ed4b8 0%, #00b8a0 38%, #008f8a 68%, #006268 100%) !important;
+  background: linear-gradient(135deg, #0f172a 0%, #064e3b 40%, #047857 70%, #059669 100%) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   -webkit-text-fill-color: transparent !important;
@@ -1616,19 +1538,19 @@ html[data-theme="light"] .pay-qrisLocked p {
 
 html,
 html[data-theme="dark"] {
-  --checkout-drawer-solid: #081320;
-  --checkout-panel-solid: #101a2b;
-  --checkout-summary-solid: #0d1726;
-  --checkout-card-solid: #132034;
-  --checkout-mobilebar-solid: #0b1524;
+  --checkout-drawer-solid: #0a0e0c;
+  --checkout-panel-solid: #101613;
+  --checkout-summary-solid: #101613;
+  --checkout-card-solid: #16201b;
+  --checkout-mobilebar-solid: #0a0e0c;
 }
 
 html[data-theme="light"] {
-  --checkout-drawer-solid: #f3fbff;
-  --checkout-panel-solid: #f7fdff;
-  --checkout-summary-solid: #edf8fb;
-  --checkout-card-solid: #f8fdff;
-  --checkout-mobilebar-solid: #f2fbff;
+  --checkout-drawer-solid: #fcfdfc;
+  --checkout-panel-solid: #ffffff;
+  --checkout-summary-solid: #f4f6f5;
+  --checkout-card-solid: #ffffff;
+  --checkout-mobilebar-solid: #fcfdfc;
 }
 
 html,
@@ -3948,10 +3870,15 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
 }
 
 .catalog-page .catalog-card.catalog-cardV2 .catalog-cardSummary {
-  color: var(--uni-muted) !important;
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
   -webkit-line-clamp: 2 !important;
-  line-height: 1.55 !important;
+  overflow: hidden !important;
+  font-size: 11px !important;
+  line-height: 1.35 !important;
+  color: var(--uni-muted) !important;
   overflow-wrap: anywhere !important;
+  margin-top: 2px !important;
 }
 
 .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
@@ -4111,23 +4038,15 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
     border-radius: 20px !important;
   }
 
-  /* Dark mode mobile — neumorphic + gradasi hijau */
+  /* Mobile header shell: keep transparent to avoid duplicate background over floating header-inner */
   .header,
-  .site-header {
-    background:
-      linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 138, 148, 0.08) 40%, rgba(0, 0, 0, 0) 70%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.05) 20%, rgba(255, 255, 255, 0) 44%),
-      var(--skeu-panel-bg) !important;
-    backdrop-filter: none !important;
-  }
-
-  /* Light mode mobile — neumorphic + gradasi hijau */
+  .site-header,
   html[data-theme="light"] .header,
   html[data-theme="light"] .site-header {
-    background:
-      linear-gradient(135deg, rgba(0, 214, 180, 0.18) 0%, rgba(0, 194, 208, 0.08) 40%, rgba(255, 255, 255, 0) 70%),
-      linear-gradient(180deg, rgba(255, 255, 255, 0.94) 0%, rgba(255, 255, 255, 0.55) 22%, rgba(255, 255, 255, 0) 48%),
-      var(--skeu-panel-bg) !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
     backdrop-filter: none !important;
   }
 

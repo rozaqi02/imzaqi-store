@@ -28,6 +28,7 @@ function BannerIcon({ name }) {
 }
 
 const FLASH_ROTATE_MS = 6000;
+const TICKER_ROTATE_MS = 8000;
 const PROMO_DISMISS_KEY = "imzaqi_ticker_promo_dismissed";
 const FLASH_DISMISS_KEY = "imzaqi_ticker_flash_dismissed";
 const NEW_PRODUCT_DISMISS_KEY = "imzaqi_ticker_new_product_dismissed";
@@ -85,6 +86,7 @@ function pickHomePromo(promos, allowedCodes) {
 export default function PromoTicker() {
   const [flashItems, setFlashItems] = useState([]);
   const [flashIndex, setFlashIndex] = useState(0);
+  const [slotIndex, setSlotIndex] = useState(0);
   const [promo, setPromo] = useState(null);
   const [bannerConfig, setBannerConfig] = useState(null);
   const [serviceBannerConfig, setServiceBannerConfig] = useState(null);
@@ -164,6 +166,15 @@ export default function PromoTicker() {
   const showFlash = Boolean(flash) && !flashDismissed && !(showBanner && bannerConfig?.type === "flash");
   const showService = Boolean(serviceBannerConfig?.enabled) && !serviceDismissed;
   const bannerLabel = { product: "Produk baru", flash: "Flash sale pilihan", academic: "Jasa akademik", custom: "Pengumuman toko" }[bannerConfig?.type] || "Pengumuman toko";
+  const slotCount = [showBanner, showFlash, showService, showPromo].filter(Boolean).length;
+
+  useEffect(() => {
+    if (slotCount < 2) return undefined;
+    const timer = window.setInterval(() => {
+      setSlotIndex((index) => (index + 1) % slotCount);
+    }, TICKER_ROTATE_MS);
+    return () => window.clearInterval(timer);
+  }, [slotCount]);
 
   function dismissFlash() {
     try {
@@ -214,103 +225,115 @@ export default function PromoTicker() {
 
   const flashLabel = flash ? (flash.duration ? `${flash.name} · ${flash.duration}` : flash.name) : "";
 
-  return (
-    <div className="promo-tickerStack">
-      {showBanner ? (
-        <div
-          className={`promo-ticker promo-ticker--newProduct promo-ticker--color-${bannerConfig.color || "orange"} promo-ticker--style-${bannerConfig.banner_style || "minimal_border"}`}
-          role="region"
-          aria-label={bannerLabel}
-        >
-          <p className="promo-tickerItem">
-            <BannerIcon name={bannerConfig.icon} />
-            {bannerCopy.badge ? (
-              <span className="promo-tickerBadge">{bannerCopy.badge}</span>
-            ) : null}
-            {/^https?:\/\//i.test(bannerCopy.link)
-              ? <a className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} href={bannerCopy.link}>{bannerCopy.text}</a>
-              : <Link className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} to={bannerCopy.link}>{bannerCopy.text}</Link>}
-            <BannerGraphic name={bannerConfig.graphic || "bell_megaphone"} height={22} />
-          </p>
-          <button
-            type="button"
-            className="promo-tickerClose"
-            aria-label={`Tutup banner ${bannerLabel.toLowerCase()}`}
-            onClick={dismissNewProduct}
-          >
-            <X size={15} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-        </div>
-      ) : null}
+  const slots = [];
 
-      {showFlash ? (
-        <div className="promo-ticker promo-ticker--flash" role="region" aria-label="Flash sale">
-          <p className="promo-tickerItem">
-            <BannerGraphic name="flash_lightning" height={20} />
-            Flash sale{" "}
-            <Link className="promo-tickerLink promo-tickerLink--underline" to={flash.to}>
-              {flashLabel}
+  if (showBanner) {
+    slots.push(
+      <div
+        key="banner"
+        className={`promo-ticker promo-ticker--newProduct promo-ticker--color-${bannerConfig.color || "orange"} promo-ticker--style-${bannerConfig.banner_style || "minimal_border"}`}
+        role="region"
+        aria-label={bannerLabel}
+      >
+        <p className="promo-tickerItem">
+          <BannerIcon name={bannerConfig.icon} />
+          {bannerCopy.badge ? (
+            <span className="promo-tickerBadge">{bannerCopy.badge}</span>
+          ) : null}
+          {/^https?:\/\//i.test(bannerCopy.link)
+            ? <a className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} href={bannerCopy.link}>{bannerCopy.text}</a>
+            : <Link className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} to={bannerCopy.link}>{bannerCopy.text}</Link>}
+          <BannerGraphic name={bannerConfig.graphic || "bell_megaphone"} height={22} />
+        </p>
+        <button
+          type="button"
+          className="promo-tickerClose"
+          aria-label={`Tutup banner ${bannerLabel.toLowerCase()}`}
+          onClick={dismissNewProduct}
+        >
+          <X size={15} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+      </div>
+    );
+  }
+
+  if (showFlash) {
+    slots.push(
+      <div key="flash" className="promo-ticker promo-ticker--flash" role="region" aria-label="Flash sale">
+        <p className="promo-tickerItem">
+          <BannerGraphic name="flash_lightning" height={20} />
+          Flash sale{" "}
+          <Link className="promo-tickerLink promo-tickerLink--underline" to={flash.to}>
+            {flashLabel}
+          </Link>
+          {` · -${flash.discount}%`}
+        </p>
+        <button type="button" className="promo-tickerClose promo-tickerClose--flash" aria-label="Tutup banner flash sale" onClick={dismissFlash}>
+          <X size={15} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+      </div>
+    );
+  }
+
+  if (showService) {
+    slots.push(
+      <div
+        key="service"
+        className={`promo-ticker promo-ticker--service promo-ticker--color-${serviceBannerConfig.color || "green"} promo-ticker--style-${serviceBannerConfig.banner_style || "minimal_border"}`}
+        role="region"
+        aria-label="Info layanan"
+      >
+        <p className="promo-tickerItem">
+          <BannerIcon name={serviceBannerConfig.icon} />
+          {serviceBannerConfig.badge ? (
+            <span className="promo-tickerBadge">{serviceBannerConfig.badge}</span>
+          ) : null}
+          {/^https?:\/\//i.test(serviceBannerConfig.link) ? (
+            <a className={`promo-tickerLink promo-tickerLink--${serviceBannerConfig.link_style || "underline"}`} href={serviceBannerConfig.link}>
+              {serviceBannerConfig.text}
+            </a>
+          ) : (
+            <Link className={`promo-tickerLink promo-tickerLink--${serviceBannerConfig.link_style || "underline"}`} to={serviceBannerConfig.link || "/produk"}>
+              {serviceBannerConfig.text}
             </Link>
-            {` · -${flash.discount}%`}
-          </p>
-          <button type="button" className="promo-tickerClose promo-tickerClose--flash" aria-label="Tutup banner flash sale" onClick={dismissFlash}>
-            <X size={15} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-        </div>
-      ) : null}
-
-      {showService ? (
-        <div
-          className={`promo-ticker promo-ticker--service promo-ticker--color-${serviceBannerConfig.color || "green"} promo-ticker--style-${serviceBannerConfig.banner_style || "minimal_border"}`}
-          role="region"
-          aria-label="Info layanan"
+          )}
+          <BannerGraphic name={serviceBannerConfig.graphic || "shield_star"} height={22} />
+        </p>
+        <button
+          type="button"
+          className="promo-tickerClose promo-tickerClose--flash"
+          aria-label="Tutup banner info layanan"
+          onClick={dismissService}
         >
-          <p className="promo-tickerItem">
-            <BannerIcon name={serviceBannerConfig.icon} />
-            {serviceBannerConfig.badge ? (
-              <span className="promo-tickerBadge">{serviceBannerConfig.badge}</span>
-            ) : null}
-            {/^https?:\/\//i.test(serviceBannerConfig.link) ? (
-              <a className={`promo-tickerLink promo-tickerLink--${serviceBannerConfig.link_style || "underline"}`} href={serviceBannerConfig.link}>
-                {serviceBannerConfig.text}
-              </a>
-            ) : (
-              <Link className={`promo-tickerLink promo-tickerLink--${serviceBannerConfig.link_style || "underline"}`} to={serviceBannerConfig.link || "/produk"}>
-                {serviceBannerConfig.text}
-              </Link>
-            )}
-            <BannerGraphic name={serviceBannerConfig.graphic || "shield_star"} height={22} />
-          </p>
+          <X size={15} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+      </div>
+    );
+  }
+
+  if (showPromo) {
+    slots.push(
+      <div key="promo" className="promo-ticker promo-ticker--code" role="region" aria-label="Kode promo">
+        <p className="promo-tickerItem">
+          Kode promo{" "}
           <button
             type="button"
-            className="promo-tickerClose promo-tickerClose--flash"
-            aria-label="Tutup banner info layanan"
-            onClick={dismissService}
+            className="promo-tickerLink promo-tickerCode"
+            onClick={copyPromo}
+            aria-label={copied ? `Kode ${promo.code} tersalin` : `Salin kode promo ${promo.code}`}
           >
-            <X size={15} strokeWidth={2.4} aria-hidden="true" />
+            {promo.code}
           </button>
-        </div>
-      ) : null}
+          {copied ? " tersalin" : ` · ${promo.percent}%`}
+        </p>
+        <button type="button" className="promo-tickerClose" aria-label="Tutup kode promo" onClick={dismissPromo}>
+          <X size={15} strokeWidth={2.4} aria-hidden="true" />
+        </button>
+      </div>
+    );
+  }
 
-      {showPromo ? (
-        <div className={`promo-ticker promo-ticker--code${(flashItems.length || showService || showBanner) ? " promo-ticker--mobileStack" : ""}`} role="region" aria-label="Kode promo">
-          <p className="promo-tickerItem">
-            Kode promo{" "}
-            <button
-              type="button"
-              className="promo-tickerLink promo-tickerCode"
-              onClick={copyPromo}
-              aria-label={copied ? `Kode ${promo.code} tersalin` : `Salin kode promo ${promo.code}`}
-            >
-              {promo.code}
-            </button>
-            {copied ? " tersalin" : ` · ${promo.percent}%`}
-          </p>
-          <button type="button" className="promo-tickerClose" aria-label="Tutup kode promo" onClick={dismissPromo}>
-            <X size={15} strokeWidth={2.4} aria-hidden="true" />
-          </button>
-        </div>
-      ) : null}
-    </div>
-  );
+  const activeSlot = slots.length ? slots[Math.min(slotIndex, slots.length - 1)] : null;
+
+  return <div className="promo-tickerStack">{activeSlot}</div>;
 }

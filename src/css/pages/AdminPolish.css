@@ -1,0 +1,195 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   ADMIN POLISH — lapisan polesan terakhir untuk seluruh area admin
+   (dashboard + login). Diimpor terakhir di AdminDashboard.jsx &
+   AdminLogin.jsx sehingga menang atas AdminUI.overhaul / fixes.
+   Aksen teal lama (#00c2d0) diselaraskan ke hijau brand (#009e60).
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.admin-page {
+  /* Aksen brand hijau (sebelumnya teal #00c2d0) */
+  --adm-accent: #009e60;
+  --adm-accent-strong: #067a4c;
+  --adm-accent-soft: rgba(0, 158, 96, 0.12);
+  --adm-accent-mid: rgba(0, 158, 96, 0.08);
+  --adm-focus: 0 0 0 3px rgba(0, 158, 96, 0.28);
+}
+
+html[data-theme="light"] .admin-page {
+  --adm-accent: #007a4a;
+  --adm-accent-strong: #067a4c;
+  --adm-accent-soft: rgba(0, 158, 96, 0.1);
+  --adm-accent-mid: rgba(0, 158, 96, 0.06);
+}
+
+/* ── Dark mode: permukaan lebih dalam & bernuansa hijau ─────────────── */
+html[data-theme="dark"] .admin-page {
+  --adm-line: rgba(255, 255, 255, 0.09);
+  --adm-surface:
+    linear-gradient(165deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.015) 40%, rgba(0, 245, 196, 0.02) 100%),
+    #131916;
+  --adm-surface-soft:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015) 40%),
+    #1a211d;
+  --adm-surface-inset:
+    linear-gradient(180deg, rgba(0, 0, 0, 0.25), rgba(255, 255, 255, 0.02) 30%),
+    #0d1210;
+  --adm-shadow:
+    14px 18px 36px rgba(0, 0, 0, 0.38),
+    -6px -6px 16px rgba(255, 255, 255, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.32);
+  --adm-text-2: rgba(228, 242, 235, 0.8);
+  --adm-text-3: rgba(190, 214, 203, 0.55);
+}
+
+/* ── Kartu statistik (KPI): angka lebih besar & tegas ───────────────── */
+.admin-page .admin-statCard {
+  transition: transform 0.2s var(--adm-ease, ease), box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.admin-page .admin-statCard .admin-statValue {
+  font-size: 26px;
+  letter-spacing: -0.03em;
+}
+.admin-page .admin-statCard .admin-statIcon {
+  background: var(--adm-accent-soft);
+  color: var(--adm-accent);
+  border-color: rgba(0, 158, 96, 0.2);
+}
+
+/* ── Kartu prioritas ("Kerjakan dulu"): strip aksen kiri ────────────── */
+.admin-page .admin-priorityCard {
+  position: relative;
+  overflow: hidden;
+}
+.admin-page .admin-priorityCard::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 14%;
+  bottom: 14%;
+  width: 3px;
+  border-radius: 999px;
+  background: var(--adm-accent);
+  opacity: 0.85;
+}
+.admin-page .admin-priorityCard:hover {
+  border-color: rgba(0, 158, 96, 0.4) !important;
+}
+.admin-page .admin-priorityCard .admin-priorityIcon {
+  background: var(--adm-accent-soft);
+  color: var(--adm-accent);
+}
+
+/* ── Sidebar: item aktif lebih jelas, dot count hijau brand ─────────── */
+.admin-page .adm-navItem.is-active {
+  border-color: rgba(0, 158, 96, 0.4) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 30%),
+    var(--adm-accent-mid, rgba(0, 158, 96, 0.08)) !important;
+  color: var(--adm-accent) !important;
+}
+.admin-page .adm-navItem.is-active .adm-navItemIcon {
+  color: var(--adm-accent) !important;
+  border-color: rgba(0, 158, 96, 0.32) !important;
+}
+.admin-page .adm-navDot--accent {
+  background: #009e60;
+  color: #fff;
+}
+.admin-page .adm-navItemLabel {
+  font-weight: 750;
+}
+
+/* ── Chart bar & progress: gradien hijau brand ──────────────────────── */
+.admin-page .admin-chartBar.orders {
+  background: linear-gradient(90deg, #00c277, #009e60) !important;
+}
+.admin-page .admin-chartBar.revenue {
+  background: linear-gradient(90deg, rgba(0, 158, 96, 0.45), rgba(0, 158, 96, 0.85)) !important;
+}
+.admin-page .admin-progress > span {
+  background: linear-gradient(90deg, #00c277, #009e60) !important;
+}
+
+/* ── Chip aktif (7 hari / 30 hari / 90 hari) ────────────────────────── */
+.admin-page .admin-chip.active {
+  background: var(--imzaqi-btn-face, #009e60) !important;
+  border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
+  color: var(--imzaqi-btn-text, #fff) !important;
+  box-shadow: var(--imzaqi-btn-shadow-compact, 0 3px 4px -2px rgba(0, 0, 0, 0.28)) !important;
+}
+
+/* ── Tombol utama di panel admin ikut sistem tombol toko ───────────── */
+.admin-page .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled) {
+  background: var(--imzaqi-btn-face, #009e60) !important;
+  border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
+  color: var(--imzaqi-btn-text, #fff) !important;
+  box-shadow: var(--imzaqi-btn-shadow, none) !important;
+}
+
+/* ── Status pill order: kontras lebih baik di dark ──────────────────── */
+html[data-theme="dark"] .admin-page .admin-status {
+  border-width: 1px;
+}
+
+/* ── Rank item: nomor #1 pakai aksen ────────────────────────────────── */
+.admin-page .admin-rankIndex {
+  background: var(--adm-accent-soft) !important;
+  color: var(--adm-accent) !important;
+  border-color: rgba(0, 158, 96, 0.24) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN LOGIN — kartu masuk lebih fokus & profesional
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Badge "Aman/Privat/Terverifikasi": jelas bukan tombol */
+.admin-loginSignal,
+.admin-page .admin-loginSignal {
+  cursor: default;
+  pointer-events: none;
+}
+.admin-loginSignal svg {
+  color: var(--adm-accent, #007a4a);
+}
+html[data-theme="dark"] .admin-loginSignal svg {
+  color: #2fbf7f;
+}
+
+/* Tombol masuk: hijau brand penuh */
+.admin-page .admin-loginSubmit,
+button.admin-loginSubmit {
+  background: var(--imzaqi-btn-face, #009e60) !important;
+  border: 1px solid var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
+  color: var(--imzaqi-btn-text, #fff) !important;
+  box-shadow: var(--imzaqi-btn-shadow, none) !important;
+}
+.admin-page .admin-loginSubmit:hover:not(:disabled) {
+  box-shadow: var(--imzaqi-btn-shadow-hover, var(--imzaqi-btn-shadow, none)) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   Polesan halus lintas tema
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Judul panel lebih tegas */
+.admin-page .admin-panel-title {
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+/* Baris hover pada list order/produk: highlight lembut */
+.admin-page .admin-orderCardModern,
+.admin-page .admin-product-row {
+  transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+}
+
+/* Empty state inline lebih tenang */
+.admin-page .admin-emptyInline {
+  opacity: 0.85;
+}
+
+/* Sinkron label kecil di sidebar footer */
+.admin-page .adm-syncLabel {
+  letter-spacing: 0.02em;
+}

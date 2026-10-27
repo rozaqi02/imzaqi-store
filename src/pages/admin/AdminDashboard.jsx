@@ -31,6 +31,8 @@ import {
   TrendingUp,
   Users,
   Wallet,
+  Volume2,
+  VolumeX,
   X,
 } from "lucide-react";
 
@@ -72,6 +74,7 @@ import "../../css/pages/AdminDashboard.fixes.css";
 import "../../css/pages/AdminNav.css";
 import "../../css/pages/AdminUI.overhaul.css";
 import "../../css/pages/AdminApp.shell.css";
+import "../../css/pages/AdminPolish.css";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -97,6 +100,8 @@ import { formatIDR, slugify, getTimeline, calcConversionRate, formatCohortDispla
 import { usePageMeta } from "../../hooks/usePageMeta";
 import { useToast } from "../../context/ToastContext";
 import { copyToClipboard } from "../../utils/clipboard";
+import { compressImage } from "../../utils/imageCompress";
+import { playOrderAlertChime } from "../../utils/audioChime";
 import { warn } from "../../lib/log";
 import {
   notifyAdminNewOrder,
@@ -253,6 +258,25 @@ export default function AdminDashboard() {
   const [settingsQrisImageUrl, setSettingsQrisImageUrl] = useState("");
   const promotionDraftCache = useRef({});
   const [newOrderCount, setNewOrderCount] = useState(0);
+  const [soundEnabled, setSoundEnabled] = useState(() => {
+    try {
+      const saved = localStorage.getItem("imzaqi_admin_sound");
+      return saved === null ? true : saved === "1";
+    } catch {
+      return true;
+    }
+  });
+
+  const toggleSound = () => {
+    setSoundEnabled((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("imzaqi_admin_sound", next ? "1" : "0");
+      } catch {}
+      if (next) playOrderAlertChime();
+      return next;
+    });
+  };
   const [exportDateFrom, setExportDateFrom] = useState("");
   const [exportDateTo, setExportDateTo] = useState("");
   const [ordersHasMore, setOrdersHasMore] = useState(false);
@@ -1427,6 +1451,9 @@ export default function AdminDashboard() {
               byStatus,
             };
           });
+          if (soundEnabled) {
+            playOrderAlertChime();
+          }
           notifyAdminNewOrder(newOrder, waNumber);
           const now = Date.now();
           if (now - realtimeToastAtRef.current >= REALTIME_TOAST_DEBOUNCE_MS) {
@@ -1462,7 +1489,13 @@ export default function AdminDashboard() {
   }, [waNumber]);
 
   // ===== Helpers =====
-  async function uploadToBucket(bucket, file, folder) {
+  async function uploadToBucket(bucket, rawFile, folder) {
+    const isIcon = folder === "icons" || String(bucket || "").includes("icon");
+    const file = await compressImage(rawFile, {
+      maxWidth: isIcon ? 512 : 1280,
+      maxHeight: isIcon ? 512 : 1280,
+      quality: isIcon ? 0.88 : 0.82,
+    });
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase();
     const safeExt = ["jpg", "jpeg", "png", "webp"].includes(ext) ? ext : "jpg";
     const path = `${folder}/${Date.now()}-${Math.random().toString(16).slice(2)}.${safeExt}`;
@@ -2088,20 +2121,40 @@ export default function AdminDashboard() {
       }
 
       if (status === "cancelled") {
-        // Use RPC that atomically restores stock + promo slot
-        const { data, error } = await supabase.rpc("cancel_order_with_stock_restore", {
-          p_order_id: orderId,
-        });
-        if (error) {
+        let extra = "";
+        const { data: cancelState } = await supabase
+          .from("orders")
+          .select("inventory_released_at")
+          .eq("id", orderId)
+          .maybeSingle();
+        const alreadyReleased = Boolean(cancelState?.inventory_released_at);
+
+        if (alreadyReleased) {
+          const { error } = await supabase
+            .from("orders")
+            .update({ status: "cancelled" })
+            .eq("id", orderId);
+          if (error) {
+            await refreshOrders({ force: true });
+            throw error;
+          }
           await refreshOrders({ force: true });
-          throw error;
+        } else {
+          // Use RPC that atomically restores stock + promo slot
+          const { data, error } = await supabase.rpc("cancel_order_with_stock_restore", {
+            p_order_id: orderId,
+          });
+          if (error) {
+            await refreshOrders({ force: true });
+            throw error;
+          }
+          const result = data || {};
+          extra = result.restored_stock
+            ? ` (stok +${result.restored_stock}${result.restored_promo ? ", promo dikembalikan" : ""})`
+            : "";
+          invalidateProductCaches();
+          await Promise.all([refreshOrders({ force: true }), refreshProducts({ force: true })]);
         }
-        const result = data || {};
-        const extra = result.restored_stock
-          ? ` (stok +${result.restored_stock}${result.restored_promo ? ", promo dikembalikan" : ""})`
-          : "";
-        invalidateProductCaches();
-        await Promise.all([refreshOrders({ force: true }), refreshProducts({ force: true })]);
         toast.remove(tid);
 
         // Toast with WA redirect button for cancellation
@@ -2588,6 +2641,8 @@ export default function AdminDashboard() {
             onRefresh={refreshAll}
             onLogout={logout}
             syncLabel={syncCopy}
+            soundEnabled={soundEnabled}
+            onToggleSound={toggleSound}
           />
 
           <main className="admin-main">
@@ -2601,6 +2656,8 @@ export default function AdminDashboard() {
               flashSaleEndingSoon={flashSaleEndingSoon}
               onRefresh={refreshAll}
               onLogout={logout}
+              soundEnabled={soundEnabled}
+              onToggleSound={toggleSound}
             />
 
             {msg ? (
@@ -4504,6 +4561,20 @@ export default function AdminDashboard() {
 
             {/* ── Quick Action Buttons ── */}
             <div className="admin-orderQuickActions">
+              <select
+                className="input admin-select admin-orderInlineSelect"
+                value={String(activeOrder.status || "pending")}
+                aria-label={`Ubah status order ${activeOrder.order_code || activeOrder.id}`}
+                onChange={(e) =>
+                  requestOrderStatusChange(activeOrder.id, e.target.value, activeOrder.status)
+                }
+              >
+                {ORDER_STATUS_OPTIONS.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
               {String(activeOrder.status || "pending") !== "done" && String(activeOrder.status || "pending") !== "cancelled" ? (
                 <button
                   className="btn"
@@ -4742,6 +4813,18 @@ export default function AdminDashboard() {
                     disabled={!activeOrder.customer_whatsapp}
                   >
                     ⭐ Minta Review
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-sm btn-ghost"
+                    onClick={() => {
+                      const link = buildWhatsAppActionLink(activeOrder, "warranty", adminNoteDrafts[activeOrder.id]);
+                      if (link) window.open(link, "_blank");
+                    }}
+                    disabled={!activeOrder.customer_whatsapp}
+                    title="Kirim pesan solusi garansi/akun pengganti ke customer"
+                  >
+                    🛡️ Respon Garansi
                   </button>
                 </div>
               </div>

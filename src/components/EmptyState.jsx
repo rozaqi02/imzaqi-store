@@ -19,7 +19,7 @@ export default function EmptyState({
   const showMascot = MASCOTS_ENABLED && Boolean(mascot);
 
   return (
-    <div className="empty empty--animated">
+    <div className="empty">
       <div className={`empty-icon${isElement ? " empty-icon-component" : ""}${showMascot ? " empty-icon-mascot" : ""}`} aria-hidden="true">
         {showMascot ? (
           <BannerGraphic name={mascot} height={56} className="empty-mascotGraphic" />

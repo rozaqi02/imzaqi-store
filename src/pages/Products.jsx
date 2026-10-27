@@ -4,7 +4,6 @@ import { Link, useLocation, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   CircleAlert,
-  Flame,
   Grid2x2,
   Layers3,
   List,
@@ -23,11 +22,10 @@ import CatalogFilterSidebar from "../components/CatalogFilterSidebar";
 import EmptyState from "../components/EmptyState";
 import FlashSaleBanner from "../components/FlashSaleBanner";
 import { CatalogHero } from "../components/StorefrontHero";
-import NumberCounter from "../components/NumberCounter";
 
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
-import { formatIDR, summarizeCatalogCopy, detectAccountTypes, classifyStock } from "../lib/format";
+import { formatIDR, summarizeCatalogCopy, classifyStock } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import {
   CATALOG_LINE_FILTERS,
@@ -56,7 +54,6 @@ import {
   hasCatalogProductsCache,
   setCatalogProductsCache,
 } from "../lib/catalogCache";
-import TypewriterSearchInput from "../components/TypewriterSearchInput";
 
 const CATEGORIES = CATALOG_LINE_FILTERS;
 
@@ -78,15 +75,6 @@ const SORT_LABELS = {
 const DEFAULT_SORT = "reco";
 /** Initial catalog batch - keeps mobile DOM/paint light; expand via "Muat lagi". */
 const CATALOG_BATCH = 12;
-
-const SEARCH_QUERIES = [
-  "Netflix Premium",
-  "Spotify Family",
-  "YouTube Premium",
-  "Canva Pro",
-  "ChatGPT Plus",
-  "Disney+ Hotstar",
-];
 
 function inferCategory(product) {
   return resolveCatalogLine(product);
@@ -303,7 +291,8 @@ function FilterPanel({
           <header className="catalog-filterSectionHead">
             <span className="catalog-filterLabel">Tampilan</span>
           </header>
-          <div className="catalog-viewSwitch">
+          <div className="catalog-viewSwitch" data-view={view}>
+            <span className="catalog-viewPill" aria-hidden="true" />
             <button
               type="button"
               className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
@@ -561,7 +550,12 @@ export default function Products() {
   }, [query, products, searchOpen]);
 
   useEffect(() => {
-    if (activeSuggestionIndex >= searchSuggestions.length) setActiveSuggestionIndex(-1);
+    if (activeSuggestionIndex >= searchSuggestions.length) {
+      setActiveSuggestionIndex(-1);
+    } else if (activeSuggestionIndex >= 0) {
+      const el = document.getElementById(`${catalogListboxId}-option-${activeSuggestionIndex}`);
+      el?.scrollIntoView?.({ block: "nearest" });
+    }
   }, [activeSuggestionIndex, searchSuggestions.length]);
 
   useEffect(() => {
@@ -806,7 +800,7 @@ export default function Products() {
     else if (sort === "price_desc") sorted.sort(byPriceDesc);
     else if (sort === "stock_desc") sorted.sort(byStockDesc);
     else if (sort === "name_desc") sorted.sort(byNameDesc);
-    else if (sort === "reco") sorted.sort(byReco);
+    else if (sort === "reco") sorted.sort((a, b) => Number(b._stock > 0) - Number(a._stock > 0) || byReco(a, b));
     else sorted.sort(byName);
     return sorted;
   }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, debouncedQuery, restockOnly, sort]);
@@ -1007,8 +1001,6 @@ export default function Products() {
     <div className="page catalog-page">
       <section className="section catalog-hero">
         <div className="container">
-          <FlashSaleBanner products={products} />
-
           <CatalogHero
             products={products}
             loading={loading}
@@ -1022,11 +1014,11 @@ export default function Products() {
                   <span className="hero-search-icon" aria-hidden="true">
                     <Search size={16} />
                   </span>
-                  <TypewriterSearchInput
+                  <input
                     ref={searchRef}
                     className="input hero-search-input"
                     value={query}
-                    words={SEARCH_QUERIES}
+                    placeholder="Cari produk atau paket"
                     onFocus={() => setSearchOpen(true)}
                     onChange={(e) => {
                       setQuery(e.target.value);
@@ -1056,6 +1048,13 @@ export default function Products() {
                         } else if (query.trim()) {
                           e.preventDefault();
                           applySearchTerm(query);
+                        }
+                      }
+                      if (e.key === "Tab" && searchOpen && activeSuggestionIndex >= 0) {
+                        const pick = searchSuggestions[activeSuggestionIndex];
+                        if (pick) {
+                          e.preventDefault();
+                          applySearchTerm(pick);
                         }
                       }
                       if (e.key === "Escape") {
@@ -1179,6 +1178,9 @@ export default function Products() {
 
           <div className="catalog-content">
             <div className="catalog-quickFilters" aria-label="Kategori toko">
+              <button type="button" className={`catalog-quickChip${inStockOnly ? " active" : ""}`} aria-pressed={inStockOnly} onClick={() => setInStockOnly(value => !value)}>
+                <PackageCheck size={18} aria-hidden="true" /> Tersedia
+              </button>
               {quickFilters.map((item) => {
                 const Icon = item.Icon;
                 return (
@@ -1197,13 +1199,15 @@ export default function Products() {
               })}
             </div>
 
+            {!query && !cats.length && !inStockOnly && !newOnly && !restockOnly ? <FlashSaleBanner products={products} compact /> : null}
+
             <div className="catalog-contentBar">
               <div className={`catalog-contentMeta${isFiltering ? " is-filtering" : ""}`}>
                 <strong>
                   {loading || isFiltering ? (
                     "..."
                   ) : (
-                    <NumberCounter key={filterSignature} value={filtered.length} duration={420} />
+                    filtered.length.toLocaleString("id-ID")
                   )}
                 </strong>
                 <span>produk</span>
@@ -1221,7 +1225,8 @@ export default function Products() {
                     <option key={value} value={value}>{label}</option>
                   ))}
                 </select>
-                <div className="catalog-contentViewSwitch" aria-label="Tampilan katalog">
+                <div className="catalog-contentViewSwitch" data-view={view} aria-label="Tampilan katalog">
+                  <span className="catalog-viewPill" aria-hidden="true" />
                 <button
                   type="button"
                   className={`catalog-viewBtn ${view === "grid" ? "active" : ""}`}
@@ -1275,7 +1280,7 @@ export default function Products() {
                 <div className="card pad catalog-emptyResult" style={{ gridColumn: "1 / -1" }}>
                   <EmptyState
                     icon="!"
-                    title="Gagal load"
+                    title="Produk belum bisa dimuat"
                     description={error}
                     primaryAction={{ label: "Coba ulang", onClick: () => window.location.reload() }}
                     suggestions={[
@@ -1287,13 +1292,13 @@ export default function Products() {
                 <div className="card pad catalog-emptyResult" style={{ gridColumn: "1 / -1" }}>
                   <EmptyState
                     icon={<PackageSearch size={32} strokeWidth={2} />}
-                    title={query ? `Hasil untuk "${query}"` : "Tidak ditemukan"}
+                    title="Produk belum ditemukan"
                     description={
                       query
-                        ? `Belum nemu "${query}". Coba kata kunci lain atau intip yang lagi viral.`
+                        ? `Tidak ada hasil untuk "${query}". Coba nama produk lain atau hapus filter.`
                         : inStockOnly
-                          ? "Belum ada produk yang ready saat ini. Cek lagi nanti, ya!"
-                          : "Reset filternya dulu, baru coba lagi."
+                          ? "Belum ada produk tersedia dengan filter ini. Coba lihat semua stok."
+                          : "Coba ubah pilihan atau hapus filter untuk melihat produk lainnya."
                     }
                     suggestions={emptySuggestions}
                     primaryAction={{ label: "Reset filter", onClick: resetFilters }}
@@ -1402,15 +1407,9 @@ export default function Products() {
 
 const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0, onBeforeNavigate }) {
   const stock = Number(product._stock || 0);
-  const sold = Number(product._sold || 0);
   const stockState = classifyStock(stock);
-  const hot = sold >= 10;
   const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
-  const category = CATEGORIES.find((item) => item.key === product._category);
-  const categoryLabel = category?.label || "Digital";
-  const CategoryIcon = category?.icon || Sparkles;
   const summaryCopy = summarizeCatalogCopy(product.description);
-  const accountTypes = useMemo(() => detectAccountTypes(product._vars || product.product_variants), [product]);
 
   return (
     <Link
@@ -1418,7 +1417,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
       state={{ fromCatalog: true, catalogSearch: location.search }}
       id={`catalog-card-${product.slug}`}
       data-catalog-slug={product.slug}
-      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}`}
+      className={`catalog-card catalog-cardV2 ${view === "list" ? "list" : "grid"}${stockState === "out" ? " is-unavailable" : ""}`}
       role="listitem"
       aria-label={`Buka detail ${product.name}`}
       style={{ "--reveal-i": revealIndex }}
@@ -1443,10 +1442,6 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
           </div>
 
           <div className="catalog-cardCopy">
-            <div className="catalog-cardKicker">
-              <CategoryIcon size={11} />
-              <span>{categoryLabel}</span>
-            </div>
             <div className="catalog-cardTitle">{product.name}</div>
             <div className="catalog-cardSummary">{summaryCopy}</div>
           </div>
@@ -1458,16 +1453,10 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
       </div>
 
       <div className="catalog-cardSignals">
-        {hot ? (
-          <span className="catalog-status hot">
-            <Flame size={13} />
-            <span>Hot</span>
-          </span>
-        ) : null}
         {stockState === "out" ? (
           <span className="catalog-status soldout">
             <CircleAlert size={13} />
-            <span>Habis</span>
+            <span>Stok habis</span>
           </span>
         ) : stockState === "low" ? (
           <span className="catalog-status warn">
@@ -1477,22 +1466,12 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
         ) : (
           <span className="catalog-status ok">
             <PackageCheck size={13} />
-            <span>Stok: {stock}</span>
+            <span>Tersedia</span>
           </span>
         )}
-        {sold > 0 ? (
-          <span className="catalog-status muted">
-            <span>{sold} terjual</span>
-          </span>
-        ) : null}
       </div>
 
       <div className="catalog-cardMeta">
-        {accountTypes.map((t) => (
-          <span key={t.label} className="catalog-metaType" style={{ "--type-color": t.color }}>
-            {t.label}
-          </span>
-        ))}
         <span>
           <Layers3 size={13} />
           <span>{product._vars?.length || 0} varian</span>
@@ -1500,7 +1479,7 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
       </div>
 
       <div className="catalog-cardFoot">
-        <span>Pilih paket</span>
+        <span>{stockState === "out" ? "Lihat detail" : "Pilih paket"}</span>
         <ArrowRight size={15} />
       </div>
     </Link>

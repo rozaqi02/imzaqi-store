@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { STORE_WHATSAPP } from "../lib/productCategories";
+import { useIsMobile } from "../hooks/useIsMobile";
 
 const footerColumns = [
   {
@@ -46,11 +47,12 @@ function FooterLink({ item, className = "" }) {
 
 export default function Footer() {
   const year = new Date().getFullYear();
+  const isMobile = useIsMobile("(max-width: 767px)");
 
   return (
     <footer className="site-footer site-footer--gopay">
       <div className="container">
-        <div className="site-footerPanel site-footerGo reveal">
+        <div className="site-footerPanel site-footerGo">
           <div className="site-footerGoIntro">
             <Link className="site-footerGoBrand" to="/" aria-label="Kembali ke beranda">
               <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
@@ -60,23 +62,23 @@ export default function Footer() {
 
           <div className="site-footerGoColumns">
             {footerColumns.map((group) => (
-              <div key={group.label} className="site-footerGoCol">
-                <h3 className="site-footerGoTitle">{group.label}</h3>
+              <details key={group.label} className="site-footerGoCol" open={!isMobile}>
+                <summary className="site-footerGoTitle">{group.label}</summary>
                 <div className="site-footerGoList">
                   {group.links.map((item) => (
                     <FooterLink key={`${group.label}-${item.label}`} item={item} className="site-footerGoLink" />
                   ))}
                 </div>
-              </div>
+              </details>
             ))}
 
-            <div className="site-footerGoCol">
-              <h3 className="site-footerGoTitle">Bantuan</h3>
+            <details className="site-footerGoCol" open={!isMobile}>
+              <summary className="site-footerGoTitle">Bantuan</summary>
               <div className="site-footerGoList">
-                <Link className="site-footerGoLink" to="/faq">
+                <Link className="site-footerGoLink" to="/faq?q=paket">
                   Cara Pesan
                 </Link>
-                <Link className="site-footerGoLink" to="/faq">
+                <Link className="site-footerGoLink" to="/faq?q=QRIS">
                   Cara Bayar QRIS
                 </Link>
                 <Link className="site-footerGoLink" to="/faq">
@@ -91,12 +93,12 @@ export default function Footer() {
                   Hubungi Admin
                 </a>
               </div>
-            </div>
+            </details>
           </div>
 
           <div className="site-footerGoLegal">
             <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
-            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v6.2.0</p>
+            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v6.0.0</p>
           </div>
         </div>
       </div>

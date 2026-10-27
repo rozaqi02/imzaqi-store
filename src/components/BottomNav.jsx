@@ -12,6 +12,7 @@ import { useIsMobile } from "../hooks/useIsMobile";
 import { isFunnelPath } from "../hooks/useFunnelRoute";
 import { BOTTOM_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
 import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
+import { prefetchRoute } from "../lib/routePrefetch";
 import { useCart } from "../context/CartContext";
 
 const ICONS = {
@@ -98,7 +99,7 @@ export default function BottomNav() {
   if (hidden || typeof document === "undefined") return null;
 
   return createPortal(
-    <nav ref={navRef} className={`bottom-nav${isPhone && shrunk ? " is-shrunk" : ""}`} aria-label="Navigasi utama">
+    <nav ref={navRef} className={`bottom-nav bottom-nav--neumorphic${isPhone && shrunk ? " is-shrunk" : ""}`} aria-label="Navigasi utama">
       <ul className="bottom-nav-list">
         {SITE_BOTTOM_NAV.map((item) => {
           const Icon = ICONS[item.to] || House;
@@ -116,6 +117,9 @@ export default function BottomNav() {
                 className={`bottom-nav-item${active ? " is-active" : ""}`}
                 aria-current={active ? "page" : undefined}
                 aria-label={ariaLabel}
+                onMouseEnter={() => prefetchRoute(item.to)}
+                onFocus={() => prefetchRoute(item.to)}
+                onTouchStart={() => prefetchRoute(item.to)}
                 onClick={(event) => {
                   if (!active) return;
                   event.preventDefault();

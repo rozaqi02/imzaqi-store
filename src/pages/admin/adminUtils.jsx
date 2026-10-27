@@ -206,6 +206,15 @@ export function buildWhatsAppMessage({ order, type = "chat", customNote = "" }) 
         `🔗 ${statusUrl}\n\n` +
         `Terima kasih banyak atas kepercayaannya pada Imzaqi Store! 🙏`
       );
+    case "warranty":
+    case "warranty_claim":
+      return (
+        `Halo kak! Terkait garansi pesanan kamu di Imzaqi Store:\n\n` +
+        `📦 Detail Order:\n- ID: ${orderCode}\n- Paket:\n- ${itemsSummary}\n\n` +
+        `🛡️ Solusi Garansi / Akun Baru:\n${note ? note : "Akun pengganti / solusi kendala sudah kami siapkan. Silakan cek catatan pesanan kamu."}\n\n` +
+        `🔗 Cek Status & Catatan:\n${statusUrl}\n\n` +
+        `Jika masih ada kendala login, silakan balas chat ini ya kak. Garansi selalu kami kawal sampai tuntas! 🙌`
+      );
     case "chat":
     default:
       return `Halo kak! Perihal pesanan dengan ID ${orderCode} di Imzaqi Store...`;

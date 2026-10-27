@@ -1,7 +1,7 @@
 /* Admin audit fixes — tokens, utilities, mobile guards */
 
 .admin-page {
-  --adm-accent: var(--accent, #00d6b4);
+  --adm-accent: var(--accent);
   --adm-accent-soft: rgba(0, 214, 180, 0.14);
   --adm-accent-mid: rgba(0, 194, 208, 0.12);
   --adm-warn: #ff8c00;

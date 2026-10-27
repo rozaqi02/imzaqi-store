@@ -60,7 +60,11 @@ export default function AchievementToast() {
   return (
     <div className="achievement-toast" role="status" aria-live="polite">
       <div className="achievement-toast-inner">
-        <span className="achievement-toast-icon">{current.icon}</span>
+        {current.Icon ? (
+          <span className="achievement-toast-icon" aria-hidden="true">
+            <current.Icon size={24} strokeWidth={2.2} />
+          </span>
+        ) : null}
         <div className="achievement-toast-body">
           <div className="achievement-toast-title">Pencapaian baru!</div>
           <div className="achievement-toast-name">{current.title}</div>

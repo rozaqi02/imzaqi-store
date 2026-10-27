@@ -3,7 +3,7 @@ import { MessageCircle, QrCode, ShieldCheck, Timer } from "lucide-react";
 const DEFAULT_ITEMS = [
   { icon: QrCode, label: "QRIS" },
   { icon: ShieldCheck, label: "Garansi replace" },
-  { icon: Timer, label: "~5 menit" },
+  { icon: Timer, label: "5–30 menit" },
   { icon: MessageCircle, label: "Chat admin" },
 ];
 

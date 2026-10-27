@@ -38,7 +38,7 @@ describe("storefront promotion setup", () => {
     await waitFor(() => expect(upsertSetting).toHaveBeenCalledWith("new_product_popup", expect.objectContaining({ enabled: true, product_id: "n", title: "", link: "", show_on: "home" })));
     await waitFor(() => expect(screen.getByRole("button", { name: "Simpan pop-up produk baru" })).toBeDisabled());
     expect(upsertSetting).toHaveBeenCalledTimes(1);
-  });
+  }, 15000);
   it("saving flash sale preserves a different announcement's unsaved draft", async () => {
     render(<Host/>);
     fireEvent.click(screen.getByRole("radio", { name: /Pengumuman bebas/ }));

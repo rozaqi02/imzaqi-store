@@ -1,33 +1,35 @@
+import { CalendarCheck, Flame, Gem, PartyPopper, ShoppingCart } from "lucide-react";
+
 const ACHIEVEMENTS_KEY = "imzaqi_achievements_v1";
 const SEEN_KEY = "imzaqi_achievements_seen_v1";
 
 const ACHIEVEMENT_DEFS = [
   {
     id: "first_order",
-    title: "Pertama Kali 🎉",
+    title: "Pertama Kali",
     desc: "Order pertama kamu!",
-    icon: "🎉",
+    Icon: PartyPopper,
     check: (history) => history.length >= 1,
   },
   {
     id: "fifth_order",
-    title: "Makin Sering 🛒",
+    title: "Makin Sering",
     desc: "Udah 5x order!",
-    icon: "🛒",
+    Icon: ShoppingCart,
     check: (history) => history.length >= 5,
   },
   {
     id: "tenth_order",
-    title: "Pelanggan Setia 💎",
+    title: "Pelanggan Setia",
     desc: "10x order, mantap!",
-    icon: "💎",
+    Icon: Gem,
     check: (history) => history.length >= 10,
   },
   {
     id: "streak_2",
-    title: "Rajin Banget 📆",
+    title: "Rajin Banget",
     desc: "Order 2 bulan berturut-turut",
-    icon: "📆",
+    Icon: CalendarCheck,
     check: (history) => {
       const months = [...new Set(
         history
@@ -50,9 +52,9 @@ const ACHIEVEMENT_DEFS = [
   },
   {
     id: "streak_3",
-    title: "Langganan Tetap 🔥",
+    title: "Langganan Tetap",
     desc: "Order 3 bulan berturut-turut!",
-    icon: "🔥",
+    Icon: Flame,
     check: (history) => {
       const months = [...new Set(
         history

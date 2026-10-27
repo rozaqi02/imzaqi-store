@@ -13,7 +13,7 @@ function ProductLogo({ product }) {
   ) : <span aria-hidden="true">{String(product.name || "P").slice(0, 1).toUpperCase()}</span>;
 }
 
-export default function FlashSaleBanner({ products = [] }) {
+export default function FlashSaleBanner({ products = [], compact = false }) {
   const titleId = useId();
   const offerId = useId();
   const railRef = useRef(null);
@@ -75,6 +75,23 @@ export default function FlashSaleBanner({ products = [] }) {
   const units = flashCountdown(offer.endsAt, now);
   const chooseAdjacent = direction => setSelectedId(offers[(selectedIndex + direction + offers.length) % offers.length].id);
 
+  if (compact) return (
+    <section className="flash-drop flash-drop--compact" aria-labelledby={titleId}>
+      <div className="fsd-backdrop" aria-hidden="true"><ProductLogo product={offer.product} /></div>
+      <div className="fsd-compactCopy">
+        <span className="fsd-eyebrow"><Zap size={13} aria-hidden="true" /> Flash sale · −{offer.discountPercent}%</span>
+        <h2 id={titleId}>{offer.product.name} · {offer.variant.duration_label}</h2>
+        <p>{offer.variant.name}</p>
+        <span className="fsd-compactExpiry">Berakhir {new Intl.DateTimeFormat("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(offer.endsAt))}</span>
+      </div>
+      <div className="fsd-compactAction">
+        <strong>{flashPrice(offer.discountedPrice)}</strong>
+        <Link className="btn btn-primary btn-sm fsd-cta" to={`/produk/${offer.product.slug}`}>Lihat paket <ArrowUpRight size={16} aria-hidden="true" /></Link>
+        {offers.length > 1 ? <button type="button" className="btn btn-ghost btn-sm fsd-compactNext" onClick={() => chooseAdjacent(1)}>Promo berikutnya <ChevronRight size={14} aria-hidden="true" /></button> : null}
+      </div>
+    </section>
+  );
+
   return (
     <section className="flash-drop" aria-labelledby={titleId}>
       <div className="fsd-campaign">
@@ -106,7 +123,7 @@ export default function FlashSaleBanner({ products = [] }) {
         </div>
         <div className="fsd-ticketBottom">
           <span className="fsd-stock"><PackageCheck size={14} aria-hidden="true" />{offer.stock == null ? "Paket tersedia" : `Stok ${offer.stock}`}</span>
-          <Link className="fsd-cta" to={`/produk/${offer.product.slug}`} aria-label={`Lihat paket ${offer.product.name}, ${offer.variant.name}`}>
+          <Link className="btn btn-primary btn-sm fsd-cta" to={`/produk/${offer.product.slug}`} aria-label={`Lihat paket ${offer.product.name}, ${offer.variant.name}`}>
             Lihat paket <ArrowUpRight size={17} aria-hidden="true" />
           </Link>
         </div>
@@ -114,11 +131,11 @@ export default function FlashSaleBanner({ products = [] }) {
 
       {offers.length > 1 ? <div className="fsd-switcher">
         <div className="fsd-switchLabel"><span>PILIH PROMO</span><div className="fsd-arrows">
-          <button type="button" onClick={() => chooseAdjacent(-1)} aria-label="Promo sebelumnya" aria-controls={offerId}><ChevronLeft size={16} aria-hidden="true" /></button>
-          <button type="button" onClick={() => chooseAdjacent(1)} aria-label="Promo berikutnya" aria-controls={offerId}><ChevronRight size={16} aria-hidden="true" /></button>
+          <button className="btn btn-ghost btn-icon" type="button" onClick={() => chooseAdjacent(-1)} aria-label="Promo sebelumnya" aria-controls={offerId}><ChevronLeft size={16} aria-hidden="true" /></button>
+          <button className="btn btn-ghost btn-icon" type="button" onClick={() => chooseAdjacent(1)} aria-label="Promo berikutnya" aria-controls={offerId}><ChevronRight size={16} aria-hidden="true" /></button>
         </div></div>
         <div className="fsd-rail" ref={railRef} role="group" aria-label="Pilihan promo flash sale">
-          {offers.map(item => <button type="button" className="fsd-choice" key={item.id} data-selected={item.id === offer.id}
+          {offers.map(item => <button type="button" className="btn btn-ghost fsd-choice" key={item.id} data-selected={item.id === offer.id}
             aria-pressed={item.id === offer.id} aria-controls={offerId} onClick={() => setSelectedId(item.id)}>
             <span className="fsd-choiceLogo"><ProductLogo product={item.product} /></span>
             <span className="fsd-choiceCopy"><strong>{item.product.name}</strong><small>{[item.variant.name, item.variant.duration_label].filter(Boolean).join(" · ")}</small></span>

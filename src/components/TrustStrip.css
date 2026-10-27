@@ -45,7 +45,7 @@
 }
 
 .trust-strip-item svg {
-  color: var(--accent, #00d6b4);
+  color: var(--accent);
   flex-shrink: 0;
 }
 

@@ -1,0 +1,269 @@
+/*
+  Overrides v3 - requested polish (footer redesign, genZ accents)
+  NOTE: header shell blocks restored on request - the navy glass navbar
+  look is intentional. These win the cascade via html body .header
+  specificity over storefront-chrome.css / theme-consolidated.css.
+*/
+
+/* Baseline - header shell is transparent pass-through for the floating navbar */
+html body .header,
+html body .site-header,
+html[data-theme] body .header,
+html[data-theme] body .site-header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:1000;
+  background:transparent !important;
+  border:0 !important;
+  border-bottom:0 !important;
+  box-shadow:none !important;
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+/* Mobile */
+@media (max-width: 768px){
+  html .header,
+  html .site-header,
+  html[data-motion="lite"] .header,
+  html[data-motion="lite"] .site-header,
+  html[data-motion="off"] .header,
+  html[data-motion="off"] .site-header,
+  html[data-theme] .header,
+  html[data-theme] .site-header{
+    background:transparent !important;
+    border:0 !important;
+    border-bottom:0 !important;
+    box-shadow:none !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  }
+}
+
+@media (max-width: 680px){
+  .header-inner{padding:12px 0;}
+}
+
+/* Steps: legacy fallback only (funnel uses .steps--visual neumorphism in checkout-steps.css) */
+.steps:not(.steps--visual){border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.045);backdrop-filter:blur(12px);}
+.steps:not(.steps--visual) .step.active{border-color:rgba(255,255,255,.18);background:rgba(255,255,255,.07);} 
+.steps:not(.steps--visual) .step.done{border-color:rgba(255,255,255,.14);background:rgba(255,255,255,.04);} 
+.steps:not(.steps--visual) .step-dot{border-color:rgba(255,255,255,.16);} 
+.steps:not(.steps--visual) .step.active .step-dot{border-color:rgba(255,255,255,.28);background:rgba(255,255,255,.88);color:#071018;}
+
+/* Footer redesign (v3) */
+.footer{position:relative;overflow:hidden;}
+.footer::before{content:"";position:absolute;left:0;right:0;top:0;height:2px;background:linear-gradient(90deg, rgba(255,255,255,0), rgba(22,199,166,.9), rgba(29,131,255,.9), rgba(255,255,255,0));opacity:.85;}
+.footer::after{content:"";position:absolute;inset:-30% -10%;background:
+  radial-gradient(900px 460px at 10% 20%, rgba(22,199,166,.18), rgba(0,0,0,0) 60%),
+  radial-gradient(820px 520px at 85% 10%, rgba(29,131,255,.12), rgba(0,0,0,0) 58%),
+  radial-gradient(900px 520px at 50% 120%, rgba(255,255,255,.05), rgba(0,0,0,0) 60%);
+pointer-events:none;}
+
+.footer .footer-topbar{position:relative;z-index:1;margin:0 auto 18px;max-width:1280px;padding:16px 14px;border-radius:22px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);backdrop-filter:blur(12px);display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.footer .footer-topbarTitle{font-weight:1100;letter-spacing:-.2px;}
+.footer .footer-topbarSub{color:rgba(234,255,245,.74);font-size:13px;margin-top:6px;line-height:1.5;}
+.footer .footer-topbarActions{display:flex;gap:10px;flex-wrap:wrap;}
+
+.footer-grid{position:relative;z-index:1;}
+.footer-col a{color:rgba(234,255,245,.78);} 
+.footer-col a:hover{color:#fff;} 
+
+.footer-brandRow{display:flex;align-items:center;gap:12px;}
+.footer-logo{width:38px;height:38px;border-radius:14px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.04);display:grid;place-items:center;overflow:hidden;}
+.footer-logo img{width:100%;height:100%;object-fit:contain;display:block;}
+.footer-brand{font-weight:1200;letter-spacing:-.3px;font-size:18px;}
+
+.footer-trust{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.footer-trust span{display:inline-flex;align-items:center;gap:8px;height:32px;padding:0 12px;border-radius:10px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);font-weight:1000;font-size:12px;}
+
+.footer-social{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap;}
+.footer-social a{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);}
+.footer-social a:hover{background:rgba(255,255,255,.06);border-color:rgba(22,199,166,.28);} 
+
+.footer-bottom{position:relative;z-index:1;}
+.footer-bottom .container{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;}
+.footer-legal{color:rgba(234,255,245,.65);font-size:12px;}
+
+@media (max-width: 680px){
+  .footer .footer-topbar{margin-bottom:14px;}
+}
+
+/* ── Visual UI sprint: floating priority, thumb zone, funnel mode ── */
+
+body.is-funnel .abandoned-cart-banner,
+body.is-funnel .fsp-backdrop,
+body.is-funnel .achievement-toast,
+body.is-funnel .bottom-nav {
+  display: none !important;
+}
+
+/* Thumb-friendly CTAs in funnel */
+.checkout-floating-bar-btn,
+.checkout-summaryBtn,
+.pay-stageActionsMobile .pay-confirmBtn,
+.st-checkBtn {
+  min-height: 48px;
+}
+
+.btn-wide,
+.pay-successActions .btn {
+  min-height: 48px;
+}
+
+/* Status order progress — neumorphic panel + inset track */
+.st-progressBar {
+  margin-bottom: 14px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.18));
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0) 24%),
+    var(--skeu-panel-bg, rgba(29, 131, 255, 0.08));
+  box-shadow: var(--skeu-control-shadow, none);
+}
+
+.st-progressBar-track {
+  height: 6px;
+  border-radius: 999px;
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--skeu-inset-shadow, none);
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.st-progressBar-fill {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent), #5ce0ff);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  transition: width 0.4s ease;
+}
+
+.st-progressBar-label {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--st-text, #ecf8ff);
+}
+
+html[data-theme="light"] .st-progressBar {
+  background: rgba(0, 214, 180, 0.08);
+  border-color: rgba(0, 138, 148, 0.16);
+}
+
+html[data-theme="light"] .st-progressBar-label {
+  color: #234652;
+}
+
+/* Pay QRIS hero on mobile */
+@media (max-width: 720px) {
+  .pay-stageGrid {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .pay-stageVisual {
+    order: -1;
+  }
+
+  .pay-qrisFrame {
+    max-width: min(100%, 320px);
+    margin: 0 auto;
+  }
+
+  .qris-img {
+    max-width: 100%;
+  }
+}
+
+/* Admin mobile order cards */
+@media (max-width: 720px) {
+  .admin-orderListItem {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-areas:
+      "check main"
+      "check meta"
+      "actions actions";
+    gap: 10px 12px;
+    padding: 14px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .admin-orderListCheckbox {
+    grid-area: check;
+  }
+
+  .admin-orderListMain {
+    grid-area: main;
+  }
+
+  .admin-orderListRight {
+    grid-area: actions;
+    width: 100%;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .admin-orderRowActions {
+    flex-wrap: wrap;
+    width: 100%;
+  }
+
+  .admin-orderInlineSelect {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.admin-nav-stockBadge {
+  margin-left: auto;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  border-radius: 6px;
+  background: #ff6b4a;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  display: grid;
+  place-items: center;
+}
+
+/* Mini cart sheet styles removed — component no longer exists. */
+
+.checkout-drawer .checkout-mobile-floating-bar--drawer {
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  flex-shrink: 0;
+  margin: 0;
+  padding: 12px 0 0 !important;
+  border-top: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  z-index: 2;
+  background: transparent !important;
+  backdrop-filter: none !important;
+}
+
+.checkout-drawer .checkout-mobile-floating-bar--drawer .checkout-floating-bar-btn {
+  min-height: 48px;
+}
+
+button.header-cart {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  color: inherit;
+  font: inherit;
+}

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDeviceCapability, useMediaQuery } from "../hooks/useIsMobile";
 
 const DESKTOP_ROW_COUNT = 4;
@@ -7,10 +7,16 @@ const DESKTOP_ROW_COUNT = 4;
 const DESKTOP_MIN_TILES = 18;
 const MOBILE_ROW_COUNT = 4;
 const MOBILE_MIN_TILES = 12;
+const DESKTOP_ROW_HEIGHT = 124;
+const MOBILE_ROW_HEIGHT = 104;
+const DESKTOP_STAGE_TOP = -10;
+const MOBILE_STAGE_TOP = 8;
+const MAX_DESKTOP_ROWS = 8;
+const MAX_MOBILE_ROWS = 7;
 const ROW_DURATIONS = ["88s", "104s", "96s", "112s"];
 const MOBILE_ROW_DURATIONS = ["56s", "66s", "60s", "70s"];
 
-function getBackdropConfig(caps, isNarrowViewport) {
+function getBackdropConfig(caps, isNarrowViewport, viewportHeight) {
   // A desktop touchscreen can report `pointer: coarse`. The backdrop should
   // still use its desktop four-row layout when there is desktop-width space.
   const isMobile = isNarrowViewport;
@@ -21,7 +27,14 @@ function getBackdropConfig(caps, isNarrowViewport) {
     return {
       isMobile: true,
       motionOff,
-      rowCount: MOBILE_ROW_COUNT,
+      rowCount: getRowCount({
+        viewportHeight,
+        heroRatio: 0.88,
+        stageTop: MOBILE_STAGE_TOP,
+        rowHeight: MOBILE_ROW_HEIGHT,
+        baseRows: MOBILE_ROW_COUNT,
+        maxRows: MAX_MOBILE_ROWS,
+      }),
       minTilesPerRow: MOBILE_MIN_TILES,
       durations: MOBILE_ROW_DURATIONS,
     };
@@ -30,10 +43,23 @@ function getBackdropConfig(caps, isNarrowViewport) {
   return {
     isMobile: false,
     motionOff,
-    rowCount: DESKTOP_ROW_COUNT,
+    rowCount: getRowCount({
+      viewportHeight,
+      heroRatio: 1,
+      stageTop: DESKTOP_STAGE_TOP,
+      rowHeight: DESKTOP_ROW_HEIGHT,
+      baseRows: DESKTOP_ROW_COUNT,
+      maxRows: MAX_DESKTOP_ROWS,
+    }),
     minTilesPerRow: DESKTOP_MIN_TILES,
     durations: ROW_DURATIONS,
   };
+}
+
+function getRowCount({ viewportHeight, heroRatio, stageTop, rowHeight, baseRows, maxRows }) {
+  const heroHeight = (Number(viewportHeight) || 900) * heroRatio;
+  const needed = Math.ceil(Math.max(0, heroHeight - stageTop) / rowHeight);
+  return Math.min(maxRows, Math.max(baseRows, needed));
 }
 
 function buildProductPool(products, config) {
@@ -95,11 +121,27 @@ function CatalogTile({ product, eager = false }) {
 export default function HeroCatalogBackdrop({ products = [] }) {
   const caps = useDeviceCapability();
   const isNarrowViewport = useMediaQuery("(max-width: 720px)");
+  const [viewportHeight, setViewportHeight] = useState(() =>
+    typeof window === "undefined" ? 900 : window.innerHeight
+  );
   const config = useMemo(
-    () => getBackdropConfig(caps, isNarrowViewport),
-    [isNarrowViewport, caps.isReducedMotion, caps.saveData, caps.lowMemory]
+    () => getBackdropConfig(caps, isNarrowViewport, viewportHeight),
+    [isNarrowViewport, viewportHeight, caps.isReducedMotion, caps.saveData, caps.lowMemory]
   );
   const rootRef = useRef(null);
+
+  useEffect(() => {
+    let frame = 0;
+    const handleResize = () => {
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => setViewportHeight(window.innerHeight));
+    };
+    window.addEventListener("resize", handleResize, { passive: true });
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   const rows = useMemo(
     () => buildRows(buildProductPool(products, config), config),
@@ -162,22 +204,13 @@ export default function HeroCatalogBackdrop({ products = [] }) {
                 />
               ))}
               {!config.motionOff ? (
-                <>
-                  {row.items.map((product, idx) => (
-                    <CatalogTile
-                      key={`${row.id}-b-${product.id}-${idx}`}
-                      product={product}
-                      eager={false}
-                    />
-                  ))}
-                  {row.items.map((product, idx) => (
-                    <CatalogTile
-                      key={`${row.id}-c-${product.id}-${idx}`}
-                      product={product}
-                      eager={false}
-                    />
-                  ))}
-                </>
+                row.items.map((product, idx) => (
+                  <CatalogTile
+                    key={`${row.id}-b-${product.id}-${idx}`}
+                    product={product}
+                    eager={false}
+                  />
+                ))
               ) : null}
             </div>
           </div>

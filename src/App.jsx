@@ -5,15 +5,14 @@ import RouteProgress from "./components/RouteProgress";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLoader from "./components/AdminLoader";
 import NetworkBridge from "./components/NetworkBridge";
-import PolishEffects from "./components/PolishEffects";
 import Confetti from "./components/Confetti";
 import FlashSalePopup from "./components/FlashSalePopup";
 import AcademicPopup from "./components/AcademicPopup";
 import NewProductPopup from "./components/NewProductPopup";
 
-const DEFER_POLISH_MS = 2000;
+const DEFER_OVERLAY_MS = 2000;
 
-function useDeferredPolishMount(delayMs = DEFER_POLISH_MS) {
+function useDeferredOverlayMount(delayMs = DEFER_OVERLAY_MS) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -51,33 +50,34 @@ import PageErrorBoundary from "./components/PageErrorBoundary";
 import { shouldSkipCatalogScrollToTop } from "./hooks/useScrollMemory";
 import { getOrderHistory } from "./lib/orderHistory";
 import { captureReferralFromUrl } from "./lib/referral";
+import { lazyPage, prefetchPrimaryRoutes } from "./lib/routePrefetch";
 import { useStorefrontOverlayBlocked } from "./hooks/useFunnelRoute";
 
 // ── Eager-loaded pages (critical path) ──
 import Home from "./pages/Home";
 
 // ── Lazy-loaded pages (non-critical, reduces initial bundle) ──
-const Faq = React.lazy(() => import("./pages/Faq"));
-const Products = React.lazy(() => import("./pages/Products"));
-const ProductDetail = React.lazy(() => import("./pages/ProductDetail"));
-const Status = React.lazy(() => import("./pages/Status"));
-const NotFound = React.lazy(() => import("./pages/NotFound"));
-const About = React.lazy(() => import("./pages/About"));
-const Testimonials = React.lazy(() => import("./pages/Testimonials"));
-const Promosi = React.lazy(() => import("./pages/Promosi"));
-const Checkout = React.lazy(() => import("./pages/Checkout"));
-const Pay = React.lazy(() => import("./pages/Pay"));
-const AdminLogin = React.lazy(() => import("./pages/admin/AdminLogin"));
-const AdminDashboard = React.lazy(() => import("./pages/admin/AdminDashboard"));
+const Faq = lazyPage("faq");
+const Products = lazyPage("products");
+const ProductDetail = lazyPage("productDetail");
+const Status = lazyPage("status");
+const NotFound = lazyPage("notFound");
+const About = lazyPage("about");
+const Testimonials = lazyPage("testimonials");
+const Promosi = lazyPage("promosi");
+const Checkout = lazyPage("checkout");
+const Pay = lazyPage("pay");
+const AdminLogin = lazyPage("adminLogin");
+const AdminDashboard = lazyPage("adminDashboard");
 
 const LOADER_QUOTES = [
   "Nyiapin yang terbaik buat kamu...",
-  "Stok fresh, harga pelajar 💎",
+  "Stok fresh, harga pelajar.",
   "Sebentar ya, lagi ngambil dari gudang...",
-  "Premium terjangkau, bukan mimpi ✨",
+  "Premium terjangkau, bukan mimpi.",
   "Muat sebentar, worth the wait!",
-  "Loading... tapi cepet kok 😄",
-  "Akun ready, tinggal checkout 🚀",
+  "Loading... tapi cepet kok.",
+  "Akun ready, tinggal checkout.",
 ];
 
 // ── Branded page loading fallback ──
@@ -308,9 +308,31 @@ function AppRoutes() {
 
 export default function App() {
   const caps = useDeviceCapability();
-  const polishReady = useDeferredPolishMount();
+  const overlayReady = useDeferredOverlayMount();
   useLongTaskMonitor();
   useTitleTicker();
+
+  useEffect(() => {
+    if (typeof window === "undefined") return undefined;
+    let cancelled = false;
+    const run = () => {
+      if (!cancelled) prefetchPrimaryRoutes();
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const idleId = window.requestIdleCallback(run, { timeout: 2500 });
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback(idleId);
+      };
+    }
+
+    const timerId = window.setTimeout(run, 1800);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timerId);
+    };
+  }, []);
 
   // Rage Click Detector
   useEffect(() => {
@@ -330,14 +352,9 @@ export default function App() {
         el.className = "rage-toast";
         el.setAttribute("role", "status");
 
-        const icon = document.createElement("span");
-        icon.className = "rage-toast-char";
-        icon.textContent = "😅";
-
         const text = document.createElement("span");
         text.textContent = "Sabar ya, lagi diproses...";
 
-        el.appendChild(icon);
         el.appendChild(text);
         document.body.appendChild(el);
         activeToast = el;
@@ -385,8 +402,7 @@ export default function App() {
     <BrowserRouter>
       <ReferralCapture />
       <NetworkBridge />
-      <PolishEffects />
-      {polishReady ? (
+      {overlayReady ? (
         <>
           <Confetti />
           <StorefrontOverlays />

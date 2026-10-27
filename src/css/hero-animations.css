@@ -1,28 +1,9 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    Hero Text Animations — imzaqi-store
    Animasi masuk 1x, tidak loop, respects prefers-reduced-motion.
-   Garis lengkung abstrak sebagai elemen dekoratif SVG + CSS.
    ═══════════════════════════════════════════════════════════════════════════ */
 
 /* ── Keyframes ────────────────────────────────────────────────────────────── */
-
-/* Eyebrow/kicker: slide dari kiri + fade */
-@keyframes heroKickerIn {
-  0% {
-    opacity: 0;
-    transform: translateX(-22px);
-    letter-spacing: 0.28em;
-  }
-  60% {
-    opacity: 1;
-    letter-spacing: 0.16em;
-  }
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-    letter-spacing: 0.14em;
-  }
-}
 
 /* H1 reveal — setiap kata muncul dari bawah via clip-path */
 @keyframes heroTitleReveal {
@@ -57,75 +38,15 @@
   }
 }
 
-/* Garis lengkung SVG: stroke draw dari kiri ke kanan */
-@keyframes heroLinesDraw {
-  0% {
-    stroke-dashoffset: 1;
-  }
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-/* Titik / ornamen kecil: pop in */
-@keyframes heroDotPop {
-  0% {
-    opacity: 0;
-    transform: scale(0) rotate(-20deg);
-  }
-  70% {
-    transform: scale(1.18) rotate(4deg);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1) rotate(0deg);
-  }
-}
-
-/* Shimmer teal di belakang judul */
-@keyframes heroShimmer {
-  0% {
-    background-position: -200% center;
-    opacity: 0;
-  }
-  30% {
-    opacity: 1;
-  }
-  100% {
-    background-position: 200% center;
-    opacity: 0;
-  }
-}
-
 /* ── Shared utility classes ───────────────────────────────────────────────── */
 
-/* Wrapper dekoratif — posisi relative agar SVG bisa absolute */
+/* Wrapper dekoratif */
 .hero-anim-wrap {
   position: relative;
   overflow: visible;
 }
 
-/* SVG dekoratif garis lengkung */
-.hero-deco-svg {
-  position: absolute;
-  pointer-events: none;
-  overflow: visible;
-  z-index: 0;
-}
-
-.hero-deco-svg path,
-.hero-deco-svg circle,
-.hero-deco-svg ellipse {
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  pathLength: 1;
-}
-
 /* ── Animation trigger classes ───────────────────────────────────────────── */
-
-.hero-anim-kicker {
-  animation: heroKickerIn 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.05s both;
-}
 
 .hero-anim-title {
   animation: heroTitleReveal 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
@@ -135,102 +56,7 @@
   animation: heroSubIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.44s both;
 }
 
-.hero-anim-lines {
-  animation: heroLinesDraw 1.1s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
-}
-
-.hero-anim-dot {
-  animation: heroDotPop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.6s both;
-}
-
-/* ── Garis lengkung dekoratif — per halaman ──────────────────────────────── */
-
-/* Dekorasi default (dark mode) */
-.hero-deco-svg .deco-line {
-  fill: none;
-  stroke: rgba(0, 214, 180, 0.18);
-  stroke-width: 1.5;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  pathLength: 1;
-}
-
-.hero-deco-svg .deco-line-accent {
-  fill: none;
-  stroke: rgba(0, 138, 148, 0.12);
-  stroke-width: 1;
-  stroke-linecap: round;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  pathLength: 1;
-}
-
-.hero-deco-svg .deco-dot {
-  fill: rgba(0, 214, 180, 0.35);
-}
-
-.hero-deco-svg .deco-circle {
-  fill: none;
-  stroke: rgba(0, 194, 208, 0.14);
-  stroke-width: 1;
-  stroke-dasharray: 1;
-  stroke-dashoffset: 1;
-  pathLength: 1;
-}
-
-/* Light mode overrides */
-html[data-theme="light"] .hero-deco-svg .deco-line {
-  stroke: rgba(0, 138, 148, 0.22);
-}
-html[data-theme="light"] .hero-deco-svg .deco-line-accent {
-  stroke: rgba(0, 100, 120, 0.14);
-}
-html[data-theme="light"] .hero-deco-svg .deco-dot {
-  fill: rgba(0, 138, 148, 0.4);
-}
-html[data-theme="light"] .hero-deco-svg .deco-circle {
-  stroke: rgba(0, 138, 148, 0.18);
-}
-
-/* ── Animasi SVG saat hero masuk ─────────────────────────────────────────── */
-.hero-anim-wrap .hero-deco-svg .deco-line {
-  animation: heroLinesDraw 1.4s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
-}
-
-.hero-anim-wrap .hero-deco-svg .deco-line-accent {
-  animation: heroLinesDraw 1.6s cubic-bezier(0.4, 0, 0.2, 1) 0.35s both;
-}
-
-.hero-anim-wrap .hero-deco-svg .deco-circle {
-  animation: heroLinesDraw 1.2s cubic-bezier(0.4, 0, 0.2, 1) 0.5s both;
-}
-
-.hero-anim-wrap .hero-deco-svg .deco-dot {
-  animation: heroDotPop 0.45s cubic-bezier(0.34, 1.56, 0.64, 1) 0.7s both;
-}
-
 /* ── Specific page delays (agar stagger terasa lebih natural) ────────────── */
-
-/* Catalog page */
-.catalog-eyebrow.hero-anim-kicker  { animation-delay: 0.04s; }
-.catalog-title.hero-anim-title     { animation-delay: 0.16s; }
-.catalog-sub.hero-anim-sub         { animation-delay: 0.38s; }
-
-/* Status page */
-.st-kicker.hero-anim-kicker  { animation-delay: 0.06s; }
-.st-title.hero-anim-title    { animation-delay: 0.18s; }
-.st-sub.hero-anim-sub        { animation-delay: 0.40s; }
-
-/* Testimonials page */
-.testi-kicker.hero-anim-kicker  { animation-delay: 0.05s; }
-.testi-title.hero-anim-title    { animation-delay: 0.17s; }
-.testi-sub.hero-anim-sub        { animation-delay: 0.38s; }
-
-/* FAQ page */
-.faq-kicker.hero-anim-kicker  { animation-delay: 0.05s; }
-.faq-title.hero-anim-title    { animation-delay: 0.16s; }
-.faq-sub.hero-anim-sub        { animation-delay: 0.36s; }
 
 /* Pay page */
 .pay-shell-title.hero-anim-title  { animation-delay: 0.12s; }
@@ -240,62 +66,34 @@ html[data-theme="light"] .hero-deco-svg .deco-circle {
 .checkout-full-title.hero-anim-title  { animation-delay: 0.10s; }
 .checkout-full-sub.hero-anim-sub      { animation-delay: 0.28s; }
 
-/* ProductDetail page */
-.pdx-title.hero-anim-title      { animation-delay: 0.14s; }
-.pdx-priceValue.hero-anim-sub   { animation-delay: 0.34s; }
-
 /* ── Reduced motion: disable semua animasi ───────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
-  .hero-anim-kicker,
   .hero-anim-title,
-  .hero-anim-sub,
-  .hero-anim-lines,
-  .hero-anim-dot,
-  .hero-anim-wrap .hero-deco-svg .deco-line,
-  .hero-anim-wrap .hero-deco-svg .deco-line-accent,
-  .hero-anim-wrap .hero-deco-svg .deco-circle,
-  .hero-anim-wrap .hero-deco-svg .deco-dot {
+  .hero-anim-sub {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
     filter: none !important;
-    stroke-dashoffset: 0 !important;
   }
 }
 
 /* data-motion="off" juga disable */
-html[data-motion="off"] .hero-anim-kicker,
 html[data-motion="off"] .hero-anim-title,
-html[data-motion="off"] .hero-anim-sub,
-html[data-motion="off"] .hero-anim-lines,
-html[data-motion="off"] .hero-anim-dot,
-html[data-motion="off"] .hero-anim-wrap .hero-deco-svg .deco-line,
-html[data-motion="off"] .hero-anim-wrap .hero-deco-svg .deco-line-accent,
-html[data-motion="off"] .hero-anim-wrap .hero-deco-svg .deco-circle,
-html[data-motion="off"] .hero-anim-wrap .hero-deco-svg .deco-dot {
+html[data-motion="off"] .hero-anim-sub {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
   clip-path: none !important;
   filter: none !important;
-  stroke-dashoffset: 0 !important;
 }
 
 /* data-motion="lite" — animasi lebih simpel (opacity only, no transform) */
-html[data-motion="lite"] .hero-anim-kicker {
-  animation: heroSubIn 0.4s ease 0.05s both;
-}
 html[data-motion="lite"] .hero-anim-title {
   animation: heroSubIn 0.45s ease 0.15s both;
 }
 html[data-motion="lite"] .hero-anim-sub {
   animation: heroSubIn 0.4s ease 0.3s both;
-}
-html[data-motion="lite"] .hero-anim-wrap .hero-deco-svg .deco-line,
-html[data-motion="lite"] .hero-anim-wrap .hero-deco-svg .deco-line-accent,
-html[data-motion="lite"] .hero-anim-wrap .hero-deco-svg .deco-circle {
-  animation: heroLinesDraw 0.8s ease 0.2s both;
 }
 
 /* ── Hero Entrance Keyframes & Stagger ── */
@@ -310,54 +108,171 @@ html[data-motion="lite"] .hero-anim-wrap .hero-deco-svg .deco-circle {
   }
 }
 
-.hx-eyebrow-row {
-  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.04s both;
-}
-
-.hx-subtitle {
-  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
-}
-
-.hx-search-section {
-  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
-}
-
-.hx-ctas-row {
-  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.24s both;
-}
-
-.hx-stats-row {
-  animation: heroEntranceFadeUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) 0.30s both;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hx-eyebrow-row,
-  .hx-subtitle,
-  .hx-search-section,
-  .hx-ctas-row,
-  .hx-stats-row {
-    animation: none !important;
-    opacity: 1 !important;
-    transform: none !important;
+/* Headline: Snappy, modern kinetic word reveal */
+@keyframes heroWordReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0) scale(0.96);
+    filter: blur(5px);
+  }
+  65% {
+    opacity: 1;
+    filter: blur(0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: none;
   }
 }
 
-html[data-motion="off"] .hx-eyebrow-row,
-html[data-motion="off"] .hx-subtitle,
-html[data-motion="off"] .hx-search-section,
-html[data-motion="off"] .hx-ctas-row,
-html[data-motion="off"] .hx-stats-row {
+/* Gradient words ("Premium", "Pelajar"): smooth rise with luminous emerald glow bloom */
+@keyframes heroGradientWordReveal {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 20px, 0) scale(0.95);
+    filter: blur(5px) drop-shadow(0 0 0 var(--hero-glow-start, rgba(0, 255, 179, 0)));
+  }
+  60% {
+    opacity: 1;
+    filter: blur(0) drop-shadow(0 0 16px var(--hero-glow-peak, rgba(0, 255, 179, 0.45)));
+    transform: translate3d(0, -1px, 0) scale(1.015);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+    filter: var(--hero-glow-settled, drop-shadow(0 2px 10px rgba(0, 255, 179, 0.28)));
+  }
+}
+
+@keyframes heroWordRevealLite {
+  0% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Headline typography containers & descender safety */
+.hx-hero--choreographed .hx-headline-mask {
+  display: inline-block;
+  overflow: visible;
+  vertical-align: baseline;
+}
+
+.hx-hero--choreographed .hx-headline-word {
+  display: inline-block;
+  opacity: 0;
+  will-change: transform, opacity, filter;
+  overflow: visible;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.04em;
+  line-height: 1.08;
+}
+
+/* Snappy, choreographed entrance timings for each word */
+.hx-hero--choreographed[data-hero-active="true"] .hx-word-0 {
+  animation: heroWordReveal 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.10s both;
+}
+
+.hx-hero--choreographed[data-hero-active="true"] .hx-word-1 {
+  animation: heroGradientWordReveal 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
+}
+
+.hx-hero--choreographed[data-hero-active="true"] .hx-word-2 {
+  animation: heroWordReveal 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
+}
+
+.hx-hero--choreographed[data-hero-active="true"] .hx-word-3 {
+  animation: heroGradientWordReveal 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.34s both;
+}
+
+/* Lite motion mode */
+html[data-motion="lite"] .hx-hero--choreographed[data-hero-active="true"] .hx-headline-word {
+  animation: heroWordRevealLite 0.38s ease-out both !important;
+}
+html[data-motion="lite"] .hx-hero--choreographed[data-hero-active="true"] .hx-word-0 { animation-delay: 0.06s !important; }
+html[data-motion="lite"] .hx-hero--choreographed[data-hero-active="true"] .hx-word-1 { animation-delay: 0.12s !important; }
+html[data-motion="lite"] .hx-hero--choreographed[data-hero-active="true"] .hx-word-2 { animation-delay: 0.18s !important; }
+html[data-motion="lite"] .hx-hero--choreographed[data-hero-active="true"] .hx-word-3 { animation-delay: 0.24s !important; }
+
+@keyframes heroBackdropIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes heroLogoIn {
+  from { opacity: 0; transform: translateY(-10px) scale(0.94); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.hx-hero--choreographed {
+  --hero-entry-ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --hero-entry-play: paused;
+  --hero-glow-start: rgba(0, 255, 179, 0);
+  --hero-glow-peak: rgba(0, 255, 179, 0.45);
+  --hero-glow-settled: drop-shadow(0 2px 10px rgba(0, 255, 179, 0.28));
+}
+html[data-theme="light"] .hx-hero--choreographed {
+  --hero-glow-start: rgba(0, 158, 96, 0);
+  --hero-glow-peak: rgba(0, 158, 96, 0.32);
+  --hero-glow-settled: drop-shadow(0 2px 8px rgba(0, 158, 96, 0.18));
+}
+
+.hx-hero--choreographed[data-hero-active="true"] { --hero-entry-play: running; }
+.hx-hero--choreographed .hx-catalog-stage {
+  animation: heroBackdropIn 0.8s ease-out both;
+  animation-play-state: var(--hero-entry-play);
+}
+.hx-hero--choreographed .hx-hero-logo img {
+  animation: heroLogoIn 0.5s var(--hero-entry-ease) 0.06s both;
+  animation-play-state: var(--hero-entry-play);
+}
+.hx-hero--choreographed :is(.hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item) {
+  animation: heroEntranceFadeUp 0.55s var(--hero-entry-ease) var(--hero-entry-delay, 0s) both;
+  animation-play-state: var(--hero-entry-play);
+}
+.hx-hero--choreographed .hx-eyebrow-row { --hero-entry-delay: 0.08s; }
+.hx-hero--choreographed .hx-subtitle { --hero-entry-delay: 0.44s; }
+.hx-hero--choreographed .hx-ctas-row > a:first-child { --hero-entry-delay: 0.56s; }
+.hx-hero--choreographed .hx-ctas-row > a:nth-child(2) { --hero-entry-delay: 0.64s; }
+.hx-hero--choreographed .hx-stat-item { --hero-entry-delay: 0.72s; }
+.hx-hero--choreographed .hx-stat-item:nth-child(2) { --hero-entry-delay: 0.78s; }
+.hx-hero--choreographed .hx-stat-item:nth-child(3) { --hero-entry-delay: 0.84s; }
+.hx-hero--choreographed .hx-stat-item:nth-child(4) { --hero-entry-delay: 0.90s; }
+
+/* Interactive states on CTA buttons must not be overridden by animation-fill-mode */
+.hx-hero--choreographed .hx-ctas-row > a:hover {
+  transform: translateY(-2px) !important;
+}
+.hx-hero--choreographed .hx-ctas-row > a:active {
+  transform: translateY(1px) !important;
+}
+
+/* Keyboard access never waits for an entrance animation. */
+.hx-hero--choreographed .hx-ctas-row > a:focus-visible { animation: none; opacity: 1; transform: none; }
+
+/* Reduced motion / off */
+.hx-hero--choreographed[data-hero-reduced="true"] :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item, .hx-headline-word) {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
+  filter: none !important;
 }
 
-html[data-motion="lite"] .hx-eyebrow-row,
-html[data-motion="lite"] .hx-subtitle,
-html[data-motion="lite"] .hx-search-section,
-html[data-motion="lite"] .hx-ctas-row,
-html[data-motion="lite"] .hx-stats-row {
-  animation-duration: 0.3s !important;
+html[data-motion="off"] .hx-hero--choreographed :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item, .hx-headline-word) {
+  animation: none !important;
+  opacity: 1 !important;
   transform: none !important;
+  filter: none !important;
 }
 
+@media (prefers-reduced-motion: reduce) {
+  .hx-hero--choreographed :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item, .hx-headline-word) {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+.hx-hero--choreographed[data-hero-reduced="true"] .hx-catalog-stage { animation: none !important; }

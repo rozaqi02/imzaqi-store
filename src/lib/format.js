@@ -9,7 +9,9 @@ export function normalizeProductRecord(product) {
 
 export function formatIDR(n) {
   const value = Number(n || 0);
-  return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(value);
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency", currency: "IDR", maximumFractionDigits: 0,
+  }).format(value).replace(/\s/g, "");
 }
 
 export function isKnownOutOfStock(variant) {

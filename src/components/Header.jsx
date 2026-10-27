@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { Moon, Shield, SunMedium } from "lucide-react";
 import { isNavItemActive, SITE_DESKTOP_NAV } from "../lib/siteNav";
+import { prefetchRoute } from "../lib/routePrefetch";
 import { useCart } from "../context/CartContext";
 import { checkAdminAccess } from "../lib/adminAuth";
 import { supabase } from "../lib/supabaseClient";
@@ -15,6 +16,8 @@ import PromoTicker from "./PromoTicker";
 import CartIcon from "./CartIcon";
 
 const HEADER_SHRINK_MS = 280;
+const HERO_HEADER_HIDE_AT = 35;
+const HERO_HEADER_REVEAL_AT = 70;
 const NAV_LINKS = SITE_DESKTOP_NAV;
 
 function AdminHeaderLink({ to, isActive, title }) {
@@ -64,6 +67,10 @@ export default function Header() {
   const location = useLocation();
   const [canAccessAdmin, setCanAccessAdmin] = useState(false);
   const isOnAdminRoute = location.pathname.startsWith("/admin");
+  const isHome = location.pathname === "/";
+  const [hideOverHero, setHideOverHero] = useState(
+    () => isHome && typeof window !== "undefined" && window.scrollY <= HERO_HEADER_REVEAL_AT
+  );
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
 
   const updatePill = useCallback(() => {
@@ -113,6 +120,38 @@ export default function Header() {
     const timer = window.setTimeout(updatePill, HEADER_SHRINK_MS + 20);
     return () => window.clearTimeout(timer);
   }, [updatePill]);
+
+  useEffect(() => {
+    if (!isHome || typeof window === "undefined") {
+      setHideOverHero(false);
+      return undefined;
+    }
+
+    let frame = 0;
+    const sync = () => {
+      frame = 0;
+      const y = window.scrollY;
+      setHideOverHero((prev) => {
+        if (prev && y > HERO_HEADER_REVEAL_AT) return false;
+        if (!prev && y < HERO_HEADER_HIDE_AT) return true;
+        return prev;
+      });
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(sync);
+    };
+
+    sync();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [isHome]);
+
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
@@ -145,7 +184,10 @@ export default function Header() {
 
   return (
     <>
-      <header ref={headerRef} className="header is-shrunk">
+      <header
+        ref={headerRef}
+        className={`header is-shrunk${hideOverHero ? " is-heroHidden" : ""}`}
+      >
         <PromoTicker />
         <div className="container header-inner">
           <div className="header-mobile-left">
@@ -182,6 +224,9 @@ export default function Header() {
                     to={link.to}
                     className={isActive ? "active" : ""}
                     aria-current={isActive ? "page" : undefined}
+                    onMouseEnter={() => prefetchRoute(link.to)}
+                    onFocus={() => prefetchRoute(link.to)}
+                    onTouchStart={() => prefetchRoute(link.to)}
                   >
                     {link.label}
                   </Link>

@@ -23,6 +23,13 @@ html.catalog-scroll-restore body {
   pointer-events: none;
 }
 
+/* A dropdown must paint outside the section. content-visibility:auto implies
+   paint containment even when overflow is visible, clipping mobile results. */
+.catalog-page .catalog-hero {
+  content-visibility: visible;
+  contain-intrinsic-size: none;
+}
+
 html[data-theme="light"] .catalog-hero::before {
   background:
     radial-gradient(620px 320px at 84% 16%, rgba(0, 138, 148, 0.26), rgba(0, 138, 148, 0) 70%);
@@ -47,7 +54,7 @@ html[data-theme="light"] .catalog-hero::before {
   overflow: visible;
 }
 
-.catalog-searchSuggestions {
+html[data-theme] .catalog-page .catalog-searchSuggestions {
   position: absolute;
   top: calc(100% + 10px);
   left: 0;
@@ -55,9 +62,10 @@ html[data-theme="light"] .catalog-hero::before {
   z-index: 100;
   border-radius: 20px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 20%),
-    var(--skeu-panel-bg, rgba(7, 10, 18, 0.97));
+  background: var(--ux-surface, #ffffff) !important;
+  color: var(--ux-ink, #0b1f17);
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
   box-shadow: var(--skeu-panel-shadow, 0 24px 60px rgba(0, 0, 0, 0.42));
   overflow-x: hidden;
   overflow-y: auto;
@@ -839,8 +847,40 @@ html[data-theme="dark"] .catalog-rangeInput::-moz-range-thumb {
 }
 
 .catalog-viewSwitch,
-.catalog-contentActions,
 .catalog-contentViewSwitch {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  padding: 3px;
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
+  border-radius: 14px;
+  gap: 2px;
+  isolation: isolate;
+}
+
+.catalog-viewPill {
+  position: absolute;
+  top: 3px;
+  bottom: 3px;
+  width: calc(50% - 4px);
+  border-radius: 11px;
+  background: var(--imzaqi-btn-face, #009e60);
+  box-shadow: var(--imzaqi-btn-shadow, 0 2px 8px rgba(0, 0, 0, 0.25));
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  z-index: 0;
+  pointer-events: none;
+}
+
+[data-view="grid"] .catalog-viewPill {
+  transform: translateX(1px);
+}
+
+[data-view="list"] .catalog-viewPill {
+  transform: translateX(calc(100% + 2px));
+}
+
+.catalog-contentActions {
   display: flex !important;
   align-items: center;
   gap: 6px;
@@ -867,45 +907,42 @@ html[data-theme="dark"] .catalog-rangeInput::-moz-range-thumb {
 }
 
 .catalog-viewBtn {
+  position: relative;
+  z-index: 1;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 36px;
-  height: 36px;
-  min-height: 36px;
-  padding: 0;
-  border-radius: 12px;
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
-    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
-  box-shadow:
-    var(--skeu-control-shadow, none),
-    0 2px 6px rgba(0, 0, 0, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.15);
-  color: var(--brand-muted, rgba(234, 255, 245, 0.84));
+  height: 34px;
+  min-height: 34px;
+  padding: 0 6px;
+  border-radius: 11px;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--brand-muted, rgba(234, 255, 245, 0.7));
   cursor: pointer;
-  transition: all 0.18s ease;
+  transition: color 0.18s ease;
+}
+
+.catalog-viewSwitch .catalog-viewBtn {
+  width: auto;
+  min-width: 62px;
+  gap: 6px;
 }
 
 html[data-theme="light"] .catalog-viewBtn {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 40%),
-    var(--skeu-control-bg, #ffffff) !important;
-  border-color: rgba(40, 60, 75, 0.14) !important;
-  box-shadow:
-    0 2px 6px rgba(40, 70, 90, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
   color: #324f59 !important;
 }
 
 .catalog-viewBtn.active {
-  background: var(--imzaqi-btn-face, #009e60) !important;
-  border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
+  background: transparent !important;
+  border: none !important;
   color: var(--imzaqi-btn-text, #ffffff) !important;
-  box-shadow:
-    var(--imzaqi-btn-shadow, 0 4px 12px rgba(0, 158, 96, 0.35)),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
+  box-shadow: none !important;
 }
 
 .catalog-contentBar {
@@ -951,8 +988,8 @@ html[data-theme="light"] .catalog-contentBar {
   min-width: 0;
   scrollbar-width: none;
   contain: layout paint;
-  mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 32px), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 24px, black calc(100% - 24px), transparent 100%);
 }
 
 .catalog-quickFilters::-webkit-scrollbar {
@@ -1228,7 +1265,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   display: flex;
   gap: 14px;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 20px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
   background: var(--skeu-panel-bg, linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.03)));
   box-shadow: var(--skeu-panel-shadow, 0 24px 70px rgba(0, 0, 0, 0.2));
@@ -1251,7 +1288,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 
 @media (hover: hover) {
   .catalog-card:hover {
-    transform: translateY(-3px);
+    transform: translateY(-2px);
     border-color: rgba(79, 255, 200, 0.28);
     box-shadow:
       var(--skeu-panel-shadow, 0 34px 80px rgba(0, 0, 0, 0.26)),
@@ -1373,7 +1410,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
 }
 
 .catalog-status.ok {
-  border: 1px solid color-mix(in srgb, var(--accent, #00d6b4) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
     linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 90, 0.45));
@@ -2296,9 +2333,23 @@ html[data-theme="light"] .catalog-sheetFoot {
     line-height: 1.16;
   }
 
-  .catalog-card.grid .catalog-cardKicker,
-  .catalog-card.grid .catalog-cardSummary {
+  .catalog-card.grid .catalog-cardKicker {
     display: none;
+  }
+
+  .catalog-card.grid .catalog-cardSummary {
+    display: -webkit-box !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+    overflow: hidden !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    color: #4d6671 !important;
+    margin-top: 2px !important;
+  }
+
+  html[data-theme="dark"] .catalog-card.grid .catalog-cardSummary {
+    color: rgba(234, 255, 245, 0.72) !important;
   }
 
   .catalog-card.grid .catalog-cardPrice {
@@ -2524,7 +2575,7 @@ html[data-theme="light"] .catalog-card.catalog-cardV2:active {
 }
 
 .catalog-card.catalog-cardV2 .catalog-status.ok {
-  border: 1px solid color-mix(in srgb, var(--accent, #00d6b4) 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--accent) 42%, transparent);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
     linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 80, 90, 0.45));
@@ -2678,14 +2729,15 @@ html[data-theme="light"] .catalog-card.catalog-cardV2:active {
   }
 
   .catalog-card.catalog-cardV2.grid .catalog-cardTitle {
-    font-size: 13.5px !important;
-    line-height: 1.2 !important;
+    font-size: 15px;
+    line-height: 1.4;
     margin: 0 !important;
   }
 
   .catalog-card.catalog-cardV2 .catalog-cardSummary {
-    -webkit-line-clamp: 1;
-    font-size: 10px;
+    -webkit-line-clamp: 2;
+    font-size: 11px;
+    line-height: 1.35;
   }
 
   .catalog-card.catalog-cardV2 .catalog-cardPriceLabel {
@@ -2729,9 +2781,16 @@ html[data-theme="light"] .catalog-card.catalog-cardV2:active {
   .catalog-card.catalog-cardV2 .catalog-cardSummary {
     display: -webkit-box !important;
     -webkit-box-orient: vertical !important;
-    -webkit-line-clamp: 1 !important;
+    -webkit-line-clamp: 2 !important;
     overflow: hidden !important;
-    font-size: 10px !important;
+    font-size: 11px !important;
+    line-height: 1.35 !important;
+    color: #4d6671 !important;
+    margin-top: 2px !important;
+  }
+
+  html[data-theme="dark"] .catalog-card.catalog-cardV2 .catalog-cardSummary {
+    color: rgba(234, 255, 245, 0.72) !important;
   }
 
   .catalog-card.catalog-cardV2 .catalog-cardMeta {
@@ -2994,7 +3053,9 @@ html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardFoot {
   .catalog-card.catalog-cardV2 .catalog-cardSummary {
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
+    font-size: 11px;
+    line-height: 1.35;
   }
 
   .catalog-card.catalog-cardV2 .catalog-cardFoot {
@@ -3355,9 +3416,14 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
 
 /* Mobile: keep catalog gutters visually balanced (no bleed hacks) */
 @media (max-width: 720px) {
-  .catalog-page .container,
   .catalog-page .catalog-body .container {
     overflow-x: clip;
+  }
+
+  /* The search menu extends below this container. Even overflow-x: clip can
+     clip its vertical paint area on mobile browsers. Only clip the body. */
+  .catalog-page .catalog-hero > .container {
+    overflow: visible;
   }
 
   .catalog-page .catalog-contentBar {
@@ -3486,8 +3552,10 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
   .catalog-card.catalog-cardV2 .catalog-cardSummary {
     display: -webkit-box;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
+    -webkit-line-clamp: 2;
     overflow: hidden;
+    font-size: 11px;
+    line-height: 1.35;
   }
 
   .catalog-card.catalog-cardV2 .catalog-cardMeta {
@@ -3542,4 +3610,3 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
     font-size: 11px !important;
   }
 }
-

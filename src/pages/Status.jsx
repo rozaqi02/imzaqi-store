@@ -11,22 +11,26 @@ import {
   CheckCircle2,
   Clock3,
   Copy,
+  Flame,
   History,
   Info,
   Mail,
   MessageCircle,
   MessageSquareText,
   Package,
+  PartyPopper,
   RefreshCw,
   Search,
   Send,
   ShieldCheck,
   Sparkles,
   Star,
+  ThumbsUp,
   Trash2,
   WalletCards,
   X,
   XCircle,
+  Zap,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { formatIDR } from "../lib/format";
@@ -218,10 +222,10 @@ function DoneCelebration({ show, onDismiss }) {
   return (
     <div className="st-doneCelebration" role="status" aria-live="assertive">
       <div className="st-doneCelebration-inner">
-        <span className="st-doneCelebration-icon">🎉</span>
+        <span className="st-doneCelebration-icon" aria-hidden="true"><PartyPopper size={26} /></span>
         <div className="st-doneCelebration-text">
           <strong>Pesananmu sudah selesai!</strong>
-          <span>Terima kasih sudah belanja di Imzaqi Store 🤩</span>
+          <span>Terima kasih sudah belanja di Imzaqi Store.</span>
         </div>
       </div>
     </div>
@@ -259,19 +263,19 @@ function PostTransactionReview({ order, waUrl, toast }) {
   });
 
   const RATING_LABELS = {
-    5: "Sangat Puas! ⭐⭐⭐⭐⭐",
-    4: "Puas & Lancar 👍",
-    3: "Cukup Baik 🙂",
-    2: "Kurang Puas 🙁",
-    1: "Perlu Peningkatan 😞",
+    5: "Sangat Puas! ★★★★★",
+    4: "Puas & Lancar",
+    3: "Cukup Baik",
+    2: "Kurang Puas",
+    1: "Perlu Peningkatan",
   };
 
   const QUICK_CHIPS = [
-    "⚡ Akun Kilat",
-    "🔒 Garansi Aman",
-    "💬 Admin Responsif",
-    "💰 Harga Pas",
-    "✨ Rekomen",
+    "Akun Kilat",
+    "Garansi Aman",
+    "Admin Responsif",
+    "Harga Pas",
+    "Rekomen",
   ];
 
   const handleAddChip = (chip) => {
@@ -324,10 +328,10 @@ function PostTransactionReview({ order, waUrl, toast }) {
       }
 
       setExistingReview(reviewData);
-      toast?.success?.("Terima kasih atas ulasanmu! ⭐");
+      toast?.success?.("Terima kasih atas ulasanmu!");
     } catch {
       setExistingReview(reviewData);
-      toast?.success?.("Terima kasih atas ulasanmu! ⭐");
+      toast?.success?.("Terima kasih atas ulasanmu!");
     } finally {
       setSubmitting(false);
     }
@@ -340,8 +344,8 @@ function PostTransactionReview({ order, waUrl, toast }) {
     const msg = encodeURIComponent(
       `Halo Admin Imzaqi Store! Saya ingin memberikan ulasan untuk pesanan #${order.order_code}:\n\n` +
       `⭐ Rating: ${rev.rating}/5 (${RATING_LABELS[rev.rating] || "Puas"})\n` +
-      `💬 Ulasan: "${rev.reviewText}"\n` +
-      `👤 Oleh: ${rev.authorName}\n\n` +
+      `Ulasan: "${rev.reviewText}"\n` +
+      `Oleh: ${rev.authorName}\n\n` +
       `Terima kasih banyak atas pelayanannya!`
     );
     const baseUrl = waUrl.split("?")[0];
@@ -354,7 +358,7 @@ function PostTransactionReview({ order, waUrl, toast }) {
       <article className="st-card st-reviewCard st-reviewCard--completed">
         <div className="st-cardHead">
           <div>
-            <div className="st-kicker" style={{ color: "var(--accent, #00d6b4)" }}>Feedback Terkirim</div>
+            <div className="st-kicker" style={{ color: "var(--accent)" }}>Feedback Terkirim</div>
             <h2 className="st-cardTitle">Ulasan Pesanan Kamu</h2>
           </div>
           <div className="st-cardIcon" style={{ color: "#f5a623" }}>
@@ -506,6 +510,7 @@ function TabCekStatus({ settings }) {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [copiedCode, setCopiedCode] = useState(false);
   const prevStatusRef = useRef(null);
 
   const isAcademicOrder = useMemo(() => {
@@ -611,20 +616,38 @@ function TabCekStatus({ settings }) {
       return undefined;
     }
 
-    // Hanya buat interval baru jika order_code berubah - jangan reset saat status change
-    if (pollTimerRef.current) return undefined;
-
-    pollTimerRef.current = setInterval(() => {
-      silentRefresh(order.order_code);
-    }, POLL_INTERVAL_MS);
-
-    return () => {
+    const orderCode = order.order_code;
+    const startPolling = () => {
+      if (pollTimerRef.current) return;
+      pollTimerRef.current = setInterval(() => {
+        // Hemat kuota: jangan polling saat tab tidak terlihat
+        if (document.visibilityState === "visible") silentRefresh(orderCode);
+      }, POLL_INTERVAL_MS);
+    };
+    const stopPolling = () => {
       if (pollTimerRef.current) {
         clearInterval(pollTimerRef.current);
         pollTimerRef.current = null;
       }
     };
-  }, [order?.order_code, silentRefresh]);
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        // Langsung segarkan saat user kembali ke tab
+        silentRefresh(orderCode);
+        startPolling();
+      } else {
+        stopPolling();
+      }
+    };
+
+    startPolling();
+    document.addEventListener("visibilitychange", onVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+      stopPolling();
+    };
+  }, [order?.order_code, order?.status, silentRefresh]);
 
   const [products, setProducts] = useState([]);
 
@@ -690,6 +713,25 @@ function TabCekStatus({ settings }) {
     return `https://wa.me/${waNumber}?text=${text}`;
   }, [input, order?.order_code, order?.items, order?.status, order?.total_idr, waNumber]);
 
+  const proofWaUrl = useMemo(() => {
+    const code = order?.order_code || input.trim();
+    if (!code) return "";
+    const itemLines = (order?.items || [])
+      .map((item) => `• ${item.product_name || "-"} / ${item.variant_name || "-"} x${item.qty || 1}`)
+      .join("\n");
+    const lines = [
+      "Halo Admin Imzaqi Store, saya ingin mengirimkan bukti pembayaran:",
+      "",
+      `• ID Order: ${code}`,
+      order?.total_idr ? `• Total Tagihan: ${formatIDR(order.total_idr)}` : null,
+      itemLines ? `• Paket:\n${itemLines}` : null,
+      "",
+      "Berikut saya lampirkan foto bukti transfernya ya kak. Mohon segera dicek dan diproses. Terima kasih!",
+    ].filter(Boolean);
+    const text = encodeURIComponent(lines.join("\n"));
+    return `https://wa.me/${waNumber}?text=${text}`;
+  }, [input, order?.items, order?.order_code, order?.total_idr, waNumber]);
+
   const claimWarrantyUrl = useMemo(() => {
     const code = order?.order_code || "";
     const itemLines = (order?.items || [])
@@ -711,6 +753,8 @@ function TabCekStatus({ settings }) {
   async function copyOrderCode() {
     try {
       await copyToClipboard(order?.order_code || "");
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
       toast.success("ID disalin");
     } catch {
       toast.error("Gagal menyalin ID.");
@@ -747,7 +791,7 @@ function TabCekStatus({ settings }) {
             <div className="st-searchHead">
               <div>
                 <div className="st-kicker">ID order</div>
-                <h2 className="st-searchTitle">Masukin ID</h2>
+                <h2 className="st-searchTitle">Masukkan ID pesanan</h2>
               </div>
               <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
                 Tempel
@@ -764,7 +808,10 @@ function TabCekStatus({ settings }) {
                   autoCorrect="off"
                   autoComplete="off"
                   spellCheck={false}
-                  placeholder="IMZ-ABCD1234"
+                   placeholder="IMZ-ABCD1234"
+                   aria-label="ID pesanan"
+                   aria-describedby="status-search-hint"
+                   aria-invalid={Boolean(message) || undefined}
                   value={input}
                   onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
                   onKeyDown={(e) => {
@@ -777,14 +824,14 @@ function TabCekStatus({ settings }) {
                 {loading ? (
                   <>
                     <span className="st-checkSpinner" aria-hidden="true" />
-                    Nyari...
+                    Mencari...
                   </>
                 ) : "Cek status"}
               </button>
             </div>
 
-            <div className={`st-searchHint${message ? " is-error" : ""}`}>
-              {message || "Masukkan ID order 8 karakter yang kamu dapat setelah checkout."}
+            <div id="status-search-hint" className={`st-searchHint${message ? " is-error" : ""}`} role="status">
+              {message || "Contoh: IMZ-ABCD1234. ID tersedia setelah konfirmasi pembayaran berhasil disimpan."}
             </div>
           </section>
 
@@ -814,19 +861,12 @@ function TabCekStatus({ settings }) {
             </section>
           ) : null}
 
-          <section className="st-empty">
-            <div className="st-emptyBadge">ID</div>
-            <h2 className="st-emptyTitle">Belum ada order</h2>
-            <p className="st-emptyText">Tempel ID pesanan Anda untuk melacak status proses pesanan.</p>
-            <div className="st-emptyActions">
-              <button className="btn btn-ghost" type="button" onClick={pasteOrderCode}>
-                Tempel ID
-              </button>
-              <a className="btn" href={waUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <section className="st-searchSupport">
+            <p>Kesulitan menemukan ID pesanan?</p>
+              <a className="btn btn-ghost" href={waUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                 <MessageCircle size={15} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />
                 <span>Hubungi admin</span>
               </a>
-            </div>
           </section>
         </>
       ) : (
@@ -869,13 +909,13 @@ function TabCekStatus({ settings }) {
                     <strong className="st-orderCodeText">{order.order_code}</strong>
                     <button
                       type="button"
-                      className="st-copyCodeBtn"
+                      className={`st-copyCodeBtn ${copiedCode ? "is-copied" : ""}`}
                       onClick={copyOrderCode}
                       title="Salin ID Pesanan"
                       aria-label="Salin ID Pesanan"
                     >
-                      <Copy size={13} />
-                      <span>Salin</span>
+                      {copiedCode ? <Check size={13} className="st-copySuccessIcon" /> : <Copy size={13} />}
+                      <span>{copiedCode ? "Tersalin!" : "Salin"}</span>
                     </button>
                   </div>
                 </div>
@@ -885,8 +925,8 @@ function TabCekStatus({ settings }) {
                     <StatusIcon size={15} />
                     <span>{prettyStatus(order.status)}</span>
                   </div>
-                  <div className="st-lastUpdated">
-                    {lastUpdatedLabel ? <span>Diperbarui {lastUpdatedLabel}</span> : null}
+          <div className="st-lastUpdated" aria-live="polite">
+            {lastUpdatedLabel ? <span>Diperbarui {lastUpdatedLabel}</span> : null}
                     {!isTerminal ? (
                       <button
                         type="button"
@@ -930,9 +970,24 @@ function TabCekStatus({ settings }) {
               </div>
 
               {isLiveStatus ? (
-                <div className="st-liveHint">
-                  <Clock3 size={13} style={{ opacity: 0.7 }} />
-                  <span>Status diperbarui otomatis setiap 30 detik</span>
+                <div className="st-liveHint" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
+                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <Clock3 size={13} style={{ opacity: 0.7 }} />
+                    <span>Status diperbarui otomatis setiap 30 detik</span>
+                  </div>
+                  {proofWaUrl ? (
+                    <a
+                      className="btn btn-sm btn-primary st-sendProofBtn"
+                      href={proofWaUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{ display: "inline-flex", alignItems: "center", gap: 6 }}
+                    >
+                      <MessageCircle size={14} strokeWidth={2.4} aria-hidden="true" />
+                      <span>Kirim Bukti Bayar via WA</span>
+                      <ArrowUpRight size={13} />
+                    </a>
+                  ) : null}
                 </div>
               ) : null}
             </article>
@@ -1124,6 +1179,19 @@ function TabCekStatus({ settings }) {
               <p className="st-helpText">Ada kendala atau butuh aktivasi lebih cepat? Hubungi admin resmi via WhatsApp.</p>
 
               <div className="st-helpActions">
+                {order && (order.status === "pending" || order.status === "paid_reported") && proofWaUrl ? (
+                  <a
+                    className="btn btn-wide btn-primary st-sendProofBtn"
+                    href={proofWaUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6, marginBottom: 8 }}
+                  >
+                    <MessageCircle size={16} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />
+                    <span>Kirim Bukti Bayar via WA</span>
+                    <ArrowUpRight size={15} style={{ flexShrink: 0, marginLeft: 2 }} />
+                  </a>
+                ) : null}
                 <a className="btn btn-wide" href={waUrl} target="_blank" rel="noreferrer" style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
                   <MessageCircle size={16} strokeWidth={2.2} style={{ flexShrink: 0 }} aria-hidden="true" />
                   <span>Hubungi Admin WA</span>
@@ -1243,7 +1311,7 @@ function calcStreak(entries) {
 
 function StreakBadge({ streak }) {
   if (streak < 2) return null;
-  const emoji = streak >= 6 ? "🔥" : streak >= 3 ? "⚡" : "👍";
+  const StreakIcon = streak >= 6 ? Flame : streak >= 3 ? Zap : ThumbsUp;
   const label = streak >= 6
     ? `${streak} bulan berturut-turut! Pelanggan setia!`
     : streak >= 3
@@ -1251,7 +1319,7 @@ function StreakBadge({ streak }) {
     : `${streak} bulan berturut-turut!`;
   return (
     <div className="st-streakBadge">
-      <span className="st-streakEmoji" aria-hidden="true">{emoji}</span>
+      <span className="st-streakEmoji" aria-hidden="true"><StreakIcon size={24} /></span>
       <div className="st-streakText">
         <strong>Streak {streak} Bulan</strong>
         <span>{label}</span>

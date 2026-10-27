@@ -2,14 +2,12 @@
 .np-popup-backdrop {
   position: fixed;
   inset: 0;
-  z-index: 10000;
+  z-index: 9999;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px 16px;
-  background: rgba(0, 0, 0, 0.54);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.55);
   animation: npFadeIn 0.3s ease both;
 }
 
@@ -47,7 +45,7 @@
     0 4px 12px rgba(0, 120, 80, 0.08);
   padding: 26px 24px 22px;
   color: #0a0a0a;
-  animation: npScaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: npScaleUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 html[data-theme="dark"] .np-popup-card {
@@ -62,12 +60,13 @@ html[data-theme="dark"] .np-popup-card {
     0 28px 70px rgba(0, 0, 0, 0.55);
 }
 
+/* Shared close-button standard: inside-the-card = subtle circle chip */
 .np-popup-close {
   position: absolute;
   top: 16px;
   right: 16px;
-  width: 32px;
-  height: 32px;
+  width: 44px;
+  height: 44px;
   display: flex;
   align-items: center;
   justify-content: center;

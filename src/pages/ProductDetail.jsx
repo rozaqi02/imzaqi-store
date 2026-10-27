@@ -404,8 +404,8 @@ const VariantCard = React.memo(({
 
         {factItems.length ? (
           <p className="pdx-packFacts">
-            {factItems.map((item) => (
-              <span key={item}>{item}</span>
+            {factItems.map((item, index) => (
+              <span key={item} className={index === 0 && durationLabel ? "pdx-packDuration" : undefined}>{item}</span>
             ))}
           </p>
         ) : null}
@@ -414,7 +414,7 @@ const VariantCard = React.memo(({
       <div className="pdx-packCommerce" aria-label="Ketersediaan dan penjualan varian">
         <span className={`pdx-packSignal pdx-packStock${out ? " is-out" : lowStock ? " is-low" : ""}`}>
           <PackageCheck className="pdx-packSignalIcon" size={12} aria-hidden="true" />
-          {out ? "Habis" : stock == null || !Number.isFinite(stock) ? "Tersedia" : lowStock ? `Sisa ${stock}` : `Stok ${stock}`}
+          {out ? "Stok habis" : stock == null || !Number.isFinite(stock) ? "Tersedia" : lowStock ? `Sisa ${stock}` : `Stok ${stock}`}
         </span>
         <span className="pdx-packSignal pdx-packSold">
           <ShoppingBag size={12} aria-hidden="true" />
@@ -1111,9 +1111,9 @@ export default function ProductDetail() {
               <section id="paket-tersedia" className="pdx-variantsSection">
                 <div className="pdx-variantsHead">
                   <div className="pdx-variantsTitleRow">
-                    <h2 className="pdx-sectionTitle">Paket</h2>
+                    <h2 className="pdx-sectionTitle">Pilih paketmu</h2>
                     {variants.length > 1 ? (
-                      <button className="pdx-compareBtn" type="button" onClick={() => setCompareOpen(true)}>
+                      <button className="pdx-compareBtn" type="button" title="Bandingkan harga, durasi, dan garansi" onClick={() => setCompareOpen(true)}>
                         <span className="pdx-compareIcon" aria-hidden="true">⇄</span>
                         <span className="pdx-compareLabel">Bandingkan paket</span>
                       </button>
@@ -1249,6 +1249,29 @@ export default function ProductDetail() {
       </div>
     </section>
 
+
+    {/* Mobile Sticky Purchase Dock */}
+    <div className="pdx-mobileStickyDock" aria-label="Aksi pembelian cepat">
+      <div className="pdx-mobileStickyDockPrice">
+        <span className="pdx-mobileStickyDockLabel">Mulai dari</span>
+        <strong className="pdx-mobileStickyDockValue">
+          {summary.minPrice ? formatIDR(summary.minPrice) : "-"}
+        </strong>
+      </div>
+      <button
+        type="button"
+        className="btn btn-primary pdx-mobileStickyDockBtn"
+        onClick={() => {
+          const variantsSection = document.getElementById("pdx-variants-section") || document.querySelector(".pdx-variantsSection");
+          if (variantsSection) {
+            variantsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+          }
+        }}
+      >
+        <span>Pilih Paket</span>
+        <ArrowDown size={15} />
+      </button>
+    </div>
 
     <VariantCompareModal
       open={compareOpen}

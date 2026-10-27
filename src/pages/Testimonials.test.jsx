@@ -12,17 +12,17 @@ beforeEach(() => { fetchTestimonials.mockReset(); fetchTestimonials.mockResolved
 it("paginates gallery and resets both search and caption filter", async () => {
   openPage();
   await screen.findByRole("button", { name: "Buka testimoni 1: Paket Canva 0" });
-  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(18);
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(9);
   fireEvent.click(screen.getByRole("button", { name: "Lihat lebih banyak" }));
-  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(20);
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(18);
   fireEvent.click(screen.getByRole("button", { name: "Foto saja" }));
-  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(10);
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(9);
   fireEvent.change(screen.getByRole("searchbox"), { target: { value: "canva" } });
   expect(screen.getByText("Ceritanya belum ketemu")).toBeVisible();
   fireEvent.click(screen.getByRole("button", { name: "Lihat semua testimoni" }));
   expect(screen.getByRole("button", { name: "Semua", pressed: true })).toBeVisible();
   expect(screen.getByRole("searchbox")).toHaveValue("");
-  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(18);
+  expect(screen.getAllByRole("button", { name: /^Buka testimoni/ })).toHaveLength(9);
 });
 it("navigates the image dialog, handles image errors, and closes with Escape", async () => {
   openPage();

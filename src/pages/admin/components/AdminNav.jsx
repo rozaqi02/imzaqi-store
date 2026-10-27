@@ -12,6 +12,8 @@ import {
   Star,
   Tags,
   Zap,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 
 export const ADMIN_NAV_GROUPS = [
@@ -116,6 +118,8 @@ export function AdminSidebar({
   flashSaleEndingSoon,
   onRefresh,
   onLogout,
+  soundEnabled = true,
+  onToggleSound,
   syncLabel,
 }) {
   const tabsById = useMemo(() => Object.fromEntries(tabs.map((t) => [t.id, t])), [tabs]);
@@ -165,7 +169,18 @@ export function AdminSidebar({
       </nav>
 
       <footer className="adm-sidebarFoot">
-        {syncLabel ? <div className="adm-syncLabel">{syncLabel}</div> : null}
+        {syncLabel ? (
+          <div className="adm-syncLabel">
+            <span className="adm-liveSyncDot" aria-hidden="true" />
+            <span>{syncLabel}</span>
+          </div>
+        ) : null}
+        {onToggleSound ? (
+          <button className="adm-footBtn" type="button" onClick={onToggleSound} title={soundEnabled ? "Matikan suara notifikasi" : "Aktifkan suara notifikasi"}>
+            {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+            <span>{soundEnabled ? "Suara order aktif" : "Suara order senyap"}</span>
+          </button>
+        ) : null}
         <button className="adm-footBtn" type="button" onClick={onRefresh}>
           <RefreshCw size={16} />
           Sinkron data
@@ -189,6 +204,8 @@ export function AdminMobileNav({
   flashSaleEndingSoon,
   onRefresh,
   onLogout,
+  soundEnabled = true,
+  onToggleSound,
 }) {
   const [moreOpen, setMoreOpen] = useState(false);
   const tabsById = useMemo(() => Object.fromEntries(tabs.map((t) => [t.id, t])), [tabs]);
@@ -273,6 +290,16 @@ export function AdminMobileNav({
           })}
         </div>
         <div className="adm-moreSheetActions">
+          {onToggleSound ? (
+            <button
+              className="adm-moreAction"
+              type="button"
+              onClick={onToggleSound}
+            >
+              {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+              <span>{soundEnabled ? "Suara order: Aktif" : "Suara order: Senyap"}</span>
+            </button>
+          ) : null}
           <button
             className="adm-moreAction"
             type="button"

@@ -1,14 +1,13 @@
 {
   "name": "imzaqi-store",
-  "version": "6.2.0",
+  "version": "6.0.0",
   "private": true,
   "dependencies": {
+    "@fontsource-variable/bricolage-grotesque": "^5.3.0",
     "@fontsource/inter": "^5.3.0",
     "@fontsource/jetbrains-mono": "^5.3.0",
-    "@fontsource/montserrat": "^5.3.0",
-    "@fontsource/outfit": "^5.2.8",
     "@fontsource/plus-jakarta-sans": "^5.2.8",
-    "@fontsource/poppins": "^5.3.0",
+    "@fontsource/space-grotesk": "^5.3.0",
     "@supabase/supabase-js": "^2.102.1",
     "framer-motion": "^12.38.0",
     "lucide-react": "^0.563.0",

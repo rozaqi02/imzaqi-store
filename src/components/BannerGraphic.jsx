@@ -12,10 +12,6 @@ const MASCOT_MAP = {
   headset_support: { src: "/mascots/headset_support.png", alt: "Maskot CS Siaga 24/7" },
   qris_wallet: { src: "/mascots/qris_wallet.png", alt: "Maskot Dompet & QRIS" },
   sparkle_celebration: { src: "/mascots/sparkle_celebration.png", alt: "Maskot Bintang Pesta Baru" },
-  imzaqi_mascot: { src: "/mascots/imzaqi_mascot.png", alt: "Imzi, maskot resmi Imzaqi Store" },
-  imzaqi_mascot_wave: { src: "/mascots/imzaqi_mascot_wave.png", alt: "Imzi menyapa pelanggan" },
-  imzaqi_mascot_success: { src: "/mascots/imzaqi_mascot_success.png", alt: "Imzi merayakan pembayaran sukses" },
-  imzaqi_mascot_sad: { src: "/mascots/imzaqi_mascot_sad.png", alt: "Imzi bersedih saat ada yang salah" },
 };
 
 export default function BannerGraphic({ name, className = "", style = {}, height = 24 }) {

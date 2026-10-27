@@ -30,8 +30,8 @@ const HOME_FAQ = [
     category: "Bayar",
     question: "Gimana cara bayarnya?",
     answer: [
-      "Pilih produk + varian, lanjut ke halaman bayar.",
-      "Scan QRIS sesuai total, konfirmasi, dapet ID order.",
+      "Pilih paket, isi kontak di checkout, lalu lanjut bayar.",
+      "Bayar lewat QRIS dan konfirmasikan pembayaran untuk mendapatkan ID pesanan.",
     ],
   },
   {
@@ -59,19 +59,19 @@ const HOW_IT_WORKS = [
   {
     step: "01",
     title: "Pilih & Cek",
-    desc: "Browse katalog, pilih produk dan varian yang kamu mau. Harganya transparan, no biaya tersembunyi.",
-    details: "Cek rincian tipe akun (Private/Sharing), durasi, dan garansi replace full.",
+    desc: "Pilih produk dan paket sesuai kebutuhanmu. Cek harga, durasi, dan stok sebelum lanjut.",
+    details: "Tipe akun dan garansi mengikuti paket yang kamu pilih.",
   },
   {
     step: "02",
     title: "Bayar QRIS",
-    desc: "Scan QRIS dari app apa aja. Konfirmasi, dapet ID order dalam hitungan detik.",
+    desc: "Bayar dengan bank atau e-wallet yang mendukung QRIS, lalu konfirmasikan pembayaran.",
     details: "Support GoPay, OVO, Dana, LinkAja, ShopeePay, dan M-Banking apapun.",
   },
   {
     step: "03",
-    title: "Gas & Pantau",
-    desc: "Akun aktif dalam hitungan menit. Pake ID order buat pantau status di halaman Status.",
+    title: "Simpan & Pantau",
+    desc: "Simpan ID pesanan. Admin akan memeriksa pembayaran sebelum memproses paketmu.",
     details: "Umumnya diproses 5–30 menit pada jam operasional; varian email maksimal 2 jam. Kendala bisa dilaporkan lewat WhatsApp Admin.",
   },
 ];
@@ -296,7 +296,9 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
+                kicker="Paling dicari"
                 title="Terlaris"
+                sub="Empat produk yang paling sering dibeli pelajar minggu ini."
               />
             </div>
 
@@ -354,7 +356,9 @@ export default function Home() {
             <div className="container home-sectionInner">
               <div className="reveal" style={{ transitionDelay: "50ms" }}>
                 <HomeSectionHead
+                  kicker="Bantuan tugas"
                   title="Jasa Akademik"
+                  sub="Paraphrase, cek plagiasi, dan tools akademik dengan proses cepat."
                 />
               </div>
 
@@ -402,7 +406,9 @@ export default function Home() {
             <div className="container home-sectionInner">
               <div className="reveal" style={{ transitionDelay: "60ms" }}>
                 <HomeSectionHead
+                  kicker="Hemat"
                   title="Promo"
+                  sub="Copy kodenya, tempel saat checkout. Kuota terbatas."
                 />
               </div>
 
@@ -445,7 +451,9 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal reveal-left" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
+                kicker="3 langkah"
                 title="Cara beli"
+                sub="Dari pilih produk sampai akun aktif, semuanya transparan."
               />
             </div>
             <div className="home-howGrid">
@@ -473,9 +481,6 @@ export default function Home() {
                         </div>
                       </div>
                     </div>
-                    {i < HOW_IT_WORKS.length - 1 ? (
-                      <div className="home-howCard-connector" aria-hidden="true" />
-                    ) : null}
                   </button>
                 );
               })}
@@ -491,7 +496,9 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
+                kicker="Pusat bantuan"
                 title="FAQ"
+                sub="Jawaban cepat soal pembayaran, order, dan kendala akun."
               />
             </div>
 

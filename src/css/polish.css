@@ -1,6 +1,8 @@
 /*
-  10 polish effects — all lightweight and disabled appropriately on
-  mobile / coarse pointer / prefers-reduced-motion.
+  Shared UI utilities: scrollbar, selection, focus rings, confetti layer,
+  skeletons, reveal transitions and cross-page consistency rules.
+  Decorative-only effects (cursor spotlight, rotating borders, aurora text)
+  were removed — they added render cost without conveying information.
 */
 
 /* ─── 1. Smooth themed scrollbar ────────────────────────────────────────── */
@@ -76,28 +78,6 @@ html[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput
     0 0 0 4px rgba(0, 138, 148, 0.6);
 }
 
-/* ─── 4. Image fade-in on load ──────────────────────────────────────────── */
-img {
-  transition: opacity 0.4s ease, filter 0.4s ease;
-}
-
-img[loading="lazy"]:not([data-loaded]) {
-  opacity: 0;
-  filter: blur(6px);
-}
-
-img[data-loaded],
-img:not([loading]) {
-  opacity: 1;
-  filter: none;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  img {
-    transition: none !important;
-  }
-}
-
 /* ─── 5. Tap highlight remove + soft press ──────────────────────────────── */
 * {
   -webkit-tap-highlight-color: transparent;
@@ -123,21 +103,6 @@ a.btn:active {
   [role="button"]:active,
   a.btn:active {
     transform: none;
-  }
-}
-
-/* ─── 6. Magnetic hover hint on key buttons (desktop) ───────────────────── */
-@media (hover: hover) and (pointer: fine) {
-  .btn:not(.btn-disabled):not([disabled]) {
-    transition:
-      transform 0.22s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)),
-      box-shadow 0.22s var(--ease-out),
-      filter 0.22s var(--ease-out);
-  }
-
-  .btn:not(.btn-ghost):not(.btn-disabled):not([disabled]):hover {
-    transform: translateY(-2px);
-    filter: saturate(1.08) brightness(1.04);
   }
 }
 
@@ -184,72 +149,10 @@ a.btn:active {
   }
 }
 
-/* ─── 8. Card glow on hover (desktop, full motion only) ───────────────── */
-@media (hover: hover) and (pointer: fine) {
-
-  html[data-motion="full"] .product-tile,
-  html[data-motion="full"] .catalog-card,
-  html[data-motion="full"] .pdx-variantCard {
-    position: relative;
-  }
-
-  html[data-motion="full"] .product-tile::after,
-  html[data-motion="full"] .catalog-card::after,
-  html[data-motion="full"] .pdx-variantCard::after {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    background: radial-gradient(300px 200px at var(--mx, 50%) var(--my, 50%),
-        rgba(79, 255, 200, 0.18),
-        rgba(79, 255, 200, 0) 60%);
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
-    z-index: 0;
-  }
-
-  html[data-motion="full"] .product-tile:hover::after,
-  html[data-motion="full"] .catalog-card:hover::after,
-  html[data-motion="full"] .pdx-variantCard:hover::after {
-    opacity: 1;
-  }
-
-  html[data-motion="full"] .product-tile>*,
-  html[data-motion="full"] .catalog-card>*,
-  html[data-motion="full"] .pdx-variantCard>* {
-    position: relative;
-    z-index: 1;
-  }
-}
-
-/* ─── 9. Spotlight cursor follower (desktop only, full motion) ─────────── */
-@media (hover: hover) and (pointer: fine) {
-  html[data-motion="full"] body {
-    background-image:
-      radial-gradient(500px 350px at var(--cursor-x, -100px) var(--cursor-y, -100px),
-        rgba(0, 214, 180, 0.05),
-        rgba(0, 214, 180, 0) 60%),
-      var(--body-bg-original, none);
-    transition: background-position 0.3s var(--ease-out);
-  }
-}
-
 /* ─── 10. Page transition shimmer line (handled cleanly by RouteProgress) ─── */
 
-/* Disable expensive desktop-only effects on mobile */
-@media (max-width: 720px) {
-
-  .product-tile::after,
-  .catalog-card::after,
-  .pdx-variantCard::after {
-    display: none;
-  }
-}
-
 /* ═══════════════════════════════════════════════════════════════════════
-   POLISH PASS 2 — 10 more lightweight non-functional effects
-   All disabled on coarse pointer / reduced motion where appropriate.
+   SHARED SURFACE & MOTION RULES
    ═══════════════════════════════════════════════════════════════════════ */
 
 /* ─── 11. Skeleton loader unified shimmer ──────────────────────────────── */
@@ -289,53 +192,6 @@ a.btn:active {
   }
 }
 
-/* ─── 12. Animated gradient borders on key CTAs ───────────────────────── */
-.btn:not(.btn-ghost):not(.btn-disabled):not([disabled]) {
-  position: relative;
-  isolation: isolate;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .btn:not(.btn-ghost):not(.btn-disabled):not([disabled])::after {
-    content: "";
-    position: absolute;
-    inset: -1px;
-    border-radius: inherit;
-    padding: 1px;
-    background: linear-gradient(var(--rotate, 0deg),
-        rgba(79, 255, 200, 0),
-        rgba(79, 255, 200, 0.5),
-        rgba(0, 214, 180, 0.5),
-        rgba(79, 255, 200, 0));
-    -webkit-mask:
-      linear-gradient(#fff 0 0) content-box,
-      linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    opacity: 0;
-    pointer-events: none;
-    z-index: -1;
-    transition: opacity 0.3s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1));
-  }
-
-  .btn:not(.btn-ghost):not(.btn-disabled):not([disabled]):hover::after {
-    opacity: 0.6;
-    animation: polishBorderRotate 3s linear infinite;
-  }
-}
-
-@property --rotate {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
-
-@keyframes polishBorderRotate {
-  to {
-    --rotate: 360deg;
-  }
-}
-
 /* ─── 13. Soft scroll-fade at section edges ─────────────────────────────
    Right-edge only: first (left) item stays fully solid; right fades as a
    scroll-hint that more content exists beyond the viewport.
@@ -359,45 +215,6 @@ a.btn:active {
 .admin-mobileTabs {
   -webkit-mask-image: none !important;
   mask-image: none !important;
-}
-
-/* ─── 14. Subtle aurora gradient on header brand text ─────────────────── */
-.brand,
-.admin-brand-title,
-.admin-mobileCopy strong {
-  background-image: linear-gradient(135deg, #3fe8c8 0%, #00a88c 50%, #006b75 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  background-size: 200% auto;
-  animation: polishAurora 6s ease-in-out infinite alternate;
-}
-
-html[data-theme="dark"] .brand {
-  background-image: linear-gradient(135deg, #5cf0d5 0%, #3fe8c8 50%, #22d0a8 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-@keyframes polishAurora {
-  0% {
-    background-position: 0% center;
-  }
-
-  100% {
-    background-position: 100% center;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-
-  .brand,
-  .admin-brand-title,
-  .admin-mobileCopy strong {
-    animation: none;
-  }
 }
 
 /* ─── 15. Badge / pill micro-pulse for "active" / "new" indicators ─────── */
@@ -476,12 +293,12 @@ html[data-theme="dark"] .brand {
 input,
 textarea,
 [contenteditable] {
-  caret-color: #00d6b4;
+  caret-color: var(--accent, #009e60);
 }
 
 html[data-theme="dark"] input,
 html[data-theme="dark"] textarea {
-  caret-color: #3fe8c8;
+  caret-color: var(--accent, #00f5c4);
 }
 
 /* Scroll progress bar */

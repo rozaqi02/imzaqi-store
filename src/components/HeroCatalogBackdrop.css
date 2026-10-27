@@ -2,7 +2,7 @@
 .hx-catalog-backdrop {
   position: absolute;
   /* No top fade — tiles stay fully visible from the header down. Fade only at the bottom. */
-  inset: 0 -12% -32%;
+  inset: 0 -12% 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
@@ -40,8 +40,8 @@
 .hx-catalog-stage {
   position: absolute;
   left: 50%;
-  /* Sit just under the header so all 4 rows stay fully visible — no top fade. */
-  top: calc(var(--site-header-offset, 64px) - 10px);
+  /* Hero header is hidden, so the wall starts at the very top. */
+  top: -10px;
   width: 124vw;
   max-width: 1680px;
   display: flex;
@@ -71,6 +71,37 @@
 
 .hx-catalog-row {
   margin-inline: 0;
+  transition: opacity 0.3s ease, filter 0.3s ease;
+}
+
+.hx-catalog-row:nth-child(1) {
+  opacity: 0.6;
+  filter: blur(1.5px);
+  transform: translateZ(-35px);
+}
+
+.hx-catalog-row:nth-child(2) {
+  opacity: 0.8;
+  filter: blur(0.75px);
+  transform: translateZ(-15px);
+}
+
+.hx-catalog-row:nth-child(3) {
+  opacity: 1;
+  filter: none;
+  transform: translateZ(0);
+}
+
+.hx-catalog-row:nth-child(4) {
+  opacity: 0.85;
+  filter: blur(0.5px);
+  transform: translateZ(10px);
+}
+
+.hx-catalog-row:nth-child(n+5) {
+  opacity: 0.65;
+  filter: blur(1.2px);
+  transform: translateZ(-20px);
 }
 
 .hx-catalog-tile {
@@ -138,15 +169,16 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 90% 65% at 50% 28%, rgba(4, 7, 20, 0.75) 0%, rgba(4, 7, 20, 0.3) 55%, rgba(4, 7, 20, 0) 100%),
+    radial-gradient(ellipse 95% 70% at 50% 42%, rgba(4, 7, 20, 0.72) 0%, rgba(4, 7, 20, 0.32) 55%, rgba(4, 7, 20, 0) 100%),
     linear-gradient(
       180deg,
       transparent 0%,
-      transparent 28%,
-      rgba(4, 7, 20, 0.45) 50%,
-      rgba(4, 7, 20, 0.9) 70%,
-      var(--bg0, #040714) 82%,
-      var(--bg0, #040714) 100%
+      transparent 34%,
+      rgba(4, 7, 20, 0.32) 58%,
+      rgba(4, 7, 20, 0.62) 76%,
+      color-mix(in srgb, var(--ux-canvas, #0d1512) 88%, transparent) 88%,
+      var(--ux-canvas, #0d1512) 96%,
+      var(--ux-canvas, #0d1512) 100%
     );
 }
 
@@ -154,7 +186,7 @@ html[data-theme="light"] .hx-catalog-tile {
   border-color: rgba(0, 0, 0, 0.08);
   background:
     linear-gradient(165deg, rgba(255, 255, 255, 0.96), rgba(248, 252, 255, 0.88) 48%),
-    #f4fafc;
+    #f4f7f2;
   box-shadow: 0 12px 24px rgba(40, 94, 117, 0.12);
 }
 
@@ -165,15 +197,22 @@ html[data-theme="light"] .hx-catalog-tile.is-compact {
 
 html[data-theme="light"] .hx-hero-scrim {
   background:
-    radial-gradient(ellipse 90% 65% at 50% 28%, rgba(248, 252, 255, 0.92) 0%, rgba(248, 252, 255, 0.6) 55%, rgba(248, 252, 255, 0) 100%),
+    linear-gradient(
+      180deg,
+      rgba(13, 30, 24, 0.1) 0%,
+      rgba(13, 30, 24, 0.05) 46%,
+      transparent 72%
+    ),
+    radial-gradient(ellipse 95% 70% at 50% 42%, rgba(248, 252, 255, 0.88) 0%, rgba(248, 252, 255, 0.5) 55%, rgba(248, 252, 255, 0) 100%),
     linear-gradient(
       180deg,
       transparent 0%,
-      transparent 28%,
-      rgba(248, 252, 255, 0.34) 54%,
-      rgba(248, 252, 255, 0.62) 78%,
-      #f4fafc 100%,
-      #f4fafc 100%
+      transparent 34%,
+      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 28%, transparent) 58%,
+      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 55%, transparent) 76%,
+      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 88%, transparent) 88%,
+      var(--ux-canvas, #f4f7f2) 96%,
+      var(--ux-canvas, #f4f7f2) 100%
     );
 }
 
@@ -183,7 +222,7 @@ html[data-theme="light"] .hx-hero-scrim {
     transform: translate3d(0, 0, 0);
   }
   to {
-    transform: translate3d(-33.333%, 0, 0);
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
@@ -199,7 +238,7 @@ html[data-theme="light"] .hx-hero-scrim {
 
 /* Mobile: 4 rows, calibrated tiles, matching 3D perspective and speed */
 .hx-catalog-backdrop.is-mobile {
-  inset: 0 -18% -42%;
+  inset: 0 -18% 0;
   opacity: 0.44;
   filter: none;
   -webkit-mask-image: linear-gradient(
@@ -223,13 +262,12 @@ html[data-theme="light"] .hx-hero-scrim {
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-stage {
-  width: 132vw;
+  width: 120vw;
   max-width: 1400px;
-  /* Shift slightly downwards on mobile so the first row doesn't sit too high under the header */
-  top: calc(var(--site-header-offset, 56px) + 30px);
-  gap: 12px;
+  top: 8px;
+  gap: 10px;
   /* Exact same receding wall angle and perspective as desktop */
-  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.18);
+  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.05);
   transform-origin: center top;
 }
 
@@ -239,14 +277,14 @@ html[data-theme="light"] .hx-hero-scrim {
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-track {
-  gap: 12px;
+  gap: 10px;
   will-change: transform;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-tile {
-  width: clamp(92px, 24vw, 114px);
-  padding: 9px;
-  border-radius: 16px;
+  width: clamp(76px, 19vw, 94px);
+  padding: 8px;
+  border-radius: 14px;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-tile-icon {
@@ -270,13 +308,13 @@ html[data-theme="light"] .hx-hero-scrim {
 
 @media (max-width: 720px) {
   .hx-catalog-backdrop:not(.is-mobile) {
-    inset: 0 -18% -8%;
+    inset: 0 -18% 0;
     opacity: 0.42;
   }
 
   .hx-catalog-backdrop .hx-catalog-stage {
-    top: calc(var(--site-header-offset, 56px) + 30px);
-    transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.18);
+    top: 8px;
+    transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.05);
   }
 }
 
@@ -297,7 +335,7 @@ html[data-theme="light"] .hx-hero-scrim {
 }
 
 [data-motion="lite"] .hx-catalog-backdrop.is-mobile .hx-catalog-stage {
-  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.18);
+  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.05);
 }
 
 [data-motion="lite"] .hx-catalog-track {

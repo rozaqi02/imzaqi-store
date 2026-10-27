@@ -1,0 +1,1484 @@
+/* Motion enhancements — respects data-motion and prefers-reduced-motion */
+
+@keyframes motionChipActivate {
+  0% { transform: scale(0.94); }
+  55% { transform: scale(1.04); }
+  100% { transform: scale(1); }
+}
+
+@keyframes motionFilterCountPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.12); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes motionCatalogCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(14px) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes motionGridFadeOut {
+  to {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes motionEmptyFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes motionEmptyFadeUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes motionSuggestIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes motionSuggestItemIn {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes motionCartBump {
+  0% { transform: scale(1); }
+  35% { transform: scale(1.28); }
+  100% { transform: scale(1); }
+}
+
+@keyframes motionCartFly {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--fly-tx, 120px), var(--fly-ty, -80px)) scale(0.35);
+  }
+}
+
+@keyframes motionFlashSecPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.72; }
+}
+
+@keyframes motionHeroAuraDrift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: translate(2%, -1.5%) scale(1.03);
+    opacity: 0.92;
+  }
+}
+
+@keyframes motionViewMorph {
+  from { opacity: 0.55; transform: scale(0.992); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes motionRangeThumbPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0, 214, 180, 0.45); }
+  50% { box-shadow: 0 0 0 6px rgba(0, 214, 180, 0); }
+}
+
+@keyframes motionPdxAddedFlash {
+  0% { box-shadow: var(--pdx-inset-shadow), 0 0 0 0 rgba(79, 255, 218, 0.55); }
+  40% { box-shadow: var(--pdx-inset-shadow), 0 0 0 6px rgba(79, 255, 218, 0.28); }
+  100% { box-shadow: var(--pdx-inset-shadow), 0 0 0 0 rgba(79, 255, 218, 0); }
+}
+
+/* ── Catalog filter chips & toggles ── */
+@media (prefers-reduced-motion: no-preference) {
+  [data-motion="full"] .catalog-chip {
+    transition:
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  [data-motion="full"] .catalog-chip:active {
+    transform: scale(0.96);
+  }
+
+  [data-motion="full"] .catalog-chip.active {
+    animation: motionChipActivate 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .catalog-filterBtnCount {
+    animation: motionFilterCountPop 0.32s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .pdx-filterChip {
+    transition:
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.18s ease,
+      border-color 0.18s ease,
+      color 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+
+  [data-motion="full"] .pdx-filterChip:active {
+    transform: scale(0.96);
+  }
+
+  [data-motion="full"] .pdx-filterChip.is-active {
+    animation: motionChipActivate 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .faq-chip {
+    transition:
+      transform 0.16s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.18s ease,
+      border-color 0.18s ease;
+  }
+
+  [data-motion="full"] .faq-chip:active {
+    transform: scale(0.96);
+  }
+
+  [data-motion="full"] .faq-chip.active {
+    animation: motionChipActivate 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .pdx-packCard.is-added {
+    animation: motionPdxAddedFlash 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  [data-motion="full"] .catalog-toggleUi,
+  [data-motion="full"] .catalog-toggleUi::after {
+    transition:
+      transform 0.22s cubic-bezier(0.22, 1, 0.36, 1),
+      background 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  [data-motion="full"] .catalog-rangeInput:active::-webkit-slider-thumb {
+    animation: motionRangeThumbPulse 0.8s ease infinite;
+  }
+
+  /* ── Catalog grid stagger ── */
+  [data-motion="full"] .catalog-grid--animate .catalog-card {
+    animation: motionCatalogCardIn 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--reveal-i, 0) * 52ms);
+  }
+
+  [data-motion="full"] .catalog-grid.is-filtering {
+    animation: motionGridFadeOut 0.14s ease forwards;
+    pointer-events: none;
+  }
+
+  [data-motion="full"] .catalog-grid.is-view-morph {
+    animation: motionViewMorph 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  /* ── Empty state ── */
+  [data-motion="full"] .empty--animated .empty-icon {
+    animation: motionEmptyFloat 3.2s ease-in-out infinite;
+  }
+
+  [data-motion="full"] .empty--animated .empty-title {
+    animation: motionEmptyFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.12s both;
+  }
+
+  [data-motion="full"] .empty--animated .empty-desc {
+    animation: motionEmptyFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.22s both;
+  }
+
+  [data-motion="full"] .empty--animated .empty-actions {
+    animation: motionEmptyFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
+  }
+
+  /* ── Search suggestions ── */
+  [data-motion="full"] .suggestions--animate {
+    animation: motionSuggestIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
+    transform-origin: top center;
+  }
+
+  [data-motion="full"] .suggestions--animate .suggestion-item,
+  [data-motion="lite"] .suggestions--animate .suggestion-item {
+    animation: motionSuggestItemIn 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--suggest-i, 0) * 40ms);
+  }
+
+  [data-motion="full"] .suggestion-item:hover,
+  [data-motion="full"] .suggestion-item.is-active,
+  [data-motion="lite"] .suggestion-item:hover,
+  [data-motion="lite"] .suggestion-item.is-active {
+    transform: translateX(3px);
+    transition: transform 0.16s ease, background 0.16s ease;
+  }
+
+  /* ── Cart micro-interaction ── */
+  html:not([data-motion="off"]) .header-cart .pill.is-bumping {
+    animation: motionCartBump 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  html:not([data-motion="off"]) .pdx-addBtn.is-pressed {
+    transform: scale(0.96);
+    transition: transform 0.12s ease;
+  }
+
+  html:not([data-motion="off"]) .cart-fly-particle {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 999px;
+    background: #3fe8c8;
+    box-shadow: 0 0 12px rgba(79, 255, 218, 0.55);
+    pointer-events: none;
+    z-index: 10001;
+    animation: motionCartFly 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+
+  /* ── Flash sale ── */
+  [data-motion="full"] .flash-countdown-num--sec {
+    animation: motionFlashSecPulse 1s ease-in-out infinite;
+  }
+
+  [data-motion="full"] .flash-sale-progressFill {
+    transition: width 1s linear;
+  }
+
+  /* ── Catalog hero ambient ── */
+  [data-motion="full"] .catalog-hero::before {
+    animation: motionHeroAuraDrift 24s ease-in-out infinite;
+  }
+
+  /* ── Header shrink (whole bar, not logo only) ── */
+  @media (min-width: 721px) {
+    html[data-motion="full"] .header,
+    html[data-motion="lite"] .header {
+      --hdr-py: 10px;
+      --hdr-logo: 42px;
+      --hdr-action: 44px;
+      --hdr-action-radius: 14px;
+      --hdr-action-icon: 18px;
+      --hdr-nav-py: 10px;
+      --hdr-nav-px: 12px;
+      --hdr-nav-size: 14px;
+      --hdr-nav-gap: 14px;
+      --hdr-inner-gap: 16px;
+      --hdr-toggle-w: 58px;
+      --hdr-toggle-h: 32px;
+      --hdr-toggle-thumb: 24px;
+      --hdr-toggle-shift: 26px;
+      transition:
+        padding 0.28s cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 0.28s ease;
+    }
+
+    html[data-motion="full"] .header.is-shrunk,
+    html[data-motion="lite"] .header.is-shrunk {
+      --hdr-py: 5px;
+      --hdr-logo: 34px;
+      --hdr-action: 38px;
+      --hdr-action-radius: 12px;
+      --hdr-action-icon: 16px;
+      --hdr-nav-py: 7px;
+      --hdr-nav-px: 9px;
+      --hdr-nav-size: 12.5px;
+      --hdr-nav-gap: 6px;
+      --hdr-inner-gap: 9px;
+      --hdr-toggle-w: 50px;
+      --hdr-toggle-h: 28px;
+      --hdr-toggle-thumb: 20px;
+      --hdr-toggle-shift: 22px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.22);
+    }
+
+    html[data-motion="full"] .header .header-inner,
+    html[data-motion="lite"] .header .header-inner {
+      padding-top: var(--hdr-py);
+      padding-bottom: var(--hdr-py);
+      gap: var(--hdr-inner-gap);
+    }
+
+    html[data-motion="full"] .header .brand-img,
+    html[data-motion="lite"] .header .brand-img {
+      height: var(--hdr-logo);
+    }
+
+    html[data-motion="full"] .header .nav,
+    html[data-motion="lite"] .header .nav {
+      gap: var(--hdr-nav-gap);
+    }
+
+    html[data-motion="full"] .header .nav a,
+    html[data-motion="lite"] .header .nav a {
+      padding: var(--hdr-nav-py) var(--hdr-nav-px);
+      font-size: var(--hdr-nav-size);
+    }
+
+    html[data-motion="full"] .header .header-actions,
+    html[data-motion="lite"] .header .header-actions {
+      gap: calc(var(--hdr-inner-gap) * 0.65);
+    }
+
+    html[data-motion="full"] .header .header-cart,
+    html[data-motion="lite"] .header .header-cart,
+    html[data-motion="full"] .header .header-iconAction,
+    html[data-motion="lite"] .header .header-iconAction {
+      width: var(--hdr-action) !important;
+      height: var(--hdr-action) !important;
+      min-width: var(--hdr-action) !important;
+      min-height: var(--hdr-action) !important;
+      flex: 0 0 var(--hdr-action) !important;
+      border-radius: var(--hdr-action-radius) !important;
+    }
+
+    html[data-motion="full"] .header .header-cart svg,
+    html[data-motion="lite"] .header .header-cart svg,
+    html[data-motion="full"] .header .header-iconAction svg,
+    html[data-motion="lite"] .header .header-iconAction svg {
+      width: var(--hdr-action-icon) !important;
+      height: var(--hdr-action-icon) !important;
+    }
+
+    html[data-motion="full"] .header .theme-toggle,
+    html[data-motion="lite"] .header .theme-toggle {
+      width: var(--hdr-toggle-w) !important;
+      height: var(--hdr-toggle-h) !important;
+    }
+
+    html[data-motion="full"] .header .theme-toggleThumb,
+    html[data-motion="lite"] .header .theme-toggleThumb {
+      width: var(--hdr-toggle-thumb) !important;
+      height: var(--hdr-toggle-thumb) !important;
+      transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1) !important;
+    }
+
+    /* Shrink cart badge with the icon button */
+    html[data-motion="full"] .header.is-shrunk .header-cart .pill,
+    html[data-motion="lite"] .header.is-shrunk .header-cart .pill {
+      min-width: 14px;
+      height: 14px;
+      font-size: 8px;
+      top: 2px;
+      right: 2px;
+    }
+
+    html[data-motion="full"] .header .theme-toggle.is-dark .theme-toggleThumb,
+    html[data-motion="lite"] .header .theme-toggle.is-dark .theme-toggleThumb {
+      transform: translateX(var(--hdr-toggle-shift));
+    }
+
+    html[data-motion="full"] .header .nav-active-pill,
+    html[data-motion="lite"] .header .nav-active-pill,
+    html[data-motion="full"] .header .nav-hover-pill,
+    html[data-motion="lite"] .header .nav-hover-pill {
+      inset: unset !important;
+      bottom: auto !important;
+      right: auto !important;
+      will-change: transform, width, height, opacity;
+    }
+
+    html[data-motion="full"] .header.is-shrunk .nav-active-pill,
+    html[data-motion="lite"] .header.is-shrunk .nav-active-pill,
+    html[data-motion="full"] .header.is-shrunk .nav-hover-pill,
+    html[data-motion="lite"] .header.is-shrunk .nav-hover-pill {
+      border-radius: 11px !important;
+    }
+  }
+}
+
+[data-motion="lite"] .catalog-grid--animate .catalog-card,
+[data-motion="off"] .catalog-grid--animate .catalog-card {
+  animation: none !important;
+}
+
+[data-motion="lite"] .suggestions--animate {
+  animation: motionSuggestIn 0.2s ease both;
+}
+
+[data-motion="off"] .empty--animated .empty-icon,
+[data-motion="off"] .flash-countdown-num--sec,
+[data-motion="off"] .catalog-hero::before {
+  animation: none !important;
+}
+
+/* ── Neumorphism Depth Effects & Interactions ── */
+
+/* Opsi 1: Tactile Click Inset Transition (Efek Tekan Cekung) — full motion only */
+[data-motion="full"] .btn:active,
+[data-motion="full"] .catalog-chip:active,
+[data-motion="full"] .pdx-filterChip:active,
+[data-motion="full"] .home-promoCard:active,
+[data-motion="full"] .home-howCard:active,
+[data-motion="full"] .faq-item:has(.faq-itemHead:active),
+[data-motion="full"] .product-card-modern:active,
+[data-motion="full"] .product-tile:active,
+[data-motion="full"] .card:active,
+[data-motion="full"] .st-infoCard:active,
+[data-motion="full"] .st-card:active,
+[data-motion="full"] .pay-card:active {
+  box-shadow:
+    inset 8px 10px 18px rgba(0, 0, 0, 0.42),
+    inset -5px -5px 12px rgba(255, 255, 255, 0.04) !important;
+  transform: translateY(1px) scale(0.982) !important;
+  transition: box-shadow 0.1s cubic-bezier(0.22, 1, 0.36, 1), transform 0.1s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+html[data-theme="light"][data-motion="full"] .btn:active,
+html[data-theme="light"][data-motion="full"] .catalog-chip:active,
+html[data-theme="light"][data-motion="full"] .pdx-filterChip:active,
+html[data-theme="light"][data-motion="full"] .home-promoCard:active,
+html[data-theme="light"][data-motion="full"] .home-howCard:active,
+html[data-theme="light"][data-motion="full"] .faq-item:has(.faq-itemHead:active),
+html[data-theme="light"][data-motion="full"] .product-card-modern:active,
+html[data-theme="light"][data-motion="full"] .product-tile:active,
+html[data-theme="light"][data-motion="full"] .card:active,
+html[data-theme="light"][data-motion="full"] .st-infoCard:active,
+html[data-theme="light"][data-motion="full"] .st-card:active,
+html[data-theme="light"][data-motion="full"] .pay-card:active {
+  box-shadow:
+    inset 6px 8px 14px rgba(124, 158, 171, 0.28),
+    inset -5px -5px 10px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Reset child button scale on FAQ items to prevent double shrink mismatch */
+.faq-itemHead:active {
+  transform: none !important;
+}
+
+/* Opsi 3: Deep Inset Focus on Inputs (Kotak Pencarian & Form Cekung Dinamis) */
+.input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+.hero-search-shell:focus-within,
+.catalog-commandSearch:focus-within,
+.catalog-filterSearch:focus-within,
+.status-searchField:focus-within,
+.st-inputWrap:focus-within,
+.faq-searchWrap:focus-within,
+.testi-searchShell:focus-within,
+.admin-searchRow:focus-within,
+.status-commandBox:focus-within {
+  box-shadow:
+    inset 4px 6px 12px rgba(0, 0, 0, 0.48),
+    inset -3px -3px 8px rgba(255, 255, 255, 0.04),
+    0 0 0 1px rgba(0, 214, 180, 0.35),
+    0 0 12px rgba(0, 214, 180, 0.15) !important;
+  border-color: rgba(0, 214, 180, 0.45) !important;
+  background: var(--skeu-control-bg, #161c24) !important;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease !important;
+}
+
+html[data-theme="light"] .input:not(.hero-search-input):not(.catalog-commandInput):not(.st-input):not(.testi-searchInput):not(.faq-searchInput):not(.admin-searchInput):not(.catalog-filterInput):not(.st-searchInput):not(.ai-input):focus,
+html[data-theme="light"] .hero-search-shell:focus-within,
+html[data-theme="light"] .catalog-commandSearch:focus-within,
+html[data-theme="light"] .catalog-filterSearch:focus-within,
+html[data-theme="light"] .status-searchField:focus-within,
+html[data-theme="light"] .st-inputWrap:focus-within,
+html[data-theme="light"] .faq-searchWrap:focus-within,
+html[data-theme="light"] .testi-searchShell:focus-within,
+html[data-theme="light"] .admin-searchRow:focus-within,
+html[data-theme="light"] .status-commandBox:focus-within {
+  box-shadow:
+    inset 4px 6px 10px rgba(124, 158, 171, 0.28),
+    inset -4px -4px 8px rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(6, 123, 136, 0.35),
+    0 0 10px rgba(6, 123, 136, 0.15) !important;
+  border-color: rgba(6, 123, 136, 0.45) !important;
+  background: #ffffff !important;
+}
+
+/* BUG-12: Reset will-change di mobile/touch agar tidak drain GPU mid-range Android */
+@media (max-width: 920px), (pointer: coarse) {
+  html[data-motion="lite"] .header .nav-active-pill,
+  html[data-motion="lite"] .header .nav-hover-pill {
+    will-change: auto;
+  }
+}
+
+/* UX motion layer — interactive polish */
+
+@keyframes uxRouteForward {
+  0% { opacity: 0; transform: translate3d(0, 10px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes uxRouteBack {
+  0% { opacity: 0; transform: translate3d(0, -8px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes uxRouteFade {
+  0% { opacity: 0; transform: translate3d(0, 6px, 0); }
+  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes uxRouteFadeOnly {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes uxLoadMoreProgress {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes uxFlashBorderSpin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes uxFlashUrgentShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  75% { transform: translateX(2px); }
+}
+
+@keyframes uxPayStepIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes uxCheckoutQtyPulse {
+  0% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 0 rgba(79, 255, 218, 0.45); }
+  45% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 4px rgba(79, 255, 218, 0.22); }
+  100% { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04), 0 0 0 0 rgba(79, 255, 218, 0); }
+}
+
+@keyframes uxCheckoutRemoveFlash {
+  0% { opacity: 1; transform: translateX(0); filter: none; }
+  100% { opacity: 0.35; transform: translateX(10px); filter: blur(1px); }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app-main:not(.app-main-admin) > .route-transition--forward {
+
+    animation: uxRouteForward 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .app-main:not(.app-main-admin) > .route-transition--back {
+
+    animation: uxRouteBack 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  .app-main:not(.app-main-admin) > .route-transition--fade,
+  .app-main:not(.app-main-admin) > .route-transition {
+    animation: uxRouteFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  }
+
+  /* Catalog route: smooth opacity fade without vertical transform to keep sticky filters rock-solid */
+  .app-main-catalog > .route-transition {
+    animation: uxRouteFadeOnly 0.22s cubic-bezier(0.16, 1, 0.3, 1) both !important;
+    transform: none !important;
+  }
+
+  .catalog-contentMeta.is-filtering strong {
+    opacity: 0.55;
+  }
+
+  .catalog-gridWrap {
+    position: relative;
+  }
+
+  .catalog-loadMoreProgress {
+    grid-column: 1 / -1;
+    height: 3px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+
+  .catalog-loadMoreProgress > span {
+    display: block;
+    height: 100%;
+    transform-origin: left center;
+    background: linear-gradient(90deg, #3fe8c8, #00a88c);
+    animation: uxLoadMoreProgress 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .catalog-card--loadMore {
+    animation: motionCatalogCardIn 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation-delay: calc(var(--reveal-i, 0) * 52ms);
+  }
+
+  .catalog-cardSkeletonV2 {
+    display: grid;
+    gap: 10px;
+    padding: 14px;
+    min-height: 248px;
+  }
+
+  .catalog-cardSkeletonV2.list {
+    min-height: 156px;
+  }
+
+  .catalog-cardSkeletonTop {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .catalog-cardSkeletonIcon {
+    width: 58px;
+    height: 58px;
+    border-radius: 18px;
+    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 34%),
+      var(--skeu-control-bg, rgba(255, 255, 255, 0.06));
+    box-shadow: var(--skeu-control-shadow, none);
+    flex: 0 0 auto;
+  }
+
+  .catalog-cardSkeletonCopy {
+    flex: 1;
+    display: grid;
+    gap: 8px;
+    min-width: 0;
+  }
+
+  .catalog-cardSkeletonLine,
+  .catalog-cardSkeletonPrice,
+  .catalog-cardSkeletonSignals span,
+  .catalog-cardSkeletonMeta span,
+  .catalog-cardSkeletonFoot {
+    border-radius: 999px;
+    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.06));
+    background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.06));
+    box-shadow: var(--skeu-inset-shadow, none);
+  }
+
+  .catalog-cardSkeletonLine.is-short { width: 38%; height: 10px; }
+  .catalog-cardSkeletonLine.is-title { width: 72%; height: 14px; }
+  .catalog-cardSkeletonLine.is-body { width: 90%; height: 10px; }
+  .catalog-cardSkeletonPrice { width: 72px; height: 16px; margin-left: auto; }
+  .catalog-cardSkeletonSignals { display: flex; gap: 8px; }
+  .catalog-cardSkeletonSignals span { width: 64px; height: 24px; border-radius: 12px; }
+  .catalog-cardSkeletonMeta { display: flex; gap: 8px; flex-wrap: wrap; }
+  .catalog-cardSkeletonMeta span { width: 78px; height: 22px; }
+  .catalog-cardSkeletonFoot { width: 42%; height: 12px; }
+
+  .empty-suggestions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .empty-suggestionChip {
+    min-height: 34px;
+    padding: 0 12px;
+    border-radius: 999px;
+    border: 1px solid var(--brand-line, rgba(79, 255, 218, 0.22));
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 32%),
+      var(--skeu-control-bg, rgba(0, 214, 180, 0.08));
+    box-shadow: var(--skeu-control-shadow, none);
+    color: var(--brand-text, rgba(234, 255, 245, 0.9));
+    font-size: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: transform 0.16s ease, background 0.16s ease, filter 0.16s ease;
+  }
+
+  .empty-suggestionChip:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.06);
+  }
+
+  .flash-sale-banner.is-urgent {
+    animation: uxFlashUrgentShake 0.42s ease-in-out infinite;
+  }
+
+  .flash-sale-banner.is-urgent .flash-countdown-num--sec {
+    color: #ff3c64;
+  }
+
+  .flash-sale-card {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .flash-sale-stockBar {
+    width: 100%;
+    height: 4px;
+    margin-top: 6px;
+    border-radius: 999px;
+    background: rgba(255, 60, 100, 0.12);
+    overflow: hidden;
+  }
+
+  .flash-sale-stockBar > span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, #ff3c64, #ff7a96);
+    transition: width 0.4s ease;
+  }
+
+  .pay-successSteps {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    margin-bottom: 14px;
+  }
+
+  .pay-successStep {
+    display: grid;
+    justify-items: center;
+    gap: 6px;
+    padding: 10px 8px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.03);
+    font-size: 11px;
+    font-weight: 800;
+    color: rgba(234, 255, 245, 0.55);
+    animation: uxPayStepIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .pay-successStep:nth-child(2) { animation-delay: 0.08s; }
+  .pay-successStep:nth-child(3) { animation-delay: 0.16s; }
+
+  .pay-successStep > span {
+    width: 22px;
+    height: 22px;
+    display: grid;
+    place-items: center;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .pay-successStep.is-done {
+    color: rgba(234, 255, 245, 0.82);
+    border-color: rgba(79, 255, 218, 0.22);
+  }
+
+  .pay-successStep.is-done > span {
+    background: rgba(0, 214, 180, 0.2);
+    color: #3fe8c8;
+  }
+
+  .pay-successStep.is-active {
+    color: #fff;
+    border-color: rgba(79, 255, 218, 0.34);
+    box-shadow: 0 0 0 1px rgba(79, 255, 218, 0.12) inset;
+  }
+
+  .pay-successStep.is-active > span {
+    background: linear-gradient(135deg, #3fe8c8, #00a88c);
+    color: #032235;
+  }
+
+  html[data-theme="light"] .pay-successStep {
+    border-color: rgba(0, 34, 53, 0.08);
+    background: rgba(0, 34, 53, 0.03);
+    color: rgba(0, 34, 53, 0.55);
+  }
+
+  html[data-theme="light"] .pay-successStep > span {
+    background: rgba(0, 34, 53, 0.06);
+    color: rgba(0, 34, 53, 0.8);
+  }
+
+  html[data-theme="light"] .pay-successStep.is-done {
+    color: rgba(0, 120, 100, 0.82);
+    border-color: rgba(0, 214, 180, 0.22);
+  }
+
+  html[data-theme="light"] .pay-successStep.is-done > span {
+    background: rgba(0, 214, 180, 0.15);
+    color: #008f75;
+  }
+
+  html[data-theme="light"] .pay-successStep.is-active {
+    color: #032235;
+    border-color: rgba(0, 214, 180, 0.34);
+    box-shadow: 0 0 0 1px rgba(0, 214, 180, 0.12) inset;
+  }
+
+  html[data-theme="light"] .pay-successStep.is-active > span {
+    background: linear-gradient(135deg, #00a88c, #3fe8c8);
+    color: #032235;
+  }
+
+  .checkout-item-card.is-qty-pulse {
+    animation: uxCheckoutQtyPulse 0.38s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .checkout-item-card.is-qty-pulse .checkout-item-price {
+    transform: scale(1.06);
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .checkout-item-card.is-removing {
+    animation: uxCheckoutRemoveFlash 0.22s ease forwards;
+    pointer-events: none;
+  }
+
+  .product-tile-tiltWrap,
+  .flash-sale-cardInner {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+}
+
+[data-motion="off"] .route-transition,
+[data-motion="off"] .catalog-card--loadMore,
+[data-motion="off"] .flash-sale-banner.is-urgent,
+[data-motion="off"] .flash-sale-card::before,
+[data-motion="off"] .pdx-packCard.is-added,
+[data-motion="off"] .checkout-item-card.is-qty-pulse,
+[data-motion="off"] .checkout-item-card.is-removing {
+  animation: none !important;
+}
+
+/*
+  Adaptive motion layer
+  - full: desktop/default
+  - lite: mobile/coarse pointer (keep animation, reduce render cost)
+  - off: prefers-reduced-motion
+*/
+
+/* Catalog routes: opacity-only fade to preserve sticky sidebar (no transform) */
+/* Lite motion: gentle fade for low-power devices */
+[data-motion="lite"] .app-main:not(.app-main-admin) > .route-transition {
+  animation: uxRouteFade 0.18s ease both !important;
+  transform: none !important;
+  will-change: opacity !important;
+}
+
+[data-motion="off"] .route-transition {
+  animation: none !important;
+  transform: none !important;
+}
+
+/*
+  Lite mode: remove backdrop-filter only from elements that paint during scroll/animation.
+  The AI panel (.ai-panel--glass), checkout backdrop overlay, and lightbox keep their
+  blur because they are fixed/modal overlays that do NOT scroll with the page.
+*/
+[data-motion="lite"] .pay-card,
+[data-motion="lite"] .pay-orderDesktop,
+[data-motion="lite"] .pay-orderMobileCard,
+[data-motion="lite"] .qris-wrap,
+[data-motion="lite"] .pay-successModal,
+[data-motion="lite"] .pay-confirmModal,
+[data-motion="lite"] .st-hero,
+[data-motion="lite"] .st-search,
+[data-motion="lite"] .st-card,
+[data-motion="lite"] .st-infoCard,
+[data-motion="lite"] .toast,
+[data-motion="lite"] .bottom-nav,
+[data-motion="off"] .bottom-nav {
+  backdrop-filter: none !important;
+}
+
+[data-motion="lite"] .card,
+[data-motion="lite"] .btn,
+[data-motion="lite"] .checkout-panel,
+[data-motion="lite"] .checkout-summary,
+[data-motion="lite"] .status-mainCard,
+[data-motion="lite"] .status-sideCard,
+[data-motion="lite"] .status-emptyCard,
+[data-motion="lite"] .st-hero,
+[data-motion="lite"] .st-search,
+[data-motion="lite"] .st-card,
+[data-motion="lite"] .st-infoCard,
+[data-motion="lite"] .pay-card,
+[data-motion="lite"] .pay-orderDesktop,
+[data-motion="lite"] .pay-orderMobileCard,
+[data-motion="lite"] .qris-wrap,
+[data-motion="lite"] .pay-successModal,
+[data-motion="lite"] .pay-confirmModal,
+[data-motion="lite"] .admin-panel,
+[data-motion="lite"] .admin-card {
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
+}
+
+[data-motion="lite"] .btn,
+[data-motion="lite"] .card,
+[data-motion="lite"] .checkout-panel,
+[data-motion="lite"] .checkout-summary,
+[data-motion="lite"] .product-card-modern,
+[data-motion="lite"] .catalog-card,
+[data-motion="lite"] .st-hero,
+[data-motion="lite"] .st-search,
+[data-motion="lite"] .st-card,
+[data-motion="lite"] .st-infoCard,
+[data-motion="lite"] .pay-card,
+[data-motion="lite"] .pay-orderDesktop,
+[data-motion="lite"] .pay-orderMobileCard,
+[data-motion="lite"] .qris-wrap,
+[data-motion="lite"] .pay-successModal,
+[data-motion="lite"] .pay-confirmModal,
+[data-motion="lite"] .admin-panel,
+[data-motion="lite"] .admin-orderCardModern {
+  transition-property: transform, opacity, border-color, background-color !important;
+  transition-duration: 160ms !important;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
+  will-change: auto !important;
+}
+
+[data-motion="lite"] .btn::before,
+[data-motion="lite"] .skeleton::after,
+[data-motion="lite"] .catalog-cardSkeleton::after,
+[data-motion="lite"] .testi-skel::after,
+[data-motion="lite"] .qris-skeletonBox,
+[data-motion="lite"] .stock-progress-fill::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Status page: isolate repaint boundary on main wrapper */
+[data-motion="lite"] .st-wrap {
+  contain: layout paint style;
+}
+
+[data-motion="lite"] .trending-badge,
+[data-motion="lite"] .stock-badge-modern.low-stock,
+[data-motion="lite"] .route-progress-bar,
+[data-motion="lite"] .cursor {
+  animation: none !important;
+}
+
+/* Checkout specifically: keep smooth open/close with lower paint cost */
+[data-motion="lite"] .checkout-overlay {
+  contain: layout paint;
+}
+
+[data-motion="lite"] .checkout-backdrop {
+  background: rgba(3, 8, 18, 0.56) !important;
+}
+
+[data-motion="lite"] .checkout-drawer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  contain: layout paint style;
+  will-change: transform !important;
+}
+
+[data-motion="lite"] .checkout-drawerBody {
+  contain: content;
+}
+
+[data-motion="lite"] .checkout-drawerGesture {
+  animation: checkoutGestureIn 220ms cubic-bezier(0.16, 1, 0.3, 1) both !important;
+}
+
+/* Product page + detail page: reduce paint complexity while keeping style direction */
+[data-motion="lite"] .catalog-page .catalog-hero::before,
+[data-motion="lite"] .catalog-page .catalog-card::before,
+[data-motion="lite"] .catalog-page .catalog-cardSkeleton::after,
+[data-motion="lite"] .pay-shell-hero::before {
+  display: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-command,
+[data-motion="lite"] .catalog-page .catalog-filterShell,
+[data-motion="lite"] .catalog-page .catalog-filter,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2,
+[data-motion="lite"] .catalog-page .catalog-quickChip,
+[data-motion="lite"] .catalog-page .catalog-sheet {
+  background: var(--skeu-panel-bg) !important;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.18) !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-sheetBackdrop {
+  backdrop-filter: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card {
+  /* Keep content-visibility so off-screen cards skip paint while scrolling */
+  content-visibility: auto;
+  contain: layout paint style;
+  transform: none;
+  will-change: auto;
+  backface-visibility: hidden;
+  transition-property: transform, box-shadow, border-color, opacity !important;
+  transition-duration: 140ms !important;
+}
+
+/* Allow press-in feedback on touch even in lite mode */
+[data-motion="lite"] .catalog-page .catalog-card:active,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2:active {
+  transform: scale(0.97) translateY(1px) !important;
+  box-shadow:
+    inset 6px 8px 16px rgba(0, 0, 0, 0.28),
+    inset -3px -3px 10px rgba(255, 255, 255, 0.06),
+    inset 0 2px 0 rgba(0, 0, 0, 0.2),
+    0 1px 2px rgba(0, 0, 0, 0.12) !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardIcon,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta > span,
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardFoot,
+[data-motion="lite"] .catalog-page .catalog-status {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-grid--animate .catalog-card,
+[data-motion="off"] .catalog-page .catalog-grid--animate .catalog-card {
+  animation: none !important;
+}
+
+[data-motion="lite"] .catalog-hero::before,
+[data-motion="off"] .catalog-hero::before {
+  animation: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card:hover,
+[data-motion="lite"] .detail-page .pdx-variantCard:hover {
+  transform: none !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardSummary {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical !important;
+  -webkit-line-clamp: 2 !important;
+  overflow: hidden !important;
+}
+
+[data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta {
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+}
+
+/* Home page mobile hotspots: popular list + side stats */
+[data-motion="lite"] .home-page .product-tile::before,
+[data-motion="lite"] .home-page .product-tile::after {
+  display: none !important;
+}
+
+[data-motion="lite"] .home-page .hero-search-shell,
+[data-motion="lite"] .home-page .suggestions {
+  backdrop-filter: none !important;
+}
+
+[data-motion="lite"] .home-page .flow-assist,
+[data-motion="lite"] .home-page .home-popularList .product-tile,
+[data-motion="lite"] .home-page .home-popularList .product-tile-pill {
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-motion="lite"] .home-page .home-popularList {
+  contain: layout;
+  overflow: visible !important;
+}
+
+[data-motion="lite"] .home-page .home-popularList .product-tile {
+  /* Skip paint for off-screen tiles while scrolling (same win as catalog) */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 120px;
+  contain: layout paint style;
+  overflow: visible !important;
+  transition-duration: 120ms !important;
+  will-change: auto !important;
+}
+
+[data-motion="lite"] .home-page .home-popularList .product-tile:hover {
+  transform: none !important;
+}
+
+[data-motion="lite"] .home-page .home-howCard,
+[data-motion="lite"] .home-page .home-promoCard,
+[data-motion="lite"] .home-page .home-faqItem.faq-item,
+[data-motion="lite"] .home-page .hx-stat-item {
+  box-shadow:
+    0 6px 14px rgba(0, 0, 0, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+
+[data-motion="lite"] .home-page .hx-live-eye-icon {
+  animation: none !important;
+}
+
+[data-motion="off"] *,
+[data-motion="off"] *::before,
+[data-motion="off"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* ─── Mobile navbar: solid bg, no backdrop blur (phone only) ─────────────── */
+@media (max-width: 720px) {
+  /* Header mobile dark mode — neumorphic solid + gradasi hijau */
+  html .header,
+  html .site-header,
+  html[data-motion="lite"] .header,
+  html[data-motion="lite"] .site-header,
+  html[data-motion="off"] .header,
+  html[data-motion="off"] .site-header,
+  html[data-theme="dark"] .header,
+  html[data-theme="dark"] .site-header,
+  html[data-theme="dark"][data-motion="lite"] .header,
+  html[data-theme="dark"][data-motion="lite"] .site-header {
+    background: transparent !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    transform: none;
+    will-change: auto;
+  }
+
+  /* Header mobile light mode — neumorphic + gradasi hijau */
+  html[data-theme="light"] .header,
+  html[data-theme="light"] .site-header,
+  html[data-theme="light"][data-motion="lite"] .header,
+  html[data-theme="light"][data-motion="lite"] .site-header {
+    background: transparent !important;
+    border-bottom: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+  }
+
+  /* Header buttons — same neumorphism as desktop */
+  html body .header .header-cart,
+  html body .header .header-iconAction,
+  html[data-theme="light"] body .header .header-cart,
+  html[data-theme="light"] body .header .header-iconAction,
+  html[data-theme="dark"] body .header .header-cart,
+  html[data-theme="dark"] body .header .header-iconAction {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+      var(--skeu-control-bg) !important;
+    border-color: var(--brand-line) !important;
+    box-shadow: var(--skeu-control-shadow) !important;
+    color: var(--brand-text) !important;
+  }
+
+  html[data-theme="light"] body .header .header-iconAction.active {
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.42), rgba(255, 255, 255, 0) 28%),
+      linear-gradient(180deg, rgba(0, 214, 180, 0.26), rgba(0, 194, 208, 0.12)) !important;
+    border-color: rgba(0, 158, 96, 0.32) !important;
+      color: #067b88 !important;
+      box-shadow:
+        0 10px 22px rgba(0, 158, 96, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
+    }
+
+  /* On admin page: disable backdrop-filter on header for scroll performance and provide solid background */
+  html:has(.admin-page) .header,
+  html:has(.admin-page) .site-header,
+  html:has(.app-main-admin) .header,
+  html:has(.app-main-admin) .site-header {
+    backdrop-filter: none !important;
+  }
+  
+  html[data-theme="light"] html:has(.admin-page) .header,
+  html[data-theme="light"] html:has(.admin-page) .site-header,
+  html[data-theme="light"] html:has(.app-main-admin) .header,
+  html[data-theme="light"] html:has(.app-main-admin) .site-header {
+    background: linear-gradient(180deg, rgba(251, 254, 255, 1), rgba(238, 247, 251, 1) 58%, rgba(228, 241, 247, 1) 100%) !important;
+  }
+
+  html[data-theme="dark"] html:has(.admin-page) .header,
+  html[data-theme="dark"] html:has(.admin-page) .site-header,
+  html[data-theme="dark"] html:has(.app-main-admin) .header,
+  html[data-theme="dark"] html:has(.app-main-admin) .site-header {
+    background: linear-gradient(180deg, rgba(17, 29, 58, 1), rgba(8, 14, 31, 1) 55%, rgba(4, 8, 21, 1) 100%) !important;
+  }
+}
+
+/* ─── Mobile checkout: pure CSS class-swap animation (zero JS overhead) ─── */
+@media (max-width: 720px) {
+  /* Backdrop */
+  .checkout-backdrop-mobile {
+    opacity: 0;
+    transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+    /* No backdrop-filter — pure clean translucent dimming */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+
+  .checkout-backdrop-mobile.checkout-mobile-open {
+    opacity: 1;
+    transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .checkout-backdrop-mobile.checkout-mobile-closing {
+    opacity: 0;
+    transition: opacity 0.44s cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* Drawer: matches desktop timing & physics: 0.6s entry, 0.46s exit, matching scale & opacity */
+  .checkout-drawer.checkout-mobile-entering {
+    transform: translate3d(0, 100%, 0) scale(0.992);
+    opacity: 0.72;
+    transition: none;
+    /* Strip all expensive properties during animation */
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .checkout-drawer.checkout-mobile-open {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+    transition:
+      transform 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+      scale 0.52s cubic-bezier(0.22, 1, 0.36, 1),
+      opacity 0.3s ease-out;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.2) !important;
+  }
+
+  .checkout-drawer.checkout-mobile-closing {
+    transform: translate3d(0, 100%, 0) scale(0.994);
+    opacity: 0.68;
+    transition:
+      transform 0.46s cubic-bezier(0.32, 0.72, 0, 1),
+      scale 0.38s ease-in-out,
+      opacity 0.34s ease-in;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    box-shadow: none !important;
+  }
+
+  .checkout-drawer {
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    will-change: transform;
+    transform: translateZ(0);
+    backface-visibility: hidden;
+    contain: layout style;
+  }
+
+  .checkout-backdrop,
+  .checkout-backdrop-mobile {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(0, 0, 0, 0.55) !important;
+    will-change: opacity;
+    contain: paint;
+  }
+
+  .checkout-drawerBody {
+    contain: content;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+  }
+
+  .checkout-drawer::before {
+    display: none;
+  }
+
+  .checkout-panel,
+  .checkout-summary,
+  .checkout-main {
+    backdrop-filter: none !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .hx-live-badge {
+    backdrop-filter: none !important;
+  }
+
+  /* Standard document flow on mobile — matching desktop */
+  .hx-hero {
+    contain: none !important;
+  }
+}
+
+/* Home page: kill expensive gradients/shadows on product tiles in lite mode */
+[data-motion="lite"] .home-page .product-tile {
+  background: var(--skeu-panel-bg, rgba(11, 18, 32, 0.96)) !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  transition-duration: 120ms !important;
+}
+[data-motion="lite"] .home-page .product-tile-tiltWrap {
+  will-change: auto !important;
+}
+[data-motion="lite"] .home-page .product-tile-price {
+  text-shadow: none !important;
+}
+[data-motion="lite"] .home-page .home-howCard {
+  background: var(--skeu-panel-bg, rgba(11, 18, 32, 0.96)) !important;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  transition: transform 0.15s ease !important;
+}
+[data-motion="lite"] .home-page .home-howCard-icon {
+  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.06)) !important;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+  transition: transform 0.12s ease !important;
+}
+[data-motion="lite"] .home-page .home-tileSkeleton::after {
+  will-change: auto !important;
+}
+/* State pages: kill expensive effects in lite mode */
+[data-motion="lite"] .checkout-page .checkout-panel,
+[data-motion="lite"] .pay-page .pay-stageCard,
+[data-motion="lite"] .status-page .st-card {
+  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: none !important;
+}
+[data-motion="lite"] .pay-page .pay-qrisFrame {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+}
+[data-motion="lite"] .pay-page .pay-confirmModal,
+[data-motion="lite"] .pay-page .pay-confirmOverlay,
+[data-motion="lite"] .pay-page .pay-successModal,
+[data-motion="lite"] .pay-page .pay-zoomOverlay,
+[data-motion="lite"] .status-page .st-statePill {
+  backdrop-filter: none !important;
+}
+[data-motion="lite"] .pay-page .pay-card {
+  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  backdrop-filter: none !important;
+}
+
+/* Home hero: keep lite mode cheap */
+[data-motion="lite"] .hx-live-badge {
+  backdrop-filter: none !important;
+}
+[data-motion="lite"] .hx-stat-item {
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+}
+
+/* Product Detail: strip all expensive effects in lite mode */
+[data-motion="lite"] .detail-page-v3 .pdx-topCard {
+  backdrop-filter: none !important;
+  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-heroPanel,
+[data-motion="lite"] .detail-page-v3 .pdx-summaryPanel,
+[data-motion="lite"] .detail-page-v3 .pdx-variantsSection,
+[data-motion="lite"] .detail-page-v3 .pdx-packCard,
+[data-motion="lite"] .detail-page-v3 .pdx-variantCard,
+[data-motion="lite"] .detail-page-v3 .pdx-infoTabsCard,
+[data-motion="lite"] .detail-page-v3 .pdx-flowCard {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  transition: border-color 0.15s ease !important;
+  will-change: auto !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-productIcon,
+[data-motion="lite"] .detail-page-v3 .pdx-chip,
+[data-motion="lite"] .detail-page-v3 .pdx-stockPill,
+[data-motion="lite"] .detail-page-v3 .pdx-qtyBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-benefitToggle,
+[data-motion="lite"] .detail-page-v3 .pdx-benefitToggle-modern,
+[data-motion="lite"] .detail-page-v3 .pdx-compareBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-iconBtn,
+[data-motion="lite"] .detail-page-v3 .pdx-variantBadge {
+  box-shadow:
+    0 3px 8px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  background: var(--skeu-control-bg) !important;
+}
+[data-motion="lite"] .detail-page-v3 {
+  contain: layout style;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 220px;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile {
+  box-shadow:
+    0 4px 12px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  will-change: auto !important;
+  transform: none !important;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 160px;
+  contain: layout paint style;
+  perspective: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile::after,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile::before {
+  display: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-pill,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-typeBadge,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-arrow,
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-favBtn {
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-liveViewersDot,
+[data-motion="lite"] .detail-page-v3 .pdx-stockUrgency,
+[data-motion="off"] .detail-page-v3 .pdx-liveViewersDot,
+[data-motion="off"] .detail-page-v3 .pdx-stockUrgency {
+  animation: none !important;
+}
+[data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-tiltWrap {
+  will-change: auto !important;
+  transform: none !important;
+  transform-style: flat !important;
+}
+
+/* Mobile typography hierarchy */
+@media (max-width: 720px) {
+  h1, .h1, .nf-title, .checkout-full-title, .st-emptyTitle {
+    font-size: clamp(22px, 6.4vw, 34px) !important;
+  }
+  h2, .h2, .oh-title, .faq-title, .home-title {
+    font-size: clamp(18px, 5.6vw, 28px) !important;
+  }
+  h3, .h3, .oh-orderCode {
+    font-size: clamp(15px, 4.8vw, 20px) !important;
+  }
+  p, .p, body, .oh-sub, .st-emptyText, .faq-itemBody p {
+    font-size: clamp(13px, 4vw, 15px) !important;
+  }
+  .kicker, .oh-kicker, .faq-kicker, .st-kicker, .caption, small {
+    font-size: clamp(10px, 3.2vw, 12px) !important;
+  }
+}
+
+/* ─── iPad / tablet: restore frosted-glass overlays (721–1024px) ─────────── */
+@media (min-width: 721px) and (max-width: 1024px) {
+  .header,
+  .site-header {
+    backdrop-filter: blur(16px) saturate(130%) !important;
+  }
+
+  .catalog-sheetBackdrop.is-open {
+    backdrop-filter: blur(18px) saturate(140%) !important;
+  }
+
+  .catalog-filterShell {
+    backdrop-filter: blur(20px) saturate(145%) !important;
+  }
+}

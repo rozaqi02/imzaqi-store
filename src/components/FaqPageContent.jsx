@@ -25,8 +25,8 @@ const FAQ_ITEMS = [
     category: "payment",
     question: "Gimana cara bayarnya?",
     answer: [
-      "Pilih produk + varian, lanjut ke halaman bayar.",
-      "Scan QRIS sesuai total, konfirmasi, dapet ID order.",
+      "Pilih paket, isi kontak di checkout, lalu lanjut ke QRIS.",
+      "Bayar sesuai total, tekan Saya sudah bayar, lalu simpan ID pesanan setelah konfirmasi berhasil.",
     ],
     tags: ["qris", "bayar", "payment", "scan"],
   },
@@ -36,7 +36,7 @@ const FAQ_ITEMS = [
     question: "QRIS-nya kok gak muncul?",
     answer: [
       "Biasanya karena kontak belum valid atau email aktivasi belum lengkap.",
-      "Lengkapi nomor WhatsApp & email buyer (kalo paket butuh email) di halaman bayar, nanti QRIS kebuka otomatis.",
+      "Lengkapi WhatsApp dan email aktivasi jika paket memerlukannya. QRIS akan tampil setelah kontak valid.",
     ],
     tags: ["qris", "locked", "email", "catatan"],
   },
@@ -45,8 +45,8 @@ const FAQ_ITEMS = [
     category: "payment",
     question: "Pakai promo, total auto kepotong?",
     answer: [
-      "Iya, kalo promo valid potongan langsung keitung di checkout & status.",
-      "Kalo promo gak cocok, sistem bakal ngasih tau dan total balik normal.",
+      "Ya. Masukkan kode di checkout untuk melihat potongan dan total akhirnya.",
+      "Jika promo tidak berlaku, periksa pesannya sebelum melanjutkan pembayaran.",
     ],
     tags: ["promo", "diskon", "checkout"],
   },
@@ -55,8 +55,8 @@ const FAQ_ITEMS = [
     category: "order",
     question: "Udah bayar, terus gimana?",
     answer: [
-      "Klik tombol 'Saya Sudah Bayar' setelah scan QRIS, lalu simpan ID order yang muncul.",
-      "Kalo mau lebih cepet diproses, kirim bukti transfer ke WhatsApp admin.",
+      "Setelah pembayaran berhasil di aplikasi bank atau e-wallet, tekan Saya sudah bayar dan selesaikan konfirmasi.",
+      "Simpan ID pesanan yang muncul. Konfirmasi ini belum berarti pembayaran terverifikasi; admin akan memeriksanya sebelum memproses pesanan.",
     ],
     tags: ["id order", "status", "setelah bayar", "qris"],
   },
@@ -65,8 +65,8 @@ const FAQ_ITEMS = [
     category: "order",
     question: "Format ID order kayak gimana?",
     answer: [
-      "Format baru memakai 8 karakter acak, misalnya IMZ-ABCD1234.",
-      "Ketik delapan karakter ID setelah awalan IMZ-. Contoh: IMZ-ABCD1234.",
+      "ID pesanan terdiri dari awalan IMZ- dan 8 karakter, misalnya IMZ-ABCD1234.",
+      "Salin ID dari konfirmasi pesanan, lalu tempel di halaman Cek status.",
     ],
     tags: ["format", "id", "imz"],
   },
@@ -95,8 +95,8 @@ const FAQ_ITEMS = [
     category: "product",
     question: "Stok di website real-time gak?",
     answer: [
-      "Iya, stok berkurang otomatis setiap ada order baru.",
-      "Kalo varian yang kamu mau habis, tunggu restock atau tanyain ke admin via WhatsApp.",
+      "Stok diperiksa kembali ketika pesanan dibuat. Angka di katalog dapat berubah saat pembeli lain memesan.",
+      "Jika paket habis, pilih paket lain atau tanyakan jadwal stok ke admin.",
     ],
     tags: ["stok", "real-time", "checkout"],
   },
@@ -115,8 +115,8 @@ const FAQ_ITEMS = [
     category: "account",
     question: "Kenapa beberapa varian wajib isi email?",
     answer: [
-      "Beberapa layanan butuh email buyer buat aktivasi akun.",
-      "Varian yang mewajibkan bakal nampilin petunjuk otomatis di halaman bayar.",
+      "Beberapa layanan menggunakan emailmu untuk aktivasi atau undangan paket.",
+      "Isi kolom Email aktivasi di checkout jika paket memerlukannya. Kamu dapat memeriksanya lagi sebelum bayar.",
     ],
     tags: ["email buyer", "aktivasi", "requires_buyer_email"],
   },
@@ -125,8 +125,8 @@ const FAQ_ITEMS = [
     category: "account",
     question: "Catatan pembeli dipakai buat apa?",
     answer: [
-      "Buat info khusus kayak email aktivasi, preferensi, atau request tambahan.",
-      "Catatan bantu admin proses order lebih cepet & akurat.",
+      "Gunakan untuk permintaan atau informasi tambahan yang relevan dengan pesanan.",
+      "Email aktivasi tetap diisi di kolom email, bukan di catatan.",
     ],
     tags: ["catatan", "notes", "buyer"],
   },
@@ -169,15 +169,15 @@ const HOWTO_STEPS = [
   {
     num: "03",
     icon: ClipboardList,
-    title: "Simpen ID",
-    desc: "Simpan ID aman seperti IMZ-ABCD1234 yang muncul saat stok dikunci.",
+    title: "Simpan ID",
+    desc: "Setelah membayar, konfirmasikan pembayaran dan simpan ID pesanan yang muncul.",
     to: "/status",
   },
   {
     num: "04",
     icon: CircleCheck,
-    title: "Pantau progress",
-    desc: "Masukin ID di halaman Status - update real-time.",
+    title: "Pantau pesanan",
+    desc: "Masukkan ID di halaman Status untuk melihat verifikasi dan proses pesanan.",
     to: "/status",
   },
 ];
@@ -303,7 +303,7 @@ export default function FaqPageContent() {
     const context = query.trim() ? ` Saya tadi mencari: “${query.trim()}”.` : "";
     const message = encodeURIComponent(`Halo Admin Imzaqi Store, saya mau tanya terkait order/produk.${context}`);
     return `https://wa.me/${waNumber}?text=${message}`;
-  }, [waNumber]);
+  }, [waNumber, query]);
 
   return (
     <div className="help-page">
@@ -314,36 +314,23 @@ export default function FaqPageContent() {
               <BannerGraphic name="headset_support" height={22} className="help-mascot" />
               <CircleHelp size={16} /> PUSAT BANTUAN
             </span>
-            <h1>Biar jelas.<br /><span>Biar tenang.</span></h1>
-            <p>Dari pilih paket sampai akun aktif. Temukan jawabanmu dan lanjut belanja tanpa bingung.</p>
+            <h1>Ada yang ingin <span>ditanyakan?</span></h1>
+            <p>Cari jawaban tentang pembayaran, paket, dan pesananmu.</p>
             <div className="help-search">
               <Search size={21} aria-hidden="true" />
               <input value={query} onChange={(e) => handleQueryChange(e.target.value)} placeholder="Cari QRIS, promo, aktivasi…" aria-label="Cari FAQ" type="search" />
               {query && <button type="button" onClick={() => handleQueryChange("")} aria-label="Hapus pencarian"><X size={18} /></button>}
             </div>
-            <div className="help-popular"><span>Sering dicari:</span>{["QRIS", "ID order", "email"].map(term => <button key={term} type="button" onClick={() => { handleQueryChange(term); setActiveCategory("all"); }}>{term}</button>)}</div>
-          </div>
-          <div className="help-heroAside">
-            <span className="help-asideLabel">BELANJA LEBIH NYAMAN</span>
-            <div className="help-heroSymbol" aria-hidden="true"><MessageCircle size={68} strokeWidth={1.4} /><span><CircleCheck size={26} /></span></div>
-            <h2>Ada jawaban.<br />Ada yang bantu.</h2>
-            <p>Cari panduan di sini, atau ngobrol langsung dengan admin.</p>
-            <a className="hx-btn-primary" href={waUrl} target="_blank" rel="noreferrer">Tanya admin <ArrowUpRight size={18} /></a>
+            <div className="help-popular"><span>Sering dicari:</span>{["QRIS", "ID order", "email"].map(term => <button className="btn btn-ghost btn-sm" key={term} type="button" onClick={() => { handleQueryChange(term); setActiveCategory("all"); }}>{term}</button>)}</div>
           </div>
         </header>
 
-        {!query.trim() && activeCategory === "all" ? (
-          <section className="help-popularAnswers" aria-labelledby="help-popular-title">
-            <div className="help-listHead"><div><span className="help-eyebrow">PALING SERING DIBUTUHKAN</span><h2 id="help-popular-title">Jawaban cepat.</h2></div></div>
-            <div className="help-list">{FAQ_ITEMS.slice(0, 3).map(item => <FaqItem key={item.id} item={item} idPrefix="popular-faq" open={item.id === openId} onToggle={handleToggle} />)}</div>
-          </section>
-        ) : null}
 
         <div className="help-workspace">
           <aside className="help-sidebar">
             <span className="help-eyebrow">JELAJAHI TOPIK</span>
             <div className="help-categories" role="group" aria-label="Filter kategori FAQ">
-              {FAQ_CATEGORIES.map(category => <button key={category.key} type="button" aria-pressed={category.key === activeCategory} onClick={() => setActiveCategory(category.key)}><span>{category.label}</span>{" "}<span className="help-count">{categoryCounts[category.key] || 0}</span></button>)}
+              {FAQ_CATEGORIES.map(category => <button className="btn btn-ghost" key={category.key} type="button" aria-pressed={category.key === activeCategory} onClick={() => setActiveCategory(category.key)}><span>{category.label}</span>{" "}<span className="help-count">{categoryCounts[category.key] || 0}</span></button>)}
             </div>
             <Link className="help-orderLink" to="/status"><ClipboardList size={22} /><span><strong>Sudah punya order?</strong><small>Pantau status pesananmu</small></span><ArrowUpRight size={18} /></Link>
           </aside>
@@ -353,10 +340,11 @@ export default function FaqPageContent() {
           </section>
         </div>
 
-        <section className="help-howto" aria-labelledby="help-howto-title">
+        <details className="help-howto">
+          <summary>Pertama kali belanja? Lihat langkahnya</summary>
           <div className="help-sectionHead"><div><span className="help-eyebrow">BARU PERTAMA BELANJA?</span><h2 id="help-howto-title">Dari pilih sampai siap pakai.</h2></div><Link to="/produk">Jelajahi produk <ArrowUpRight size={18} /></Link></div>
           <div className="help-steps">{HOWTO_STEPS.map(step => { const Icon = step.icon; return <div className="help-step" key={step.num}><div className="help-stepTop"><Icon size={23} /><span>{step.num}</span></div><h3>{step.title}</h3><p>{step.desc}</p></div>; })}</div>
-        </section>
+        </details>
 
         <section className="help-support" aria-labelledby="help-support-title">
           <div className="help-supportIcon"><ShieldCheck size={30} /></div><div><span className="help-eyebrow">KAMI BANTU SAMPAI JELAS</span><h2 id="help-support-title">Masih ada yang mengganjal?</h2><p>Kirim ID order dan ceritakan kendalamu. Jangan bagikan password atau kode OTP saat meminta bantuan.</p></div><a className="help-button" href={waUrl} target="_blank" rel="noreferrer"><MessageCircle size={18} /> Chat admin</a>

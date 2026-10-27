@@ -55,7 +55,7 @@ html[data-theme="light"] .product-tile-face {
 }
 
 .catalog-emptyResult .empty-icon-component {
-  color: var(--accent, #00d6b4);
+  color: var(--accent);
 }
 
 .catalog-searchHistoryHead {

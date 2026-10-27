@@ -1,9 +1,11 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
+  Crown,
   Eye,
   Package,
+  PackageCheck,
   ShoppingBag,
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
@@ -42,14 +44,15 @@ function ActiveShoppersBadge() {
   }, []);
 
   return (
-    <span className="hx-live-badge">
-      <span className="hx-live-eye" aria-hidden="true">
-        <Eye size={14} strokeWidth={2.4} className="hx-live-eye-icon" />
+    <div className="hx-stat-item hx-stat-item--live">
+      <span className="hx-stat-icon-wrap" aria-hidden="true">
+        <Eye size={15} strokeWidth={2.4} className="hx-stat-icon hx-live-eye-icon" />
       </span>
-      <span>
-        <strong>{activeShoppers}</strong> pembeli online
-      </span>
-    </span>
+      <div className="hx-stat-meta">
+        <span className="hx-stat-val">{activeShoppers}</span>
+        <span className="hx-stat-label">Pembeli Online</span>
+      </div>
+    </div>
   );
 }
 
@@ -90,9 +93,96 @@ function HeroStatsRow({ activeProductCount }) {
 }
 
 /* ── Main Hero ── */
+const HERO_LOGO_SCROLL_RANGE = 75;
+const HEADLINE_WORDS = ["Akses", "Premium", "Budget", "Pelajar"];
+
+function useHeroVisibility() {
+  // Latching entrance state: starts active immediately if page is visible,
+  // or triggers once when a background tab becomes active. Never un-mounts or replays.
+  const [active, setActive] = useState(() => {
+    if (typeof document === "undefined") return true;
+    return !document.hidden;
+  });
+
+  useEffect(() => {
+    if (active) return undefined;
+
+    const handleVisible = () => {
+      if (!document.hidden) {
+        setActive(true);
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisible);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisible);
+    };
+  }, [active]);
+
+  return active;
+}
+
+function HeroHeadline({ active = true, reduced = false } = {}) {
+  const words = HEADLINE_WORDS.map((word, index) => {
+    const isGradient = index % 2 === 1;
+    return (
+      <span className="hx-headline-mask" key={word}>
+        <span
+          className={`hx-headline-word hx-word-${index}${isGradient ? " hx-headline-gradient" : ""}`}
+          style={{ "--w": index }}
+        >
+          {word}
+        </span>
+      </span>
+    );
+  });
+
+  return (
+    <h1
+      className={`hx-headline hx-headline--kinetic${reduced ? " hx-headline--static" : " hx-headline--enter"}`}
+      aria-label="Akses Premium Budget Pelajar"
+    >
+      <span className="hx-headline-line" aria-hidden="true">
+        {words[0]}{" "}{words[1]}
+      </span>
+      <span className="hx-headline-line" aria-hidden="true">
+        {words[2]}{" "}{words[3]}
+      </span>
+    </h1>
+  );
+}
+
 export default function Hero({ products = [] }) {
   const caps = useDeviceCapability();
   const isMotionReduced = caps.isReducedMotion || caps.saveData || caps.lowMemory;
+  const logoRef = useRef(null);
+  const heroRef = useRef(null);
+  const entranceActive = useHeroVisibility(heroRef);
+
+  useEffect(() => {
+    const logo = logoRef.current;
+    if (!logo || typeof window === "undefined") return undefined;
+
+    let frame = 0;
+    const syncLogo = () => {
+      frame = 0;
+      const progress = Math.min(1, Math.max(0, window.scrollY / HERO_LOGO_SCROLL_RANGE));
+      logo.style.setProperty("--logo-progress", progress.toFixed(3));
+    };
+    const onScroll = () => {
+      if (!frame) frame = requestAnimationFrame(syncLogo);
+    };
+
+    syncLogo();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
 
   const activeProductCount = useMemo(
     () =>
@@ -103,44 +193,23 @@ export default function Hero({ products = [] }) {
   );
 
   return (
-    <section className="hx-hero" aria-label="Marketplace Hero">
+    <section ref={heroRef} className="hx-hero hx-hero--choreographed" data-hero-active={entranceActive} data-hero-reduced={isMotionReduced} aria-label="Marketplace Hero">
       <HeroCatalogBackdrop products={products} />
       <div className="hx-hero-scrim" aria-hidden="true" />
+      <Link ref={logoRef} to="/" className="hx-hero-logo" aria-label="Imzaqi Store">
+        <img src="/icon.png" alt="Imzaqi Store" />
+      </Link>
       <div className="container">
         <div className="hx-stage">
           <div className="hx-main">
             <div className="hx-eyebrow-row">
-              <ActiveShoppersBadge />
+              <span className="hx-eyebrow">
+                <Crown size={13} aria-hidden="true" />
+                Marketplace langganan premium
+              </span>
             </div>
 
-            <h1
-              className={`hx-headline${isMotionReduced ? " hx-headline--static" : " hx-headline--enter"}`}
-            >
-              <span className="hx-headline-line">
-                <span className="hx-headline-mask">
-                  <span className="hx-headline-word" style={{ "--w": 0 }}>
-                    Akses
-                  </span>
-                </span>{" "}
-                <span className="hx-headline-mask">
-                  <span className="hx-headline-word hx-headline-gradient" style={{ "--w": 1 }}>
-                    Premium
-                  </span>
-                </span>
-              </span>
-              <span className="hx-headline-line">
-                <span className="hx-headline-mask">
-                  <span className="hx-headline-word" style={{ "--w": 2 }}>
-                    Budget
-                  </span>
-                </span>{" "}
-                <span className="hx-headline-mask">
-                  <span className="hx-headline-word hx-headline-gradient" style={{ "--w": 3 }}>
-                    Pelajar
-                  </span>
-                </span>
-              </span>
-            </h1>
+             <HeroHeadline active={entranceActive} reduced={isMotionReduced} />
 
             <p className="hx-subtitle">
               Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
@@ -152,10 +221,15 @@ export default function Hero({ products = [] }) {
                 <span>Gas Lihat Katalog</span>
                 <ArrowRight size={15} aria-hidden="true" />
               </Link>
+              <Link className="hx-btn-secondary" to="/status">
+                <PackageCheck size={15} aria-hidden="true" />
+                <span>Cek Status</span>
+              </Link>
             </div>
           </div>
 
           <div className="hx-stats-row" aria-label="Statistik toko">
+            <ActiveShoppersBadge />
             <HeroStatsRow activeProductCount={activeProductCount} />
           </div>
         </div>

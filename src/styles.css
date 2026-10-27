@@ -9,12 +9,9 @@
 @import "./css/global.css";
 @import "./css/theme-variables.css";
 @import "./css/theme-consolidated.css";
-@import "./css/motion-enhancements.css";
-@import "./css/motion-ux.css";
-@import "./css/motion-adaptive.css";
+@import "./css/motion.css";
 @import "./css/polish.css";
-@import "./css/overrides-v3.css";
-@import "./css/visual-ui.css";
+@import "./css/overrides.css";
 @import "./css/fab-stack.css";
 @import "./css/bottom-nav.css";
 @import "./css/light-mode-cards.css";
@@ -40,7 +37,6 @@
 /* Shared components */
 @import "./components/AcademicPopup.css";
 @import "./components/AbandonedCartBanner.css";
-@import "./components/CheckoutTrustBlock.css";
 @import "./components/FlashSalePopup.css";
 @import "./components/HeroCatalogBackdrop.css";
 @import "./components/NewProductPopup.css";
@@ -55,4 +51,10 @@
 @import "./css/storefront-spacing.css";
 @import "./css/storefront-refinements.css";
 @import "./css/background-texture.css";
+@import "./css/header-nav.css";
+@import "./css/user-redesign.css";
+@import "./css/buttons.css";
+@import "./css/page-transitions.css";
+@import "./css/home-polish.css";
+
 

@@ -20,12 +20,6 @@ html[data-theme] body .header .header-iconAction::after {
   display: none;
 }
 
-@media (min-width: 861px) {
-  .header .promo-ticker--mobileStack {
-    display: none;
-  }
-}
-
 @media (max-width: 860px) {
   body:has(.pdx-mobileProductBar) {
     overflow-x: clip;
@@ -149,8 +143,8 @@ html[data-theme] body .header .header-iconAction::after {
   .pdx-mobileProductBar {
     position: fixed !important;
     top: calc(var(--site-header-offset, 64px) + 8px);
-    left: 12px;
-    right: 12px;
+    left: max(var(--storefront-gutter, 16px), env(safe-area-inset-left, 0px)) !important;
+    right: max(var(--storefront-gutter, 16px), env(safe-area-inset-right, 0px)) !important;
     z-index: 998 !important;
     display: grid !important;
     grid-template-columns: 40px minmax(0, 1fr) 40px !important;
@@ -203,7 +197,7 @@ html[data-theme] body .header .header-iconAction::after {
   html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-mobileProductBar,
   html[data-theme="dark"] .pdx-mobileProductBar {
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
-    background: linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
+    background: var(--brand-surface) !important;
     color: #f1f5f9 !important;
     box-shadow:
       0 16px 36px rgba(0, 0, 0, 0.5),
@@ -223,7 +217,7 @@ html[data-theme] body .header .header-iconAction::after {
     pointer-events: auto !important;
     transform: translateY(0) !important;
     border: 1px solid rgba(255, 255, 255, 0.14) !important;
-    background: linear-gradient(180deg, #111d3a 0%, #080e1f 55%, #040815 100%) !important;
+    background: var(--brand-surface) !important;
     box-shadow:
       0 20px 44px rgba(0, 0, 0, 0.6),
       0 8px 20px rgba(0, 10, 28, 0.4),

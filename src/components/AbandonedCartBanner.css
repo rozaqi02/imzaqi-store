@@ -21,7 +21,7 @@ html[data-theme="light"] .abandoned-cart-banner {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 28%),
     var(--skeu-panel-bg, rgba(255, 255, 255, 0.94));
-  border-color: rgba(0, 138, 148, 0.16);
+  border-color: rgba(0, 158, 96, 0.16);
 }
 
 .abandoned-cart-copy {
@@ -40,6 +40,7 @@ html[data-theme="light"] .abandoned-cart-banner {
 }
 
 .abandoned-cart-dismiss {
+  position: relative;
   width: 30px;
   height: 30px;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
@@ -52,6 +53,14 @@ html[data-theme="light"] .abandoned-cart-banner {
   display: grid;
   place-items: center;
   cursor: pointer;
+}
+
+/* Expand the tap target to 44px without growing the visual chip */
+.abandoned-cart-dismiss::after {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  border-radius: 12px;
 }
 
 @media (min-width: 721px) {

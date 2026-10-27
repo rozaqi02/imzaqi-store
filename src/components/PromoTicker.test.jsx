@@ -68,15 +68,21 @@ describe("PromoTicker", () => {
     });
   }
 
-  it("offers both banners with the second row marked as mobile-only during flash sales", async () => {
+  it("shows one banner at a time and rotates to the promo-code slot after 8 seconds", async () => {
     await renderTicker();
 
     expect(screen.getByText(/Flash sale/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Gemini AI Pro · 30 Hari" })).toHaveAttribute("href", "/produk/gemini-ai-pro");
     expect(screen.getByText(/-38%/)).toBeInTheDocument();
-    expect(screen.getByRole("region", { name: "Kode promo" })).toHaveClass("promo-ticker--mobileStack");
+    expect(screen.queryByRole("region", { name: "Kode promo" })).toBeNull();
+
+    act(() => {
+      vi.advanceTimersByTime(8000);
+    });
+
+    expect(screen.queryByRole("region", { name: "Flash sale" })).toBeNull();
+    expect(screen.getByRole("region", { name: "Kode promo" })).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Salin kode promo HEMAT20" })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "Gemini AI Pro · 30 Hari" })).toBeInTheDocument();
   });
 
   it("dismisses each banner independently and remembers it for the session", async () => {

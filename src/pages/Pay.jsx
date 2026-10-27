@@ -30,7 +30,6 @@ const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
 const BUYER_EMAIL_REQUIREMENT_REGEX =
   /(akun\s*buyer|buyer\s*akun|email\s*(buyer|pembeli)|wajib\s*email|butuh\s*email|email\s*aktivasi|aktivasi\s*akun|account\s*activation|send\s*email)/i;
 const COPY_TIMEOUT_MS = 1800;
-const QRIS_UNLOCK_TIMEOUT_MS = 700;
 const STORAGE_KEY_BUYER_EMAIL = "imzaqi_last_buyer_email";
 const STORAGE_KEY_NOTES = "imzaqi_last_notes";
 const PRODUCT_NAME_MAX_LEN = 24;
@@ -245,10 +244,9 @@ export default function Pay() {
   const [productIconLookup, setProductIconLookup] = useState({});
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [isZoomed, setIsZoomed] = useState(false);
-  const [qrisJustUnlocked, setQrisJustUnlocked] = useState(false);
   const [qrisShownAt, setQrisShownAt] = useState(null);
-  const prevCanShowQrisRef = useRef(false);
   const contactCardRef = useRef(null);
+  const contactDetailsRef = useRef(null);
   const buyerEmailRef = useRef(null);
   const focusTimerRef = useRef(null);
   const showPayCta = !ok && items.length > 0;
@@ -409,22 +407,11 @@ export default function Pay() {
   const qrisTimerActive = canShowQris && !isFreeOrder && qris.mode !== "idle";
   const qrisTimer = useQrisTimer(qrisTimerActive);
 
-  useEffect(() => {
-    if (!prevCanShowQrisRef.current && canShowQris && !isFreeOrder) {
-      setQrisJustUnlocked(true);
-      const timer = window.setTimeout(() => setQrisJustUnlocked(false), QRIS_UNLOCK_TIMEOUT_MS);
-      prevCanShowQrisRef.current = canShowQris;
-      return () => window.clearTimeout(timer);
-    }
-    prevCanShowQrisRef.current = canShowQris;
-    return undefined;
-  }, [canShowQris, isFreeOrder]);
-
   const isDynamicQris = qris.mode === "dynamic";
   const qrisFootText = !hasValidWhatsApp
     ? "Masukkan nomor WhatsApp di formulir sebelah untuk konfirmasi pesanan."
     : missingBuyerEmailNote
-      ? "Lengkapi email buyer agar aktivasi akun lancar."
+      ? "Lengkapi email aktivasi untuk paket ini."
       : isDynamicQris
         ? "Nominal QR sudah otomatis sesuai total tagihan."
         : "QR statis aktif. Bayar sesuai total di ringkasan.";
@@ -568,7 +555,7 @@ export default function Pay() {
       return;
     }
     if (missingBuyerEmailNote) {
-      const text = "Item tertentu perlu email buyer. Isi email buyer di catatan dulu.";
+      const text = "Paket ini memerlukan email aktivasi. Lengkapi kolom email pembeli terlebih dahulu.";
       setErrorText(text);
       toast.error(text);
       return;
@@ -714,10 +701,11 @@ export default function Pay() {
   const payCtaHint = !hasValidWhatsApp
     ? "Isi WhatsApp dulu"
     : missingBuyerEmailNote
-      ? "Lengkapi email buyer"
+      ? "Lengkapi email aktivasi"
       : null;
 
   function focusBlockingField() {
+    if (contactDetailsRef.current) contactDetailsRef.current.open = true;
     if (!hasValidWhatsApp) {
       contactCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
       if (focusTimerRef.current) window.clearTimeout(focusTimerRef.current);
@@ -809,6 +797,17 @@ export default function Pay() {
             <span className="pay-shell-kicker">QRIS aman & instan</span>
             <h1 className="h1 pay-shell-title hero-anim-title">Selesaikan pembayaran.</h1>
             <p className="pay-shell-sub hero-anim-sub">Scan QRIS dengan aplikasi m-banking atau e-wallet pilihanmu.</p>
+            <span
+              className={`pay-shell-status${isFreeOrder ? " is-free" : qrisTimer.expired ? " is-expired" : ""}`}
+              role="status"
+              aria-live="polite"
+            >
+              {isFreeOrder
+                ? "Order gratis — tinggal konfirmasi"
+                : qrisTimer.expired
+                  ? "Sesi QR berakhir — muat ulang QR"
+                  : "Menunggu pembayaran"}
+            </span>
           </div>
         </div>
 
@@ -818,22 +817,27 @@ export default function Pay() {
 
         {items.length > 0 ? (
           <div className="container pay-order-mobileWrap">
-            <aside className="card pad pay-card pay-orderMobileCard reveal">
-              <div className="pay-orderHead">
+            <details className="card pad pay-card pay-orderMobileCard">
+              <summary className="pay-orderHead">
                 <div>
                   <div className="pay-orderKicker">Ringkasan pesanan</div>
-                  <div className="pay-orderTitle">{itemCount} item</div>
+                   <div className="pay-orderTitle">{itemCount} item · Lihat rincian</div>
                 </div>
                 {promoPercent ? <span className="pay-orderPromo">{promo?.code}</span> : null}
-              </div>
+              </summary>
               {renderOrderSummaryContent()}
-            </aside>
+            </details>
           </div>
         ) : null}
 
         <div className="container pay-shell-grid">
           <div className="pay-mainStack">
-            <section ref={contactCardRef} className="card pad pay-card pay-contactCard reveal" style={{ transitionDelay: "90ms" }}>
+            <section ref={contactCardRef} className="card pad pay-card pay-contactCard">
+              <details ref={contactDetailsRef} open={!hasValidWhatsApp || missingBuyerEmailNote}>
+                <summary className="pay-contactSummary">
+                  <span><strong>Kontak pesanan</strong><span>{customerWhatsApp || "Lengkapi WhatsApp"}</span>{requiresBuyerEmailNote ? <span>{buyerEmail || "Lengkapi email aktivasi"}</span> : null}</span>
+                  <span className="pay-contactEdit">Ubah</span>
+                </summary>
               <div className="pay-cardHead">
                 <div>
                   <div className="pay-cardKicker">Tujuan pengiriman</div>
@@ -890,12 +894,14 @@ export default function Pay() {
                   <div id="pay-email-hint" className="pay-emailHintText">
                     {missingBuyerEmailNote
                       ? `${requiredEmailProductsText} butuh email pembeli buat aktivasi akun.`
-                      : "Email pembeli sudah terisi - akun bakal dikirim ke sini."}
+                       : "Email ini digunakan untuk aktivasi paketmu."}
                   </div>
                 </div>
               )}
 
-              <div className="pay-notePanel">
+              </details>
+               <details className="pay-notePanel" open={notes ? true : undefined}>
+                 <summary>Catatan tambahan <span>Opsional</span></summary>
                 <div className="pay-noteHead">
                   <div className="pay-noteLabelWrap">
                     <FileText size={14} aria-hidden="true" />
@@ -918,31 +924,29 @@ export default function Pay() {
 
                 <div className="pay-noteMetaRow">
                   <div className="pay-noteHintText">
-                    Ada request khusus? Tulis di sini, admin bakal baca.
+                     Ada permintaan khusus? Tulis di sini untuk admin.
                   </div>
                   <div className="pay-noteMeta">{notes.length}/400</div>
                 </div>
-              </div>
+              </details>
             </section>
 
             <section className="card pad pay-card pay-stageCard reveal" style={{ transitionDelay: "160ms" }}>
+              <div className="pay-stageHeading">
+                <div className="pay-stageLabel">Total pembayaran</div>
+                <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
+              </div>
               <div className="pay-stageGrid">
                 <div className="pay-stageMeta">
-                  <div className="pay-stageLabel">Total pembayaran</div>
-                  <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
                   <div className="pay-stageHint">
                     {isFreeOrder
                       ? "Promo 100% diterapkan. Tidak perlu bayar, langsung konfirmasi order."
-                      : "Scan QRIS dengan m-banking atau e-wallet (BCA, GoPay, OVO, Dana, ShopeePay), lalu konfirmasi di bawah."}
+                      : "1. Scan atau simpan QRIS. 2. Bayar sesuai nominal. 3. Tekan Saya sudah bayar."}
                   </div>
 
 
 
                   <div className="pay-stageRows">
-                    <div className="pay-stageRow">
-                      <span>Subtotal</span>
-                      <b>{formatIDR(subtotal)}</b>
-                    </div>
                     {discount > 0 ? (
                       <div className="pay-stageRow">
                         <span>Promo ({promo?.code || `${promoPercent}%`})</span>
@@ -965,7 +969,7 @@ export default function Pay() {
 
                 <div className="pay-stageVisual">
                   <div
-                    className={`qris-wrap pay-qrisFrame ${canShowQris && !isFreeOrder ? "" : "is-locked"}${qrisJustUnlocked ? " is-unlocking" : ""}`}
+                    className={`qris-wrap pay-qrisFrame ${canShowQris && !isFreeOrder ? "" : "is-locked"}`}
                   >
                     {isFreeOrder ? (
                       <div className="pay-freePanel">
@@ -999,13 +1003,13 @@ export default function Pay() {
                         {qris.loaded && !qris.failed && !qrisTimer.expired && (
                           <div className={`pay-qrisTimer${qrisTimer.urgent ? " is-urgent" : ""}`} aria-live="polite">
                             <Clock size={13} />
-                            <span>QR valid: <strong>{qrisTimer.label}</strong></span>
+                            <span>Sesi QR: <strong>{qrisTimer.label}</strong></span>
                           </div>
                         )}
                         {qrisTimer.expired && (
                           <div className="pay-qrisTimer is-expired" role="alert">
                             <Clock size={13} />
-                            <span>QR kedaluwarsa - buat QR baru untuk melanjutkan pembayaran</span>
+                            <span>Sesi QR berakhir. Jika belum membayar, muat ulang QR untuk melanjutkan.</span>
                             <button
                               type="button"
                               className="btn btn-sm pay-qrisRefreshBtn"
@@ -1018,6 +1022,11 @@ export default function Pay() {
 
                         {!qris.loaded && !qris.failed ? <QRISSkeleton /> : null}
                         {qris.url ? (
+                          <div className="pay-qrisReticleFrame">
+                            <span className="pay-reticleCorner pay-reticleCorner--tl" aria-hidden="true" />
+                            <span className="pay-reticleCorner pay-reticleCorner--tr" aria-hidden="true" />
+                            <span className="pay-reticleCorner pay-reticleCorner--bl" aria-hidden="true" />
+                            <span className="pay-reticleCorner pay-reticleCorner--br" aria-hidden="true" />
                           <button
                             type="button"
                             className="pay-qrisZoomBtn"
@@ -1042,6 +1051,7 @@ export default function Pay() {
                               }}
                             />
                           </button>
+                        </div>
                         ) : null}
 
                         {!qris.failed && qris.url && !qrisTimer.expired && (
@@ -1079,6 +1089,7 @@ export default function Pay() {
                   <div className={`pay-stageFoot ${canShowQris && !isDynamicQris && !isFreeOrder ? "warning" : ""}`}>
                     {isFreeOrder ? "Promo 100% aktif - tidak ada pembayaran yang diperlukan." : qrisFootText}
                   </div>
+                  {!isFreeOrder ? <p className="pay-sessionHint">Timer adalah batas sesi QR di halaman ini, bukan jaminan reservasi stok. Setelah membayar, konfirmasikan agar admin dapat memeriksa pembayaranmu.</p> : null}
                   {canShowQris && qris.notice && !isFreeOrder ? (
                     <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qris.notice}</div>
                   ) : null}

@@ -24,7 +24,7 @@ export default function AbandonedCartBanner() {
       <BannerGraphic name="rocket_speed" height={22} className="abandoned-cart-mascot" />
       <div className="abandoned-cart-copy">
         <strong>Masih ada {count} item di keranjang</strong>
-        <span>Lanjut checkout sebelum kehabisan stok.</span>
+        <span>Itemmu masih tersimpan, lanjut checkout kapan saja.</span>
       </div>
       <Link
         className="btn btn-sm"
