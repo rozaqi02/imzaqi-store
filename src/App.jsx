@@ -9,6 +9,7 @@ import Confetti from "./components/Confetti";
 import FlashSalePopup from "./components/FlashSalePopup";
 import AcademicPopup from "./components/AcademicPopup";
 import NewProductPopup from "./components/NewProductPopup";
+import { PresenceProvider } from "./context/PresenceContext";
 
 const DEFER_OVERLAY_MS = 2000;
 
@@ -400,21 +401,23 @@ export default function App() {
 
   return (
     <BrowserRouter>
-      <ReferralCapture />
-      <NetworkBridge />
-      {overlayReady ? (
-        <>
-          <Confetti />
-          <StorefrontOverlays />
-        </>
-      ) : null}
-      <AchievementToast />
-      <AbandonedCartBanner />
-      <SwUpdateToast />
-      <ScrollToTop />
-      <RouteProgress />
-      <FloatingOrderStatus />
-      <AppRoutes />
+      <PresenceProvider>
+        <ReferralCapture />
+        <NetworkBridge />
+        {overlayReady ? (
+          <>
+            <Confetti />
+            <StorefrontOverlays />
+          </>
+        ) : null}
+        <AchievementToast />
+        <AbandonedCartBanner />
+        <SwUpdateToast />
+        <ScrollToTop />
+        <RouteProgress />
+        <FloatingOrderStatus />
+        <AppRoutes />
+      </PresenceProvider>
     </BrowserRouter>
   );
 }

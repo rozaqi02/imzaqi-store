@@ -10,38 +10,12 @@ import {
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
 import NumberCounter from "./NumberCounter";
-import { supabase } from "../lib/supabaseClient";
+import { usePresence } from "../context/PresenceContext";
 import { useDeviceCapability } from "../hooks/useIsMobile";
 import HeroCatalogBackdrop from "./HeroCatalogBackdrop";
 
 function ActiveShoppersBadge() {
-  const [activeShoppers, setActiveShoppers] = useState(1);
-
-  useEffect(() => {
-    const channel = supabase.channel("online-shoppers", {
-      config: {
-        presence: {
-          key: "shopper-" + Math.random().toString(36).substring(2, 9),
-        },
-      },
-    });
-
-    channel
-      .on("presence", { event: "sync" }, () => {
-        const presenceState = channel.presenceState();
-        const count = Object.keys(presenceState).length;
-        setActiveShoppers(Math.max(1, count));
-      })
-      .subscribe(async (status) => {
-        if (status === "SUBSCRIBED") {
-          await channel.track({ online_at: new Date().toISOString() });
-        }
-      });
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, []);
+  const { activeShoppers } = usePresence();
 
   return (
     <div className="hx-stat-item hx-stat-item--live">
@@ -49,7 +23,7 @@ function ActiveShoppersBadge() {
         <Eye size={15} strokeWidth={2.4} className="hx-stat-icon hx-live-eye-icon" />
       </span>
       <div className="hx-stat-meta">
-        <span className="hx-stat-val">{activeShoppers}</span>
+        <span className="hx-stat-val">{activeShoppers || 1}</span>
         <span className="hx-stat-label">Pembeli Online</span>
       </div>
     </div>
