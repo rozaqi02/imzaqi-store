@@ -25,39 +25,78 @@ function getShopperKey() {
 
 function PresenceRouteSync({ channelRef, isSubscribed }) {
   const location = useLocation();
-  const isTrackedRef = useRef(false);
+  // trackingStatus: "idle" | "tracking" | "tracked"
+  const trackingStatusRef = useRef("idle");
+  const isMountedRef = useRef(true);
+  const locationRef = useRef(location);
+  const isSubscribedRef = useRef(isSubscribed);
+
+  useEffect(() => {
+    locationRef.current = location;
+  }, [location]);
+
+  useEffect(() => {
+    isSubscribedRef.current = isSubscribed;
+  }, [isSubscribed]);
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+      trackingStatusRef.current = "idle";
+    };
+  }, []);
 
   useEffect(() => {
     const channel = channelRef.current;
     if (!channel || !isSubscribed) {
-      isTrackedRef.current = false;
+      trackingStatusRef.current = "idle";
       return;
     }
 
     const isAdmin = location.pathname.startsWith("/admin");
     if (isAdmin) {
-      // Only untrack if previously tracked on storefront
+      // Only untrack if previously tracked or tracking on storefront
       // Prevents spamming untrack() on every internal admin navigation
-      if (isTrackedRef.current) {
+      if (trackingStatusRef.current === "tracked" || trackingStatusRef.current === "tracking") {
+        trackingStatusRef.current = "idle";
         channel.untrack().catch(() => {});
-        isTrackedRef.current = false;
       }
       return;
     }
 
     // Only track once upon entering storefront or reconnecting
-    // Prevents broadcast storms (excessive message quota burn) when navigating catalog pages
-    if (!isTrackedRef.current) {
+    // Prevents broadcast storms and duplicate calls while track() is in flight
+    if (trackingStatusRef.current === "idle") {
+      trackingStatusRef.current = "tracking";
       channel
         .track({
           online_at: new Date().toISOString(),
           page: location.pathname,
         })
         .then(() => {
-          isTrackedRef.current = true;
+          if (!isMountedRef.current) return;
+
+          // Check if route or connection changed while track was in-flight
+          const currentIsAdmin = locationRef.current.pathname.startsWith("/admin");
+          const currentlySubscribed = isSubscribedRef.current;
+
+          if (!currentlySubscribed) {
+            trackingStatusRef.current = "idle";
+            return;
+          }
+
+          if (currentIsAdmin) {
+            trackingStatusRef.current = "idle";
+            channel.untrack().catch(() => {});
+            return;
+          }
+
+          trackingStatusRef.current = "tracked";
         })
         .catch(() => {
-          isTrackedRef.current = false;
+          if (!isMountedRef.current) return;
+          trackingStatusRef.current = "idle";
         });
     }
   }, [location.pathname, isSubscribed, channelRef]);
@@ -76,6 +115,7 @@ export function PresenceProvider({ children }) {
     }
 
     let isMounted = true;
+    let channelInstance = null;
 
     try {
       const shopperKey = getShopperKey();
@@ -87,6 +127,7 @@ export function PresenceProvider({ children }) {
         },
       });
 
+      channelInstance = channel;
       channelRef.current = channel;
 
       channel
@@ -114,11 +155,12 @@ export function PresenceProvider({ children }) {
 
     return () => {
       isMounted = false;
-      try {
-        if (channelRef.current && typeof supabase.removeChannel === "function") {
-          Promise.resolve(supabase.removeChannel(channelRef.current)).catch(() => {});
-        }
-      } catch {}
+      const ch = channelInstance || channelRef.current;
+      if (ch && typeof supabase.removeChannel === "function") {
+        try {
+          Promise.resolve(supabase.removeChannel(ch)).catch(() => {});
+        } catch {}
+      }
       channelRef.current = null;
     };
   }, []);

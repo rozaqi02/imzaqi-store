@@ -238,6 +238,136 @@ describe("PresenceContext & PresenceProvider", () => {
     ).resolves.not.toThrow();
   });
 
+  it("prevents duplicate track calls if storefront navigation occurs while track() is in-flight", async () => {
+    let resolveTrack;
+    mockChannel.track = vi.fn(() => new Promise((resolve) => { resolveTrack = resolve; }));
+
+    let navigate;
+    function Consumer() {
+      navigate = useNavigate();
+      return <div>Test</div>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={["/"]}>
+        <PresenceProvider>
+          <Consumer />
+        </PresenceProvider>
+      </MemoryRouter>
+    );
+
+    await act(async () => {
+      await subscribeCallback("SUBSCRIBED");
+    });
+
+    expect(mockChannel.track).toHaveBeenCalledTimes(1);
+
+    // Navigate to another storefront route while track is still in-flight
+    await act(async () => {
+      navigate("/produk");
+    });
+
+    // Should NOT have triggered a second track call
+    expect(mockChannel.track).toHaveBeenCalledTimes(1);
+
+    // Resolve the in-flight track
+    await act(async () => {
+      resolveTrack();
+    });
+
+    // Still exactly 1 call
+    expect(mockChannel.track).toHaveBeenCalledTimes(1);
+  });
+
+  it("immediately untracks if user navigates to admin while storefront track() is in-flight", async () => {
+    let resolveTrack;
+    mockChannel.track = vi.fn(() => new Promise((resolve) => { resolveTrack = resolve; }));
+
+    let navigate;
+    function Consumer() {
+      navigate = useNavigate();
+      return <div>Test</div>;
+    }
+
+    render(
+      <MemoryRouter initialEntries={["/produk"]}>
+        <PresenceProvider>
+          <Consumer />
+        </PresenceProvider>
+      </MemoryRouter>
+    );
+
+    await act(async () => {
+      await subscribeCallback("SUBSCRIBED");
+    });
+
+    expect(mockChannel.track).toHaveBeenCalledTimes(1);
+    expect(mockChannel.untrack).not.toHaveBeenCalled();
+
+    // Navigate to admin while track is still in-flight
+    await act(async () => {
+      navigate("/admin/dashboard");
+    });
+
+    // Admin navigation triggers untrack immediately
+    expect(mockChannel.untrack).toHaveBeenCalledTimes(1);
+
+    // Now resolve the in-flight track()
+    await act(async () => {
+      resolveTrack();
+    });
+
+    // Admin should not remain tracked; untrack is called when in-flight track completes on admin
+    expect(mockChannel.untrack).toHaveBeenCalledTimes(2);
+
+    // Navigating back to storefront tracks again
+    await act(async () => {
+      navigate("/produk");
+    });
+
+    expect(mockChannel.track).toHaveBeenCalledTimes(2);
+  });
+
+  it("re-tracks properly if TIMED_OUT occurs and recovers when in-flight track resolves", async () => {
+    let resolveTrack;
+    mockChannel.track = vi.fn(() => new Promise((resolve) => { resolveTrack = resolve; }));
+
+    render(
+      <MemoryRouter initialEntries={["/produk"]}>
+        <PresenceProvider>
+          <div>Test</div>
+        </PresenceProvider>
+      </MemoryRouter>
+    );
+
+    await act(async () => {
+      await subscribeCallback("SUBSCRIBED");
+    });
+
+    expect(mockChannel.track).toHaveBeenCalledTimes(1);
+
+    // Disconnect occurs while track is pending
+    await act(async () => {
+      await subscribeCallback("TIMED_OUT");
+    });
+
+    // Track promise resolves after disconnect
+    await act(async () => {
+      resolveTrack();
+    });
+
+    // Reset track to resolve normally for reconnection
+    mockChannel.track = vi.fn(() => Promise.resolve());
+
+    // Reconnected
+    await act(async () => {
+      await subscribeCallback("SUBSCRIBED");
+    });
+
+    // Must re-track upon reconnection
+    expect(mockChannel.track).toHaveBeenCalledTimes(1);
+  });
+
   it("does not update state if presence sync or subscribe fires after unmount", async () => {
     const { unmount } = render(
       <MemoryRouter initialEntries={["/"]}>

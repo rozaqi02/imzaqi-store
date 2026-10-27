@@ -4,6 +4,7 @@
   background: transparent;
   color: var(--surface-text);
   padding: calc(var(--site-header-offset, 0px) + 38px) 24px 80px;
+  overflow-x: clip;
 }
 
 .promosi-wrap {

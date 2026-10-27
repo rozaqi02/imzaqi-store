@@ -39,4 +39,10 @@ describe("mobile overflow guards", () => {
     expect(css).toMatch(/overflow-wrap:\s*anywhere/);
     expect(css).toMatch(/min-width:\s*0/);
   });
+
+  it("clips Promosi page width on mobile", () => {
+    const css = readCss("css/pages/Promosi.css");
+    expect(css).toMatch(/overflow-x:\s*clip/);
+    expect(css).toMatch(/\.promosi-page/);
+  });
 });

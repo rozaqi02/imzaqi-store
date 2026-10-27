@@ -125,6 +125,17 @@ describe("Hero Component & Headline Entrance", () => {
     expect(statusBtn).toHaveAttribute("href", "/status");
   });
 
+  it("renders active shoppers badge with fallback value and label", () => {
+    render(
+      <MemoryRouter>
+        <Hero products={[]} />
+      </MemoryRouter>
+    );
+
+    expect(screen.getByText("Pembeli Online")).toBeInTheDocument();
+    expect(screen.getByText("1")).toBeInTheDocument();
+  });
+
   it("assigns index-based stagger css variable --w to all headline words", () => {
     const { container } = render(
       <MemoryRouter>

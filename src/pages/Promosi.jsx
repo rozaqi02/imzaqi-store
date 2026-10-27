@@ -24,14 +24,18 @@ export default function Promosi() {
 
   useEffect(() => {
     let alive = true;
-    Promise.all([
+    Promise.allSettled([
       fetchProducts({ includeInactive: false, useCache: true }),
       fetchSettings({ useCache: true }),
     ])
-      .then(([prods, sets]) => {
+      .then(([prodsRes, setsRes]) => {
         if (!alive) return;
-        setProducts(Array.isArray(prods) ? prods : []);
-        setSettings(sets || {});
+        if (prodsRes.status === "fulfilled" && Array.isArray(prodsRes.value)) {
+          setProducts(prodsRes.value);
+        }
+        if (setsRes.status === "fulfilled" && setsRes.value) {
+          setSettings(setsRes.value);
+        }
       })
       .catch((err) => {
         console.error("Gagal memuat data promosi:", err);
