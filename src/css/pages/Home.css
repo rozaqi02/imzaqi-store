@@ -691,6 +691,7 @@ html[data-theme="light"] .hx-live-eye {
   /* Safari: prevent gradient text clipping descenders */
   -webkit-box-decoration-break: clone;
   box-decoration-break: clone;
+  padding-right: 0.08em;
 }
 
 html[data-theme="dark"] .hx-headline-gradient,

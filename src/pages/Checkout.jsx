@@ -338,7 +338,7 @@ export default function Checkout() {
         />
         {requiresBuyerEmail ? (
           <div className="checkout-emailField">
-            <label htmlFor="checkout-buyer-email"><Mail size={14} /> Email aktivasi <span>Wajib untuk paket ini</span></label>
+            <label htmlFor="checkout-buyer-email"><Mail size={14} /> Email aktivasi <span className="required" style={{ color: "#ef4444", fontWeight: "bold" }}>*</span> <span>(Wajib untuk paket ini)</span></label>
             <input
               id="checkout-buyer-email"
               className="input"

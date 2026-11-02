@@ -108,7 +108,7 @@ const FAQ_ITEMS = [
       "Masa garansi mengikuti label pada varian dan melindungi kendala akun sebelum masa paket berakhir.",
       "Laporkan kendala maksimal 24 jam setelah ditemukan, sertakan ID order, dan jangan mengubah data login untuk akun sharing.",
     ],
-    tags: ["garansi", "replace", "kendala", "24 jam"],
+    tags: ["garansi", "replace", "kendala", "24 jam", "syarat", "kebijakan"],
   },
   {
     id: "buyer-email",
@@ -118,7 +118,7 @@ const FAQ_ITEMS = [
       "Beberapa layanan menggunakan emailmu untuk aktivasi atau undangan paket.",
       "Isi kolom Email aktivasi di checkout jika paket memerlukannya. Kamu dapat memeriksanya lagi sebelum bayar.",
     ],
-    tags: ["email buyer", "aktivasi", "requires_buyer_email"],
+    tags: ["email buyer", "aktivasi", "requires_buyer_email", "privasi", "keamanan"],
   },
   {
     id: "notes-usage",

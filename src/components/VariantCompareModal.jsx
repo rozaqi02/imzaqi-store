@@ -11,14 +11,18 @@ import {
 import { formatGuaranteeLabel, formatIDR, isKnownOutOfStock, packDisplayName } from "../lib/format";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 
-function classifyType(name) {
+function classifyType(name, variant) {
+  const custom = String(variant?.account_type || variant?.type || "").trim();
+  if (custom && custom.toLowerCase() !== "lainnya") return custom;
   const n = String(name || "").toLowerCase();
   if (/\b(sharing|share)\b/.test(n)) return "Sharing";
   if (/\b(family|keluarga)\b/.test(n)) return "Family";
   if (/\b(private|privat)\b/.test(n)) return "Private";
+  if (/\b(invite|undangan)\b/.test(n)) return "Invite Email";
+  if (/\b(edu|education|pendidikan)\b/.test(n)) return "Edu";
   if (/\bstudent\b/.test(n)) return "Student";
   if (/\bbasic\b/.test(n)) return "Basic";
-  return "Lainnya";
+  return "";
 }
 
 function getEffectivePrice(variant, flashSaleMap) {
@@ -79,7 +83,7 @@ export default function VariantCompareModal({
   });
 
   const enriched = useMemo(() => {
-    if (!variants?.length) return { items: [], bestPriceId: null, hasDiff: {}, showEmailRow: false };
+    if (!variants?.length) return { items: [], bestPriceId: null, hasDiff: {}, showEmailRow: false, showTypeRow: false };
 
     const items = variants.map((variant) => {
       const flash = flashSaleMap?.get(variant.id) || 0;
@@ -88,7 +92,7 @@ export default function VariantCompareModal({
         variant,
         flash,
         price,
-        type: classifyType(variant.name),
+        type: classifyType(variant.name, variant),
         duration: normalizeDuration(variant.duration_label),
         guarantee: normalizeGuarantee(variant.guarantee_text),
         stock: variant.stock == null || variant.stock === "" ? null : Number(variant.stock),
@@ -110,16 +114,21 @@ export default function VariantCompareModal({
       email: new Set(items.map((item) => item.requiresEmail)).size > 1,
     };
 
+    const showTypeRow = items.some((item) => Boolean(item.type));
     const showEmailRow = hasDiff.email || items.some((item) => item.requiresEmail);
 
-    return { items, bestPriceId, hasDiff, showEmailRow };
+    return { items, bestPriceId, hasDiff, showEmailRow, showTypeRow };
   }, [variants, flashSaleMap]);
 
   if (!open || !variants?.length) return null;
 
-  const { items, bestPriceId, hasDiff, showEmailRow } = enriched;
+  const { items, bestPriceId, hasDiff, showEmailRow, showTypeRow } = enriched;
   const showScrollHint = variants.length > 2;
-  const visibleRows = ROWS.filter((row) => row.key !== "email" || showEmailRow);
+  const visibleRows = ROWS.filter((row) => {
+    if (row.key === "email") return showEmailRow;
+    if (row.key === "type") return showTypeRow;
+    return true;
+  });
 
   const renderCell = (rowKey, item) => {
     const { variant, flash, price, type, duration, guarantee, stock, requiresEmail } = item;
@@ -142,7 +151,7 @@ export default function VariantCompareModal({
           </div>
         );
       case "type":
-        return <span className="vcm-typeBadge">{type}</span>;
+        return type ? <span className="vcm-typeBadge">{type}</span> : <span className="vcm-muted">—</span>;
       case "duration":
         return (
           <span className="vcm-inlineValue">

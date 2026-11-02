@@ -27,8 +27,13 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
     const fallbackSold = allVariants.reduce((sum, item) => sum + Number(item?.sold_count || 0), 0);
     const sold = overrideSold != null ? overrideSold : fallbackSold;
 
+    const activePrices = activeVariants
+      .map((v) => Number(v?.price_idr || 0))
+      .filter((val) => Number.isFinite(val) && val > 0);
+    const startingPrice = activePrices.length ? Math.min(...activePrices) : range.minPrice;
+
     return {
-      minPrice: range.minPrice,
+      minPrice: startingPrice,
       variantsCount: activeVariants.length,
       stock,
       sold,
@@ -80,8 +85,8 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
         </div>
 
         <div className="product-tile-main">
-          <div className="product-tile-name">
-            {product?.name || "-"}
+          <div className="product-tile-name" title={product?.name || undefined}>
+            <span className="product-tile-nameText">{product?.name || "-"}</span>
             {rank === 1 ? (
               <span className="product-tile-rankBadge product-tile-rankBadge--1">
                 <Flame size={12} />
@@ -93,7 +98,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
               </span>
             ) : null}
           </div>
-          <div className="product-tile-desc">{summary.summaryCopy}</div>
+          <div className="product-tile-desc" title={summary.summaryCopy || undefined}>{summary.summaryCopy}</div>
         </div>
 
         <div className="product-tile-arrow" aria-hidden="true">
@@ -131,6 +136,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
         </div>
 
         <div className="product-tile-price" aria-label="Harga mulai">
+          <span className="product-tile-pricePrefix" style={{ fontSize: "12px", fontWeight: "normal", opacity: 0.8, marginRight: "4px" }}>Mulai</span>
           {displayPrice}
         </div>
       </div>
@@ -165,7 +171,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
                     )}
                   </div>
                   <div className="product-tile-back-name">{product?.name}</div>
-                  <div className="product-tile-back-price">{displayPrice}</div>
+                  <div className="product-tile-back-price"><span style={{ fontSize: "12px", fontWeight: "normal", opacity: 0.8, marginRight: "4px" }}>Mulai</span>{displayPrice}</div>
                   <div className="product-tile-back-stats">
                     <span><PackageCheck size={12} />&nbsp;{stock} stok</span>
                     <span><ShoppingBag size={12} />&nbsp;{sold} terjual</span>

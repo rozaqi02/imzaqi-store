@@ -1213,7 +1213,11 @@ export default function ProductDetail() {
                           descriptionBody={descriptionBody}
                           onAdd={handleAdd}
                           onBuy={(v, q, e) => {
-                            if (handleAdd(v, q, e)) {
+                            const isAlreadyInCart = (cart.items || []).some((it) => it.variant_id === v.id);
+                            if (isAlreadyInCart) {
+                              trackFunnelEvent("buy_now", { productId: product.id, variantId: v.id });
+                              nav("/checkout");
+                            } else if (handleAdd(v, q, e)) {
                               trackFunnelEvent("buy_now", { productId: product.id, variantId: v.id });
                               nav("/checkout");
                             }

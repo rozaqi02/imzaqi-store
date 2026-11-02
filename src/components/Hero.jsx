@@ -30,15 +30,30 @@ function ActiveShoppersBadge() {
   );
 }
 
-function HeroStatsRow({ activeProductCount }) {
-  const { last7DaysViews, totalOrders } = useLiveStats({
+function HeroStatsRow({ activeProductCount, isProductsLoading = false }) {
+  const { last7DaysViews, totalOrders, loading } = useLiveStats({
     intervalMs: 60000,
   });
 
   const stats = [
-    { val: totalOrders || 0, label: "Total Order", icon: ShoppingBag },
-    { val: activeProductCount, label: "Produk Aktif", icon: Package },
-    { val: last7DaysViews || 0, label: "Views 7 Hari", icon: Eye },
+    {
+      val: totalOrders,
+      isLoading: loading || totalOrders == null,
+      label: "Total Order",
+      icon: ShoppingBag,
+    },
+    {
+      val: activeProductCount,
+      isLoading: isProductsLoading && activeProductCount === 0,
+      label: "Produk Aktif",
+      icon: Package,
+    },
+    {
+      val: last7DaysViews,
+      isLoading: loading || last7DaysViews == null,
+      label: "Views 7 Hari",
+      icon: Eye,
+    },
   ];
 
   return (
@@ -55,7 +70,22 @@ function HeroStatsRow({ activeProductCount }) {
             </span>
             <div className="hx-stat-meta">
               <span className="hx-stat-val">
-                <NumberCounter value={s.val} />
+                {s.isLoading ? (
+                  <span
+                    className="hx-stat-skeleton"
+                    aria-label="Memuat statistik"
+                    style={{
+                      display: "inline-block",
+                      width: 32,
+                      height: 16,
+                      borderRadius: 4,
+                      background: "rgba(255, 255, 255, 0.2)",
+                      verticalAlign: "middle",
+                    }}
+                  />
+                ) : (
+                  <NumberCounter value={s.val || 0} />
+                )}
               </span>
               <span className="hx-stat-label">{s.label}</span>
             </div>
@@ -126,7 +156,7 @@ function HeroHeadline({ active = true, reduced = false } = {}) {
   );
 }
 
-export default function Hero({ products = [] }) {
+export default function Hero({ products = [], loading = false }) {
   const caps = useDeviceCapability();
   const isMotionReduced = caps.isReducedMotion || caps.saveData || caps.lowMemory;
   const logoRef = useRef(null);
@@ -204,7 +234,10 @@ export default function Hero({ products = [] }) {
 
           <div className="hx-stats-row" aria-label="Statistik toko">
             <ActiveShoppersBadge />
-            <HeroStatsRow activeProductCount={activeProductCount} />
+            <HeroStatsRow
+              activeProductCount={activeProductCount}
+              isProductsLoading={loading || (!products || products.length === 0)}
+            />
           </div>
         </div>
       </div>

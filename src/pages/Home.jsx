@@ -284,7 +284,7 @@ export default function Home() {
       <ScrollProgressBar />
 
       <div className="hx-heroZone">
-        <Hero products={products} topIds={topIds} />
+        <Hero products={products} topIds={topIds} loading={loading} />
       </div>
 
       <div className="home-body">

@@ -418,9 +418,12 @@ export default function AdminDashboard() {
 
   function requestOrderStatusChange(orderId, nextStatus, currentStatus) {
     if (String(nextStatus) === String(currentStatus || "pending")) return;
+    const isFromCancelled = currentStatus === "cancelled";
     openConfirm({
       title: "Ubah status order",
-      message: `Ubah status ke "${prettyOrderStatus(nextStatus)}"?`,
+      message: isFromCancelled
+        ? `Order ini sebelumnya Dibatalkan. Ubah status ke "${prettyOrderStatus(nextStatus)}"? Stok produk akan otomatis disesuaikan kembali.`
+        : `Ubah status ke "${prettyOrderStatus(nextStatus)}"?`,
       confirmLabel: "Ya, ubah",
       danger: nextStatus === "cancelled",
       onConfirm: () => updateOrderStatus(orderId, nextStatus),
@@ -1848,6 +1851,19 @@ export default function AdminDashboard() {
       return;
     }
 
+    // DAT-03: Validasi keunikan nama varian dan durasi per produk
+    const existingVariants = selectedProduct?.product_variants || [];
+    const isDuplicate = existingVariants.some((v) => {
+      if (variantMode === "edit" && v.id === variantForm.id) return false;
+      const sameName = String(v.name || "").trim().toLowerCase() === payload.name.toLowerCase();
+      const sameDuration = String(v.duration_label || "").trim().toLowerCase() === payload.duration_label.toLowerCase();
+      return sameName && sameDuration;
+    });
+    if (isDuplicate) {
+      toast.error("Varian dengan nama dan durasi ini sudah ada untuk produk ini. Gunakan nama/durasi yang berbeda.");
+      return;
+    }
+
     const tid = toast.loading(variantMode === "edit" ? "Menyimpan varian..." : "Menambah varian...");
     setMsg("");
 
@@ -2177,12 +2193,18 @@ export default function AdminDashboard() {
           toast.success(`Order dibatalkan${extra}`, { duration: 2400 });
         }
       } else {
+        const isFromCancelled = orderToUpdate?.status === "cancelled";
         const { error } = await supabase.from("orders").update({ status }).eq("id", orderId);
         if (error) {
           await refreshOrders({ force: true });
           throw error;
         }
-        await refreshOrders({ force: true });
+        if (isFromCancelled) {
+          invalidateProductCaches();
+          await Promise.all([refreshOrders({ force: true }), refreshProducts({ force: true })]);
+        } else {
+          await refreshOrders({ force: true });
+        }
         toast.remove(tid);
 
         const statusLabel = prettyOrderStatus(status);
@@ -2208,8 +2230,13 @@ export default function AdminDashboard() {
       }
     } catch (e) {
       toast.remove(tid);
-      toast.error("Gagal update status");
-      setMsg(e?.message || String(e));
+      const errMsg = e?.message || String(e);
+      if (errMsg.includes("ORDER_CLOSED")) {
+        toast.error("Database memblokir order batal (ORDER_CLOSED). Jalankan migration 0004 di Supabase SQL Editor.");
+      } else {
+        toast.error("Gagal update status");
+      }
+      setMsg(errMsg);
     }
   }
 
@@ -2431,6 +2458,11 @@ export default function AdminDashboard() {
     const productName = e.target.elements.product_name.value || "";
     const purchasedAt = e.target.elements.purchased_at.value || null;
     const isVerified = e.target.elements.is_verified.checked;
+    const privacyConfirmed = e.target.elements.privacy_confirmed ? e.target.elements.privacy_confirmed.checked : true;
+    if (!privacyConfirmed) {
+      toast.error("Wajib konfirmasi bahwa gambar tidak memuat data sensitif pelanggan.");
+      return;
+    }
 
     if (files.length === 0) {
       toast.error("Pilih minimal 1 gambar");
@@ -2449,13 +2481,11 @@ export default function AdminDashboard() {
         urls.push(await uploadToBucket(BUCKET_TESTIMONIALS, f, "testimonials"));
       }
 
+      const metaInfo = [customerName ? `Dari ${customerName.trim()}` : "", productName ? `(${productName.trim()})` : ""].filter(Boolean).join(" ");
+      const finalCaption = [caption.trim(), metaInfo].filter(Boolean).join(" · ") || null;
       const payload = urls.map((u) => ({
         image_url: u,
-        caption,
-        customer_name: customerName.trim() || null,
-        product_name: productName.trim() || null,
-        purchased_at: purchasedAt ? new Date(purchasedAt).toISOString() : null,
-        is_verified: isVerified,
+        caption: finalCaption,
         is_active: true,
         sort_order: 100,
       }));
@@ -4434,6 +4464,25 @@ export default function AdminDashboard() {
               placeholder="Contoh: 1 Bulan · Private"
               autoFocus
             />
+            <div style={{ display: "flex", gap: "6px", marginTop: "6px", flexWrap: "wrap", alignItems: "center" }}>
+              <span style={{ fontSize: "11px", opacity: 0.7 }}>Tipe Akun:</span>
+              {["Private", "Sharing", "Invite Email", "Family Plan", "Edu"].map((typeTag) => (
+                <button
+                  key={typeTag}
+                  type="button"
+                  className="btn btn-ghost btn-sm"
+                  style={{ padding: "2px 8px", fontSize: "11px", height: "auto", minHeight: "22px" }}
+                  onClick={() => {
+                    setVariantForm((p) => {
+                      const base = p.name ? p.name.replace(/\s*·\s*(Private|Sharing|Invite Email|Family Plan|Edu)/gi, "").trim() : "";
+                      return { ...p, name: base ? `${base} · ${typeTag}` : typeTag };
+                    });
+                  }}
+                >
+                  +{typeTag}
+                </button>
+              ))}
+            </div>
           </label>
 
           <label className="admin-field">

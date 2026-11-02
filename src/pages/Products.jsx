@@ -655,9 +655,10 @@ export default function Products() {
   }, [products]);
 
   const priceBounds = useMemo(() => {
-    const prices = enriched.map((item) => item._minPrice).filter((value) => Number.isFinite(value) && value > 0);
-    if (!prices.length) return { min: 0, max: 0 };
-    return { min: Math.min(...prices), max: Math.max(...prices) };
+    const minPrices = enriched.map((item) => item._minPrice).filter((value) => Number.isFinite(value) && value > 0);
+    const maxPrices = enriched.flatMap((item) => (item._vars || []).map((v) => Number(v?.price_idr || 0))).filter((value) => Number.isFinite(value) && value > 0);
+    if (!minPrices.length || !maxPrices.length) return { min: 0, max: 0 };
+    return { min: Math.min(...minPrices), max: Math.max(...maxPrices) };
   }, [enriched]);
 
   useEffect(() => {
@@ -769,8 +770,9 @@ export default function Products() {
     if (priceBounds.max > 0) {
       list = list.filter((item) => {
         const minPrice = Number(item._minPrice || 0);
+        const maxPrice = Number(item._maxPrice || minPrice);
         if (!minPrice) return true;
-        return minPrice >= price.min && minPrice <= price.max;
+        return minPrice <= price.max && maxPrice >= price.min;
       });
     }
 
@@ -1442,8 +1444,8 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
           </div>
 
           <div className="catalog-cardCopy">
-            <div className="catalog-cardTitle">{product.name}</div>
-            <div className="catalog-cardSummary">{summaryCopy}</div>
+            <div className="catalog-cardTitle" title={product.name}>{product.name}</div>
+            <div className="catalog-cardSummary" title={summaryCopy}>{summaryCopy}</div>
           </div>
         </div>
 

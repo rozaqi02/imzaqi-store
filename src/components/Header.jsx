@@ -68,9 +68,7 @@ export default function Header() {
   const [canAccessAdmin, setCanAccessAdmin] = useState(false);
   const isOnAdminRoute = location.pathname.startsWith("/admin");
   const isHome = location.pathname === "/";
-  const [hideOverHero, setHideOverHero] = useState(
-    () => isHome && typeof window !== "undefined" && window.scrollY <= HERO_HEADER_REVEAL_AT
-  );
+  const [hideOverHero, setHideOverHero] = useState(false);
   const [pillStyle, setPillStyle] = useState({ left: 0, top: 0, width: 0, height: 0, opacity: 0 });
 
   const updatePill = useCallback(() => {
@@ -122,35 +120,9 @@ export default function Header() {
   }, [updatePill]);
 
   useEffect(() => {
-    if (!isHome || typeof window === "undefined") {
-      setHideOverHero(false);
-      return undefined;
-    }
-
-    let frame = 0;
-    const sync = () => {
-      frame = 0;
-      const y = window.scrollY;
-      setHideOverHero((prev) => {
-        if (prev && y > HERO_HEADER_REVEAL_AT) return false;
-        if (!prev && y < HERO_HEADER_HIDE_AT) return true;
-        return prev;
-      });
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(sync);
-    };
-
-    sync();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, [isHome]);
+    // UX-02: Navbar sticky top-0 selalu terlihat sejak scroll 0px
+    setHideOverHero(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;

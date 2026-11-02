@@ -121,10 +121,17 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
         ]);
 
         if (!alive) return;
+
+        const totalViews = Number(siteStats?.total_views || 0);
+        const todayViews = Number(
+          siteStats?.last_date === day ? siteStats?.today_views || 0 : 0
+        );
+        const last7DaysViews = Number(views7dFallback ?? todayViews ?? 0);
+
         setState({
-          totalViews: Number(siteStats?.total_views || 0),
-          todayViews: Number(siteStats?.today_views || 0),
-          last7DaysViews: Number(views7dFallback ?? siteStats?.today_views ?? 0),
+          totalViews,
+          todayViews,
+          last7DaysViews,
           totalOrders: 0,
           todayOrders: 0,
           weekOrders: 0,
@@ -158,5 +165,8 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
     };
   }, [intervalMs]);
 
-  return state;
+  return {
+    ...state,
+    loading: state.totalOrders == null && state.last7DaysViews == null,
+  };
 }

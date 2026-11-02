@@ -22,6 +22,14 @@ const footerColumns = [
       { label: "Riwayat Pesanan", to: "/status?tab=riwayat" },
     ],
   },
+  {
+    label: "Kebijakan",
+    links: [
+      { label: "Syarat & Ketentuan", to: "/faq?q=syarat" },
+      { label: "Ketentuan Garansi", to: "/faq?q=garansi" },
+      { label: "Kebijakan Privasi", to: "/faq?q=privasi" },
+    ],
+  },
 ];
 
 function FooterLink({ item, className = "" }) {
@@ -73,7 +81,7 @@ export default function Footer() {
             ))}
 
             <details className="site-footerGoCol" open={!isMobile}>
-              <summary className="site-footerGoTitle">Bantuan</summary>
+              <summary className="site-footerGoTitle">Bantuan & Kontak</summary>
               <div className="site-footerGoList">
                 <Link className="site-footerGoLink" to="/faq?q=paket">
                   Cara Pesan
@@ -90,14 +98,17 @@ export default function Footer() {
                   target="_blank"
                   rel="noreferrer"
                 >
-                  Hubungi Admin
+                  WhatsApp Resmi (+{STORE_WHATSAPP.app_premium})
                 </a>
+                <span className="site-footerGoLink" style={{ opacity: 0.8, cursor: "default", fontSize: "13px" }}>
+                  Jam Buka: 08.00–22.00 WIB
+                </span>
               </div>
             </details>
           </div>
 
           <div className="site-footerGoLegal">
-            <p>Imzaqi Store. Pilih produk, bayar QRIS, simpan ID, pantau status. Simpel banget.</p>
+            <p>Imzaqi Store. Pilih produk, bayar QRIS otomatis, simpan ID, pantau status 24 jam. Garansi penuh.</p>
             <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v6.0.0</p>
           </div>
         </div>
