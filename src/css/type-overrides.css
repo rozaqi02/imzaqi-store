@@ -1,0 +1,642 @@
+/*
+ * ── Type Scale Overrides ─────────────────────────────────────────────────────
+ * Standardizes font sizes across all pages to the unified type scale.
+ * Loaded LAST in styles.css so it always wins with rational hierarchy.
+ *
+ * Hierarchy Rules:
+ *  - Eyebrow / Kicker: --ts-xs (11px), uppercase, letter-spacing 0.08em
+ *  - Badges / Chips / Meta / Timestamps: --ts-xs (11px)
+ *  - Helper / Caption / Secondary text: --ts-sm (13px)
+ *  - Form Inputs / Body / Card descriptions: --ts-base (15px) [min 16px on mobile inputs]
+ *  - Sub-headings / Card titles: --ts-md (17px), font-weight 600-700
+ *  - Section headings (H3): --ts-lg (20px), font-weight 700-800
+ *  - Page section headings (H2): --ts-xl (24px), font-weight 800
+ *  - Inner Page titles (H1): --ts-2xl (30px), font-weight 800
+ *  - Display Hero H1: var(--ts-hero) clamp(34px, 6vw, 56px), font-weight 900
+ *
+ * Admin Dashboard Scale:
+ *  - Form labels / Meta / Table headers: --ts-xs (11px)
+ *  - Table cells / Form inputs / Tab items: --ts-sm (13px)
+ *  - Section / Card titles: --ts-md (17px)
+ *  - Panel titles: --ts-xl (24px)
+ *  - Stat metric numbers: --ts-2xl (30px)
+ */
+
+/* ══════════════════════════════════════════════════
+   1. GLOBAL COMPONENT RESETS
+   ══════════════════════════════════════════════════ */
+
+.badge,
+.chip,
+.tag,
+.pill,
+[class*="-badge"],
+[class*="-chip"],
+[class*="-tag"],
+[class*="-pill"],
+.st-badge,
+.order-badge {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  line-height: 1.2 !important;
+}
+
+.muted,
+.caption,
+.helper,
+.hint,
+.meta,
+[class*="-muted"],
+[class*="-caption"],
+[class*="-hint"],
+[class*="-helper"],
+[class*="-meta"]:not(.ac-meta) {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-snug) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   2. HEADER & NAVIGATION
+   ══════════════════════════════════════════════════ */
+
+.hdr-nav-link,
+.site-nav a,
+.nav-link,
+.hdr-link {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-medium) !important;
+  line-height: var(--lh-snug) !important;
+}
+
+.hdr-brand,
+.site-brand,
+.brand-title {
+  font-size: var(--ts-md) !important;
+  font-weight: var(--fw-bold) !important;
+}
+
+/* Bottom Navigation (Mobile) */
+.bnav-label,
+.bottom-nav-label,
+.bottom-nav__label,
+[class*="bnav-"] .label,
+[class*="bottom-nav"] [class*="label"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.02em;
+}
+
+/* ══════════════════════════════════════════════════
+   3. HERO SECTION
+   ══════════════════════════════════════════════════ */
+
+.hx-headline,
+.hx-headline--kinetic {
+  font-size: var(--ts-hero) !important;
+  font-weight: var(--fw-black) !important;
+  line-height: var(--lh-tight) !important;
+  letter-spacing: -0.03em;
+}
+
+.hx-eyebrow {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+}
+
+.hx-subtitle {
+  font-size: var(--ts-base) !important;
+  line-height: var(--lh-base) !important;
+  font-weight: var(--fw-normal) !important;
+}
+
+.hx-stat-val {
+  font-size: var(--ts-md) !important;
+  font-weight: var(--fw-heavy) !important;
+  line-height: 1.2 !important;
+}
+
+.hx-stat-label {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-medium) !important;
+  line-height: 1.2 !important;
+}
+
+/* ══════════════════════════════════════════════════
+   4. CATALOG & PRODUCT TILES
+   ══════════════════════════════════════════════════ */
+
+.catalog-heading,
+.products-title,
+.section-heading,
+.home-section-title {
+  font-size: var(--ts-xl) !important;
+  font-weight: var(--fw-heavy) !important;
+  line-height: var(--lh-tight) !important;
+  letter-spacing: -0.02em;
+}
+
+.catalog-subheading,
+.section-subtitle,
+.home-section-sub {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-base) !important;
+}
+
+/* Product Card Elements */
+.catalog-cardTitle,
+.product-tile-name,
+.pt-name,
+[class*="tile-"] [class*="-title"],
+[class*="tile-"] [class*="-name"] {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-semi) !important;
+  line-height: var(--lh-snug) !important;
+}
+
+.catalog-cardPrice,
+.product-tile-price,
+.pt-price,
+[class*="tile-"] [class*="-price"] {
+  font-size: var(--ts-md) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+.catalog-filter,
+.filter-chip,
+.cat-chip,
+[class*="filter-chip"],
+[class*="cat-chip"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   5. PRODUCT DETAIL PAGE
+   ══════════════════════════════════════════════════ */
+
+.pd-title,
+.product-detail-name,
+[class*="pd-"] [class*="-title"] {
+  font-size: var(--ts-2xl) !important;
+  font-weight: var(--fw-heavy) !important;
+  line-height: var(--lh-tight) !important;
+}
+
+.pd-price,
+[class*="pd-"] [class*="-price"] {
+  font-size: var(--ts-xl) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+.pd-desc,
+.pd-description,
+[class*="pd-"] [class*="-desc"],
+.product-detail-description {
+  font-size: var(--ts-base) !important;
+  line-height: var(--lh-base) !important;
+}
+
+.variant-name,
+[class*="variant-"] [class*="-name"] {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-semi) !important;
+}
+
+.guarantee-text,
+[class*="-guarantee"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-medium) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   6. CHECKOUT & PAYMENT
+   ══════════════════════════════════════════════════ */
+
+/* Stepper indicators */
+.checkout-step-label,
+.checkout-steps-label,
+[class*="step-"] [class*="-label"],
+[class*="checkout-step"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+}
+
+/* Page / drawer main titles */
+.checkout-drawerTitle,
+.checkout-full-title,
+.pay-shell-title {
+  font-size: var(--ts-2xl) !important;
+  font-weight: var(--fw-heavy) !important;
+  line-height: var(--lh-tight) !important;
+  letter-spacing: -0.02em;
+}
+
+/* Page / drawer subtitles */
+.checkout-drawerSub,
+.checkout-full-sub,
+.pay-shell-sub {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-snug) !important;
+  font-weight: var(--fw-normal) !important;
+}
+
+/* Eyebrow / kickers */
+.checkout-main-kicker,
+.checkout-full-kicker,
+.checkout-drawerKicker,
+.pay-shell-kicker,
+.pay-cardKicker,
+.pay-orderKicker,
+.pay-successKicker {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase;
+}
+
+/* Card & section titles */
+.checkout-main-title,
+.pay-cardTitle,
+.pay-orderTitle {
+  font-size: var(--ts-lg) !important;
+  font-weight: var(--fw-heavy) !important;
+  line-height: var(--lh-tight) !important;
+}
+
+/* Item cards in cart & pay summary */
+.checkout-item-name,
+.checkout-itemName,
+.pay-orderItemName {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-semi) !important;
+  line-height: var(--lh-snug) !important;
+}
+
+.checkout-item-meta,
+.pay-orderItemMeta {
+  font-size: var(--ts-xs) !important;
+  line-height: 1.3 !important;
+}
+
+.checkout-item-price,
+.pay-orderItemPrice {
+  font-size: var(--ts-md) !important;
+  font-weight: var(--fw-heavy) !important;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Form inputs & labels */
+.checkout-label,
+.pay-emailLabel,
+.pay-noteLabel,
+[class*="checkout-"] label,
+[class*="pay-"] label {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.03em;
+}
+
+.checkout-contactHead h3,
+.checkout-contactBlock h3 {
+  font-size: var(--ts-md) !important;
+  font-weight: var(--fw-bold) !important;
+}
+
+.checkout-contactHead span,
+.checkout-contactBlock span {
+  font-size: var(--ts-xs) !important;
+}
+
+/* Grand total section */
+.checkout-summaryLabel,
+.pay-stageLabel,
+.pay-confirmTotalLabel,
+.checkout-floating-bar-label {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.checkout-summaryTotal,
+.pay-stageTotal,
+.pay-confirmTotalAmount,
+.checkout-floating-bar-price {
+  font-size: var(--ts-2xl) !important;
+  font-weight: var(--fw-black) !important;
+  line-height: 1.1 !important;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Summary line items */
+.checkout-summaryRow,
+.pay-stageRow,
+.pay-orderRow {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-snug) !important;
+}
+
+.checkout-summaryRow b,
+.pay-stageRow b,
+.pay-orderRow b {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-bold) !important;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* Trust signals, hints, and helper texts */
+.checkout-trustSignals,
+.checkout-summaryHint,
+.checkout-summaryLink,
+.pay-stageHint,
+.pay-stageFoot,
+.pay-stageMobileHint,
+.pay-emailHintText,
+.pay-noteHintText,
+.pay-waField .hint,
+.checkout-emptyConversion p {
+  font-size: var(--ts-xs) !important;
+  line-height: var(--lh-base) !important;
+}
+
+/* QRIS timer & badges */
+.pay-qrisTimer {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-semi) !important;
+}
+
+.pay-statePill,
+.pay-shell-status,
+.checkout-summaryBadge {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.04em;
+}
+
+/* Payment Modals & Success Overlays */
+.pay-confirmModalTitle,
+.pay-successModal .modal-title {
+  font-size: var(--ts-lg) !important;
+  font-weight: var(--fw-heavy) !important;
+  line-height: var(--lh-tight) !important;
+}
+
+.pay-confirmModalSub,
+.pay-successModal .modal-sub,
+.pay-successLead,
+.pay-confirmDeclarationDesc {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-base) !important;
+}
+
+.pay-confirmDeclarationTitle {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-bold) !important;
+}
+
+.pay-successCode {
+  font-size: var(--ts-xl) !important;
+  font-weight: var(--fw-black) !important;
+  font-family: var(--font-mono) !important;
+  letter-spacing: 0.04em;
+}
+
+.pay-successLabel {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ══════════════════════════════════════════════════
+   7. STATUS & TRACKING
+   ══════════════════════════════════════════════════ */
+
+.st-pageTitle,
+[class*="st-"] [class*="-title"] {
+  font-size: var(--ts-2xl) !important;
+  font-weight: var(--fw-heavy) !important;
+  line-height: var(--lh-tight) !important;
+}
+
+.st-orderCode,
+[class*="st-order"] [class*="-code"] {
+  font-size: var(--ts-md) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+.st-statusLabel,
+[class*="st-"] [class*="-status"] {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-semi) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   8. FAQ & TESTIMONIALS
+   ══════════════════════════════════════════════════ */
+
+.faq-question,
+[class*="faq-"] [class*="-question"] {
+  font-size: var(--ts-base) !important;
+  font-weight: var(--fw-semi) !important;
+  line-height: var(--lh-snug) !important;
+}
+
+.faq-answer,
+[class*="faq-"] [class*="-answer"] {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-base) !important;
+}
+
+.faq-category,
+[class*="faq-"] [class*="-category"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[class*="testimoni"] [class*="-caption"],
+[class*="testimonial"] [class*="-caption"] {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-base) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   9. POPUPS & MODALS
+   ══════════════════════════════════════════════════ */
+
+[class*="flash-"] [class*="-title"],
+[class*="flashSale"] [class*="-title"],
+.flash-sale-title {
+  font-size: var(--ts-xl) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+[class*="flash-"] [class*="-subtitle"],
+[class*="flashSale"] [class*="-subtitle"] {
+  font-size: var(--ts-sm) !important;
+}
+
+[class*="flash-"] [class*="-price"],
+[class*="flashSale"] [class*="-price"] {
+  font-size: var(--ts-lg) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+[class*="popup-"] [class*="-title"],
+[class*="modal-"] [class*="-title"],
+[class*="newProduct"] [class*="-title"],
+[class*="academic"] [class*="-title"] {
+  font-size: var(--ts-lg) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+[class*="popup-"] [class*="-body"],
+[class*="modal-"] [class*="-body"],
+[class*="popup-"] p,
+[class*="modal-"] p {
+  font-size: var(--ts-sm) !important;
+  line-height: var(--lh-base) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   10. FOOTER
+   ══════════════════════════════════════════════════ */
+
+.site-footerGoTitle {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.site-footerGoLink {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-normal) !important;
+}
+
+.site-footerGoLegal p {
+  font-size: var(--ts-xs) !important;
+  line-height: var(--lh-base) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   11. ADMIN DASHBOARD & PANES (COMPACT SCALE)
+   ══════════════════════════════════════════════════ */
+
+.admin-app,
+[class*="admin-"] {
+  font-size: var(--ts-sm);
+}
+
+.admin-panel-title,
+[class*="admin-"] [class*="-title"],
+[class*="admin-"] h2,
+[class*="admin-"] h3 {
+  font-size: var(--ts-md) !important;
+  font-weight: var(--fw-bold) !important;
+  line-height: var(--lh-snug) !important;
+}
+
+.admin-panel-sub,
+[class*="admin-"] [class*="-sub"],
+[class*="admin-"] [class*="-label"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-medium) !important;
+}
+
+[class*="admin-"] th,
+[class*="admin-"] [class*="-th"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+[class*="admin-"] td,
+[class*="admin-"] [class*="-td"] {
+  font-size: var(--ts-sm) !important;
+}
+
+[class*="admin-"] [class*="-stat"] [class*="-val"],
+[class*="admin-"] [class*="-metric"] [class*="-val"],
+[class*="admin-"] [class*="-count"] {
+  font-size: var(--ts-xl) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+[class*="admin-"] [class*="-stat"] [class*="-label"],
+[class*="admin-"] [class*="-metric"] [class*="-label"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-medium) !important;
+}
+
+[class*="admin-"] label,
+[class*="admin-"] .label {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.03em;
+}
+
+[class*="admin-nav"] a,
+[class*="admin-tab"],
+[class*="admin-"] [class*="-tab"] {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-medium) !important;
+}
+
+[class*="admin-"] [class*="-badge"],
+[class*="admin-"] [class*="-status"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+}
+
+.admin-login-title {
+  font-size: var(--ts-xl) !important;
+  font-weight: var(--fw-heavy) !important;
+}
+
+.admin-login-sub {
+  font-size: var(--ts-sm) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   12. BUTTON SCALE
+   ══════════════════════════════════════════════════ */
+
+.btn,
+button[class*="btn-"],
+a[class*="btn-"],
+[class*="hx-btn-"] {
+  font-size: var(--ts-sm) !important;
+  font-weight: var(--fw-semi) !important;
+  letter-spacing: 0.01em;
+}
+
+.btn-sm,
+button[class*="btn-sm"],
+button[class*="-compact"],
+[class*="-btn-sm"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-semi) !important;
+}
+
+/* ══════════════════════════════════════════════════
+   13. PROMO TICKER & TRUST STRIPS
+   ══════════════════════════════════════════════════ */
+
+[class*="promo-ticker"],
+[class*="promoTicker"] {
+  font-size: var(--ts-xs) !important;
+  font-weight: var(--fw-medium) !important;
+}
+
+[class*="social-proof"],
+[class*="socialProof"],
+[class*="trust-strip"],
+[class*="trustStrip"] {
+  font-size: var(--ts-xs) !important;
+}

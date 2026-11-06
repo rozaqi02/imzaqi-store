@@ -248,12 +248,13 @@ export default function FaqPageContent() {
     setQuery(val);
     setSearchParams(
       (prev) => {
+        const next = new URLSearchParams(prev);
         if (val) {
-          prev.set("q", val);
+          next.set("q", val);
         } else {
-          prev.delete("q");
+          next.delete("q");
         }
-        return prev;
+        return next;
       },
       { replace: true }
     );

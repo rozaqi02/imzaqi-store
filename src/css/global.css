@@ -408,9 +408,10 @@ body.checkout-open {
 }
 
 .header.is-heroHidden {
-  transform: translateY(-8px);
-  opacity: 0;
-  pointer-events: none;
+  transform: translateY(-16px) !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden;
 }
 
 .header-inner {

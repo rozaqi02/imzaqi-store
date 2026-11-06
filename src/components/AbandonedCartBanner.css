@@ -63,6 +63,20 @@ html[data-theme="light"] .abandoned-cart-banner {
   border-radius: 12px;
 }
 
+@media (max-width: 1024px) {
+  body.has-bottom-nav .abandoned-cart-banner {
+    bottom: calc(var(--site-bottom-nav-clearance, 82px) + 8px);
+  }
+
+  body.has-bottom-nav:has(.pdx-mobileStickyDock, .with-sticky-cta) .abandoned-cart-banner {
+    bottom: calc(var(--site-bottom-nav-clearance, 82px) + 78px + 8px);
+  }
+
+  body:has(.pdx-mobileStickyDock, .with-sticky-cta):not(.has-bottom-nav) .abandoned-cart-banner {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 76px);
+  }
+}
+
 @media (min-width: 721px) {
   .abandoned-cart-banner {
     left: auto;

@@ -1,6 +1,13 @@
 import * as fc from "fast-check";
-import { describe, it, expect } from "vitest";
-import { csvEscapeValue, buildOrdersCSV } from "./api";
+import { describe, it, expect, vi } from "vitest";
+import { csvEscapeValue, buildOrdersCSV, checkStockAvailability } from "./api";
+import { supabase } from "./supabaseClient";
+
+vi.mock("./supabaseClient", () => ({
+  supabase: {
+    from: vi.fn(),
+  },
+}));
 
 describe("csvEscapeValue", () => {
   it("returns empty string for nullish values", () => {
@@ -48,5 +55,32 @@ describe("buildOrdersCSV", () => {
     expect(csv).toContain("Lapor Bayar");
     expect(csv).not.toMatch(/;done;/);
     expect(csv).not.toMatch(/;paid_reported;/);
+  });
+
+  describe("checkStockAvailability", () => {
+    it("treats stock: null as available (untracked stock)", async () => {
+      supabase.from.mockReturnValueOnce({
+        select: vi.fn().mockReturnValueOnce({
+          in: vi.fn().mockResolvedValueOnce({
+            data: [
+              { id: "v-null-stock", name: "Netflix Sharing", stock: null, is_active: true },
+              { id: "v-empty-stock", name: "Canva Pro", stock: "", is_active: true },
+              { id: "v-zero-stock", name: "Spotify", stock: 0, is_active: true },
+            ],
+            error: null,
+          }),
+        }),
+      });
+
+      const result = await checkStockAvailability([
+        { variant_id: "v-null-stock", qty: 2 },
+        { variant_id: "v-empty-stock", qty: 1 },
+        { variant_id: "v-zero-stock", qty: 1 },
+      ]);
+
+      expect(result.outOfStock).toHaveLength(1);
+      expect(result.outOfStock[0].variant_id).toBe("v-zero-stock");
+      expect(result.insufficient).toHaveLength(0);
+    });
   });
 });

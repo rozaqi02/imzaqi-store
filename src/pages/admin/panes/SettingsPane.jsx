@@ -36,7 +36,7 @@ export default function SettingsPane({
         <div className="admin-panel-head">
           <div>
             <div className="admin-panel-title">Kontak & pembayaran</div>
-            <div className="admin-panel-sub">WA admin + payload QRIS checkout</div>
+            <div className="admin-panel-sub">WA admin & payload QRIS</div>
           </div>
         </div>
 

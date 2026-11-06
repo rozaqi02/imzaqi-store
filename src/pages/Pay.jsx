@@ -16,7 +16,6 @@ import CheckoutSteps from "../components/CheckoutSteps";
 import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
-import { useDialogA11y } from "../hooks/useDialogA11y";
 import { addOrderToHistory } from "../lib/orderHistory";
 import { getReferralCode } from "../lib/referral";
 import { copyToClipboard } from "../utils/clipboard";
@@ -134,6 +133,7 @@ export default function Pay() {
   });
 
   const [snapshot, setSnapshot] = useState(() => (Array.isArray(cart.items) ? cart.items : []));
+  const [promoPercent, setPromoPercent] = useState(0);
 
   useEffect(() => {
     if (Array.isArray(cart.items) && cart.items.length > 0) setSnapshot(cart.items);
@@ -200,7 +200,6 @@ export default function Pay() {
   }, []);
 
   const items = snapshot;
-  const [promoPercent, setPromoPercent] = useState(0);
   const subtotal = useMemo(() => items.reduce((sum, item) => sum + (Number(item.price_idr) || 0) * (Number(item.qty) || 0), 0), [items]);
   const { discount, total } = useMemo(() => calcTotal(subtotal, promoPercent), [subtotal, promoPercent]);
   const itemCount = useMemo(() => items.reduce((sum, item) => sum + Number(item.qty || 0), 0), [items]);
@@ -383,6 +382,12 @@ export default function Pay() {
   const requiresBuyerEmailNote = requiredBuyerEmailItems.length > 0;
   const hasEmailInNotes = EMAIL_IN_TEXT_REGEX.test(String(buyerEmail || "").trim());
   const missingBuyerEmailNote = requiresBuyerEmailNote && !hasEmailInNotes;
+  const [contactOpen, setContactOpen] = useState(() => !hasValidWhatsApp || missingBuyerEmailNote);
+  const [notesOpen, setNotesOpen] = useState(() => Boolean(notes));
+
+  useEffect(() => {
+    if (!hasValidWhatsApp || missingBuyerEmailNote) setContactOpen(true);
+  }, [hasValidWhatsApp, missingBuyerEmailNote]);
   const requiredEmailProductsText = useMemo(() => {
     const names = Array.from(
       new Set(
@@ -705,6 +710,7 @@ export default function Pay() {
       : null;
 
   function focusBlockingField() {
+    setContactOpen(true);
     if (contactDetailsRef.current) contactDetailsRef.current.open = true;
     if (!hasValidWhatsApp) {
       contactCardRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -794,9 +800,9 @@ export default function Pay() {
       <section className="section reveal pay-shell-hero">
         <div className="container pay-shell-top">
           <div className="pay-shell-copy hero-anim-wrap">
-            <span className="pay-shell-kicker">QRIS aman & instan</span>
-            <h1 className="h1 pay-shell-title hero-anim-title">Selesaikan pembayaran.</h1>
-            <p className="pay-shell-sub hero-anim-sub">Scan QRIS dengan aplikasi m-banking atau e-wallet pilihanmu.</p>
+            <span className="pay-shell-kicker">Pembayaran QRIS</span>
+            <h1 className="h1 pay-shell-title hero-anim-title">Bayar pesanan.</h1>
+            <p className="pay-shell-sub hero-anim-sub">Scan QRIS lewat m-banking atau e-wallet.</p>
             <span
               className={`pay-shell-status${isFreeOrder ? " is-free" : qrisTimer.expired ? " is-expired" : ""}`}
               role="status"
@@ -833,10 +839,14 @@ export default function Pay() {
         <div className="container pay-shell-grid">
           <div className="pay-mainStack">
             <section ref={contactCardRef} className="card pad pay-card pay-contactCard">
-              <details ref={contactDetailsRef} open={!hasValidWhatsApp || missingBuyerEmailNote}>
+              <details
+                ref={contactDetailsRef}
+                open={contactOpen}
+                onToggle={(e) => setContactOpen(e.currentTarget.open)}
+              >
                 <summary className="pay-contactSummary">
                   <span><strong>Kontak pesanan</strong><span>{customerWhatsApp || "Lengkapi WhatsApp"}</span>{requiresBuyerEmailNote ? <span>{buyerEmail || "Lengkapi email aktivasi"}</span> : null}</span>
-                  <span className="pay-contactEdit">Ubah</span>
+                  <span className="pay-contactEdit">{contactOpen ? "Selesai" : "Ubah"}</span>
                 </summary>
               <div className="pay-cardHead">
                 <div>
@@ -856,7 +866,7 @@ export default function Pay() {
                 rememberLast
                 compact
                 label="WhatsApp"
-                helperText="Nomor buat notifikasi order ini ya."
+                helperText="Untuk pengiriman akun & update status."
                 placeholder="08xxxxxxxxxx"
                 className="pay-waField"
                 disabled={busy}
@@ -900,7 +910,7 @@ export default function Pay() {
               )}
 
               </details>
-               <details className="pay-notePanel" open={notes ? true : undefined}>
+               <details className="pay-notePanel" open={notesOpen} onToggle={(e) => setNotesOpen(e.currentTarget.open)}>
                  <summary>Catatan tambahan <span>Opsional</span></summary>
                 <div className="pay-noteHead">
                   <div className="pay-noteLabelWrap">
@@ -924,7 +934,7 @@ export default function Pay() {
 
                 <div className="pay-noteMetaRow">
                   <div className="pay-noteHintText">
-                     Ada permintaan khusus? Tulis di sini untuk admin.
+                     Catatan untuk admin (opsional).
                   </div>
                   <div className="pay-noteMeta">{notes.length}/400</div>
                 </div>
@@ -940,8 +950,8 @@ export default function Pay() {
                 <div className="pay-stageMeta">
                   <div className="pay-stageHint">
                     {isFreeOrder
-                      ? "Promo 100% diterapkan. Tidak perlu bayar, langsung konfirmasi order."
-                      : "1. Scan atau simpan QRIS. 2. Bayar sesuai nominal. 3. Tekan Saya sudah bayar."}
+                      ? "Diskon 100%. Langsung konfirmasi pesanan."
+                      : "Scan QRIS, bayar nominal pas, lalu konfirmasi."}
                   </div>
 
 
@@ -1060,13 +1070,13 @@ export default function Pay() {
                             download="qris-pembayaran.png"
                             className="btn btn-ghost btn-sm pay-qrisDownload"
                           >
-                            Simpan QRIS ke Galeri
+                            Simpan QRIS
                           </a>
                         )}
 
                         {qris.failed ? (
                           <div className="hint subtle pay-qrisFailedHint">
-                            <span>QRIS gagal dimuat. Refresh lalu coba lagi.</span>
+                            <span>Gagal memuat QRIS. Muat ulang halaman.</span>
                             <button
                               type="button"
                               className="btn btn-sm pay-qrisRefreshBtn"

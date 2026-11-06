@@ -179,11 +179,11 @@ html[data-motion="lite"] .hero-anim-sub {
 }
 
 .hx-hero--choreographed[data-hero-active="true"] .hx-word-1 {
-  animation: heroGradientWordReveal 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
+  animation: heroWordReveal 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.18s both;
 }
 
 .hx-hero--choreographed[data-hero-active="true"] .hx-word-2 {
-  animation: heroWordReveal 0.48s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
+  animation: heroGradientWordReveal 0.52s cubic-bezier(0.16, 1, 0.3, 1) 0.26s both;
 }
 
 .hx-hero--choreographed[data-hero-active="true"] .hx-word-3 {
@@ -227,7 +227,7 @@ html[data-theme="light"] .hx-hero--choreographed {
   animation: heroLogoIn 0.5s var(--hero-entry-ease) 0.06s both;
   animation-play-state: var(--hero-entry-play);
 }
-.hx-hero--choreographed :is(.hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item) {
+.hx-hero--choreographed :is(.hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-trust-bar, .hx-stat-item) {
   animation: heroEntranceFadeUp 0.55s var(--hero-entry-ease) var(--hero-entry-delay, 0s) both;
   animation-play-state: var(--hero-entry-play);
 }
@@ -235,6 +235,7 @@ html[data-theme="light"] .hx-hero--choreographed {
 .hx-hero--choreographed .hx-subtitle { --hero-entry-delay: 0.44s; }
 .hx-hero--choreographed .hx-ctas-row > a:first-child { --hero-entry-delay: 0.56s; }
 .hx-hero--choreographed .hx-ctas-row > a:nth-child(2) { --hero-entry-delay: 0.64s; }
+.hx-hero--choreographed .hx-trust-bar { --hero-entry-delay: 0.74s; }
 .hx-hero--choreographed .hx-stat-item { --hero-entry-delay: 0.72s; }
 .hx-hero--choreographed .hx-stat-item:nth-child(2) { --hero-entry-delay: 0.78s; }
 .hx-hero--choreographed .hx-stat-item:nth-child(3) { --hero-entry-delay: 0.84s; }
@@ -252,14 +253,14 @@ html[data-theme="light"] .hx-hero--choreographed {
 .hx-hero--choreographed .hx-ctas-row > a:focus-visible { animation: none; opacity: 1; transform: none; }
 
 /* Reduced motion / off */
-.hx-hero--choreographed[data-hero-reduced="true"] :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item, .hx-headline-word) {
+.hx-hero--choreographed[data-hero-reduced="true"] :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-trust-bar, .hx-stat-item, .hx-headline-word) {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
   filter: none !important;
 }
 
-html[data-motion="off"] .hx-hero--choreographed :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item, .hx-headline-word) {
+html[data-motion="off"] .hx-hero--choreographed :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-trust-bar, .hx-stat-item, .hx-headline-word) {
   animation: none !important;
   opacity: 1 !important;
   transform: none !important;
@@ -267,7 +268,7 @@ html[data-motion="off"] .hx-hero--choreographed :is(.hx-hero-logo img, .hx-eyebr
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .hx-hero--choreographed :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-stat-item, .hx-headline-word) {
+  .hx-hero--choreographed :is(.hx-hero-logo img, .hx-eyebrow-row, .hx-subtitle, .hx-ctas-row > a, .hx-trust-bar, .hx-stat-item, .hx-headline-word) {
     animation: none !important;
     opacity: 1 !important;
     transform: none !important;

@@ -43,4 +43,52 @@ describe("CartProvider live synchronization", () => {
 
     expect(current.items[0]).toMatchObject({ stock: 2, requires_buyer_email: true });
   });
+
+  it("allows adding and increasing qty for untracked stock (stock: null)", () => {
+    let current;
+    render(<CartProvider><Probe onValue={(value) => { current = value; }} /></CartProvider>);
+
+    let result;
+    act(() => {
+      result = current.add({
+        id: "variant-untracked",
+        product_id: "prod-1",
+        product_name: "Netflix",
+        name: "Sharing 1 Bulan",
+        price_idr: 25000,
+        stock: null,
+      }, 1);
+    });
+
+    expect(result.success).toBe(true);
+    expect(current.items).toHaveLength(1);
+    expect(current.items[0].qty).toBe(1);
+
+    // Can increase qty above 1 for untracked stock
+    act(() => {
+      current.setQty("variant-untracked", 5);
+    });
+    expect(current.items[0].qty).toBe(5);
+  });
+
+  it("rejects adding when stock is explicitly 0", () => {
+    let current;
+    render(<CartProvider><Probe onValue={(value) => { current = value; }} /></CartProvider>);
+
+    let result;
+    act(() => {
+      result = current.add({
+        id: "variant-out",
+        product_id: "prod-2",
+        product_name: "Spotify",
+        name: "Individual",
+        price_idr: 30000,
+        stock: 0,
+      }, 1);
+    });
+
+    expect(result.success).toBe(false);
+    expect(result.outOfStock).toBe(true);
+    expect(current.items).toHaveLength(0);
+  });
 });

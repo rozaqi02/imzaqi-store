@@ -2499,10 +2499,12 @@ export default function AdminDashboard() {
       e.target.reset();
       toast.remove(tid);
       toast.success("Testimoni ditambah", { duration: 1400 });
+      return true;
     } catch (e2) {
       toast.remove(tid);
       toast.error("Gagal upload testimoni");
       setMsg(e2?.message || String(e2));
+      return false;
     }
   }
 
@@ -2510,6 +2512,11 @@ export default function AdminDashboard() {
     const tid = toast.loading("Update testimoni");
     try {
       const { error } = await supabase.from("testimonials").update(patch).eq("id", id);
+      if (error && patch.is_verified !== undefined && String(error.message || "").includes("is_verified")) {
+        toast.remove(tid);
+        toast.warning("Kolom is_verified belum tersedia di database.");
+        return;
+      }
       if (error) throw error;
       invalidateTestimonialsCache();
       setTestimonials(await fetchTestimonials({ includeInactive: true }));
@@ -2590,14 +2597,14 @@ export default function AdminDashboard() {
 
   // ===== Render =====
   const tabs = [
-    { id: "overview", label: "Ringkasan", hint: "Apa yang perlu dikerjakan sekarang" },
-    { id: "products", label: "Produk", hint: "Katalog, paket, dan stok" },
-    { id: "orders", label: "Pesanan", hint: "Antrean bayar & proses" },
-    { id: "promos", label: "Promo", hint: "Kode diskon pelanggan" },
-    { id: "flashsale", label: "Flash Sale", hint: "Diskon kilat per varian" },
-    { id: "marketing", label: "Media Promosi", hint: "Poster produk & pamflet harga" },
-    { id: "testimonials", label: "Testimoni", hint: "Bukti sosial di etalase" },
-    { id: "settings", label: "Pengaturan", hint: "WA, QRIS, operasional" },
+    { id: "overview", label: "Ringkasan", hint: "Metrik & antrean" },
+    { id: "products", label: "Produk", hint: "Katalog & stok" },
+    { id: "orders", label: "Pesanan", hint: "Antrean bayar" },
+    { id: "promos", label: "Promo", hint: "Kode voucher" },
+    { id: "flashsale", label: "Flash Sale", hint: "Diskon kilat" },
+    { id: "marketing", label: "Media Promosi", hint: "Poster & brosur" },
+    { id: "testimonials", label: "Testimoni", hint: "Ulasan toko" },
+    { id: "settings", label: "Pengaturan", hint: "Sistem & toko" },
   ];
 
   const activeTab = tabs.find((item) => item.id === tab) || tabs[0];

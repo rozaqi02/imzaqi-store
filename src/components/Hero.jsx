@@ -2,97 +2,70 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
-  Crown,
-  Eye,
-  Package,
+  CheckCircle2,
   PackageCheck,
-  ShoppingBag,
+  ShieldCheck,
+  Zap,
 } from "lucide-react";
 import { useLiveStats } from "../hooks/useLiveStats";
 import NumberCounter from "./NumberCounter";
-import { usePresence } from "../context/PresenceContext";
 import { useDeviceCapability } from "../hooks/useIsMobile";
 import HeroCatalogBackdrop from "./HeroCatalogBackdrop";
 
-function ActiveShoppersBadge() {
-  const { activeShoppers } = usePresence();
-
-  return (
-    <div className="hx-stat-item hx-stat-item--live">
-      <span className="hx-stat-icon-wrap" aria-hidden="true">
-        <Eye size={15} strokeWidth={2.4} className="hx-stat-icon hx-live-eye-icon" />
-      </span>
-      <div className="hx-stat-meta">
-        <span className="hx-stat-val">{activeShoppers || 1}</span>
-        <span className="hx-stat-label">Pembeli Online</span>
-      </div>
-    </div>
-  );
-}
-
-function HeroStatsRow({ activeProductCount, isProductsLoading = false }) {
-  const { last7DaysViews, totalOrders, loading } = useLiveStats({
+/* ── Trust Bar (Replaces generic 4-box dashboard cards with bespoke e-commerce proof) ── */
+function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
+  const { totalOrders, loading } = useLiveStats({
     intervalMs: 60000,
   });
 
-  const stats = [
-    {
-      val: totalOrders,
-      isLoading: loading || totalOrders == null,
-      label: "Total Order",
-      icon: ShoppingBag,
-    },
-    {
-      val: activeProductCount,
-      isLoading: isProductsLoading && activeProductCount === 0,
-      label: "Produk Aktif",
-      icon: Package,
-    },
-    {
-      val: last7DaysViews,
-      isLoading: loading || last7DaysViews == null,
-      label: "Views 7 Hari",
-      icon: Eye,
-    },
-  ];
+  const orderCount = totalOrders || 200;
+  const productCount = activeProductCount || 25;
 
   return (
-    <>
-      {stats.map((s) => {
-        const Icon = s.icon;
-        return (
-          <div
-            key={s.label}
-            className="hx-stat-item"
-          >
-            <span className="hx-stat-icon-wrap" aria-hidden="true">
-              <Icon size={15} className="hx-stat-icon" />
-            </span>
-            <div className="hx-stat-meta">
-              <span className="hx-stat-val">
-                {s.isLoading ? (
-                  <span
-                    className="hx-stat-skeleton"
-                    aria-label="Memuat statistik"
-                    style={{
-                      display: "inline-block",
-                      width: 32,
-                      height: 16,
-                      borderRadius: 4,
-                      background: "rgba(255, 255, 255, 0.2)",
-                      verticalAlign: "middle",
-                    }}
-                  />
-                ) : (
-                  <NumberCounter value={s.val || 0} />
-                )}
-              </span>
-              <span className="hx-stat-label">{s.label}</span>
-            </div>
-          </div>
-        );
-      })}
-    </>
+    <div className="hx-trust-bar" role="region" aria-label="Jaminan & Bukti Toko">
+      <div className="hx-trust-item">
+        <ShieldCheck size={14} className="hx-trust-icon" aria-hidden="true" />
+        <span className="hx-trust-text">
+          <strong>
+            {loading && !totalOrders ? (
+              "200+"
+            ) : (
+              <>
+                <NumberCounter value={orderCount} />+
+              </>
+            )}
+          </strong>{" "}
+          Pesanan Sukses
+        </span>
+      </div>
+
+      <span className="hx-trust-divider" aria-hidden="true" />
+
+      <div className="hx-trust-item">
+        <Zap size={14} className="hx-trust-icon" aria-hidden="true" />
+        <span className="hx-trust-text">
+          <strong>
+            {isProductsLoading && !activeProductCount ? (
+              "25+"
+            ) : (
+              <>
+                <NumberCounter value={productCount} />+
+              </>
+            )}
+          </strong>{" "}
+          Layanan Aktif
+        </span>
+      </div>
+
+      <span className="hx-trust-divider" aria-hidden="true" />
+
+      <div className="hx-trust-item">
+        <CheckCircle2 size={14} className="hx-trust-icon" aria-hidden="true" />
+        <span className="hx-trust-text">
+          <strong>Garansi Penuh</strong> &amp; Proses Cepat
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -101,8 +74,6 @@ const HERO_LOGO_SCROLL_RANGE = 75;
 const HEADLINE_WORDS = ["Akses", "Premium", "Budget", "Pelajar"];
 
 function useHeroVisibility() {
-  // Latching entrance state: starts active immediately if page is visible,
-  // or triggers once when a background tab becomes active. Never un-mounts or replays.
   const [active, setActive] = useState(() => {
     if (typeof document === "undefined") return true;
     return !document.hidden;
@@ -127,12 +98,14 @@ function useHeroVisibility() {
 }
 
 function HeroHeadline({ active = true, reduced = false } = {}) {
+  // Line 1: "Akses Premium" (solid editorial tone)
+  // Line 2: "Budget Pelajar" (unified accent phrase, no alternating word-by-word colors)
   const words = HEADLINE_WORDS.map((word, index) => {
-    const isGradient = index % 2 === 1;
+    const isAccent = index >= 2;
     return (
       <span className="hx-headline-mask" key={word}>
         <span
-          className={`hx-headline-word hx-word-${index}${isGradient ? " hx-headline-gradient" : ""}`}
+          className={`hx-headline-word hx-word-${index}${isAccent ? " hx-headline-gradient" : ""}`}
           style={{ "--w": index }}
         >
           {word}
@@ -191,14 +164,14 @@ export default function Hero({ products = [], loading = false }) {
   const activeProductCount = useMemo(
     () =>
       (products || []).filter((p) =>
-        (p?.product_variants || []).some((v) => v?.is_active)
+        p && p.is_active !== false && (p?.product_variants || []).some((v) => v?.is_active !== false)
       ).length,
     [products]
   );
 
   return (
     <section ref={heroRef} className="hx-hero hx-hero--choreographed" data-hero-active={entranceActive} data-hero-reduced={isMotionReduced} aria-label="Marketplace Hero">
-      <HeroCatalogBackdrop products={products} />
+      <HeroCatalogBackdrop />
       <div className="hx-hero-scrim" aria-hidden="true" />
       <Link ref={logoRef} to="/" className="hx-hero-logo" aria-label="Imzaqi Store">
         <img src="/icon.png" alt="Imzaqi Store" />
@@ -206,39 +179,28 @@ export default function Hero({ products = [], loading = false }) {
       <div className="container">
         <div className="hx-stage">
           <div className="hx-main">
-            <div className="hx-eyebrow-row">
-              <span className="hx-eyebrow">
-                <Crown size={13} aria-hidden="true" />
-                Marketplace langganan premium
-              </span>
-            </div>
-
-             <HeroHeadline active={entranceActive} reduced={isMotionReduced} />
+            <HeroHeadline active={entranceActive} reduced={isMotionReduced} />
 
             <p className="hx-subtitle">
-              Akses premium tanpa boncos: pilih paket, scan QRIS, lacak status order kamu.
+              Pilih paket, bayar QRIS, lacak status order.
             </p>
 
             <div className="hx-ctas-row">
               <Link className="hx-btn-primary" to="/produk">
-                <ShoppingBag size={15} aria-hidden="true" />
-                <span>Gas Lihat Katalog</span>
-                <ArrowRight size={15} aria-hidden="true" />
+                <span>Lihat Katalog</span>
+                <ArrowRight size={16} aria-hidden="true" className="hx-btn-arrow" />
               </Link>
               <Link className="hx-btn-secondary" to="/status">
-                <PackageCheck size={15} aria-hidden="true" />
+                <PackageCheck size={16} aria-hidden="true" />
                 <span>Cek Status</span>
               </Link>
             </div>
           </div>
 
-          <div className="hx-stats-row" aria-label="Statistik toko">
-            <ActiveShoppersBadge />
-            <HeroStatsRow
-              activeProductCount={activeProductCount}
-              isProductsLoading={loading || (!products || products.length === 0)}
-            />
-          </div>
+          <HeroTrustBar
+            activeProductCount={activeProductCount}
+            isProductsLoading={loading || (!products || products.length === 0)}
+          />
         </div>
       </div>
     </section>

@@ -46,14 +46,14 @@ const MOBILE_SHORT_LABELS = {
 };
 
 const TAB_HINTS = {
-  overview: "Apa yang perlu dikerjakan sekarang",
-  orders: "Antrean bayar & proses",
-  products: "Katalog & stok paket",
-  promos: "Kode diskon aktif",
-  flashsale: "Diskon kilat per varian",
-  marketing: "Poster produk & pamflet harga",
-  testimonials: "Bukti sosial di etalase",
-  settings: "WA, QRIS, operasional",
+  overview: "Metrik & antrean",
+  orders: "Antrean bayar",
+  products: "Katalog & stok",
+  promos: "Kode voucher",
+  flashsale: "Diskon kilat",
+  marketing: "Poster & brosur",
+  testimonials: "Ulasan toko",
+  settings: "Sistem & toko",
 };
 
 function NavDot({ tone = "accent", children }) {

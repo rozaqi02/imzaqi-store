@@ -35,6 +35,7 @@ import {
 import { supabase } from "../lib/supabaseClient";
 import { formatIDR } from "../lib/format";
 import { fetchSettings, fetchProducts } from "../lib/api";
+import { STORE_WHATSAPP } from "../lib/productCategories";
 import {
   getOrderHistory,
   updateOrderHistoryStatus,
@@ -419,7 +420,7 @@ function PostTransactionReview({ order, waUrl, toast }) {
       </div>
 
       <p className="st-reviewIntro">
-        Pesananmu sudah selesai! Bagaimana pengalaman belanja kamu di Imzaqi Store?
+        Pesanan selesai! Bagaimana pengalaman belanja kamu?
       </p>
 
       <form onSubmit={handleSubmit} className="st-reviewForm">
@@ -512,6 +513,7 @@ function TabCekStatus({ settings }) {
   const [showCelebration, setShowCelebration] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
   const prevStatusRef = useRef(null);
+  const lastLookedUpCodeRef = useRef("");
 
   const isAcademicOrder = useMemo(() => {
     if (!order?.items || !Array.isArray(order.items)) return false;
@@ -521,7 +523,9 @@ function TabCekStatus({ settings }) {
     });
   }, [order]);
 
-  const waNumber = isAcademicOrder ? "6281232742374" : (settings?.whatsapp?.number || "6283136049987");
+  const waNumber = isAcademicOrder
+    ? STORE_WHATSAPP.academic
+    : (settings?.whatsapp?.number || (typeof settings?.whatsapp === "string" ? settings.whatsapp : STORE_WHATSAPP.app_premium));
   const pollTimerRef = useRef(null);
 
   const lookup = useCallback(async (rawValue) => {
@@ -535,6 +539,7 @@ function TabCekStatus({ settings }) {
       toast.error(text);
       return;
     }
+    lastLookedUpCodeRef.current = code;
     setLoading(true);
     setMessage("");
     setOrder(null);
@@ -581,7 +586,9 @@ function TabCekStatus({ settings }) {
     if (!initialParam) return;
     const normalized = normalizeOrderCode(initialParam);
     setInput(normalized);
-    lookup(normalized);
+    if (lastLookedUpCodeRef.current !== normalized) {
+      lookup(normalized);
+    }
   }, [initialParam, lookup]);
 
   // Trigger celebration and record loyalty reward when status becomes "done"
@@ -831,7 +838,7 @@ function TabCekStatus({ settings }) {
             </div>
 
             <div id="status-search-hint" className={`st-searchHint${message ? " is-error" : ""}`} role="status">
-              {message || "Contoh: IMZ-ABCD1234. ID tersedia setelah konfirmasi pembayaran berhasil disimpan."}
+              {message || "Contoh: IMZ-ABCD1234 dari bukti konfirmasi pembayaran."}
             </div>
           </section>
 
@@ -1349,8 +1356,12 @@ function TabRiwayat() {
     const errors = {};
     try {
       const results = await Promise.all(history.map(async (entry) => {
-        const row = await fetchOrderByCode(entry.order_code);
-        return { entry, row };
+        try {
+          const row = await fetchOrderByCode(entry.order_code);
+          return { entry, row };
+        } catch {
+          return { entry, row: null };
+        }
       }));
 
       results.forEach(({ entry, row }) => {
@@ -1542,7 +1553,7 @@ export default function Status() {
   const tabParam = searchParams.get("tab");
   const activeTab = tabParam === "riwayat" ? "riwayat" : "cek";
 
-  const [settings, setSettings] = useState({ whatsapp: { number: "6283136049987" } });
+  const [settings, setSettings] = useState({ whatsapp: { number: STORE_WHATSAPP.app_premium } });
 
   usePageMeta({
     title: activeTab === "riwayat" ? "Riwayat Pesanan" : "Status Pesanan",
@@ -1557,7 +1568,8 @@ export default function Status() {
     fetchSettings()
       .then((result) => {
         if (!active) return;
-        setSettings({ whatsapp: result.whatsapp || { number: "6283136049987" } });
+        const wa = typeof result?.whatsapp === "string" ? { number: result.whatsapp } : (result?.whatsapp || { number: STORE_WHATSAPP.app_premium });
+        setSettings({ whatsapp: wa });
       })
       .catch(() => {});
     return () => { active = false; };

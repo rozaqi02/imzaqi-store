@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDeviceCapability, useMediaQuery } from "../hooks/useIsMobile";
+import { BACKDROP_PRODUCTS } from "../data/backdropProducts";
 
 const DESKTOP_ROW_COUNT = 4;
 // One source row must be wider than the stage. Three copies then keep both
@@ -82,8 +83,7 @@ function buildProductPool(products, config) {
 function buildRows(pool, config) {
   if (!pool.length) return [];
 
-  // Background dekoratif cukup memakai sampel kecil katalog; tidak perlu
-  // menggandakan seluruh daftar produk di atas lipatan pertama.
+  // Background dekoratif memakai ikon lokal dari public/backdrop-icons
   const perRow = config.minTilesPerRow;
 
   return Array.from({ length: config.rowCount }, (_, index) => {
@@ -105,20 +105,20 @@ function CatalogTile({ product, eager = false }) {
   return (
     <article className="hx-catalog-tile" aria-hidden="true">
       <div className="hx-catalog-tile-icon">
-          <img
-            src={product.icon_url}
-            alt=""
-            loading={eager ? "eager" : "lazy"}
-            decoding="async"
-            fetchPriority={eager ? "high" : "low"}
-            draggable={false}
-          />
+        <img
+          src={product.icon_url}
+          alt=""
+          loading={eager ? "eager" : "lazy"}
+          decoding="async"
+          fetchPriority={eager ? "high" : "low"}
+          draggable={false}
+        />
       </div>
     </article>
   );
 }
 
-export default function HeroCatalogBackdrop({ products = [] }) {
+export default function HeroCatalogBackdrop({ products = BACKDROP_PRODUCTS } = {}) {
   const caps = useDeviceCapability();
   const isNarrowViewport = useMediaQuery("(max-width: 720px)");
   const [viewportHeight, setViewportHeight] = useState(() =>
@@ -143,9 +143,12 @@ export default function HeroCatalogBackdrop({ products = [] }) {
     };
   }, []);
 
+  // Use local static icons from public/backdrop-icons (no Supabase query needed for backdrop)
+  const backdropPool = (products && products.length > 0) ? products : BACKDROP_PRODUCTS;
+
   const rows = useMemo(
-    () => buildRows(buildProductPool(products, config), config),
-    [products, config]
+    () => buildRows(buildProductPool(backdropPool, config), config),
+    [backdropPool, config]
   );
 
   useEffect(() => {

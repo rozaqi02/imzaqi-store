@@ -209,7 +209,12 @@ export function detectAccountTypes(variants) {
   const found = [];
   if (!variants || !variants.length) return found;
   ACCOUNT_TYPE_KEYWORDS.forEach(({ keyword, label, color }) => {
-    if ((variants || []).some((v) => String(v?.name || "").toLowerCase().includes(keyword))) {
+    if (
+      (variants || []).some((v) => {
+        const text = `${v?.account_type || ""} ${v?.type || ""} ${v?.name || ""}`.toLowerCase();
+        return text.includes(keyword);
+      })
+    ) {
       found.push({ label, color });
     }
   });

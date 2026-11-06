@@ -8,6 +8,7 @@
 
 @import "./css/global.css";
 @import "./css/theme-variables.css";
+@import "./css/type-scale.css";
 @import "./css/theme-consolidated.css";
 @import "./css/motion.css";
 @import "./css/polish.css";
@@ -57,5 +58,4 @@
 @import "./css/buttons.css";
 @import "./css/page-transitions.css";
 @import "./css/home-polish.css";
-
-
+@import "./css/type-overrides.css";

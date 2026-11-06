@@ -28,7 +28,7 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import WhatsAppInput from "../components/WhatsAppInput";
-import { loadBuyerDetails, saveBuyerDetails } from "../lib/buyerDetails";
+import { loadBuyerDetails, saveBuyerDetails, variantNeedsBuyerEmail } from "../lib/buyerDetails";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
 import CartIcon from "../components/CartIcon";
 
@@ -200,7 +200,7 @@ export default function Checkout() {
   const hasStockIssue = useMemo(() => cart.items.some((item) => stockWarnings[item.variant_id]), [cart.items, stockWarnings]);
   const stockDisabledReason = hasStockIssue ? "Ada item yang stoknya abis atau kurang" : null;
   const requiresBuyerEmail = useMemo(
-    () => cart.items.some((item) => Boolean(item.requires_buyer_email)),
+    () => cart.items.some((item) => variantNeedsBuyerEmail(item)),
     [cart.items]
   );
   const hasValidEmail = !requiresBuyerEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail.trim());
@@ -216,13 +216,14 @@ export default function Checkout() {
   }, []);
 
   useDialogA11y({
-    open: true,
+    open: isDrawerCheckout,
     containerRef: drawerRef,
     onClose: requestClose,
     initialFocusSelector: ".checkout-drawerClose",
   });
 
   useEffect(() => {
+    if (!isDrawerCheckout) return undefined;
     function onKeyDown(event) {
       if (event.key === "Escape" && event.target.tagName !== "INPUT" && event.target.tagName !== "TEXTAREA") {
         requestClose();
@@ -231,13 +232,13 @@ export default function Checkout() {
 
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, [requestClose]);
+  }, [isDrawerCheckout, requestClose]);
 
   useEffect(() => {
     if (!closing) return undefined;
 
     const timer = window.setTimeout(() => {
-      if (backgroundLocation || (typeof window !== "undefined" && window.history.length > 1)) {
+      if (backgroundLocation) {
         nav(-1);
         return;
       }
@@ -322,7 +323,7 @@ export default function Checkout() {
         <div className="checkout-contactHead">
           <div>
             <div className="checkout-main-kicker">Kontak pengiriman</div>
-            <h3>Siapkan tujuan pesanan</h3>
+            <h3>Tujuan pesanan</h3>
           </div>
            <span>Untuk pengiriman</span>
         </div>
@@ -334,11 +335,11 @@ export default function Checkout() {
           compact
           rememberLast
           label="WhatsApp"
-          helperText="Dipakai untuk mengirim akun dan memulihkan riwayat order."
+          helperText="Untuk kirim akun & lacak status order."
         />
         {requiresBuyerEmail ? (
           <div className="checkout-emailField">
-            <label htmlFor="checkout-buyer-email"><Mail size={14} /> Email aktivasi <span className="required" style={{ color: "#ef4444", fontWeight: "bold" }}>*</span> <span>(Wajib untuk paket ini)</span></label>
+            <label htmlFor="checkout-buyer-email"><Mail size={14} /> Email aktivasi <span className="required" style={{ color: "#ef4444", fontWeight: "bold" }}>*</span> <span>(Wajib)</span></label>
             <input
               id="checkout-buyer-email"
               className="input"
@@ -356,7 +357,7 @@ export default function Checkout() {
               aria-invalid={showEmailError || undefined}
                aria-describedby={showEmailError ? "checkout-buyer-email-error checkout-email-help" : "checkout-email-help"}
              />
-             <p id="checkout-email-help" className="hint">Email ini digunakan untuk aktivasi paketmu.</p>
+             <p id="checkout-email-help" className="hint">Untuk aktivasi paketmu.</p>
             {showEmailError ? (
               <div id="checkout-buyer-email-error" className="hint error-hint" role="alert">
                 Masukkan email yang valid, contoh: nama@email.com
@@ -458,8 +459,8 @@ export default function Checkout() {
         {cart.hasBackup && cart.hasBackup() ? (
           <div className="checkout-restoreCard">
             <div className="checkout-restoreInfo">
-              <strong>Punya pesanan yang belum diselesaikan?</strong>
-              <span>Kamu bisa memulihkan item dari checkout sebelumnya.</span>
+              <strong>Ada pesanan tersimpan?</strong>
+              <span>Pulihkan item dari checkout sebelumnya.</span>
             </div>
             <button
               type="button"
@@ -471,7 +472,7 @@ export default function Checkout() {
                 }
               }}
             >
-              <RefreshCw size={13} /> Pulihkan Keranjang
+              <RefreshCw size={13} /> Pulihkan item
             </button>
           </div>
         ) : null}
@@ -520,10 +521,10 @@ export default function Checkout() {
           <ArrowRight size={16} />
         </button>
 
-        <p className="checkout-summaryHint">Menuju halaman QRIS untuk menyelesaikan pesanan.</p>
+        <p className="checkout-summaryHint">Bayar instan via QRIS.</p>
 
         <Link className="checkout-summaryLink" to="/status">
-          Sudah punya ID? Cek status
+          Punya ID order? Cek status
         </Link>
       </aside>
     );
@@ -536,8 +537,8 @@ export default function Checkout() {
         <div className="checkout-drawerHandle" aria-hidden="true" />
         <div className="checkout-drawerHead">
           <div className="checkout-drawerCopy">
-            <h1 className="h1 checkout-drawerTitle">Cek sebelum bayar.</h1>
-            <p className="checkout-drawerSub"><BadgeCheck size={14} aria-hidden="true" /><span>Keranjang tersimpan otomatis</span></p>
+            <h1 className="h1 checkout-drawerTitle">Pesananmu.</h1>
+            <p className="checkout-drawerSub"><BadgeCheck size={14} aria-hidden="true" /><span>Tersimpan otomatis</span></p>
           </div>
 
           <button
@@ -659,9 +660,9 @@ export default function Checkout() {
               <span>Kembali</span>
             </button>
             <div className="checkout-full-title-wrap hero-anim-wrap">
-              <span className="checkout-full-kicker">Checkout aman & cepat</span>
-              <h1 className="h1 checkout-full-title hero-anim-title">Cek pesananmu.</h1>
-              <p className="checkout-full-sub hero-anim-sub">Pastikan paket dan durasinya sudah pas sebelum bayar.</p>
+              <span className="checkout-full-kicker">Checkout</span>
+              <h1 className="h1 checkout-full-title hero-anim-title">Pesananmu.</h1>
+              <p className="checkout-full-sub hero-anim-sub">Periksa paket dan durasi sebelum lanjut bayar.</p>
             </div>
           </div>
 

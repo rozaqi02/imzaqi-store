@@ -169,16 +169,20 @@
   z-index: 1;
   pointer-events: none;
   background:
-    radial-gradient(ellipse 95% 70% at 50% 42%, rgba(4, 7, 20, 0.72) 0%, rgba(4, 7, 20, 0.32) 55%, rgba(4, 7, 20, 0) 100%),
+    radial-gradient(
+      ellipse 780px 480px at 50% 46%,
+      rgba(13, 21, 18, 0.98) 0%,
+      rgba(13, 21, 18, 0.92) 42%,
+      rgba(13, 21, 18, 0.65) 68%,
+      transparent 100%
+    ),
     linear-gradient(
       180deg,
-      transparent 0%,
-      transparent 34%,
-      rgba(4, 7, 20, 0.32) 58%,
-      rgba(4, 7, 20, 0.62) 76%,
-      color-mix(in srgb, var(--ux-canvas, #0d1512) 88%, transparent) 88%,
-      var(--ux-canvas, #0d1512) 96%,
-      var(--ux-canvas, #0d1512) 100%
+      rgba(13, 21, 18, 0.4) 0%,
+      transparent 24%,
+      transparent 55%,
+      color-mix(in srgb, var(--ux-canvas, #0d1512) 65%, transparent) 76%,
+      var(--ux-canvas, #0d1512) 98%
     );
 }
 
@@ -197,25 +201,22 @@ html[data-theme="light"] .hx-catalog-tile.is-compact {
 
 html[data-theme="light"] .hx-hero-scrim {
   background:
-    linear-gradient(
-      180deg,
-      rgba(13, 30, 24, 0.1) 0%,
-      rgba(13, 30, 24, 0.05) 46%,
-      transparent 72%
+    radial-gradient(
+      ellipse 780px 480px at 50% 46%,
+      rgba(244, 247, 242, 0.98) 0%,
+      rgba(244, 247, 242, 0.94) 42%,
+      rgba(244, 247, 242, 0.65) 68%,
+      transparent 100%
     ),
-    radial-gradient(ellipse 95% 70% at 50% 42%, rgba(248, 252, 255, 0.88) 0%, rgba(248, 252, 255, 0.5) 55%, rgba(248, 252, 255, 0) 100%),
     linear-gradient(
       180deg,
-      transparent 0%,
-      transparent 34%,
-      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 28%, transparent) 58%,
-      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 55%, transparent) 76%,
-      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 88%, transparent) 88%,
-      var(--ux-canvas, #f4f7f2) 96%,
-      var(--ux-canvas, #f4f7f2) 100%
+      rgba(244, 247, 242, 0.4) 0%,
+      transparent 24%,
+      transparent 55%,
+      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 65%, transparent) 76%,
+      var(--ux-canvas, #f4f7f2) 98%
     );
 }
-
 
 @keyframes hx-catalog-drift {
   from {

@@ -42,7 +42,7 @@ export default function TestimonialsPane({
         >
           <AlertTriangle size={18} style={{ color: "#eab308", flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: "13px", lineHeight: "1.4" }}>
-            <strong>Proteksi Privasi Pelanggan (P0):</strong> Pastikan screenshot chat/bukti transaksi sudah disensor (blur/crop) pada bagian alamat email, kata sandi, PIN, token, dan nomor telepon sebelum diunggah ke publik.
+            <strong>Privasi Pelanggan:</strong> Sensor email, nomor HP, dan data sensitif sebelum diunggah.
           </div>
         </div>
 
@@ -53,9 +53,9 @@ export default function TestimonialsPane({
               e.preventDefault();
               return;
             }
-            onAddTestimonials(e);
-            setPrivacyConfirmed(false);
+            Promise.resolve(onAddTestimonials(e)).then((ok) => { if (ok !== false) setPrivacyConfirmed(false); });
           }}
+          onReset={() => setPrivacyConfirmed(false)}
         >
           <label className="admin-fileBtn">
             <input name="files" type="file" accept="image/*" multiple required />
@@ -86,7 +86,7 @@ export default function TestimonialsPane({
               required
             />
             <ShieldCheck size={14} style={{ display: "inline", verticalAlign: "middle", marginRight: 4 }} />
-            Saya telah memastikan tidak ada email, password, atau nomor telepon pelanggan pada gambar ini
+            Data sensitif pelanggan sudah disensor
           </label>
 
           <button className="btn btn-primary" type="submit" disabled={!privacyConfirmed}>

@@ -23,7 +23,7 @@ export default function NewProductPopupContent({ config, product, onNavigate, on
     </div>
     <div className="np-popup-actions">
       {preview ? <span className="np-popup-btnPrimary">{copy.button}<ArrowRight size={16}/></span> : <button type="button" className="np-popup-btnPrimary" onClick={onNavigate}>{copy.button}<ArrowRight size={16}/></button>}
-      {preview ? <span className="np-popup-btnMuted">Jangan tampilkan lagi hari ini</span> : <button type="button" className="np-popup-btnMuted" onClick={onSuppress}>Jangan tampilkan lagi hari ini</button>}
+      {preview ? <span className="np-popup-btnMuted">Jangan tampilkan hari ini</span> : <button type="button" className="np-popup-btnMuted" onClick={onSuppress}>Jangan tampilkan hari ini</button>}
     </div>
   </>;
 }

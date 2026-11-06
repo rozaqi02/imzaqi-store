@@ -76,9 +76,9 @@ export default function MarketingMediaGenerator({ products = [], settings = {} }
     mountedRef.current = true;
     let alive = true;
     fetchActiveFlashSales({ useCache: false })
-      .then(data => { if (alive) setSales(data); })
-      .catch(() => { if (alive) setSaleError(true); })
-      .finally(() => { if (alive) setSalesPending(false); });
+      .then(data => { if (alive && mountedRef.current) setSales(data); })
+      .catch(() => { if (alive && mountedRef.current) setSaleError(true); })
+      .finally(() => { if (alive && mountedRef.current) setSalesPending(false); });
     const timer = setInterval(() => setNow(Date.now()), 30000);
     return () => { alive = false; mountedRef.current = false; clearInterval(timer); clearTimeout(copyTimer.current); };
   }, []);

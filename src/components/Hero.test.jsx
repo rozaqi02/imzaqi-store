@@ -95,11 +95,11 @@ describe("Hero Component & Headline Entrance", () => {
     expect(word2).toHaveTextContent("Budget");
     expect(word3).toHaveTextContent("Pelajar");
 
-    // Word 1 and Word 3 should have gradient styling
-    expect(word1).toHaveClass("hx-headline-gradient");
-    expect(word3).toHaveClass("hx-headline-gradient");
+    // Line 1 ("Akses Premium") is solid, Line 2 ("Budget Pelajar") is the unified accent phrase
     expect(word0).not.toHaveClass("hx-headline-gradient");
-    expect(word2).not.toHaveClass("hx-headline-gradient");
+    expect(word1).not.toHaveClass("hx-headline-gradient");
+    expect(word2).toHaveClass("hx-headline-gradient");
+    expect(word3).toHaveClass("hx-headline-gradient");
 
     // Old writing nib and measure hacks must NOT exist
     expect(container.querySelector(".hx-penNib")).toBeNull();
@@ -115,25 +115,26 @@ describe("Hero Component & Headline Entrance", () => {
     );
 
     expect(
-      screen.getByText(/Akses premium tanpa boncos/i)
+      screen.getByText(/Pilih paket, bayar QRIS/i)
     ).toBeInTheDocument();
 
-    const catalogBtn = screen.getByRole("link", { name: /Gas Lihat Katalog/i });
+    const catalogBtn = screen.getByRole("link", { name: /Lihat Katalog/i });
     expect(catalogBtn).toHaveAttribute("href", "/produk");
 
     const statusBtn = screen.getByRole("link", { name: /Cek Status/i });
     expect(statusBtn).toHaveAttribute("href", "/status");
   });
 
-  it("renders active shoppers badge with fallback value and label", () => {
+  it("renders hero trust bar with verified store proof and guarantees", () => {
     render(
       <MemoryRouter>
         <Hero products={[]} />
       </MemoryRouter>
     );
 
-    expect(screen.getByText("Pembeli Online")).toBeInTheDocument();
-    expect(screen.getByText("1")).toBeInTheDocument();
+    expect(screen.getByText(/Pesanan Sukses/i)).toBeInTheDocument();
+    expect(screen.getByText(/Layanan/i)).toBeInTheDocument();
+    expect(screen.getByText(/Garansi Penuh/i)).toBeInTheDocument();
   });
 
   it("assigns index-based stagger css variable --w to all headline words", () => {

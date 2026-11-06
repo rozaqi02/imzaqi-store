@@ -52,15 +52,11 @@ export function CartProvider({ children }) {
     if (items.length > 0) touchCartActivity();
   }, [items]);
 
-  const api = useMemo(() => ({
-    items,
-
-    bumpToken,
-    lastAddedVariantId,
-
-    add(variant, qty = 1) {
+  const api = useMemo(() => {
+    function add(variant, qty = 1) {
       const requestedQty = Math.max(1, Math.floor(Number(qty) || 1));
-      const availableStock = Number(variant?.stock);
+      const hasStockLimit = variant?.stock != null && variant?.stock !== "" && !isNaN(Number(variant?.stock));
+      const availableStock = hasStockLimit ? Number(variant.stock) : null;
       const newItemCategory = getItemCategoryLine(variant);
       const hasConflict = items.some((existingItem) => {
         const existingCategory = getItemCategoryLine(existingItem);
@@ -79,7 +75,7 @@ export function CartProvider({ children }) {
 
       const existingItem = items.find((item) => item.variant_id === variant.id);
       const nextQty = Number(existingItem?.qty || 0) + requestedQty;
-      if (Number.isFinite(availableStock) && availableStock >= 0 && nextQty > availableStock) {
+      if (hasStockLimit && availableStock != null && nextQty > availableStock) {
         return {
           success: false,
           outOfStock: true,
@@ -121,8 +117,8 @@ export function CartProvider({ children }) {
               typeof variant.requires_buyer_email === "boolean"
                 ? variant.requires_buyer_email
                 : !!next[i].requires_buyer_email,
-            stock: Number.isFinite(availableStock) ? availableStock : next[i].stock,
-            qty: clamp(next[i].qty + requestedQty, 1, 99),
+            stock: hasStockLimit ? availableStock : variant.stock ?? next[i].stock,
+            qty: clamp(next[i].qty + requestedQty, 1, hasStockLimit && availableStock >= 0 ? Math.min(99, availableStock) : 99),
           };
           return next;
         }
@@ -140,31 +136,45 @@ export function CartProvider({ children }) {
             guarantee_text: variant.guarantee_text || "",
             catalog_line: newItemCategory,
             requires_buyer_email: !!variant.requires_buyer_email,
-            stock: Number.isFinite(availableStock) ? availableStock : null,
-            qty: clamp(requestedQty, 1, 99),
+            stock: hasStockLimit ? availableStock : variant.stock ?? null,
+            qty: clamp(requestedQty, 1, hasStockLimit && availableStock >= 0 ? Math.min(99, availableStock) : 99),
           },
         ];
       });
       return { success: true };
-    },
+    }
 
-    remove(variant_id) {
+    function remove(variant_id) {
       setItems(prev => prev.filter(x => x.variant_id !== variant_id));
-    },
+    }
 
-    setQty(variant_id, qty) {
+    function setQty(variant_id, qty) {
       setItems(prev => prev.map((x) => {
         if (x.variant_id !== variant_id) return x;
-        const maxQty = Number.isFinite(Number(x.stock)) && Number(x.stock) >= 0
+        const hasStockLimit = x.stock != null && x.stock !== "" && !isNaN(Number(x.stock));
+        const maxQty = hasStockLimit && Number(x.stock) >= 0
           ? Math.min(99, Number(x.stock))
           : 99;
         return { ...x, qty: clamp(qty, 1, Math.max(1, maxQty)) };
       }));
-    },
+    }
 
-    clear() {
+    function clear() {
       setItems([]);
-    },
+    }
+
+    return {
+      items,
+      bumpToken,
+      lastAddedVariantId,
+      add,
+      addItem: add,
+      remove,
+      removeItem: remove,
+      setQty,
+      updateQty: setQty,
+      clear,
+      clearCart: clear,
 
     backup(overrideItems = null) {
       const storage = safeStorage();
@@ -242,7 +252,7 @@ export function CartProvider({ children }) {
             product_name: live.product_name || item.product_name,
             variant_name: live.variant_name || item.variant_name,
             duration_label: live.duration_label || item.duration_label,
-            stock: Number.isFinite(Number(live.stock)) ? Number(live.stock) : item.stock,
+            stock: (live.stock != null && live.stock !== "" && !isNaN(Number(live.stock))) ? Number(live.stock) : (live.stock ?? item.stock),
             requires_buyer_email: live.requires_buyer_email ?? item.requires_buyer_email,
           };
         });
@@ -273,7 +283,7 @@ export function CartProvider({ children }) {
       }
     },
 
-  }), [items, bumpToken, lastAddedVariantId]);
+  }; }, [items, bumpToken, lastAddedVariantId]);
 
   return <CartContext.Provider value={api}>{children}</CartContext.Provider>;
 }
@@ -285,10 +295,21 @@ export function useCart() {
       items: [],
       bumpToken: 0,
       lastAddedVariantId: null,
-      addItem: () => {},
+      add: () => ({ success: false }),
+      addItem: () => ({ success: false }),
+      remove: () => {},
       removeItem: () => {},
+      setQty: () => {},
       updateQty: () => {},
+      clear: () => {},
       clearCart: () => {},
+      subtotal: () => 0,
+      total: () => 0,
+      backup: () => {},
+      hasBackup: () => false,
+      restoreFromBackup: () => false,
+      clearBackup: () => {},
+      syncPrices: () => {},
       checkStockForVariant: async () => null,
     };
   }

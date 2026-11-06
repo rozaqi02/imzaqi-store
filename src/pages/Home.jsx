@@ -93,10 +93,10 @@ function HomeFaqItem({ item, open, onToggle }) {
           <span className="faq-itemCategory">{item.category}</span>
           <span>{item.question}</span>
         </span>
-        <ChevronDown size={17} aria-hidden="true" />
+        <ChevronDown size={17} aria-hidden="true" style={{ transform: open ? "rotate(180deg)" : "none", transition: "transform 0.2s ease" }} />
       </button>
 
-      <div className="faq-itemBodyWrap" aria-hidden={!open}>
+      <div className="faq-itemBodyWrap" aria-hidden={!open} hidden={!open}>
         <div className="faq-itemBody">
           {item.answer.map((line) => (
             <p key={line}>{line}</p>
@@ -230,7 +230,8 @@ export default function Home() {
 
   const popularProducts = useMemo(() => {
     if (products.length === 0) return [];
-    const sorted = [...products].sort((a, b) => {
+    const activeProducts = products.filter((p) => p && p.is_active !== false && (p.product_variants || []).some((v) => v?.is_active !== false));
+    const sorted = [...activeProducts].sort((a, b) => {
       const soldA = salesMap[a.id] ?? (a.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
       const soldB = salesMap[b.id] ?? (b.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
 
@@ -261,7 +262,7 @@ export default function Home() {
   }, [products]);
 
   const totalActiveProducts = useMemo(
-    () => products.filter((p) => (p?.product_variants || []).some((v) => v?.is_active)).length,
+    () => products.filter((p) => p && p.is_active !== false && (p?.product_variants || []).some((v) => v?.is_active !== false)).length,
     [products]
   );
 
@@ -421,7 +422,12 @@ export default function Home() {
                     onClick={(e) => handleCopyPromo(promo.code, e)}
                     role="button"
                     tabIndex={0}
-                    onKeyDown={(e) => e.key === "Enter" && handleCopyPromo(promo.code, e)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        handleCopyPromo(promo.code, e);
+                      }
+                    }}
                     aria-label={`Salin kode promo ${promo.code} untuk diskon ${promo.percent}%`}
                   >
                     <div className="home-promoCard-stub">
@@ -460,28 +466,35 @@ export default function Home() {
               {HOW_IT_WORKS.map((step, i) => {
                 const isOpen = activeStep === i;
                 return (
-                  <button
-                    type="button"
+                  <div
+                    role="button"
+                    tabIndex={0}
                     key={step.step}
                     className={`home-howCard reveal reveal-scale${isOpen ? " is-expanded" : ""}`}
                     style={{ "--how-i": i, transitionDelay: `${100 + i * 110}ms` }}
                     onClick={() => setActiveStep(isOpen ? null : i)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setActiveStep(isOpen ? null : i);
+                      }
+                    }}
                     aria-expanded={isOpen}
                     aria-label={`Langkah ${step.step}: ${step.title}. ${isOpen ? "Tutup" : "Buka"} detail tambahan.`}
                   >
                     <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
                     <div className="home-howCard-content">
-                      <h3 className="home-howCard-title">{step.title}</h3>
+                      <strong className="home-howCard-title" role="heading" aria-level={3}>{step.title}</strong>
                       <p className="home-howCard-desc">{step.desc}</p>
                       
                       {/* Accordion Expansion details */}
-                      <div className={`home-howCard-expandedWrap${isOpen ? " open" : ""}`}>
+                      <div className={`home-howCard-expandedWrap${isOpen ? " open" : ""}`} hidden={!isOpen}>
                         <div className="home-howCard-expandedContent">
                           <p>{step.details}</p>
                         </div>
                       </div>
                     </div>
-                  </button>
+                  </div>
                 );
               })}
             </div>

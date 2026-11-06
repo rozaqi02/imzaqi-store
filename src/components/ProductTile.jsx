@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { formatIDR, classifyStock, summarizeCatalogCopy, detectAccountTypes, getCatalogPriceRange } from "../lib/format";
+import { formatIDR, classifyStock, isKnownOutOfStock, summarizeCatalogCopy, detectAccountTypes, getCatalogPriceRange } from "../lib/format";
 
 export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false, overrideSold = null, flashSaleMap = null }) {
+  if (!product) return null;
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
   // Flip card dihapus — semua info tampil langsung di depan
@@ -23,19 +24,22 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
     const activeVariants = allVariants.filter((v) => v?.is_active !== false);
     const range = getCatalogPriceRange(activeVariants, flashSaleMap);
 
-    const stock = activeVariants.reduce((sum, item) => sum + Number(item?.stock || 0), 0);
+    const hasExplicitStock = activeVariants.some((v) => v?.stock != null && v?.stock !== "");
+    const stock = hasExplicitStock
+      ? activeVariants.reduce((sum, item) => sum + Number(item?.stock || 0), 0)
+      : null;
+    const isOutOfStock = activeVariants.length > 0 && activeVariants.every((v) => isKnownOutOfStock(v));
     const fallbackSold = allVariants.reduce((sum, item) => sum + Number(item?.sold_count || 0), 0);
     const sold = overrideSold != null ? overrideSold : fallbackSold;
 
-    const activePrices = activeVariants
-      .map((v) => Number(v?.price_idr || 0))
-      .filter((val) => Number.isFinite(val) && val > 0);
-    const startingPrice = activePrices.length ? Math.min(...activePrices) : range.minPrice;
+    const startingPrice = range.minPrice;
 
     return {
       minPrice: startingPrice,
       variantsCount: activeVariants.length,
       stock,
+      hasExplicitStock,
+      isOutOfStock,
       sold,
       summaryCopy: summarizeCatalogCopy(product?.description),
     };
@@ -112,9 +116,12 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
             <Layers3 size={14} />
             <span>{summary.variantsCount || 0} varian</span>
           </span>
-          <span className="product-tile-pill" title="Total stok aktif">
+          <span
+            className="product-tile-pill"
+            title={summary.isOutOfStock ? "Stok habis" : summary.hasExplicitStock ? "Total stok aktif" : "Status stok"}
+          >
             <PackageCheck size={14} />
-            <span>{stock} stok</span>
+            <span>{summary.isOutOfStock ? "Habis" : summary.hasExplicitStock ? `${summary.stock} stok` : "Tersedia"}</span>
           </span>
           <span className="product-tile-pill home-popularSold" title={`${sold} item terjual`}>
             <ShoppingBag size={14} />
@@ -128,10 +135,10 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
           <span className="product-tile-pill home-deliveryPill" title="Estimasi pengiriman">
             <span>~5 menit</span>
           </span>
-          {classifyStock(stock) === "low" ? (
-            <span className="product-lowStockBadge">Sisa {stock}</span>
-          ) : classifyStock(stock) === "out" ? (
+          {summary.isOutOfStock ? (
             <span className="product-lowStockBadge out">Habis</span>
+          ) : summary.hasExplicitStock && summary.stock > 0 && summary.stock <= 5 ? (
+            <span className="product-lowStockBadge">Sisa {summary.stock}</span>
           ) : null}
         </div>
 
@@ -149,7 +156,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
       role="listitem"
     >
       <Link
-        to={`/produk/${product.slug}`}
+        to={`/produk/${product?.slug || ""}`}
         className="product-tile-link"
         aria-label={`Buka detail ${productName}`}
         onMouseEnter={prefetchDetail}

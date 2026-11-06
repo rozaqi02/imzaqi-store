@@ -1,3 +1,5 @@
+import { isKnownOutOfStock } from "./format";
+
 const CATEGORY_LABELS = {
   streaming: "Streaming",
   music: "Music",
@@ -60,12 +62,13 @@ export function buildStoreInsights({ products = [], testimonials = [], settings 
   return {
     productCount: activeProducts.length,
     variantCount: variants.length,
-    readyVariantsCount: variants.filter((variant) => Number(variant?.stock || 0) > 0).length,
+    readyVariantsCount: variants.filter((variant) => !isKnownOutOfStock(variant)).length,
     lowStockCount: variants.filter((variant) => {
-      const stock = Number(variant?.stock || 0);
-      return stock > 0 && stock <= 3;
+      if (variant?.stock == null || variant?.stock === "") return false;
+      const stock = Number(variant.stock);
+      return Number.isFinite(stock) && stock > 0 && stock <= 3;
     }).length,
-    outOfStockCount: variants.filter((variant) => Number(variant?.stock || 0) <= 0).length,
+    outOfStockCount: variants.filter((variant) => isKnownOutOfStock(variant)).length,
     minPrice: prices.length ? Math.min(...prices) : 0,
     maxPrice: prices.length ? Math.max(...prices) : 0,
     topProduct: soldProducts.find((product) => product.sold > 0) || null,

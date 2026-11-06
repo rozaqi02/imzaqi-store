@@ -70,7 +70,7 @@ export default function Footer() {
 
           <div className="site-footerGoColumns">
             {footerColumns.map((group) => (
-              <details key={group.label} className="site-footerGoCol" open={!isMobile}>
+              <details key={`${group.label}-${isMobile ? "m" : "d"}`} className="site-footerGoCol" open={!isMobile}>
                 <summary className="site-footerGoTitle">{group.label}</summary>
                 <div className="site-footerGoList">
                   {group.links.map((item) => (
@@ -80,7 +80,7 @@ export default function Footer() {
               </details>
             ))}
 
-            <details className="site-footerGoCol" open={!isMobile}>
+            <details key={`bantuan-${isMobile ? "m" : "d"}`} className="site-footerGoCol" open={!isMobile}>
               <summary className="site-footerGoTitle">Bantuan & Kontak</summary>
               <div className="site-footerGoList">
                 <Link className="site-footerGoLink" to="/faq?q=paket">
@@ -108,8 +108,8 @@ export default function Footer() {
           </div>
 
           <div className="site-footerGoLegal">
-            <p>Imzaqi Store. Pilih produk, bayar QRIS otomatis, simpan ID, pantau status 24 jam. Garansi penuh.</p>
-            <p>© {year} imzaqi.store. Hak cipta dilindungi. • imzaqi store v6.0.0</p>
+            <p>Bayar QRIS, pantau status 24 jam.</p>
+            <p>© {year} imzaqi.store</p>
           </div>
         </div>
       </div>

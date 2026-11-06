@@ -163,8 +163,8 @@ export default function AdminLogin() {
         <div className="container narrow">
           <div className="admin-loginShell">
             <div className="admin-loginAside">
-              <h1 className="h2">Masuk ke Admin Dashboard.</h1>
-              <p className="admin-loginSub">Kelola orderan, produk, promo, sama QRIS.</p>
+              <h1 className="h2">Admin Dashboard.</h1>
+              <p className="admin-loginSub">Kelola order, produk, promo, dan QRIS.</p>
 
               <div className="admin-loginSignals">
                 <div className="admin-loginSignal">

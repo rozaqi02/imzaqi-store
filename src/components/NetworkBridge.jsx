@@ -8,6 +8,7 @@ import { useToast } from "../context/ToastContext";
 export default function NetworkBridge() {
   const toast = useToast();
   const hasConnectedOnce = useRef(false);
+  const isOfflineRef = useRef(false);
   const offlineTimerRef = useRef(null);
 
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function NetworkBridge() {
       // Debounce 3000ms: if connection recovers within 3s (brief handshake/glitch), do not alert
       offlineTimerRef.current = setTimeout(() => {
         if (typeof navigator !== "undefined" && navigator.onLine === false) {
+          isOfflineRef.current = true;
           toast.error("Koneksi terputus. Cek internet kamu ya.", { duration: 5000 });
         }
       }, 3000);
@@ -33,8 +35,9 @@ export default function NetworkBridge() {
         clearTimeout(offlineTimerRef.current);
         offlineTimerRef.current = null;
       }
-      if (hasConnectedOnce.current) {
+      if (hasConnectedOnce.current && isOfflineRef.current) {
         toast.success("Koneksi balik normal.", { duration: 2200 });
+        isOfflineRef.current = false;
       }
       hasConnectedOnce.current = true;
     }

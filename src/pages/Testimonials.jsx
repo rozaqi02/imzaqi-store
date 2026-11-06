@@ -53,6 +53,17 @@ function ReviewImage({ src, alt, eager = false, isViewer = false }) {
   );
 }
 
+function formatPurchasedDate(isoDate) {
+  if (!isoDate) return null;
+  try {
+    const d = new Date(isoDate);
+    if (isNaN(d.getTime())) return null;
+    return new Intl.DateTimeFormat("id-ID", { month: "short", year: "numeric" }).format(d);
+  } catch {
+    return null;
+  }
+}
+
 export default function Testimonials() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
@@ -148,7 +159,7 @@ export default function Testimonials() {
             : <><div className={view === "grid" ? "reviews-grid" : "reviews-masonry"}>
               {shown.map((item, idx) => <button className="reviews-card" type="button" key={item.id} onClick={() => setActiveIdx(idx)} aria-label={`Buka testimoni ${idx + 1}${item.caption ? `: ${item.caption}` : ""}`}>
                 <span className="reviews-image"><ReviewImage key={item.image_url} src={item.image_url} alt={item.caption || `Screenshot testimoni ${idx + 1}`} /><span className="reviews-zoom" aria-hidden="true"><ZoomIn size={17} /></span></span>
-                <span className="reviews-cardCopy"><span className="reviews-cardLabel">{item.is_verified ? <><BadgeCheck size={14} /> TERVERIFIKASI</> : <>CERITA {String(idx + 1).padStart(2, "0")}</>}<ArrowUpRight size={16} /></span><strong>{item.caption?.trim() || "Testimoni pelanggan"}</strong><small>{[item.product_name, item.purchased_at ? new Intl.DateTimeFormat("id-ID", { month: "short", year: "numeric" }).format(new Date(item.purchased_at)) : null].filter(Boolean).join(" · ") || "Ketuk untuk melihat lengkap"}</small></span>
+                <span className="reviews-cardCopy"><span className="reviews-cardLabel">{item.is_verified ? <><BadgeCheck size={14} /> TERVERIFIKASI</> : <>CERITA {String(idx + 1).padStart(2, "0")}</>}<ArrowUpRight size={16} /></span><strong>{item.caption?.trim() || "Testimoni pelanggan"}</strong><small>{[item.product_name, formatPurchasedDate(item.purchased_at)].filter(Boolean).join(" · ") || "Ketuk untuk melihat lengkap"}</small></span>
               </button>)}
             </div>{shown.length < filtered.length && <div className="reviews-more"><p>{shown.length} dari {filtered.length} testimoni</p><button className="reviews-button reviews-button--secondary" type="button" onClick={() => setLimit(n => n + 9)}>Lihat lebih banyak</button></div>}</>}
         </section>

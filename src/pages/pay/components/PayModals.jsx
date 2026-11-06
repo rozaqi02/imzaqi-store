@@ -7,6 +7,7 @@ import { copyToClipboard } from "../../../utils/clipboard";
 import { formatIDR } from "../../../lib/format";
 import { fireConfetti } from "../../../components/Confetti";
 import CheckoutSteps from "../../../components/CheckoutSteps";
+import { STORE_WHATSAPP } from "../../../lib/productCategories";
 
 const COPY_TIMEOUT_MS = 1800;
 const QRIS_EXPIRY_MS = 30 * 60 * 1000; // 30 menit
@@ -107,7 +108,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
     }
   }
 
-  const academicWaUrl = `https://wa.me/6281232742374?text=${encodeURIComponent(
+  const academicWaUrl = `https://wa.me/${STORE_WHATSAPP.academic}?text=${encodeURIComponent(
     `Halo Admin Jasa Akademik, saya telah menyelesaikan pembayaran dengan ID Order: ${orderCode}`
   )}`;
 
@@ -131,7 +132,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
           <div>
             <p className="pay-successLabel">Order Berhasil</p>
             <div className="modal-title">Pembayaran dilaporkan</div>
-            <div className="modal-sub">Admin sedang memverifikasi pembayaranmu. Biasanya selesai dalam 5–30 menit.</div>
+            <div className="modal-sub">Pesanan diproses dalam 5–30 menit.</div>
           </div>
           <button className="pay-successClose" type="button" onClick={onClose} aria-label="Tutup">
             <X size={16} strokeWidth={2.4} />
@@ -149,7 +150,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
             </div>
             <div className="pay-successKicker">ID ORDER</div>
             <div className="pay-successCode" style={{ whiteSpace: "nowrap" }}>{orderCode}</div>
-            <p className="pay-successLead">Simpan ID ini untuk mengecek status pesanan dari perangkat mana pun.</p>
+            <p className="pay-successLead">Simpan ID untuk lacak status pesanan.</p>
           </div>
 
           {isAcademicOrder ? (
@@ -246,10 +247,10 @@ export function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, i
 
   const declarationTitle = isFree
     ? "Konfirmasi order promo 100%"
-    : "Saya telah scan QRIS dan transfer sukses";
+    : "Sudah transfer sesuai nominal";
   const declarationDesc = isFree
     ? "Order gratis tanpa transfer. Admin akan langsung menyiapkan akun Anda."
-    : `Pembayaran ${formatIDR(total)} sudah berhasil dari m-banking / e-wallet saya.`;
+    : `Pembayaran ${formatIDR(total)} sudah selesai via m-banking / e-wallet.`;
 
   return createPortal(
     <div className="modal-backdrop pay-overlay pay-confirmOverlay" onMouseDown={onCancel} role="presentation">
@@ -316,10 +317,10 @@ export function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, i
                 onClick={onConfirm}
               >
                 <Check size={16} strokeWidth={2.5} />
-                {isFree ? "Konfirmasi Order Sekarang" : "Konfirmasi Pembayaran Sekarang"}
+                {isFree ? "Konfirmasi Order" : "Saya Sudah Bayar"}
               </button>
               <button className="pay-confirmSecondaryBtn" type="button" onClick={onCancel}>
-                Belum, cek lagi
+                Cek lagi
               </button>
             </div>
           </div>

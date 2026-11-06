@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, memo } from "react";
 import { createPortal } from "react-dom";
-import { Link, useLocation, useSearchParams } from "react-router-dom";
+import { Link, useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowRight,
   CircleAlert,
@@ -25,7 +25,7 @@ import { CatalogHero } from "../components/StorefrontHero";
 
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
-import { formatIDR, summarizeCatalogCopy, classifyStock } from "../lib/format";
+import { formatIDR, summarizeCatalogCopy, classifyStock, isKnownOutOfStock } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import {
   CATALOG_LINE_FILTERS,
@@ -327,6 +327,7 @@ function FilterPanel({
 }
 
 export default function Products() {
+  const navigate = useNavigate();
   const motionMode = useAdaptiveMotion();
   const location = useLocation();
   const [params, setParams] = useSearchParams();
@@ -633,8 +634,14 @@ export default function Products() {
         .map((variant) => Number(variant?.price_idr || 0))
         .filter((value) => Number.isFinite(value) && value > 0);
 
+      const isAvailable = vars.some((v) => !isKnownOutOfStock(v));
+      const hasExplicitStock = vars.some((v) => v?.stock != null && v?.stock !== "");
+      const totalStock = hasExplicitStock
+        ? vars.reduce((sum, variant) => sum + Number(variant?.stock || 0), 0)
+        : null;
+
       const latestInStockUpdateTs = vars
-        .filter((variant) => Number(variant?.stock || 0) > 0)
+        .filter((variant) => !isKnownOutOfStock(variant))
         .reduce((maxTs, variant) => {
           const next = Math.max(toTime(variant?.updated_at), toTime(variant?.created_at));
           return next > maxTs ? next : maxTs;
@@ -643,9 +650,11 @@ export default function Products() {
       return {
         ...product,
         _vars: vars,
+        _isAvailable: isAvailable,
+        _hasExplicitStock: hasExplicitStock,
         _minPrice: prices.length ? Math.min(...prices) : 0,
         _maxPrice: prices.length ? Math.max(...prices) : 0,
-        _stock: vars.reduce((sum, variant) => sum + Number(variant?.stock || 0), 0),
+        _stock: totalStock ?? 0,
         _sold: vars.reduce((sum, variant) => sum + Number(variant?.sold_count || 0), 0),
         _category: inferCategory(product),
         _createdAtTs: toTime(product?.created_at),
@@ -758,12 +767,12 @@ export default function Products() {
     const now = Date.now();
     const newCutoff = now - NEW_PRODUCT_DAYS * DAY_MS;
     const restockCutoff = now - RESTOCK_DAYS * DAY_MS;
-    let list = (enriched || []).filter((item) => item?.is_active);
+    let list = (enriched || []).filter((item) => item?.is_active !== false);
 
     if (cats.length) {
       list = list.filter((item) => matchesCatalogLineFilters(item, cats));
     }
-    if (inStockOnly) list = list.filter((item) => Number(item._stock || 0) > 0);
+    if (inStockOnly) list = list.filter((item) => item._isAvailable);
     if (newOnly) list = list.filter((item) => Number(item._createdAtTs || 0) >= newCutoff);
     if (restockOnly) list = list.filter((item) => Number(item._latestInStockUpdateTs || 0) >= restockCutoff);
 
@@ -802,7 +811,7 @@ export default function Products() {
     else if (sort === "price_desc") sorted.sort(byPriceDesc);
     else if (sort === "stock_desc") sorted.sort(byStockDesc);
     else if (sort === "name_desc") sorted.sort(byNameDesc);
-    else if (sort === "reco") sorted.sort((a, b) => Number(b._stock > 0) - Number(a._stock > 0) || byReco(a, b));
+    else if (sort === "reco") sorted.sort((a, b) => Number(b._isAvailable) - Number(a._isAvailable) || byReco(a, b));
     else sorted.sort(byName);
     return sorted;
   }, [cats, enriched, inStockOnly, newOnly, price.max, price.min, priceBounds.max, debouncedQuery, restockOnly, sort]);
@@ -1286,7 +1295,7 @@ export default function Products() {
                     description={error}
                     primaryAction={{ label: "Coba ulang", onClick: () => window.location.reload() }}
                     suggestions={[
-                      { key: "back", label: "Balik ke Beranda", onClick: () => window.location.href = "/" },
+                      { key: "back", label: "Balik ke Beranda", onClick: () => navigate("/") },
                     ]}
                   />
                 </div>
@@ -1408,8 +1417,10 @@ export default function Products() {
 }
 
 const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0, onBeforeNavigate }) {
+  const isAvailable = product._isAvailable ?? true;
+  const hasExplicitStock = product._hasExplicitStock ?? false;
   const stock = Number(product._stock || 0);
-  const stockState = classifyStock(stock);
+  const stockState = !isAvailable ? "out" : hasExplicitStock ? classifyStock(stock) : "ok";
   const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
   const summaryCopy = summarizeCatalogCopy(product.description);
 

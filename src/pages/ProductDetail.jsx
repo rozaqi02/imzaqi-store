@@ -302,17 +302,21 @@ function LazyProductImage({ src, alt, className, fetchPriority }) {
 
   useEffect(() => {
     if (!imgRef.current) return;
+    let active = true;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
-          setIsInView(true);
+          if (active) setIsInView(true);
           observer.disconnect();
         }
       },
       { rootMargin: "200px" }
     );
     observer.observe(imgRef.current);
-    return () => observer.disconnect();
+    return () => {
+      active = false;
+      observer.disconnect();
+    };
   }, []);
 
   return (
@@ -646,6 +650,7 @@ export default function ProductDetail() {
   const [allProducts, setAllProducts] = useState([]);
   const [recommendationsReady, setRecommendationsReady] = useState(false);
   const recommendationsRef = useRef(null);
+  const recommendationsRequestedRef = useRef(false);
   const [error, setError] = useState("");
   const [flashSaleMap, setFlashSaleMap] = useState(new Map());
   const [topSalesMap, setTopSalesMap] = useState({});
@@ -665,7 +670,7 @@ export default function ProductDetail() {
     const existing = document.getElementById("jsonld-product");
     if (existing) existing.remove();
 
-    const activeVariants = asVariantList(product.product_variants).filter((v) => v?.is_active);
+    const activeVariants = asVariantList(product.product_variants).filter((v) => v?.is_active !== false);
     const range = getCatalogPriceRange(activeVariants, flashSaleMap);
     const minPrice = range.minPrice;
     const maxPrice = range.maxPrice;
@@ -721,15 +726,33 @@ export default function ProductDetail() {
   }, [slug]);
 
   useEffect(() => {
-    if (!product || recommendationsReady) return;
+    recommendationsRequestedRef.current = false;
+    setRecommendationsReady(false);
+    setAllProducts([]);
+  }, [slug]);
+
+  useEffect(() => {
+    if (!product || recommendationsReady || recommendationsRequestedRef.current) return;
     const node = recommendationsRef.current;
     if (!node) return;
+    let cancelled = false;
 
     const loadRecommendations = () => {
-      setRecommendationsReady(true);
-      fetchProducts()
-        .then((productsData) => setAllProducts(productsData || []))
-        .catch(() => setAllProducts([]));
+      if (cancelled || recommendationsRequestedRef.current) return;
+      recommendationsRequestedRef.current = true;
+      fetchProducts({ useCache: true })
+        .then((productsData) => {
+          if (!cancelled) {
+            setAllProducts(productsData || []);
+            setRecommendationsReady(true);
+          }
+        })
+        .catch(() => {
+          if (!cancelled) {
+            setAllProducts([]);
+            setRecommendationsReady(true);
+          }
+        });
     };
 
     if (typeof IntersectionObserver === "undefined") {
@@ -747,14 +770,17 @@ export default function ProductDetail() {
       { rootMargin: "240px 0px" }
     );
     observer.observe(node);
-    return () => observer.disconnect();
-  }, [product, recommendationsReady]);
+    return () => {
+      cancelled = true;
+      observer.disconnect();
+    };
+  }, [product, slug, recommendationsReady]);
 
   const variants = useMemo(
     () =>
       asVariantList(product?.product_variants)
         .slice()
-        .filter((variant) => variant?.is_active)
+        .filter((variant) => variant?.is_active !== false)
         .sort((a, b) => (a.sort_order || 0) - (b.sort_order || 0)),
     [product]
   );
@@ -879,7 +905,7 @@ export default function ProductDetail() {
         if (itemCat === currentCat && currentCat !== "other") score += 16;
 
         const variantsList = asVariantList(item.product_variants);
-        const activeVariants = variantsList.filter((variant) => variant.is_active);
+        const activeVariants = variantsList.filter((variant) => variant?.is_active !== false);
         const totalStock = activeVariants.reduce((sum, variant) => sum + Number(variant.stock || 0), 0);
         const totalSold = activeVariants.reduce((sum, variant) => sum + Number(variant.sold_count || 0), 0);
 
@@ -914,13 +940,14 @@ export default function ProductDetail() {
   }, [product?.id, product?.slug]);
 
   function handleAdd(variant, qty = 1, event) {
-    const stock = Number(variant?.stock ?? 999);
+    const hasStockLimit = variant?.stock != null && variant?.stock !== "" && !isNaN(Number(variant?.stock));
+    const stock = hasStockLimit ? Number(variant.stock) : 999;
     const requestedQty = Math.max(1, Math.floor(Number(qty) || 1));
     const cartQty = cart.items
       .filter((item) => item.variant_id === variant?.id)
       .reduce((sum, item) => sum + Number(item.qty || 0), 0);
 
-    if (stock <= 0 || cartQty + requestedQty > stock) {
+    if (hasStockLimit && (stock <= 0 || cartQty + requestedQty > stock)) {
       const message = stock > 0
         ? `Stok tersisa ${stock}. Kurangi jumlah di keranjang terlebih dahulu.`
         : "Produk ini lagi abis";
@@ -1027,7 +1054,7 @@ export default function ProductDetail() {
   const icon = product.icon_url;
 
   return (
-    <div className="page detail-page detail-page-v3 pdx-contentLoaded">
+    <div className="page detail-page detail-page-v3 pdx-contentLoaded with-sticky-cta">
       <section className="section">
         <div className="container">
           <MobileProductBar name={product.name} icon={icon} onBack={goBackToCatalog} />
@@ -1216,10 +1243,10 @@ export default function ProductDetail() {
                             const isAlreadyInCart = (cart.items || []).some((it) => it.variant_id === v.id);
                             if (isAlreadyInCart) {
                               trackFunnelEvent("buy_now", { productId: product.id, variantId: v.id });
-                              nav("/checkout");
+                              nav("/checkout", { state: { backgroundLocation: location } });
                             } else if (handleAdd(v, q, e)) {
                               trackFunnelEvent("buy_now", { productId: product.id, variantId: v.id });
-                              nav("/checkout");
+                              nav("/checkout", { state: { backgroundLocation: location } });
                             }
                           }}
                           adminUrl={adminWhatsAppUrl}
@@ -1266,7 +1293,7 @@ export default function ProductDetail() {
         type="button"
         className="btn btn-primary pdx-mobileStickyDockBtn"
         onClick={() => {
-          const variantsSection = document.getElementById("pdx-variants-section") || document.querySelector(".pdx-variantsSection");
+          const variantsSection = document.getElementById("paket-tersedia") || document.getElementById("pdx-variants-section") || document.querySelector(".pdx-variantsSection");
           if (variantsSection) {
             variantsSection.scrollIntoView({ behavior: "smooth", block: "start" });
           }

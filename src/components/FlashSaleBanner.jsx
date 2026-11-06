@@ -7,10 +7,10 @@ import { buildFlashOffers, flashCountdown, flashPrice } from "../lib/flashOffers
 
 function ProductLogo({ product }) {
   const [failed, setFailed] = useState(false);
-  useEffect(() => setFailed(false), [product.icon_url]);
-  return product.icon_url && !failed ? (
+  useEffect(() => setFailed(false), [product?.icon_url]);
+  return product?.icon_url && !failed ? (
     <img src={product.icon_url} alt="" decoding="async" onError={() => setFailed(true)} />
-  ) : <span aria-hidden="true">{String(product.name || "P").slice(0, 1).toUpperCase()}</span>;
+  ) : <span aria-hidden="true">{String(product?.name || "P").slice(0, 1).toUpperCase()}</span>;
 }
 
 export default function FlashSaleBanner({ products = [], compact = false }) {

@@ -1,5 +1,5 @@
 import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import Layout from "./components/Layout";
 import RouteProgress from "./components/RouteProgress";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -128,6 +128,7 @@ function StorefrontOverlays() {
 
 // ── Floating recent order button ──
 function FloatingOrderStatus() {
+  const navigate = useNavigate();
   const overlayBlocked = useStorefrontOverlayBlocked();
   const [order, setOrder] = useState(null);
   const [dismissed, setDismissed] = useState(false);
@@ -158,7 +159,7 @@ function FloatingOrderStatus() {
         className="floating-order-btn"
         type="button"
         onClick={() => {
-          window.location.href = `/status?order=${encodeURIComponent(order.order_code)}`;
+          navigate(`/status?order=${encodeURIComponent(order.order_code)}`);
         }}
       >
         <span className="floating-order-label">Order terbaru Anda:</span>
@@ -343,7 +344,7 @@ export default function App() {
     let activeToast = null;
 
     function handleRageClick(e) {
-      const target = e.target.closest(RAGE_SELECTOR);
+      const target = e.target?.closest?.(RAGE_SELECTOR);
       if (!target) return;
       const now = Date.now();
       clicks.push(now);
@@ -383,7 +384,7 @@ export default function App() {
     let lastVibrate = 0;
 
     function handleInteractiveClick(e) {
-      const target = e.target.closest(
+      const target = e.target?.closest?.(
         "button:not([disabled]), .btn, .pdx-variantCard, .hc-statCard, .ai-chip, .st-tab, .st-pasteBtn, .oh-cekBtn, [role='switch'], [role='tab']"
       );
       if (!target) return;

@@ -33,7 +33,7 @@ export function CatalogHero({
     <header className="store-hero store-hero--catalog">
       <div className="store-heroCopy">
         <h1>Pilih paket <span>andalanmu.</span></h1>
-        <p>Aplikasi premium & layanan untuk kebutuhanmu.</p>
+        <p>Aplikasi premium untuk kebutuhanmu.</p>
         <div className="store-heroFacts" aria-label="Ringkasan katalog">
           <span><strong>{loading ? "…" : error ? "—" : productCount}</strong> produk</span>
           <span><strong>{loading ? "…" : error ? "—" : readyCount}</strong> varian tersedia</span>
@@ -70,8 +70,8 @@ export function StatusHero({ history = false, hasOrder = false }) {
         </h1>
         <p>
           {history
-            ? "Lihat kembali order yang tersimpan di browser perangkat ini."
-            : "Masukkan ID order untuk melihat perkembangan pesanan dan info dari admin."}
+            ? "Riwayat order di perangkat ini."
+            : "Cek perkembangan order dan data akun dari admin."}
         </p>
       </div>
 

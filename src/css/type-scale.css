@@ -1,0 +1,121 @@
+/*
+ * ── Imzaqi Store — Unified Type Scale ───────────────────────────────────────
+ * Single source of truth for ALL font sizes site-wide.
+ * 7-step scale + display/hero sizes.
+ *
+ * Scale:
+ *  --ts-xs    11px   meta, timestamps, badges, labels tiny
+ *  --ts-sm    13px   captions, helper text, admin-sub, chips
+ *  --ts-base  15px   body copy, card descriptions, form placeholders
+ *  --ts-md    17px   sub-headings, card titles, strong body
+ *  --ts-lg    20px   section headings (h3-equivalent)
+ *  --ts-xl    24px   page section headings (h2-equivalent)
+ *  --ts-2xl   30px   page title (h1-equivalent on inner pages)
+ *  --ts-3xl   38px   hero headline / major display
+ *  --ts-hero  clamp(34px, 6vw, 56px)   hero H1 kinetic
+ *
+ * Line-height tokens:
+ *  --lh-tight  1.15  headings
+ *  --lh-snug   1.3   sub-headings, card titles
+ *  --lh-base   1.55  body copy
+ *  --lh-loose  1.7   long-form prose
+ *
+ * Font-weight tokens:
+ *  --fw-normal   400
+ *  --fw-medium   500
+ *  --fw-semi     600
+ *  --fw-bold     700
+ *  --fw-heavy    800
+ *  --fw-black    900
+ */
+
+html {
+  /* ── Type Scale ── */
+  --ts-xs:   11px;
+  --ts-sm:   13px;
+  --ts-base: 15px;
+  --ts-md:   17px;
+  --ts-lg:   20px;
+  --ts-xl:   24px;
+  --ts-2xl:  30px;
+  --ts-3xl:  38px;
+  --ts-hero: clamp(34px, 6vw, 56px);
+
+  /* ── Line Heights ── */
+  --lh-tight: 1.15;
+  --lh-snug:  1.3;
+  --lh-base:  1.55;
+  --lh-loose: 1.7;
+
+  /* ── Font Weights ── */
+  --fw-normal: 400;
+  --fw-medium: 500;
+  --fw-semi:   600;
+  --fw-bold:   700;
+  --fw-heavy:  800;
+  --fw-black:  900;
+}
+
+/* ── Base body typography ── */
+body {
+  font-size: var(--ts-base);
+  line-height: var(--lh-base);
+  font-weight: var(--fw-normal);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Semantic heading scale ── */
+h1, .h1 {
+  font-size: var(--ts-3xl);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.02em;
+}
+h2, .h2 {
+  font-size: var(--ts-xl);
+  font-weight: var(--fw-heavy);
+  line-height: var(--lh-tight);
+  letter-spacing: -0.015em;
+}
+h3, .h3 {
+  font-size: var(--ts-lg);
+  font-weight: var(--fw-bold);
+  line-height: var(--lh-snug);
+  letter-spacing: -0.01em;
+}
+h4, .h4 {
+  font-size: var(--ts-md);
+  font-weight: var(--fw-semi);
+  line-height: var(--lh-snug);
+}
+h5, .h5, h6, .h6 {
+  font-size: var(--ts-base);
+  font-weight: var(--fw-semi);
+  line-height: var(--lh-snug);
+}
+
+/* ── Utility classes ── */
+.text-xs    { font-size: var(--ts-xs);   line-height: var(--lh-snug); }
+.text-sm    { font-size: var(--ts-sm);   line-height: var(--lh-snug); }
+.text-base  { font-size: var(--ts-base); line-height: var(--lh-base); }
+.text-md    { font-size: var(--ts-md);   line-height: var(--lh-snug); }
+.text-lg    { font-size: var(--ts-lg);   line-height: var(--lh-tight); }
+.text-xl    { font-size: var(--ts-xl);   line-height: var(--lh-tight); }
+.text-2xl   { font-size: var(--ts-2xl);  line-height: var(--lh-tight); }
+.text-3xl   { font-size: var(--ts-3xl);  line-height: var(--lh-tight); }
+
+/* ── Responsive scale adjustments ── */
+@media (max-width: 720px) {
+  h1, .h1  { font-size: var(--ts-2xl); }
+  h2, .h2  { font-size: var(--ts-xl); }
+}
+
+/* ── iOS input zoom prevention: min 16px ── */
+@media (max-width: 720px), (pointer: coarse) {
+  input:not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
+}
