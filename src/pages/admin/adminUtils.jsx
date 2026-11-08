@@ -145,6 +145,7 @@ export function normalizeWhatsApp(value) {
   if (!raw) return "";
   if (raw.startsWith("62")) return raw;
   if (raw.startsWith("0")) return `62${raw.slice(1)}`;
+  if (raw.startsWith("8")) return `62${raw}`;
   return raw;
 }
 

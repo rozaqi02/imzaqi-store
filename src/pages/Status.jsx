@@ -33,7 +33,7 @@ import {
   Zap,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
-import { formatIDR } from "../lib/format";
+import { formatIDR, toWhatsAppDigits } from "../lib/format";
 import { fetchSettings, fetchProducts } from "../lib/api";
 import { STORE_WHATSAPP } from "../lib/productCategories";
 import {
@@ -523,9 +523,10 @@ function TabCekStatus({ settings }) {
     });
   }, [order]);
 
-  const waNumber = isAcademicOrder
+  const waNumberRaw = isAcademicOrder
     ? STORE_WHATSAPP.academic
     : (settings?.whatsapp?.number || (typeof settings?.whatsapp === "string" ? settings.whatsapp : STORE_WHATSAPP.app_premium));
+  const waNumber = toWhatsAppDigits(waNumberRaw) || STORE_WHATSAPP.app_premium;
   const pollTimerRef = useRef(null);
 
   const lookup = useCallback(async (rawValue) => {
@@ -550,11 +551,27 @@ function TabCekStatus({ settings }) {
         const text = "Order tidak ditemukan.";
         setMessage(text);
         toast.error(text);
+        setSearchParams(
+          (prev) => {
+            const next = new URLSearchParams(prev);
+            next.delete("order");
+            return next;
+          },
+          { replace: true }
+        );
         return;
       }
 
       setOrder(row);
-      setSearchParams({ tab: "cek", order: code }, { replace: true });
+      setSearchParams(
+        (prev) => {
+          const next = new URLSearchParams(prev);
+          next.set("order", code);
+          next.delete("tab");
+          return next;
+        },
+        { replace: true }
+      );
       toast.success("Order ditemukan", { title: row.order_code || code, duration: 2200 });
     } catch (error) {
       const text = toFriendlyStatusError();
@@ -1243,6 +1260,7 @@ function TabCekStatus({ settings }) {
                   autoComplete="off"
                   spellCheck={false}
                   placeholder="IMZ-ABCD1234"
+                  aria-label="ID pesanan"
                   value={input}
                   onChange={(e) => setInput(sanitizeOrderInput(e.target.value))}
                   onKeyDown={(e) => {
@@ -1255,7 +1273,7 @@ function TabCekStatus({ settings }) {
                 {loading ? (
                   <>
                     <span className="st-checkSpinner" aria-hidden="true" />
-                    Nyari...
+                    Mencari...
                   </>
                 ) : "Cek status"}
               </button>
@@ -1302,15 +1320,16 @@ function calcStreak(entries) {
       .filter((e) => e.status === "done")
       .map((e) => {
         const d = new Date(e.created_at || 0);
-        return `${d.getFullYear()}-${d.getMonth()}`;
+        return d.getFullYear() * 12 + d.getMonth();
       })
-  )].sort().reverse();
+  )].sort((a, b) => b - a);
   if (months.length === 0) return 0;
+  const now = new Date();
+  const currentMonthIdx = now.getFullYear() * 12 + now.getMonth();
+  if (currentMonthIdx - months[0] > 1) return 0;
   let streak = 1;
   for (let i = 0; i < months.length - 1; i++) {
-    const [y1, m1] = months[i].split("-").map(Number);
-    const [y2, m2] = months[i + 1].split("-").map(Number);
-    if ((y1 * 12 + m1) - (y2 * 12 + m2) === 1) streak++;
+    if (months[i] - months[i + 1] === 1) streak++;
     else break;
   }
   return streak;
@@ -1576,7 +1595,13 @@ export default function Status() {
   }, []);
 
   function switchTab(tab) {
-    setSearchParams(tab === "cek" ? {} : { tab }, { replace: true });
+    const next = new URLSearchParams(searchParams);
+    if (tab === "cek") {
+      next.delete("tab");
+    } else {
+      next.set("tab", tab);
+    }
+    setSearchParams(next, { replace: true });
   }
 
   return (

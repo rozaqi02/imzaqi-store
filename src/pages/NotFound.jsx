@@ -47,7 +47,8 @@ export default function NotFound() {
 
   const popularProducts = useMemo(() => {
     if (!products.length) return [];
-    const scored = [...products].map((product) => {
+    const activeProducts = (products || []).filter((p) => p && p.is_active !== false && (p.product_variants || []).some((v) => v?.is_active !== false));
+    const scored = activeProducts.map((product) => {
       const sold = (product?.product_variants || []).reduce(
         (sum, variant) => sum + Number(variant?.sold_count || 0),
         0

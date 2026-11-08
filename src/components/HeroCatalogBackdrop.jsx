@@ -102,6 +102,7 @@ function buildRows(pool, config) {
 }
 
 function CatalogTile({ product, eager = false }) {
+  if (!product?.icon_url) return null;
   return (
     <article className="hx-catalog-tile" aria-hidden="true">
       <div className="hx-catalog-tile-icon">

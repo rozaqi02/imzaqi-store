@@ -109,6 +109,8 @@ import {
   buildAdminOrderAlertUrl,
 } from "../../lib/adminNotify";
 
+const ALLOWED_CATEGORIES = new Set(["streaming", "music", "tools", "ai", "design", "learning", "academic", "other"]);
+
 import {
   CATEGORY_OPTIONS,
   StatusBadge,
@@ -151,7 +153,9 @@ const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders
 const TABS_NEED_ORDERS = new Set(["overview", "orders"]);
 
 function clampPercent(value) {
-  return Math.max(0, Math.min(100, Number(value || 0)));
+  const n = Number(value);
+  if (!Number.isFinite(n)) return 0;
+  return Math.max(0, Math.min(100, n));
 }
 
 export default function AdminDashboard() {
@@ -1557,7 +1561,8 @@ export default function AdminDashboard() {
     }
 
     const slug = makeUniqueProductSlug(name);
-    const category = String(newProduct.category || "other").trim().toLowerCase() || "other";
+    const rawCat = String(newProduct.category || "other").trim().toLowerCase();
+    const category = ALLOWED_CATEGORIES.has(rawCat) ? rawCat : "other";
     const iconUrl = String(newProduct.icon_url || "").trim() || null;
 
     const tid = toast.loading("Membuat produk");
@@ -1602,7 +1607,8 @@ export default function AdminDashboard() {
   async function saveProduct() {
     if (!productForm?.id) return;
 
-    const category = String(productForm.category || "other").trim().toLowerCase() || "other";
+    const rawFormCat = String(productForm.category || "other").trim().toLowerCase();
+    const category = ALLOWED_CATEGORIES.has(rawFormCat) ? rawFormCat : "other";
     const payload = {
       name: String(productForm.name || "").trim(),
       slug: String(productForm.slug || "").trim() || slugify(productForm.name),
@@ -2279,10 +2285,10 @@ export default function AdminDashboard() {
     // format: CODE,percent
     const rows = [];
     for (const line of lines) {
-      const [codeRaw, percentRaw] = line.split(",");
+      const [codeRaw, percentRaw] = line.includes(";") ? line.split(";") : line.split(",");
       const code = String(codeRaw || "").trim().toUpperCase();
-      const percent = Number(String(percentRaw || "").trim());
-      if (!code || !Number.isFinite(percent)) continue;
+      const percent = Math.floor(Number(String(percentRaw || "").trim()));
+      if (!code || !Number.isFinite(percent) || percent < 1 || percent > 100) continue;
       rows.push({ code, percent, is_active: true, updated_at: new Date().toISOString() });
     }
 
@@ -2457,7 +2463,7 @@ export default function AdminDashboard() {
     const customerName = e.target.elements.customer_name.value || "";
     const productName = e.target.elements.product_name.value || "";
     const purchasedAt = e.target.elements.purchased_at.value || null;
-    const isVerified = e.target.elements.is_verified.checked;
+    const isVerified = Boolean(e.target.elements.is_verified?.checked);
     const privacyConfirmed = e.target.elements.privacy_confirmed ? e.target.elements.privacy_confirmed.checked : true;
     if (!privacyConfirmed) {
       toast.error("Wajib konfirmasi bahwa gambar tidak memuat data sensitif pelanggan.");
@@ -2481,16 +2487,30 @@ export default function AdminDashboard() {
         urls.push(await uploadToBucket(BUCKET_TESTIMONIALS, f, "testimonials"));
       }
 
-      const metaInfo = [customerName ? `Dari ${customerName.trim()}` : "", productName ? `(${productName.trim()})` : ""].filter(Boolean).join(" ");
-      const finalCaption = [caption.trim(), metaInfo].filter(Boolean).join(" · ") || null;
       const payload = urls.map((u) => ({
         image_url: u,
-        caption: finalCaption,
+        caption: caption.trim() || null,
+        customer_name: customerName.trim() || null,
+        product_name: productName.trim() || null,
+        purchased_at: purchasedAt ? new Date(purchasedAt).toISOString() : null,
+        is_verified: isVerified,
         is_active: true,
         sort_order: 100,
       }));
 
-      const { error } = await supabase.from("testimonials").insert(payload);
+      let { error } = await supabase.from("testimonials").insert(payload);
+      if (error && /column|schema cache|does not exist/i.test(String(error.message || ""))) {
+        const metaInfo = [customerName ? `Dari ${customerName.trim()}` : "", productName ? `(${productName.trim()})` : ""].filter(Boolean).join(" ");
+        const finalCaption = [caption.trim(), metaInfo].filter(Boolean).join(" · ") || null;
+        const fallbackPayload = urls.map((u) => ({
+          image_url: u,
+          caption: finalCaption,
+          is_active: true,
+          sort_order: 100,
+        }));
+        const res = await supabase.from("testimonials").insert(fallbackPayload);
+        error = res.error;
+      }
       if (error) throw error;
 
       invalidateTestimonialsCache();
@@ -3054,7 +3074,7 @@ export default function AdminDashboard() {
                         <div className="admin-alertItem" key={request.id}>
                           <div><strong>{request.products?.name || "Produk"} · {request.product_variants?.name || "Varian"}</strong><small>{request.customer_whatsapp} · {request.notified_at ? "Sudah dikabari" : "Belum dikabari"}</small></div>
                           <div style={{ display: "flex", gap: 8 }}>
-                            <a className="btn btn-ghost btn-sm" href={`https://wa.me/${String(request.customer_whatsapp || "").replace(/\D/g, "")}`} target="_blank" rel="noreferrer">WhatsApp</a>
+                            <a className="btn btn-ghost btn-sm" href={`https://wa.me/${normalizeWhatsApp(request.customer_whatsapp)}`} target="_blank" rel="noreferrer">WhatsApp</a>
                             {!request.notified_at ? <button className="btn btn-sm" type="button" onClick={async () => {
                               const notifiedAt = new Date().toISOString();
                               const { error } = await supabase.from("restock_requests").update({ notified_at: notifiedAt }).eq("id", request.id);

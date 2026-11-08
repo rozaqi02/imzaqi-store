@@ -36,18 +36,21 @@ const ACHIEVEMENT_DEFS = [
           .filter((e) => e.status === "done")
           .map((e) => {
             const d = new Date(e.created_at || 0);
-            return `${d.getFullYear()}-${d.getMonth()}`;
+            return d.getFullYear() * 12 + d.getMonth();
           })
-      )].sort();
+      )].sort((a, b) => a - b);
       if (months.length < 2) return false;
       let streak = 1;
+      let maxStreak = 1;
       for (let i = 0; i < months.length - 1; i++) {
-        const [y1, m1] = months[i].split("-").map(Number);
-        const [y2, m2] = months[i + 1].split("-").map(Number);
-        if ((y2 * 12 + m2) - (y1 * 12 + m1) === 1) streak++;
-        else streak = 1;
+        if (months[i + 1] - months[i] === 1) {
+          streak++;
+          if (streak > maxStreak) maxStreak = streak;
+        } else {
+          streak = 1;
+        }
       }
-      return streak >= 2;
+      return maxStreak >= 2;
     },
   },
   {
@@ -61,18 +64,21 @@ const ACHIEVEMENT_DEFS = [
           .filter((e) => e.status === "done")
           .map((e) => {
             const d = new Date(e.created_at || 0);
-            return `${d.getFullYear()}-${d.getMonth()}`;
+            return d.getFullYear() * 12 + d.getMonth();
           })
-      )].sort();
+      )].sort((a, b) => a - b);
       if (months.length < 3) return false;
       let streak = 1;
+      let maxStreak = 1;
       for (let i = 0; i < months.length - 1; i++) {
-        const [y1, m1] = months[i].split("-").map(Number);
-        const [y2, m2] = months[i + 1].split("-").map(Number);
-        if ((y2 * 12 + m2) - (y1 * 12 + m1) === 1) streak++;
-        else streak = 1;
+        if (months[i + 1] - months[i] === 1) {
+          streak++;
+          if (streak > maxStreak) maxStreak = streak;
+        } else {
+          streak = 1;
+        }
       }
-      return streak >= 3;
+      return maxStreak >= 3;
     },
   },
 ];
@@ -103,11 +109,12 @@ function markSeen(ids) {
 }
 
 export function checkAchievements(history) {
+  const list = Array.isArray(history) ? history : [];
   const unlocked = getUnlockedAchievements();
   const newOnes = [];
 
   ACHIEVEMENT_DEFS.forEach((def) => {
-    if (!unlocked.includes(def.id) && def.check(history)) {
+    if (!unlocked.includes(def.id) && def.check(list)) {
       unlocked.push(def.id);
       newOnes.push(def);
     }
@@ -121,6 +128,9 @@ export function checkAchievements(history) {
 }
 
 export function getNewAchievements(history) {
+  if (Array.isArray(history) && history.length > 0) {
+    checkAchievements(history);
+  }
   const unlocked = getUnlockedAchievements();
   const seen = getSeenAchievements();
   const unseen = unlocked.filter((id) => !seen.includes(id));

@@ -44,7 +44,7 @@ export default function BottomNav() {
   const navRef = useRef(null);
   const hidden = !showBottomNav || isBottomNavHidden(location.pathname);
   const { items = [] } = useCart();
-  const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
+  const cartCount = useMemo(() => items.reduce((sum, item) => sum + Number(item?.qty || 0), 0), [items]);
 
   useEffect(() => {
     setShrunk(false);

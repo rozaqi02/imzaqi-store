@@ -50,6 +50,7 @@ export default function MobileProductBar({ name, icon, onBack }) {
       <button
         type="button"
         className="pdx-mobileBack"
+        tabIndex={active ? 0 : -1}
         onClick={onBack}
         aria-label="Kembali ke katalog"
       >

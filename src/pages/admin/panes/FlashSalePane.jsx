@@ -174,7 +174,7 @@ export default function FlashSalePane({
         ) : null}
 
         {flashSales.length === 0 ? (
-          <div className="admin-emptyInline">Belum ada flash sale. Klik "Buat Flash Sale" untuk mulai.</div>
+          <div className="admin-emptyInline">Belum ada flash sale. Klik "Buat" untuk mulai.</div>
         ) : (
           <div className="admin-promo-grid">
             {flashSales.map((fs) => {
@@ -192,7 +192,7 @@ export default function FlashSalePane({
                   <div className="admin-promo-cardTop">
                     <div className="admin-promo-cardLeft">
                       <div className="admin-promo-cardCode">
-                        <span>{product?.name || "?"} - {variant?.name || fs.variant_id.slice(0, 8)}</span>
+                        <span>{product?.name || "?"} - {variant?.name || (fs.variant_id ? String(fs.variant_id).slice(0, 8) : "?")}</span>
                       </div>
                       <span className={`admin-promoBadge ${isLive ? "active" : isExpired ? "expired" : "off"}`}>
                         {isLive ? "Live" : isExpired ? "Berakhir" : isUpcoming ? "Akan datang" : "Nonaktif"}
@@ -258,6 +258,7 @@ export default function FlashSalePane({
                           await updateFlashSale(fs.id, { is_active: !fs.is_active });
                           setFlashSales(await fetchAllFlashSales());
                           toast.remove(tid);
+                          toast.success(fs.is_active ? "Flash sale dinonaktifkan" : "Flash sale diaktifkan");
                         } catch (e) {
                           toast.remove(tid);
                           toast.error("Gagal update");

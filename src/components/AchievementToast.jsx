@@ -37,23 +37,32 @@ export default function AchievementToast() {
 
   // Tunda promosi toast selama rute sensitif atau ada overlay eksklusif aktif.
   useEffect(() => {
-    if (current || queue.length === 0 || overlayBlocked || overlayBusy) return undefined;
+    if (current || queue.length === 0 || overlayBlocked || overlayBusy) return;
     const next = queue[0];
     setCurrent(next);
     setQueue((prev) => prev.slice(1));
+  }, [current, queue, overlayBlocked, overlayBusy]);
+
+  // Otomatis tutup toast setelah timer selesai
+  useEffect(() => {
+    if (!current) return undefined;
     timerRef.current = setTimeout(() => {
       setCurrent(null);
     }, 4000);
-    return () => clearTimeout(timerRef.current);
-  }, [current, queue, overlayBlocked, overlayBusy]);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [current]);
 
-  // Bila popup eksklusif naik saat toast sedang tayang, kembalikan toast ke
-  // antrean supaya tidak habis tanpa terlihat; ia tayang lagi setelah slot bebas.
+  // Bila popup eksklusif naik atau masuk rute sensitif (checkout/pay/admin) saat toast sedang tayang,
+  // kembalikan toast ke antrean supaya tidak habis tanpa terlihat; ia tayang lagi setelah slot bebas.
   useEffect(() => {
-    if (!overlayBusy || !current) return;
+    if ((!overlayBusy && !overlayBlocked) || !current) return;
+    if (timerRef.current) clearTimeout(timerRef.current);
+    const item = current;
     setCurrent(null);
-    setQueue((prev) => [current, ...prev]);
-  }, [overlayBusy, current]);
+    setQueue((prev) => [item, ...prev]);
+  }, [overlayBusy, overlayBlocked, current]);
 
   if (overlayBlocked || overlayBusy || !current) return null;
 

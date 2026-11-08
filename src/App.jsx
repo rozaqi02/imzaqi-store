@@ -129,7 +129,9 @@ function StorefrontOverlays() {
 // ── Floating recent order button ──
 function FloatingOrderStatus() {
   const navigate = useNavigate();
+  const location = useLocation();
   const overlayBlocked = useStorefrontOverlayBlocked();
+  const isStatusPage = location.pathname === "/status";
   const [order, setOrder] = useState(null);
   const [dismissed, setDismissed] = useState(false);
 
@@ -140,18 +142,21 @@ function FloatingOrderStatus() {
         const last = history[0];
         const age = Date.now() - new Date(last.created_at).getTime();
         if (age < 86400000) setOrder(last);
+        else setOrder(null);
+      } else {
+        setOrder(null);
       }
     } catch {}
-  }, []);
+  }, [location.pathname]);
 
   useEffect(() => {
     if (typeof document === "undefined") return undefined;
-    const active = Boolean(order && !dismissed && !overlayBlocked);
+    const active = Boolean(order && !dismissed && !overlayBlocked && !isStatusPage);
     document.body.classList.toggle("has-floating-order", active);
     return () => document.body.classList.remove("has-floating-order");
-  }, [order, dismissed, overlayBlocked]);
+  }, [order, dismissed, overlayBlocked, isStatusPage]);
 
-  if (overlayBlocked || !order || dismissed) return null;
+  if (overlayBlocked || isStatusPage || !order || dismissed) return null;
 
   return (
     <div className="floating-order-status">
@@ -182,12 +187,15 @@ function FloatingOrderStatus() {
 function SuspenseReadyNotifier({ onReady, routeKey }) {
   React.useEffect(() => {
     // Double rAF ensures browser has painted before showing footer
-    let id1 = requestAnimationFrame(() => {
-      let id2 = requestAnimationFrame(() => onReady());
-      return () => cancelAnimationFrame(id2);
+    let id2 = null;
+    const id1 = requestAnimationFrame(() => {
+      id2 = requestAnimationFrame(() => onReady());
     });
-    return () => cancelAnimationFrame(id1);
-  }, [routeKey]);
+    return () => {
+      cancelAnimationFrame(id1);
+      if (id2 !== null) cancelAnimationFrame(id2);
+    };
+  }, [routeKey, onReady]);
   return null;
 }
 

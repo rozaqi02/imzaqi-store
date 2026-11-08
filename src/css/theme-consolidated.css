@@ -3176,8 +3176,8 @@ html[data-theme="light"] .site-footer--gopay .site-footerBottom {
 
 .site-footer--gopay .site-footerGoColumns {
   display: grid;
-  /* JSX renders 3 link columns (Navigasi, Order, Bantuan). */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  /* JSX renders 4 link columns (Navigasi, Order, Kebijakan, Bantuan). */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 22px;
   padding-top: 24px;
 }

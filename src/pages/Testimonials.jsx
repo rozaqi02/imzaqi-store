@@ -113,8 +113,8 @@ export default function Testimonials() {
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     function onKey(event) {
-      if (event.key === "ArrowLeft") { event.preventDefault(); setActiveIdx(i => (i - 1 + filtered.length) % filtered.length); }
-      if (event.key === "ArrowRight") { event.preventDefault(); setActiveIdx(i => (i + 1) % filtered.length); }
+      if (filtered.length > 1 && event.key === "ArrowLeft") { event.preventDefault(); setActiveIdx(i => (i - 1 + filtered.length) % filtered.length); }
+      if (filtered.length > 1 && event.key === "ArrowRight") { event.preventDefault(); setActiveIdx(i => (i + 1) % filtered.length); }
     }
     window.addEventListener("keydown", onKey);
     return () => { document.body.style.overflow = previousOverflow; window.removeEventListener("keydown", onKey); };

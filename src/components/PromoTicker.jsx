@@ -195,8 +195,10 @@ export default function PromoTicker() {
   }
 
   function dismissPromo(event) {
-    event.preventDefault();
-    event.stopPropagation();
+    if (event) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
     try {
       sessionStorage.setItem(PROMO_DISMISS_KEY, "1");
     } catch {}
@@ -242,7 +244,7 @@ export default function PromoTicker() {
           ) : null}
           {/^https?:\/\//i.test(bannerCopy.link)
             ? <a className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} href={bannerCopy.link}>{bannerCopy.text}</a>
-            : <Link className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} to={bannerCopy.link}>{bannerCopy.text}</Link>}
+            : <Link className={`promo-tickerLink promo-tickerLink--${bannerConfig.link_style || "underline"}`} to={bannerCopy.link || "/produk"}>{bannerCopy.text}</Link>}
           <BannerGraphic name={bannerConfig.graphic || "bell_megaphone"} height={22} />
         </p>
         <button
@@ -334,6 +336,7 @@ export default function PromoTicker() {
   }
 
   const activeSlot = slots.length ? slots[Math.min(slotIndex, slots.length - 1)] : null;
+  if (!activeSlot) return null;
 
   return <div className="promo-tickerStack">{activeSlot}</div>;
 }

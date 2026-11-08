@@ -32,6 +32,15 @@ export function QRISZoomModal({ open, qrisUrl, onClose }) {
   });
 
   useEffect(() => {
+    if (!open) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
+
+  useEffect(() => {
     if (!open) return;
     const f1 = requestAnimationFrame(() => {
       requestAnimationFrame(() => {
@@ -88,6 +97,15 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
     onClose,
     initialFocusSelector: ".pay-successClose",
   });
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
 
   useEffect(() => {
     if (open) {
@@ -240,6 +258,15 @@ export function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, i
     onClose: onCancel,
     initialFocusSelector: ".pay-confirmPrimaryBtn",
   });
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
 
   if (!open || typeof document === "undefined") return null;
 

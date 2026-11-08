@@ -69,42 +69,81 @@ export default function Footer() {
           </div>
 
           <div className="site-footerGoColumns">
-            {footerColumns.map((group) => (
-              <details key={`${group.label}-${isMobile ? "m" : "d"}`} className="site-footerGoCol" open={!isMobile}>
-                <summary className="site-footerGoTitle">{group.label}</summary>
+            {footerColumns.map((group) =>
+              isMobile ? (
+                <details key={`${group.label}-m`} className="site-footerGoCol">
+                  <summary className="site-footerGoTitle">{group.label}</summary>
+                  <div className="site-footerGoList">
+                    {group.links.map((item) => (
+                      <FooterLink key={`${group.label}-${item.label}`} item={item} className="site-footerGoLink" />
+                    ))}
+                  </div>
+                </details>
+              ) : (
+                <div key={`${group.label}-d`} className="site-footerGoCol">
+                  <div className="site-footerGoTitle">{group.label}</div>
+                  <div className="site-footerGoList">
+                    {group.links.map((item) => (
+                      <FooterLink key={`${group.label}-${item.label}`} item={item} className="site-footerGoLink" />
+                    ))}
+                  </div>
+                </div>
+              )
+            )}
+
+            {isMobile ? (
+              <details key="bantuan-m" className="site-footerGoCol">
+                <summary className="site-footerGoTitle">Bantuan & Kontak</summary>
                 <div className="site-footerGoList">
-                  {group.links.map((item) => (
-                    <FooterLink key={`${group.label}-${item.label}`} item={item} className="site-footerGoLink" />
-                  ))}
+                  <Link className="site-footerGoLink" to="/faq?q=paket">
+                    Cara Pesan
+                  </Link>
+                  <Link className="site-footerGoLink" to="/faq?q=QRIS">
+                    Cara Bayar QRIS
+                  </Link>
+                  <Link className="site-footerGoLink" to="/faq">
+                    Pusat Bantuan
+                  </Link>
+                  <a
+                    className="site-footerGoLink"
+                    href={`https://wa.me/${STORE_WHATSAPP.app_premium}?text=${encodeURIComponent("Halo Admin imzaqi.store, saya butuh bantuan.")}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    WhatsApp Resmi (+{STORE_WHATSAPP.app_premium})
+                  </a>
+                  <span className="site-footerGoLink" style={{ opacity: 0.8, cursor: "default", fontSize: "13px" }}>
+                    Jam Buka: 08.00–22.00 WIB
+                  </span>
                 </div>
               </details>
-            ))}
-
-            <details key={`bantuan-${isMobile ? "m" : "d"}`} className="site-footerGoCol" open={!isMobile}>
-              <summary className="site-footerGoTitle">Bantuan & Kontak</summary>
-              <div className="site-footerGoList">
-                <Link className="site-footerGoLink" to="/faq?q=paket">
-                  Cara Pesan
-                </Link>
-                <Link className="site-footerGoLink" to="/faq?q=QRIS">
-                  Cara Bayar QRIS
-                </Link>
-                <Link className="site-footerGoLink" to="/faq">
-                  Pusat Bantuan
-                </Link>
-                <a
-                  className="site-footerGoLink"
-                  href={`https://wa.me/${STORE_WHATSAPP.app_premium}?text=${encodeURIComponent("Halo Admin imzaqi.store, saya butuh bantuan.")}`}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  WhatsApp Resmi (+{STORE_WHATSAPP.app_premium})
-                </a>
-                <span className="site-footerGoLink" style={{ opacity: 0.8, cursor: "default", fontSize: "13px" }}>
-                  Jam Buka: 08.00–22.00 WIB
-                </span>
+            ) : (
+              <div key="bantuan-d" className="site-footerGoCol">
+                <div className="site-footerGoTitle">Bantuan & Kontak</div>
+                <div className="site-footerGoList">
+                  <Link className="site-footerGoLink" to="/faq?q=paket">
+                    Cara Pesan
+                  </Link>
+                  <Link className="site-footerGoLink" to="/faq?q=QRIS">
+                    Cara Bayar QRIS
+                  </Link>
+                  <Link className="site-footerGoLink" to="/faq">
+                    Pusat Bantuan
+                  </Link>
+                  <a
+                    className="site-footerGoLink"
+                    href={`https://wa.me/${STORE_WHATSAPP.app_premium}?text=${encodeURIComponent("Halo Admin imzaqi.store, saya butuh bantuan.")}`}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    WhatsApp Resmi (+{STORE_WHATSAPP.app_premium})
+                  </a>
+                  <span className="site-footerGoLink" style={{ opacity: 0.8, cursor: "default", fontSize: "13px" }}>
+                    Jam Buka: 08.00–22.00 WIB
+                  </span>
+                </div>
               </div>
-            </details>
+            )}
           </div>
 
           <div className="site-footerGoLegal">

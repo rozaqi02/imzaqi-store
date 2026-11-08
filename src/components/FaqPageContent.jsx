@@ -15,6 +15,8 @@ import {
   X,
 } from "lucide-react";
 import { fetchSettings } from "../lib/api";
+import { toWhatsAppDigits } from "../lib/format";
+import { STORE_WHATSAPP } from "../lib/productCategories";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "./EmptyState";
 import BannerGraphic from "./BannerGraphic";
@@ -232,7 +234,7 @@ export default function FaqPageContent() {
     description: "Jawaban cepet soal bayar, order, varian, & aktivasi - biar gak bingung.",
   });
 
-  const [waNumber, setWaNumber] = useState("6283136049987");
+  const [waNumber, setWaNumber] = useState(STORE_WHATSAPP.app_premium);
   const [searchParams, setSearchParams] = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
   const [query, setQuery] = useState(initialQuery);
@@ -265,7 +267,8 @@ export default function FaqPageContent() {
     fetchSettings()
       .then((result) => {
         if (!active) return;
-        const next = String(result?.whatsapp?.number || "").trim();
+        const raw = String(result?.whatsapp?.number || (typeof result?.whatsapp === "string" ? result.whatsapp : "")).trim();
+        const next = toWhatsAppDigits(raw);
         if (next) setWaNumber(next);
       })
       .catch(() => {});

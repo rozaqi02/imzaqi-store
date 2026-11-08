@@ -8,8 +8,8 @@ import { AlertTriangle, ShieldCheck } from "lucide-react";
  * murni tampilan dan mudah di-code-split / diuji.
  */
 export default function TestimonialsPane({
-  activeCount,
-  testimonials,
+  activeCount = 0,
+  testimonials = [],
   onAddTestimonials,
   onUpdateTestimonial,
   onDeleteTestimonial,
@@ -68,7 +68,6 @@ export default function TestimonialsPane({
           <label className="admin-check">
             <input name="is_verified" type="checkbox" /> Pembelian terverifikasi
           </label>
-
           <label
             className="admin-check"
             style={{
@@ -94,55 +93,61 @@ export default function TestimonialsPane({
           </button>
         </form>
 
-        <div className="admin-grid" style={{ marginTop: 14 }}>
-          {testimonials.map((t) => (
-            <div key={t.id} className="admin-thumb">
-              <img src={t.image_url} alt={t.caption || "testimoni"} />
-              {t.caption ? <div className="admin-thumb-caption">{t.caption}</div> : null}
-              {t.customer_name || t.product_name ? (
-                <div className="admin-thumb-caption">
-                  {[t.customer_name, t.product_name].filter(Boolean).join(" · ")}
+        {testimonials.length === 0 ? (
+          <div className="admin-emptyInline" style={{ marginTop: 14 }}>
+            Belum ada testimoni. Unggah screenshot ulasan pelanggan untuk mulai.
+          </div>
+        ) : (
+          <div className="admin-grid" style={{ marginTop: 14 }}>
+            {testimonials.map((t) => (
+              <div key={t.id} className="admin-thumb">
+                <img src={t.image_url} alt={t.caption || "testimoni"} />
+                {t.caption ? <div className="admin-thumb-caption">{t.caption}</div> : null}
+                {t.customer_name || t.product_name ? (
+                  <div className="admin-thumb-caption">
+                    {[t.customer_name, t.product_name].filter(Boolean).join(" · ")}
+                  </div>
+                ) : null}
+                <div className="admin-thumb-actions">
+                  <button
+                    className={"btn btn-sm " + (t.is_active ? "btn-ghost" : "")}
+                    type="button"
+                    onClick={() => onUpdateTestimonial(t.id, { is_active: !t.is_active })}
+                  >
+                    {t.is_active ? "Off" : "On"}
+                  </button>
+                  <button
+                    className={"btn btn-sm " + (t.is_verified ? "btn-primary" : "btn-ghost")}
+                    type="button"
+                    onClick={() => onUpdateTestimonial(t.id, { is_verified: !t.is_verified })}
+                  >
+                    {t.is_verified ? "Verified" : "Verifikasi"}
+                  </button>
+                  <button
+                    className="btn btn-ghost btn-sm"
+                    type="button"
+                    onClick={() => {
+                      openConfirm({
+                        title: "Edit caption",
+                        prompt: true,
+                        promptDefault: t.caption || "",
+                        promptLabel: "Caption",
+                        confirmLabel: "Simpan",
+                        onConfirm: (newCaption) =>
+                          onUpdateTestimonial(t.id, { caption: String(newCaption || "") }),
+                      });
+                    }}
+                  >
+                    Caption
+                  </button>
+                  <button className="btn btn-danger btn-sm" type="button" onClick={() => onDeleteTestimonial(t.id)}>
+                    Hapus
+                  </button>
                 </div>
-              ) : null}
-              <div className="admin-thumb-actions">
-                <button
-                  className={"btn btn-sm " + (t.is_active ? "btn-ghost" : "")}
-                  type="button"
-                  onClick={() => onUpdateTestimonial(t.id, { is_active: !t.is_active })}
-                >
-                  {t.is_active ? "Off" : "On"}
-                </button>
-                <button
-                  className={"btn btn-sm " + (t.is_verified ? "btn-primary" : "btn-ghost")}
-                  type="button"
-                  onClick={() => onUpdateTestimonial(t.id, { is_verified: !t.is_verified })}
-                >
-                  {t.is_verified ? "Verified" : "Verifikasi"}
-                </button>
-                <button
-                  className="btn btn-ghost btn-sm"
-                  type="button"
-                  onClick={() => {
-                    openConfirm({
-                      title: "Edit caption",
-                      prompt: true,
-                      promptDefault: t.caption || "",
-                      promptLabel: "Caption",
-                      confirmLabel: "Simpan",
-                      onConfirm: (newCaption) =>
-                        onUpdateTestimonial(t.id, { caption: String(newCaption || "") }),
-                    });
-                  }}
-                >
-                  Caption
-                </button>
-                <button className="btn btn-danger btn-sm" type="button" onClick={() => onDeleteTestimonial(t.id)}>
-                  Hapus
-                </button>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );

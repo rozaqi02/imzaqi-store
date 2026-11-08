@@ -92,7 +92,7 @@ function ChannelHeader({ icon: Icon, title, subtitle, editor, label }) {
 
 function TextField({ label, field, editor, placeholder, hint, error, maxLength, multiline = false }) {
   const id = useId();
-  const props = { id, className: "input", value: editor.draft[field], maxLength, placeholder, disabled: editor.busy, "aria-invalid": Boolean(error), "aria-describedby": `${id}-hint`, onChange: event => editor.patch({ [field]: event.target.value }) };
+  const props = { id, className: "input", value: editor.draft[field] ?? "", maxLength, placeholder, disabled: editor.busy, "aria-invalid": Boolean(error), "aria-describedby": `${id}-hint`, onChange: event => editor.patch({ [field]: event.target.value }) };
   return <div className="sps-field"><label htmlFor={id}>{label}</label>{multiline ? <textarea {...props} rows={3}/> : <input {...props}/>}
     <small id={`${id}-hint`} className={error ? "sps-error" : ""}>{error || hint}</small>
   </div>;

@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { createPortal } from "react-dom";
 import {
   Clock3,
@@ -81,6 +81,15 @@ export default function VariantCompareModal({
     onClose,
     initialFocusSelector: ".vcm-close",
   });
+
+  useEffect(() => {
+    if (!open) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [open]);
 
   const enriched = useMemo(() => {
     if (!variants?.length) return { items: [], bestPriceId: null, hasDiff: {}, showEmailRow: false, showTypeRow: false };

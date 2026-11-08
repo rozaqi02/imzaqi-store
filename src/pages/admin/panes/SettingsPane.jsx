@@ -118,8 +118,8 @@ export default function SettingsPane({
           </div>
           <div className="admin-miniCard">
             <span>Traffic hari ini</span>
-            <strong>{formatCompactNumber(storePulse.today_views)} views</strong>
-            <small>{storePulse.today_orders || analyticsSummary.todayOrders} order masuk</small>
+            <strong>{formatCompactNumber(storePulse?.today_views || 0)} views</strong>
+            <small>{storePulse?.today_orders || analyticsSummary?.todayOrders || 0} order masuk</small>
           </div>
         </div>
       </div>

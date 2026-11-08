@@ -5,7 +5,7 @@ import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, 
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
-import { formatIDR } from "../lib/format";
+import { formatIDR, validateWhatsApp, toWhatsAppDigits } from "../lib/format";
 import { fetchProducts, fetchSettings } from "../lib/api";
 import { buildLiveCartItems } from "../lib/liveCartPricing";
 import { STORE_WHATSAPP } from "../lib/productCategories";
@@ -213,22 +213,23 @@ export default function Pay() {
   }, [items]);
 
   const [settings, setSettings] = useState({ whatsapp: { number: STORE_WHATSAPP.app_premium }, qris: {}, qris_academic: {} });
-  const waNumber = isAcademicOrder ? STORE_WHATSAPP.academic : (settings?.whatsapp?.number || STORE_WHATSAPP.app_premium);
+  const waNumberRaw = isAcademicOrder
+    ? STORE_WHATSAPP.academic
+    : (settings?.whatsapp?.number || (typeof settings?.whatsapp === "string" ? settings.whatsapp : STORE_WHATSAPP.app_premium));
+  const waNumber = toWhatsAppDigits(waNumberRaw) || STORE_WHATSAPP.app_premium;
   const qrisBaseFromSettings = String(settings?.qris?.base_payload || "").trim();
   const qrisBaseFromEnv = String(import.meta.env.VITE_QRIS_BASE || "").trim();
   const qrisBase = qrisBaseFromSettings || qrisBaseFromEnv;
-  const fallbackQrisUrl = isAcademicOrder ? "/qris_academic.jpg" : (String(settings?.qris?.image_url || "").trim() || "/qris_payment.jpeg");
+  const fallbackQrisUrl = isAcademicOrder
+    ? (String(settings?.qris_academic?.image_url || "").trim() || "/qris_academic.jpg")
+    : (String(settings?.qris?.image_url || "").trim() || "/qris_payment.jpeg");
 
   const initialBuyerDetails = useMemo(
     () => location.state?.buyerDetails || loadBuyerDetails(),
     [location.state]
   );
   const [customerWhatsApp, setCustomerWhatsApp] = useState(() => initialBuyerDetails.whatsapp || "");
-  const [isWaValid, setIsWaValid] = useState(() => {
-    const raw = String(initialBuyerDetails.whatsapp || "").replace(/\D/g, "");
-    return (raw.startsWith("08") && raw.length >= 10 && raw.length <= 15) ||
-           (raw.startsWith("628") && raw.length >= 11 && raw.length <= 16);
-  });
+  const [isWaValid, setIsWaValid] = useState(() => validateWhatsApp(initialBuyerDetails.whatsapp).valid);
   const [buyerEmail, setBuyerEmail] = useState(() => {
     try { return initialBuyerDetails.email || localStorage.getItem(STORAGE_KEY_BUYER_EMAIL) || ""; } catch { return initialBuyerDetails.email || ""; }
   });
@@ -268,7 +269,7 @@ export default function Pay() {
       .then((result) => {
         if (!active) return;
         setSettings({
-          whatsapp: result.whatsapp || { number: STORE_WHATSAPP.app_premium },
+          whatsapp: typeof result.whatsapp === "string" ? { number: result.whatsapp } : (result.whatsapp || { number: STORE_WHATSAPP.app_premium }),
           qris: result.qris || {},
           qris_academic: result.qris_academic || {},
         });
@@ -331,7 +332,7 @@ export default function Pay() {
         if (!active) return;
         dispatchQris({
           type: "FALLBACK",
-          url: "/qris_academic.jpg",
+          url: fallbackQrisUrl,
           notice: "QRIS khusus Jasa Akademik (AGTA_STORE, DIGITAL & KREATIF).",
         });
         return;
@@ -371,8 +372,10 @@ export default function Pay() {
 
   const noteText = useMemo(() => {
     const parts = [];
-    if (buyerEmail.trim()) parts.push(`Email buyer: ${buyerEmail.trim()}`);
-    if (notes.trim()) parts.push(notes.trim());
+    const trimmedEmail = String(buyerEmail || "").trim();
+    const trimmedNotes = String(notes || "").trim();
+    if (trimmedEmail) parts.push(`Email buyer: ${trimmedEmail}`);
+    if (trimmedNotes) parts.push(trimmedNotes);
     const ref = getReferralCode();
     if (ref) parts.push(`Ref: ${ref}`);
     return parts.join("\n");
@@ -434,7 +437,7 @@ export default function Pay() {
   const summaryText = useMemo(() => {
     const rows = items.map(
       (item) =>
-        `- ${item.product_name} / ${item.variant_name} / ${item.duration_label} x${item.qty} = ${formatIDR(item.price_idr * item.qty)}`
+        `- ${item.product_name} / ${item.variant_name} / ${item.duration_label} x${item.qty} = ${formatIDR((Number(item.price_idr) || 0) * (Number(item.qty) || 0))}`
     );
     rows.push(`Subtotal: ${formatIDR(subtotal)}`);
     rows.push(`Diskon: ${formatIDR(discount)}`);
@@ -675,7 +678,7 @@ export default function Pay() {
                     </div>
                   </div>
                 </div>
-                <b>{formatIDR(item.price_idr * item.qty)}</b>
+                <b>{formatIDR((Number(item.price_idr) || 0) * (Number(item.qty) || 0))}</b>
               </div>
             );
           })}

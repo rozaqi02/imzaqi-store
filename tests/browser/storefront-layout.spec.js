@@ -1,7 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-for (const path of ["/", "/produk", "/status", "/checkout"]) {
-  test(`${path} does not overflow horizontally`, async ({ page }) => {
+for (const path of ["/", "/produk", "/status", "/checkout", "/faq", "/testimoni", "/promosi", "/bayar", "/admin", "/tentang"]) {
+  test(`${path} does not overflow horizontally and has no console errors`, async ({ page }) => {
+    const errors = [];
+    page.on("pageerror", (err) => errors.push(`PageError: ${err.message}`));
+    page.on("console", (msg) => {
+      if (msg.type() === "error") {
+        errors.push(`ConsoleError: ${msg.text()}`);
+      }
+    });
+
     await page.goto(path);
     await page.waitForLoadState("networkidle");
     const sizes = await page.evaluate(() => ({
@@ -9,6 +17,7 @@ for (const path of ["/", "/produk", "/status", "/checkout"]) {
       clientWidth: document.documentElement.clientWidth,
     }));
     expect(sizes.scrollWidth).toBeLessThanOrEqual(sizes.clientWidth + 1);
+    expect(errors).toEqual([]);
   });
 }
 

@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
-import { formatIDR } from "../lib/format";
+import { formatIDR, validateWhatsApp } from "../lib/format";
 import { checkStockAvailability } from "../lib/api";
 import CheckoutSteps from "../components/CheckoutSteps";
 import CheckoutExtrasPanel from "../components/CheckoutExtrasPanel";
@@ -120,7 +120,7 @@ export default function Checkout() {
   const [buyerEmail, setBuyerEmail] = useState(() => loadBuyerDetails().email);
   const [emailTouched, setEmailTouched] = useState(false);
   const [contactAttempted, setContactAttempted] = useState(false);
-  const [isWaValid, setIsWaValid] = useState(false);
+  const [isWaValid, setIsWaValid] = useState(() => validateWhatsApp(loadBuyerDetails().whatsapp).valid);
   const [isMobileSheet, setIsMobileSheet] = useState(() =>
     typeof window !== "undefined" ? window.matchMedia("(max-width: 720px)").matches : false
   );
@@ -203,7 +203,7 @@ export default function Checkout() {
     () => cart.items.some((item) => variantNeedsBuyerEmail(item)),
     [cart.items]
   );
-  const hasValidEmail = !requiresBuyerEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(buyerEmail.trim());
+  const hasValidEmail = !requiresBuyerEmail || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(buyerEmail || "").trim());
   const showEmailError = requiresBuyerEmail && !hasValidEmail && (emailTouched || contactAttempted);
   const showWaError = !isWaValid && contactAttempted;
 
@@ -314,7 +314,12 @@ export default function Checkout() {
 
     const buyerDetails = saveBuyerDetails({ whatsapp: customerWhatsApp, email: buyerEmail });
     trackFunnelEvent("begin_checkout", { metadata: { itemCount, total } });
-    nav("/bayar", { state: { buyerDetails } });
+    nav("/bayar", {
+      state: {
+        buyerDetails,
+        ...(backgroundLocation ? { backgroundLocation } : {}),
+      },
+    });
   }
 
   function renderBuyerContact() {
@@ -647,10 +652,10 @@ export default function Checkout() {
           <div className="checkout-full-header">
             <button
               onClick={() => {
-                if (window.history.length > 1) {
+                if (typeof window !== "undefined" && window.history.state?.idx > 0) {
                   nav(-1);
                 } else {
-                  nav("/");
+                  nav("/produk");
                 }
               }}
               className="btn btn-ghost checkout-back-btn"
@@ -934,7 +939,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
         </div>
 
         <div className="checkout-item-price">
-          <strong>{formatIDR(item.price_idr * item.qty)}</strong>
+          <strong>{formatIDR((Number(item.price_idr) || 0) * (Number(item.qty) || 0))}</strong>
           {item.qty > 1 ? <small>{formatIDR(item.price_idr)} / item</small> : null}
         </div>
 

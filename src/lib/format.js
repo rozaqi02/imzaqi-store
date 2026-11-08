@@ -174,8 +174,8 @@ export function summarizeCatalogCopy(text) {
 export function mapPromoResult(rpcValue) {
   const v = Number(rpcValue);
   if (v === -3) return { ok: false, message: "Kuota kode promo sudah habis.", percent: 0 };
-  if (v === -2) return { ok: false, message: "Kode promo sudah kedaluwarsa.", percent: 0 };
-  if (v === -1) return { ok: false, message: "Terlalu banyak percobaan. Coba lagi dalam 1 jam.", percent: 0 };
+  if (v === -2) return { ok: false, message: "Kamu sudah pernah menggunakan kode promo ini.", percent: 0 };
+  if (v === -1) return { ok: false, message: "Kode promo sudah kedaluwarsa.", percent: 0 };
   if (v === 0)  return { ok: false, message: "Kode tidak valid atau tidak aktif.", percent: 0 };
   if (v > 0)   return { ok: true, message: `Berhasil! Diskon ${v}% diterapkan.`, percent: v };
   return { ok: false, message: "Kode tidak valid.", percent: 0 };
@@ -251,7 +251,15 @@ export function formatWhatsAppNumber(value) {
 export function normalizeWhatsApp(value) {
   let clean = String(value || '').replace(/[^\d+]/g, '');
   if (clean.startsWith('0')) clean = '+62' + clean.slice(1);
+  if (clean.startsWith('8')) clean = '+62' + clean;
   if (clean.startsWith('62') && !clean.startsWith('+62')) clean = '+' + clean;
+  return clean;
+}
+
+export function toWhatsAppDigits(value) {
+  let clean = String(value || '').replace(/\D/g, '');
+  if (clean.startsWith('0')) clean = '62' + clean.slice(1);
+  if (clean.startsWith('8')) clean = '62' + clean;
   return clean;
 }
 
@@ -261,7 +269,7 @@ export function validateWhatsApp(value) {
   if (normalized.length < 12) return { valid: false, message: 'Nomor terlalu pendek' };
   if (normalized.length > 16) return { valid: false, message: 'Nomor terlalu panjang' };
   const rawClean = String(value).replace(/[^\d]/g, '');
-  const isValid = /^08\d{8,13}$/.test(rawClean) || /^(\+?62)8\d{8,13}$/.test(normalized);
+  const isValid = /^(0|8)\d{8,13}$/.test(rawClean) || /^(\+?62)8\d{8,13}$/.test(normalized);
   if (!isValid) return { valid: false, message: 'Format: 08xxx atau +62xxx' };
   return { valid: true, message: '' };
 }

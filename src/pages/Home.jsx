@@ -484,7 +484,7 @@ export default function Home() {
                   >
                     <div className="home-howCard-step" aria-hidden="true">{step.step}</div>
                     <div className="home-howCard-content">
-                      <strong className="home-howCard-title" role="heading" aria-level={3}>{step.title}</strong>
+                      <strong className="home-howCard-title">{step.title}</strong>
                       <p className="home-howCard-desc">{step.desc}</p>
                       
                       {/* Accordion Expansion details */}

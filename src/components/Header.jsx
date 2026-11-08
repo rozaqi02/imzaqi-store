@@ -60,7 +60,7 @@ export default function Header() {
   const { items } = useCart();
   useHeaderShrink();
   const { isDark, toggleTheme } = useTheme();
-  const cartCount = useMemo(() => items.reduce((sum, item) => sum + item.qty, 0), [items]);
+  const cartCount = useMemo(() => items.reduce((sum, item) => sum + Number(item?.qty || 0), 0), [items]);
   const isCompactNav = useIsMobile(COMPACT_NAV_MEDIA);
   const headerRef = useRef(null);
   const navRef = useRef(null);

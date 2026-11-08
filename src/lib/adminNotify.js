@@ -1,7 +1,8 @@
-﻿import { formatIDR } from "./format";
+import { formatIDR } from "./format";
 
 export function buildAdminOrderAlertUrl(phone, order) {
-  const digits = String(phone || "").replace(/\D/g, "");
+  let digits = String(phone || "").replace(/\D/g, "");
+  if (digits.startsWith("0")) digits = "62" + digits.slice(1);
   if (!digits) return "";
   const text = encodeURIComponent(
     `Order baru Imzaqi Store!\n\nID: ${order?.order_code || "-"}\nTotal: ${formatIDR(order?.total_idr || 0)}\nWA: ${order?.customer_whatsapp || "-"}\nStatus: ${order?.status || "pending"}`

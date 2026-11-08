@@ -7,6 +7,7 @@ const CATEGORY_LABELS = {
   ai: "AI",
   design: "Design",
   learning: "Belajar",
+  academic: "Jasa Akademik",
   other: "Lainnya",
 };
 

@@ -44,6 +44,11 @@ export function CartProvider({ children }) {
     return safeParse(storage.getItem(STORAGE_KEY), []);
   });
   useEffect(() => {
+    return () => {
+      if (lastAddedTimerRef.current) window.clearTimeout(lastAddedTimerRef.current);
+    };
+  }, []);
+  useEffect(() => {
     const storage = safeStorage();
     if (!storage) return;
     try {
@@ -54,6 +59,9 @@ export function CartProvider({ children }) {
 
   const api = useMemo(() => {
     function add(variant, qty = 1) {
+      if (!variant) return { success: false };
+      const targetVariantId = variant?.id ?? variant?.variant_id;
+      if (!targetVariantId) return { success: false };
       const requestedQty = Math.max(1, Math.floor(Number(qty) || 1));
       const hasStockLimit = variant?.stock != null && variant?.stock !== "" && !isNaN(Number(variant?.stock));
       const availableStock = hasStockLimit ? Number(variant.stock) : null;
@@ -73,7 +81,8 @@ export function CartProvider({ children }) {
         };
       }
 
-      const existingItem = items.find((item) => item.variant_id === variant.id);
+      const targetVariantName = variant?.name ?? variant?.variant_name ?? "";
+      const existingItem = items.find((item) => item.variant_id === targetVariantId);
       const nextQty = Number(existingItem?.qty || 0) + requestedQty;
       if (hasStockLimit && availableStock != null && nextQty > availableStock) {
         return {
@@ -87,7 +96,7 @@ export function CartProvider({ children }) {
       }
 
       setBumpToken((t) => t + 1);
-      setLastAddedVariantId(variant.id);
+      setLastAddedVariantId(targetVariantId);
       // Track timer agar bisa di-cancel sebelum set ulang
       if (lastAddedTimerRef.current) window.clearTimeout(lastAddedTimerRef.current);
       lastAddedTimerRef.current = window.setTimeout(() => {
@@ -95,14 +104,14 @@ export function CartProvider({ children }) {
         lastAddedTimerRef.current = null;
       }, 900);
       setItems((prev) => {
-        const i = prev.findIndex((x) => x.variant_id === variant.id);
+        const i = prev.findIndex((x) => x.variant_id === targetVariantId);
         if (i >= 0) {
           const next = [...prev];
           next[i] = {
             ...next[i],
             product_id: variant.product_id ?? next[i].product_id,
             product_name: variant.product_name ?? next[i].product_name,
-            variant_name: variant.name ?? next[i].variant_name,
+            variant_name: targetVariantName || next[i].variant_name,
             duration_label: variant.duration_label ?? next[i].duration_label,
             price_idr: variant.price_idr ?? next[i].price_idr,
             product_icon_url:
@@ -125,10 +134,10 @@ export function CartProvider({ children }) {
         return [
           ...prev,
           {
-            variant_id: variant.id,
+            variant_id: targetVariantId,
             product_id: variant.product_id,
             product_name: variant.product_name,
-            variant_name: variant.name,
+            variant_name: targetVariantName,
             duration_label: variant.duration_label,
             price_idr: variant.price_idr,
             product_icon_url: variant.product_icon_url || variant.icon_url || "",
@@ -261,12 +270,12 @@ export function CartProvider({ children }) {
     },
 
     subtotal() {
-      return items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0);
+      return items.reduce((sum, x) => sum + ((Number(x.price_idr) || 0) * (Number(x.qty) || 0)), 0);
     },
 
-    // TAMBAHKAN INI (Alias agar cart.total() jalan)
+    // Alias agar cart.total() jalan
     total() {
-      return items.reduce((sum, x) => sum + (x.price_idr * x.qty), 0);
+      return items.reduce((sum, x) => sum + ((Number(x.price_idr) || 0) * (Number(x.qty) || 0)), 0);
     },
 
     async checkStockForVariant(variantId) {

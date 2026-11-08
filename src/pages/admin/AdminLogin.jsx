@@ -79,9 +79,13 @@ export default function AdminLogin() {
   }, [searchParams]);
 
   useEffect(() => {
+    let alive = true;
     checkAdminAccess().then((result) => {
-      if (result.ok) nav("/admin/dashboard");
+      if (alive && result.ok) nav("/admin/dashboard");
     });
+    return () => {
+      alive = false;
+    };
   }, [nav]);
 
   usePageMeta({
@@ -100,13 +104,8 @@ export default function AdminLogin() {
       return;
     }
 
-    // SEC-02: Validasi kompleksitas password di client (minimal 12 karakter, tolak PIN numerik pendek)
-    if (!password || /^\d+$/.test(password) || password.length < 12) {
-      const warning = /^\d+$/.test(password)
-        ? "PIN numerik tidak diizinkan. Gunakan kata sandi minimal 12 karakter."
-        : "Kata sandi admin minimal 12 karakter sesuai standar keamanan.";
-      setMsg(warning);
-      toast.error("Kata sandi tidak memenuhi standar keamanan");
+    if (!email || !password) {
+      setMsg("Email dan password wajib diisi.");
       return;
     }
 
@@ -223,7 +222,7 @@ export default function AdminLogin() {
                 />
 
                 <label className="label" htmlFor="admin-login-password">
-                  Password <span style={{ fontSize: "11px", color: "var(--text-subtle, #888)" }}>(min. 12 karakter)</span>
+                  Password
                 </label>
                 <input
                   id="admin-login-password"
@@ -231,7 +230,7 @@ export default function AdminLogin() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password kuat"
+                  placeholder="Masukkan password"
                   autoComplete="current-password"
                   required
                   disabled={isLocked}

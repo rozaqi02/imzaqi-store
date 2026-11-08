@@ -69,7 +69,7 @@ export const CATALOG_LINE_WHATSAPP = STORE_WHATSAPP;
 
 export function buildCatalogAdminWhatsAppUrl(product, { minPriceLabel = "", pageUrl = "" } = {}) {
   const line = resolveCatalogLine(product);
-  const number = CATALOG_LINE_WHATSAPP[line];
+  const number = CATALOG_LINE_WHATSAPP[line] || STORE_WHATSAPP.app_premium;
   const name = String(product?.name || "produk ini").trim();
   const priceBit = minPriceLabel ? ` Mulai dari ${minPriceLabel}.` : "";
   const urlBit = pageUrl ? `\n${pageUrl}` : "";

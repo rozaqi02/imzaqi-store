@@ -189,6 +189,15 @@ export default function FlashSalePopup() {
     initialFocusSelector: ".fsp-closeFloat",
   });
 
+  useEffect(() => {
+    if (!isOpen || overlayBlocked) return undefined;
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [isOpen, overlayBlocked]);
+
   const featured = useMemo(() => {
     const live = salesItems.filter((item) => !isKnownOutOfStock(item));
     const pool = live.length ? live : [];

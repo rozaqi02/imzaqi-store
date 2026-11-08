@@ -147,7 +147,25 @@ function RestockRequest({ variant, adminUrl }) {
       visitor_id: getVisitorIdAsUUID(), product_id: variant.product_id,
       variant_id: variant.id, customer_whatsapp: digits,
     });
-    if (error && error.code !== "23505") { setState("error"); return; }
+    if (error && error.code !== "23505") {
+      const isMissingTable =
+        error.code === "42P01" ||
+        error.status === 404 ||
+        /does not exist|not found|schema cache|42P01/i.test(String(error.message || ""));
+      if (isMissingTable) {
+        const targetUrl = adminUrl || "https://wa.me/6283136049987";
+        const msg = `Halo Admin Imzaqi Store, saya ingin info saat paket *${variant.name || "produk"}* ready ya (WA: ${digits}).`;
+        const base = targetUrl.split("?")[0];
+        const waLink = `${base}?text=${encodeURIComponent(msg)}`;
+        try {
+          window.open(waLink, "_blank", "noopener,noreferrer");
+        } catch {}
+        setState("done");
+        return;
+      }
+      setState("error");
+      return;
+    }
     setState("done");
     trackFunnelEvent("restock_request", { productId: variant.product_id, variantId: variant.id });
   }
@@ -409,7 +427,7 @@ const VariantCard = React.memo(({
         {factItems.length ? (
           <p className="pdx-packFacts">
             {factItems.map((item, index) => (
-              <span key={item} className={index === 0 && durationLabel ? "pdx-packDuration" : undefined}>{item}</span>
+              <span key={`${item}-${index}`} className={index === 0 && durationLabel ? "pdx-packDuration" : undefined}>{item}</span>
             ))}
           </p>
         ) : null}
@@ -973,11 +991,15 @@ export default function ProductDetail() {
       requestedQty
     );
 
-    if (res && res.conflict) {
-      toast.warning(res.message, {
-        title: "Pesanan Harus Terpisah",
-        duration: 5000,
-      });
+    if (res && !res.success) {
+      if (res.conflict) {
+        toast.warning(res.message, {
+          title: "Pesanan Harus Terpisah",
+          duration: 5000,
+        });
+      } else if (res.message) {
+        toast.error(res.message, { title: variant.name, duration: 3000 });
+      }
       return false;
     }
 

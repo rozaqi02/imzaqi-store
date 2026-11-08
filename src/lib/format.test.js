@@ -8,8 +8,10 @@ import {
   normalizeProductRecord,
   packDisplayName,
   isPromoExpired,
+  mapPromoResult,
   formatWhatsAppNumber,
   normalizeWhatsApp,
+  toWhatsAppDigits,
   validateWhatsApp,
 } from "./format";
 
@@ -134,6 +136,13 @@ describe("WhatsApp Utilities", () => {
     expect(normalizeWhatsApp("+628123456789")).toBe("+628123456789");
   });
 
+  it("converts numbers to wa.me clean digits without leading plus", () => {
+    expect(toWhatsAppDigits("08123456789")).toBe("628123456789");
+    expect(toWhatsAppDigits("+628123456789")).toBe("628123456789");
+    expect(toWhatsAppDigits("62812-3456-7890")).toBe("6281234567890");
+    expect(toWhatsAppDigits("")).toBe("");
+  });
+
   it("formats numbers with proper spacing and dashes", () => {
     expect(formatWhatsAppNumber("081234567890")).toBe("0812-3456-7890");
     expect(formatWhatsAppNumber("+6281234567890")).toBe("+62 812-3456-7890");
@@ -141,9 +150,42 @@ describe("WhatsApp Utilities", () => {
 
   it("validates mobile numbers correctly", () => {
     expect(validateWhatsApp("08123456789").valid).toBe(true);
+    expect(validateWhatsApp("81234567890").valid).toBe(true);
     expect(validateWhatsApp("+6281234567890").valid).toBe(true);
     expect(validateWhatsApp("").valid).toBe(false);
     expect(validateWhatsApp("123").valid).toBe(false);
     expect(validateWhatsApp("021123456").valid).toBe(false); // Jakarta landline not mobile
+  });
+});
+describe("mapPromoResult (Supabase validate_promo RPC mapping)", () => {
+  it("maps -1 to promo expired message", () => {
+    const res = mapPromoResult(-1);
+    expect(res.ok).toBe(false);
+    expect(res.message).toBe("Kode promo sudah kedaluwarsa.");
+  });
+
+  it("maps -2 to already claimed message", () => {
+    const res = mapPromoResult(-2);
+    expect(res.ok).toBe(false);
+    expect(res.message).toBe("Kamu sudah pernah menggunakan kode promo ini.");
+  });
+
+  it("maps -3 to quota exhausted message", () => {
+    const res = mapPromoResult(-3);
+    expect(res.ok).toBe(false);
+    expect(res.message).toBe("Kuota kode promo sudah habis.");
+  });
+
+  it("maps 0 to invalid/inactive code", () => {
+    const res = mapPromoResult(0);
+    expect(res.ok).toBe(false);
+    expect(res.message).toBe("Kode tidak valid atau tidak aktif.");
+  });
+
+  it("maps positive numbers to success with discount percent", () => {
+    const res = mapPromoResult(15);
+    expect(res.ok).toBe(true);
+    expect(res.percent).toBe(15);
+    expect(res.message).toContain("15%");
   });
 });

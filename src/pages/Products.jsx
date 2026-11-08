@@ -627,7 +627,7 @@ export default function Products() {
     return (products || []).map((product) => {
       const vars = (product?.product_variants || [])
         .slice()
-        .filter((variant) => variant?.is_active)
+        .filter((variant) => variant?.is_active !== false)
         .sort((a, b) => (a?.sort_order || 0) - (b?.sort_order || 0));
 
       const prices = vars
@@ -672,10 +672,19 @@ export default function Products() {
 
   useEffect(() => {
     if (!priceReady && priceBounds.max > 0) {
-      setPrice({ min: priceBounds.min, max: priceBounds.max });
+      const pminParam = Number(params.get("pmin"));
+      const pmaxParam = Number(params.get("pmax"));
+      const nextMin = pminParam > 0 ? clamp(pminParam, priceBounds.min, priceBounds.max) : priceBounds.min;
+      const nextMax = pmaxParam > 0 ? clamp(pmaxParam, priceBounds.min, priceBounds.max) : priceBounds.max;
+      const initialPrice = {
+        min: Math.min(nextMin, nextMax),
+        max: Math.max(nextMin, nextMax),
+      };
+      setPrice(initialPrice);
+      setLocalPrice(initialPrice);
       setPriceReady(true);
     }
-  }, [priceBounds.min, priceBounds.max, priceReady]);
+  }, [priceBounds.min, priceBounds.max, priceReady, params]);
 
   useEffect(() => {
     if (!priceReady) return;
@@ -745,10 +754,12 @@ export default function Products() {
 
   const applyBudgetCap = useCallback((cap) => {
     if (priceBounds.max <= 0) return;
-    setPrice({
+    const nextBounds = {
       min: priceBounds.min,
       max: Math.max(priceBounds.min, Math.min(priceBounds.max, cap)),
-    });
+    };
+    setPrice(nextBounds);
+    setLocalPrice(nextBounds);
   }, [priceBounds.max, priceBounds.min]);
 
   function resetFilters() {
@@ -759,7 +770,11 @@ export default function Products() {
     setRestockOnly(false);
     setSort(DEFAULT_SORT);
     setView("grid");
-    if (priceBounds.max > 0) setPrice({ min: priceBounds.min, max: priceBounds.max });
+    if (priceBounds.max > 0) {
+      const defaultBounds = { min: priceBounds.min, max: priceBounds.max };
+      setPrice(defaultBounds);
+      setLocalPrice(defaultBounds);
+    }
   }
 
   const filtered = useMemo(() => {
@@ -896,7 +911,7 @@ export default function Products() {
     const now = Date.now();
     const newCutoff = now - NEW_PRODUCT_DAYS * DAY_MS;
     const restockCutoff = now - RESTOCK_DAYS * DAY_MS;
-    const active = (enriched || []).filter((item) => item?.is_active);
+    const active = (enriched || []).filter((item) => item?.is_active !== false);
     return {
       newProducts: active.filter((item) => Number(item?._createdAtTs || 0) >= newCutoff).length,
       restocked: active.filter((item) => Number(item?._latestInStockUpdateTs || 0) >= restockCutoff).length,
@@ -947,7 +962,11 @@ export default function Products() {
       tags.push({
         key: "price",
         label: `Harga: ${formatCompactIDR(price.min)}-${formatCompactIDR(price.max)}`,
-        onRemove: () => setPrice({ min: priceBounds.min, max: priceBounds.max }),
+        onRemove: () => {
+          const reset = { min: priceBounds.min, max: priceBounds.max };
+          setPrice(reset);
+          setLocalPrice(reset);
+        },
       });
     }
 

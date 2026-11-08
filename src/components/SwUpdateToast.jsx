@@ -1,18 +1,21 @@
-﻿import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { RefreshCw } from "lucide-react";
 
 export default function SwUpdateToast() {
   const [waitingWorker, setWaitingWorker] = useState(null);
 
   useEffect(() => {
-    if (!("serviceWorker" in navigator) || !import.meta.env.PROD) return;
+    let alive = true;
+    if (!("serviceWorker" in navigator) || !import.meta.env.PROD) return undefined;
 
     navigator.serviceWorker.ready.then((registration) => {
+      if (!alive) return;
       if (registration.waiting) setWaitingWorker(registration.waiting);
       registration.addEventListener("updatefound", () => {
         const worker = registration.installing;
         if (!worker) return;
         worker.addEventListener("statechange", () => {
+          if (!alive) return;
           if (worker.state === "installed" && navigator.serviceWorker.controller) {
             setWaitingWorker(worker);
           }
@@ -21,11 +24,16 @@ export default function SwUpdateToast() {
     });
 
     let refreshing = false;
-    navigator.serviceWorker.addEventListener("controllerchange", () => {
+    const onControllerChange = () => {
       if (refreshing) return;
       refreshing = true;
       window.location.reload();
-    });
+    };
+    navigator.serviceWorker.addEventListener("controllerchange", onControllerChange);
+    return () => {
+      alive = false;
+      navigator.serviceWorker.removeEventListener("controllerchange", onControllerChange);
+    };
   }, []);
 
   if (!waitingWorker) return null;
