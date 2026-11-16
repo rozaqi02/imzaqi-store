@@ -37,12 +37,9 @@
 }
 
 html[data-theme="light"] .admin-gate-card {
-  background:
-    linear-gradient(165deg, #ffffff 0%, #f3fafc 55%, #eaf6f9 100%);
-  border-color: rgba(119, 175, 194, 0.22);
-  box-shadow:
-    0 20px 40px rgba(40, 94, 117, 0.12),
-    inset 0 1px 0 #fff;
+  background: var(--skeu-panel-bg, linear-gradient(165deg, #ffffff 0%, #f3fafc 55%, #eaf6f9 100%));
+  border-color: var(--brand-line, rgba(119, 175, 194, 0.22));
+  box-shadow: var(--skeu-panel-shadow, 0 20px 40px rgba(40, 94, 117, 0.12), inset 0 1px 0 #fff);
 }
 
 .admin-gate-brand {
@@ -66,7 +63,7 @@ html[data-theme="light"] .admin-gate-card {
   border-radius: 14px;
   object-fit: contain;
   z-index: 1;
-  box-shadow: 0 8px 18px rgba(0, 140, 140, 0.22);
+  box-shadow: var(--skeu-control-shadow, 0 8px 18px rgba(0, 140, 140, 0.22));
 }
 
 .admin-gate-ring {

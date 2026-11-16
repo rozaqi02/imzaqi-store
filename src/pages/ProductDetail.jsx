@@ -39,7 +39,7 @@ import { fireConfetti } from "../components/Confetti";
 // Live viewer & countdown removed (fake data - hurts trust)
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
-import { buildCatalogAdminWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
+import { buildCatalogAdminWhatsAppUrl, buildSupportWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
 import ProductTile from "../components/ProductTile";
 import RecentlyViewed from "../components/RecentlyViewed";
 import MobileProductBar from "../components/MobileProductBar";
@@ -182,8 +182,10 @@ function RestockRequest({ variant, adminUrl }) {
         error.status === 404 ||
         /does not exist|not found|schema cache|42P01/i.test(String(error.message || ""));
       if (isMissingTable) {
-        const targetUrl = adminUrl || "https://wa.me/6283136049987";
         const msg = `Halo Admin Imzaqi Store, saya ingin info saat paket *${variant.name || "produk"}* ready ya (WA: ${digits}).`;
+        const waFallback = adminUrl
+          ? `${adminUrl}?text=${encodeURIComponent(msg)}`
+          : buildSupportWhatsAppUrl(msg, resolveCatalogLine(product));
         const base = targetUrl.split("?")[0];
         const waLink = `${base}?text=${encodeURIComponent(msg)}`;
         try {
@@ -1157,23 +1159,23 @@ export default function ProductDetail() {
                         <span>Katalog</span>
                       </button>
 
-                    <div className="pdx-topActions">
-                      <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan" aria-label="Bagikan produk">
-                        <Share2 size={16} />
-                      </button>
+                      <div className="pdx-topActions">
+                        <Link
+                          to={`/produk?cats=${productCategory.key}`}
+                          className="pdx-label pdx-categoryPill"
+                          data-category={productCategory.key}
+                          aria-label={`Lihat produk kategori ${productCategory.label}`}
+                        >
+                          <CategoryIcon size={12} aria-hidden="true" />
+                          <span>{productCategory.label}</span>
+                        </Link>
+                        <button type="button" className="pdx-iconBtn" onClick={handleShare} title="Bagikan" aria-label="Bagikan produk">
+                          <Share2 size={16} />
+                        </button>
+                      </div>
                     </div>
-                  </div>
 
-                      <Link
-                        to={`/produk?cats=${productCategory.key}`}
-                        className="pdx-label pdx-categoryPill"
-                        data-category={productCategory.key}
-                        aria-label={`Lihat produk kategori ${productCategory.label}`}
-                      >
-                        <CategoryIcon size={12} aria-hidden="true" />
-                        <span>{productCategory.label}</span>
-                      </Link>
-                      <h1 className="pdx-title">{product.name}</h1>
+                    <h1 className="pdx-title">{product.name}</h1>
 
                   <div className="pdx-statsStrip">
                     <div className="pdx-heroPrice">

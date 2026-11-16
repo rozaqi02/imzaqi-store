@@ -83,14 +83,15 @@ html[data-theme="dark"] {
     inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
     inset 0 -1px 0 rgba(0, 0, 0, 0.5),
     0 0 18px -4px rgba(0, 245, 196, 0.08);
-  --skeu-control-bg:
-    linear-gradient(170deg, rgba(255, 255, 255, 0.1) 0%, rgba(255, 255, 255, 0.02) 100%),
-    #17202c;
+  --skeu-control-bg: linear-gradient(180deg, #202c3a 0%, #172230 100%);
   --skeu-control-shadow:
-    0 8px 20px -4px rgba(0, 0, 0, 0.42),
-    0 0 0 1px rgba(255, 255, 255, 0.12),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.28),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+    0 3px 8px -2px rgba(0, 3, 10, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.09),
+    inset 0 1px 0 rgba(255, 255, 255, 0.18);
+  --skeu-control-shadow-hover:
+    0 5px 12px -2px rgba(0, 3, 10, 0.5),
+    0 0 0 1px rgba(0, 214, 180, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24);
   --skeu-inset-bg: linear-gradient(180deg, #090e14, #0e151e);
   --skeu-inset-shadow:
     inset 0 2px 6px rgba(0, 0, 0, 0.65),
@@ -105,23 +106,28 @@ html[data-theme="dark"] {
     inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
     inset 0 -2px 0 rgba(0, 60, 50, 0.48);
 
-  /* Primary button - specular rim lighting */
-  --imzaqi-btn-face:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0) 34%),
-    #009e60;
-  --imzaqi-btn-border: rgba(0, 80, 50, 0.35);
+  /* Primary button - soft neumorphic pillow matching white control contrast (Dark Mode) */
+  --imzaqi-btn-face: linear-gradient(180deg, #05a867 0%, #009e60 100%);
+  --imzaqi-btn-border: #05a867;
   --imzaqi-btn-text: #ffffff;
   --imzaqi-btn-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 1px 2px rgba(0, 0, 0, 0.24),
-    0 8px 20px -3px rgba(0, 158, 96, 0.28);
+    0 6px 10px rgba(0, 0, 0, 0.22),
+    0 18px 30px rgba(0, 140, 84, 0.16),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -3px 0 rgba(0, 76, 44, 0.24);
   --imzaqi-btn-shadow-compact:
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    0 1px 2px rgba(0, 0, 0, 0.2);
+    0 4px 8px rgba(0, 0, 0, 0.2),
+    0 10px 18px rgba(0, 140, 84, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 0 rgba(0, 76, 44, 0.22);
   --imzaqi-btn-shadow-hover:
-    inset 0 1px 0 rgba(255, 255, 255, 0.45),
-    0 2px 4px rgba(0, 0, 0, 0.2),
-    0 12px 26px -3px rgba(0, 158, 96, 0.36);
+    0 8px 14px rgba(0, 0, 0, 0.26),
+    0 20px 34px rgba(0, 158, 96, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -3px 0 rgba(0, 76, 44, 0.28);
+  --imzaqi-btn-shadow-active:
+    inset 0 2px 6px rgba(0, 76, 44, 0.32),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
   /* Unified Layout Design Tokens (Dark Mode) */
   --uni-panel:
@@ -225,13 +231,17 @@ html[data-theme="light"] {
     inset 0 1.5px 0 #ffffff,
     inset 0 -1px 0 rgba(0, 0, 0, 0.04),
     0 0 14px -2px rgba(0, 158, 96, 0.06);
-  --skeu-control-bg:
-    linear-gradient(180deg, #ffffff 0%, #f6faf8 100%);
+  --skeu-control-bg: #ffffff;
   --skeu-control-shadow:
-    0 6px 16px -4px rgba(45, 85, 100, 0.09),
-    0 0 0 1px rgba(0, 158, 96, 0.14),
-    inset 0 1.5px 0 #ffffff,
-    inset 0 -1px 0 rgba(0, 0, 0, 0.03);
+    0 6px 10px rgba(67, 111, 129, 0.1),
+    0 18px 30px rgba(67, 111, 129, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(154, 191, 203, 0.3);
+  --skeu-control-shadow-hover:
+    0 8px 14px rgba(67, 111, 129, 0.14),
+    0 20px 34px rgba(67, 111, 129, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -3px 0 rgba(154, 191, 203, 0.36);
   --skeu-inset-bg: linear-gradient(180deg, #edf4f1 0%, #f5f8f6 100%);
   --skeu-inset-shadow:
     inset 0 2px 5px rgba(45, 85, 100, 0.12),
@@ -244,23 +254,28 @@ html[data-theme="light"] {
     inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
     inset 0 -2px 0 rgba(0, 90, 50, 0.24);
 
-  /* Primary button - specular rim lighting (Light Mode) */
-  --imzaqi-btn-face:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0) 34%),
-    #009e60;
-  --imzaqi-btn-border: rgba(0, 80, 50, 0.28);
+  /* Primary button - soft neumorphic pillow matching white control contrast (Light Mode) */
+  --imzaqi-btn-face: linear-gradient(180deg, #05a867 0%, #009e60 100%);
+  --imzaqi-btn-border: #05a867;
   --imzaqi-btn-text: #ffffff;
   --imzaqi-btn-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 1px 2px rgba(0, 80, 50, 0.16),
-    0 8px 20px -3px rgba(0, 158, 96, 0.25);
+    0 6px 10px rgba(67, 111, 129, 0.1),
+    0 18px 30px rgba(67, 111, 129, 0.12),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -3px 0 rgba(0, 76, 44, 0.22);
   --imzaqi-btn-shadow-compact:
-    inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 1px 2px rgba(0, 80, 50, 0.14);
+    0 4px 8px rgba(67, 111, 129, 0.1),
+    0 10px 18px rgba(67, 111, 129, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    inset 0 -2px 0 rgba(0, 76, 44, 0.2);
   --imzaqi-btn-shadow-hover:
-    inset 0 1px 0 rgba(255, 255, 255, 0.65),
-    0 2px 4px rgba(0, 80, 50, 0.18),
-    0 12px 24px -3px rgba(0, 158, 96, 0.32);
+    0 8px 14px rgba(67, 111, 129, 0.14),
+    0 20px 34px rgba(67, 111, 129, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.12),
+    inset 0 -3px 0 rgba(0, 76, 44, 0.26);
+  --imzaqi-btn-shadow-active:
+    inset 0 2px 6px rgba(0, 76, 44, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
 
   /* Unified Layout Design Tokens (Light Mode) */
   --uni-panel: #ffffff;

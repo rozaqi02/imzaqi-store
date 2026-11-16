@@ -67,6 +67,14 @@ export const STORE_WHATSAPP = {
 
 export const CATALOG_LINE_WHATSAPP = STORE_WHATSAPP;
 
+export function buildSupportWhatsAppUrl(text = "", line = "app_premium") {
+  const number = CATALOG_LINE_WHATSAPP[line] || STORE_WHATSAPP.app_premium;
+  const trimmed = String(text || "").trim();
+  return trimmed
+    ? `https://wa.me/${number}?text=${encodeURIComponent(trimmed)}`
+    : `https://wa.me/${number}`;
+}
+
 export function buildCatalogAdminWhatsAppUrl(product, { minPriceLabel = "", pageUrl = "" } = {}) {
   const line = resolveCatalogLine(product);
   const number = CATALOG_LINE_WHATSAPP[line] || STORE_WHATSAPP.app_premium;

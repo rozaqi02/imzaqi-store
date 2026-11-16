@@ -1,6 +1,7 @@
 ﻿import React from "react";
 import { AlertTriangle, RefreshCw, MessageCircle } from "lucide-react";
 import { warn } from "../lib/log";
+import { buildSupportWhatsAppUrl } from "../lib/productCategories";
 
 export default class AppErrorBoundary extends React.Component {
   constructor(props) {
@@ -61,7 +62,7 @@ export default class AppErrorBoundary extends React.Component {
               </button>
               <a
                 className="btn btn-ghost aeb-waBtn"
-                href="https://wa.me/6283136049987"
+                href={buildSupportWhatsAppUrl("Halo Admin Imzaqi Store, saya mengalami kendala saat membuka halaman.")}
                 target="_blank"
                 rel="noreferrer"
               >

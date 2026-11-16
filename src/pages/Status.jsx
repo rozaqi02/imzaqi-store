@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams, Link } from "react-router-dom";
+import { useSearchParams, Link, useNavigate } from "react-router-dom";
 import { fireConfetti } from "../components/Confetti";
 import {
   Activity,
@@ -20,6 +20,7 @@ import {
   Package,
   PartyPopper,
   RefreshCw,
+  RotateCcw,
   Search,
   Send,
   ShieldCheck,
@@ -27,6 +28,7 @@ import {
   Star,
   ThumbsUp,
   Trash2,
+  Upload,
   WalletCards,
   X,
   XCircle,
@@ -36,6 +38,9 @@ import { supabase } from "../lib/supabaseClient";
 import { formatIDR, toWhatsAppDigits } from "../lib/format";
 import { fetchSettings, fetchProducts } from "../lib/api";
 import { STORE_WHATSAPP } from "../lib/productCategories";
+import { prettyOrderStatus, getOrderStatusTone } from "../lib/orderStatus";
+import { useCart } from "../context/CartContext";
+import { compressImage } from "../utils/imageCompress";
 import {
   getOrderHistory,
   updateOrderHistoryStatus,
@@ -56,7 +61,7 @@ import { trackFunnelEvent } from "../lib/funnelAnalytics";
 // Constants
 
 const POLL_INTERVAL_MS = 30_000;
-const TERMINAL_STATUSES = new Set(["done", "cancelled"]);
+const TERMINAL_STATUSES = new Set(["done", "cancelled", "expired"]);
 
 // Helpers
 
@@ -69,24 +74,26 @@ function prettyStatus(status) {
     paid_reported: "Menunggu verifikasi",
     cancelled: "Dibatalkan",
   };
-  return map[value] || value;
+  return map[value] || prettyOrderStatus(value);
 }
 
 function getStatusMeta(status) {
   const value = String(status || "pending");
-  if (value === "done") return { tone: "done", icon: CheckCircle2 };
-  if (value === "processing") return { tone: "processing", icon: RefreshCw };
-  if (value === "cancelled") return { tone: "cancelled", icon: XCircle };
-  if (value === "paid_reported") return { tone: "reported", icon: ShieldCheck };
-  return { tone: "pending", icon: Clock3 };
+  const tone = getOrderStatusTone(value);
+  if (value === "done") return { tone, icon: CheckCircle2 };
+  if (value === "processing") return { tone, icon: RefreshCw };
+  if (value === "cancelled") return { tone, icon: XCircle };
+  if (value === "expired") return { tone, icon: Clock3 };
+  if (value === "paid_reported") return { tone, icon: ShieldCheck };
+  return { tone, icon: Clock3 };
 }
 
 function getTimeline(status) {
   const value = String(status || "pending");
-  if (value === "cancelled") {
+  if (value === "cancelled" || value === "expired") {
     return [
       { key: "pending", label: "Order masuk", active: true, done: true },
-      { key: "cancelled", label: "Dibatalkan", active: true, done: false },
+      { key: value, label: value === "expired" ? "Kedaluwarsa" : "Dibatalkan", active: true, done: false },
     ];
   }
   const pastPending = value !== "pending";
@@ -177,14 +184,7 @@ async function fetchOrderByCode(orderCode) {
 }
 
 function statusTone(status) {
-  const map = {
-    pending: "pending",
-    paid_reported: "reported",
-    processing: "processing",
-    done: "done",
-    cancelled: "cancelled",
-  };
-  return map[String(status || "pending")] || "pending";
+  return getOrderStatusTone(status);
 }
 
 function formatDate(isoString) {
@@ -216,8 +216,13 @@ function formatRelativeTime(date) {
 // Sub-components
 
 function FlowStep({ step, index }) {
-  const isCancelled = step.key === "cancelled";
-  const stateText = step.done ? "Selesai" : step.active ? (isCancelled ? "Batal" : "Aktif") : "Menunggu";
+  const isExpired = step.key === "expired";
+  const isCancelled = step.key === "cancelled" || isExpired;
+  const stateText = step.done
+    ? "Selesai"
+    : step.active
+      ? (isExpired ? "Habis" : isCancelled ? "Batal" : "Aktif")
+      : "Menunggu";
   return (
     <div className={`st-flowStep${step.active ? " is-active" : ""}${step.done ? " is-done" : ""}${isCancelled ? " is-cancelled" : ""}`}>
       <div className="st-flowNumber" aria-hidden="true">
@@ -351,18 +356,27 @@ function PostTransactionReview({ order, waUrl, toast }) {
       });
       fireConfetti();
 
-      // Safely attempt DB insertion into testimonials
+      // Safely attempt DB insertion into testimonials (structured first, legacy caption fallback)
       if (typeof supabase?.from === "function") {
         const firstItem = order?.items?.[0];
-        const iconUrl = firstItem?.product_icon_url || "https://imzaqistore.com/favicon.ico";
-        await supabase.from("testimonials").insert([
-          {
-            image_url: iconUrl,
-            caption: `[${rating}/5] "${effectiveText}", ${effectiveAuthor} (#${order.order_code})`,
-            is_active: false,
-            sort_order: 100,
-          },
-        ]);
+        const iconUrl = firstItem?.product_icon_url || "/icon.png";
+        const basePayload = {
+          image_url: iconUrl,
+          caption: `[${rating}/5] "${effectiveText}", ${effectiveAuthor} (#${order.order_code})`,
+          is_active: false,
+          sort_order: 100,
+        };
+        const richPayload = {
+          ...basePayload,
+          product_name: String(firstItem?.product_name || "").trim() || null,
+          customer_name: effectiveAuthor,
+          rating,
+          is_verified: true,
+        };
+        const res = await supabase.from("testimonials").insert([richPayload]);
+        if (res?.error) {
+          await supabase.from("testimonials").insert([basePayload]);
+        }
       }
 
       setExistingReview(reviewData);
@@ -538,6 +552,8 @@ function PostTransactionReview({ order, waUrl, toast }) {
 // Tab: Cek Status
 
 function TabCekStatus({ settings }) {
+  const navigate = useNavigate();
+  const cart = useCart();
   const [searchParams, setSearchParams] = useSearchParams();
   const initialParam = searchParams.get("order") || searchParams.get("id") || searchParams.get("order_id") || "";
   const toast = useToast();
@@ -550,6 +566,8 @@ function TabCekStatus({ settings }) {
   const [refreshing, setRefreshing] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
   const [copiedCode, setCopiedCode] = useState(false);
+  const [uploadingProof, setUploadingProof] = useState(false);
+  const [nowTick, setNowTick] = useState(() => Date.now());
   const prevStatusRef = useRef(null);
   const lastLookedUpCodeRef = useRef("");
 
@@ -840,6 +858,128 @@ function TabCekStatus({ settings }) {
   const isTerminal = order ? TERMINAL_STATUSES.has(order.status) : false;
   const lastUpdatedLabel = lastUpdated ? formatRelativeTime(lastUpdated) : null;
 
+  useEffect(() => {
+    if (order?.status !== "pending" || !order?.reservation_expires_at) return undefined;
+    setNowTick(Date.now());
+    const id = setInterval(() => setNowTick(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [order?.status, order?.reservation_expires_at]);
+
+  const reservationCountdown = useMemo(() => {
+    if (order?.status !== "pending" || !order?.reservation_expires_at) return null;
+    const expiresMs = new Date(order.reservation_expires_at).getTime();
+    if (Number.isNaN(expiresMs)) return null;
+    const remainingSec = Math.max(0, Math.floor((expiresMs - nowTick) / 1000));
+    if (remainingSec <= 0) return "Batas pembayaran berakhir";
+    const mins = Math.floor(remainingSec / 60);
+    const secs = remainingSec % 60;
+    return `Batas bayar ${String(mins).padStart(2, "0")}:${String(secs).padStart(2, "0")}`;
+  }, [order?.status, order?.reservation_expires_at, nowTick]);
+
+  async function handleProofUpload(event) {
+    const file = event?.target?.files?.[0];
+    if (!file || !order?.order_code) return;
+    if (!String(file.type || "").startsWith("image/")) {
+      toast.error("Pilih file gambar screenshot pembayaran (JPG/PNG/WebP).");
+      event.target.value = "";
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      toast.error("Ukuran file terlalu besar (maks 8 MB).");
+      event.target.value = "";
+      return;
+    }
+    if (typeof supabase?.storage?.from !== "function") {
+      toast.info("Gunakan tombol Kirim Bukti Bayar via WA di bawah.");
+      event.target.value = "";
+      return;
+    }
+
+    setUploadingProof(true);
+    try {
+      const compressed = await compressImage(file, { maxWidth: 1200, maxHeight: 1200, quality: 0.78 });
+      const ext = compressed.type === "image/png" ? "png" : compressed.type === "image/webp" ? "webp" : "jpg";
+      const filePath = `orders/${order.order_code}/${Date.now()}.${ext}`;
+      const uploadRes = await supabase.storage
+        .from("payment-proofs")
+        .upload(filePath, compressed, { upsert: true, contentType: compressed.type || "image/jpeg" });
+      if (uploadRes.error) throw uploadRes.error;
+
+      const { data: pub } = supabase.storage.from("payment-proofs").getPublicUrl(filePath);
+      const proofUrl = pub?.publicUrl || "";
+      if (!proofUrl) throw new Error("URL bukti gagal dibuat.");
+
+      const rpcRes = await supabase.rpc("report_order_payment", {
+        p_order_code: order.order_code,
+        p_payment_proof_url: proofUrl,
+      });
+      if (rpcRes.error) throw rpcRes.error;
+      const updated = Array.isArray(rpcRes.data) ? rpcRes.data[0] : rpcRes.data;
+      const nextStatus = updated?.status || (order.status === "pending" ? "paid_reported" : order.status);
+      setOrder((prev) =>
+        prev
+          ? {
+              ...prev,
+              status: nextStatus,
+              payment_proof_url: updated?.payment_proof_url || proofUrl,
+              payment_reported_at: updated?.payment_reported_at || new Date().toISOString(),
+            }
+          : prev
+      );
+      updateOrderHistoryStatus?.(order.order_code, nextStatus);
+      toast.success("Bukti pembayaran terunggah! Pesanan diteruskan ke admin.");
+    } catch (err) {
+      warn("Gagal upload bukti pembayaran:", err);
+      toast.error("Upload otomatis belum aktif. Kirim bukti lewat tombol WA di bawah ya.");
+    } finally {
+      setUploadingProof(false);
+      if (event?.target) event.target.value = "";
+    }
+  }
+
+  function handleReorder() {
+    if (!order?.items?.length || typeof cart?.add !== "function") return;
+    let addedCount = 0;
+    for (const item of order.items) {
+      const product =
+        (item?.product_id ? productLookup.get(item.product_id) : null) ||
+        (item?.product_name ? productLookup.get(String(item.product_name).toLowerCase().trim()) : null);
+      const activeVariants = Array.isArray(product?.variants) ? product.variants : [];
+      const matchedVariant =
+        activeVariants.find((v) => item?.variant_id && v.id === item.variant_id) ||
+        activeVariants.find(
+          (v) =>
+            String(v.name || "").trim().toLowerCase() === String(item?.variant_name || "").trim().toLowerCase()
+        );
+      const variantPayload = {
+        variant_id: matchedVariant?.id || item?.variant_id || `${item?.product_name || "item"}-${addedCount}`,
+        product_id: matchedVariant?.product_id || product?.id || item?.product_id || null,
+        product_name: product?.name || item?.product_name || "Produk",
+        variant_name: matchedVariant?.name || item?.variant_name || "",
+        duration_label: matchedVariant?.duration_label || item?.duration_label || "",
+        price_idr: Number(matchedVariant?.price_idr ?? item?.price_idr ?? 0),
+        product_icon_url: product?.icon_url || item?.product_icon_url || "",
+        description: matchedVariant?.description || item?.description || product?.description || "",
+        guarantee_text: matchedVariant?.guarantee_text || item?.guarantee_text || "",
+        category: product?.category || item?.category || "other",
+        requires_buyer_email:
+          typeof matchedVariant?.requires_buyer_email === "boolean"
+            ? matchedVariant.requires_buyer_email
+            : !!item?.requires_buyer_email,
+        stock: matchedVariant?.stock ?? null,
+      };
+      const qty = Math.max(1, Number(item?.qty || 1));
+      const res = cart.add(variantPayload, qty);
+      if (res?.success !== false) addedCount += 1;
+    }
+    if (addedCount > 0) {
+      toast.success("Paket ditambahkan ke keranjang");
+      navigate("/checkout");
+    } else {
+      toast.error("Stok paket sedang kosong, cek produk lain ya.");
+    }
+  }
+
   return (
     <>
       <DoneCelebration
@@ -855,14 +995,14 @@ function TabCekStatus({ settings }) {
                 <div className="st-kicker">ID order</div>
                 <h2 className="st-searchTitle">Masukkan ID pesanan</h2>
               </div>
-              <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
-                Tempel
-              </button>
             </div>
 
             <div className="st-searchRow">
-              <label className="st-inputWrap">
+              <div className="st-inputWrap">
                 <Search size={16} />
+                <button className="btn btn-ghost st-pasteBtn st-pasteBtn--inline" type="button" onClick={pasteOrderCode}>
+                  Tempel
+                </button>
                 <input
                   className="input st-input"
                   inputMode="search"
@@ -880,7 +1020,7 @@ function TabCekStatus({ settings }) {
                     if (e.key === "Enter") lookup(input);
                   }}
                 />
-              </label>
+              </div>
 
               <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
                 {loading ? (
@@ -1074,9 +1214,17 @@ function TabCekStatus({ settings }) {
 
               {isLiveStatus ? (
                 <div className="st-liveHint" style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: 10 }}>
-                  <div style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-                    <Clock3 size={13} style={{ opacity: 0.7 }} />
-                    <span>Status diperbarui otomatis setiap 30 detik</span>
+                  <div style={{ display: "inline-flex", flexWrap: "wrap", alignItems: "center", gap: 8 }}>
+                    <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                      <Clock3 size={13} style={{ opacity: 0.7 }} />
+                      <span>Status diperbarui otomatis setiap 30 detik</span>
+                    </span>
+                    {reservationCountdown ? (
+                      <span className="st-expiryChip" role="status">
+                        <Clock3 size={12} aria-hidden="true" />
+                        <span>{reservationCountdown}</span>
+                      </span>
+                    ) : null}
                   </div>
                   {proofWaUrl ? (
                     <a
@@ -1281,6 +1429,43 @@ function TabCekStatus({ settings }) {
 
               <p className="st-helpText">Ada kendala atau butuh aktivasi lebih cepat? Hubungi admin resmi via WhatsApp.</p>
 
+              {order && (order.status === "pending" || order.status === "paid_reported") ? (
+                <div className="st-proofUploadBox" style={{ marginBottom: 12 }}>
+                  <div className="st-proofUploadRow">
+                    <div>
+                      <strong style={{ fontSize: "13px", display: "block" }}>
+                        {order.payment_proof_url ? "Bukti bayar terunggah" : "Upload bukti transfer"}
+                      </strong>
+                      <small className="muted" style={{ fontSize: "12px" }}>
+                        {order.payment_proof_url
+                          ? "Bisa unggah ulang jika ingin mengganti screenshot."
+                          : "Screenshot QRIS dikompresi otomatis sebelum dikirim."}
+                      </small>
+                    </div>
+                    {order.payment_proof_url ? (
+                      <a href={order.payment_proof_url} target="_blank" rel="noreferrer" aria-label="Lihat bukti bayar">
+                        <img
+                          className="st-proofPreviewThumb"
+                          src={order.payment_proof_url}
+                          alt="Bukti pembayaran pesanan"
+                        />
+                      </a>
+                    ) : null}
+                  </div>
+                  <label className="btn btn-ghost btn-sm btn-wide" style={{ cursor: uploadingProof ? "wait" : "pointer" }}>
+                    <Upload size={14} aria-hidden="true" />
+                    <span>{uploadingProof ? "Mengunggah..." : order.payment_proof_url ? "Ganti Bukti Transfer" : "Pilih Screenshot Bukti"}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      disabled={uploadingProof}
+                      onChange={handleProofUpload}
+                      style={{ position: "absolute", opacity: 0, width: 1, height: 1, overflow: "hidden" }}
+                    />
+                  </label>
+                </div>
+              ) : null}
+
               <div className="st-helpActions">
                 {order && (order.status === "pending" || order.status === "paid_reported") && proofWaUrl ? (
                   <a
@@ -1300,6 +1485,17 @@ function TabCekStatus({ settings }) {
                   <span>Hubungi Admin WA</span>
                   <ArrowUpRight size={15} style={{ flexShrink: 0, marginLeft: 2 }} />
                 </a>
+                {order?.items?.length > 0 ? (
+                  <button
+                    className="btn btn-ghost btn-wide"
+                    type="button"
+                    onClick={handleReorder}
+                    style={{ marginTop: 8, display: "inline-flex", alignItems: "center", justifyContent: "center", gap: 6 }}
+                  >
+                    <RotateCcw size={15} aria-hidden="true" />
+                    <span>Pesan Lagi</span>
+                  </button>
+                ) : null}
                 {order && order.status === "done" ? (
                   <a
                     className="btn btn-ghost btn-wide st-warrantyBtn"
@@ -1323,14 +1519,14 @@ function TabCekStatus({ settings }) {
                 <div className="st-kicker">Pencarian</div>
                 <h2 className="st-searchTitle">Cari Order Lain</h2>
               </div>
-              <button className="st-pasteBtn" type="button" onClick={pasteOrderCode}>
-                Tempel
-              </button>
             </div>
 
             <div className="st-searchRow">
-              <label className="st-inputWrap">
+              <div className="st-inputWrap">
                 <Search size={16} />
+                <button className="btn btn-ghost st-pasteBtn st-pasteBtn--inline" type="button" onClick={pasteOrderCode}>
+                  Tempel
+                </button>
                 <input
                   className="input st-input"
                   inputMode="search"
@@ -1346,7 +1542,7 @@ function TabCekStatus({ settings }) {
                     if (e.key === "Enter") lookup(input);
                   }}
                 />
-              </label>
+              </div>
 
               <button className="btn st-checkBtn" type="button" onClick={() => lookup(input)} disabled={loading}>
                 {loading ? (

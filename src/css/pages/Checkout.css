@@ -538,6 +538,11 @@ html[data-theme="light"] .checkout-floating-bar-reason {
   align-items: start;
 }
 
+.checkout-full-grid.is-empty {
+  grid-template-columns: minmax(0, 680px);
+  justify-content: center;
+}
+
 .checkout-full-main {
   display: flex;
   flex-direction: column;
@@ -873,8 +878,9 @@ html[data-theme="light"] .checkout-back-btn:hover {
 .checkout-contactHead h3 { margin: 3px 0 0; font-size: 18px; letter-spacing: -.03em; }
 .checkout-contactHead > span { padding: 5px 9px; border-radius: 6px; font-size: 9px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; color: var(--brand-icon); background: rgba(0,158,96,.1); }
 .checkout-emailField { display: grid; gap: 7px; }
-.checkout-emailField label { display: flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; }
-.checkout-emailField label span { margin-left: auto; color: var(--brand-muted); font-size: 10px; font-weight: 600; }
+.checkout-emailField label { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 800; }
+.checkout-emailField label span:not(.required) { margin-left: auto; color: var(--brand-muted); font-size: 10px; font-weight: 600; }
+.checkout-emailField label .required { margin-left: 0; }
 .checkout-full-contact-panel { padding: 24px 26px !important; border-radius: 24px; }
 
 @media (max-width: 720px) {

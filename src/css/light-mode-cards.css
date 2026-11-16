@@ -20,9 +20,9 @@ html[data-theme="light"] .catalog-emptyResult {
 }
 
 html[data-theme="light"] .product-tile-pill {
-  box-shadow: none;
-  border: 1px solid rgba(0, 138, 148, 0.1);
-  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--skeu-control-shadow);
+  border: 1px solid var(--brand-line, rgba(0, 138, 148, 0.14));
+  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.88));
 }
 
 html[data-theme="light"] h1,

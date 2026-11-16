@@ -16,7 +16,6 @@
 @import "./css/fab-stack.css";
 @import "./css/bottom-nav.css";
 @import "./css/light-mode-cards.css";
-@import "./css/neumorphic-depth.css";
 @import "./css/hero-animations.css";
 
 /* Storefront route foundations. Keep these in one predictable cascade instead
@@ -55,6 +54,7 @@
 @import "./css/background-texture.css";
 @import "./css/header-nav.css";
 @import "./css/user-redesign.css";
+@import "./css/neumorphic-depth.css";
 @import "./css/buttons.css";
 @import "./css/page-transitions.css";
 @import "./css/home-polish.css";

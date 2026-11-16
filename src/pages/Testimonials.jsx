@@ -66,6 +66,44 @@ function formatPurchasedDate(isoDate) {
   }
 }
 
+function parseStructuredCaption(caption) {
+  const raw = String(caption || "").trim();
+  if (!raw) return {};
+  const result = {};
+  const ratingMatch = raw.match(/^\[([1-5])\/5\]\s*/);
+  let rest = raw;
+  if (ratingMatch) {
+    result.rating = Number(ratingMatch[1]);
+    rest = rest.slice(ratingMatch[0].length);
+  }
+  const adminMatch = rest.match(/^(.*)\s*·\s*Dari\s+([^(]+?)(?:\s*\(([^)]+)\))?\s*$/i);
+  if (adminMatch) {
+    result.cleanCaption = adminMatch[1].replace(/^["“]|["”]$/g, "").trim();
+    result.customerName = adminMatch[2].trim();
+    if (adminMatch[3]) result.productName = adminMatch[3].trim();
+    return result;
+  }
+  const reviewMatch = rest.match(/^"([^"]+)"\s*,\s*([^()]+?)(?:\s*\(#([A-Z0-9-]+)\))?\s*$/i);
+  if (reviewMatch) {
+    result.cleanCaption = reviewMatch[1].trim();
+    result.customerName = reviewMatch[2].trim();
+    return result;
+  }
+  return result;
+}
+
+function enrichTestimonial(item) {
+  if (!item || typeof item !== "object") return item;
+  const parsed = parseStructuredCaption(item.caption);
+  return {
+    ...item,
+    display_caption: parsed.cleanCaption || String(item.caption || "").trim(),
+    product_name: item.product_name || parsed.productName || "",
+    customer_name: item.customer_name || parsed.customerName || "",
+    rating: Number(item.rating || parsed.rating || 0) || null,
+  };
+}
+
 export default function Testimonials() {
   const [loading, setLoading] = useState(true);
   const [items, setItems] = useState([]);
@@ -87,7 +125,7 @@ export default function Testimonials() {
     setLoading(true);
     setError("");
     fetchTestimonials({ useCache: retry === 0 })
-      .then(data => { if (alive) setItems(Array.isArray(data) ? data : []); })
+      .then(data => { if (alive) setItems(Array.isArray(data) ? data.map(enrichTestimonial) : []); })
       .catch(e => { warn(e); if (alive) setError("Periksa koneksi internet, lalu coba muat kembali."); })
       .finally(() => { if (alive) setLoading(false); });
     return () => { alive = false; };
@@ -140,7 +178,7 @@ export default function Testimonials() {
         {verifiedStories.length ? (
           <section className="reviews-verifiedStories" aria-labelledby="verified-stories-title">
             <div className="reviews-sectionHead"><div><span className="reviews-eyebrow">PEMBELIAN TERVERIFIKASI</span><h2 id="verified-stories-title">Cerita singkat pelanggan.</h2></div></div>
-            <div className="reviews-storyGrid">{verifiedStories.map(item => <article key={item.id} className="reviews-storyCard"><BadgeCheck size={20} /><p>“{item.caption.trim()}”</p><div><strong>{item.customer_name || "Pelanggan"}</strong><span>{item.product_name || "Pesanan Imzaqi Store"}</span></div></article>)}</div>
+            <div className="reviews-storyGrid">{verifiedStories.map(item => <article key={item.id} className="reviews-storyCard"><BadgeCheck size={20} /><p>“{item.display_caption || item.caption.trim()}”</p><div><strong>{item.customer_name || "Pelanggan"}</strong><span>{item.product_name || "Pesanan Imzaqi Store"}</span></div></article>)}</div>
           </section>
         ) : null}
 
@@ -159,9 +197,9 @@ export default function Testimonials() {
             : error ? <div className="reviews-empty" role="alert"><ImageOff size={34} /><h3>Galeri belum bisa dimuat</h3><p>{error}</p><button className="reviews-button" type="button" onClick={() => setRetry(n => n + 1)}>Coba lagi</button></div>
             : !filtered.length ? <div className="reviews-empty"><Images size={36} /><h3>{items.length ? "Ceritanya belum ketemu" : "Cerita pertama segera hadir"}</h3><p>{items.length ? "Coba kata kunci lain atau lihat semua testimoni." : "Testimoni pelanggan akan ditampilkan di sini setelah ditambahkan."}</p>{items.length ? <button className="reviews-button" type="button" onClick={resetFilters}>Lihat semua testimoni</button> : <Link className="reviews-button" to="/produk">Jelajahi produk <ArrowUpRight size={17} /></Link>}</div>
             : <><div className={view === "grid" ? "reviews-grid" : "reviews-masonry"}>
-              {shown.map((item, idx) => <button className="reviews-card" type="button" key={item.id} onClick={() => setActiveIdx(idx)} aria-label={`Buka testimoni ${idx + 1}${item.caption ? `: ${item.caption}` : ""}`}>
-                <span className="reviews-image"><ReviewImage key={item.image_url} src={item.image_url} alt={item.caption || `Screenshot testimoni ${idx + 1}`} /><span className="reviews-zoom" aria-hidden="true"><ZoomIn size={17} /></span></span>
-                <span className="reviews-cardCopy"><span className="reviews-cardLabel">{item.is_verified ? <><BadgeCheck size={14} /> TERVERIFIKASI</> : <>CERITA {String(idx + 1).padStart(2, "0")}</>}<ArrowUpRight size={16} /></span><strong>{item.caption?.trim() || "Testimoni pelanggan"}</strong><small>{[item.product_name, formatPurchasedDate(item.purchased_at)].filter(Boolean).join(" · ") || "Ketuk untuk melihat lengkap"}</small></span>
+              {shown.map((item, idx) => <button className="reviews-card" type="button" key={item.id} onClick={() => setActiveIdx(idx)} aria-label={`Buka testimoni ${idx + 1}${item.display_caption ? `: ${item.display_caption}` : ""}`}>
+                <span className="reviews-image"><ReviewImage key={item.image_url} src={item.image_url} alt={item.display_caption || `Screenshot testimoni ${idx + 1}`} /><span className="reviews-zoom" aria-hidden="true"><ZoomIn size={17} /></span></span>
+                <span className="reviews-cardCopy"><span className="reviews-cardLabel">{item.is_verified ? <><BadgeCheck size={14} /> TERVERIFIKASI{item.rating ? ` · ${item.rating}/5` : ""}</> : <>CERITA {String(idx + 1).padStart(2, "0")}{item.rating ? ` · ${item.rating}/5` : ""}</>}<ArrowUpRight size={16} /></span><strong>{item.display_caption || "Testimoni pelanggan"}</strong><small>{[item.product_name, item.customer_name, formatPurchasedDate(item.purchased_at)].filter(Boolean).join(" · ") || "Ketuk untuk melihat lengkap"}</small></span>
               </button>)}
             </div>{shown.length < filtered.length && <div className="reviews-more"><p>{shown.length} dari {filtered.length} testimoni</p><button className="reviews-button reviews-button--secondary" type="button" onClick={() => setLimit(n => n + 9)}>Lihat lebih banyak</button></div>}</>}
         </section>
@@ -172,7 +210,7 @@ export default function Testimonials() {
           <div ref={dialogRef} className="reviews-lightbox" role="dialog" aria-modal="true" aria-labelledby="reviews-viewer-title">
             <div className="reviews-viewerHead"><div><span className="reviews-eyebrow">GALERI PELANGGAN</span><h2 id="reviews-viewer-title">Testimoni {activeIdx + 1} dari {filtered.length}</h2></div><button className="reviews-iconButton" type="button" onClick={closeViewer} aria-label="Tutup testimoni"><X size={21} /></button></div>
             <div className="reviews-viewerImage"><ReviewImage key={active.image_url} src={active.image_url} alt={active.caption || "Screenshot testimoni pelanggan"} eager isViewer /></div>
-            <div className="reviews-viewerFoot"><div><p>{active.caption?.trim() || "Testimoni pelanggan"}</p>{active.is_verified ? <span className="reviews-verifiedMeta"><BadgeCheck size={14} /> Pembelian terverifikasi{active.product_name ? ` · ${active.product_name}` : ""}</span> : null}</div>{filtered.length > 1 && <div className="reviews-viewerNav"><button className="reviews-iconButton" type="button" onClick={() => setActiveIdx(i => (i - 1 + filtered.length) % filtered.length)} aria-label="Testimoni sebelumnya"><ChevronLeft size={22} /></button><button className="reviews-iconButton" type="button" onClick={() => setActiveIdx(i => (i + 1) % filtered.length)} aria-label="Testimoni berikutnya"><ChevronRight size={22} /></button></div>}</div>
+            <div className="reviews-viewerFoot"><div><p>{active.display_caption || "Testimoni pelanggan"}</p>{(active.is_verified || active.product_name || active.rating) ? <span className="reviews-verifiedMeta">{active.is_verified ? <BadgeCheck size={14} /> : null} {[active.is_verified ? "Pembelian terverifikasi" : "", active.rating ? `Rating ${active.rating}/5` : "", active.product_name, active.customer_name].filter(Boolean).join(" · ")}</span> : null}</div>{filtered.length > 1 && <div className="reviews-viewerNav"><button className="reviews-iconButton" type="button" onClick={() => setActiveIdx(i => (i - 1 + filtered.length) % filtered.length)} aria-label="Testimoni sebelumnya"><ChevronLeft size={22} /></button><button className="reviews-iconButton" type="button" onClick={() => setActiveIdx(i => (i + 1) % filtered.length)} aria-label="Testimoni berikutnya"><ChevronRight size={22} /></button></div>}</div>
           </div>
         </div>, document.body)}
     </div>

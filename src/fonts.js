@@ -10,25 +10,7 @@ import pjsLatin700 from "@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-l
 import pjsLatin800 from "@fontsource/plus-jakarta-sans/files/plus-jakarta-sans-latin-800-normal.woff2?url";
 
 
-import "@fontsource/plus-jakarta-sans/latin-300.css";
-import "@fontsource/plus-jakarta-sans/latin-400.css";
-import "@fontsource/plus-jakarta-sans/latin-500.css";
-import "@fontsource/plus-jakarta-sans/latin-600.css";
-import "@fontsource/plus-jakarta-sans/latin-700.css";
-import "@fontsource/plus-jakarta-sans/latin-800.css";
-
-import "@fontsource-variable/bricolage-grotesque/wght.css";
-
-import "@fontsource/space-grotesk/latin-400.css";
-import "@fontsource/space-grotesk/latin-500.css";
-import "@fontsource/space-grotesk/latin-600.css";
-import "@fontsource/space-grotesk/latin-700.css";
-
-import "@fontsource/jetbrains-mono/latin-400.css";
-import "@fontsource/jetbrains-mono/latin-500.css";
-import "@fontsource/jetbrains-mono/latin-600.css";
-import "@fontsource/jetbrains-mono/latin-700.css";
-import "@fontsource/jetbrains-mono/latin-800.css";
+import "./css/fonts.css";
 
 function preloadCriticalFont(href) {
   if (typeof document === "undefined" || !href) return;

@@ -3821,8 +3821,8 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
 }
 
 .catalog-page .catalog-card.catalog-cardV2 .catalog-cardTitle {
-  font-size: clamp(16px, 2.2vw, 24px) !important;
-  line-height: 1.15 !important;
+  font-size: clamp(16px, 1.35vw, 18.5px) !important;
+  line-height: 1.2 !important;
   -webkit-line-clamp: 2 !important;
   display: -webkit-box !important;
   -webkit-box-orient: vertical !important;

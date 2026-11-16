@@ -198,12 +198,73 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 0 14px;
+  padding: 0 10px 0 16px;
   border-radius: 18px;
   border: 1px solid var(--st-line);
   background: var(--st-inset);
   box-shadow: var(--st-inset-shadow);
-  color: rgba(153, 208, 255, 0.96);
+  color: var(--st-muted, rgba(153, 208, 255, 0.96));
+}
+
+.st-inputWrap .st-input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.st-pasteBtn.st-pasteBtn--inline {
+  order: 2;
+  flex-shrink: 0;
+  min-height: 38px !important;
+  height: 38px !important;
+  padding: 0 12px !important;
+  border-radius: 10px !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+}
+
+.st-expiryChip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  border-radius: 9px;
+  font-size: 11.5px;
+  font-weight: 800;
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+html[data-theme="dark"] .st-expiryChip {
+  background: rgba(245, 158, 11, 0.16);
+  color: #fbbf24;
+  border-color: rgba(245, 158, 11, 0.32);
+}
+
+.st-proofUploadBox {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px dashed var(--brand-line, rgba(0, 158, 96, 0.28));
+  background: var(--skeu-inset-bg);
+  box-shadow: var(--skeu-inset-shadow);
+}
+
+.st-proofUploadRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.st-proofPreviewThumb {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid var(--brand-line);
 }
 
 .st-input {

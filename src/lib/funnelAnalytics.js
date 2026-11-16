@@ -86,13 +86,18 @@ export function trackFunnelEvent(eventName, details = {}) {
     metadata: details.metadata || {},
   };
 
-  supabase
-    .from("funnel_events")
-    .insert(payload, { returning: "minimal" })
-    .then(({ error }) => {
-      if (isMissingBackendError(error)) {
-        markBackendUnavailable();
-      }
-    })
-    .catch(() => {});
+  try {
+    const table = supabase?.from?.("funnel_events");
+    if (typeof table?.insert !== "function") return;
+
+    Promise.resolve(table.insert(payload, { returning: "minimal" }))
+      .then((res) => {
+        if (isMissingBackendError(res?.error)) {
+          markBackendUnavailable();
+        }
+      })
+      .catch(() => {});
+  } catch {
+    // Non-fatal analytics safeguard
+  }
 }

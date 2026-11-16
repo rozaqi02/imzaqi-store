@@ -675,7 +675,7 @@ export default function Checkout() {
             <CheckoutSteps current="checkout" />
           </div>
 
-          <div className="checkout-full-grid">
+          <div className={`checkout-full-grid${cart.items.length === 0 ? " is-empty" : ""}`}>
             <main className="checkout-full-main">
               {cart.items.length === 0 ? (
                 <div className="card pad checkout-panel checkout-full-empty-card">

@@ -1782,7 +1782,7 @@ html[data-theme="light"] .catalog-page .catalog-sheetFoot,
 html[data-theme="light"] .catalog-page .catalog-filter.is-sheet .catalog-filterSection,
 html[data-theme="light"] .catalog-page .catalog-searchHistoryClear,
 html[data-theme="light"] .catalog-page .empty-suggestionChip {
-  border-color: rgba(13, 124, 144, 0.14) !important;
+  border-color: rgba(0, 158, 96, 0.14) !important;
 }
 
 html[data-theme="light"] .catalog-page .catalog-card,
@@ -1790,8 +1790,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2,
 html[data-theme="light"] .catalog-page .catalog-cardSkeleton,
 html[data-theme="light"] .catalog-page .catalog-emptyResult {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0) 32%),
-    var(--skeu-panel-bg) !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 251, 249, 0.98) 100%) !important;
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
@@ -1802,21 +1801,16 @@ html[data-theme="light"] .catalog-page .catalog-filter.is-sheet .catalog-filterS
 html[data-theme="light"] .catalog-page .catalog-searchHistoryClear,
 html[data-theme="light"] .catalog-page .empty-suggestionChip {
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 34%),
-    var(--skeu-control-bg) !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(246, 250, 248, 0.94) 100%) !important;
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
 html[data-theme="light"] .catalog-page .catalog-activeTag {
-  border-color: rgba(24, 122, 157, 0.28) !important;
+  border-color: rgba(0, 158, 96, 0.28) !important;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, #dcf4fc, #b8e8f4) !important;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(24, 122, 157, 0.12),
-    4px 6px 12px rgba(24, 122, 157, 0.1) !important;
-  color: #1f4a5a !important;
+    linear-gradient(180deg, #ffffff 0%, #edf8f3 100%) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+  color: #0b4c32 !important;
 }
 
 html[data-theme="light"] .catalog-page .catalog-activeReset {
@@ -1835,13 +1829,9 @@ html[data-theme="light"] .catalog-page .catalog-activeReset {
   html[data-theme="light"] .catalog-page .catalog-card,
   html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2 {
     background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 35%),
-      linear-gradient(180deg, #ffffff 0%, #ffffff 50%, #f0f9f5 78%, #e4f5ed 100%) !important;
-    border-color: rgba(0, 158, 96, 0.12) !important;
-    box-shadow:
-      0 8px 20px rgba(40, 94, 117, 0.14),
-      inset 0 2px 0 rgba(255, 255, 255, 0.9),
-      inset 0 -2px 0 rgba(0, 120, 80, 0.05) !important;
+      linear-gradient(180deg, #ffffff 0%, #f8fbf9 100%) !important;
+    border-color: rgba(0, 158, 96, 0.14) !important;
+    box-shadow: var(--skeu-panel-shadow) !important;
   }
 }
 
@@ -2438,4 +2428,615 @@ html[data-theme="light"] .faq-categoryChip:active {
   box-shadow:
     inset 0 2px 4px rgba(67, 111, 129, 0.2),
     0 1px 2px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   Pass 11: Universal Storefront Neumorphism Depth Unification
+   Ensures every storefront surface, control, pill, modal, popup, and inset
+   well shares consistent extruded/recessed depth across light & dark modes.
+   Intentional exceptions preserved:
+   - .header-cart .pill (solid alert red badge)
+   - .catalog-cardPrice / .catalog-cardPriceWrap (borderless pricing)
+   - .promo-tickerClose (unframed dismiss button inside announcement bar)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Desktop Floating Header Capsule & Nav Active Pill */
+@media (min-width: 901px) {
+  html[data-theme] body .header .header-inner {
+    border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+    background:
+      linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 28%),
+      var(--skeu-panel-bg);
+    box-shadow: var(--skeu-panel-shadow);
+  }
+}
+
+html[data-theme] body .header .nav-active-pill {
+  background: var(--skeu-control-bg);
+  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.12));
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+/* 2. Raised Panel Surfaces (Cards, Modals, Popups, Sections, Drawers, Banners) */
+html[data-theme] body :is(
+  .modal,
+  .confirm-dialog,
+  .site-footerPanel,
+  .flow-assist,
+  .abandoned-cart-banner,
+  .sw-update-toast,
+  .achievement-toast-inner,
+  .toast,
+  .aeb-shell,
+  .store-hero,
+  .store-guideSteps li,
+  .hero-backdrop-card,
+  .home-page .home-promoCard,
+  .home-page .home-faqItem.faq-item,
+  .home-page .home-popularList .product-tile,
+  .home-page .home-howCard,
+  .home-page .home-tileSkeleton,
+  .flash-drop,
+  .fsd-ticket,
+  .ac-billboard,
+  .fsp-billboard,
+  .np-popup-card,
+  .rv-card,
+  .social-proof-card,
+  .catalog-contentBar,
+  .catalog-filterShell,
+  .catalog-filter.is-sheet,
+  .catalog-card,
+  .catalog-card.catalog-cardV2,
+  .catalog-cardSkeleton,
+  .catalog-emptyResult,
+  .detail-page-v3 .pdx-billboard.pdx-topCard,
+  .detail-page-v3 .pdx-infoTabsCard,
+  .detail-page-v3 .pdx-variantsSection,
+  .detail-page-v3 .pdx-packCard,
+  .detail-page-v3 .pdx-emptyCard,
+  .detail-page-v3 .pdx-accountStrip,
+  .detail-page-v3 .pdx-mobileProductBar,
+  .detail-page-v3 .pdx-mobileStickyDock,
+  .vcm,
+  .checkout-drawer,
+  .checkout-panel,
+  .checkout-summary,
+  .checkout-item-card,
+  .checkout-promo-card,
+  .checkout-extras-collapsible,
+  .checkout-mobile-floating-bar,
+  .pay-card,
+  .pay-orderDesktop,
+  .pay-orderMobileCard,
+  .pay-confirmModal,
+  .pay-successModal,
+  .st-hero,
+  .st-card,
+  .st-infoCard,
+  .st-empty,
+  .st-search,
+  .st-doneCelebration-inner,
+  .oh-card,
+  .oh-empty,
+  .help-hero,
+  .help-sidebar,
+  .help-list,
+  .help-item,
+  .help-howto,
+  .help-step,
+  .help-support,
+  .help-empty,
+  .faq-hero,
+  .faq-sidebar,
+  .faq-list,
+  .faq-item,
+  .faq-steps article,
+  .faq-support,
+  .reviews-hero,
+  .reviews-metrics article,
+  .reviews-storyCard,
+  .reviews-card,
+  .reviews-support,
+  .reviews-lightbox,
+  .testi-card,
+  .promosi-studio,
+  .promosi-loading,
+  .promosi-panel,
+  .promosi-sidebar,
+  .promosi-preview,
+  .nf-card,
+  .nf-popular
+) {
+  background: var(--skeu-panel-bg);
+  border: 1px solid var(--brand-line);
+  box-shadow: var(--skeu-panel-shadow);
+}
+
+/* Keep ProductDetail billboard split visual gradient untouched on the left visual pane */
+html[data-theme] body .detail-page-v3 .pdx-billboard.pdx-topCard {
+  background: var(--skeu-panel-bg) !important;
+  border-color: var(--brand-line) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+/* Selected / recommended accent rim in ProductDetail */
+html[data-theme] body .detail-page-v3 .pdx-packCard.is-recommended,
+html[data-theme] body .detail-page-v3 .pdx-packCard.is-selected {
+  border-color: rgba(0, 158, 96, 0.45) !important;
+  box-shadow:
+    var(--skeu-panel-shadow),
+    0 0 0 1px rgba(0, 158, 96, 0.22) !important;
+}
+
+html[data-theme="dark"] body .detail-page-v3 .pdx-packCard.is-recommended,
+html[data-theme="dark"] body .detail-page-v3 .pdx-packCard.is-selected {
+  border-color: rgba(0, 214, 180, 0.45) !important;
+  box-shadow:
+    var(--skeu-panel-shadow),
+    0 0 0 1px rgba(0, 214, 180, 0.22) !important;
+}
+
+/* 3. Raised Controls, Chips, Badges, Secondary Buttons, Icon Pills */
+html[data-theme] body :is(
+  .modal-close,
+  .toast-action,
+  .toast-close,
+  .abandoned-cart-dismiss,
+  .empty-suggestionChip,
+  .trust-strip-item,
+  .floating-order-btn,
+  .floating-order-dismiss,
+  .site-footerBadge,
+  .site-footerGoContactChip,
+  .flow-assist-badge,
+  .hx-badge,
+  .hero-proof-chip,
+  .hero-backdrop-chip,
+  .home-page .home-howCard-icon,
+  .home-page .faq-itemCategory,
+  .fsd-eyebrow,
+  .fsd-unit,
+  .fsd-arrows button,
+  .fsd-choice:not([data-selected="true"]),
+  .fsd-logo,
+  .fsd-choiceLogo,
+  .fsd-package span,
+  .fsd-saving,
+  .ac-popup-closeFloat,
+  .ac-moreChip,
+  .fsp-closeFloat,
+  .fsp-moreChip,
+  .np-popup-close,
+  .np-popup-badge,
+  .np-popup-btnMuted,
+  .catalog-filterMobileTrigger,
+  .catalog-viewBtn:not(.active),
+  .catalog-chip:not(.active),
+  .catalog-activeTag,
+  .catalog-activeReset,
+  .catalog-searchHistoryChip,
+  .catalog-cardIcon,
+  .pdx-backLink,
+  .pdx-mobileBack,
+  .pdx-iconBtn,
+  .pdx-categoryPill,
+  .pdx-heroStat,
+  .pdx-contactAdmin,
+  .pdx-infoTabBtn:not(.is-active),
+  .pdx-addBtn,
+  .pdx-restockBtn,
+  .pdx-restockAdminBtn,
+  .vcm-close,
+  .vcm-typeBadge,
+  .checkout-drawerClose,
+  .qty-btn,
+  .checkout-item-remove,
+  .checkout-stockWarn-btn,
+  .checkout-summaryBadge,
+  .checkout-main-count,
+  .checkout-quickPicks a,
+  .pay-contactEdit,
+  .pay-statePill,
+  .pay-orderPromo,
+  .pay-emailState,
+  .pay-qrisTimer,
+  .pay-qrisRefreshBtn,
+  .pay-qrisGuideStep,
+  .pay-confirmCloseBtn,
+  .pay-successClose,
+  .pay-confirmModalHeaderIcon,
+  .pay-confirmTotalBadge,
+  .pay-confirmSecondaryBtn,
+  .pay-successBtnGhost,
+  .pay-appleSuccessBadge,
+  .pay-freePanelBadge,
+  .pay-freePanelCheck,
+  .st-tab:not(.is-active),
+  .st-statePill,
+  .st-streakBadge,
+  .st-streakEmoji,
+  .st-copyNoteBtn,
+  .st-pasteBtn,
+  .st-refreshBtn,
+  .oh-statusPill,
+  .oh-cekBtn,
+  .help-popular button,
+  .help-categories button:not([aria-pressed="true"]),
+  .help-orderLink,
+  .help-button--secondary,
+  .faq-itemCategory,
+  .faq-chip:not(.active),
+  .reviews-metrics svg,
+  .reviews-filters button:not([aria-pressed="true"]),
+  .reviews-view button:not([aria-pressed="true"]),
+  .reviews-supportIcon,
+  .reviews-iconButton,
+  .reviews-button--secondary,
+  .nf-badge,
+  .nf-linkCard,
+  .nf-linkIcon,
+  .nf-helpLink,
+  .nf-popularAll
+) {
+  background: var(--skeu-control-bg);
+  border: 1px solid var(--brand-line);
+  box-shadow: var(--skeu-control-shadow);
+}
+
+/* Keep filter chips inside horizontal scroll rows compact so shadows never clip */
+html[data-theme] body :is(
+  .catalog-quickChip:not(.active),
+  .pdx-filterChip:not(.is-active)
+) {
+  background: var(--skeu-control-bg) !important;
+  border: 1px solid var(--brand-line) !important;
+  box-shadow:
+    0 3px 6px -2px rgba(20, 45, 50, 0.24),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7) !important;
+}
+
+html[data-theme="dark"] body :is(
+  .catalog-quickChip:not(.active),
+  .pdx-filterChip:not(.is-active)
+) {
+  box-shadow:
+    0 3px 7px -2px rgba(0, 0, 0, 0.58),
+    inset 0 1px 0 rgba(255, 255, 255, 0.14) !important;
+}
+
+/* 4. Primary Extruded CTAs & Active Selection Pills */
+html[data-theme] body :is(
+  .ac-shop,
+  .fsp-shop,
+  .np-popup-btnPrimary,
+  .fsd-cta,
+  .pdx-buyNowBtn,
+  .pdx-mobileStickyDockBtn,
+  .pdx-compareBtn,
+  .pay-confirmPrimaryBtn,
+  .pay-successBtnPrimary,
+  .pay-qrisDownload,
+  .st-checkBtn,
+  .help-button:not(.help-button--secondary),
+  .reviews-button:not(.reviews-button--secondary),
+  .nf-ctaPrimary
+) {
+  background: var(--imzaqi-btn-face) !important;
+  border: 1px solid var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow) !important;
+}
+
+html[data-theme] body :is(
+  .ac-shop,
+  .fsp-shop,
+  .np-popup-btnPrimary,
+  .fsd-cta,
+  .pdx-buyNowBtn,
+  .pdx-mobileStickyDockBtn,
+  .pdx-compareBtn,
+  .pay-confirmPrimaryBtn,
+  .pay-successBtnPrimary,
+  .pay-qrisDownload,
+  .st-checkBtn,
+  .nf-ctaPrimary
+):hover:not(:disabled) {
+  box-shadow: var(--imzaqi-btn-shadow-hover, var(--imzaqi-btn-shadow)) !important;
+  transform: translateY(-1.5px);
+}
+
+html[data-theme] body :is(
+  .ac-shop,
+  .fsp-shop,
+  .np-popup-btnPrimary,
+  .fsd-cta,
+  .pdx-buyNowBtn,
+  .pdx-mobileStickyDockBtn,
+  .pdx-compareBtn,
+  .pay-confirmPrimaryBtn,
+  .pay-successBtnPrimary,
+  .pay-qrisDownload,
+  .st-checkBtn,
+  .help-button:not(.help-button--secondary),
+  .reviews-button:not(.reviews-button--secondary),
+  .nf-ctaPrimary
+):active:not(:disabled) {
+  transform: translateY(1.5px) scale(0.98) !important;
+  box-shadow: var(--imzaqi-btn-shadow-active, var(--skeu-inset-shadow)) !important;
+}
+
+html[data-theme] body :is(
+  .catalog-quickChip.active,
+  .catalog-chip.active,
+  .catalog-viewBtn.active,
+  .pdx-filterChip.is-active,
+  .pdx-infoTabBtn.is-active,
+  .st-tab.is-active,
+  .help-categories button[aria-pressed="true"],
+  .reviews-filters button[aria-pressed="true"],
+  .reviews-view button[aria-pressed="true"],
+  .vcm-chip--best,
+  .steps .step.is-active .step-dot,
+  .steps .step.is-done .step-dot
+) {
+  background: var(--imzaqi-btn-face) !important;
+  border-color: var(--imzaqi-btn-border) !important;
+  color: var(--imzaqi-btn-text) !important;
+  box-shadow: var(--imzaqi-btn-shadow-compact) !important;
+}
+
+/* 5. Recessed Inset Wells, Inputs, Search Bars, Tracks & Tab Bodies */
+html[data-theme] body :is(
+  .input,
+  textarea.input,
+  select.input,
+  .whatsapp-input-wrapper .input,
+  .hero-search,
+  .hero-search-pill,
+  .faq-searchWrap,
+  .catalog-filterSearch,
+  .catalog-toggleUi,
+  .catalog-rangeTrack,
+  .detail-page-v3 .pdx-infoTabContent,
+  .detail-page-v3 .pdx-packMetaItem,
+  .detail-page-v3 .pdx-packSignal,
+  .detail-page-v3 .pdx-restock .input,
+  .vcm-tableWrap,
+  .checkout-item-stepper,
+  .checkout-stockWarn,
+  .pay-orderItem,
+  .qris-wrap,
+  .pay-qrisLocked,
+  .pay-freePanel,
+  .pay-confirmTotalCard,
+  .pay-successHero,
+  .pay-waField .input,
+  .pay-emailInput,
+  .pay-noteInput,
+  .st-tabs,
+  .st-codeBox,
+  .st-search .input,
+  .oh-emptyIcon,
+  .help-search,
+  .help-supportIcon,
+  .reviews-search,
+  .reviews-productFilter select,
+  .reviews-image,
+  .reviews-viewerImage,
+  .store-guideNumber,
+  .store-statusTip,
+  .nf-visualCore,
+  .empty-icon-component,
+  .empty-icon-mascot,
+  .achievement-toast-icon,
+  .rv-icon,
+  .aeb-devError,
+  .fsp-timer,
+  .np-popup-priceRow,
+  .np-popup-featItem
+) {
+  background: var(--skeu-inset-bg);
+  border: 1px solid var(--brand-line);
+  box-shadow: var(--skeu-inset-shadow);
+}
+
+html[data-theme] body .fsd-choice[data-selected="true"] {
+  background: var(--skeu-inset-bg) !important;
+  border-color: rgba(0, 158, 96, 0.55) !important;
+  box-shadow:
+    var(--skeu-inset-shadow),
+    0 0 0 1px rgba(0, 158, 96, 0.25) !important;
+}
+
+/* Clear inner search <input> elements inside recessed wrappers so there is never double-boxing */
+html[data-theme] body :is(
+  .help-search input,
+  .reviews-search input,
+  .faq-searchWrap input.faq-searchInput,
+  .catalog-filterSearch input,
+  .st-search .st-searchInputRow input,
+  .hero-search input
+) {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+/* Inset focus ring without losing recessed shadow */
+html[data-theme] body :is(
+  .input,
+  textarea.input,
+  select.input,
+  .pay-waField .input,
+  .pay-emailInput,
+  .pay-noteInput,
+  .help-search,
+  .reviews-search,
+  .faq-searchWrap,
+  .catalog-filterSearch
+):focus,
+html[data-theme] body :is(
+  .help-search,
+  .reviews-search,
+  .faq-searchWrap,
+  .catalog-filterSearch
+):focus-within {
+  border-color: rgba(0, 180, 130, 0.55) !important;
+  box-shadow:
+    var(--skeu-inset-shadow),
+    0 0 0 3px rgba(0, 214, 180, 0.16) !important;
+}
+
+/* Re-affirm deliberate exclusions */
+html[data-theme] body .header .promo-ticker .promo-tickerClose,
+html[data-theme] body .header .promo-ticker .promo-tickerClose:hover,
+html[data-theme] body .header .promo-ticker .promo-tickerClose:active {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme] body .catalog-card .catalog-cardPrice,
+html[data-theme] body .catalog-card .catalog-cardPriceWrap {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* 6. Tactile Hover Lift & Press-In (:active) on Secondary Controls & Interactive Tiles */
+html[data-theme] body :is(
+  .ac-moreChip,
+  .ac-popup-closeFloat,
+  .fsp-moreChip,
+  .fsp-closeFloat,
+  .np-popup-btnMuted,
+  .np-popup-close,
+  .fsd-arrows button,
+  .fsd-choice:not([data-selected="true"]),
+  .catalog-filterMobileTrigger,
+  .pdx-backLink,
+  .pdx-mobileBack,
+  .pdx-iconBtn,
+  .pdx-contactAdmin,
+  .pdx-infoTabBtn:not(.is-active),
+  .pdx-addBtn,
+  .pdx-restockBtn,
+  .pdx-restockAdminBtn,
+  .vcm-close,
+  .checkout-drawerClose,
+  .pay-confirmSecondaryBtn,
+  .pay-confirmCloseBtn,
+  .pay-successBtnGhost,
+  .pay-successClose,
+  .st-pasteBtn,
+  .st-refreshBtn,
+  .oh-cekBtn,
+  .help-popular button,
+  .help-button--secondary,
+  .reviews-button--secondary,
+  .reviews-iconButton,
+  .nf-linkCard
+):hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  box-shadow: var(--skeu-control-shadow-hover, var(--skeu-control-shadow)) !important;
+}
+
+html[data-theme] body :is(
+  .ac-moreChip,
+  .ac-popup-closeFloat,
+  .fsp-moreChip,
+  .fsp-closeFloat,
+  .np-popup-btnMuted,
+  .np-popup-close,
+  .fsd-arrows button,
+  .fsd-choice,
+  .catalog-quickChip,
+  .catalog-filterMobileTrigger,
+  .pdx-backLink,
+  .pdx-mobileBack,
+  .pdx-iconBtn,
+  .pdx-contactAdmin,
+  .pdx-infoTabBtn,
+  .pdx-addBtn,
+  .pdx-restockBtn,
+  .pdx-restockAdminBtn,
+  .vcm-close,
+  .vcm-dismissBtn,
+  .checkout-drawerClose,
+  .checkout-item-remove,
+  .pay-confirmSecondaryBtn,
+  .pay-confirmCloseBtn,
+  .pay-successBtnGhost,
+  .pay-successClose,
+  .st-pasteBtn,
+  .st-refreshBtn,
+  .oh-cekBtn,
+  .help-button--secondary,
+  .help-popular button,
+  .help-categories button,
+  .help-itemHead,
+  .reviews-button--secondary,
+  .reviews-filters button,
+  .reviews-view button,
+  .reviews-card,
+  .reviews-iconButton,
+  .nf-linkCard
+):active:not(:disabled) {
+  transform: translateY(1px) scale(0.985) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+}
+
+/* 7. Mobile & Reduced/Lite Motion Performance Guard */
+@media (max-width: 720px) {
+  html[data-theme] body :is(
+    .catalog-card,
+    .catalog-card.catalog-cardV2,
+    .product-tile,
+    .home-page .home-howCard,
+    .home-page .home-faqItem.faq-item,
+    .home-page .home-promoCard,
+    .detail-page-v3 .pdx-packCard,
+    .checkout-item-card,
+    .pay-orderItem,
+    .oh-card,
+    .reviews-card,
+    .help-item
+  ) {
+    box-shadow:
+      0 6px 14px rgba(0, 0, 0, 0.22),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  }
+
+  html[data-theme="light"] body :is(
+    .catalog-card,
+    .catalog-card.catalog-cardV2,
+    .product-tile,
+    .home-page .home-howCard,
+    .home-page .home-faqItem.faq-item,
+    .home-page .home-promoCard,
+    .detail-page-v3 .pdx-packCard,
+    .checkout-item-card,
+    .pay-orderItem,
+    .oh-card,
+    .reviews-card,
+    .help-item
+  ) {
+    box-shadow:
+      0 5px 12px rgba(67, 111, 129, 0.12),
+      inset 0 1px 0 rgba(255, 255, 255, 0.92) !important;
+  }
+}
+
+:is([data-motion="lite"], [data-motion="off"]) .btn:active,
+:is([data-motion="lite"], [data-motion="off"]) .reviews-card:active,
+:is([data-motion="lite"], [data-motion="off"]) .pdx-packCard:active {
+  transform: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html[data-theme] body :is(.btn, .reviews-card, .nf-linkCard, .pdx-packCard):active {
+    transform: none !important;
+  }
 }

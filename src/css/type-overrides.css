@@ -145,7 +145,22 @@
 }
 
 /* Product Card Elements */
-.catalog-cardTitle,
+.catalog-page .catalog-card.catalog-cardV2 .catalog-cardTitle,
+.catalog-cardTitle {
+  font-family: var(--font-display) !important;
+  font-size: clamp(16px, 1.35vw, 18.5px) !important;
+  font-weight: 800 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -0.03em !important;
+}
+
+@media (max-width: 720px) {
+  .catalog-page .catalog-card.catalog-cardV2.grid .catalog-cardTitle {
+    font-size: 14.5px !important;
+    line-height: 1.2 !important;
+  }
+}
+
 .product-tile-name,
 .pt-name,
 [class*="tile-"] [class*="-title"],

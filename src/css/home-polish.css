@@ -9,11 +9,92 @@
 .home-page .hx-heroZone::after {
   height: clamp(64px, 9vw, 120px);
 }
+.home-page .hx-hero-scrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+}
+html[data-theme="light"] .home-page .hx-hero-scrim {
+  background: radial-gradient(
+    ellipse 68% 58% at 50% 47%,
+    rgba(244, 247, 242, 0.98) 0%,
+    rgba(244, 247, 242, 0.92) 48%,
+    rgba(244, 247, 242, 0.56) 76%,
+    rgba(244, 247, 242, 0) 100%
+  ) !important;
+}
+html[data-theme="dark"] .home-page .hx-hero-scrim {
+  background:
+    radial-gradient(
+      ellipse 68% 58% at 50% 47%,
+      rgba(16, 23, 21, 0.96) 0%,
+      rgba(16, 23, 21, 0.86) 48%,
+      rgba(16, 23, 21, 0.44) 76%,
+      rgba(16, 23, 21, 0) 100%
+    ),
+    linear-gradient(
+      180deg,
+      transparent 0%,
+      transparent 55%,
+      rgba(14, 22, 18, 0.62) 78%,
+      rgba(14, 22, 18, 0.9) 92%,
+      var(--storefront-global-bg, #101715) 100%
+    ) !important;
+}
+@media (max-width: 720px) {
+  html[data-theme="light"] .home-page .hx-hero-scrim {
+    background: radial-gradient(
+      ellipse 90% 54% at 50% 46%,
+      rgba(244, 247, 242, 0.98) 0%,
+      rgba(244, 247, 242, 0.9) 52%,
+      rgba(244, 247, 242, 0) 100%
+    ) !important;
+  }
+  html[data-theme="dark"] .home-page .hx-hero-scrim {
+    background:
+      radial-gradient(
+        ellipse 90% 54% at 50% 46%,
+        rgba(16, 23, 21, 0.96) 0%,
+        rgba(16, 23, 21, 0.84) 52%,
+        rgba(16, 23, 21, 0) 100%
+      ),
+      linear-gradient(
+        180deg,
+        transparent 0%,
+        transparent 58%,
+        rgba(14, 22, 18, 0.68) 82%,
+        var(--storefront-global-bg, #101715) 100%
+      ) !important;
+  }
+}
+.home-page .home-body > .home-section {
+  scroll-margin-top: calc(var(--site-header-offset, 64px) + 12px);
+}
 .home-page .home-body > .home-section:first-child {
-  padding-top: clamp(14px, 2.2vw, 24px) !important;
+  padding-top: clamp(20px, 3vw, 28px) !important;
 }
 .home-page .hx-hero {
-  padding-bottom: clamp(20px, 3vw, 36px) !important;
+  padding-bottom: clamp(24px, 3.5vw, 40px) !important;
+}
+
+@media (max-width: 720px) {
+  .home-page .hx-heroZone {
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+  }
+  .home-page .hx-hero {
+    min-height: 100svh !important;
+    min-height: 100dvh !important;
+    padding-top: calc(var(--site-header-offset, 64px) + 18px) !important;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+  .home-page .hx-trust-bar {
+    margin-top: auto !important;
+    width: 100%;
+    max-width: 360px;
+    margin-inline: auto;
+  }
 }
 
 /* 2. Judul section lebih tegas & karismatik */
@@ -38,14 +119,14 @@
   letter-spacing: 0.14em;
 }
 
-/* 3. Daftar produk: grid 2 kolom di desktop, max-width rapi */
+/* 3. Daftar produk: grid 2 kolom seimbang di desktop tanpa celah ganjil */
 @media (min-width: 901px) {
   .home-page .home-popularList.list-mode {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 14px !important;
   }
-  /* Kartu pertama (Terlaris #1) tampil lebar penuh biar jadi highlight */
-  .home-page .home-popularList.list-mode > .reveal:first-child {
+  .home-page .home-popularList.list-mode > .reveal:first-child:nth-last-child(odd),
+  .home-page .home-popularList.list-mode > .reveal:last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
@@ -87,13 +168,14 @@
 .home-page .home-faqSection .faq-itemCategory {
   border-color: rgba(0, 158, 96, 0.24) !important;
   color: var(--ux-accent-dark, #076a44) !important;
-  background: rgba(0, 158, 96, 0.08) !important;
-  box-shadow: none !important;
+  background: rgba(0, 158, 96, 0.1) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
 }
 html[data-theme="dark"] .home-page .home-faqSection .faq-itemCategory {
   border-color: rgba(0, 245, 196, 0.28) !important;
   color: #4ef0c4 !important;
-  background: rgba(0, 245, 196, 0.08) !important;
+  background: rgba(0, 245, 196, 0.1) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
 }
 
 /* 6. Dark mode: warna senada brand
@@ -102,7 +184,7 @@ html[data-theme="dark"] .home-page .home-faqSection .faq-itemCategory {
    (#111822 / #17202c) yang bentrok dengan canvas hijau #101715. */
 html[data-theme="dark"] .home-page {
   --skeu-panel-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 42%, rgba(0, 245, 196, 0.03) 100%), #141a17;
-  --skeu-control-bg: linear-gradient(170deg, rgba(255, 255, 255, 0.09) 0%, rgba(255, 255, 255, 0.02) 100%), #1b231f;
+  --skeu-control-bg: linear-gradient(180deg, #232f2a 0%, #1b231f 100%);
   --skeu-inset-bg: linear-gradient(180deg, #0d1210, #121816);
   --brand-line: rgba(255, 255, 255, 0.12);
 }
@@ -146,21 +228,74 @@ html[data-theme="dark"] .home-page .home-popularList .product-tile {
   .home-page .home-sectionTitle.h2 {
     font-size: clamp(22px, 6vw, 26px) !important;
   }
-  /* Kartu produk mobile: ikon sedikit besar + nama 2 baris maksimal */
-  .home-page .home-popularList .product-tile--list {
-    padding: 13px !important;
+  /* Kartu produk Terlaris mobile: susunan 2 baris penuh agar judul tidak terpotong ("ChatGPT Premiu...") */
+  .home-page .home-popularList:not(.home-academicList) .product-tile--list {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding: 13px 14px !important;
+    gap: 10px !important;
+  }
+  .home-page .home-popularList:not(.home-academicList) .product-tile-link,
+  .home-page .home-popularList:not(.home-academicList) .product-tile-tiltWrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+  .home-page .home-popularList:not(.home-academicList) .product-tile-top {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
   }
   .home-page .home-popularList .product-tile-name {
-    font-size: 14px !important;
+    font-family: var(--font-display) !important;
+    font-size: 15.5px !important;
+    font-weight: 800 !important;
+    letter-spacing: -0.025em !important;
+    line-height: 1.25 !important;
+    justify-content: space-between;
+    width: 100%;
+    flex-wrap: nowrap;
   }
-  /* Nama produk tidak squeeze: pill terjual & harga turun ke baris bawah */
-  .home-page .home-popularList .product-tile-top {
-    grid-template-columns: auto minmax(0, 1fr) !important;
+  .home-page .home-popularList .product-tile-nameText {
+    -webkit-line-clamp: 1;
   }
-  .home-page .home-popularList .product-tile-bottom {
-    grid-column: 2;
-    justify-content: flex-start !important;
+  .home-page .home-popularList:not(.home-academicList) .product-tile-bottom {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
     gap: 10px !important;
+    padding-top: 9px;
+    border-top: 1px solid rgba(0, 158, 96, 0.12);
+    grid-column: auto !important;
+  }
+  html[data-theme="dark"] .home-page .home-popularList:not(.home-academicList) .product-tile-bottom {
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+  .home-page .home-popularList.home-academicList .product-tile--list {
+    padding: 13px 14px !important;
+  }
+  .home-page .home-popularList.home-academicList .product-tile-name {
+    font-size: 14.5px !important;
+  }
+  .home-page .home-popularList.home-academicList .product-tile-nameText {
+    -webkit-line-clamp: 2;
+  }
+  .home-page .home-popularList.home-academicList .product-tile-price {
+    white-space: nowrap !important;
+  }
+  .home-page .home-sectionCta .btn {
+    width: 100%;
+    min-height: 46px;
+    border-radius: 14px;
+  }
+  .app-shell:has(.home-page) .site-footer {
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
 

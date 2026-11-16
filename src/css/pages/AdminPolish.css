@@ -19,6 +19,31 @@ html[data-theme="light"] .admin-page {
   --adm-accent-strong: #067a4c;
   --adm-accent-soft: rgba(0, 158, 96, 0.1);
   --adm-accent-mid: rgba(0, 158, 96, 0.06);
+  --adm-text: #0f172a;
+  --adm-text-2: rgba(15, 23, 42, 0.84);
+  --adm-text-3: rgba(15, 23, 42, 0.56);
+  --adm-line: rgba(15, 23, 42, 0.09);
+  --adm-surface: var(--skeu-panel-bg, #ffffff);
+  --adm-surface-soft: var(--skeu-control-bg, #ffffff);
+  --adm-surface-inset: var(--skeu-inset-bg, #edf4f1);
+  --adm-shadow: var(--skeu-panel-shadow);
+  --adm-shadow-soft: var(--skeu-control-shadow);
+  --adm-shadow-inset: var(--skeu-inset-shadow);
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocus {
+  border: 1px solid rgba(0, 158, 96, 0.24) !important;
+  background: linear-gradient(180deg, #effaf4 0%, #ddf4e9 100%) !important;
+  box-shadow: var(--skeu-control-shadow) !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocusLabel,
+html[data-theme="light"] .admin-page .adm-nextFocusCta {
+  color: #067a4c !important;
+}
+
+html[data-theme="light"] .admin-page .adm-nextFocus strong {
+  color: #0f172a !important;
 }
 
 /* Dark mode: permukaan lebih dalam & bernuansa hijau */
@@ -120,11 +145,24 @@ html[data-theme="dark"] .admin-page {
 }
 
 /* Tombol utama di panel admin ikut sistem tombol toko */
-.admin-page .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled) {
+.admin-page .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled),
+.admin-page .sps-saveButton {
   background: var(--imzaqi-btn-face, #009e60) !important;
   border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
   color: var(--imzaqi-btn-text, #fff) !important;
   box-shadow: var(--imzaqi-btn-shadow, none) !important;
+}
+
+.admin-page .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled):hover:not(:disabled),
+.admin-page .sps-saveButton:hover:not(:disabled) {
+  transform: translateY(-1.5px);
+  box-shadow: var(--imzaqi-btn-shadow-hover, var(--imzaqi-btn-shadow, none)) !important;
+}
+
+.admin-page .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled):active:not(:disabled),
+.admin-page .sps-saveButton:active:not(:disabled) {
+  transform: translateY(1.5px) scale(0.98) !important;
+  box-shadow: var(--imzaqi-btn-shadow-active, var(--adm-shadow-inset)) !important;
 }
 
 /* Status pill order: kontras lebih baik di dark */
@@ -164,8 +202,15 @@ button.admin-loginSubmit {
   color: var(--imzaqi-btn-text, #fff) !important;
   box-shadow: var(--imzaqi-btn-shadow, none) !important;
 }
-.admin-page .admin-loginSubmit:hover:not(:disabled) {
+.admin-page .admin-loginSubmit:hover:not(:disabled),
+button.admin-loginSubmit:hover:not(:disabled) {
+  transform: translateY(-1.5px);
   box-shadow: var(--imzaqi-btn-shadow-hover, var(--imzaqi-btn-shadow, none)) !important;
+}
+.admin-page .admin-loginSubmit:active:not(:disabled),
+button.admin-loginSubmit:active:not(:disabled) {
+  transform: translateY(1.5px) scale(0.98) !important;
+  box-shadow: var(--imzaqi-btn-shadow-active, var(--adm-shadow-inset)) !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════════
@@ -289,29 +334,32 @@ button.admin-loginSubmit {
   border-radius: 12px;
   background: var(--adm-surface-soft, rgba(255, 255, 255, 0.03));
   border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--adm-shadow-soft);
   color: inherit;
   cursor: pointer;
   text-decoration: none;
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
 }
 
 .admin-actionShortcut:hover {
   border-color: rgba(0, 158, 96, 0.35);
   transform: translateY(-1px);
+  box-shadow: var(--adm-shadow);
 }
 
 .admin-actionShortcut:active {
-  transform: scale(0.98);
+  transform: translateY(1px) scale(0.985);
+  box-shadow: var(--adm-shadow-inset);
 }
 
 .admin-actionShortcut.is-highlight {
   border-color: rgba(0, 158, 96, 0.35);
-  background: linear-gradient(180deg, rgba(0, 158, 96, 0.08), transparent);
+  background: linear-gradient(180deg, rgba(0, 158, 96, 0.08), transparent), var(--adm-surface-soft);
 }
 
 .admin-actionShortcut.is-warn {
   border-color: rgba(234, 179, 8, 0.35);
-  background: linear-gradient(180deg, rgba(234, 179, 8, 0.08), transparent);
+  background: linear-gradient(180deg, rgba(234, 179, 8, 0.08), transparent), var(--adm-surface-soft);
 }
 
 .admin-actionShortcutIcon {
@@ -321,7 +369,8 @@ button.admin-loginSubmit {
   display: grid;
   place-items: center;
   flex-shrink: 0;
-  background: var(--adm-accent-soft, rgba(0, 158, 96, 0.12));
+  background: var(--adm-surface-inset, rgba(0, 158, 96, 0.12));
+  box-shadow: var(--adm-shadow-inset);
   color: var(--adm-accent, #009e60);
 }
 
@@ -361,5 +410,140 @@ button.admin-loginSubmit {
     flex-direction: column;
     align-items: flex-start;
     gap: 10px;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   ADMIN NEUMORPHISM DEPTH UNIFICATION LAYER
+   Overrides any residual box-shadow: none flattening in AdminApp.shell / light
+   and keeps dark + light admin consoles unified with tactile depth.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+.admin-page .admin-panel,
+.admin-page .admin-card,
+.admin-page .admin-stat,
+.admin-page .admin-kpiCard,
+.admin-page .admin-priorityBoard,
+.admin-page .admin-initialLoadCard,
+.admin-page .adm-sidebar,
+.admin-page .adm-mobileHead,
+.admin-page .adm-dock,
+.admin-page .adm-moreSheet,
+.admin-page .admin-workspaceToolbar,
+.admin-page .admin-orderToolbar,
+.admin-page .admin-stickyTools,
+.admin-loginShell,
+.admin-loginCard,
+.admin-page ~ .modal-backdrop .modal {
+  background: var(--adm-surface, var(--skeu-panel-bg)) !important;
+  border: 1px solid var(--adm-line, var(--brand-line)) !important;
+  box-shadow: var(--adm-shadow, var(--skeu-panel-shadow)) !important;
+}
+
+.admin-page .admin-panel .admin-panel,
+.admin-page .admin-priorityCard,
+.admin-page .admin-actionShortcut,
+.admin-page .admin-nav-btn:not(.active):not(.is-active),
+.admin-page .adm-navItem:not(.is-active):hover,
+.admin-page .adm-footBtn,
+.admin-page .adm-nextFocus,
+.admin-page .admin-chip:not(.active):not(.is-active),
+.admin-page .admin-chip--filter:not(.active):not(.is-active),
+.admin-page .admin-product-row,
+.admin-page .admin-productRow,
+.admin-page .admin-productPick:not(.is-active),
+.admin-page .admin-productListItem:not(.is-active),
+.admin-page .admin-promo-row,
+.admin-page .admin-promoRow,
+.admin-page .admin-orderCard,
+.admin-page .admin-orderCardModern,
+.admin-page .admin-listItem,
+.admin-page .admin-testimonialRow,
+.admin-page .admin-fileBtn,
+.admin-page .admin-alertDismiss,
+.admin-page .admin-inlineStats > span,
+.admin-page .admin-status,
+.admin-page .admin-badge,
+.admin-page .admin-topbar-current,
+.admin-page .admin-alert,
+.admin-page .admin-stockAlertBanner,
+.admin-loginSignal,
+.admin-loginBadge,
+.admin-page ~ .modal-backdrop .modal-close {
+  background: var(--adm-surface-soft, var(--skeu-control-bg)) !important;
+  border: 1px solid var(--adm-line, var(--brand-line)) !important;
+  box-shadow: var(--adm-shadow-soft, var(--skeu-control-shadow)) !important;
+}
+
+.admin-page .admin-chip.active,
+.admin-page .admin-chip.is-active,
+.admin-page .admin-chip--filter.is-active,
+.admin-page .admin-productPick.is-active,
+.admin-page .admin-productListItem.is-active,
+.admin-page .adm-navItem.is-active {
+  box-shadow: var(--adm-shadow-soft, var(--skeu-control-shadow)) !important;
+}
+
+.admin-page :is(
+  .input,
+  select,
+  textarea,
+  .adm-statPill,
+  .admin-categoryTag,
+  .admin-orderStatusMenu,
+  .admin-flowAssist,
+  .admin-form-grid--modal .admin-icon-preview
+),
+.admin-loginForm .input {
+  background: var(--adm-surface-inset, var(--skeu-inset-bg)) !important;
+  border: 1px solid var(--adm-line, var(--brand-line)) !important;
+  box-shadow: var(--adm-shadow-inset, var(--skeu-inset-shadow)) !important;
+}
+
+.admin-page :is(input[type="checkbox"], input[type="radio"]).admin-orderCheck,
+.admin-page .admin-orderListCheckbox input[type="checkbox"] {
+  box-shadow: var(--adm-shadow-inset, var(--skeu-inset-shadow)) !important;
+}
+
+.admin-page :is(
+  .input,
+  select,
+  textarea
+):focus,
+.admin-loginForm .input:focus {
+  border-color: var(--adm-accent, #00c2d0) !important;
+  box-shadow:
+    var(--adm-shadow-inset, var(--skeu-inset-shadow)),
+    var(--adm-focus, 0 0 0 3px rgba(0, 194, 208, 0.22)) !important;
+}
+
+.admin-page :is(
+  .admin-priorityCard,
+  .admin-actionShortcut,
+  .admin-chip,
+  .admin-nav-btn,
+  .adm-navItem,
+  .adm-footBtn,
+  .adm-nextFocus,
+  .admin-fileBtn,
+  .admin-productPick,
+  .admin-productListItem
+):active:not(:disabled) {
+  transform: translateY(1px) scale(0.988) !important;
+  box-shadow: var(--adm-shadow-inset, var(--skeu-inset-shadow)) !important;
+}
+
+@media (max-width: 720px) {
+  .admin-page :is(
+    .admin-panel,
+    .admin-kpiCard,
+    .admin-orderCard,
+    .admin-orderCardModern,
+    .admin-product-row,
+    .admin-productRow,
+    .admin-promoRow,
+    .admin-testimonialRow
+  ) {
+    box-shadow: var(--adm-shadow-soft, var(--skeu-control-shadow)) !important;
   }
 }

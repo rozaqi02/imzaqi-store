@@ -164,6 +164,7 @@ function FilterPanel({
   onReset,
   variant = "sidebar",
   showViewToggle = true,
+  showSort = true,
   showReset = true,
   showCategories = true,
   idPrefix = "",
@@ -270,20 +271,22 @@ function FilterPanel({
         />
       </section>
 
-      <section className="catalog-filterSection" style={{ "--section-i": 3 }}>
-        <header className="catalog-filterSectionHead">
-          <span className="catalog-filterLabel">Urutin</span>
-        </header>
-        <select className="input catalog-filterSelect" value={sort} onChange={(e) => setSort(e.target.value)}>
-          <option value="name">Nama A-Z</option>
-          <option value="name_desc">Nama Z-A</option>
-          <option value="reco">Rekomendasi</option>
-          <option value="popular">Paling laris</option>
-          <option value="price_asc">Termurah</option>
-          <option value="price_desc">Termahal</option>
-          <option value="stock_desc">Stok Terbanyak</option>
-        </select>
-      </section>
+      {showSort ? (
+        <section className="catalog-filterSection" style={{ "--section-i": 3 }}>
+          <header className="catalog-filterSectionHead">
+            <span className="catalog-filterLabel">Urutin</span>
+          </header>
+          <select className="input catalog-filterSelect" value={sort} onChange={(e) => setSort(e.target.value)}>
+            <option value="name">Nama A-Z</option>
+            <option value="name_desc">Nama Z-A</option>
+            <option value="reco">Rekomendasi</option>
+            <option value="popular">Paling laris</option>
+            <option value="price_asc">Termurah</option>
+            <option value="price_desc">Termahal</option>
+            <option value="stock_desc">Stok Terbanyak</option>
+          </select>
+        </section>
+      ) : null}
 
       {showViewToggle ? (
         <section className="catalog-filterSection catalog-filterSection--view" style={{ "--section-i": 4 }}>
@@ -1183,6 +1186,7 @@ export default function Products() {
               idPrefix="catalog-side"
               variant="sidebar"
               showCategories={false}
+              showSort={false}
               showViewToggle={false}
               showReset={false}
               cats={cats}
@@ -1487,30 +1491,32 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
         </div>
       </div>
 
-      <div className="catalog-cardSignals">
-        {stockState === "out" ? (
-          <span className="catalog-status soldout">
-            <CircleAlert size={13} />
-            <span>Stok habis</span>
-          </span>
-        ) : stockState === "low" ? (
-          <span className="catalog-status warn">
-            <CircleAlert size={13} />
-            <span>Stok menipis</span>
-          </span>
-        ) : (
-          <span className="catalog-status ok">
-            <PackageCheck size={13} />
-            <span>Tersedia</span>
-          </span>
-        )}
-      </div>
+      <div className="catalog-cardBottomRow">
+        <div className="catalog-cardSignals">
+          {stockState === "out" ? (
+            <span className="catalog-status soldout">
+              <CircleAlert size={13} />
+              <span>Stok habis</span>
+            </span>
+          ) : stockState === "low" ? (
+            <span className="catalog-status warn">
+              <CircleAlert size={13} />
+              <span>Stok menipis</span>
+            </span>
+          ) : (
+            <span className="catalog-status ok">
+              <PackageCheck size={13} />
+              <span>Tersedia</span>
+            </span>
+          )}
+        </div>
 
-      <div className="catalog-cardMeta">
-        <span>
-          <Layers3 size={13} />
-          <span>{product._vars?.length || 0} varian</span>
-        </span>
+        <div className="catalog-cardMeta">
+          <span>
+            <Layers3 size={13} />
+            <span>{product._vars?.length || 0} varian</span>
+          </span>
+        </div>
       </div>
 
       <div className="catalog-cardFoot">

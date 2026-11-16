@@ -249,6 +249,7 @@ export default function Pay() {
   const contactDetailsRef = useRef(null);
   const buyerEmailRef = useRef(null);
   const focusTimerRef = useRef(null);
+  const qrisOpenedRef = useRef(false);
   const showPayCta = !ok && items.length > 0;
 
   // Cleanup focus timer saat unmount
@@ -359,6 +360,16 @@ export default function Pay() {
       active = false;
     };
   }, [fallbackQrisUrl, qrisBase, total, isAcademicOrder, settings]);
+
+  useEffect(() => {
+    if (!qris.loaded || qrisOpenedRef.current) return;
+    if (qris.mode === "dynamic" || qris.mode === "fallback") {
+      qrisOpenedRef.current = true;
+      trackFunnelEvent("qris_opened", {
+        metadata: { mode: qris.mode, total },
+      });
+    }
+  }, [qris.loaded, qris.mode, total]);
 
   useEffect(() => {
     if (!ok && !orderCode && items.length === 0) {
@@ -540,13 +551,18 @@ export default function Pay() {
     if (!data || data.length === 0) throw new Error("Gagal membuat order.");
     const created = data[0];
 
-    // Best-effort direct update to orders.buyer_email in case RPC did not set it
-    if (created?.id && trimmedBuyerEmail) {
+    // Best-effort direct update to orders.buyer_email / referral_code in case RPC did not set them
+    const refCode = String(getReferralCode() || "").trim().slice(0, 64);
+    if (created?.id && (trimmedBuyerEmail || refCode)) {
+      const patch = {
+        ...(trimmedBuyerEmail ? { buyer_email: trimmedBuyerEmail } : {}),
+        ...(refCode ? { referral_code: refCode } : {}),
+      };
       try {
-        await supabase
-          .from("orders")
-          .update({ buyer_email: trimmedBuyerEmail })
-          .eq("id", created.id);
+        const upRes = await supabase.from("orders").update(patch).eq("id", created.id);
+        if (upRes?.error && trimmedBuyerEmail && refCode) {
+          await supabase.from("orders").update({ buyer_email: trimmedBuyerEmail }).eq("id", created.id);
+        }
       } catch {}
     }
 
@@ -638,9 +654,16 @@ export default function Pay() {
       });
       if (loadingId) toast.remove(loadingId);
       toast.success("ID order berhasil dibuat.");
+      trackFunnelEvent("payment_reported", {
+        orderCode: generatedCode,
+        metadata: { total: canonicalOrder.total, promoCode: canonicalOrder.promoCode || null },
+      });
     } catch (error) {
       const message = toFriendlyPayError(error, { hasNotes: Boolean(noteText) });
       warn("Gagal memproses order:", error);
+      trackFunnelEvent("payment_failed", {
+        metadata: { message: error?.message || message || "unknown" },
+      });
       setErrorText(message);
       if (loadingId) toast.remove(loadingId);
       toast.error(message);
@@ -860,7 +883,7 @@ export default function Pay() {
               >
                 <summary className="pay-contactSummary">
                   <span><strong>Kontak pesanan</strong><span>{customerWhatsApp || "Lengkapi WhatsApp"}</span>{requiresBuyerEmailNote ? <span>{buyerEmail || "Lengkapi email aktivasi"}</span> : null}</span>
-                  <span className="pay-contactEdit">{contactOpen ? "Selesai" : "Ubah"}</span>
+                  <span className="pay-contactEdit">{contactOpen ? (buyerReady ? "Selesai" : "Isi kontak") : "Ubah"}</span>
                 </summary>
               <div className="pay-cardHead">
                 <div>
