@@ -20,7 +20,7 @@ export function usePerformanceMonitor(options = {}) {
       fpsRef.current = fps;
 
       if (fps < 30 && elapsed > 0.5) {
-        console.warn(`[Perf] Low FPS: ${fps} — consider reducing animations`);
+        console.warn(`[Perf] Low FPS: ${fps} - consider reducing animations`);
       }
 
       frameCountRef.current = 0;

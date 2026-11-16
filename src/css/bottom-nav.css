@@ -1,4 +1,4 @@
-/* ── Bottom navigation (phone + iPad ≤1024px) ── */
+/* Bottom navigation (phone + iPad ≤1024px) */
 /* Full-bleed bar + upward shadow illusion (timbul di atas konten). */
 
 html {
@@ -109,7 +109,7 @@ html[data-theme="light"] .bottom-nav::before {
   transform: scale(0.96);
 }
 
-/* Active menu marker — elevated frosted pill with glowing mint indicator dot */
+/* Active menu marker - elevated frosted pill with glowing mint indicator dot */
 .bottom-nav-item.is-active {
   background: rgba(255, 255, 255, 0.09) !important;
   border: 1px solid rgba(255, 255, 255, 0.12) !important;

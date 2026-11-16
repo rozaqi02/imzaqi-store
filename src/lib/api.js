@@ -5,7 +5,7 @@ import { getCatalogProductsCache, setCatalogProductsCache } from "./catalogCache
 
 const PUBLIC_CACHE_PREFIX = "imzaqi-public-cache:";
 const publicCacheMemory = new Map();
-/** In-flight product list fetches — prevents duplicate network on warm + Home mount */
+/** In-flight product list fetches - prevents duplicate network on warm + Home mount */
 const productsInflight = new Map();
 
 function safeStorage() {
@@ -381,7 +381,7 @@ export async function checkStockAvailability(cartItems) {
   const outOfStock = [];
   const insufficient = [];
   
-  // Cek validItems saja — item dengan variant_id null dianggap valid (free item)
+  // Cek validItems saja - item dengan variant_id null dianggap valid (free item)
   validItems.forEach(item => {
     const variantStock = stockMap[item.variant_id];
     if (!variantStock || variantStock.is_active === false) {
@@ -417,7 +417,7 @@ export async function updateVariantStock(variantId, newStock) {
   if (error) throw error;
 }
 
-// ── Analytics: daily stats (dari tabel daily_stats) ──
+// Analytics: daily stats (dari tabel daily_stats)
 export async function fetchDailyStats({ days = 30 } = {}) {
   const { data, error } = await supabase.rpc("get_daily_stats", { p_days: days });
   if (error) throw error;
@@ -429,7 +429,7 @@ export async function fetchDailyStats({ days = 30 } = {}) {
   }));
 }
 
-// ── Analytics: visitor stats (new vs returning) ──
+// Analytics: visitor stats (new vs returning)
 export async function fetchVisitorStats({ days = 30 } = {}) {
   const { data, error } = await supabase.rpc("get_visitor_stats", { p_days: days });
   if (error) throw error;
@@ -441,7 +441,7 @@ export async function fetchVisitorStats({ days = 30 } = {}) {
   };
 }
 
-// ── Analytics: top pages ──
+// Analytics: top pages
 // Web Vitals are stored in page_views with path `/__vitals/{metric}` (see webVitalsReporter).
 // Exclude those synthetic paths so the admin "Halaman Terpopuler" only shows real routes.
 export async function fetchTopPages({ days = 30, limit = 10 } = {}) {
@@ -464,7 +464,7 @@ export async function fetchTopPages({ days = 30, limit = 10 } = {}) {
     .slice(0, limit);
 }
 
-// ── Track page view ke tabel page_views ──
+// Track page view ke tabel page_views
 export async function trackPageView({ visitorId, path, referrer } = {}) {
   if (!visitorId) return;
   const { error } = await supabase.from("page_views").insert({
@@ -475,7 +475,7 @@ export async function trackPageView({ visitorId, path, referrer } = {}) {
   if (error) throw error;
 }
 
-// ── CSV Export helpers ──
+// CSV Export helpers
 export function csvEscapeValue(value) {
   const str = value == null ? "" : String(value);
   if (str.includes(";") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
@@ -573,7 +573,7 @@ export function downloadCSV(csvString, filename) {
   URL.revokeObjectURL(url);
 }
 
-// ── Analytics: cohort return (visitors who came back) ──
+// Analytics: cohort return (visitors who came back)
 export async function fetchCohortReturn({ days = 7 } = {}) {
   try {
     const { data, error } = await supabase.rpc("get_cohort_return", { p_days: days });
@@ -585,7 +585,7 @@ export async function fetchCohortReturn({ days = 7 } = {}) {
 }
 
 
-// ── Flash Sales ──────────────────────────────────────────────────────────
+// Flash Sales
 
 export async function fetchActiveFlashSales({ useCache = true, ttlMs = 30000 } = {}) {
   const cacheKey = "flash-sales:active";

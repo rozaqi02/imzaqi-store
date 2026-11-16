@@ -54,25 +54,25 @@ const HOME_FAQ = [
   },
 ];
 
-// Langkah cara kerja — 3 step visual dengan detail tambahan untuk accordion
+// Langkah cara kerja: 3 step visual dengan detail tambahan untuk accordion
 const HOW_IT_WORKS = [
   {
     step: "01",
     title: "Pilih & Cek",
-    desc: "Pilih produk dan paket sesuai kebutuhanmu. Cek harga, durasi, dan stok sebelum lanjut.",
-    details: "Tipe akun dan garansi mengikuti paket yang kamu pilih.",
+    desc: "Pilih produk dan paket sesuai kebutuhanmu. Cek harga, durasi, dan garansi paket sebelum lanjut.",
+    details: "Tipe akun (sharing atau private) dan durasi garansi mengikuti paket yang kamu pilih.",
   },
   {
     step: "02",
     title: "Bayar QRIS",
-    desc: "Bayar dengan bank atau e-wallet yang mendukung QRIS, lalu konfirmasikan pembayaran.",
-    details: "Support GoPay, OVO, Dana, LinkAja, ShopeePay, dan M-Banking apapun.",
+    desc: "Bayar dengan e-wallet atau m-banking yang mendukung QRIS, lalu konfirmasikan pembayaran.",
+    details: "Mendukung GoPay, OVO, Dana, ShopeePay, LinkAja, BCA, Mandiri, BRI, dan semua aplikasi QRIS.",
   },
   {
     step: "03",
     title: "Simpan & Pantau",
-    desc: "Simpan ID pesanan. Admin akan memeriksa pembayaran sebelum memproses paketmu.",
-    details: "Umumnya diproses 5–30 menit pada jam operasional; varian email maksimal 2 jam. Kendala bisa dilaporkan lewat WhatsApp Admin.",
+    desc: "Simpan ID pesanan untuk cek progres langsung di halaman status.",
+    details: "Diproses 5 sampai 30 menit pada jam operasional; varian invite email maksimal 2 jam.",
   },
 ];
 
@@ -170,6 +170,14 @@ export default function Home() {
   const [openFaqId, setOpenFaqId] = useState(HOME_FAQ[0]?.id || null);
   const [activeStep, setActiveStep] = useState(null);
   const [faqQuery, setFaqQuery] = useState("");
+  const [copiedPromoCode, setCopiedPromoCode] = useState(null);
+  const copyTimerRef = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+    };
+  }, []);
 
   const toast = useToast();
   const nav = useNavigate();
@@ -177,7 +185,7 @@ export default function Home() {
 
   usePageMeta({
     title: "Beranda",
-    description: "Langganan premium budget pelajar \u2014 cepet, gampang, anti ribet.",
+    description: "Langganan premium budget pelajar, cepet, gampang, anti ribet.",
   });
 
   useEffect(() => {
@@ -270,7 +278,12 @@ export default function Home() {
     copyToClipboard(code).then(
       () => {
         if (navigator.vibrate) navigator.vibrate(12);
-        toast.success("Kode udah ke-copy!", { title: code, duration: 2000 });
+        setCopiedPromoCode(code);
+        if (copyTimerRef.current) clearTimeout(copyTimerRef.current);
+        copyTimerRef.current = setTimeout(() => {
+          setCopiedPromoCode(null);
+        }, 2000);
+        toast.success("Kode berhasil disalin!", { title: code, duration: 2000 });
         if (e && e.clientX && e.clientY) {
           fireConfetti(e.clientX, e.clientY);
         }
@@ -345,13 +358,12 @@ export default function Home() {
                 {!loading && totalActiveProducts > 4
                   ? `Intip ${totalActiveProducts - 4} produk lainnya`
                   : "Lihat semua produk"}
-                <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>
           </div>
         </section>
 
-        {/* ── Jasa Akademik — semua produk line academic (tampil begitu data ada) ── */}
+        {/* ── Jasa Akademik: semua produk line academic (tampil begitu data ada) ── */}
         {academicProducts.length > 0 ? (
           <section className="home-section home-academicSection" aria-label="Jasa Akademik">
             <div className="container home-sectionInner">
@@ -391,14 +403,13 @@ export default function Home() {
               >
                 <Link className="btn btn-ghost" to="/produk?cats=academic">
                   Lihat di katalog Jasa Akademik
-                  <ArrowRight size={16} aria-hidden="true" />
                 </Link>
               </div>
             </div>
           </section>
         ) : null}
 
-        {/* ── Kupon Promo — hanya tampil jika ada promo aktif ── */}
+        {/* ── Kupon Promo: hanya tampil jika ada promo aktif ── */}
         {!loading && promos.length > 0 ? (
           <section
             className="home-section"
@@ -415,19 +426,12 @@ export default function Home() {
 
               <div className="home-promoGrid">
                 {promos.map((promo, idx) => (
-                  <div
+                  <button
+                    type="button"
                     key={promo.code}
                     className="home-promoCard reveal reveal-scale"
                     style={{ transitionDelay: `${100 + idx * 100}ms` }}
                     onClick={(e) => handleCopyPromo(promo.code, e)}
-                    role="button"
-                    tabIndex={0}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        handleCopyPromo(promo.code, e);
-                      }
-                    }}
                     aria-label={`Salin kode promo ${promo.code} untuk diskon ${promo.percent}%`}
                   >
                     <div className="home-promoCard-stub">
@@ -440,9 +444,11 @@ export default function Home() {
                       <div className="home-promoCard-punch bottom" />
                     </div>
                     <div className="home-promoCard-body">
-                      <span className="home-promoCard-code">{promo.code}</span>
+                      <span className="home-promoCard-code">
+                        {copiedPromoCode === promo.code ? "Tersalin!" : promo.code}
+                      </span>
                     </div>
-                  </div>
+                  </button>
                 ))}
               </div>
             </div>
@@ -457,7 +463,7 @@ export default function Home() {
           <div className="container home-sectionInner">
             <div className="reveal reveal-left" style={{ transitionDelay: "60ms" }}>
               <HomeSectionHead
-                kicker="3 langkah"
+                kicker="Panduan"
                 title="Cara beli"
                 sub="Dari pilih produk sampai akun aktif, semuanya transparan."
               />
@@ -466,19 +472,12 @@ export default function Home() {
               {HOW_IT_WORKS.map((step, i) => {
                 const isOpen = activeStep === i;
                 return (
-                  <div
-                    role="button"
-                    tabIndex={0}
+                  <button
+                    type="button"
                     key={step.step}
                     className={`home-howCard reveal reveal-scale${isOpen ? " is-expanded" : ""}`}
                     style={{ "--how-i": i, transitionDelay: `${100 + i * 110}ms` }}
                     onClick={() => setActiveStep(isOpen ? null : i)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.preventDefault();
-                        setActiveStep(isOpen ? null : i);
-                      }
-                    }}
                     aria-expanded={isOpen}
                     aria-label={`Langkah ${step.step}: ${step.title}. ${isOpen ? "Tutup" : "Buka"} detail tambahan.`}
                   >
@@ -493,8 +492,11 @@ export default function Home() {
                           <p>{step.details}</p>
                         </div>
                       </div>
+                      <span className="home-howCard-toggleHint" aria-hidden="true">
+                        {isOpen ? "Tutup detail ▲" : "Detail langkah ▼"}
+                      </span>
                     </div>
-                  </div>
+                  </button>
                 );
               })}
             </div>
@@ -564,7 +566,6 @@ export default function Home() {
             <div className="home-sectionCta reveal" style={{ transitionDelay: `${90 + HOME_FAQ.length * 70}ms` }}>
               <Link className="btn btn-ghost" to="/faq">
                 Baca FAQ Lengkap
-                <ArrowRight size={16} aria-hidden="true" />
               </Link>
             </div>
           </div>

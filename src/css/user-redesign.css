@@ -574,7 +574,7 @@ html[data-theme="dark"] {
   }
 }
 
-/* -- Home: one calm canvas, flat content surfaces --------------------- */
+/* Home: one calm canvas, flat content surfaces */
 html[data-theme] .app-shell:has(.home-page),
 html[data-theme] .home-page {
   background: var(--ux-canvas) !important;

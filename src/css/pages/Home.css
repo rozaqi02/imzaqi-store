@@ -3,13 +3,13 @@
 }
 
 .home-body {
-  /* Seamless continuation under hero â€” no visual â€œgapâ€ */
+  /* Direct continuation under hero - no visual gap */
   padding-top: 0;
   position: relative;
   z-index: 2;
 }
 
-/* Hero â†’ content blend (fade catalog into page background) */
+/* Hero -> content blend (fade catalog into page background) */
 .hx-heroZone {
   position: relative;
   z-index: 1;
@@ -395,7 +395,7 @@ html[data-theme="light"] .hero-search-shell:focus-within {
     contain: none;
   }
 
-  /* Simpler shadows â€” avoids GPU overdraw on large blur radii */
+  /* Simpler shadows - avoids GPU overdraw on large blur radii */
   .home-page .home-popularList .product-tile,
   .home-page .home-popularList .product-tile-pill,
   .home-page .home-howCard,
@@ -439,7 +439,7 @@ html[data-theme="light"] .hero-search-shell:focus-within {
 }
 
 /* Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â
-   HERO Ã¢â‚¬â€ same page background (no solid fill / no hard seam)
+   HERO Ã¢â‚¬" same page background (no solid fill / no hard seam)
    + soft cursor glow + centered content + stats dock
    Ã¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢ÂÃ¢â€¢Â */
 
@@ -526,7 +526,7 @@ body:has(.header:not(.is-heroHidden)) .hx-hero-logo {
   width: 100%;
 }
 
-/* Ã¢â€â‚¬Ã¢â€â‚¬ Eyebrow / live Ã¢â€â‚¬Ã¢â€â‚¬ */
+/* Ã¢"â‚¬Ã¢"â‚¬ Eyebrow / live Ã¢"â‚¬Ã¢"â‚¬ */
 .hx-eyebrow-row {
   display: flex;
   flex-wrap: wrap;
@@ -648,7 +648,7 @@ html[data-theme="light"] .hx-live-eye {
   }
 }
 
-/* â”€â”€ Headline â€” one-shot entrance (no loop) â”€â”€ */
+/* â”€â”€ Headline - one-shot entrance (no loop) â”€â”€ */
 .hx-headline {
   margin: 0;
   font-size: clamp(40px, 5.6vw, 68px);
@@ -670,7 +670,7 @@ html[data-theme="light"] .hx-live-eye {
 
 .hx-headline-mask {
   display: inline-block;
-  /* No overflow:hidden â€” that was cutting the bottom of "j" */
+  /* No overflow:hidden - that was cutting the bottom of "j" */
   overflow: visible;
   vertical-align: baseline;
   padding: 0;
@@ -708,7 +708,7 @@ html[data-theme="dark"] .hx-headline-gradient,
   filter: drop-shadow(0 2px 10px rgba(0, 255, 179, 0.28));
 }
 
-/* Entrance without mask-clip (so "j" never gets cut) â€” one shot only */
+/* Entrance without mask-clip (so "j" never gets cut) - one shot only */
 @media (prefers-reduced-motion: no-preference) {
   html[data-motion="full"] .hx-headline--enter .hx-headline-word {
     opacity: 0;
@@ -761,7 +761,7 @@ html[data-theme="dark"] .hx-headline-gradient,
   }
 }
 
-/* Static / reduced motion / off — no entrance animation */
+/* Static / reduced motion / off - no entrance animation */
 .hx-headline--static .hx-headline-word,
 html[data-motion="off"] .hx-headline--enter .hx-headline-word,
 html[data-motion="off"] .hx-headline--kinetic .hx-headline-word {
@@ -799,7 +799,7 @@ html[data-theme="dark"] .hx-subtitle {
   color: #cbd5e1;
 }
 
-/* ── Bespoke Handcrafted CTAs (Tied to Imzaqi Logo Aesthetic) ── */
+/* Bespoke Handcrafted CTAs (Tied to Imzaqi Logo Aesthetic) */
 .hx-ctas-row {
   display: flex;
   flex-wrap: wrap;
@@ -959,7 +959,7 @@ html[data-theme="dark"] .hx-btn-secondary:active {
     0 4px 10px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* ── Bespoke Storefront Trust Bar (Replaces 4 Clunky Dashboard Cards) ── */
+/* Bespoke Storefront Trust Bar (Replaces 4 Clunky Dashboard Cards) */
 .hx-trust-bar {
   display: inline-flex;
   align-items: center;
@@ -1257,7 +1257,7 @@ html[data-theme="dark"] .hx-trust-icon {
     height: 15px;
   }
 
-  /* ── Block 3: Trust Bar (Mobile Compact Pill) ── */
+  /* Block 3: Trust Bar (Mobile Compact Pill) */
   .hx-trust-bar {
     gap: 8px 12px;
     padding: 8px 16px;
@@ -1517,7 +1517,7 @@ html[data-theme="dark"] .home-sectionHead .home-kicker {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  /* Match global .btn radius â€” not full pill */
+  /* Match global .btn radius - not full pill */
   border-radius: 14px !important;
 }
 
@@ -1702,7 +1702,7 @@ html[data-theme="light"] .home-howCard:hover {
   }
 }
 
-/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Tablet: 2ÃƒÆ’Ã¢â‚¬â€2 grid ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
+/* ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ Tablet: 2ÃƒÆ’Ã¢â‚¬"2 grid ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ÃƒÂ¢Ã¢â‚¬ÂÃ¢â€šÂ¬ */
 @media (max-width: 900px) and (min-width: 721px) {
   .home-howGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1978,7 +1978,7 @@ html[data-theme="light"] .home-promoCard-punch {
 /* â”€â”€ Popular products list (restore pre-polish mobile layout) â”€â”€ */
 .home-page .home-popularList {
   overflow: visible !important;
-  /* No extra side padding/margin â€” parent .container already gutters */
+  /* No extra side padding/margin - parent .container already gutters */
   padding: 0 0 4px !important;
   margin: 0 !important;
 }
@@ -2000,7 +2000,7 @@ html[data-theme="light"] .home-promoCard-punch {
   grid-template-columns: minmax(0, 1fr) auto !important;
   align-items: center !important;
   margin: 0 !important;
-  /* Equal L/R â€” match original home list feel */
+  /* Equal L/R - match original home list feel */
   padding: 14px 16px !important;
   gap: 12px 14px !important;
   border-radius: 18px !important;
@@ -2151,7 +2151,7 @@ html[data-theme="light"] .home-page .home-popularList .product-tile:hover {
   }
 
   .home-page .home-popularList .product-tile--list {
-    /* Equal 12px L/R â€” same as original mobile home list */
+    /* Equal 12px L/R - same as original mobile home list */
     padding: 12px !important;
     gap: 10px !important;
   }
@@ -2463,7 +2463,7 @@ html[data-theme="light"] .home-page .home-popularList .product-tile:hover {
   }
 }
 
-/* === INTERACTIVE ENHANCEMENTS === */
+/* INTERACTIVE ENHANCEMENTS */
 
 /* Expandable Step Cards (How It Works) */
 .home-howCard-expandedWrap {
@@ -2507,7 +2507,26 @@ html[data-theme="light"] .home-howCard.is-expanded {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-/* FAQ search Ã¢â‚¬â€ reuse shared faq-searchWrap system (same as /faq page) */
+.home-howCard-toggleHint {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent, #00d6b4);
+  letter-spacing: 0.02em;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.home-howCard:hover .home-howCard-toggleHint {
+  opacity: 1;
+}
+
+html[data-theme="light"] .home-howCard-toggleHint {
+  color: #007a4a;
+}
+
+/* FAQ search Ã¢â‚¬" reuse shared faq-searchWrap system (same as /faq page) */
 .home-faqSearchWrap {
   width: 100%;
   max-width: 560px;
@@ -2557,7 +2576,7 @@ html[data-theme="light"] .home-howCard.is-expanded {
   }
 }
 
-/* Home body â€” mobile layout polish (all sections except hero) */
+/* Home body - mobile layout polish (all sections except hero) */
 @media (max-width: 720px) {
   .home-page .home-body {
     display: grid;
@@ -2636,7 +2655,7 @@ html[data-theme="light"] .home-howCard.is-expanded {
     border-radius: 14px !important;
   }
 
-  /* Product list spacing handled above â€” do not re-pad here */
+  /* Product list spacing handled above - do not re-pad here */
 
   /* Skeleton matches list cards */
   .home-page .home-tileSkeleton {
@@ -2740,7 +2759,7 @@ html[data-theme="light"] .home-howCard.is-expanded {
     margin-top: 2px;
   }
 
-  /* Academic accent â€” lighter so it doesn't dominate small screens */
+  /* Academic accent - lighter so it doesn't dominate small screens */
   .home-page .home-academicSection {
     background: transparent;
   }
@@ -2750,7 +2769,7 @@ html[data-theme="light"] .home-howCard.is-expanded {
   }
 }
 
-/* Narrow phones â€” tighter rhythm */
+/* Narrow phones - tighter rhythm */
 @media (max-width: 480px) {
   .home-page .home-body > .home-section {
     padding: 18px 0;

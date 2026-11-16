@@ -11,7 +11,7 @@ export function useMediaQuery(query) {
     const mq = window.matchMedia(query);
     const handler = (e) => setMatches(e.matches);
 
-    // BUG-15: addListener deprecated di Chrome 108+ — pakai addEventListener selalu
+    // BUG-15: addListener deprecated di Chrome 108+ - pakai addEventListener selalu
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
   }, [query]);
@@ -30,7 +30,7 @@ export function useIsMobile(breakpoint = "(max-width: 720px), (pointer: coarse)"
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
 
-    // Cek apakah ini compound query — split untuk reliability
+    // Cek apakah ini compound query - split untuk reliability
     const parts = breakpoint.split(/,\s*(?=\()/);
     if (parts.length > 1) {
       const mqs = parts.map((p) => window.matchMedia(p.trim()));

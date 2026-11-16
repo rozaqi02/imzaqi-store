@@ -91,7 +91,7 @@ pointer-events:none;}
   .footer .footer-topbar{margin-bottom:14px;}
 }
 
-/* ── Visual UI sprint: floating priority, thumb zone, funnel mode ── */
+/* Visual UI sprint: floating priority, thumb zone, funnel mode */
 
 body.is-funnel .abandoned-cart-banner,
 body.is-funnel .fsp-backdrop,
@@ -113,7 +113,7 @@ body.is-funnel .bottom-nav {
   min-height: 48px;
 }
 
-/* Status order progress — neumorphic panel + inset track */
+/* Status order progress - neumorphic panel + inset track */
 .st-progressBar {
   margin-bottom: 14px;
   padding: 12px 14px;
@@ -238,7 +238,7 @@ html[data-theme="light"] .st-progressBar-label {
   place-items: center;
 }
 
-/* Mini cart sheet styles removed — component no longer exists. */
+/* Mini cart sheet styles removed - component no longer exists. */
 
 .checkout-drawer .checkout-mobile-floating-bar--drawer {
   position: relative !important;

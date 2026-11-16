@@ -25,7 +25,6 @@
   display: contents;
 }
 
-/* ─────────────────────────────────────────────────────────── */
 
 .product-tile {
   position: relative;
@@ -46,7 +45,7 @@
   /*
     content-visibility: auto lets the browser skip layout/paint for off-screen
     tiles entirely, which is the single biggest scroll-performance win here.
-    Use 'auto' instead of 'visible' — 'visible' is a no-op.
+    Use 'auto' instead of 'visible' - 'visible' is a no-op.
   */
   content-visibility: auto;
   contain-intrinsic-size: auto 120px;
@@ -122,7 +121,7 @@ html[data-theme="light"] .product-tile {
   align-items: center;
 }
 
-/* Outer glow drop-shadow container — prevents clipping from icon overflow: hidden */
+/* Outer glow drop-shadow container - prevents clipping from icon overflow: hidden */
 .product-tile-iconWrap {
   position: relative;
   display: grid;
@@ -213,7 +212,7 @@ html[data-theme="light"] .product-tile {
   flex-shrink: 0;
 }
 
-/* Rank badges — flat chips, one colour per tier (no 3D/neumorphic layers) */
+/* Rank badges - flat chips, one colour per tier (no 3D/neumorphic layers) */
 .product-tile-rankBadge--1 {
   border: 1px solid rgba(217, 119, 6, 0.45);
   background: rgba(245, 158, 11, 0.14);
@@ -423,7 +422,7 @@ html[data-theme="light"] .home-popularList .home-popularSold {
   font-weight: 900;
 }
 
-/* ── Account Type Badge ── */
+/* Account Type Badge */
 .product-typeBadge {
   display: inline-flex;
   align-items: center;
@@ -452,8 +451,6 @@ html[data-theme="light"] .home-popularList .home-popularSold {
   height: 6px;
   border-radius: 50%;
   background: currentColor;
-  box-shadow: 0 0 0 0 currentColor;
-  animation: tileRadarPulse 1.8s infinite ease-out;
   flex-shrink: 0;
   margin-right: 5px;
 }
@@ -469,7 +466,7 @@ html[data-theme="light"] .product-typeBadge {
     4px 6px 12px rgba(60, 100, 120, 0.1);
 }
 
-/* ── Delivery ETA & Secondary Badges in Mobile Grid ── */
+/* Delivery ETA & Secondary Badges in Mobile Grid */
 @media (max-width: 560px) {
   .home-deliveryPill,
   .product-tile--grid .home-popularSold {
@@ -477,7 +474,7 @@ html[data-theme="light"] .product-typeBadge {
   }
 }
 
-/* ── Low Stock & Out of Stock Badges with Radar Pulse ── */
+/* Low Stock & Out of Stock Badges with Radar Pulse */
 .product-lowStockBadge {
   display: inline-flex;
   align-items: center;
@@ -501,7 +498,7 @@ html[data-theme="light"] .product-typeBadge {
   border-radius: 50%;
   background: currentColor;
   box-shadow: 0 0 0 0 currentColor;
-  animation: tileRadarPulse 1.8s infinite ease-out;
+  /* Clean static dot - no endless radar pulse */
   flex-shrink: 0;
 }
 
@@ -574,7 +571,7 @@ html[data-theme="light"] .product-tile-price {
   }
 }
 
-/* ── Realistic skeleton matching ProductTile shape (1:1 Zero CLS) ── */
+/* Realistic skeleton matching ProductTile shape (1:1 Zero CLS) */
 .home-tileSkeleton {
   padding: 16px;
   border-radius: 20px;

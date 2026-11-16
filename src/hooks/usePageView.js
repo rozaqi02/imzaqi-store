@@ -56,7 +56,7 @@ export function usePageView() {
     typeof document !== "undefined" ? document.referrer : null
   );
 
-  // Track setiap navigasi ke tabel page_views — hanya saat pathname berubah
+  // Track setiap navigasi ke tabel page_views - hanya saat pathname berubah
   useEffect(() => {
     let cancelled = false;
 
@@ -75,7 +75,7 @@ export function usePageView() {
       const visitorId = getVisitorIdAsUUID();
 
       // Fire-and-forget: tidak perlu return value, tidak crash kalau gagal.
-      // Catatan: error 403 di Network tab tidak bisa disembunyikan dari kode —
+      // Catatan: error 403 di Network tab tidak bisa disembunyikan dari kode -
       // itu log level browser bukan JS. Fix permanen ada di RLS Supabase.
       supabase
         .from("page_views")
@@ -84,7 +84,7 @@ export function usePageView() {
           { returning: "minimal" }
         )
         .then(({ error }) => {
-          // Abaikan error permission/network saat tracking — bukan error kritis
+          // Abaikan error permission/network saat tracking - bukan error kritis
           if (error && error.code !== '42501' && error.status !== 403) {
             // Hanya log error yang tidak terduga (bukan permission denied)
             console.debug("[pageView] insert non-critical error:", error.code);
@@ -99,7 +99,7 @@ export function usePageView() {
     };
   }, [location.pathname]);
 
-  // Increment unique visit counter (site_stats) — sekali per hari
+  // Increment unique visit counter (site_stats) - sekali per hari
   useEffect(() => {
     async function hitUniqueVisit() {
       const day = todayISO("Asia/Jakarta");

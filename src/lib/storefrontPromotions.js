@@ -24,27 +24,27 @@ export const BANNER_STYLES = [
 ];
 
 export const BANNER_GRAPHICS = [
-  { id: "bell_megaphone", label: "Lonceng & Megafon 🔔", description: "Maskot hijau bertopi lonceng emas berseru dengan megafon." },
-  { id: "rocket_speed", label: "Roket Kilat 🚀", description: "Maskot roket hijau turbo dengan semburan api kilat." },
-  { id: "gift_box", label: "Hadiah Kado 🎁", description: "Maskot kado hijau berpita ceria & kilauan bintang." },
-  { id: "shield_star", label: "Perisai Garansi 🛡️", description: "Maskot perisai hijau tangguh dengan bintang emas garansi." },
-  { id: "discount_tag", label: "Diskon Belanja 🏷️", description: "Maskot kupon diskon hijau ceria dengan tanda %." },
-  { id: "flash_lightning", label: "Petir Flash Sale ⚡", description: "Maskot kilat hijau energetik untuk diskon waktu terbatas." },
-  { id: "academic_grad", label: "Topi Wisuda Pelajar 🎓", description: "Maskot pelajar hijau berkacamata dengan toga & ijazah." },
-  { id: "headset_support", label: "CS Siaga 24/7 🎧", description: "Maskot layanan hijau ber-headset ramah & siap bantu." },
-  { id: "qris_wallet", label: "Dompet & QRIS 💳", description: "Maskot dompet hijau dengan koin & kartu scan QRIS." },
-  { id: "sparkle_celebration", label: "Bintang Pesta Baru ✨", description: "Maskot bintang hijau ceria bertopi pesta & konfeti." },
+  { id: "bell_megaphone", label: "Lonceng & Megafon", description: "Maskot hijau bertopi lonceng emas berseru dengan megafon." },
+  { id: "rocket_speed", label: "Roket Kilat", description: "Maskot roket hijau turbo dengan semburan api kilat." },
+  { id: "gift_box", label: "Hadiah Kado", description: "Maskot kado hijau berpita ceria & kilauan bintang." },
+  { id: "shield_star", label: "Perisai Garansi", description: "Maskot perisai hijau tangguh dengan bintang emas garansi." },
+  { id: "discount_tag", label: "Diskon Belanja", description: "Maskot kupon diskon hijau ceria dengan tanda %." },
+  { id: "flash_lightning", label: "Petir Flash Sale", description: "Maskot kilat hijau energetik untuk diskon waktu terbatas." },
+  { id: "academic_grad", label: "Topi Wisuda Pelajar", description: "Maskot pelajar hijau berkacamata dengan toga & ijazah." },
+  { id: "headset_support", label: "CS Siaga 24/7", description: "Maskot layanan hijau ber-headset ramah & siap bantu." },
+  { id: "qris_wallet", label: "Dompet & QRIS", description: "Maskot dompet hijau dengan koin & kartu scan QRIS." },
+  { id: "sparkle_celebration", label: "Bintang Pesta Baru", description: "Maskot bintang hijau ceria bertopi pesta & konfeti." },
   { id: "imzaqi_mascot", label: "Imzi (Pose Branding)", description: "Karakter teal Imzi memegang tas belanja dengan centang." },
-  { id: "imzaqi_mascot_wave", label: "Imzi Menyapa 👋", description: "Imzi ceria melambai menyapa pelanggan." },
-  { id: "imzaqi_mascot_success", label: "Imzi Sukses ✅", description: "Imzi merayakan checkout & pembayaran berhasil." },
-  { id: "imzaqi_mascot_sad", label: "Imzi Sedih 😟", description: "Imzi membantu saat ada masalah atau halaman kosong." },
+  { id: "imzaqi_mascot_wave", label: "Imzi Menyapa", description: "Imzi ceria melambai menyapa pelanggan." },
+  { id: "imzaqi_mascot_success", label: "Imzi Sukses", description: "Imzi merayakan checkout & pembayaran berhasil." },
+  { id: "imzaqi_mascot_sad", label: "Imzi Sedih", description: "Imzi membantu saat ada masalah atau halaman kosong." },
   { id: "none", label: "Tanpa Karakter", description: "Tampilan teks & ikon standar tanpa karakter grafis." },
 ];
 
 export const BANNER_LINK_STYLES = [
   { id: "underline", label: "Garis Bawah", description: "Teks tautan bergaris bawah jelas." },
   { id: "underline_hover", label: "Garis saat Hover", description: "Garis bawah muncul saat diarahkan kursor." },
-  { id: "bold_arrow", label: "Tebal + Panah →", description: "Teks tebal dengan panah penunjuk." },
+  { id: "bold_arrow", label: "Tebal + Panah Aksi", description: "Teks tebal dengan panah penunjuk." },
   { id: "pill_button", label: "Tombol Mini", description: "Tautan berupa tombol pill kontras." },
   { id: "plain", label: "Polos", description: "Teks menyatu tanpa dekorasi khusus." },
 ];

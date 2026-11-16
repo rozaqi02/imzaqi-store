@@ -11,7 +11,6 @@ import {
   PackageSearch,
   Search,
   SlidersHorizontal,
-  Sparkles,
   X,
 } from "lucide-react";
 
@@ -1351,6 +1350,10 @@ export default function Products() {
                       <button type="button" className="btn btn-ghost" onClick={loadMoreProducts}>
                         Muat lagi ({filtered.length - visibleProducts.length} tersisa)
                       </button>
+                    </div>
+                  ) : filtered.length > CATALOG_BATCH ? (
+                    <div className="catalog-loadMore text-muted text-center" style={{ padding: "16px 0", fontSize: "13px" }}>
+                      <span>Semua produk aktif sudah ditampilkan ({filtered.length} produk)</span>
                     </div>
                   ) : null}
                 </>

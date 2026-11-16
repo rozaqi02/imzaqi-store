@@ -1,14 +1,14 @@
-/* Netflix-style drifting catalog wall — hero background only */
+/* Netflix-style drifting catalog wall - hero background only */
 .hx-catalog-backdrop {
   position: absolute;
-  /* No top fade — tiles stay fully visible from the header down. Fade only at the bottom. */
+  /* No top fade - tiles stay fully visible from the header down. Fade only at the bottom. */
   inset: 0 -12% 0;
   z-index: 0;
   overflow: hidden;
   pointer-events: none;
   opacity: 0.48;
   filter: saturate(0.9);
-  /* Instant paint — no delayed fade-in waiting for products */
+  /* Instant paint - no delayed fade-in waiting for products */
   transition: none;
   visibility: visible;
   -webkit-mask-image: linear-gradient(
@@ -168,22 +168,13 @@
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background:
-    radial-gradient(
-      ellipse 780px 480px at 50% 46%,
-      rgba(13, 21, 18, 0.98) 0%,
-      rgba(13, 21, 18, 0.92) 42%,
-      rgba(13, 21, 18, 0.65) 68%,
-      transparent 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(13, 21, 18, 0.4) 0%,
-      transparent 24%,
-      transparent 55%,
-      color-mix(in srgb, var(--ux-canvas, #0d1512) 65%, transparent) 76%,
-      var(--ux-canvas, #0d1512) 98%
-    );
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 55%,
+    color-mix(in srgb, var(--ux-canvas, #0d1512) 65%, transparent) 76%,
+    var(--ux-canvas, #0d1512) 98%
+  );
 }
 
 html[data-theme="light"] .hx-catalog-tile {
@@ -200,22 +191,13 @@ html[data-theme="light"] .hx-catalog-tile.is-compact {
 }
 
 html[data-theme="light"] .hx-hero-scrim {
-  background:
-    radial-gradient(
-      ellipse 780px 480px at 50% 46%,
-      rgba(244, 247, 242, 0.98) 0%,
-      rgba(244, 247, 242, 0.94) 42%,
-      rgba(244, 247, 242, 0.65) 68%,
-      transparent 100%
-    ),
-    linear-gradient(
-      180deg,
-      rgba(244, 247, 242, 0.4) 0%,
-      transparent 24%,
-      transparent 55%,
-      color-mix(in srgb, var(--ux-canvas, #f4f7f2) 65%, transparent) 76%,
-      var(--ux-canvas, #f4f7f2) 98%
-    );
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 55%,
+    color-mix(in srgb, var(--ux-canvas, #f4f7f2) 65%, transparent) 76%,
+    var(--ux-canvas, #f4f7f2) 98%
+  );
 }
 
 @keyframes hx-catalog-drift {

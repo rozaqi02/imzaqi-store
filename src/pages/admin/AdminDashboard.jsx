@@ -24,7 +24,7 @@ import {
   Plus,
   Search,
   Settings2,
-  Sparkles,
+  Megaphone,
   Star,
   Tags,
   Trash2,
@@ -142,7 +142,7 @@ const TAB_ICONS = {
   orders: ClipboardList,
   promos: Tags,
   flashsale: TrendingUp,
-  marketing: Sparkles,
+  marketing: Megaphone,
   testimonials: Star,
   settings: Settings2,
 };
@@ -190,7 +190,7 @@ export default function AdminDashboard() {
   });
   const [analyticsWindow, setAnalyticsWindow] = useState("7d");
 
-  // ── Analytics state (dari tabel daily_stats & page_views) ──
+  // Analytics state (dari tabel daily_stats & page_views)
   const [dailyStats, setDailyStats] = useState([]);
   const [visitorStats, setVisitorStats] = useState({ totalVisitors: 0, returningVisitors: 0, newVisitors: 0 });
   const [topPages, setTopPages] = useState([]);
@@ -200,13 +200,13 @@ export default function AdminDashboard() {
   const [funnelUnavailable, setFunnelUnavailable] = useState(false);
   const [restockRequests, setRestockRequests] = useState([]);
 
-  // ── Bulk Actions state ──
+  // Bulk Actions state
   const [selectedOrderIds, setSelectedOrderIds] = useState(new Set());
 
   // Products UI state
   const [visibleProductsCount, setVisibleProductsCount] = useState(20);
   const [productQuery, setProductQuery] = useState("");
-  /** all | low — low = only products with thin stock variants */
+  /** all | low - low = only products with thin stock variants */
   const [productStockFilter, setProductStockFilter] = useState("all");
   const [selectedProductId, setSelectedProductId] = useState("");
   const [productForm, setProductForm] = useState(null);
@@ -297,7 +297,7 @@ export default function AdminDashboard() {
   });
   const [confirmDialog, setConfirmDialog] = useState(null);
   const [msgIsError, setMsgIsError] = useState(false);
-  /** Domain load flags — avoid re-fetch when switching tabs. */
+  /** Domain load flags - avoid re-fetch when switching tabs. */
   const loadedRef = useRef({
     settings: false,
     products: false,
@@ -378,7 +378,7 @@ export default function AdminDashboard() {
       ? "Base QR masih ikut env build."
       : "Base QR kosong. Checkout akan pakai QR statis.";
 
-  // ===== Auth guard + admin-only body class =====
+  // Auth guard + admin-only body class
   useEffect(() => {
     checkAdminAccess().then((result) => {
       if (!result.ok) {
@@ -439,7 +439,7 @@ export default function AdminDashboard() {
     nav("/admin");
   }
 
-  // ===== Fetching =====
+  // Fetching
   useEffect(() => {
     setSettingsWhatsApp(waNumber);
   }, [waNumber]);
@@ -505,7 +505,7 @@ export default function AdminDashboard() {
     return data;
   }
 
-  /** Full DB counts by status — independent of list page size. */
+  /** Full DB counts by status - independent of list page size. */
   async function fetchOrderDbStats() {
     try {
       const statuses = ORDER_STATUS_OPTIONS.map((o) => o.value);
@@ -794,7 +794,7 @@ export default function AdminDashboard() {
     }
   }
 
-  /** Manual full refresh (toolbar) — still scoped smarter than old refreshAll. */
+  /** Manual full refresh (toolbar) - still scoped smarter than old refreshAll. */
   async function refreshAll() {
     setMsg("");
     setMsgIsError(false);
@@ -832,7 +832,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // Bootstrap + lazy tab data (single effect — avoids double-fetch on mount)
+  // Bootstrap + lazy tab data (single effect - avoids double-fetch on mount)
   useEffect(() => {
     let cancelled = false;
     (async () => {
@@ -911,7 +911,7 @@ export default function AdminDashboard() {
   }, [activeOrderId]);
 
   // If selected product was deleted / no longer in list, clear selection.
-  // Do NOT auto-pick products[0] — that trapped mobile "Daftar" back onto the first item (e.g. Canva).
+  // Do NOT auto-pick products[0] - that trapped mobile "Daftar" back onto the first item (e.g. Canva).
   useEffect(() => {
     if (!selectedProductId) return;
     if (!products || products.length === 0) {
@@ -1033,7 +1033,7 @@ export default function AdminDashboard() {
   const shouldComputeOverview = tab === "overview";
 
   const analyticsSummary = useMemo(() => {
-    // Lightweight stub when not on overview — avoid O(orders×items) on every orders keystroke
+    // Lightweight stub when not on overview - avoid O(orders×items) on every orders keystroke
     if (!shouldComputeOverview) {
       const stockAlerts = (allVariants || [])
         .filter((variant) => variant?.is_active && isThinStock(variant?.stock))
@@ -1420,7 +1420,7 @@ export default function AdminDashboard() {
     requestAdminNotificationPermission().catch(() => {});
   }, []);
 
-  // ===== Realtime subscription for orders (minimal patch + debounced toast) =====
+  // Realtime subscription for orders (minimal patch + debounced toast)
   useEffect(() => {
     const channel = supabase
       .channel("admin-orders-realtime")
@@ -1475,7 +1475,7 @@ export default function AdminDashboard() {
         (payload) => {
           const updated = payload.new;
           if (!updated?.id || !loadedRef.current.orders) return;
-          // Minimal patch — merge only changed row; do not recompute analytics here
+          // Minimal patch - merge only changed row; do not recompute analytics here
           setOrders((prev) => {
             const list = prev || [];
             const idx = list.findIndex((o) => o.id === updated.id);
@@ -1495,7 +1495,7 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [waNumber]);
 
-  // ===== Helpers =====
+  // Helpers
   async function uploadToBucket(bucket, rawFile, folder) {
     const isIcon = folder === "icons" || String(bucket || "").includes("icon");
     const file = await compressImage(rawFile, {
@@ -1517,7 +1517,7 @@ export default function AdminDashboard() {
     return data.publicUrl;
   }
 
-  // ===== Products actions =====
+  // Products actions
   function makeUniqueProductSlug(name) {
     const base = slugify(name) || `produk-${Date.now().toString(36)}`;
     const taken = new Set((products || []).map((p) => String(p?.slug || "").toLowerCase()));
@@ -1780,7 +1780,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // ===== Variants actions =====
+  // Variants actions
   function openCreateVariant() {
     if (!selectedProduct) return;
 
@@ -1955,7 +1955,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // ===== Orders actions =====
+  // Orders actions
 
   function getOrdersForExport() {
     let list = filteredOrders;
@@ -2269,7 +2269,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // ===== Promo actions =====
+  // Promo actions
 
   async function addPromoBulk() {
     const lines = String(promoBulk || "")
@@ -2453,7 +2453,7 @@ export default function AdminDashboard() {
     setTimeout(() => setCopiedCode(""), 1800);
   }
 
-  // ===== Testimonials actions (multi) =====
+  // Testimonials actions (multi)
   async function addTestimonials(e) {
     e.preventDefault();
     setMsg("");
@@ -2576,7 +2576,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // ===== Settings =====
+  // Settings
   async function saveWhatsApp(number) {
     const n = String(number || "").trim();
     const tid = toast.loading("Simpan WA");
@@ -2615,7 +2615,7 @@ export default function AdminDashboard() {
     }
   }
 
-  // ===== Render =====
+  // Render
   const tabs = [
     { id: "overview", label: "Ringkasan", hint: "Metrik & antrean" },
     { id: "products", label: "Produk", hint: "Katalog & stok" },
@@ -2740,115 +2740,89 @@ export default function AdminDashboard() {
 
             {tab === "overview" ? (
               <div className="admin-overview admin-workspaceScroll">
-                <section className="admin-priorityBoard" aria-label="Antrian prioritas">
-                  <div className="admin-priorityBoardHead">
-                    <div>
-                      <div className="admin-sectionKicker">Fokus sekarang</div>
-                      <h2 className="admin-sectionTitle">Kerjakan dulu</h2>
-                    </div>
+                <div className="admin-overviewHeader">
+                  <div>
+                    <h2 className="admin-overviewMainTitle">Ringkasan Operasional</h2>
+                    <span className="admin-overviewMainSub">
+                      Pantauan omzet, antrean pesanan, dan performa katalog real-time.
+                    </span>
                   </div>
-                  <div className="admin-priorityGrid">
-                    <button
-                      type="button"
-                      className="admin-priorityCard"
-                      onClick={() => {
-                        setOrderBucket("attention");
-                        handleSelectTab("orders");
-                      }}
-                    >
-                      <span className="admin-priorityIcon admin-priorityIcon--orders"><ClipboardList size={18} /></span>
-                      <strong>{orderStats.live}</strong>
-                      <span>Order aksi</span>
-                      <small>{newOrderCount > 0 ? `${newOrderCount} baru` : "Buka antrean"}</small>
-                    </button>
-                    <button type="button" className="admin-priorityCard" onClick={openLowStockProducts}>
-                      <span className="admin-priorityIcon admin-priorityIcon--stock"><AlertTriangle size={18} /></span>
-                      <strong>{analyticsSummary.stockAlerts.length}</strong>
-                      <span>Stok tipis</span>
-                      <small>Restock</small>
-                    </button>
-                    <button type="button" className="admin-priorityCard" onClick={() => handleSelectTab("flashsale")}>
-                      <span className="admin-priorityIcon admin-priorityIcon--flash"><TrendingUp size={18} /></span>
-                      <strong>{liveFlashCount}</strong>
-                      <span>Flash live</span>
-                      <small>{flashSaleEndingSoon ? "Hampir habis" : "Kelola"}</small>
-                    </button>
+                  <div className="admin-chipRow" role="group" aria-label="Pilih rentang waktu">
+                    {ANALYTICS_WINDOWS.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        className={`admin-chip ${analyticsWindow === option.value ? "active" : ""}`}
+                        onClick={() => setAnalyticsWindow(option.value)}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
                   </div>
-                </section>
-
-                <div className="admin-stats admin-stats--compact">
-                  {dashboardStats.slice(0, 4).map((stat) => {
-                    const StatIcon = stat.icon || TAB_ICONS[stat.key] || Box;
-                    return (
-                      <div key={stat.key} className="admin-statCard">
-                        <span className="admin-statIcon">
-                          <StatIcon size={16} />
-                        </span>
-                        <span className="admin-statLabel">{stat.label}</span>
-                        <strong className="admin-statValue">{stat.value}</strong>
-                        <span className="admin-statHelper admin-desktopOnly">{stat.helper}</span>
-                      </div>
-                    );
-                  })}
                 </div>
 
-                <div className="admin-panel admin-overviewHero">
-                  <div className="admin-panel-body">
-                    <div className="admin-overviewHeroTop">
-                      <div>
-                        <div className="admin-topbar-eyebrow">Kesehatan toko</div>
-                        <div className="admin-heroTitle">Performa & tren</div>
-                        <div className="admin-panel-sub">
-                          Revenue, order selesai, dan sinyal operasional.
-                        </div>
-                      </div>
-
-                      <div className="admin-chipRow">
-                        {ANALYTICS_WINDOWS.map((option) => (
-                          <button
-                            key={option.value}
-                            type="button"
-                            className={`admin-chip ${analyticsWindow === option.value ? "active" : ""}`}
-                            onClick={() => setAnalyticsWindow(option.value)}
-                          >
-                            {option.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="admin-miniGrid admin-miniGridHero">
-                      <div className="admin-miniCard">
-                        <span>Revenue total</span>
-                        <strong>{formatIDR(analyticsSummary.revenueTotal)}</strong>
-                        <small>{analyticsSummary.doneOrders} order sukses</small>
-                      </div>
-                      <div className="admin-miniCard">
-                        <span>Revenue hari ini</span>
-                        <strong>{formatIDR(analyticsSummary.todayRevenue)}</strong>
-                        <small>{analyticsSummary.todayOrders} order masuk</small>
-                      </div>
-                      <div className="admin-miniCard">
-                        <span>Rata-rata order</span>
-                        <strong>{formatIDR(analyticsSummary.averageOrderValue)}</strong>
-                        <small>Nilai order selesai</small>
-                      </div>
-                      <div className="admin-miniCard">
-                        <span>Konversi kasar</span>
-                        <strong>{formatPercent(analyticsSummary.conversionRatio, 1)}</strong>
-                        <small>{formatCompactNumber(storePulse.total_views)} total views</small>
-                      </div>
-                    </div>
+                <div className="admin-kpiStrip">
+                  <div className="admin-kpiCard">
+                    <span className="admin-kpiLabel">Omzet ({analyticsWindow === "7d" ? "7 Hari" : "30 Hari"})</span>
+                    <strong className="admin-kpiValue">{formatIDR(analyticsSummary.revenueTotal)}</strong>
+                    <span className="admin-kpiSub">{analyticsSummary.doneOrders} transaksi selesai</span>
                   </div>
+                  <div className="admin-kpiCard">
+                    <span className="admin-kpiLabel">Omzet Hari Ini</span>
+                    <strong className="admin-kpiValue">{formatIDR(analyticsSummary.todayRevenue)}</strong>
+                    <span className="admin-kpiSub">{analyticsSummary.todayOrders} pesanan masuk</span>
+                  </div>
+                  <div className="admin-kpiCard">
+                    <span className="admin-kpiLabel">Rata-rata Order</span>
+                    <strong className="admin-kpiValue">{formatIDR(analyticsSummary.averageOrderValue)}</strong>
+                    <span className="admin-kpiSub">Nilai keranjang</span>
+                  </div>
+                  <div className="admin-kpiCard">
+                    <span className="admin-kpiLabel">Konversi & Kunjungan</span>
+                    <strong className="admin-kpiValue">{formatPercent(analyticsSummary.conversionRatio, 1)}</strong>
+                    <span className="admin-kpiSub">{formatCompactNumber(storePulse.total_views)} total tayangan</span>
+                  </div>
+                </div>
+
+                <div className="admin-actionShortcuts">
+                  <button
+                    type="button"
+                    className={`admin-actionShortcut${orderStats.live > 0 ? " is-highlight" : ""}`}
+                    onClick={() => {
+                      setOrderBucket("attention");
+                      handleSelectTab("orders");
+                    }}
+                  >
+                    <span className="admin-actionShortcutIcon"><ClipboardList size={16} /></span>
+                    <span className="admin-actionShortcutLabel">Pesanan Perlu Aksi</span>
+                    <strong className="admin-actionShortcutCount">{orderStats.live}</strong>
+                  </button>
+
+                  <button
+                    type="button"
+                    className={`admin-actionShortcut${analyticsSummary.stockAlerts.length > 0 ? " is-warn" : ""}`}
+                    onClick={openLowStockProducts}
+                  >
+                    <span className="admin-actionShortcutIcon"><AlertTriangle size={16} /></span>
+                    <span className="admin-actionShortcutLabel">Stok Kritis</span>
+                    <strong className="admin-actionShortcutCount">{analyticsSummary.stockAlerts.length}</strong>
+                  </button>
+
+                  <button
+                    type="button"
+                    className="admin-actionShortcut"
+                    onClick={() => handleSelectTab("flashsale")}
+                  >
+                    <span className="admin-actionShortcutIcon"><TrendingUp size={16} /></span>
+                    <span className="admin-actionShortcutLabel">Flash Sale Aktif</span>
+                    <strong className="admin-actionShortcutCount">{liveFlashCount}</strong>
+                  </button>
                 </div>
 
                 <div className="admin-overviewGrid">
                   <div className="admin-panel admin-panelWide">
                     <div className="admin-panel-head">
-                      <div>
-                        <div className="admin-panel-title">Tren order dan revenue</div>
-                        <div className="admin-panel-sub">Ritme toko harian - order masuk vs revenue selesai.</div>
-                      </div>
+                      <div className="admin-panel-title">Tren Penjualan Harian</div>
                     </div>
 
                     <div className="admin-panel-body">
@@ -2885,10 +2859,7 @@ export default function AdminDashboard() {
 
                   <div className="admin-panel">
                     <div className="admin-panel-head">
-                      <div>
-                        <div className="admin-panel-title">Status order</div>
-                        <div className="admin-panel-sub">Mana yang perlu di-follow up duluan.</div>
-                      </div>
+                      <div className="admin-panel-title">Status Pesanan</div>
                     </div>
                     <div className="admin-panel-body admin-stack">
                       {ORDER_STATUS_OPTIONS.map((option) => {
@@ -2911,10 +2882,7 @@ export default function AdminDashboard() {
 
                   <div className="admin-panel">
                     <div className="admin-panel-head">
-                      <div>
-                        <div className="admin-panel-title">Produk paling laku</div>
-                        <div className="admin-panel-sub">Akumulasi sold_count katalog (semua periode).</div>
-                      </div>
+                      <div className="admin-panel-title">Produk Terlaris</div>
                     </div>
                     <div className="admin-panel-body admin-stack">
                       {analyticsSummary.topProducts.length ? (
@@ -2938,36 +2906,15 @@ export default function AdminDashboard() {
 
                   <div className="admin-panel">
                     <div className="admin-panel-head">
-                      <div>
-                        <div className="admin-panel-title">Promo dan kategori</div>
-                        <div className="admin-panel-sub">Insight promo aktif dan distribusi kategori.</div>
-                      </div>
+                      <div className="admin-panel-title">Distribusi Kategori & Promo</div>
                     </div>
                     <div className="admin-panel-body admin-stack">
-                      <div className="admin-miniGrid">
-                        <div className="admin-miniCard">
-                          <span>Promo aktif</span>
-                          <strong>{analyticsSummary.activePromos}</strong>
-                          <small>{promoClaims.length} total claim</small>
-                        </div>
-                        <div className="admin-miniCard">
-                          <span>Produk aktif</span>
-                          <strong>{analyticsSummary.activeProducts}</strong>
-                          <small>{analyticsSummary.inactiveProducts} nonaktif</small>
-                        </div>
-                        <div className="admin-miniCard">
-                          <span>Flash sale aktif</span>
-                          <strong>{flashSales.filter(fs => { const now = new Date(); return fs.is_active && new Date(fs.ends_at) >= now && new Date(fs.starts_at) <= now; }).length}</strong>
-                          <small>{flashSales.length} total dibuat</small>
-                        </div>
-                      </div>
-
                       {analyticsSummary.categories.length ? (
                         analyticsSummary.categories.map((item) => (
                           <div key={item.category} className="admin-rankItem compact">
                             <div className="admin-rankCopy">
                               <strong>{item.category}</strong>
-                              <small>{item.quantity} item</small>
+                              <small>{item.quantity} produk terjual</small>
                             </div>
                             <div className="admin-rankMeta">{formatIDR(item.revenue)}</div>
                           </div>
@@ -2979,37 +2926,22 @@ export default function AdminDashboard() {
                           <div key={item.code} className="admin-rankItem compact">
                             <div className="admin-rankCopy">
                               <strong>{item.code}</strong>
-                              <small>{item.orders} order memakai promo ini</small>
+                              <small>{item.orders} order terpakai</small>
                             </div>
                             <div className="admin-rankMeta">{formatIDR(item.revenue)}</div>
                           </div>
                         ))
                       ) : (
-                        <div className="admin-emptyInline">Belum ada promo yang dipakai dalam checkout.</div>
+                        <div className="admin-emptyInline">Belum ada promo yang terpakai.</div>
                       )}
                     </div>
                   </div>
 
                   <div className="admin-panel">
                     <div className="admin-panel-head">
-                      <div>
-                        <div className="admin-panel-title">Traffic dan stok</div>
-                        <div className="admin-panel-sub">Views vs kesiapan stok.</div>
-                      </div>
+                      <div className="admin-panel-title">Peringatan Stok</div>
                     </div>
                     <div className="admin-panel-body admin-stack">
-                      <div className="admin-miniGrid">
-                        <div className="admin-miniCard">
-                          <span>Total views</span>
-                          <strong>{formatCompactNumber(storePulse.total_views)}</strong>
-                          <small>{formatCompactNumber(storePulse.today_views)} views hari ini</small>
-                        </div>
-                        <div className="admin-miniCard">
-                          <span>Pipeline</span>
-                          <strong>{formatIDR(analyticsSummary.pipelineValue)}</strong>
-                          <small>{orderStats.live} order butuh aksi</small>
-                        </div>
-                      </div>
 
                       {analyticsSummary.stockAlerts.length ? (
                         analyticsSummary.stockAlerts.map((variant) => (
@@ -3068,7 +3000,7 @@ export default function AdminDashboard() {
                   </div>
 
                   <div className="admin-panel">
-                    <div className="admin-panel-head"><div><div className="admin-panel-title">Permintaan restock</div><div className="admin-panel-sub">Calon pembeli yang menunggu stok kembali.</div></div></div>
+                    <div className="admin-panel-head"><div className="admin-panel-title">Permintaan Restock</div></div>
                     <div className="admin-panel-body admin-stack">
                       {restockRequests.length ? restockRequests.map((request) => (
                         <div className="admin-alertItem" key={request.id}>
@@ -3120,7 +3052,7 @@ export default function AdminDashboard() {
                           Visitor Analytics
                         </div>
                         <div className="admin-panel-sub">
-                          Pengunjung baru vs. yang kembali lagi - {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
+                          Pengunjung baru vs pengunjung kembali ({analyticsWindow === "30d" ? "30" : "7"} hari terakhir).
                         </div>
                       </div>
                       {analyticsLoading ? <span className="admin-panel-sub">Memuat...</span> : null}
@@ -3189,7 +3121,7 @@ export default function AdminDashboard() {
                           Tren Views Harian
                         </div>
                         <div className="admin-panel-sub">
-                          Unique views per hari dari tabel daily_stats - {analyticsWindow === "30d" ? "30" : "7"} hari terakhir.
+                          Unique views dan omzet harian ({analyticsWindow === "30d" ? "30" : "7"} hari terakhir).
                         </div>
                       </div>
                     </div>
@@ -3353,7 +3285,7 @@ export default function AdminDashboard() {
                     <div className="admin-panel-head">
                       <div>
                         <div className="admin-panel-title">Revenue Forecast 7 Hari</div>
-                        <div className="admin-panel-sub">Proyeksi revenue berdasarkan tren 30 hari terakhir (regresi linear).</div>
+                        <div className="admin-panel-sub">Proyeksi 7 hari ke depan berdasarkan tren riwayat order.</div>
                       </div>
                     </div>
                     <div className="admin-panel-body admin-stack">
@@ -3393,12 +3325,9 @@ export default function AdminDashboard() {
               <div className={`admin-products admin-workspacePane${selectedProductId ? " has-selection" : ""}`}>
                 <div className="admin-panel admin-products-list">
                   <div className="admin-panel-head">
-                    <div>
-                      <div className="admin-panel-title">Katalog</div>
-                      <div className="admin-panel-sub">Pilih produk untuk edit</div>
-                    </div>
+                    <div className="admin-panel-title">Katalog Produk</div>
                     <button className="btn btn-sm btn-primary" onClick={openCreateProduct}>
-                      <Plus size={14} /> Produk
+                      <Plus size={14} /> Tambah Produk
                     </button>
                   </div>
 
@@ -3529,11 +3458,10 @@ export default function AdminDashboard() {
                         <div className="admin-panel-head admin-panel-head--split admin-productsEditorHead">
                           <div className="admin-panel-headMain">
                             <div className="admin-panel-title">{selectedProduct.name || "Detail Produk"}</div>
-                            <div className="admin-panel-sub">Edit info + paket</div>
                           </div>
                           <div className="admin-head-actions admin-panel-headActions">
                             <a className="btn btn-ghost btn-sm" href={`/produk/${selectedProduct.slug}`} target="_blank" rel="noreferrer">
-                              Preview
+                              Preview di Toko
                             </a>
                             <button className="btn btn-danger btn-sm" type="button" onClick={() => deleteProduct(selectedProduct.id)}>
                               Hapus
@@ -3658,15 +3586,9 @@ export default function AdminDashboard() {
                         <div className="divider" style={{ margin: "18px 0" }} />
 
                         <div className="admin-panel-head" style={{ padding: 0, marginBottom: 10 }}>
-                          <div>
-                            <div className="admin-panel-title">Paket harga</div>
-                            <div className="admin-panel-sub">
-                              Tambah paket: nama, harga, stok, durasi, garansi, dan opsi email.
-                            </div>
-                          </div>
-
-                          <button className="btn btn-sm" onClick={openCreateVariant}>
-                            + Paket
+                          <div className="admin-panel-title">Varian & Paket Harga</div>
+                          <button className="btn btn-sm btn-primary" onClick={openCreateVariant} type="button">
+                            + Tambah Paket
                           </button>
                         </div>
 
@@ -3711,12 +3633,12 @@ export default function AdminDashboard() {
               <div className="admin-panel admin-panel--fill admin-ordersPanel admin-workspacePane">
                 <div className="admin-panel-head admin-panel-head--split admin-ordersHead">
                   <div>
-                    <div className="admin-panel-title">Pesanan</div>
+                    <div className="admin-panel-title">Daftar Pesanan</div>
                     <div className="admin-panel-sub">
                       {orderBucket === "attention"
-                        ? `${orderStats.live} perlu aksi (semua di database)`
-                        : `${filteredOrders.length} di halaman ini · ${orderStats.total} total di database`}
-                      {orderSearchingServer ? <span className="admin-orderSearchHint"> · Mencari di database...</span> : null}
+                        ? `${orderStats.live} pesanan perlu diproses`
+                        : `${orderStats.total} total pesanan`}
+                      {orderSearchingServer ? <span className="admin-orderSearchHint"> · Mencari...</span> : null}
                     </div>
                   </div>
                   <div className="admin-panel-headActions">

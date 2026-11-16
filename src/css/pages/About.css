@@ -579,7 +579,7 @@ html[data-theme="light"] .faq-shell::before {
   }
 }
 
-/* ── Cara pesan ── */
+/* Cara pesan */
 .faq-howto {
   display: grid;
   gap: 14px;

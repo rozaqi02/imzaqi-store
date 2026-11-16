@@ -1,7 +1,7 @@
 /**
  * Code-split hooks for admin workspace panes.
  * AdminDashboard remains the data container; panes can be moved here incrementally.
- * App already React.lazy()'s AdminDashboard — these chunks load only when a tab mounts.
+ * App already React.lazy()'s AdminDashboard - these chunks load only when a tab mounts.
  */
 import React from "react";
 

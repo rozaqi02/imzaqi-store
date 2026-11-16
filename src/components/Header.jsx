@@ -174,7 +174,7 @@ export default function Header() {
           </div>
 
           <Link to="/" className="brand" aria-label="Beranda Imzaqi Store">
-            <img className="brand-img" src="/icon.png" alt="imzaqi.store" />
+            <img className="brand-img" src="/icon.png" alt="imzaqi.store" width="36" height="36" />
           </Link>
 
           {!isCompactNav ? (

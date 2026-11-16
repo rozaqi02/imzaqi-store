@@ -4,7 +4,7 @@
   with variables centralized in theme-variables.css.
 */
 
-/* ── Layer 1: Disney Base overrides ── */
+/* Layer 1: Disney Base overrides */
 /*
   Disney+ Hotstar inspired theme layer.
   Imported last so it can harmonize older page styles into one brand direction.
@@ -408,7 +408,7 @@ code{
    (backdrop-filter:none under 720px). The old 920px green-navy header block
    here fought both and was removed. */
 
-/* ── Layer 2: Neumorphic overrides ── */
+/* Layer 2: Neumorphic overrides */
 /*
   Skeuomorphic brand theme modes.
   This layer sits after theme-disney.css so the project keeps the original
@@ -1303,7 +1303,7 @@ html[data-theme="light"] .lightbox-nav {
   border-color: rgba(0, 138, 148, 0.14) !important;
 }
 
-/* Catalog stock pill uses brand teal — not generic slate text/border */
+/* Catalog stock pill uses brand teal - not generic slate text/border */
 html[data-theme="light"] .catalog-status.ok {
   color: var(--accent, #067b88) !important;
   border-color: rgba(0, 138, 148, 0.32) !important;
@@ -3360,10 +3360,10 @@ html[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
   border-top-color: rgba(0, 138, 148, 0.16) !important;
 }
 
-/* Mobile navbar uses identical neumorphism as desktop — handled in motion-adaptive.css */
+/* Mobile navbar uses identical neumorphism as desktop - handled in motion-adaptive.css */
 
 
-/* ── Layer 3: Unified overrides ── */
+/* Layer 3: Unified overrides */
 /*
   Unified UI v4
   Goal: make non-Status/FAQ pages use the same visual language as Status/FAQ.
@@ -3642,7 +3642,7 @@ html[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
   opacity: 0.52;
 }
 
-/* Product tile: subtle top sheen only — much lower opacity in dark mode */
+/* Product tile: subtle top sheen only - much lower opacity in dark mode */
 .home-page .product-tile::after {
   content: "";
   position: absolute;
@@ -3757,7 +3757,7 @@ html[data-theme="light"] .home-page .hero-search-shell:focus-within {
   backdrop-filter: none !important;
 }
 
-/* Home popular sold badge — raised neumorphic control (project tokens) */
+/* Home popular sold badge - raised neumorphic control (project tokens) */
 .home-page .home-popularList .home-popularSold {
   border: none !important;
   background: var(--skeu-control-bg, var(--home-neo-control, var(--uni-neo-control))) !important;
@@ -3995,7 +3995,7 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
   border-radius: 12px !important;
   pointer-events: none;
 
-  /* Deep 3D Neumorphism — skeuomorphic pill surface */
+  /* Deep 3D Neumorphism - skeuomorphic pill surface */
   background: var(--skeu-pill-bg) !important;
   border: 1px solid var(--brand-line) !important;
   box-shadow: var(--skeu-control-shadow) !important;
@@ -4612,7 +4612,7 @@ html[data-theme="light"] {
 .detail-page .variants-grid,
 .testimonials-page .testi-grid {
   overflow: visible !important;
-  /* Equal L/R only — asymmetric padding made mobile list look off-center */
+  /* Equal L/R only - asymmetric padding made mobile list look off-center */
   padding: 8px 0 16px !important;
   margin: 0 !important;
 }
@@ -4644,7 +4644,7 @@ html[data-theme="light"] {
   max-width: 100% !important;
   min-width: 0 !important;
   overflow-x: auto !important;
-  /* Don't clip Y — shadow extends below chips */
+  /* Don't clip Y - shadow extends below chips */
   overflow-y: visible !important;
   padding-top: 10px !important;
   padding-bottom: 22px !important;
@@ -5016,9 +5016,7 @@ html[data-theme="light"] .status-page .st-noteBody.is-empty {
   color: rgba(62, 98, 112, 0.82) !important;
 }
 
-/* =====================================================================
-   PRODUCT DETAIL (Liquid Glass & Advanced Neumorphism)
-   ===================================================================== */
+/* Product Detail utility overrides */
 
 /* 1. Floating App Icon Layering */
 .detail-page .pdx-productIcon {
@@ -5470,7 +5468,7 @@ html[data-theme="light"] .detail-page .pdx-infoBtn {
   transform: rotate(180deg);
 }
 
-/* --- New CSS for Product Detail (Priority 1 & 2) --- */
+/* New CSS for Product Detail (Priority 1 & 2) */
 .detail-page .pdx-summaryActionsMain {
   display: flex;
   gap: 12px;
@@ -5748,7 +5746,7 @@ html[data-theme="dark"] .detail-page .pdx-addBtn {
   }
 }
 
-/* --- Cart Notification Badge (solid red alert; not generic neo pill) --- */
+/* Cart Notification Badge (solid red alert; not generic neo pill) */
 .header-cart .pill {
   background: #ff4d6d !important;
   color: #fff !important;
@@ -5769,7 +5767,7 @@ html[data-theme="light"] .header-cart .pill {
 }
 
 
-/* ─── ProductDetail mobile: compact toolbar + scrollable segment control ── */
+/* ProductDetail mobile: compact toolbar + scrollable segment control */
 @media (max-width: 720px) {
   .detail-page .pdx-toolbar {
     flex-direction: column;
@@ -5815,7 +5813,7 @@ html[data-theme="light"] .header-cart .pill {
     padding: 0;
   }
 
-  /* Variant card buttons — 44px minimum tap target */
+  /* Variant card buttons - 44px minimum tap target */
   .detail-page .pdx-variantsGrid:not(.is-list) .pdx-buyNowBtn,
   .detail-page .pdx-variantsGrid:not(.is-list) .pdx-addBtn {
     min-height: 44px;
@@ -5823,7 +5821,7 @@ html[data-theme="light"] .header-cart .pill {
   }
 }
 
-/* ─── v7: deeper neumorphism 3D sitewide ─────────────────────────────── */
+/* v7: deeper neumorphism 3D sitewide */
 .header-nav a,
 .header-iconBtn,
 .checkout-panel,
@@ -5894,7 +5892,7 @@ html[data-theme="light"] .header-cart .pill {
   border-color: var(--imzaqi-btn-border) !important;
   color: var(--imzaqi-btn-text) !important;
   box-shadow: var(--imzaqi-btn-shadow) !important;
-  /* Smooth transition untuk efek hover/pressed — GPU-accelerated */
+  /* Smooth transition untuk efek hover/pressed - GPU-accelerated */
   transition:
     box-shadow 0.18s ease,
     transform 0.14s ease,
@@ -5909,7 +5907,7 @@ html[data-theme="light"] .header-cart .pill {
   transform: translateY(-1px);
 }
 
-/* Pressed state — inset shadow masuk, tombol sedikit turun */
+/* Pressed state - inset shadow masuk, tombol sedikit turun */
 .btn:not(.btn-ghost):not(.btn-disabled):active,
 .pdx-buyNowBtn:active:not(:disabled),
 .pdx-stickyCheckoutBtn:active {
@@ -5921,7 +5919,7 @@ html[data-theme="light"] .header-cart .pill {
   filter: brightness(0.96);
 }
 
-/* Reduced motion — tidak tambah beban di mobile */
+/* Reduced motion - tidak tambah beban di mobile */
 @media (prefers-reduced-motion: reduce) {
   .btn:not(.btn-ghost):not(.btn-disabled),
   .pdx-buyNowBtn,
@@ -5931,7 +5929,7 @@ html[data-theme="light"] .header-cart .pill {
   }
 }
 
-/* ── Light mode: catalog filter sidebar ── */
+/* Light mode: catalog filter sidebar */
 html[data-theme="light"] .catalog-filterShell {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0) 22%),

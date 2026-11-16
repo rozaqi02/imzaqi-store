@@ -35,8 +35,8 @@ export function CatalogHero({
         <h1>Pilih paket <span>andalanmu.</span></h1>
         <p>Aplikasi premium untuk kebutuhanmu.</p>
         <div className="store-heroFacts" aria-label="Ringkasan katalog">
-          <span><strong>{loading ? "…" : error ? "—" : productCount}</strong> produk</span>
-          <span><strong>{loading ? "…" : error ? "—" : readyCount}</strong> varian tersedia</span>
+          <span><strong>{loading ? "…" : error ? "-" : productCount}</strong> produk</span>
+          <span><strong>{loading ? "…" : error ? "-" : readyCount}</strong> varian tersedia</span>
         </div>
       </div>
       <div className="store-heroStackClip" aria-hidden="true">
@@ -45,7 +45,7 @@ export function CatalogHero({
       <div className="store-heroActions store-heroActions--search">
         {search || children || (
           <button className="hx-btn-primary" type="button" onClick={onSearch}>
-            <Search size={15} /> Cari paketmu <ArrowUpRight size={15} />
+            <Search size={15} aria-hidden="true" /> Cari paketmu
           </button>
         )}
       </div>
@@ -58,8 +58,8 @@ export function StatusHero({ history = false, hasOrder = false }) {
     <header className={`store-hero store-hero--status${hasOrder ? " store-hero--hasOrder" : ""}`}>
       <div className="store-heroCopy">
         <span className="store-heroEyebrow">
-          {history ? <History size={14} /> : <PackageCheck size={14} />}
-          {history ? "RIWAYAT PESANAN" : "PANTAU PESANANMU"}
+          {history ? <History size={14} aria-hidden="true" /> : <PackageCheck size={14} aria-hidden="true" />}
+          {history ? "Riwayat Pesanan" : "Pantau Pesanan"}
         </span>
         <h1>
           {history ? (
@@ -77,7 +77,7 @@ export function StatusHero({ history = false, hasOrder = false }) {
 
       <div className="store-heroAside">
         <div className="store-statusTip">
-          <ClipboardList size={14} />
+          <ClipboardList size={14} aria-hidden="true" />
           <span>
             {history
               ? "Riwayat tersimpan di perangkat ini."

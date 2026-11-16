@@ -145,7 +145,7 @@ export function useLiveStats({ intervalMs = 15000 } = {}) {
     }
 
     function onVisibilityChange() {
-      // BUG-35: kondisi sebelumnya terbalik — harusnya load saat visibilityState === "visible"
+      // BUG-35: kondisi sebelumnya terbalik - harusnya load saat visibilityState === "visible"
       if (typeof document !== "undefined" && document.visibilityState === "visible") {
         load();
       }

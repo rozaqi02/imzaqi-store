@@ -1,4 +1,4 @@
-/* 404 — full redesign (neumorphic, compact, clear CTA) */
+/* 404 - full redesign (neumorphic, compact, clear CTA) */
 
 .nf-page {
   /* Reset legacy global .nf-page flex centering that pulls content under the fixed header */
@@ -8,7 +8,7 @@
 }
 
 .nf-section {
-  /* Must include header offset — fixed site-header overlays the main column */
+  /* Must include header offset - fixed site-header overlays the main column */
   padding-top: calc(var(--site-header-offset, 80px) + var(--page-top-gap, 28px)) !important;
   padding-bottom: clamp(28px, 5vw, 48px) !important;
 }
@@ -251,7 +251,7 @@ html[data-theme="light"] .nf-linkCard {
   border-radius: 12px;
   display: grid;
   place-items: center;
-  /* !important: neumorphic-depth overrides background to dark skeu-control — dark glyph on dark chip = invisible */
+  /* !important: neumorphic-depth overrides background to dark skeu-control - dark glyph on dark chip = invisible */
   color: #032235 !important;
   background: linear-gradient(160deg, #6dffd8, #00b8a8) !important;
   box-shadow:

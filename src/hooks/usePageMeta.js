@@ -71,7 +71,7 @@ export function usePageMeta({ title, description, ogImage } = {}) {
     upsertMeta('meta[property="og:url"]', { property: "og:url", content: nextUrl });
     upsertMeta('meta[property="og:image"]', { property: "og:image", content: nextImage });
     const imageAlt = nextImage === DEFAULT_OG_IMAGE
-      ? "Imzaqi Store — Premium. Budget aman. Langganan premium, harga pelajar."
+      ? "Imzaqi Store: Premium. Budget aman. Langganan premium, harga pelajar."
       : nextTitle;
     upsertMeta('meta[property="og:image:alt"]', { property: "og:image:alt", content: imageAlt });
     if (nextImage === DEFAULT_OG_IMAGE) {

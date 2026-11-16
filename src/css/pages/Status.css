@@ -249,7 +249,7 @@ html[data-theme="light"] .status-page button.st-checkBtn {
   color: #ffbccd;
 }
 
-/* ── Recent Orders ── */
+/* Recent Orders */
 .st-recent {
   margin-bottom: 20px;
 }
@@ -518,7 +518,7 @@ html[data-theme="light"] .st-recentPrice {
   background: rgba(62, 230, 192, 0.14) !important;
   color: var(--accent, #3ee6c0) !important;
   font-weight: 900;
-  animation: stFlowPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  /* Clean step state - no endless pulse */
 }
 
 .st-flowStep.is-done .st-flowNumber {
@@ -837,6 +837,20 @@ html[data-theme="light"] .status-shell::before {
   .st-emptyActions a {
     width: 100%;
     justify-content: center;
+    min-height: 44px;
+  }
+
+  .st-copyCodeBtn {
+    min-height: 36px;
+    height: 36px;
+    padding: 0 12px;
+    font-size: 12px;
+  }
+
+  .st-copyNoteBtn {
+    min-height: 38px;
+    padding: 0 14px;
+    font-size: 12px;
   }
 
   .st-metrics,
@@ -974,14 +988,12 @@ html[data-theme="light"] .status-shell::before {
 }
 
 
-/* ──────────────────────────────────────────────────────────────────────
-   Status Order — professional polish layer
+/* Status Order - professional polish layer
    - Spotlight on payment status banner
    - Emphasis on admin note (highest visual priority)
-   - Empty state with prominent contact-admin CTA
-   ────────────────────────────────────────────────────────────────── */
+   - Empty state with prominent contact-admin CTA */
 
-/* Empty state — turn into a proper hero contact CTA */
+/* Empty state - turn into a proper hero contact CTA */
 .st-empty {
   position: relative;
   overflow: hidden;
@@ -1060,7 +1072,7 @@ html[data-theme="light"] .status-shell::before {
   }
 }
 
-/* Status pill — make it the visual anchor at the top */
+/* Status pill - make it the visual anchor at the top */
 .st-statePill {
   font-weight: 900 !important;
   letter-spacing: 0.02em;
@@ -1116,7 +1128,7 @@ html[data-theme="light"] .status-shell::before {
   border: 1px solid rgba(255, 90, 122, 0.4) !important;
 }
 
-/* ─── Admin note — highest visual priority ─── */
+/* Admin note - highest visual priority */
 .st-noteCard.is-accent {
   position: relative;
   border: 1px solid rgba(0, 214, 180, 0.32) !important;
@@ -1158,7 +1170,7 @@ html[data-theme="light"] .status-shell::before {
   line-height: 1.6;
 }
 
-/* ─── Pay summary highlight ─── */
+/* Pay summary highlight */
 .st-payCard {
   position: relative;
   overflow: hidden;
@@ -1213,7 +1225,7 @@ html[data-theme="light"] .status-shell::before {
 }
 
 
-/* ─── Detailed item rows in Status order ─── */
+/* Detailed item rows in Status order */
 .st-itemRow.st-itemRowDetailed {
   display: flex;
   flex-direction: column;
@@ -1414,7 +1426,7 @@ html[data-theme="light"] .st-itemDescText {
   color: #1e293b;
 }
 
-/* Container styling — items list looks like cards stacked */
+/* Container styling - items list looks like cards stacked */
 .st-itemList {
   display: flex;
   flex-direction: column;
@@ -1468,7 +1480,7 @@ html[data-theme="light"] .st-itemDescText {
 }
 
 
-/* ─── Admin note pinned to top — full-width hero card ─── */
+/* Admin note pinned to top - full-width hero card */
 .st-noteTopAccent {
   grid-column: 1 / -1;
   margin-bottom: 14px;
@@ -1535,7 +1547,7 @@ html[data-theme="light"] .st-itemDescText {
   }
 }
 
-/* ─── Tab switcher ─────────────────────────────────────────────────────────── */
+/* Tab switcher */
 
 .st-tabs {
   display: flex;
@@ -1598,7 +1610,7 @@ html[data-theme="light"] .st-tab.is-active {
   }
 }
 
-/* ─── Status pill row (with last-updated info + fade-in) ─── */
+/* Status pill row (with last-updated info + fade-in) */
 
 @keyframes st-pillFadeIn {
   from { opacity: 0; transform: translateY(-4px); }
@@ -1614,7 +1626,7 @@ html[data-theme="light"] .st-tab.is-active {
   animation: st-pillFadeIn 0.28s ease both;
 }
 
-/* lastUpdated — muted tapi readable */
+/* lastUpdated - muted tapi readable */
 .st-lastUpdated {
   display: flex;
   align-items: center;
@@ -1623,7 +1635,7 @@ html[data-theme="light"] .st-tab.is-active {
   font-size: 12px;
 }
 
-/* Refreshing dot — sonar/ping ring */
+/* Refreshing dot - sonar/ping ring */
 .st-refreshingDot {
   position: relative;
   display: inline-block;
@@ -1683,7 +1695,7 @@ html[data-theme="light"] .st-tab.is-active {
   cursor: not-allowed;
 }
 
-/* ─── copyNoteBtn (moved from inline styles) ─── */
+/* copyNoteBtn (moved from inline styles) */
 
 .st-copyNoteBtn {
   min-height: 32px;
@@ -1697,7 +1709,7 @@ html[data-theme="light"] .st-tab.is-active {
   font-weight: 800;
 }
 
-/* ─── infoCard strong — overflow-safe + kicker truncate ─── */
+/* infoCard strong - overflow-safe + kicker truncate */
 
 .st-infoCard span {
   white-space: nowrap;
@@ -1709,7 +1721,7 @@ html[data-theme="light"] .st-tab.is-active {
   word-break: break-all;
 }
 
-/* ─── payProgress — label inline kanan ─── */
+/* payProgress - label inline kanan */
 
 .st-payProgress {
   margin-top: 14px;
@@ -1734,7 +1746,7 @@ html[data-theme="light"] .st-tab.is-active {
   box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.16);
 }
 
-/* ─── Help card — button hierarchy ─── */
+/* Help card - button hierarchy */
 
 .st-helpCard .st-helpActions .btn:first-child {
   /* Gunakan token neumorphism yang sudah ada di proyek */
@@ -1744,13 +1756,13 @@ html[data-theme="light"] .st-tab.is-active {
   color: #032235 !important;
   border: 1px solid rgba(79, 255, 200, 0.32) !important;
   box-shadow:
-    /* inset top highlight — efek "tonjolan" neumorphism */
+    /* inset top highlight - efek "tonjolan" neumorphism */
     inset 0 2px 0 rgba(255, 255, 255, 0.52),
     /* inset bottom press shadow */
     inset 0 -3px 0 rgba(0, 100, 90, 0.38),
     /* outer glow */
     0 6px 20px rgba(0, 214, 180, 0.28),
-    /* subtle directional shadow kiri-bawah — signature neumorphism */
+    /* subtle directional shadow kiri-bawah - signature neumorphism */
     4px 6px 14px rgba(0, 80, 70, 0.22),
     -2px -2px 8px rgba(255, 255, 255, 0.04) !important;
   font-weight: 900;
@@ -1770,7 +1782,7 @@ html[data-theme="light"] .st-tab.is-active {
 }
 
 .st-helpCard .st-helpActions .btn:first-child:active {
-  /* Pressed state — inset melompat balik ke dalam */
+  /* Pressed state - inset melompat balik ke dalam */
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 3px 8px rgba(0, 100, 90, 0.36),
@@ -1824,7 +1836,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
     -1px -1px 4px rgba(255, 255, 255, 0.8) !important;
 }
 
-/* Reduced motion — pastikan tidak berat di mobile */
+/* Reduced motion - pastikan tidak berat di mobile */
 @media (prefers-reduced-motion: reduce) {
   .st-helpCard .st-helpActions .btn:first-child,
   .st-helpCard .st-helpActions .btn-ghost {
@@ -1832,7 +1844,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
   }
 }
 
-/* ─── item icon placeholder — richer accent ─── */
+/* item icon placeholder - richer accent */
 
 .st-itemIcon span {
   font-size: 18px;
@@ -1846,7 +1858,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
   border-color: rgba(0, 214, 180, 0.28) !important;
 }
 
-/* ─── admin note kicker — bigger + notice symbol ─── */
+/* admin note kicker - bigger + notice symbol */
 
 .st-noteCard.is-accent .st-kicker {
   font-size: 12.5px !important;
@@ -1858,7 +1870,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
   font-style: normal;
 }
 
-/* ─── tab switcher full width at 600px ─── */
+/* tab switcher full width at 600px */
 
 @media (max-width: 600px) {
   .st-tabs {
@@ -1871,7 +1883,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
   }
 }
 
-/* ─── Mobile — statePillRow spacing ─── */
+/* Mobile - statePillRow spacing */
 
 @media (max-width: 720px) {
   .st-statePillRow {
@@ -1886,7 +1898,7 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
   }
 }
 
-/* ─── Streak Badge ───────────────────────────────────────────────── */
+/* Streak Badge */
 
 .st-streakBadge {
   display: flex;
@@ -1985,7 +1997,7 @@ html[data-theme="light"] .st-inputWrap {
   color: #737373;
 }
 
-/* ── Paper theme: white / black / green ── */
+/* Paper theme: white / black / green */
 .status-page,
 .status-shell {
   background: transparent;
@@ -2392,7 +2404,7 @@ html[data-theme="light"] .st-progressBar-label {
   }
 }
 
-/* ── Order Header Consolidated ── */
+/* Order Header Consolidated */
 .st-orderHeader {
   display: grid;
   gap: 16px;
@@ -2444,6 +2456,13 @@ html[data-theme="light"] .st-progressBar-label {
   font-weight: 800;
   cursor: pointer;
   transition: all 0.15s ease;
+  position: relative;
+}
+
+.st-copyCodeBtn::after {
+  content: "";
+  position: absolute;
+  inset: -6px;
 }
 
 .st-copyCodeBtn:hover {
@@ -2606,7 +2625,7 @@ html[data-theme="light"] .st-orderEtaCallout.is-cancelled {
   border-radius: 999px;
   background: #39e2a6;
   box-shadow: 0 0 8px rgba(57, 226, 166, 0.7);
-  animation: stLivePulseAnim 2s infinite ease-in-out;
+  /* Clean live dot - no endless pulse */
 }
 
 @keyframes stLivePulseAnim {
@@ -2661,7 +2680,7 @@ html[data-theme="dark"] .st-discountVal {
   }
 }
 
-/* ─── Post-Transaction Review Card (Neumorphic Style) ─── */
+/* Post-Transaction Review Card (Neumorphic Style) */
 .st-reviewCard {
   position: relative;
   overflow: hidden;

@@ -53,16 +53,15 @@ export default function CheckoutSteps({ current = "checkout", readOnly = false }
         };
 
         return (
-          <div
+          <button
+            type="button"
             key={step.key}
             className={cls}
             aria-current={active ? "step" : undefined}
             aria-posinset={idx + 1}
             aria-setsize={STEPS.length}
-            role={isClickable ? "button" : undefined}
-            tabIndex={isClickable ? 0 : undefined}
+            disabled={!isClickable}
             onClick={isClickable ? handleClick : undefined}
-            onKeyDown={isClickable ? handleKeyDown : undefined}
             title={isClickable ? `Kembali ke ${step.title}` : undefined}
           >
             <div className="step-dot" aria-hidden="true">
@@ -70,9 +69,9 @@ export default function CheckoutSteps({ current = "checkout", readOnly = false }
             </div>
             <div className="step-text">
               <div className="step-title">{step.title}</div>
-              <div className="step-sub">{isClickable ? "← kembali" : step.subtitle}</div>
+              <div className="step-sub">{isClickable ? "kembali" : step.subtitle}</div>
             </div>
-          </div>
+          </button>
         );
       })}
     </div>

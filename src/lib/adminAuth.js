@@ -2,7 +2,7 @@ import { supabase } from "./supabaseClient";
 import { warn } from "./log";
 
 /**
- * Admin identity — any of:
+ * Admin identity - any of:
  * 1. auth.users app_metadata.role === "admin"
  * 2. Row in public.admin_users for auth.uid() (ImzaQi production setup)
  * 3. Supabase RPC public.is_admin() when deployed

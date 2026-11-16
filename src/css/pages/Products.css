@@ -1022,7 +1022,7 @@ html[data-theme="light"] .catalog-contentBar {
     transform 0.2s ease;
 }
 
-/* Store line chips — 3D tactile neumorphic pills without outlines using web design tokens */
+/* Store line chips - 3D tactile neumorphic pills without outlines using web design tokens */
 .catalog-page .catalog-quickFilters .catalog-quickChip.catalog-quickChip--line {
   min-height: 34px !important;
   gap: 6px !important;
@@ -1085,7 +1085,7 @@ html[data-theme="light"] .catalog-contentBar {
   background: rgba(0, 0, 0, 0.08);
 }
 
-/* Count badge on line chips — pill from web design tokens */
+/* Count badge on line chips - pill from web design tokens */
 .catalog-page .catalog-quickChip.catalog-quickChip--line .catalog-quickChipCount {
   min-width: 20px;
   min-height: 18px;
@@ -1279,7 +1279,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
     box-shadow 0.3s var(--ease-out);
 }
 
-/* card sheen removed — flat face, better scroll perf */
+/* card sheen removed - flat face, better scroll perf */
 
 .catalog-card > * {
   position: relative;
@@ -1638,7 +1638,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   transform: translate3d(0, 0, 0);
 }
 
-/* Handle bar — decorative only, no swipe interaction */
+/* Handle bar - decorative only, no swipe interaction */
 .catalog-sheetHandle {
   width: 56px;
   height: 5px;
@@ -1775,7 +1775,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   flex: 1 1 auto;
 }
 
-/* ── Stagger animation: filter sections muncul bertahap saat sheet buka ── */
+/* Stagger animation: filter sections muncul bertahap saat sheet buka */
 @keyframes sheetSectionIn {
   from {
     opacity: 0;
@@ -1792,7 +1792,7 @@ html[data-theme="light"] .catalog-quickChip--budget.active {
   animation-delay: calc(var(--section-i, 0) * 50ms + 120ms);
 }
 
-/* ── Light mode overrides ── */
+/* Light mode overrides */
 html[data-theme="light"] .catalog-sheetBackdrop {
   background: rgba(9, 26, 40, 0.28);
 }
@@ -1856,7 +1856,7 @@ html[data-theme="light"] .catalog-sheetFoot {
   box-shadow: 0 -8px 20px rgba(67, 111, 129, 0.08);
 }
 
-/* ── Disable animasi di reduced motion + data-motion off/lite ── */
+/* Disable animasi di reduced motion + data-motion off/lite */
 @media (prefers-reduced-motion: reduce) {
   .catalog-sheetBackdrop,
   .catalog-sheet {
@@ -2033,7 +2033,7 @@ html[data-theme="light"] .catalog-sheetFoot {
     z-index: 110;
   }
 
-  /* Hero is always above the fold — never hide behind reveal animations */
+  /* Hero is always above the fold - never hide behind reveal animations */
   .catalog-hero,
   .catalog-hero.reveal,
   .catalog-hero.reveal.is-visible {
@@ -2149,7 +2149,7 @@ html[data-theme="light"] .catalog-sheetFoot {
     font-size: 12px;
   }
 
-  /* Mobile: lighter neumorphic paint — no will-change mass promotion */
+  /* Mobile: lighter neumorphic paint - no will-change mass promotion */
   .catalog-card {
     background: var(--skeu-panel-bg, var(--card, rgba(255, 255, 255, 0.04))) !important;
     box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2) !important;
@@ -2915,7 +2915,7 @@ html[data-theme="light"] .catalog-card.catalog-cardV2 .catalog-cardPrice {
   box-shadow: none;
 }
 
-/* Don't blanket-color all status pills — each variant owns its hue */
+/* Don't blanket-color all status pills - each variant owns its hue */
 
 html[data-theme="light"] .catalog-status.hot {
   border-color: rgba(255, 120, 30, 0.35);
@@ -3164,7 +3164,7 @@ html[data-theme="light"] .catalog-toggleItemHint {
   color: #5c7d88;
 }
 
-/* Light mode: active chips & view buttons — unified teal treatment */
+/* Light mode: active chips & view buttons - unified teal treatment */
 html[data-theme="light"] .catalog-quickChip.active,
 html[data-theme="light"] .catalog-page .catalog-quickChip.active,
 html[data-theme="light"] .catalog-chip.active,
@@ -3195,7 +3195,7 @@ html[data-theme="light"] .catalog-page .catalog-viewBtn.active {
   transform: scale(0.97);
 }
 
-/* ─── Catalog command: hero-style search box with tactile press ───────── */
+/* Catalog command: hero-style search box with tactile press */
 .catalog-commandCard {
   flex: 1 1 100%;
   width: 100%;
@@ -3233,7 +3233,7 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
   }
 }
 
-/* ─── Integrated Hero Search & Controls ────────────────────────────────── */
+/* Integrated Hero Search & Controls */
 .catalog-heroSearchRow {
   display: flex;
   align-items: center;
@@ -3334,7 +3334,7 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
   }
 }
 
-/* ─── Mobile filter sheet polish ───────────────────────────────────────── */
+/* Mobile filter sheet polish */
 @media (max-width: 720px) {
   .catalog-sheet {
     max-height: 86dvh;
@@ -3378,7 +3378,7 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
 
 
 
-/* ── Item 14: 3-column grid on tablet ── */
+/* Item 14: 3-column grid on tablet */
 @media (min-width: 901px) and (max-width: 1199px) {
   .catalog-page .catalog-grid.grid,
   .home-page .product-grid-container.grid-mode {
@@ -3386,7 +3386,7 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
   }
 }
 
-/* iPad portrait (768-900px) — 2 columns */
+/* iPad portrait (768-900px) - 2 columns */
 @media (min-width: 768px) and (max-width: 900px) {
   .catalog-page .catalog-grid.grid,
   .home-page .product-grid-container.grid-mode {
@@ -3394,7 +3394,7 @@ html[data-theme="light"] .catalog-heroSearch:focus-within {
   }
 }
 
-/* Horizontal overflow guard — app-main-catalog uses overflow:visible */
+/* Horizontal overflow guard - app-main-catalog uses overflow:visible */
 @media (max-width: 920px) {
   .catalog-page {
     overflow-x: clip;

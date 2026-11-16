@@ -1,7 +1,7 @@
-/** Shared order status labels — UI, CSV export, WA templates */
+/** Shared order status labels - UI, CSV export, WA templates */
 
 /**
- * KOSAKATA STATUS — REKONSILIASI (lihat supabase/migrations/0001_baseline.sql)
+ * KOSAKATA STATUS - REKONSILIASI (lihat supabase/migrations/0001_baseline.sql)
  * ---------------------------------------------------------------------------
  * CANONICAL (diproduksi & di CHECK constraint baseline):
  *   pending | paid_reported | processing | done | cancelled

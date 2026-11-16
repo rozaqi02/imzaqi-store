@@ -1,4 +1,4 @@
-/* ── Order History Page ── */
+/* Order History Page */
 
 .oh-page {
   min-height: 100dvh;
@@ -418,9 +418,14 @@ html[data-theme="light"] .oh-confirmClear {
   .oh-cardRight {
     align-self: flex-start;
   }
+
+  .oh-removeBtn {
+    width: 44px;
+    height: 44px;
+  }
 }
 
-/* ── Order History light mode ─────────────────────────────────── */
+/* Order History light mode */
 html[data-theme="light"] .oh-heroIcon {
   color: #0b3f4b;
 }

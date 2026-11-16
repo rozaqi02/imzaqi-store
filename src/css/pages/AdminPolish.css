@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   ADMIN POLISH — lapisan polesan terakhir untuk seluruh area admin
+   ADMIN POLISH - lapisan polesan terakhir untuk seluruh area admin
    (dashboard + login). Diimpor terakhir di AdminDashboard.jsx &
    AdminLogin.jsx sehingga menang atas AdminUI.overhaul / fixes.
    Aksen teal lama (#00c2d0) diselaraskan ke hijau brand (#009e60).
@@ -21,7 +21,7 @@ html[data-theme="light"] .admin-page {
   --adm-accent-mid: rgba(0, 158, 96, 0.06);
 }
 
-/* ── Dark mode: permukaan lebih dalam & bernuansa hijau ─────────────── */
+/* Dark mode: permukaan lebih dalam & bernuansa hijau */
 html[data-theme="dark"] .admin-page {
   --adm-line: rgba(255, 255, 255, 0.09);
   --adm-surface:
@@ -42,7 +42,7 @@ html[data-theme="dark"] .admin-page {
   --adm-text-3: rgba(190, 214, 203, 0.55);
 }
 
-/* ── Kartu statistik (KPI): angka lebih besar & tegas ───────────────── */
+/* Kartu statistik (KPI): angka lebih besar & tegas */
 .admin-page .admin-statCard {
   transition: transform 0.2s var(--adm-ease, ease), box-shadow 0.2s ease, border-color 0.2s ease;
 }
@@ -56,7 +56,7 @@ html[data-theme="dark"] .admin-page {
   border-color: rgba(0, 158, 96, 0.2);
 }
 
-/* ── Kartu prioritas ("Kerjakan dulu"): strip aksen kiri ────────────── */
+/* Kartu prioritas ("Kerjakan dulu"): strip aksen kiri */
 .admin-page .admin-priorityCard {
   position: relative;
   overflow: hidden;
@@ -80,7 +80,7 @@ html[data-theme="dark"] .admin-page {
   color: var(--adm-accent);
 }
 
-/* ── Sidebar: item aktif lebih jelas, dot count hijau brand ─────────── */
+/* Sidebar: item aktif lebih jelas, dot count hijau brand */
 .admin-page .adm-navItem.is-active {
   border-color: rgba(0, 158, 96, 0.4) !important;
   background:
@@ -100,7 +100,7 @@ html[data-theme="dark"] .admin-page {
   font-weight: 750;
 }
 
-/* ── Chart bar & progress: gradien hijau brand ──────────────────────── */
+/* Chart bar & progress: gradien hijau brand */
 .admin-page .admin-chartBar.orders {
   background: linear-gradient(90deg, #00c277, #009e60) !important;
 }
@@ -111,7 +111,7 @@ html[data-theme="dark"] .admin-page {
   background: linear-gradient(90deg, #00c277, #009e60) !important;
 }
 
-/* ── Chip aktif (7 hari / 30 hari / 90 hari) ────────────────────────── */
+/* Chip aktif (7 hari / 30 hari / 90 hari) */
 .admin-page .admin-chip.active {
   background: var(--imzaqi-btn-face, #009e60) !important;
   border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
@@ -119,7 +119,7 @@ html[data-theme="dark"] .admin-page {
   box-shadow: var(--imzaqi-btn-shadow-compact, 0 3px 4px -2px rgba(0, 0, 0, 0.28)) !important;
 }
 
-/* ── Tombol utama di panel admin ikut sistem tombol toko ───────────── */
+/* Tombol utama di panel admin ikut sistem tombol toko */
 .admin-page .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled) {
   background: var(--imzaqi-btn-face, #009e60) !important;
   border-color: var(--imzaqi-btn-border, rgba(0, 80, 50, 0.35)) !important;
@@ -127,12 +127,12 @@ html[data-theme="dark"] .admin-page {
   box-shadow: var(--imzaqi-btn-shadow, none) !important;
 }
 
-/* ── Status pill order: kontras lebih baik di dark ──────────────────── */
+/* Status pill order: kontras lebih baik di dark */
 html[data-theme="dark"] .admin-page .admin-status {
   border-width: 1px;
 }
 
-/* ── Rank item: nomor #1 pakai aksen ────────────────────────────────── */
+/* Rank item: nomor #1 pakai aksen */
 .admin-page .admin-rankIndex {
   background: var(--adm-accent-soft) !important;
   color: var(--adm-accent) !important;
@@ -140,7 +140,7 @@ html[data-theme="dark"] .admin-page .admin-status {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   ADMIN LOGIN — kartu masuk lebih fokus & profesional
+   ADMIN LOGIN - kartu masuk lebih fokus & profesional
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Badge "Aman/Privat/Terverifikasi": jelas bukan tombol */
@@ -192,4 +192,174 @@ button.admin-loginSubmit {
 /* Sinkron label kecil di sidebar footer */
 .admin-page .adm-syncLabel {
   letter-spacing: 0.02em;
+}
+
+/* ═══════════════════════════════════════════════════════════════════
+   ADMIN OVERHAUL - Unified High-Taste Layout (Anti-Slop & Linear Style)
+   ═══════════════════════════════════════════════════════════════════ */
+
+.admin-overviewHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.admin-overviewMainTitle {
+  font-size: 20px !important;
+  font-weight: 850 !important;
+  letter-spacing: -0.03em !important;
+  line-height: 1.2 !important;
+  margin: 0 !important;
+  color: var(--brand-text, #ffffff) !important;
+}
+
+.admin-overviewMainSub {
+  font-size: 12.5px;
+  color: var(--adm-text-3, rgba(255, 255, 255, 0.5));
+  display: block;
+  margin-top: 2px;
+}
+
+/* Unified Primary KPI Strip */
+.admin-kpiStrip {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.admin-kpiCard {
+  padding: 12px 14px;
+  border-radius: 13px;
+  background: var(--adm-surface);
+  border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--adm-shadow, none);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: transform 0.16s ease, border-color 0.16s ease;
+}
+
+.admin-kpiCard:hover {
+  border-color: rgba(0, 158, 96, 0.3);
+}
+
+.admin-kpiLabel {
+  font-size: 10.5px;
+  font-weight: 750;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--adm-text-3, rgba(255, 255, 255, 0.5));
+}
+
+.admin-kpiValue {
+  font-size: 20px;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-text, #ffffff);
+  line-height: 1.15;
+}
+
+.admin-kpiSub {
+  font-size: 11px;
+  color: var(--adm-text-3, rgba(255, 255, 255, 0.45));
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Operational Action Shortcuts */
+.admin-actionShortcuts {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.admin-actionShortcut {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 9px 13px;
+  border-radius: 12px;
+  background: var(--adm-surface-soft, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.08));
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+}
+
+.admin-actionShortcut:hover {
+  border-color: rgba(0, 158, 96, 0.35);
+  transform: translateY(-1px);
+}
+
+.admin-actionShortcut:active {
+  transform: scale(0.98);
+}
+
+.admin-actionShortcut.is-highlight {
+  border-color: rgba(0, 158, 96, 0.35);
+  background: linear-gradient(180deg, rgba(0, 158, 96, 0.08), transparent);
+}
+
+.admin-actionShortcut.is-warn {
+  border-color: rgba(234, 179, 8, 0.35);
+  background: linear-gradient(180deg, rgba(234, 179, 8, 0.08), transparent);
+}
+
+.admin-actionShortcutIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  background: var(--adm-accent-soft, rgba(0, 158, 96, 0.12));
+  color: var(--adm-accent, #009e60);
+}
+
+.admin-actionShortcut.is-warn .admin-actionShortcutIcon {
+  background: rgba(234, 179, 8, 0.14);
+  color: #eab308;
+}
+
+.admin-actionShortcutLabel {
+  font-size: 12.5px;
+  font-weight: 750;
+  color: var(--brand-text, #ffffff);
+  margin-inline: 10px auto;
+  text-align: left;
+}
+
+.admin-actionShortcutCount {
+  font-size: 14px;
+  font-weight: 900;
+  font-family: var(--font-mono, monospace);
+  font-variant-numeric: tabular-nums;
+  color: var(--brand-text, #ffffff);
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+  .admin-kpiStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .admin-actionShortcuts {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .admin-overviewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
 }

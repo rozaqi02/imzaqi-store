@@ -3,17 +3,19 @@ import { Link } from "react-router-dom";
 import { getRecentlyViewed } from "../lib/recentlyViewed";
 import { formatIDR } from "../lib/format";
 
-export default function RecentlyViewed({ currentProductId }) {
+export default function RecentlyViewed({ currentProductId, currentSlug }) {
   const [items, setItems] = useState([]);
 
   useEffect(() => {
     const all = getRecentlyViewed();
     // Exclude current product if viewing a product page
-    const filtered = currentProductId
-      ? all.filter((p) => p.id !== currentProductId)
-      : all;
-    setItems(filtered.slice(0, 6));
-  }, [currentProductId]);
+    const filtered = all.filter((p) => {
+      if (currentProductId && p.id === currentProductId) return false;
+      if (currentSlug && p.slug === currentSlug) return false;
+      return true;
+    });
+    setItems(filtered.slice(0, 4));
+  }, [currentProductId, currentSlug]);
 
   if (items.length === 0) return null;
 

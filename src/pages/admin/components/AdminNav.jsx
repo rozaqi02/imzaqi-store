@@ -8,7 +8,7 @@ import {
   MoreHorizontal,
   RefreshCw,
   Settings2,
-  Sparkles,
+  Megaphone,
   Star,
   Tags,
   Zap,
@@ -98,7 +98,6 @@ function AdminNavItem({ tab, Icon, active, onSelect, alerts, hint }) {
       </span>
       <span className="adm-navItemCopy">
         <span className="adm-navItemLabel">{tab.label}</span>
-        <span className="adm-navItemHint">{hint || tab.hint}</span>
       </span>
     </button>
   );
@@ -137,8 +136,8 @@ export function AdminSidebar({
           IM
         </div>
         <div className="adm-sidebarBrand">
-          <strong className="adm-sidebarGreeting">{greetingHello}</strong>
-          <span>Command Center · imzaqi.store</span>
+          <strong className="adm-sidebarGreeting">Imzaqi Admin</strong>
+          <span className="adm-sidebarRole">Kelola Toko</span>
         </div>
       </header>
 
@@ -376,8 +375,8 @@ export const ADMIN_NAV_ICONS_FALLBACK = {
   products: Box,
   promos: Tags,
   flashsale: Zap,
-  marketing: Sparkles,
+  marketing: Megaphone,
   testimonials: Star,
   settings: Settings2,
-  sparkles: Sparkles,
+  sparkles: Megaphone,
 };

@@ -53,12 +53,12 @@ import { recordCompletedOrder } from "../lib/loyalty";
 import { getVisitorIdAsUUID } from "../lib/visitor";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
-// ─── Constants ───────────────────────────────────────────────────────────────
+// Constants
 
 const POLL_INTERVAL_MS = 30_000;
 const TERMINAL_STATUSES = new Set(["done", "cancelled"]);
 
-// ─── Helpers ────────────────────────────────────────────────────────────────
+// Helpers
 
 function prettyStatus(status) {
   const value = String(status || "pending");
@@ -75,7 +75,7 @@ function prettyStatus(status) {
 function getStatusMeta(status) {
   const value = String(status || "pending");
   if (value === "done") return { tone: "done", icon: CheckCircle2 };
-  if (value === "processing") return { tone: "processing", icon: Sparkles };
+  if (value === "processing") return { tone: "processing", icon: RefreshCw };
   if (value === "cancelled") return { tone: "cancelled", icon: XCircle };
   if (value === "paid_reported") return { tone: "reported", icon: ShieldCheck };
   return { tone: "pending", icon: Clock3 };
@@ -109,6 +109,43 @@ function getTimeline(status) {
     },
     { key: "done", label: "Selesai", active: isDone, done: isDone },
   ];
+}
+
+function extractCredentials(text) {
+  if (!text) return null;
+  const lines = text.split("\n");
+  let email = null;
+  let password = null;
+
+  for (const line of lines) {
+    const emailMatch = line.match(/(?:email|surel|username|user|akun)\s*[:=]\s*([^\s]+)/i);
+    if (emailMatch && !email) {
+      email = emailMatch[1].trim();
+    } else {
+      const rawEmail = line.match(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/);
+      if (rawEmail && !email && !line.toLowerCase().includes("bantuan") && !line.toLowerCase().includes("support")) {
+        email = rawEmail[0];
+      }
+    }
+
+    const passMatch = line.match(/(?:password|pass|sandi|pin)\s*[:=]\s*([^\s]+)/i);
+    if (passMatch && !password) {
+      password = passMatch[1].trim();
+    }
+  }
+
+  if (!email && !password) {
+    const comboMatch = text.match(/([A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,})[:|\s]+([^\s\n]+)/);
+    if (comboMatch) {
+      email = comboMatch[1];
+      password = comboMatch[2];
+    }
+  }
+
+  if (email || password) {
+    return { email, password };
+  }
+  return null;
 }
 
 // Dipakai saat onChange - hanya uppercase + strip spasi, biarkan user hapus dengan bebas
@@ -176,7 +213,7 @@ function formatRelativeTime(date) {
   return `${Math.round(minutes / 60)} jam lalu`;
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
+// Sub-components
 
 function FlowStep({ step, index }) {
   const isCancelled = step.key === "cancelled";
@@ -200,7 +237,7 @@ function FlowStep({ step, index }) {
   );
 }
 
-// ── Micro Celebration on Done ───────────────────────────────────────────────
+// Micro Celebration on Done
 function DoneCelebration({ show, onDismiss }) {
   useEffect(() => {
     if (!show) return;
@@ -321,7 +358,7 @@ function PostTransactionReview({ order, waUrl, toast }) {
         await supabase.from("testimonials").insert([
           {
             image_url: iconUrl,
-            caption: `[⭐ ${rating}/5] "${effectiveText}" — ${effectiveAuthor} (#${order.order_code})`,
+            caption: `[${rating}/5] "${effectiveText}", ${effectiveAuthor} (#${order.order_code})`,
             is_active: false,
             sort_order: 100,
           },
@@ -344,7 +381,7 @@ function PostTransactionReview({ order, waUrl, toast }) {
     if (!waUrl) return "";
     const msg = encodeURIComponent(
       `Halo Admin Imzaqi Store! Saya ingin memberikan ulasan untuk pesanan #${order.order_code}:\n\n` +
-      `⭐ Rating: ${rev.rating}/5 (${RATING_LABELS[rev.rating] || "Puas"})\n` +
+      `Rating: ${rev.rating}/5 (${RATING_LABELS[rev.rating] || "Puas"})\n` +
       `Ulasan: "${rev.reviewText}"\n` +
       `Oleh: ${rev.authorName}\n\n` +
       `Terima kasih banyak atas pelayanannya!`
@@ -363,7 +400,7 @@ function PostTransactionReview({ order, waUrl, toast }) {
             <h2 className="st-cardTitle">Ulasan Pesanan Kamu</h2>
           </div>
           <div className="st-cardIcon" style={{ color: "#f5a623" }}>
-            <Star size={18} fill="#f5a623" />
+            <Star size={18} fill="#f5a623" aria-hidden="true" />
           </div>
         </div>
 
@@ -375,6 +412,7 @@ function PostTransactionReview({ order, waUrl, toast }) {
                 size={20}
                 fill={star <= existingReview.rating ? "#f5a623" : "transparent"}
                 color={star <= existingReview.rating ? "#f5a623" : "var(--st-muted, #7c9eb0)"}
+                aria-hidden="true"
               />
             ))}
             <span className="st-reviewRatingBadge">{existingReview.rating}.0 / 5.0</span>
@@ -385,8 +423,8 @@ function PostTransactionReview({ order, waUrl, toast }) {
           </blockquote>
 
           <div className="st-reviewSubmittedAuthor">
-            <span>— {existingReview.authorName}</span>
-            <span className="st-reviewVerifiedPill">✓ Pembeli Terverifikasi</span>
+            <span>{existingReview.authorName}</span>
+            <span className="st-reviewVerifiedPill">Pembeli Terverifikasi</span>
           </div>
 
           {waShareUrl ? (
@@ -497,11 +535,11 @@ function PostTransactionReview({ order, waUrl, toast }) {
   );
 }
 
-// ─── Tab: Cek Status ─────────────────────────────────────────────────────────
+// Tab: Cek Status
 
 function TabCekStatus({ settings }) {
   const [searchParams, setSearchParams] = useSearchParams();
-  const initialParam = searchParams.get("order") || "";
+  const initialParam = searchParams.get("order") || searchParams.get("id") || searchParams.get("order_id") || "";
   const toast = useToast();
 
   const [input, setInput] = useState(initialParam);
@@ -895,33 +933,74 @@ function TabCekStatus({ settings }) {
         </>
       ) : (
         <div className="st-layout">
-          {order.admin_note ? (
-            <article className="st-card st-noteCard st-noteTopAccent is-accent">
-              <div className="st-cardHead">
-                <div>
-                  <div className="st-kicker">Admin</div>
-                  <h2 className="st-cardTitle">Catatan & Akun</h2>
+          {order.admin_note ? (() => {
+            const creds = extractCredentials(order.admin_note);
+            return (
+              <article className="st-card st-noteCard st-noteTopAccent is-accent">
+                <div className="st-cardHead">
+                  <div>
+                    <div className="st-kicker">Admin</div>
+                    <h2 className="st-cardTitle">Catatan & Akun</h2>
+                  </div>
+                  <div style={{ display: "flex", gap: "6px", flexWrap: "wrap", alignItems: "center" }}>
+                    {creds?.email ? (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm st-copyNoteBtn"
+                        onClick={async () => {
+                          try {
+                            await copyToClipboard(creds.email);
+                            toast.success("Email disalin");
+                          } catch {
+                            toast.error("Gagal menyalin email");
+                          }
+                        }}
+                        title="Salin email akun"
+                      >
+                        <Copy size={12} />
+                        <span>Email</span>
+                      </button>
+                    ) : null}
+                    {creds?.password ? (
+                      <button
+                        type="button"
+                        className="btn btn-ghost btn-sm st-copyNoteBtn"
+                        onClick={async () => {
+                          try {
+                            await copyToClipboard(creds.password);
+                            toast.success("Password disalin");
+                          } catch {
+                            toast.error("Gagal menyalin password");
+                          }
+                        }}
+                        title="Salin password akun"
+                      >
+                        <Copy size={12} />
+                        <span>Password</span>
+                      </button>
+                    ) : null}
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm st-copyNoteBtn"
+                      onClick={async () => {
+                        try {
+                          await copyToClipboard(order.admin_note);
+                          toast.success("Catatan disalin");
+                        } catch {
+                          toast.error("Gagal menyalin catatan");
+                        }
+                      }}
+                      title="Salin semua catatan admin"
+                    >
+                      <Copy size={12} />
+                      <span>Salin Semua</span>
+                    </button>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  className="btn btn-ghost btn-sm st-copyNoteBtn"
-                  onClick={async () => {
-                    try {
-                      await copyToClipboard(order.admin_note);
-                      toast.success("Catatan disalin");
-                    } catch {
-                      toast.error("Gagal nyalin catatan");
-                    }
-                  }}
-                  title="Salin catatan admin"
-                >
-                  <Copy size={12} />
-                  <span>Salin</span>
-                </button>
-              </div>
-              <div className="st-noteBody">{order.admin_note}</div>
-            </article>
-          ) : null}
+                <div className="st-noteBody">{order.admin_note}</div>
+              </article>
+            );
+          })() : null}
 
           <main className="st-main">
             {/* Header Ringkasan Pesanan Terpadu */}
@@ -1196,7 +1275,7 @@ function TabCekStatus({ settings }) {
                   <h2 className="st-cardTitle">Admin Store</h2>
                 </div>
                 <div className="st-cardIcon">
-                  <Sparkles size={16} />
+                  <MessageCircle size={16} aria-hidden="true" />
                 </div>
               </div>
 
@@ -1311,7 +1390,7 @@ function TabCekStatus({ settings }) {
   );
 }
 
-// ─── Tab: Riwayat ────────────────────────────────────────────────────────────
+// Tab: Riwayat
 
 function calcStreak(entries) {
   if (!entries || entries.length === 0) return 0;
@@ -1565,7 +1644,7 @@ function TabRiwayat() {
   );
 }
 
-// ─── Main Page ───────────────────────────────────────────────────────────────
+// Main Page
 
 export default function Status() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -1608,7 +1687,10 @@ export default function Status() {
     <div className="page status-page">
       <section className="section status-shell">
         <div className="container st-wrap">
-          <StatusHero history={activeTab === "riwayat"} hasOrder={activeTab === "cek" && Boolean(searchParams.get("order"))} />
+          <StatusHero
+            history={activeTab === "riwayat"}
+            hasOrder={activeTab === "cek" && Boolean(searchParams.get("order") || searchParams.get("id") || searchParams.get("order_id"))}
+          />
 
           {activeTab === "cek" ? (
             <div className="st-checkoutSteps">

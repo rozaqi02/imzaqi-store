@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import {
-  Sparkles,
   Layers,
   Image as ImageIcon,
   CheckCircle2,
@@ -116,7 +115,7 @@ export default function Promosi() {
           <div className="promosi-studioHeader">
             <div className="promosi-studioTitleGroup">
               <span className="promosi-studioKicker">
-                <Sparkles size={13} /> KANVAS DESAIN & PRATINJAU REALTIME
+                <Palette size={13} aria-hidden="true" /> KANVAS DESAIN & PRATINJAU REALTIME
               </span>
               <h2>Kustomisasi Materi Promosi</h2>
               <p>Pilih mode pembuatan di bawah ini, lalu sesuaikan format, warna, dan unduh materinya.</p>

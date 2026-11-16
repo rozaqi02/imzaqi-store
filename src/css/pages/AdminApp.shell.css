@@ -1,10 +1,10 @@
 /**
- * Admin App Shell v2 — full-screen command center
+ * Admin App Shell v2 - full-screen command center
  * Layout + scroll + workspace chrome + priority board + nav
  * Loaded last after AdminUI.overhaul.css
  */
 
-/* ── Hide store chrome when body.is-admin-app ── */
+/* Hide store chrome when body.is-admin-app */
 body.is-admin-app {
   overflow: hidden;
 }
@@ -37,7 +37,7 @@ body.is-admin-app .app-main-admin > .route-transition > .admin-page {
   height: 100%;
 }
 
-/* ── Page = full viewport app ── */
+/* Page = full viewport app */
 .admin-page.admin-page--app {
   --adm-radius-lg: 20px;
   --adm-radius-md: 14px;
@@ -84,7 +84,7 @@ body.is-admin-app .admin-page.admin-page--app > .admin-section {
   padding: 0 !important;
 }
 
-/* ── Sidebar ── */
+/* Sidebar */
 .admin-page.admin-page--app .adm-sidebar {
   height: 100% !important;
   max-height: none !important;
@@ -122,7 +122,7 @@ body.is-admin-app .admin-page.admin-page--app > .admin-section {
   opacity: 0.75;
 }
 
-/* Next focus CTA — solid neo block, not thin outline */
+/* Next focus CTA - solid neo block, not thin outline */
 .admin-page .adm-nextFocus {
   display: grid !important;
   gap: 4px !important;
@@ -313,7 +313,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   color: #b42318 !important;
 }
 
-/* ── Main column ── */
+/* Main column */
 .admin-page.admin-page--app .admin-main {
   display: flex !important;
   flex-direction: column !important;
@@ -324,7 +324,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   gap: 10px !important;
 }
 
-/* Slim toolbar: sync + actions only (no title — titles live in pane heads) */
+/* Slim toolbar: sync + actions only (no title - titles live in pane heads) */
 .admin-page .admin-workspaceToolbar {
   display: flex !important;
   flex-shrink: 0 !important;
@@ -361,7 +361,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   text-overflow: ellipsis !important;
 }
 
-/* Keep store fonts — never force Apple/system UI faces */
+/* Keep store fonts - never force Apple/system UI faces */
 .admin-page.admin-page--app,
 .admin-page.admin-page--app * {
   font-family: inherit;
@@ -391,7 +391,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   50% { opacity: 0.45; }
 }
 
-/* ── Scrollports (critical) ── */
+/* Scrollports (critical) */
 @media (min-width: 1101px) {
   .admin-page.admin-page--app .admin-main > .admin-overview,
   .admin-page.admin-page--app .admin-main > .admin-workspaceScroll,
@@ -431,7 +431,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   }
 }
 
-/* ── Priority board (overview) ── */
+/* Priority board (overview) */
 .admin-page .admin-priorityBoard {
   padding: 14px 16px 16px !important;
   border-radius: var(--adm-radius-lg) !important;
@@ -631,7 +631,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   box-shadow: none !important;
 }
 
-/* Order search uses plain .input — same as Produk search */
+/* Order search uses plain .input - same as Produk search */
 .admin-page .admin-orderToolbar > .input {
   width: 100% !important;
   min-width: 0 !important;
@@ -706,7 +706,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   color: var(--adm-text) !important;
 }
 
-/* Product list scrollport — reserve gutter so rows aren't sliced by scrollbar */
+/* Product list scrollport - reserve gutter so rows aren't sliced by scrollbar */
 .admin-page .admin-products-list {
   min-width: 0 !important;
 }
@@ -729,7 +729,7 @@ html[data-theme="light"] .admin-page .adm-footBtn--danger {
   box-sizing: border-box !important;
 }
 
-/* Product list rows — chunky neo, active = pressed slab not thin ring */
+/* Product list rows - chunky neo, active = pressed slab not thin ring */
 .admin-page .admin-product-row {
   width: 100% !important;
   max-width: 100% !important;
@@ -952,7 +952,7 @@ html[data-theme="light"] .admin-page .admin-product-row.active {
   gap: 10px !important;
 }
 
-/* Inline stats chips — ALL breakpoints (was mobile-only → text glued on desktop) */
+/* Inline stats chips - ALL breakpoints (was mobile-only → text glued on desktop) */
 .admin-page .admin-inlineStats {
   display: flex !important;
   flex-wrap: wrap !important;
@@ -1016,11 +1016,11 @@ html[data-theme="dark"] .admin-page .admin-inlineStats > span.is-warn,
   color: #fbbf24 !important;
 }
 
-/* Mobile shell — vertical scroll OK, horizontal scroll FORBIDDEN */
+/* Mobile shell - vertical scroll OK, horizontal scroll FORBIDDEN */
 @media (max-width: 1100px) {
   html:has(body.is-admin-app),
   body.is-admin-app {
-    overflow-x: hidden !important; /* clip/hidden — block sideways swipe */
+    overflow-x: hidden !important; /* clip/hidden - block sideways swipe */
     overflow-y: auto !important;
     max-width: 100% !important;
     width: 100% !important;
@@ -1233,7 +1233,7 @@ html[data-theme="light"] .adm-dock {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Admin modals — mobile bottom sheet, compact, no chrome fight
+   Admin modals - mobile bottom sheet, compact, no chrome fight
    ═══════════════════════════════════════════════════════════════════ */
 .modal-backdrop {
   z-index: 12000 !important; /* above admin dock (80) */
@@ -1472,7 +1472,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   MOBILE UX MAX — less scroll, sticky tools, denser work panes
+   MOBILE UX MAX - less scroll, sticky tools, denser work panes
    ═══════════════════════════════════════════════════════════════════ */
 @media (max-width: 1100px) {
   .admin-desktopOnly {
@@ -1579,7 +1579,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     display: none !important;
   }
 
-  /* ── Orders: dense cards (no nested button surfaces) ── */
+  /* Orders: dense cards (no nested button surfaces) */
   .admin-page .admin-ordersList--dense {
     display: grid !important;
     gap: 8px !important;
@@ -1688,7 +1688,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     padding: 24px 8px !important;
   }
 
-  /* ── Products: list OR editor (not both) ── */
+  /* Products: list OR editor (not both) */
   .admin-page .admin-products {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr) !important;
@@ -1709,7 +1709,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     display: none !important;
   }
 
-  /* Single clean surface — avoid nested double-box look on mobile */
+  /* Single clean surface - avoid nested double-box look on mobile */
   .admin-page .admin-products > .admin-panel,
   .admin-page .admin-products-list,
   .admin-page .admin-products-editor {
@@ -1782,7 +1782,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     flex-shrink: 0 !important;
   }
 
-  /* Dedicated back control — not a stacked ghost btn inside title */
+  /* Dedicated back control - not a stacked ghost btn inside title */
   .admin-page .admin-mobileBack {
     display: inline-flex !important;
     align-items: center !important;
@@ -1868,7 +1868,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     margin-top: 8px !important;
   }
 
-  /* ── Overview denser ── */
+  /* Overview denser */
   .admin-page .admin-priorityBoard {
     padding: 12px !important;
   }
@@ -1978,7 +1978,7 @@ html[data-theme="light"] .modal-body .admin-field-switch {
     position: static !important;
   }
 
-  /* Desktop order row: checkbox | info | actions — single clean card */
+  /* Desktop order row: checkbox | info | actions - single clean card */
   .admin-page .admin-ordersList--dense {
     display: grid !important;
     gap: 10px !important;
@@ -2229,7 +2229,7 @@ html[data-theme="light"] .admin-page .admin-priorityBoard {
   display: none !important;
 }
 
-/* Soften “Apple Settings” typography — keep store weight/spacing */
+/* Soften “Apple Settings” typography - keep store weight/spacing */
 .admin-page.admin-page--app .admin-panel-title,
 .admin-page.admin-page--app .admin-sectionTitle,
 .admin-page.admin-page--app .admin-heroTitle,

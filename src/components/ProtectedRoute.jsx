@@ -5,7 +5,7 @@ import { supabase } from "../lib/supabaseClient";
 import { checkAdminAccess } from "../lib/adminAuth";
 
 /**
- * Admin route guard — session + admin_users row or app_metadata.role === "admin".
+ * Admin route guard - session + admin_users row or app_metadata.role === "admin".
  */
 export default function ProtectedRoute({ children, fallback = null }) {
   const [state, setState] = React.useState({ checking: true, ok: false, reason: null });

@@ -5,11 +5,11 @@ import { useTilt } from "../hooks/useTilt";
 import { useIsMobile } from "../hooks/useIsMobile";
 import { formatIDR, classifyStock, isKnownOutOfStock, summarizeCatalogCopy, detectAccountTypes, getCatalogPriceRange } from "../lib/format";
 
-export default function ProductTile({ product, rank, layout = "list", disableTilt = false, disableFlip = false, overrideSold = null, flashSaleMap = null }) {
+export default function ProductTile({ product, rank, layout = "list", disableTilt = true, disableFlip = false, overrideSold = null, flashSaleMap = null }) {
   if (!product) return null;
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
-  // Flip card dihapus — semua info tampil langsung di depan
+  // Flip card dinonaktifkan: semua info tampil langsung di depan
   const useFlipCard = false;
   const prefetchedRef = useRef(false);
 
@@ -93,7 +93,7 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
             <span className="product-tile-nameText">{product?.name || "-"}</span>
             {rank === 1 ? (
               <span className="product-tile-rankBadge product-tile-rankBadge--1">
-                <Flame size={12} />
+                <Flame size={12} aria-hidden="true" />
                 <span>Terlaris</span>
               </span>
             ) : rank && rank <= 4 ? (
@@ -106,25 +106,25 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
         </div>
 
         <div className="product-tile-arrow" aria-hidden="true">
-          <ArrowUpRight size={18} />
+          <ArrowUpRight size={18} aria-hidden="true" />
         </div>
       </div>
 
       <div className="product-tile-bottom" aria-label="Ringkasan produk">
         <div className="product-tile-pills" aria-label="Info singkat">
           <span className="product-tile-pill" title="Jumlah varian aktif">
-            <Layers3 size={14} />
+            <Layers3 size={14} aria-hidden="true" />
             <span>{summary.variantsCount || 0} varian</span>
           </span>
           <span
             className="product-tile-pill"
             title={summary.isOutOfStock ? "Stok habis" : summary.hasExplicitStock ? "Total stok aktif" : "Status stok"}
           >
-            <PackageCheck size={14} />
+            <PackageCheck size={14} aria-hidden="true" />
             <span>{summary.isOutOfStock ? "Habis" : summary.hasExplicitStock ? `${summary.stock} stok` : "Tersedia"}</span>
           </span>
           <span className="product-tile-pill home-popularSold" title={`${sold} item terjual`}>
-            <ShoppingBag size={14} />
+            <ShoppingBag size={14} aria-hidden="true" />
             <span>{sold} terjual</span>
           </span>
           {accountTypes.map((t) => (
@@ -137,8 +137,8 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
           </span>
           {summary.isOutOfStock ? (
             <span className="product-lowStockBadge out">Habis</span>
-          ) : summary.hasExplicitStock && summary.stock > 0 && summary.stock <= 5 ? (
-            <span className="product-lowStockBadge">Sisa {summary.stock}</span>
+          ) : summary.hasExplicitStock && summary.stock > 0 && summary.stock <= 3 ? (
+            <span className="product-lowStockBadge">Sisa {summary.stock} akun</span>
           ) : null}
         </div>
 
@@ -180,10 +180,10 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
                   <div className="product-tile-back-name">{product?.name}</div>
                   <div className="product-tile-back-price"><span style={{ fontSize: "12px", fontWeight: "normal", opacity: 0.8, marginRight: "4px" }}>Mulai</span>{displayPrice}</div>
                   <div className="product-tile-back-stats">
-                    <span><PackageCheck size={12} />&nbsp;{stock} stok</span>
-                    <span><ShoppingBag size={12} />&nbsp;{sold} terjual</span>
+                    <span><PackageCheck size={12} aria-hidden="true" />&nbsp;{stock} stok</span>
+                    <span><ShoppingBag size={12} aria-hidden="true" />&nbsp;{sold} terjual</span>
                   </div>
-                  <div className="product-tile-back-cta">Lihat detail →</div>
+                  <span className="product-tile-back-cta">Lihat detail</span>
                 </div>
               </div>
             </>

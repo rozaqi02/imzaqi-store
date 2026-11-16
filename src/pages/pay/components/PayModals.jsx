@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { Check, CheckCircle2, MessageCircle, Phone, ShieldCheck, X } from "lucide-react";
@@ -150,7 +150,7 @@ export function OrderSuccessModal({ open, orderCode, statusUrl, adminWaUrl, onCl
           <div>
             <p className="pay-successLabel">Order Berhasil</p>
             <div className="modal-title">Pembayaran dilaporkan</div>
-            <div className="modal-sub">Pesanan diproses dalam 5–30 menit.</div>
+            <div className="modal-sub">Pesanan diproses dalam 5 sampai 30 menit.</div>
           </div>
           <button className="pay-successClose" type="button" onClick={onClose} aria-label="Tutup">
             <X size={16} strokeWidth={2.4} />
@@ -276,8 +276,8 @@ export function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, i
     ? "Konfirmasi order promo 100%"
     : "Sudah transfer sesuai nominal";
   const declarationDesc = isFree
-    ? "Order gratis tanpa transfer. Admin akan langsung menyiapkan akun Anda."
-    : `Pembayaran ${formatIDR(total)} sudah selesai via m-banking / e-wallet.`;
+    ? "Order gratis tanpa transfer. Admin akan langsung menyiapkan akun kamu."
+    : `Pembayaran ${formatIDR(total)} sudah selesai via m-banking / e-wallet. Admin akan mengecek pembayaran dan memproses pesanan dalam 5 sampai 30 menit.`;
 
   return createPortal(
     <div className="modal-backdrop pay-overlay pay-confirmOverlay" onMouseDown={onCancel} role="presentation">
@@ -388,5 +388,10 @@ export function useQrisTimer(active) {
   const urgent = remaining <= 5 * 60 * 1000 && remaining > 0;
   const label = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 
-  return { label, expired, urgent, remaining };
+  const reset = useCallback(() => {
+    startRef.current = Date.now();
+    setRemaining(TOTAL_MS);
+  }, [TOTAL_MS]);
+
+  return { label, expired, urgent, remaining, reset };
 }

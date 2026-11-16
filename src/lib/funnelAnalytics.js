@@ -3,7 +3,7 @@ import { getVisitorIdAsUUID } from "./visitor";
 
 const SESSION_KEY = "imzaqi_funnel_session_v1";
 
-// ── Backend availability guard ────────────────────────────────────────────────
+// Backend availability guard
 // `funnel_events` dan `get_funnel_summary` baru ada setelah
 // supabase/migrations/0002_funnel_objects.sql diterapkan. Tanpa migration itu,
 // setiap request pasti gagal (42P01 undefined_table / 42883 undefined_function).

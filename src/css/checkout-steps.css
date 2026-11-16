@@ -1,4 +1,4 @@
-/* Neumorphic funnel steps — Checkout / Pay / Status */
+/* Neumorphic funnel steps - Checkout / Pay / Status */
 
 .steps.steps--visual {
   position: relative;
@@ -234,7 +234,7 @@ html[data-theme="light"] .steps--visual .step.done .step-sub {
   color: #3d6a74;
 }
 
-/* Context wrappers — beat page-level legacy overrides */
+/* Context wrappers - beat page-level legacy overrides */
 .pay-shell .steps.steps--visual,
 .checkout-drawer .steps.steps--visual,
 .checkout-full .steps.steps--visual,
@@ -334,7 +334,7 @@ html[data-theme="light"] .steps--visual .step.done .step-sub {
   backdrop-filter: none !important;
 }
 
-/* ── Step clickable (done steps bisa diklik untuk navigasi balik) ─────────── */
+/* Step clickable (done steps bisa diklik untuk navigasi balik) */
 .steps--visual .step--clickable {
   cursor: pointer;
   user-select: none;

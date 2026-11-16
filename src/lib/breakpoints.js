@@ -1,7 +1,7 @@
 /** Compact layout: bottom nav + header actions (matches CSS `.desktop-only` at 1024px). */
 export const COMPACT_NAV_MEDIA = "(max-width: 1024px)";
 
-/** Bottom navbar — phone + iPad portrait/compact (≤1024px). */
+/** Bottom navbar - phone + iPad portrait/compact (≤1024px). */
 export const BOTTOM_NAV_MEDIA = COMPACT_NAV_MEDIA;
 
 /** Phone-sized layout (cart sheet, checkout drawer). */

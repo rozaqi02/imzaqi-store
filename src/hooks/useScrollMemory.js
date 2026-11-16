@@ -21,7 +21,7 @@ function writeStorage(data) {
   try {
     sessionStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   } catch {
-    // Private mode or quota — in-memory fallback still works for same-tab navigation.
+    // Private mode or quota - in-memory fallback still works for same-tab navigation.
   }
 }
 
@@ -99,7 +99,7 @@ export function slugFromCatalogProductLink(href) {
 }
 
 export function saveScrollY({ slug, y } = {}) {
-  // Tidak panggil beginCatalogRestoreLock di sini — lock hanya diperlukan
+  // Tidak panggil beginCatalogRestoreLock di sini - lock hanya diperlukan
   // saat restore, bukan saat save. Kalau di-lock di sini, ProductDetail
   // akan masuk dengan scrollRestoration = "manual" yang bikin iOS scroll ke bawah.
   const current = getSaved();
@@ -127,7 +127,7 @@ export function getCatalogReturnPath() {
 export function restoreCatalogScroll({ y, slug } = {}, onDone) {
   if (typeof window === "undefined") return () => {};
 
-  // Lock lebih pendek — cukup untuk satu frame restore, bukan 1.6 detik
+  // Lock lebih pendek - cukup untuk satu frame restore, bukan 1.6 detik
   beginCatalogRestoreLock(600);
 
   const prevRestoration = history.scrollRestoration;
@@ -193,7 +193,7 @@ export function restoreCatalogScroll({ y, slug } = {}, onDone) {
     if (!stabilizeTimer) {
       stabilizeTimer = window.setTimeout(() => {
         applyScroll();
-        // Release lock segera setelah stabilize — tidak perlu extend 1200ms
+        // Release lock segera setelah stabilize - tidak perlu extend 1200ms
         releaseTimer = window.setTimeout(() => {
           applyScroll();
           cleanup();

@@ -1,4 +1,4 @@
-/* Admin audit fixes — tokens, utilities, mobile guards */
+/* Admin audit fixes - tokens, utilities, mobile guards */
 
 .admin-page {
   --adm-accent: var(--accent);
@@ -57,7 +57,7 @@
   font-size: 16px;
 }
 
-/* Order detail modal — waktu, produk, salin WA */
+/* Order detail modal - waktu, produk, salin WA */
 .admin-orderDetailFacts {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
@@ -197,7 +197,7 @@ html[data-theme="light"] .modal .admin-order-itemMeta {
   color: rgba(50, 82, 91, 0.72);
 }
 
-/* Modal portal di luar .admin-page — timeline & kartu order detail */
+/* Modal portal di luar .admin-page - timeline & kartu order detail */
 html[data-theme="light"] .modal .admin-orderTimeline {
   background: rgba(0, 138, 148, 0.06) !important;
   border-color: rgba(0, 138, 148, 0.2) !important;
@@ -290,7 +290,7 @@ html[data-theme="light"] .modal .admin-order-adminNote {
   color: rgba(255, 255, 255, 0.72);
 }
 
-/* Charts & data viz — emerald tokens */
+/* Charts & data viz - emerald tokens */
 .admin-page .admin-chartBar.orders,
 .admin-page .admin-progress span.orders {
   background: linear-gradient(90deg, var(--adm-accent), rgba(0, 214, 180, 0.55)) !important;
@@ -317,7 +317,7 @@ html[data-theme="light"] .modal .admin-order-adminNote {
   color: #a4fff0 !important;
 }
 
-/* ── Desktop product list: don't clip cards under scrollbar ── */
+/* Desktop product list: don't clip cards under scrollbar */
 @media (min-width: 1101px) {
   .admin-page .admin-products-list .admin-panel-body--scroll {
     overflow-x: hidden !important;
@@ -333,7 +333,7 @@ html[data-theme="light"] .modal .admin-order-adminNote {
   }
 }
 
-/* ── Mobile product editor: field boxes must not clip on the right ── */
+/* Mobile product editor: field boxes must not clip on the right */
 @media (max-width: 1100px) {
   .admin-page.admin-page--app > .admin-section {
     padding-left: 10px !important;
@@ -369,7 +369,7 @@ html[data-theme="light"] .modal .admin-order-adminNote {
   }
 }
 
-/* ── Products editor mobile chrome (back + head) ── */
+/* Products editor mobile chrome (back + head) */
 .admin-productsEditorChrome {
   display: grid;
   gap: 10px;
@@ -395,7 +395,7 @@ html[data-theme="light"] .modal .admin-order-adminNote {
   }
 }
 
-/* ── Catalog stock filter chip / banner ── */
+/* Catalog stock filter chip / banner */
 .admin-page .admin-inlineStatChip {
   display: inline-flex;
   align-items: center;
@@ -441,7 +441,7 @@ html[data-theme="light"] .admin-page .admin-inlineStatChip {
   background: rgba(255, 196, 60, 0.16);
 }
 
-/* ── Perf: lighter list cards (less multi-inset shadow while scrolling) ── */
+/* Perf: lighter list cards (less multi-inset shadow while scrolling) */
 .admin-page .admin-orderListItem,
 .admin-page .admin-ordersList--dense .admin-orderListItem {
   box-shadow:
@@ -468,7 +468,7 @@ html[data-theme="light"] .admin-page .admin-ordersList--dense .admin-orderListIt
   margin-bottom: 8px;
 }
 
-/* Product pills / promo cards — lighter while scrolling long lists */
+/* Product pills / promo cards - lighter while scrolling long lists */
 .admin-page .admin-product-pill,
 .admin-page .admin-promo-card {
   box-shadow:
@@ -501,7 +501,7 @@ html[data-theme="light"] .admin-page .admin-ordersList--dense .admin-orderListIt
   border-color: rgba(255, 191, 74, 0.24);
 }
 
-/* Hide store distractions on admin — never enough on its own:
+/* Hide store distractions on admin - never enough on its own:
    a display:none dialog can still mark #root inert and freeze the dashboard. */
 body.is-admin .fsp-backdrop,
 body.is-admin .ac-popup-backdrop,
@@ -517,7 +517,7 @@ body.is-admin-app .floating-order-status {
   pointer-events: none !important;
 }
 
-/* Mobile: hide inline status select — use detail modal */
+/* Mobile: hide inline status select - use detail modal */
 @media (max-width: 720px) {
   /* Detail pesanan & modal admin: tanpa backdrop blur (lebih ringan di HP) */
   body.is-admin .modal-backdrop {

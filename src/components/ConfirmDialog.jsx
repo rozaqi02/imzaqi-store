@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import Modal from "./Modal";
 
 /**
- * Accessible confirm/cancel dialog — replaces window.confirm / window.prompt flows.
+ * Accessible confirm/cancel dialog - replaces window.confirm / window.prompt flows.
  */
 export default function ConfirmDialog({
   open,

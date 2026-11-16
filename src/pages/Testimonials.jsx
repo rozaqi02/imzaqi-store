@@ -45,6 +45,8 @@ function ReviewImage({ src, alt, eager = false, isViewer = false }) {
           alt={alt}
           loading={eager ? "eager" : "lazy"}
           decoding="async"
+          width="400"
+          height="300"
           onLoad={() => setLoaded(true)}
           onError={() => setFailed(true)}
         />

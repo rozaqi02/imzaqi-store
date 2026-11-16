@@ -117,29 +117,21 @@ html[data-theme="dark"] .home-page .hx-heroZone::after {
 }
 
 html[data-theme="dark"] .home-page .hx-hero-scrim {
-  background:
-    radial-gradient(
-      ellipse 95% 70% at 50% 42%,
-      rgba(4, 12, 9, 0.72) 0%,
-      rgba(7, 16, 12, 0.32) 55%,
-      rgba(16, 23, 21, 0) 100%
-    ),
-    linear-gradient(
-      180deg,
-      transparent 0%,
-      transparent 34%,
-      rgba(10, 18, 14, 0.32) 58%,
-      rgba(14, 22, 18, 0.62) 78%,
-      rgba(14, 22, 18, 0.9) 92%,
-      var(--storefront-global-bg) 100%
-    ) !important;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 55%,
+    rgba(14, 22, 18, 0.62) 78%,
+    rgba(14, 22, 18, 0.9) 92%,
+    var(--storefront-global-bg) 100%
+  ) !important;
 }
 
 html[data-theme="dark"] .home-page .home-body {
   margin-top: -1px;
 }
 
-/* ── Promo ticker above navbar ── */
+/* Promo ticker above navbar */
 .promo-tickerStack {
   width: 100%;
   display: flex;
@@ -175,7 +167,7 @@ html[data-theme="dark"] .promo-ticker--flash {
   color: #04140e;
 }
 
-/* ── Banner Themes & Style Presets ── */
+/* Banner Themes & Style Presets */
 
 /* 1. Minimal Border (Clean light bg + accent bottom border + high-contrast text, like user's example) */
 .promo-ticker--style-minimal_border,
@@ -292,7 +284,7 @@ html[data-theme="dark"] .promo-ticker--style-pill_outline .promo-tickerItem {
   color: #f1f5f9 !important;
 }
 
-/* ── Banner Badges & Default Solid Colors ── */
+/* Banner Badges & Default Solid Colors */
 .promo-tickerItem {
   display: inline-flex;
   align-items: center;
@@ -334,7 +326,7 @@ html[data-theme="dark"] .promo-ticker--color-yellow .promo-tickerBadge { backgro
 html[data-theme="dark"] .promo-ticker--color-red .promo-tickerBadge    { background: #ffffff; color: #b91c1c; }
 html[data-theme="dark"] .promo-ticker--color-blue .promo-tickerBadge   { background: #ffffff; color: #0369a1; }
 
-/* ── Banner Glyphs (Icons) & Mascots ── */
+/* Banner Glyphs (Icons) & Mascots */
 .promo-tickerGlyph {
   display: inline-flex;
   align-items: center;
@@ -388,7 +380,7 @@ html[data-motion="off"] .promo-tickerMascot {
   animation: none !important;
 }
 
-/* ── Link Styles ── */
+/* Link Styles */
 .promo-tickerLink,
 .promo-tickerCode {
   display: inline;
@@ -524,7 +516,7 @@ body.is-admin-app .promo-ticker {
   display: none;
 }
 
-/* ── Header: Liquid Glass floating navigation shell ── */
+/* Header: Liquid Glass floating navigation shell */
 .header,
 .site-header {
   display: flex !important;
@@ -578,7 +570,7 @@ html[data-theme="light"] .theme-toggle {
   box-shadow: none !important;
 }
 
-/* ── 3D Neumorphic Category Chips (App Premium & Jasa Akademik) — Web Design Tokens (Outline-Free) ── */
+/* 3D Neumorphic Category Chips (App Premium & Jasa Akademik) - Web Design Tokens (Outline-Free) */
 .catalog-page .catalog-quickChip.catalog-quickChip--line,
 .catalog-page .catalog-quickChip.catalog-quickChip--app_premium,
 .catalog-page .catalog-quickChip.catalog-quickChip--academic {
@@ -628,7 +620,7 @@ html[data-theme="light"] .theme-toggle {
   color: var(--imzaqi-btn-text) !important;
 }
 
-/* ── 3D Neumorphic Filter Button (Search Bar Anchor) — Web Design Tokens (Outline-Free) ── */
+/* 3D Neumorphic Filter Button (Search Bar Anchor) - Web Design Tokens (Outline-Free) */
 .catalog-heroFilterBtn {
   border: none !important;
   outline: none !important;
@@ -1493,7 +1485,7 @@ html[data-theme="dark"] .rv-icon {
   }
 }
 
-/* ── Compare modal + checkout drawer: storefront green / white / black ── */
+/* Compare modal + checkout drawer: storefront green / white / black */
 .vcm-backdrop {
   background: rgba(10, 10, 10, 0.48) !important;
   backdrop-filter: blur(10px) !important;
@@ -1883,7 +1875,7 @@ html[data-theme="dark"] .checkout-promo-card {
   }
 }
 
-/* ── Pay page + success + confirm checklist ── */
+/* Pay page + success + confirm checklist */
 .pay-overlay,
 .pay-confirmOverlay {
   background: rgba(0, 0, 0, 0.55) !important;
@@ -2322,7 +2314,7 @@ html[data-theme="dark"] .pay-successBtnGhost:hover {
   background: rgba(255, 255, 255, 0.12) !important;
 }
 
-/* ── Confirm Payment Modal (Apple Sheet) ── */
+/* Confirm Payment Modal (Apple Sheet) */
 .pay-confirmModal {
   width: min(600px, 100%) !important;
   max-width: 100% !important;
@@ -2550,7 +2542,7 @@ html[data-theme="dark"] .pay-confirmSecondaryBtn:hover {
   }
 }
 
-/* ── Dark mode contrast pass ── */
+/* Dark mode contrast pass */
 html[data-theme="dark"],
 html[data-theme="dark"] body {
   background: var(--storefront-global-bg) !important;
@@ -2642,7 +2634,7 @@ html[data-theme="dark"] .catalog-cardName {
   color: #f7f7f7 !important;
 }
 
-/* ── Audit follow-up: overlay, teal leftovers, chips ── */
+/* Audit follow-up: overlay, teal leftovers, chips */
 .checkout-overlay {
   z-index: 9999 !important;
 }

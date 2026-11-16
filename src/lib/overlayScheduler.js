@@ -1,5 +1,4 @@
-// ─────────────────────────────────────────────────────────────────────────────
-// Overlay scheduler — satu-satunya sumber kebenaran untuk "siapa yang boleh
+// Overlay scheduler - satu-satunya sumber kebenaran untuk "siapa yang boleh
 // tampil sekarang".
 //
 // Masalah sebelumnya: setiap popup memeriksa popup lain lewat DOM query
@@ -20,8 +19,7 @@
 //   • Saat pemenang melepas slot (ditutup / unmount / tidak ready), antrean
 //     dihitung ulang dan kandidat berikutnya naik otomatis.
 //   • Blocking rute sensitif (/checkout, /bayar, /admin) tetap ditangani
-//     useStorefrontOverlayBlocked() — scheduler tidak menduplikasinya.
-// ─────────────────────────────────────────────────────────────────────────────
+//     useStorefrontOverlayBlocked() - scheduler tidak menduplikasinya.
 
 /** Durasi tampilan yang dipakai komponen overlay. */
 export const OVERLAY_TIMING = {

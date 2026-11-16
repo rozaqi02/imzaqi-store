@@ -131,7 +131,7 @@ function AdminWhatsAppQuickAction({ order }) {
 }
 
 /**
- * Memoized order row — virtual list re-renders only rows that change.
+ * Memoized order row - virtual list re-renders only rows that change.
  */
 function AdminOrderListItem({
   order,

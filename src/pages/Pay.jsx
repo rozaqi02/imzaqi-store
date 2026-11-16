@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, Clock, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
+import { Check, CheckCircle2, Clock, Copy, Download, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -795,7 +795,16 @@ export default function Pay() {
   function renderStageActions(extraClass = "") {
     const klass = `pay-stageActions ${extraClass}`.trim();
 
-    return <div className={klass}>{renderPayConfirmButton()}</div>;
+    return (
+      <div className={klass}>
+        {renderPayConfirmButton()}
+        <p className="pay-confirmNotice text-muted" style={{ fontSize: "12px", textAlign: "center", margin: "8px 0 0 0", opacity: 0.85, lineHeight: 1.4 }}>
+          {isFreeOrder
+            ? "Order langsung diproses setelah konfirmasi."
+            : "ID order otomatis diterbitkan setelah konfirmasi. Akun diproses dalam 5 sampai 30 menit."}
+        </p>
+      </div>
+    );
   }
 
   return (
@@ -812,9 +821,9 @@ export default function Pay() {
               aria-live="polite"
             >
               {isFreeOrder
-                ? "Order gratis — tinggal konfirmasi"
+                ? "Order gratis: tinggal konfirmasi"
                 : qrisTimer.expired
-                  ? "Sesi QR berakhir — muat ulang QR"
+                  ? "Sesi QR berakhir: muat ulang QR"
                   : "Menunggu pembayaran"}
             </span>
           </div>
@@ -830,7 +839,9 @@ export default function Pay() {
               <summary className="pay-orderHead">
                 <div>
                   <div className="pay-orderKicker">Ringkasan pesanan</div>
-                   <div className="pay-orderTitle">{itemCount} item · Lihat rincian</div>
+                  <div className="pay-orderTitle">
+                    {items[0] ? `${items[0].product_name || "Produk"} (${itemCount} item)` : `${itemCount} item`} · {isFreeOrder ? "Gratis" : formatIDR(total)}
+                  </div>
                 </div>
                 {promoPercent ? <span className="pay-orderPromo">{promo?.code}</span> : null}
               </summary>
@@ -947,7 +958,30 @@ export default function Pay() {
             <section className="card pad pay-card pay-stageCard reveal" style={{ transitionDelay: "160ms" }}>
               <div className="pay-stageHeading">
                 <div className="pay-stageLabel">Total pembayaran</div>
-                <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
+                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
+                  <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
+                  {!isFreeOrder && total > 0 ? (
+                    <button
+                      type="button"
+                      className="btn btn-ghost btn-sm"
+                      style={{ padding: "4px 8px", fontSize: "12px", height: "auto" }}
+                      onClick={() => {
+                        copyToClipboard(String(total)).then(
+                          () => {
+                            if (navigator.vibrate) navigator.vibrate(12);
+                            toast.success("Nominal disalin!", { title: formatIDR(total), duration: 2000 });
+                          },
+                          () => toast.error("Gagal menyalin nominal.")
+                        );
+                      }}
+                      title="Salin nominal untuk m-banking / e-wallet"
+                      aria-label={`Salin nominal tagihan ${formatIDR(total)}`}
+                    >
+                      <Copy size={13} aria-hidden="true" />
+                      <span>Salin nominal</span>
+                    </button>
+                  ) : null}
+                </div>
               </div>
               <div className="pay-stageGrid">
                 <div className="pay-stageMeta">
@@ -1022,11 +1056,14 @@ export default function Pay() {
                         {qrisTimer.expired && (
                           <div className="pay-qrisTimer is-expired" role="alert">
                             <Clock size={13} />
-                            <span>Sesi QR berakhir. Jika belum membayar, muat ulang QR untuk melanjutkan.</span>
+                            <span>Sesi QR berakhir. Muat ulang QR untuk melanjutkan pembayaran.</span>
                             <button
                               type="button"
                               className="btn btn-sm pay-qrisRefreshBtn"
-                              onClick={() => window.location.reload()}
+                              onClick={() => {
+                                qrisTimer.reset?.();
+                                dispatchQris({ type: "INIT", notice: "" });
+                              }}
                             >
                               Buat QR Baru
                             </button>
@@ -1068,13 +1105,23 @@ export default function Pay() {
                         ) : null}
 
                         {!qris.failed && qris.url && !qrisTimer.expired && (
-                          <a
-                            href={qris.url}
-                            download="qris-pembayaran.png"
-                            className="btn btn-ghost btn-sm pay-qrisDownload"
-                          >
-                            Simpan QRIS
-                          </a>
+                          <div className="pay-qrisMobileActions">
+                            <a
+                              href={qris.url}
+                              download="qris-pembayaran.png"
+                              className="btn btn-primary btn-sm pay-qrisDownload"
+                            >
+                              <Download size={14} aria-hidden="true" />
+                              <span>Simpan QRIS ke Galeri</span>
+                            </a>
+                            <div className="pay-qrisMobileGuide" role="note" aria-label="Panduan bayar dari HP yang sama">
+                              <span className="pay-qrisGuideStep"><strong>1</strong> Unduh QR</span>
+                              <span className="pay-qrisGuideSep" aria-hidden="true">→</span>
+                              <span className="pay-qrisGuideStep"><strong>2</strong> Buka m-Banking / e-Wallet</span>
+                              <span className="pay-qrisGuideSep" aria-hidden="true">→</span>
+                              <span className="pay-qrisGuideStep"><strong>3</strong> Bayar dari Galeri</span>
+                            </div>
+                          </div>
                         )}
 
                         {qris.failed ? (

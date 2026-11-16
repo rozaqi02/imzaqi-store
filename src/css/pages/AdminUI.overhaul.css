@@ -1,5 +1,5 @@
 /**
- * Admin UI Overhaul — Apple-clean + neumorphic depth
+ * Admin UI Overhaul - Apple-clean + neumorphic depth
  * Loaded last after AdminDashboard / Nav / light / fixes.
  * Scope: .admin-page, .admin-login*
  */
@@ -74,7 +74,7 @@ html[data-theme="light"] .admin-page,
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   SCROLL FIX — Ringkasan + all workspaces (desktop shell)
+   SCROLL FIX - Ringkasan + all workspaces (desktop shell)
    Root cause: conflicting overflow on .admin-main vs .admin-overview
    ═══════════════════════════════════════════════════════════════════ */
 @media (min-width: 1101px) {
@@ -99,7 +99,7 @@ html[data-theme="light"] .admin-page,
     overflow: hidden !important; /* chrome fixed; children scroll */
   }
 
-  /* Overview / ringkasan / settings — THIS is the scrollport */
+  /* Overview / ringkasan / settings - THIS is the scrollport */
   .admin-page .admin-main > .admin-overview,
   .admin-page .admin-main > .admin-workspaceScroll,
   .admin-page .admin-main > .admin-settingsGrid,
@@ -218,7 +218,7 @@ html[data-theme="light"] .admin-page,
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Sidebar — Apple dock energy + soft neo depth
+   Sidebar - Apple dock energy + soft neo depth
    ═══════════════════════════════════════════════════════════════════ */
 .admin-page .adm-sidebar {
   border-radius: var(--adm-radius-lg) !important;
@@ -390,7 +390,7 @@ html[data-theme="light"] .admin-page .adm-navItem.is-active .adm-navItemIcon {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Topbar — quiet, clear hierarchy
+   Topbar - quiet, clear hierarchy
    ═══════════════════════════════════════════════════════════════════ */
 .admin-page .admin-topbar {
   display: flex !important;
@@ -458,7 +458,7 @@ html[data-theme="light"] .admin-page .adm-navItem.is-active .adm-navItemIcon {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Panels / cards — unified neumorphic family
+   Panels / cards - unified neumorphic family
    ═══════════════════════════════════════════════════════════════════ */
 .admin-page .admin-panel,
 .admin-page .admin-statCard,
@@ -557,7 +557,7 @@ html[data-theme="light"] .admin-page .adm-navItem.is-active .adm-navItemIcon {
   border-radius: 999px;
   background: var(--accent, #3ee6c0);
   box-shadow: 0 0 0 0 rgba(62, 230, 192, 0.6);
-  animation: admLiveSyncPulse 2s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  /* Clean sync dot - no endless pulse */
   flex-shrink: 0;
   margin-right: 6px;
 }
@@ -847,7 +847,7 @@ body:has(.admin-page) .modal {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Login page — same language
+   Login page - same language
    ═══════════════════════════════════════════════════════════════════ */
 .admin-loginShell {
   border-radius: 28px !important;
@@ -888,7 +888,7 @@ html[data-theme="light"] .admin-loginShell {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Misc cleanup — less visual noise
+   Misc cleanup - less visual noise
    ═══════════════════════════════════════════════════════════════════ */
 .admin-page .admin-heroTitle {
   font-size: clamp(18px, 2vw, 22px) !important;

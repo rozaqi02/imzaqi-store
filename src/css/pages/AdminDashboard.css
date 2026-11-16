@@ -14,7 +14,7 @@
 /* ═══════════════════════════════════════════════════════════════════
    Viewport-locked admin shell (desktop ≥1101px)
    Independent column scroll inside products / panels; document scroll
-   remains for mobile (≤1100px) — see reset block below.
+   remains for mobile (≤1100px) - see reset block below.
    Modals (.modal-backdrop / .modal) are intentionally untouched.
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -115,7 +115,7 @@
     flex-shrink: 0;
   }
 
-  /* Products: two independent columns (list | editor) — each scrolls alone */
+  /* Products: two independent columns (list | editor) - each scrolls alone */
   .admin-page .admin-products {
     flex: 1 1 auto;
     min-height: 0;
@@ -274,7 +274,7 @@
     padding-bottom: 28px;
   }
 
-  /* Promo grid must not clip — live inside scroll body */
+  /* Promo grid must not clip - live inside scroll body */
   .admin-page .admin-promo-grid {
     max-height: none;
     overflow: visible;
@@ -2717,7 +2717,7 @@ html[data-theme="light"] .admin-advancedToggle {
   }
 }
 
-/* ===== Admin UX refresh: wider workspace + compact operational layout ===== */
+/* Admin UX refresh: wider workspace + compact operational layout */
 .container.admin-shell {
   width: min(1480px, 100%);
 }
@@ -3000,12 +3000,10 @@ html[data-theme="light"] .admin-advancedToggle {
   }
 }
 
-/* ──────────────────────────────────────────────────────────────────────
-   MOBILE ADMIN DASHBOARD — clean rebuild (overrides all prior rules)
+/* Mobile Admin Dashboard - clean rebuild
    Single source of truth for ≤720px. Designed for actual mobile use:
    readable typography, compact spacing, full-width content panels,
-   sticky tab nav, no horizontal overflow anywhere.
-   ────────────────────────────────────────────────────────────────── */
+   sticky tab nav, no horizontal overflow anywhere. */
 @media (max-width: 720px) {
   /* 1. Container: full width, no double padding */
   .admin-page .container.admin-shell,
@@ -3582,7 +3580,7 @@ html[data-theme="light"] .admin-advancedToggle {
   }
 }
 
-/* ── Realtime new order badge ── */
+/* Realtime new order badge */
 .admin-nav-newBadge {
   min-width: 20px;
   height: 20px;
@@ -3610,7 +3608,7 @@ html[data-theme="light"] .admin-advancedToggle {
   to   { transform: scale(1); opacity: 1; }
 }
 
-/* ── Order list item actions ── */
+/* Order list item actions */
 .admin-orderRowActions {
   display: flex;
   gap: 8px;
@@ -3618,7 +3616,7 @@ html[data-theme="light"] .admin-advancedToggle {
   flex-wrap: wrap;
 }
 
-/* ── Order stats strip ── */
+/* Order stats strip */
 .admin-orderStatsStrip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -3662,7 +3660,7 @@ html[data-theme="light"] .admin-advancedToggle {
   font-size: 12px;
 }
 
-/* ── Order list ── */
+/* Order list */
 .admin-ordersList {
   display: grid;
   gap: 10px;
@@ -3757,7 +3755,7 @@ html[data-theme="light"] .admin-advancedToggle {
   }
 }
 
-/* ── Order Detail Timeline ── */
+/* Order Detail Timeline */
 .admin-orderTimeline {
   display: flex;
   align-items: flex-start;
@@ -3836,7 +3834,7 @@ html[data-theme="light"] .admin-advancedToggle {
   background: rgba(255, 255, 255, 0.08);
 }
 
-/* ── Order Quick Actions ── */
+/* Order Quick Actions */
 .admin-orderQuickActions {
   display: flex;
   gap: 10px;
@@ -3844,7 +3842,7 @@ html[data-theme="light"] .admin-advancedToggle {
   margin-bottom: 16px;
 }
 
-/* ── Bulk Action Bar ── */
+/* Bulk Action Bar */
 .admin-bulkBar {
   display: flex;
   align-items: center;
@@ -3875,7 +3873,7 @@ html[data-theme="light"] .admin-advancedToggle {
   color: rgba(255, 255, 255, 0.7);
 }
 
-/* ── Order list item with checkbox ── */
+/* Order list item with checkbox */
 .admin-orderListCheckbox {
   flex-shrink: 0;
   display: flex;
@@ -3894,7 +3892,7 @@ html[data-theme="light"] .admin-advancedToggle {
   background: rgba(0, 214, 180, 0.07);
 }
 
-/* ── Promo badges ── */
+/* Promo badges */
 .admin-promoBadge {
   display: inline-flex;
   align-items: center;
@@ -3921,7 +3919,7 @@ html[data-theme="light"] .admin-advancedToggle {
   opacity: 0.65;
 }
 
-/* ── Low stock badge ── */
+/* Low stock badge */
 .product-lowStockBadge {
   display: inline-flex;
   align-items: center;
@@ -3935,19 +3933,14 @@ html[data-theme="light"] .admin-advancedToggle {
 }
 
 
-/* ──────────────────────────────────────────────────────────────────
-   ADMIN DASHBOARD — MOBILE PERFORMANCE OVERRIDES (LAST WORD)
-   This block MUST be at the end of the file to override any earlier
-   mobile media query that adds expensive paint effects.
-
+/* Admin Dashboard - Mobile Performance Overrides
    Goal: eliminate scroll lag on overview/products tabs by killing:
    - radial-gradient backgrounds (expensive paint)
    - layered/large box-shadow (expensive paint)
    - hover transforms with 0.2s+ transitions
    - hover state changes (touch devices don't need them)
    - backdrop-filter
-   - the orange radial pseudo-element on overview hero
-   ────────────────────────────────────────────────────────────────── */
+   - the orange radial pseudo-element on overview hero */
 @media (max-width: 720px) {
   /* 1. Replace gradient + radial-gradient backgrounds with flat solids */
   .admin-page .admin-sidebar,
@@ -4049,7 +4042,7 @@ html[data-theme="light"] .admin-advancedToggle {
   }
 }
 
-/* ── Promo Redesign ─────────────────────────────────────────────── */
+/* Promo Redesign */
 
 /* Stats strip */
 .admin-promo-strip {
@@ -4483,7 +4476,7 @@ html[data-theme="light"] .admin-promoBadge.active {
   }
 }
 
-/* ── Promo Delete Confirm Modal ── */
+/* Promo Delete Confirm Modal */
 .admin-promo-deleteModal {
   max-width: 400px;
 }
@@ -4537,7 +4530,7 @@ html[data-theme="light"] .admin-promo-deleteHint {
   color: rgba(50, 84, 95, 0.6);
 }
 
-/* ── Admin page horizontal overflow guard ──
+/* Admin page horizontal overflow guard:
    Since .app-main-admin has overflow-x:visible (needed for sticky sidebar),
    we clip horizontal overflow at the page level instead. */
 .admin-page {
@@ -4594,7 +4587,7 @@ html[data-theme="light"] .admin-promo-deleteHint {
   min-width: 150px;
 }
 
-/* ── iOS & Mobile Safari Picker / Date / Select Optimization ── */
+/* iOS & Mobile Safari Picker / Date / Select Optimization */
 .admin-page input[type="date"],
 .admin-page input[type="datetime-local"],
 .admin-modal input[type="date"],

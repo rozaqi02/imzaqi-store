@@ -70,7 +70,7 @@ html[data-theme="light"] .pay-shell-status.is-expired{color:#b3253c;border-color
 .pay-emailState.warn{color:#ffd089;border-color:rgba(255,208,137,.4);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(255,208,137,.22),rgba(70,40,0,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(255,180,40,.14);}
 .pay-emailState.ok{color:#9ff5d9;border-color:rgba(159,245,217,.34);background:linear-gradient(180deg,rgba(255,255,255,.12),rgba(255,255,255,0) 32%),linear-gradient(165deg,rgba(0,214,180,.22),rgba(0,50,45,.5));box-shadow:inset 0 1px 0 rgba(255,255,255,.16),inset 0 -2px 0 rgba(0,0,0,.28),0 4px 10px rgba(0,180,150,.14);}
 .pay-emailInput{height:48px;border-radius:18px;background:var(--skeu-inset-bg,rgba(255,255,255,.045));box-shadow:var(--skeu-inset-shadow,none);border:1px solid var(--brand-line,rgba(255,255,255,.1));font-size:14px;padding:0 14px;}
-/* BUG-01: iOS Safari zoom pada input < 16px — override ke 16px di mobile */
+/* BUG-01: iOS Safari zoom pada input < 16px - override ke 16px di mobile */
 @media (max-width: 920px), (pointer: coarse) {
   .pay-emailInput { font-size: 16px; }
 }
@@ -820,7 +820,7 @@ html[data-theme="light"] .pay-freePanelCheck svg {
 }
 
 
-/* ── Tap-to-Zoom QRIS Modal ── */
+/* Tap-to-Zoom QRIS Modal */
 .pay-zoomOverlay {
   position: fixed;
   inset: 0;
@@ -924,7 +924,7 @@ html[data-theme="light"] .pay-zoomTip {
   color: #5f7781;
 }
 
-/* Horizontal overflow guard â€” app-main-catalog uses overflow:visible */
+/* Horizontal overflow guard - app-main-catalog uses overflow:visible */
 @media (max-width: 920px) {
   .pay-page.pay-shell {
     overflow-x: clip;
@@ -943,7 +943,7 @@ html[data-theme="light"] .pay-zoomTip {
   }
 }
 
-/* ── QRIS Box & Timer ──────────────────────────────────────────────────────────── */
+/* QRIS Box & Timer */
 .pay-qrisBox {
   display: flex;
   flex-direction: column;
@@ -1074,7 +1074,7 @@ html[data-theme="light"] .pay-qrisTimer.is-expired {
   color: var(--danger, #c81e3c);
 }
 
-/* ── Apple-Style Pay Experience (Clean, Minimal, On-Point) ────────────────── */
+/* Apple-Style Pay Experience (Clean, Minimal, On-Point) */
 .pay-shell {
   --pay-page-bg: #f5f5f7;
   --pay-face: rgba(255, 255, 255, 0.92);
@@ -1430,6 +1430,52 @@ html[data-theme="dark"] .pay-statePill.live {
   transform: scale(0.98) !important;
 }
 
+.pay-qrisMobileActions {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pay-qrisMobileGuide {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 2px;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgba(0, 214, 180, 0.05);
+  border: 1px dashed rgba(0, 214, 180, 0.2);
+  font-size: 11px;
+  color: var(--pay-muted);
+}
+
+.pay-qrisGuideStep {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.pay-qrisGuideStep strong {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  background: var(--brand-icon, #00d6b4);
+  color: #0b1512;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.pay-qrisGuideSep {
+  opacity: 0.4;
+  font-size: 10px;
+}
+
 .pay-stageFoot {
   font-size: 12px !important;
   color: var(--pay-muted) !important;
@@ -1536,5 +1582,9 @@ html[data-theme="dark"] .pay-statePill.live {
 
   .pay-stageTotal {
     font-size: 28px !important;
+  }
+
+  .pay-qrisDownload {
+    min-height: 44px !important;
   }
 }

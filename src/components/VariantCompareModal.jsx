@@ -53,8 +53,8 @@ function normalizeGuarantee(text) {
 }
 
 function normalizeDuration(text) {
-  const value = String(text || "—").trim();
-  if (!value || value === "—") return "—";
+  const value = String(text || "-").trim();
+  if (!value || value === "-") return "-";
   return value.toLowerCase().startsWith("durasi") ? value : value;
 }
 
@@ -160,7 +160,7 @@ export default function VariantCompareModal({
           </div>
         );
       case "type":
-        return type ? <span className="vcm-typeBadge">{type}</span> : <span className="vcm-muted">—</span>;
+        return type ? <span className="vcm-typeBadge">{type}</span> : <span className="vcm-muted">-</span>;
       case "duration":
         return (
           <span className="vcm-inlineValue">
@@ -179,7 +179,7 @@ export default function VariantCompareModal({
             Wajib
           </span>
         ) : (
-          <span className="vcm-muted">—</span>
+          <span className="vcm-muted">-</span>
         );
       default:
         return null;

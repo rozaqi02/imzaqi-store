@@ -20,7 +20,7 @@ import { render, act, waitFor } from "@testing-library/react";
  * 3. No inline styles set explicit widths that could cause overflow
  */
 
-// ── Mocks ──
+// Mocks
 
 const mockSetSearchParams = jest.fn();
 const mockToast = {
@@ -60,7 +60,7 @@ jest.mock("../hooks/usePageMeta", () => ({
   usePageMeta: jest.fn(),
 }));
 
-// ── Generators ──
+// Generators
 
 const arbProductName = fc.stringOf(fc.fullUnicode(), { minLength: 1, maxLength: 200 });
 const arbVariantName = fc.stringOf(fc.fullUnicode(), { minLength: 0, maxLength: 150 });
@@ -98,7 +98,7 @@ const arbOrder = fc.record({
   created_at: fc.constant("2024-01-15T10:00:00Z"),
 });
 
-// ── CSS class lists that provide overflow protection at 320px ──
+// CSS class lists that provide overflow protection at 320px
 // These classes have `min-width: 0` and `overflow-wrap: anywhere` in the
 // @media (max-width: 320px) block of Status.css
 
@@ -122,7 +122,7 @@ const OVERFLOW_PROTECTED_CLASSES = [
   "st-main",
 ];
 
-// ── Tests ──
+// Tests
 
 describe("Status Page - Property 1: No horizontal overflow at minimum viewport", () => {
   beforeEach(() => {

@@ -1,4 +1,4 @@
-/* Motion enhancements — respects data-motion and prefers-reduced-motion */
+/* Motion enhancements - respects data-motion and prefers-reduced-motion */
 
 @keyframes motionChipActivate {
   0% { transform: scale(0.94); }
@@ -111,7 +111,7 @@
   100% { box-shadow: var(--pdx-inset-shadow), 0 0 0 0 rgba(79, 255, 218, 0); }
 }
 
-/* ── Catalog filter chips & toggles ── */
+/* Catalog filter chips & toggles */
 @media (prefers-reduced-motion: no-preference) {
   [data-motion="full"] .catalog-chip {
     transition:
@@ -182,7 +182,7 @@
     animation: motionRangeThumbPulse 0.8s ease infinite;
   }
 
-  /* ── Catalog grid stagger ── */
+  /* Catalog grid stagger */
   [data-motion="full"] .catalog-grid--animate .catalog-card {
     animation: motionCatalogCardIn 0.46s cubic-bezier(0.22, 1, 0.36, 1) both;
     animation-delay: calc(var(--reveal-i, 0) * 52ms);
@@ -197,7 +197,7 @@
     animation: motionViewMorph 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
-  /* ── Empty state ── */
+  /* Empty state */
   [data-motion="full"] .empty--animated .empty-icon {
     animation: motionEmptyFloat 3.2s ease-in-out infinite;
   }
@@ -214,7 +214,7 @@
     animation: motionEmptyFadeUp 0.5s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
   }
 
-  /* ── Search suggestions ── */
+  /* Search suggestions */
   [data-motion="full"] .suggestions--animate {
     animation: motionSuggestIn 0.24s cubic-bezier(0.22, 1, 0.36, 1) both;
     transform-origin: top center;
@@ -234,7 +234,7 @@
     transition: transform 0.16s ease, background 0.16s ease;
   }
 
-  /* ── Cart micro-interaction ── */
+  /* Cart micro-interaction */
   html:not([data-motion="off"]) .header-cart .pill.is-bumping {
     animation: motionCartBump 0.42s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
@@ -256,7 +256,7 @@
     animation: motionCartFly 0.62s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   }
 
-  /* ── Flash sale ── */
+  /* Flash sale */
   [data-motion="full"] .flash-countdown-num--sec {
     animation: motionFlashSecPulse 1s ease-in-out infinite;
   }
@@ -265,12 +265,12 @@
     transition: width 1s linear;
   }
 
-  /* ── Catalog hero ambient ── */
+  /* Catalog hero ambient */
   [data-motion="full"] .catalog-hero::before {
     animation: motionHeroAuraDrift 24s ease-in-out infinite;
   }
 
-  /* ── Header shrink (whole bar, not logo only) ── */
+  /* Header shrink (whole bar, not logo only) */
   @media (min-width: 721px) {
     html[data-motion="full"] .header,
     html[data-motion="lite"] .header {
@@ -422,9 +422,9 @@
   animation: none !important;
 }
 
-/* ── Neumorphism Depth Effects & Interactions ── */
+/* Neumorphism Depth Effects & Interactions */
 
-/* Opsi 1: Tactile Click Inset Transition (Efek Tekan Cekung) — full motion only */
+/* Opsi 1: Tactile Click Inset Transition (Efek Tekan Cekung) - full motion only */
 [data-motion="full"] .btn:active,
 [data-motion="full"] .catalog-chip:active,
 [data-motion="full"] .pdx-filterChip:active,
@@ -514,7 +514,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
   }
 }
 
-/* UX motion layer — interactive polish */
+/* UX motion layer - interactive polish */
 
 @keyframes uxRouteForward {
   0% { opacity: 0; transform: translate3d(0, 10px, 0); }
@@ -1129,9 +1129,9 @@ html[data-theme="light"] .status-commandBox:focus-within {
   scroll-behavior: auto !important;
 }
 
-/* ─── Mobile navbar: solid bg, no backdrop blur (phone only) ─────────────── */
+/* Mobile navbar: solid bg, no backdrop blur (phone only) */
 @media (max-width: 720px) {
-  /* Header mobile dark mode — neumorphic solid + gradasi hijau */
+  /* Header mobile dark mode - neumorphic solid + gradasi hijau */
   html .header,
   html .site-header,
   html[data-motion="lite"] .header,
@@ -1150,7 +1150,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
     will-change: auto;
   }
 
-  /* Header mobile light mode — neumorphic + gradasi hijau */
+  /* Header mobile light mode - neumorphic + gradasi hijau */
   html[data-theme="light"] .header,
   html[data-theme="light"] .site-header,
   html[data-theme="light"][data-motion="lite"] .header,
@@ -1161,7 +1161,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
     backdrop-filter: none !important;
   }
 
-  /* Header buttons — same neumorphism as desktop */
+  /* Header buttons - same neumorphism as desktop */
   html body .header .header-cart,
   html body .header .header-iconAction,
   html[data-theme="light"] body .header .header-cart,
@@ -1210,13 +1210,13 @@ html[data-theme="light"] .status-commandBox:focus-within {
   }
 }
 
-/* ─── Mobile checkout: pure CSS class-swap animation (zero JS overhead) ─── */
+/* Mobile checkout: pure CSS class-swap animation (zero JS overhead) */
 @media (max-width: 720px) {
   /* Backdrop */
   .checkout-backdrop-mobile {
     opacity: 0;
     transition: opacity 0.52s cubic-bezier(0.22, 1, 0.36, 1);
-    /* No backdrop-filter — pure clean translucent dimming */
+    /* No backdrop-filter - pure clean translucent dimming */
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
@@ -1306,7 +1306,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
     backdrop-filter: none !important;
   }
 
-  /* Standard document flow on mobile — matching desktop */
+  /* Standard document flow on mobile - matching desktop */
   .hx-hero {
     contain: none !important;
   }
@@ -1467,7 +1467,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
   }
 }
 
-/* ─── iPad / tablet: restore frosted-glass overlays (721–1024px) ─────────── */
+/* iPad / tablet: restore frosted-glass overlays (721–1024px) */
 @media (min-width: 721px) and (max-width: 1024px) {
   .header,
   .site-header {

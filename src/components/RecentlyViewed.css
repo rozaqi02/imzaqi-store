@@ -66,6 +66,10 @@ html[data-theme="light"] .rv-label {
   filter: brightness(1.04);
 }
 
+.rv-card:active {
+  transform: scale(0.97);
+}
+
 html[data-theme="light"] .rv-card {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 30%),

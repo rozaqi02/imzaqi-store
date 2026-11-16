@@ -1,4 +1,4 @@
-/* ── Apple-Grade Refined Flash Sale Banner (Harmonized with ImZaqi Visual Language) ── */
+/* Apple-Grade Refined Flash Sale Banner (Harmonized with ImZaqi Visual Language) */
 .flash-drop {
   --fsd-surface: linear-gradient(135deg, rgba(238, 247, 242, 0.95) 0%, rgba(246, 252, 249, 0.98) 50%, #ffffff 100%);
   --fsd-border: rgba(0, 158, 96, 0.16);
@@ -39,7 +39,7 @@
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-/* ── Campaign Left Column ── */
+/* Campaign Left Column */
 .fsd-campaign {
   position: relative;
   display: flex;
@@ -94,7 +94,7 @@
   color: var(--fsd-muted);
 }
 
-/* ── Countdown Clock ── */
+/* Countdown Clock */
 .fsd-clock {
   display: grid;
   gap: 8px;
@@ -157,7 +157,7 @@
   color: var(--fsd-accent);
 }
 
-/* ── Product Showcase Ticket Card ── */
+/* Product Showcase Ticket Card */
 .fsd-ticket {
   position: relative;
   display: flex;
@@ -359,7 +359,7 @@
 
 /* Button surface and interaction states are owned by css/buttons.css. */
 
-/* ── Multi-offer Switcher Rail ── */
+/* Multi-offer Switcher Rail */
 .fsd-switcher {
   grid-column: 1 / -1;
   display: flex;
@@ -515,7 +515,7 @@
   outline-offset: 3px;
 }
 
-/* ── Dark Mode Overrides (Obsidian Mint & Sleek Micro-Borders) ── */
+/* Dark Mode Overrides (Obsidian Mint & Sleek Micro-Borders) */
 html[data-theme="dark"] .flash-drop {
   --fsd-surface: linear-gradient(145deg, #15271f 0%, #0d1a14 100%);
   --fsd-border: rgba(78, 255, 218, 0.18);
@@ -573,7 +573,7 @@ html[data-theme="dark"] .fsd-choiceDiscount {
   color: #ff6b8b;
 }
 
-/* ── Tablet Optimization (721px - 900px) ── */
+/* Tablet Optimization (721px - 900px) */
 @media (max-width: 900px) and (min-width: 721px) {
   .flash-drop {
     grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
@@ -590,7 +590,7 @@ html[data-theme="dark"] .fsd-choiceDiscount {
   }
 }
 
-/* ── Mobile Optimization (≤ 720px) ── */
+/* Mobile Optimization (≤ 720px) */
 @media (max-width: 720px) {
   .flash-drop {
     grid-template-columns: minmax(0, 1fr);
@@ -730,9 +730,9 @@ html[data-theme="dark"] .fsd-choiceDiscount {
   }
 
   .flash-drop .fsd-cta {
-    min-height: 38px;
-    padding: 0 14px;
-    font-size: 12px;
+    min-height: 44px;
+    padding: 0 16px;
+    font-size: 13px;
     gap: 6px;
   }
 
@@ -751,11 +751,11 @@ html[data-theme="dark"] .fsd-choiceDiscount {
   .flash-drop .fsd-choice {
     max-width: 230px;
     padding: 4px 10px 4px 5px;
-    min-height: 38px;
+    min-height: 42px;
   }
 }
 
-/* ── Small Mobile (≤ 360px) ── */
+/* Small Mobile (≤ 360px) */
 @media (max-width: 360px) {
   .flash-drop {
     padding: 12px;

@@ -2,10 +2,10 @@
   Shared UI utilities: scrollbar, selection, focus rings, confetti layer,
   skeletons, reveal transitions and cross-page consistency rules.
   Decorative-only effects (cursor spotlight, rotating borders, aurora text)
-  were removed — they added render cost without conveying information.
+  were removed - they added render cost without conveying information.
 */
 
-/* ─── 1. Smooth themed scrollbar ────────────────────────────────────────── */
+/* 1. Smooth themed scrollbar */
 @media (min-width: 721px) {
   * {
     scrollbar-width: thin;
@@ -34,7 +34,7 @@
   }
 }
 
-/* ─── 2. Themed selection ───────────────────────────────────────────────── */
+/* 2. Themed selection */
 ::selection {
   background: rgba(0, 214, 180, 0.32);
   color: var(--brand-text, #fff);
@@ -51,7 +51,7 @@ html[data-theme="light"] ::selection {
   color: #0d2d39;
 }
 
-/* ─── 3. Premium focus ring (consistent across interactive elements) ───── */
+/* 3. Premium focus ring (consistent across interactive elements) */
 :where(button, a, select, textarea, [role="button"], [role="combobox"], [role="option"], [tabindex]):focus-visible {
   outline: none;
   box-shadow:
@@ -78,7 +78,7 @@ html[data-theme="light"] input:not(.hero-search-input):not(.catalog-commandInput
     0 0 0 4px rgba(0, 138, 148, 0.6);
 }
 
-/* ─── 5. Tap highlight remove + soft press ──────────────────────────────── */
+/* 5. Tap highlight remove + soft press */
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -106,7 +106,7 @@ a.btn:active {
   }
 }
 
-/* ─── 7. Confetti layer (used by Confetti.jsx) ─────────────────────────── */
+/* 7. Confetti layer (used by Confetti.jsx) */
 .confetti-layer {
   position: fixed;
   inset: 0;
@@ -149,13 +149,13 @@ a.btn:active {
   }
 }
 
-/* ─── 10. Page transition shimmer line (handled cleanly by RouteProgress) ─── */
+/* 10. Page transition shimmer line (handled cleanly by RouteProgress) */
 
 /* ═══════════════════════════════════════════════════════════════════════
    SHARED SURFACE & MOTION RULES
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ─── 11. Skeleton loader unified shimmer ──────────────────────────────── */
+/* 11. Skeleton loader unified shimmer */
 .skeleton,
 .catalog-cardSkeleton,
 .testi-skel,
@@ -192,10 +192,9 @@ a.btn:active {
   }
 }
 
-/* ─── 13. Soft scroll-fade at section edges ─────────────────────────────
+/* 13. Soft scroll-fade at section edges
    Right-edge only: first (left) item stays fully solid; right fades as a
-   scroll-hint that more content exists beyond the viewport.
-*/
+   scroll-hint that more content exists beyond the viewport. */
 .catalog-quickFilters,
 .admin-kpiStrip {
   -webkit-mask-image: linear-gradient(
@@ -217,7 +216,7 @@ a.btn:active {
   mask-image: none !important;
 }
 
-/* ─── 15. Badge / pill micro-pulse for "active" / "new" indicators ─────── */
+/* 15. Badge / pill micro-pulse for "active" / "new" indicators */
 .catalog-status.hot,
 .admin-statCard[data-pulse] {
   position: relative;
@@ -240,7 +239,7 @@ a.btn:active {
   }
 }
 
-/* No infinite Hot pulse on mobile / lite / reduced motion — saves compositor work while scrolling */
+/* No infinite Hot pulse on mobile / lite / reduced motion - saves compositor work while scrolling */
 @media (prefers-reduced-motion: reduce) {
   .catalog-status.hot::after {
     animation: none;
@@ -261,7 +260,7 @@ a.btn:active {
   display: none !important;
 }
 
-/* ─── 16. Toast slide-in with bounce ───────────────────────────────────── */
+/* 16. Toast slide-in with bounce */
 .toast {
   animation: polishToastIn 0.42s cubic-bezier(0.22, 1.14, 0.36, 1) both;
 }
@@ -289,7 +288,7 @@ a.btn:active {
   }
 }
 
-/* ─── 17. Input caret colored to brand ─────────────────────────────────── */
+/* 17. Input caret colored to brand */
 input,
 textarea,
 [contenteditable] {
@@ -314,7 +313,7 @@ html[data-theme="dark"] textarea {
   transition: width 0.08s ease-out;
 }
 
-/* ─── 18. Reveal-on-scroll soft entrance for sections ──────────────────── */
+/* 18. Reveal-on-scroll soft entrance for sections */
 @media (prefers-reduced-motion: no-preference) {
 
   .reveal,
@@ -359,7 +358,7 @@ html[data-theme="dark"] textarea {
 }
 
 
-/* ─── 19. Heading underline accent on hover (long-form pages) ─────────── */
+/* 19. Heading underline accent on hover (long-form pages) */
 .h1,
 .h2 {
   position: relative;
@@ -392,7 +391,7 @@ html[data-theme="dark"] textarea {
   }
 }
 
-/* ─── 20. Page-load subtle fade for everything inside .page ───────────── */
+/* 20. Page-load subtle fade for everything inside .page */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-motion="full"]) .page:not(.catalog-page) {
     animation: polishPageEnter 0.5s var(--ease-out, cubic-bezier(0.22, 1, 0.36, 1)) both;
@@ -416,7 +415,7 @@ html[data-theme="dark"] textarea {
    Unifies tokens across all pages for cohesive feel.
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* Unified card surface — every "panel" looks like the same family */
+/* Unified card surface - every "panel" looks like the same family */
 .card,
 .admin-panel,
 .admin-statCard,
@@ -519,7 +518,7 @@ html {
   }
 }
 
-/* ─── Unified card hover elevation ─────────────────────────── */
+/* Unified card hover elevation */
 @media (hover: hover) {
   .checkout-panel,
   .pay-stageCard,
@@ -551,4 +550,4 @@ html[data-theme="light"] .pay-qrisLocked strong,
 html[data-theme="light"] .pay-successCode {
   background: transparent !important;
 }
-
+

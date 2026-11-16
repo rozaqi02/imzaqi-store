@@ -72,8 +72,6 @@ export default function NotFound() {
               </div>
 
               <div className="nf-visual" aria-hidden="true">
-                <div className="nf-orbit nf-orbit--outer" />
-                <div className="nf-orbit nf-orbit--inner" />
                 <div className="nf-visualCore">
                   {MASCOTS_ENABLED ? (
                     <BannerGraphic name="rocket_speed" height={52} className="nf-mascot" />
@@ -87,16 +85,16 @@ export default function NotFound() {
               <h1 className="nf-title">Halaman ini nggak ketemu</h1>
               <p className="nf-sub">
                 Link mungkin salah ketik, sudah dipindah, atau memang belum ada.
-                Santai — pilih tujuan di bawah atau loncat ke katalog.
+                Santai, pilih tujuan di bawah atau loncat ke katalog.
               </p>
 
               <div className="nf-ctaRow">
                 <Link to="/produk" className="btn nf-ctaPrimary">
-                  <Search size={16} />
+                  <Search size={16} aria-hidden="true" />
                   Jelajah katalog
                 </Link>
                 <Link to="/" className="btn btn-ghost nf-ctaGhost">
-                  <Home size={16} />
+                  <Home size={16} aria-hidden="true" />
                   Ke beranda
                 </Link>
               </div>

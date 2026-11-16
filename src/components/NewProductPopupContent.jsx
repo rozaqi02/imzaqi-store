@@ -1,5 +1,5 @@
 import React from "react";
-import { ArrowRight, Sparkles } from "lucide-react";
+import { ShoppingBag, Tag } from "lucide-react";
 import { formatIDR } from "../lib/format";
 import { resolvePromotionCopy } from "../lib/storefrontPromotions";
 import BannerGraphic from "./BannerGraphic";
@@ -8,12 +8,12 @@ export default function NewProductPopupContent({ config, product, onNavigate, on
   const copy = resolvePromotionCopy(config, product);
   return <>
     <div className="np-popup-header">
-      <span className="np-popup-badge"><Sparkles size={12}/>{copy.badge}</span>
+      <span className="np-popup-badge"><Tag size={12} aria-hidden="true" />{copy.badge}</span>
       <BannerGraphic name={config?.graphic || "sparkle_celebration"} height={26} className="np-popup-mascot" />
     </div>
     <div className="np-popup-body">
       <div className="np-popup-iconWrap">
-        {product?.icon_url ? <img src={product.icon_url} alt={product.name} className="np-popup-iconImg"/> : <Sparkles size={32}/>}
+        {product?.icon_url ? <img src={product.icon_url} alt={product.name} className="np-popup-iconImg" width="56" height="56" /> : <ShoppingBag size={32} aria-hidden="true" />}
       </div>
       <div className="np-popup-copy">
         <h2 id={titleId} className="np-popup-title">{copy.title}</h2>
@@ -22,7 +22,7 @@ export default function NewProductPopupContent({ config, product, onNavigate, on
       </div>
     </div>
     <div className="np-popup-actions">
-      {preview ? <span className="np-popup-btnPrimary">{copy.button}<ArrowRight size={16}/></span> : <button type="button" className="np-popup-btnPrimary" onClick={onNavigate}>{copy.button}<ArrowRight size={16}/></button>}
+      {preview ? <span className="np-popup-btnPrimary">{copy.button}</span> : <button type="button" className="np-popup-btnPrimary" onClick={onNavigate}>{copy.button}</button>}
       {preview ? <span className="np-popup-btnMuted">Jangan tampilkan hari ini</span> : <button type="button" className="np-popup-btnMuted" onClick={onSuppress}>Jangan tampilkan hari ini</button>}
     </div>
   </>;

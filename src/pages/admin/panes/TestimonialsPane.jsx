@@ -3,7 +3,7 @@ import { AlertTriangle, ShieldCheck } from "lucide-react";
 
 /**
  * Presentational pane: Testimoni.
- * Diekstrak dari AdminDashboard.jsx — semua state & handler tetap hidup di
+ * Diekstrak dari AdminDashboard.jsx - semua state & handler tetap hidup di
  * container (AdminDashboard) dan diteruskan lewat props, sehingga komponen ini
  * murni tampilan dan mudah di-code-split / diuji.
  */

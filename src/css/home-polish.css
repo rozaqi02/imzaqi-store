@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════════════
-   HOME POLISH — lapisan polesan terakhir khusus homepage.
+   HOME POLISH - lapisan polesan terakhir khusus homepage.
    Diimpor paling akhir di styles.css sehingga menang atas lapisan lain
    dengan specificity setara. Semua selector di-scope ke .home-page /
    .hx-hero supaya tidak bocor ke halaman lain.
    ═══════════════════════════════════════════════════════════════════════ */
 
-/* ── 1. Rapatkan jarak hero → section pertama ───────────────────────── */
+/* 1. Rapatkan jarak hero → section pertama */
 .home-page .hx-heroZone::after {
   height: clamp(64px, 9vw, 120px);
 }
@@ -16,7 +16,7 @@
   padding-bottom: clamp(20px, 3vw, 36px) !important;
 }
 
-/* ── 2. Judul section lebih tegas & karismatik ──────────────────────── */
+/* 2. Judul section lebih tegas & karismatik */
 .home-page .home-sectionHead {
   max-width: 640px;
 }
@@ -38,7 +38,7 @@
   letter-spacing: 0.14em;
 }
 
-/* ── 3. Daftar produk: grid 2 kolom di desktop, max-width rapi ─────── */
+/* 3. Daftar produk: grid 2 kolom di desktop, max-width rapi */
 @media (min-width: 901px) {
   .home-page .home-popularList.list-mode {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
@@ -50,7 +50,7 @@
   }
 }
 
-/* ── 4. Nomor langkah "Cara beli" jadi chip aksen hijau ─────────────── */
+/* 4. Nomor langkah "Cara beli" jadi chip aksen hijau */
 .home-page .home-howCard-step {
   width: 42px !important;
   height: 42px !important;
@@ -70,7 +70,7 @@
   border-color: rgba(0, 158, 96, 0.55) !important;
 }
 
-/* ── 5. FAQ & konten: lebar terukur, search sejajar daftar ──────────── */
+/* 5. FAQ & konten: lebar terukur, search sejajar daftar */
 @media (min-width: 901px) {
   .home-page .home-faqSection .home-sectionInner {
     max-width: 820px;
@@ -96,7 +96,7 @@ html[data-theme="dark"] .home-page .home-faqSection .faq-itemCategory {
   background: rgba(0, 245, 196, 0.08) !important;
 }
 
-/* ── 6. Dark mode: permukaan biru-navy → hijau gelap senada brand ────
+/* 6. Dark mode: warna senada brand
    Token --skeu-panel-bg / --skeu-control-bg dipakai luas di home
    (kartu, pill, search, ghost btn). Nilai bawaannya bernuansa navy
    (#111822 / #17202c) yang bentrok dengan canvas hijau #101715. */
@@ -114,7 +114,7 @@ html[data-theme="dark"] .home-page .home-popularList .product-tile {
   border-color: rgba(255, 255, 255, 0.12) !important;
 }
 
-/* ── 7. Mobile hero: CTA stack rapi & tombol sejajar berukuran seragam ────────────────── */
+/* 7. Mobile hero: CTA stack rapi & tombol sejajar berukuran seragam */
 @media (max-width: 720px) {
   .home-page .hx-ctas-row {
     display: flex;
@@ -164,7 +164,7 @@ html[data-theme="dark"] .home-page .home-popularList .product-tile {
   }
 }
 
-/* ── 8. Footer gopay: selaras palet hijau (dark) & hangat (light) ───── */
+/* 8. Footer gopay: selaras palet hijau (dark) & hangat (light) */
 html[data-theme="dark"] .site-footer--gopay .site-footerPanel.site-footerGo {
   background:
     radial-gradient(130% 130% at 0% 0%, rgba(0, 158, 96, 0.16), rgba(0, 0, 0, 0) 58%),
@@ -193,12 +193,12 @@ html[data-theme="light"] .site-footer--gopay .site-footerGoContactIcon {
   margin-top: 10px;
 }
 
-/* ── 9. Scroll progress: hijau brand penuh ──────────────────────────── */
+/* 9. Scroll progress: hijau brand penuh */
 .home-scrollProgress {
   background: linear-gradient(90deg, #00c277, #009e60 55%, #067a4c);
 }
 
-/* ── 10. Skeleton ikut palet ─────────────────────────────────────────── */
+/* 10. Skeleton ikut palet */
 html[data-theme="dark"] .home-page .home-tileSkeleton-icon,
 html[data-theme="dark"] .home-page .home-tileSkeleton-line,
 html[data-theme="dark"] .home-page .home-tileSkeleton-pill,
@@ -206,7 +206,7 @@ html[data-theme="dark"] .home-page .home-tileSkeleton-price {
   background: rgba(255, 255, 255, 0.07);
 }
 
-/* ── 11. Promo cards (bila aktif): aksen konsisten ──────────────────── */
+/* 11. Promo cards (bila aktif): aksen konsisten */
 .home-page .home-promoCard-percent {
   color: var(--ux-accent-dark, #076a44);
 }

@@ -1,4 +1,4 @@
-/** Shared site navigation items — keep Header + BottomNav in sync. */
+/** Shared site navigation items - keep Header + BottomNav in sync. */
 
 export const SITE_PRIMARY_NAV = [
   { to: "/", label: "Beranda", shortLabel: "Beranda" },

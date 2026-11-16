@@ -4,7 +4,7 @@ import { formatAdminDate, formatCompactNumber } from "../adminUtils";
 
 /**
  * Presentational pane: Pengaturan (Kontak & pembayaran, promosi storefront,
- * catatan sistem). Diekstrak dari AdminDashboard.jsx — semua state & handler
+ * catatan sistem). Diekstrak dari AdminDashboard.jsx - semua state & handler
  * tetap di container dan diteruskan lewat props dengan nama yang identik,
  * sehingga body JSX tidak berubah sama sekali.
  */
@@ -34,10 +34,7 @@ export default function SettingsPane({
       <div className="admin-panel">
         {/* Section 1: Kontak & Pembayaran */}
         <div className="admin-panel-head">
-          <div>
-            <div className="admin-panel-title">Kontak & pembayaran</div>
-            <div className="admin-panel-sub">WA admin & payload QRIS</div>
-          </div>
+          <div className="admin-panel-title">Kontak & Pembayaran QRIS</div>
         </div>
 
         <div className="admin-panel-body">

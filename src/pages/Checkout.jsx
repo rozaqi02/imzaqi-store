@@ -37,7 +37,7 @@ function calcTotal(subtotal, percent) {
   return { discount, total: Math.max(0, subtotal - discount) };
 }
 
-/* ── Unified Framer Motion Variants (Desktop & Mobile Unified Timing & Curves) ── */
+/* Unified Framer Motion Variants (Desktop & Mobile Unified Timing & Curves) */
 const backdropVariants = {
   hidden:  { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.52, ease: [0.22, 1, 0.36, 1] } },
@@ -645,7 +645,7 @@ export default function Checkout() {
   if (typeof document === "undefined") return null;
 
   if (!isDrawerCheckout) {
-    // ── FULL-PAGE MODE (mobile + direct visits; desktop without overlay state) ──
+    // FULL-PAGE MODE (mobile + direct visits; desktop without overlay state)
     return (
       <div className="page checkout-page-full">
         <div className="container checkout-full-container">
@@ -761,7 +761,7 @@ export default function Checkout() {
     );
   }
 
-  // ── UNIFIED PORTAL: framer-motion (Desktop & Mobile matching 1:1 physics, timing & curves) ──
+  // UNIFIED PORTAL: framer-motion (Desktop & Mobile matching 1:1 physics, timing & curves)
   const drawerVariants = isMotionOff
     ? {
         hidden: { opacity: 0 },

@@ -54,10 +54,10 @@ import { captureReferralFromUrl } from "./lib/referral";
 import { lazyPage, prefetchPrimaryRoutes } from "./lib/routePrefetch";
 import { useStorefrontOverlayBlocked } from "./hooks/useFunnelRoute";
 
-// ── Eager-loaded pages (critical path) ──
+// Eager-loaded pages (critical path)
 import Home from "./pages/Home";
 
-// ── Lazy-loaded pages (non-critical, reduces initial bundle) ──
+// Lazy-loaded pages (non-critical, reduces initial bundle)
 const Faq = lazyPage("faq");
 const Products = lazyPage("products");
 const ProductDetail = lazyPage("productDetail");
@@ -81,7 +81,7 @@ const LOADER_QUOTES = [
   "Akun ready, tinggal checkout.",
 ];
 
-// ── Branded page loading fallback ──
+// Branded page loading fallback
 function PageLoader() {
   const [text, setText] = React.useState("");
   const [quoteIdx] = React.useState(() => Math.floor(Math.random() * LOADER_QUOTES.length));
@@ -126,7 +126,7 @@ function StorefrontOverlays() {
   );
 }
 
-// ── Floating recent order button ──
+// Floating recent order button
 function FloatingOrderStatus() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -183,7 +183,7 @@ function FloatingOrderStatus() {
   );
 }
 
-// ── Smooth scroll to top on route change ──
+// Smooth scroll to top on route change
 function SuspenseReadyNotifier({ onReady, routeKey }) {
   React.useEffect(() => {
     // Double rAF ensures browser has painted before showing footer
@@ -239,12 +239,12 @@ function ScrollToTop() {
     if (showCheckoutOverlay) return;
 
     if (pathname === "/produk") {
-      // URL filter sync can re-run this effect — never scroll-to-top for that.
+      // URL filter sync can re-run this effect - never scroll-to-top for that.
       if (shouldSkipCatalogScrollToTop()) return;
     }
 
     // Saat navigasi ke halaman non-katalog, pastikan scrollRestoration kembali
-    // ke "auto" — kalau tidak, iOS Safari akan ingat posisi scroll katalog
+    // ke "auto" - kalau tidak, iOS Safari akan ingat posisi scroll katalog
     // dan menerapkannya ke halaman baru (biasanya footer/bawah halaman).
     if (pathname !== "/produk" && typeof history !== "undefined") {
       history.scrollRestoration = "auto";

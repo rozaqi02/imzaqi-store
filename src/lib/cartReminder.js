@@ -13,7 +13,7 @@ export function markCheckoutVisited() {
 export function touchCartActivity() {
   try {
     localStorage.setItem(META_KEY, JSON.stringify({ updatedAt: Date.now() }));
-    // Dismiss lives in sessionStorage — clear both so cart edits can re-show the banner
+    // Dismiss lives in sessionStorage - clear both so cart edits can re-show the banner
     sessionStorage.removeItem(DISMISS_KEY);
     localStorage.removeItem(DISMISS_KEY);
   } catch {}

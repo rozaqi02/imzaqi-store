@@ -1,5 +1,5 @@
 /**
- * Self-hosted fonts — identical in Vite dev, Netlify build, and offline PWA.
+ * Self-hosted fonts - identical in Vite dev, Netlify build, and offline PWA.
  * Latin subsets only (Indonesian UI); replaces Google Fonts CDN.
  */
 import bricolageLatinWght from "@fontsource-variable/bricolage-grotesque/files/bricolage-grotesque-latin-wght-normal.woff2?url";

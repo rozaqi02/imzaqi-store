@@ -1,10 +1,10 @@
 /*
-  Neumorphic depth pass — final cascade layer.
+  Neumorphic depth pass - final cascade layer.
   Upgrades badges, chips, icon buttons, qty controls, and secondary CTAs
   that page CSS still leaves flat (rgba fill + no inset/outset).
 */
 
-/* ── Soft raised control (chips / pills / icon buttons) ─────────── */
+/* Soft raised control (chips / pills / icon buttons) */
 .product-tile-pill,
 .product-typeBadge,
 .product-lowStockBadge,
@@ -26,7 +26,7 @@
 .admin-nav-badge,
 .tab-btn:not(.active),
 .toggle-btn:not(.active),
-/* .pill intentionally excluded — header cart count stays solid red */
+/* .pill intentionally excluded - header cart count stays solid red */
 .badge,
 .flow-assist-badge,
 .home-deliveryPill,
@@ -80,7 +80,7 @@
   box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
-/* Ghost / secondary buttons — raised control, not flat glass */
+/* Ghost / secondary buttons - raised control, not flat glass */
 .btn.btn-ghost,
 .btn-ghost,
 .checkout-drawer .btn-ghost,
@@ -102,7 +102,7 @@
     var(--skeu-control-shadow) !important;
 }
 
-/* Danger — still deep, red-tinted control */
+/* Danger - still deep, red-tinted control */
 .btn.btn-danger,
 .btn-danger,
 .checkout-item-remove:hover,
@@ -139,7 +139,7 @@ html[data-theme="light"] .btn-danger {
   color: var(--brand-text) !important;
 }
 
-/* Qty buttons — compact raised */
+/* Qty buttons - compact raised */
 .qty-btn {
   width: 38px;
   height: 38px;
@@ -180,7 +180,7 @@ html[data-theme="light"] .btn-danger {
     0 0 0 1px color-mix(in srgb, var(--type-color, var(--accent)) 28%, transparent) !important;
 }
 
-/* Compare button — brand green, inset 3D */
+/* Compare button - brand green, inset 3D */
 .detail-page-v3 .pdx-compareBtn,
 .pdx-compareBtn {
   border: 1px solid var(--imzaqi-btn-border, #067a4c) !important;
@@ -229,7 +229,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
   color: var(--chip-color, var(--accent)) !important;
 }
 
-/* Low stock / out — tinted neo pills */
+/* Low stock / out - tinted neo pills */
 .product-lowStockBadge {
   border-color: rgba(255, 191, 74, 0.4) !important;
   background:
@@ -256,7 +256,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
     0 0 0 1px rgba(255, 90, 122, 0.28) !important;
 }
 
-/* Rank badges — metal depth, not flat gradient chips */
+/* Rank badges - metal depth, not flat gradient chips */
 .product-tile-rankBadge--1 {
   border-color: rgba(255, 215, 0, 0.45) !important;
   background:
@@ -309,13 +309,13 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
     0 0 0 1px rgba(0, 214, 180, 0.28) !important;
 }
 
-/* Product tile arrow — match control depth */
+/* Product tile arrow - match control depth */
 .product-tile-arrow {
   border-radius: 12px !important;
   color: var(--brand-icon, var(--accent)) !important;
 }
 
-/* Product detail chips — duration / guarantee keep hue + depth */
+/* Product detail chips - duration / guarantee keep hue + depth */
 .chip-duration,
 .chip-guarantee,
 .chip-account,
@@ -329,7 +329,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
     0 5px 12px rgba(0, 0, 0, 0.16) !important;
 }
 
-/* Status progress bar — neo inset track */
+/* Status progress bar - neo inset track */
 .st-progressBar {
   border: 1px solid var(--brand-line, var(--st-line)) !important;
   background:
@@ -381,7 +381,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-/* Flash sale countdown units — flat text, no deep face boxes */
+/* Flash sale countdown units - flat text, no deep face boxes */
 .fs-countdown-unit,
 .fs-countdown-unit * {
   border: none !important;
@@ -389,7 +389,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
   box-shadow: none !important;
 }
 
-/* Discount % badge — yellow only */
+/* Discount % badge - yellow only */
 .flash-sale-badge,
 .fs-badge {
   border: 1px solid rgba(255, 200, 40, 0.55) !important;
@@ -416,7 +416,7 @@ html[data-theme="light"] .fs-badge {
   color: #5c4200 !important;
 }
 
-/* ── Light mode soft recalibration ──────────────────────────────── */
+/* Light mode soft recalibration */
 html[data-theme="light"] .product-tile-pill,
 html[data-theme="light"] .catalog-chip:not(.active),
 html[data-theme="light"] .faq-chip:not(.active),
@@ -535,7 +535,7 @@ html[data-theme="light"] .st-progressBar-track {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 2 — remaining flat chrome across storefront pages
+   Pass 2 - remaining flat chrome across storefront pages
    ═══════════════════════════════════════════════════════════════════ */
 
 /* Catalog chips / counts / filter chrome */
@@ -650,7 +650,7 @@ html[data-theme="light"] .rv-card {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-/* Order history status pills — tinted neo */
+/* Order history status pills - tinted neo */
 .oh-statusPill {
   box-shadow: var(--skeu-control-shadow) !important;
 }
@@ -709,7 +709,7 @@ html[data-theme="light"] .rv-card {
   box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
-/* Flash sale countdown — no boxed frames (clean digits only) */
+/* Flash sale countdown - no boxed frames (clean digits only) */
 .flash-countdown-unit,
 .flash-sale-timer-box,
 .fs-unit,
@@ -770,7 +770,7 @@ html[data-theme="light"] .rv-card {
 .home-howCard-step,
 .home-sectionBadge,
 .home-kicker {
-  /* kicker is text — only step */
+  /* kicker is text - only step */
 }
 
 .home-howCard-step {
@@ -844,7 +844,7 @@ html[data-theme="light"] .faq-chipCount {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 3 — Pay / trust / toast / tile icon reinforcement
+   Pass 3 - Pay / trust / toast / tile icon reinforcement
    ═══════════════════════════════════════════════════════════════════ */
 
 .qris-wrap,
@@ -932,7 +932,7 @@ html[data-theme="light"] .pay-orderItem {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 4 — Checkout / Status / FAB / Admin status chips
+   Pass 4 - Checkout / Status / FAB / Admin status chips
    ═══════════════════════════════════════════════════════════════════ */
 
 .checkout-item-remove,
@@ -1031,7 +1031,7 @@ html[data-theme="light"] .floating-order-btn {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 5 — Catalog / Admin nav / Lightbox / Home search
+   Pass 5 - Catalog / Admin nav / Lightbox / Home search
    ═══════════════════════════════════════════════════════════════════ */
 
 .catalog-metric,
@@ -1135,7 +1135,7 @@ html[data-theme="light"] .catalog-card {
   border-color: rgba(13, 124, 144, 0.14) !important;
 }
 
-/* Admin sidebar light — readable contrast (overrides generic control wash) */
+/* Admin sidebar light - readable contrast (overrides generic control wash) */
 html[data-theme="light"] .adm-sidebar {
   border-color: rgba(13, 124, 144, 0.18) !important;
   background:
@@ -1203,7 +1203,7 @@ html[data-theme="light"] .adm-footBtn--danger {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 6 — Toast / sticky CTA / modal / footer / admin dashboard
+   Pass 6 - Toast / sticky CTA / modal / footer / admin dashboard
    ═══════════════════════════════════════════════════════════════════ */
 
 .toast,
@@ -1286,7 +1286,7 @@ html[data-theme="light"] .modal {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 7 — Admin operational surfaces (chips, lists, timeline, KPI)
+   Pass 7 - Admin operational surfaces (chips, lists, timeline, KPI)
    ═══════════════════════════════════════════════════════════════════ */
 
 .admin-chip:not(.active),
@@ -1376,7 +1376,7 @@ html[data-theme="light"] .admin-orderListItem {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 8 — Home page only (how cards, promo, FAQ, hero chrome)
+   Pass 8 - Home page only (how cards, promo, FAQ, hero chrome)
    ═══════════════════════════════════════════════════════════════════ */
 
 .home-page .home-howCard {
@@ -1461,7 +1461,7 @@ html[data-theme="light"] .home-page .home-faqItem.faq-item,
 /* .hx-stat-item transparent in single pill */
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 9 — Catalog page only (filter, cards, badges, search, sheet)
+   Pass 9 - Catalog page only (filter, cards, badges, search, sheet)
    ═══════════════════════════════════════════════════════════════════ */
 
 .catalog-page .catalog-searchSuggestions,
@@ -1530,7 +1530,7 @@ html[data-theme="light"] .home-page .home-faqItem.faq-item,
   box-shadow: var(--imzaqi-btn-shadow) !important;
 }
 
-/* Catalog line pills (Aplikasi Premium / Jasa Akademik) — outline-free 3D tactile neumorphic using web design tokens */
+/* Catalog line pills (Aplikasi Premium / Jasa Akademik) - outline-free 3D tactile neumorphic using web design tokens */
 .catalog-page .catalog-quickChip.catalog-quickChip--line:not(.active),
 .catalog-page .catalog-quickChip.catalog-quickChip--app_premium:not(.active),
 .catalog-page .catalog-quickChip.catalog-quickChip--academic:not(.active) {
@@ -1586,7 +1586,7 @@ html[data-theme="light"] .catalog-page .catalog-metric {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Pass 10 — Catalog remaining flats (mobile cards, skeleton, sheet,
+   Pass 10 - Catalog remaining flats (mobile cards, skeleton, sheet,
    content bar, filter sections, history clear, empty state)
    ═══════════════════════════════════════════════════════════════════ */
 
@@ -1641,7 +1641,7 @@ html[data-theme="light"] .catalog-page .catalog-metric {
     0 4px 10px rgba(255, 70, 100, 0.14) !important;
 }
 
-/* Catalog stock/status pills — brand-aligned colors (not washed slate) */
+/* Catalog stock/status pills - brand-aligned colors (not washed slate) */
 .catalog-page .catalog-status.ok {
   border-color: color-mix(in srgb, var(--accent) 42%, transparent) !important;
   background:
@@ -1845,7 +1845,7 @@ html[data-theme="light"] .catalog-page .catalog-activeReset {
   }
 }
 
-/* Header cart count — solid red alert (must beat generic .pill neo tokens) */
+/* Header cart count - solid red alert (must beat generic .pill neo tokens) */
 .header-cart .pill,
 html[data-theme="light"] .header-cart .pill {
   background: #ff4d6d !important;
@@ -1855,7 +1855,7 @@ html[data-theme="light"] .header-cart .pill {
   text-shadow: none !important;
 }
 
-/* Catalog card press-in — beat raised panel shadow on :active (incl. mobile) */
+/* Catalog card press-in - beat raised panel shadow on :active (incl. mobile) */
 .catalog-page .catalog-card:active,
 .catalog-page .catalog-card.catalog-cardV2:active {
   transform: scale(0.97) translateY(1px) !important;
@@ -1889,7 +1889,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Catalog mobile scroll perf — lighter paint, no mass will-change
+   Catalog mobile scroll perf - lighter paint, no mass will-change
    ═══════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 720px) {
@@ -1978,7 +1978,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 }
 
 /* ═══════════════════════════════════════════════════════════════════
-   Home mobile scroll perf — beat Pass 8 full skeu shadows on phone
+   Home mobile scroll perf - beat Pass 8 full skeu shadows on phone
    ═══════════════════════════════════════════════════════════════════ */
 
 @media (max-width: 720px) {
@@ -2079,9 +2079,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   }
 }
 
-/* -------------------------------------------------------------------
-   Product Detail mobile scroll perf � beat full skeu control shadows
-   ------------------------------------------------------------------- */
+/* Product Detail mobile scroll perf: beat full skeu control shadows */
 
 @media (max-width: 720px) {
   .detail-page-v3 .pdx-topCard,
@@ -2226,7 +2224,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   }
 }
 
-/* ── Neumorphic Meta Badges & Rank Badges Overhaul ── */
+/* Neumorphic Meta Badges & Rank Badges Overhaul */
 .pdx-packMetaItem,
 .detail-page-v3 .pdx-packMetaItem {
   display: inline-flex !important;
@@ -2275,7 +2273,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   border-radius: 8px !important;
 }
 
-/* Terlaris & Rank #1-4 Badges — 3D Neumorphic Gloss */
+/* Terlaris & Rank #1-4 Badges - 3D Neumorphic Gloss */
 .product-tile-rankBadge,
 .product-tile-rankBadge--1 {
   display: inline-flex !important;
@@ -2388,7 +2386,7 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 }
 
 
-/* ── Tactile Micro-Interactions: Physics-based button depression ── */
+/* Tactile Micro-Interactions: Physics-based button depression */
 .btn:active,
 .btn-primary:active,
 .btn-ghost:active,

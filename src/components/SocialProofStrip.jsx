@@ -17,11 +17,11 @@ export default function SocialProofStrip({ limit = 3, title = "Dipercaya pembeli
 
   return (
     <div className="social-proof-strip" aria-label={title}>
-      <div className="social-proof-head"><Star size={14} /><span>{title}</span></div>
+      <div className="social-proof-head"><Star size={14} aria-hidden="true" /><span>{title}</span></div>
       <div className="social-proof-list">
         {items.map((item) => (
           <figure key={item.id} className="social-proof-card">
-            {item.image_url ? <img src={item.image_url} alt="" loading="lazy" /> : null}
+            {item.image_url ? <img src={item.image_url} alt="" loading="lazy" width="80" height="80" /> : null}
             <figcaption>{item.caption || "Pembeli puas"}</figcaption>
           </figure>
         ))}

@@ -77,7 +77,7 @@ export function slugify(input) {
     .replace(/(^-|-$)+/g, "");
 }
 
-// ── Order Status Timeline ──
+// Order Status Timeline
 export function getTimeline(status) {
   const value = String(status || "pending");
   if (value === "cancelled") {
@@ -108,7 +108,7 @@ export function getTimeline(status) {
   ];
 }
 
-// ── Stock Classification ──
+// Stock Classification
 export function classifyStock(stock) {
   const s = Number(stock ?? 0);
   if (s <= 0) return "out";
@@ -124,7 +124,7 @@ export function getStockWarningState(orderedQty, availableStock) {
   return "ok";
 }
 
-// ── Analytics ──
+// Analytics
 export function calcConversionRate(totalOrders, totalViews) {
   const orders = Number(totalOrders || 0);
   const views = Number(totalViews || 0);
@@ -159,7 +159,7 @@ export function calcRevenueForecast(dailyStats) {
   return { forecast7d: Math.round(forecast7d), trend };
 }
 
-// ── Catalog ──
+// Catalog
 export function summarizeCatalogCopy(text) {
   const firstLine = String(text || "")
     .split(/\r?\n+/)
@@ -170,7 +170,7 @@ export function summarizeCatalogCopy(text) {
   return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
 }
 
-// ── Promo ──
+// Promo
 export function mapPromoResult(rpcValue) {
   const v = Number(rpcValue);
   if (v === -3) return { ok: false, message: "Kuota kode promo sudah habis.", percent: 0 };
@@ -221,7 +221,7 @@ export function detectAccountTypes(variants) {
   return found;
 }
 
-// ── WhatsApp Utilities ──
+// WhatsApp Utilities
 export function formatWhatsAppNumber(value) {
   const clean = String(value || '').replace(/[^\d+]/g, '');
   if (clean.startsWith('+62')) {

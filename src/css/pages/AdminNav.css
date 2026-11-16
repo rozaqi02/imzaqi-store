@@ -1,11 +1,11 @@
-/* Admin navigation — clean sidebar + 4-tab mobile dock */
+/* Admin navigation - clean sidebar + 4-tab mobile dock */
 
 .admin-shell {
   grid-template-columns: 260px minmax(0, 1fr);
   gap: 20px;
 }
 
-/* ── Desktop sidebar ── */
+/* Desktop sidebar */
 .adm-sidebar {
   position: sticky;
   top: calc(var(--site-header-offset, 86px) + 12px);
@@ -336,14 +336,14 @@ html[data-theme="light"] .adm-sidebarGreeting {
     0 5px 12px rgba(255, 73, 126, 0.14);
 }
 
-/* ── Mobile dock + sheet ── */
+/* Mobile dock + sheet */
 .adm-dock,
 .adm-moreSheet,
 .adm-sheetBackdrop {
   display: none;
 }
 
-/* Mobile page head — replaces cluttered top bar */
+/* Mobile page head - replaces cluttered top bar */
 .adm-mobileHead {
   display: none;
 }
@@ -556,7 +556,7 @@ html[data-theme="light"] .adm-sidebarGreeting {
   }
 
   .adm-dock {
-    /* 5 slots: Home | Order | Produk | Promo | Lainnya — must stay 1 row */
+    /* 5 slots: Home | Order | Produk | Promo | Lainnya - must stay 1 row */
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
     grid-auto-flow: column;
@@ -582,7 +582,7 @@ html[data-theme="light"] .adm-sidebarGreeting {
     overflow: hidden;
   }
 
-  /* Toast portals to body — lift above admin bottom dock so it doesn't cover tabs */
+  /* Toast portals to body - lift above admin bottom dock so it doesn't cover tabs */
   body:has(.app-main-admin) .toast-viewport,
   body:has(.admin-page) .toast-viewport {
     bottom: calc(64px + env(safe-area-inset-bottom, 0px) + 12px);
@@ -664,7 +664,7 @@ html[data-theme="light"] .adm-sidebarGreeting {
   to { opacity: 1; }
 }
 
-/* ── Light mode ── */
+/* Light mode */
 html[data-theme="light"] .adm-sidebar {
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0) 28%),

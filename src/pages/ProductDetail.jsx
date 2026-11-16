@@ -4,6 +4,8 @@ import { productStructuredData } from "../lib/productStructuredData.mjs";
 import {
   ArrowDown,
   ArrowLeft,
+  ArrowLeftRight,
+  Check,
   ChevronLeft,
   Clock3,
   Flame,
@@ -34,7 +36,7 @@ import { useLongTaskMonitor } from "../hooks/usePerformanceMonitor";
 import { warn } from "../lib/log";
 import { fireConfetti } from "../components/Confetti";
 
-// ── Live viewer & countdown removed (fake data - hurts trust) ──────────────
+// Live viewer & countdown removed (fake data - hurts trust)
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
 import { buildCatalogAdminWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
@@ -112,8 +114,30 @@ function VariantBenefitList({ rawText }) {
   const sections = parseDescriptionToSections(rawText);
   if (!sections.length) return null;
 
+  // Tampilkan 2 poin penting langsung tanpa harus membuka akordeon
+  const previewItems = [];
+  for (const s of sections) {
+    for (const it of s.items) {
+      if (previewItems.length < 2 && it && it.trim()) {
+        previewItems.push(it.trim());
+      }
+    }
+    if (previewItems.length >= 2) break;
+  }
+
   return (
     <div className="pdx-packDetails">
+      {previewItems.length > 0 ? (
+        <ul className="pdx-packHighlights" aria-label="Highlight paket">
+          {previewItems.map((item, i) => (
+            <li key={i} className="pdx-packHighlightItem">
+              <Check size={12} className="pdx-packHighlightIcon" aria-hidden="true" />
+              <span>{normalizeInlineText(item)}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+
       <details className="pdx-packDetailsToggle">
         <summary>Lihat rincian paket</summary>
         <div className="pdx-packDetailsContent">
@@ -140,7 +164,12 @@ function RestockRequest({ variant, adminUrl }) {
 
   async function submit(event) {
     event.preventDefault();
-    const digits = phone.replace(/\D/g, "");
+    let digits = phone.replace(/\D/g, "");
+    if (digits.startsWith("08")) {
+      digits = "628" + digits.slice(2);
+    } else if (digits.startsWith("8")) {
+      digits = "628" + digits.slice(1);
+    }
     if (digits.length < 10) { setState("invalid"); return; }
     setState("loading");
     const { error } = await supabase.from("restock_requests").insert({
@@ -215,7 +244,7 @@ function RestockRequest({ variant, adminUrl }) {
             aria-label="WhatsApp untuk notifikasi restock"
           />
           <button className="btn btn-sm pdx-restockSubmitBtn" disabled={state === "loading"}>
-            {state === "loading" ? "Menyimpan…" : "Ingatkan saya"}
+            {state === "loading" ? "Menyimpan..." : "Ingatkan saya"}
           </button>
           {state === "invalid" ? (
             <small>Masukkan nomor WhatsApp yang valid.</small>
@@ -231,6 +260,26 @@ function RestockRequest({ variant, adminUrl }) {
 function parseDays(label) {
   const match = String(label || "").match(/(\d+)/);
   return match ? Number(match[1]) : 0;
+}
+
+function getPricePerMonth(variant, price) {
+  if (!variant || !price) return null;
+  const text = `${variant.duration_label || ""} ${variant.name || ""}`;
+  const monthMatch = text.match(/(\d+)\s*(?:bln|bulan|month)/i);
+  if (monthMatch) {
+    const months = parseInt(monthMatch[1], 10);
+    if (months > 1) {
+      return Math.round(price / months);
+    }
+  }
+  const yearMatch = text.match(/(\d+)\s*(?:thn|tahun|year)/i);
+  if (yearMatch) {
+    const years = parseInt(yearMatch[1], 10);
+    if (years >= 1) {
+      return Math.round(price / (years * 12));
+    }
+  }
+  return null;
 }
 
 function pickRecommendedVariant(variants, flashSaleMap) {
@@ -272,7 +321,7 @@ const VARIANT_TAB_META = {
   semua: { label: "Semua", icon: LayoutGrid },
   bulanan: { label: "Bulanan", icon: Clock3 },
   tahunan: { label: "Tahunan", icon: Clock3 },
-  lifetime: { label: "Lifetime", icon: Sparkles },
+  lifetime: { label: "Lifetime", icon: ShieldCheck },
   sharing: { label: "Sharing", icon: Users },
   private: { label: "Private", icon: UserRound },
   family: { label: "Family", icon: Users },
@@ -393,6 +442,8 @@ const VariantCard = React.memo(({
     variant.requires_buyer_email ? "Perlu email" : null,
   ].filter(Boolean);
 
+  const pricePerMonth = getPricePerMonth(variant, effectivePrice);
+
   const cardChildren = (
     <>
       <div className="pdx-packHead">
@@ -421,6 +472,11 @@ const VariantCard = React.memo(({
             ) : (
               <div className="pdx-packPrice">{formatIDR(variant.price_idr)}</div>
             )}
+            {pricePerMonth ? (
+              <div className="pdx-pricePerMonth" style={{ fontSize: "11px", opacity: 0.75, textAlign: "right", marginTop: "2px" }}>
+                ({formatIDR(pricePerMonth)}/bln)
+              </div>
+            ) : null}
           </div>
         </div>
 
@@ -1163,7 +1219,7 @@ export default function ProductDetail() {
                     <h2 className="pdx-sectionTitle">Pilih paketmu</h2>
                     {variants.length > 1 ? (
                       <button className="pdx-compareBtn" type="button" title="Bandingkan harga, durasi, dan garansi" onClick={() => setCompareOpen(true)}>
-                        <span className="pdx-compareIcon" aria-hidden="true">⇄</span>
+                        <ArrowLeftRight size={13} className="pdx-compareIcon" aria-hidden="true" />
                         <span className="pdx-compareLabel">Bandingkan paket</span>
                       </button>
                     ) : null}
@@ -1282,7 +1338,7 @@ export default function ProductDetail() {
             </div>
           </div>
 
-          <RecentlyViewed currentProductId={product.id} />
+          <RecentlyViewed currentProductId={product.id} currentSlug={product.slug} />
 
           <section className="pdx-recommendations" ref={recommendationsRef} aria-label="Rekomendasi produk">
             <div className="pdx-recommendationsHead">
@@ -1304,27 +1360,59 @@ export default function ProductDetail() {
 
 
     {/* Mobile Sticky Purchase Dock */}
-    <div className="pdx-mobileStickyDock" aria-label="Aksi pembelian cepat">
-      <div className="pdx-mobileStickyDockPrice">
-        <span className="pdx-mobileStickyDockLabel">Mulai dari</span>
-        <strong className="pdx-mobileStickyDockValue">
-          {summary.minPrice ? formatIDR(summary.minPrice) : "-"}
-        </strong>
-      </div>
-      <button
-        type="button"
-        className="btn btn-primary pdx-mobileStickyDockBtn"
-        onClick={() => {
-          const variantsSection = document.getElementById("paket-tersedia") || document.getElementById("pdx-variants-section") || document.querySelector(".pdx-variantsSection");
-          if (variantsSection) {
-            variantsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-          }
-        }}
-      >
-        <span>Pilih Paket</span>
-        <ArrowDown size={15} />
-      </button>
-    </div>
+    {(() => {
+      const isSingleVariant = variants.length === 1;
+      const singleVariant = isSingleVariant ? variants[0] : null;
+      const singleOutOfStock = singleVariant ? isKnownOutOfStock(singleVariant) : false;
+      const singlePrice = singleVariant ? getVariantEffectivePrice(singleVariant, flashSaleMap) : null;
+
+      return (
+        <div className="pdx-mobileStickyDock" aria-label="Aksi pembelian cepat">
+          <div className="pdx-mobileStickyDockPrice">
+            <span className="pdx-mobileStickyDockLabel">
+              {isSingleVariant && singleVariant.name ? singleVariant.name : "Mulai dari"}
+            </span>
+            <strong className="pdx-mobileStickyDockValue">
+              {isSingleVariant && singlePrice
+                ? formatIDR(singlePrice)
+                : summary.minPrice
+                  ? formatIDR(summary.minPrice)
+                  : "-"}
+            </strong>
+          </div>
+          {isSingleVariant && !singleOutOfStock ? (
+            <button
+              type="button"
+              className="btn btn-primary pdx-mobileStickyDockBtn"
+              onClick={(e) => {
+                const isAlreadyInCart = (cart.items || []).some((it) => it.variant_id === singleVariant.id);
+                if (!isAlreadyInCart) {
+                  handleAdd(singleVariant, 1, e);
+                }
+                nav("/checkout", { state: { backgroundLocation: location } });
+              }}
+            >
+              <span>Beli Sekarang</span>
+              <ShoppingBag size={15} />
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn btn-primary pdx-mobileStickyDockBtn"
+              onClick={() => {
+                const variantsSection = document.getElementById("paket-tersedia") || document.getElementById("pdx-variants-section") || document.querySelector(".pdx-variantsSection");
+                if (variantsSection) {
+                  variantsSection.scrollIntoView({ behavior: "smooth", block: "start" });
+                }
+              }}
+            >
+              <span>Pilih Paket</span>
+              <ArrowDown size={15} />
+            </button>
+          )}
+        </div>
+      );
+    })()}
 
     <VariantCompareModal
       open={compareOpen}

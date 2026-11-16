@@ -12,14 +12,14 @@ import NumberCounter from "./NumberCounter";
 import { useDeviceCapability } from "../hooks/useIsMobile";
 import HeroCatalogBackdrop from "./HeroCatalogBackdrop";
 
-/* ── Trust Bar (Replaces generic 4-box dashboard cards with bespoke e-commerce proof) ── */
+/* Trust Bar (Replaces generic 4-box dashboard cards with bespoke e-commerce proof) */
 function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
   const { totalOrders, loading } = useLiveStats({
     intervalMs: 60000,
   });
 
-  const orderCount = totalOrders || 200;
-  const productCount = activeProductCount || 25;
+  const orderCount = totalOrders != null ? Number(totalOrders) : null;
+  const productCount = activeProductCount != null ? Number(activeProductCount) : null;
 
   return (
     <div className="hx-trust-bar" role="region" aria-label="Jaminan & Bukti Toko">
@@ -27,8 +27,8 @@ function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
         <ShieldCheck size={14} className="hx-trust-icon" aria-hidden="true" />
         <span className="hx-trust-text">
           <strong>
-            {loading && !totalOrders ? (
-              "200+"
+            {loading || orderCount == null ? (
+              "-"
             ) : (
               <>
                 <NumberCounter value={orderCount} />+
@@ -42,11 +42,11 @@ function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
       <span className="hx-trust-divider" aria-hidden="true" />
 
       <div className="hx-trust-item">
-        <Zap size={14} className="hx-trust-icon" aria-hidden="true" />
+        <PackageCheck size={14} className="hx-trust-icon" aria-hidden="true" />
         <span className="hx-trust-text">
           <strong>
-            {isProductsLoading && !activeProductCount ? (
-              "25+"
+            {isProductsLoading || productCount == null ? (
+              "-"
             ) : (
               <>
                 <NumberCounter value={productCount} />+
@@ -69,7 +69,7 @@ function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
   );
 }
 
-/* ── Main Hero ── */
+/* Main Hero */
 const HERO_LOGO_SCROLL_RANGE = 75;
 const HEADLINE_WORDS = ["Akses", "Premium", "Budget", "Pelajar"];
 
@@ -174,7 +174,7 @@ export default function Hero({ products = [], loading = false }) {
       <HeroCatalogBackdrop />
       <div className="hx-hero-scrim" aria-hidden="true" />
       <Link ref={logoRef} to="/" className="hx-hero-logo" aria-label="Imzaqi Store">
-        <img src="/icon.png" alt="Imzaqi Store" />
+        <img src="/icon.png" alt="Imzaqi Store" width="48" height="48" />
       </Link>
       <div className="container">
         <div className="hx-stage">
@@ -182,7 +182,7 @@ export default function Hero({ products = [], loading = false }) {
             <HeroHeadline active={entranceActive} reduced={isMotionReduced} />
 
             <p className="hx-subtitle">
-              Pilih paket, bayar QRIS, lacak status order.
+              Pilih paket, bayar QRIS, lacak status order: proses cepat 5 hingga 30 menit.
             </p>
 
             <div className="hx-ctas-row">

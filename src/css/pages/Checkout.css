@@ -82,7 +82,7 @@ html[data-theme="light"] .checkout-drawerClose:hover{background:rgba(200,30,58,.
   gap:12px;
   box-shadow:inset 0 1px 0 rgba(255,255,255,.04);
 }
-/* Left section: icon + text — MUST shrink, takes all leftover space */
+/* Left section: icon + text - MUST shrink, takes all leftover space */
 .checkout-item-left{
   display:flex;
   flex-direction:row;
@@ -115,7 +115,7 @@ html[data-theme="light"] .checkout-drawerClose:hover{background:rgba(200,30,58,.
   font-size:12px;line-height:1.5;
   white-space:normal;overflow-wrap:break-word;word-break:break-word;
 }
-/* Right section: controls — NEVER shrinks, always at natural width */
+/* Right section: controls - NEVER shrinks, always at natural width */
 .checkout-item-controls{
   display:flex;
   flex-direction:row;
@@ -219,7 +219,7 @@ html[data-theme="light"] .checkout-backdrop-mobile {
   to{opacity:1;transform:translateY(0) scale(1)}
 }
 
-/* checkoutGesturePulse removed — pill stays static after intro */
+/* checkoutGesturePulse removed - pill stays static after intro */
 
 @media (max-width: 1180px){
   .checkout-drawer{width:min(68vw, 860px);}
@@ -328,7 +328,7 @@ html[data-theme="light"] .checkout-backdrop-mobile {
   animation:checkoutGestureIn .22s var(--ease-out, cubic-bezier(0.16, 1, 0.3, 1)) both!important;
 }
 
-/* ── Stock Warning Inline ── */
+/* Stock Warning Inline */
 .checkout-stockWarn {
   width: 100%;
   margin-top: 6px;
@@ -381,7 +381,7 @@ html[data-theme="light"] .checkout-floating-bar-reason {
   color: #c2410c;
 }
 
-/* ── Mobile checkout skeleton (shown during slide-in animation) ── */
+/* Mobile checkout skeleton (shown during slide-in animation) */
 .checkout-mobileSkeleton {
   display: grid;
   gap: 12px;
@@ -434,14 +434,14 @@ html[data-theme="light"] .checkout-floating-bar-reason {
   to { opacity: 1; }
 }
 
-/* ── Stepper Active Scale Bounce ── */
+/* Stepper Active Scale Bounce */
 .qty-btn:active {
   transform: scale(0.86) !important;
   background: rgba(255, 255, 255, 0.14) !important;
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* ── Promo Controls Animations ── */
+/* Promo Controls Animations */
 .checkout-promo-controls input {
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -461,7 +461,7 @@ html[data-theme="light"] .checkout-floating-bar-reason {
   35%, 72% { transform: translateX(5px); border-color: rgba(255, 73, 126, 0.5); box-shadow: 0 0 12px rgba(255, 73, 126, 0.2); }
 }
 
-/* ── DEDICATED FULL-PAGE CHECKOUT ── */
+/* DEDICATED FULL-PAGE CHECKOUT */
 .checkout-page-full {
   min-height: 100vh;
   min-height: 100dvh;
@@ -699,7 +699,7 @@ html[data-theme="light"] .checkout-back-btn:hover {
     display: none;
   }
 
-  /* Floating sticky bottom bar — full-page checkout only (not drawer overlay) */
+  /* Floating sticky bottom bar - full-page checkout only (not drawer overlay) */
   .checkout-mobile-floating-bar:not(.checkout-mobile-floating-bar--drawer) {
     display: flex;
     align-items: center;
@@ -786,7 +786,7 @@ html[data-theme="light"] .checkout-back-btn:hover {
   }
 }
 
-/* ── Checkout App Main Container Override ── */
+/* Checkout App Main Container Override */
 .app-main-checkout {
   padding-top: 0 !important;
   padding-left: 0 !important;
@@ -855,7 +855,7 @@ html[data-theme="light"] .checkout-back-btn:hover {
   margin: 0;
 }
 
-/* ── Conversion-focused checkout layout ── */
+/* Conversion-focused checkout layout */
 .checkout-overlay .checkout-drawer,
 .checkout-page-full {
   --checkout-page-bg: #101715;

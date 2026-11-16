@@ -1,4 +1,4 @@
-/* Admin Dashboard — comprehensive light mode (desktop + mobile) */
+/* Admin Dashboard - comprehensive light mode (desktop + mobile) */
 
 html[data-theme="light"] .admin-page {
   --adm-text: #123744;
@@ -17,7 +17,7 @@ html[data-theme="light"] .admin-page {
   color: var(--adm-text);
 }
 
-/* ── Surfaces ── */
+/* Surfaces */
 html[data-theme="light"] .admin-page .admin-sidebar,
 html[data-theme="light"] .admin-page .admin-panel,
 html[data-theme="light"] .admin-page .admin-statCard,
@@ -99,7 +99,7 @@ html[data-theme="light"] .admin-page .admin-logo {
   border-color: rgba(0, 138, 148, 0.24) !important;
 }
 
-/* ── Typography / muted copy ── */
+/* Typography / muted copy */
 html[data-theme="light"] .admin-page .admin-brand-sub,
 html[data-theme="light"] .admin-page .admin-nav-copy small,
 html[data-theme="light"] .admin-page .admin-topbar-eyebrow,
@@ -144,7 +144,7 @@ html[data-theme="light"] .admin-page .admin-order-priceRow.total strong {
   color: var(--adm-text) !important;
 }
 
-/* ── Forms ── */
+/* Forms */
 html[data-theme="light"] .admin-page .input,
 html[data-theme="light"] .admin-page .admin-textarea,
 html[data-theme="light"] .admin-page select,
@@ -163,7 +163,7 @@ html[data-theme="light"] .admin-page .admin-searchInput {
   color: var(--adm-text) !important;
 }
 
-/* ── Status & pills ── */
+/* Status & pills */
 html[data-theme="light"] .admin-page .admin-status,
 html[data-theme="light"] .admin-page .admin-product-pill {
   color: var(--adm-text) !important;
@@ -201,7 +201,7 @@ html[data-theme="light"] .admin-page .admin-categoryTag {
   border-color: var(--adm-border) !important;
 }
 
-/* ── Alerts & banners ── */
+/* Alerts & banners */
 html[data-theme="light"] .admin-page .admin-alert {
   color: #9f1239 !important;
   background: rgba(255, 73, 126, 0.08) !important;
@@ -221,7 +221,7 @@ html[data-theme="light"] .admin-page .admin-stockAlertDismiss {
   color: var(--adm-muted) !important;
 }
 
-/* ── Mobile tabs ── */
+/* Mobile tabs */
 html[data-theme="light"] .admin-page .admin-mobileTab {
   color: var(--adm-muted) !important;
   background: var(--adm-surface-soft) !important;
@@ -238,7 +238,7 @@ html[data-theme="light"] .admin-page .admin-mobileTabIcon {
   color: var(--adm-accent) !important;
 }
 
-/* ── Scrollbar ── */
+/* Scrollbar */
 html[data-theme="light"] .admin-page .admin-sidebar {
   scrollbar-color: rgba(0, 138, 148, 0.22) transparent;
 }
@@ -247,13 +247,13 @@ html[data-theme="light"] .admin-page .admin-sidebar::-webkit-scrollbar-thumb {
   background: rgba(0, 138, 148, 0.22);
 }
 
-/* ── Decorative pseudo-elements off in light ── */
+/* Decorative pseudo-elements off in light */
 html[data-theme="light"] .admin-page .admin-overviewHero::before,
 html[data-theme="light"] .admin-page .admin-overviewHero::after {
   display: none !important;
 }
 
-/* ── Order pricing rows ── */
+/* Order pricing rows */
 html[data-theme="light"] .admin-page .admin-order-priceRow,
 html[data-theme="light"] .admin-page .admin-order-promo,
 html[data-theme="light"] .admin-page .admin-order-notes.empty {
@@ -264,14 +264,14 @@ html[data-theme="light"] .admin-page .admin-order-priceRow.total {
   color: var(--adm-text) !important;
 }
 
-/* ── Icon preview fallback ── */
+/* Icon preview fallback */
 html[data-theme="light"] .admin-page .admin-icon-fallback,
 html[data-theme="light"] .admin-page .admin-product-icon-fallback {
   color: var(--adm-accent) !important;
   background: var(--adm-accent-soft) !important;
 }
 
-/* ── Light gaps: orders, charts, bulk, timeline, promo ── */
+/* Light gaps: orders, charts, bulk, timeline, promo */
 html[data-theme="light"] .admin-page .admin-orderListItem {
   background: var(--adm-surface-soft) !important;
   border-color: var(--adm-border) !important;

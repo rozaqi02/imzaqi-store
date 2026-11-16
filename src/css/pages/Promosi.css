@@ -18,7 +18,7 @@
   box-sizing: border-box;
 }
 
-/* ── Hero Section ────────────────────────────────────────── */
+/* Hero Section */
 .store-hero.store-hero--promosi {
   position: relative;
   display: grid;
@@ -129,7 +129,7 @@
   display: block;
 }
 
-/* ── Studio Section ──────────────────────────────────────── */
+/* Studio Section */
 .promosi-studio {
   border: 1px solid var(--surface-line);
   border-radius: 28px;
@@ -172,7 +172,7 @@
   margin: 0;
 }
 
-/* ── Loading State ───────────────────────────────────────── */
+/* Loading State */
 .promosi-loading {
   display: flex;
   flex-direction: column;
@@ -199,7 +199,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Responsive Queries ──────────────────────────────────── */
+/* Responsive Queries */
 @media (max-width: 960px) {
   .store-hero.store-hero--promosi {
     grid-template-columns: 1fr;

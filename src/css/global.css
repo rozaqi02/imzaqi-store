@@ -7,7 +7,7 @@ html {
   --line: rgba(255, 255, 255, .12);
   --text: #f5f5f5;
   --muted: #a3a3a3;
-  /* --accent intentionally NOT set here — defined in theme-variables.css to avoid cascade conflict */
+  /* accent intentionally NOT set here - defined in theme-variables.css to avoid cascade conflict */
   --accent2: #008a94;
   --danger: #ff5a7a;
   --shadow: 0
@@ -23,7 +23,7 @@ html {
   --dur-fast: 140ms;
   --dur-med: 220ms;
   --dur-slow: 420ms;
-  /* Scroll/entrance reveal — longer so motion is more perceptible */
+  /* Scroll/entrance reveal - longer so motion is more perceptible */
   --reveal-dur: 0.95s;
   --reveal-ease: cubic-bezier(0.16, 1, 0.3, 1);
   --site-header-offset: 0px;
@@ -69,7 +69,7 @@ html[data-theme="light"] body::before {
   opacity: 0.014;
 }
 
-/* Kill SVG noise overlay on mobile — feTurbulence re-rasterizes on every zoom change, causing severe jank */
+/* Kill SVG noise overlay on mobile - feTurbulence re-rasterizes on every zoom change, causing severe jank */
 @media (max-width: 920px), (pointer: coarse) {
   body::before {
     display: none !important;
@@ -82,7 +82,7 @@ html {
   touch-action: manipulation;
 }
 
-/* Disable smooth scroll on mobile/touch — causes bottom nav & FAB stutter on iOS momentum scroll */
+/* Disable smooth scroll on mobile/touch - causes bottom nav & FAB stutter on iOS momentum scroll */
 @media (max-width: 920px), (pointer: coarse) {
   html {
     scroll-behavior: auto;
@@ -110,7 +110,7 @@ html {
   }
 }
 
-/* ── Global focus states — Double-Ring Keyboard Focus Rings ──── */
+/* Global focus states - Double-Ring Keyboard Focus Rings */
 :focus-visible {
   outline: none;
   box-shadow:
@@ -138,12 +138,12 @@ html[data-theme="light"] [tabindex]:focus-visible {
     0 0 0 4px var(--accent, #009e60);
 }
 
-/* ── Global Tabular Numbers Utility ── */
+/* Global Tabular Numbers Utility */
 :is(.price, [data-price], .tabular-nums, .checkout-summaryTotal, .pay-stageTotal, .st-orderCodeText, .st-itemRow > b) {
   font-variant-numeric: tabular-nums lining-nums;
 }
 
-/* Input focus — ring tanpa double outline */
+/* Input focus - ring tanpa double outline */
 input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
@@ -195,7 +195,7 @@ html[data-theme="light"] body {
     var(--bg1);
 }
 
-/* Simplify body background on mobile — gradients recalculated during zoom causes lag */
+/* Simplify body background on mobile - gradients recalculated during zoom causes lag */
 @media (max-width: 720px), (pointer: coarse) {
   body {
     background: linear-gradient(180deg, var(--bg1) 0%, var(--bg0) 100%);
@@ -249,7 +249,7 @@ html[data-theme="light"] body {
   color: #fff;
 }
 
-/* Global headings typography — Plus Jakarta Sans display font */
+/* Global headings typography - Plus Jakarta Sans display font */
 h1, h2, h3, h4, h5, h6,
 .h1, .h2, .h3, .h4, .h5, .h6 {
   font-family: var(--font-display);
@@ -269,7 +269,7 @@ html[data-theme="light"] h6 {
   text-shadow: 0 1px 3px rgba(67, 111, 129, 0.1);
 }
 
-/* Global focus ring — neumorphic glow */
+/* Global focus ring - neumorphic glow */
 :focus-visible {
   outline: none;
   box-shadow:
@@ -282,7 +282,7 @@ a {
   text-decoration: none;
 }
 
-/* Technical and data typography — Monospace (JetBrains Mono) */
+/* Technical and data typography - Monospace (JetBrains Mono) */
 code,
 kbd,
 samp,
@@ -1317,7 +1317,7 @@ html[data-theme="light"] .whatsapp-input-wrapper .error-hint {
   }
 }
 
-/* Legacy mobile hamburger drawer — removed; bottom nav handles compact navigation. */
+/* Legacy mobile hamburger drawer - removed; bottom nav handles compact navigation. */
 /*
 @media (max-width: 1024px) {
   .nav {
@@ -1748,7 +1748,7 @@ body {
   }
 }
 
-/* ── Enhanced Focus & Accessibility ── */
+/* Enhanced Focus & Accessibility */
 .checkout-input:focus-visible,
 .checkout-btn:focus-visible {
   outline: none;
@@ -2465,7 +2465,7 @@ html[data-theme="light"] .header-iconAction.active {
     inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-/* ── Header shrink (subtle, desktop only) ── */
+/* Header shrink (subtle, desktop only) */
 @media (min-width: 721px) {
   .header {
     transition:
@@ -2500,7 +2500,7 @@ html[data-theme="light"] .header-iconAction.active {
   }
 }
 
-/* ── Nav animated pill (active & hover) ── */
+/* Nav animated pill (active & hover) */
 .nav-active-pill,
 .nav-hover-pill {
   position: absolute;
@@ -3624,7 +3624,7 @@ body {
 
   html .header,
   html .site-header {
-    /* Styles handled by motion-adaptive.css — no overrides needed here */
+    /* Styles handled by motion-adaptive.css - no overrides needed here */
   }
 }
 
@@ -3847,7 +3847,7 @@ body {
   mask-image: none !important;
 }
 
-/* ── 404 Not Found (legacy shell styles; page layout lives in pages/NotFound.css) ── */
+/* 404 Not Found (legacy shell styles; page layout lives in pages/NotFound.css) */
 .nf-page {
   min-height: 80vh;
   /* Do not flex-center: fixed header overlays main; top padding owns clearance */
@@ -4549,7 +4549,7 @@ html[data-theme="light"] .site-header {
 }
 
 
-/* ── Do not show footer while page-level skeletons or loaders are active ── */
+/* Do not show footer while page-level skeletons or loaders are active */
 body:has(.page-loader) .site-footer,
 body:has(.pdx-skeletonPage) .site-footer,
 body:has(.reviews-skeleton) .site-footer,
@@ -4559,7 +4559,7 @@ body:has([aria-busy="true"]) .site-footer {
   display: none !important;
 }
 
-/* ── Theme transition — single overlay fade (1 layer, no per-element repaint) ── */
+/* Theme transition - single overlay fade (1 layer, no per-element repaint) */
 html.no-theme-transition,
 html.no-theme-transition *,
 html.theme-fade-active,
@@ -4593,7 +4593,7 @@ html.theme-fade-active * {
   }
 }
 
-/* ── Loading spinner for buttons ── */
+/* Loading spinner for buttons */
 @keyframes spin {
   to {
     transform: rotate(360deg);
@@ -4615,7 +4615,7 @@ html.theme-fade-active * {
   animation: spin 0.7s linear infinite;
 }
 
-/* ── EmptyState with icon component ── */
+/* EmptyState with icon component */
 .empty-icon-component {
   width: 56px;
   height: 56px;
@@ -4632,7 +4632,7 @@ html.theme-fade-active * {
   font-size: inherit;
 }
 
-/* ── Skeleton loading improvements ── */
+/* Skeleton loading improvements */
 .pdx-loadingLine {
   height: 16px;
   border-radius: 8px;
@@ -4684,7 +4684,7 @@ html.theme-fade-active * {
   margin-top: 16px;
 }
 
-/* ── Share button tooltip ── */
+/* Share button tooltip */
 .pdx-shareBtn {
   position: relative;
 }
@@ -4712,7 +4712,7 @@ html.theme-fade-active * {
   opacity: 1;
 }
 
-/* ── Toast progress bar (item 8) ── */
+/* Toast progress bar (item 8) */
 .toast {
   position: relative;
   overflow: hidden;
@@ -4759,7 +4759,7 @@ html.theme-fade-active * {
 }
 
 
-/* ── Directional route transition (item 12) ── */
+/* Directional route transition (item 12) */
 /* Override the existing routeIn animation with a more directional slide */
 @keyframes routeInDirectional {
   from {
@@ -4781,7 +4781,7 @@ html.theme-fade-active * {
    Items 1, 2, 3, 4, 7, 12
    ═══════════════════════════════════════════════════════════════ */
 
-/* ── Item 1: Minimum 44×44px tap targets ── */
+/* Item 1: Minimum 44×44px tap targets */
 .btn,
 .btn-sm,
 .header-cart,
@@ -4828,7 +4828,7 @@ html.theme-fade-active * {
   padding-bottom: 0;
 }
 
-/* ── Item 2: Touch-action manipulation (removes 300ms tap delay) ── */
+/* Item 2: Touch-action manipulation (removes 300ms tap delay) */
 button,
 a,
 [role="button"],
@@ -4855,7 +4855,7 @@ select,
   touch-action: manipulation;
 }
 
-/* ── Item 3: iOS input zoom prevention (font-size >= 16px on inputs) ── */
+/* Item 3: iOS input zoom prevention (font-size >= 16px on inputs) */
 @media (max-width: 768px) {
 
   input,
@@ -4876,7 +4876,7 @@ select,
   }
 }
 
-/* ── Item 4: Safe area insets audit — ensure all fixed/sticky elements respect notch ── */
+/* Item 4: Safe area insets audit - ensure all fixed/sticky elements respect notch */
 .header {
   padding-top: max(0px, env(safe-area-inset-top));
 }
@@ -4903,7 +4903,7 @@ body:has(.with-sticky-cta):not(.has-bottom-nav) .toast-viewport {
   z-index: 10002;
 }
 
-/* ── Item 7: Focus ring improvements for accessibility ── */
+/* Item 7: Focus ring improvements for accessibility */
 :focus-visible {
   outline: 2px solid rgba(79, 255, 200, 0.7);
   outline-offset: 2px;
@@ -4957,7 +4957,7 @@ html[data-theme="light"] .input:focus-visible {
   box-shadow: 0 0 0 4px rgba(0, 138, 148, 0.14);
 }
 
-/* ── Item 12: Hover state fix for tablet (prevent stuck hover) ── */
+/* Item 12: Hover state fix for tablet (prevent stuck hover) */
 /* Only apply hover transforms/effects on true hover-capable devices */
 @media (hover: none) {
 
@@ -5004,7 +5004,7 @@ html[data-theme="light"] .input:focus-visible {
 
 /* FAB stack moved to css/fab-stack.css */
 
-/* ── Item 10: Better Error Boundary ── */
+/* Item 10: Better Error Boundary */
 .aeb-page {
   min-height: 100dvh;
   display: flex;
@@ -5105,7 +5105,7 @@ html[data-theme="light"] .input:focus-visible {
   }
 }
 
-/* ── Item 9: Branded page loading screen ── */
+/* Item 9: Branded page loading screen */
 .page-loader {
   min-height: 60dvh;
   display: flex;
@@ -5221,7 +5221,7 @@ html[data-theme="light"] .input:focus-visible {
    raised/pressed feel across both dark and light modes.
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Buttons: raised, tactile ── */
+/* Buttons: raised, tactile */
 .btn {
   border: 1px solid var(--imzaqi-btn-border, rgba(78, 255, 218, 0.44));
   background: var(--imzaqi-btn-face);
@@ -5264,7 +5264,7 @@ html[data-theme="light"] .input:focus-visible {
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
-/* ── Inputs: inset/pressed feel ── */
+/* Inputs: inset/pressed feel */
 .input {
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   background: var(--skeu-inset-bg, linear-gradient(180deg, rgba(3, 8, 18, 0.94), rgba(9, 15, 33, 0.82)));
@@ -5284,7 +5284,7 @@ html[data-theme="light"] .input:focus-visible {
   opacity: 0.6;
 }
 
-/* ── Cards: raised panel ── */
+/* Cards: raised panel */
 .card {
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
   background: var(--skeu-panel-bg, linear-gradient(180deg, rgba(17, 29, 58, 0.98), rgba(8, 14, 31, 0.96)));
@@ -5299,7 +5299,7 @@ html[data-theme="light"] .input:focus-visible {
     0 0 0 1px rgba(0, 194, 208, 0.1);
 }
 
-/* ── Pills / badges: subtle raised ── */
+/* Pills / badges: subtle raised */
 .pill,
 .tab-btn {
   border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16));
@@ -5316,9 +5316,9 @@ html[data-theme="light"] .input:focus-visible {
   box-shadow: var(--imzaqi-btn-shadow);
 }
 
-/* Header surface — neumorphism tokens applied in theme-neumorphism.css */
+/* Header surface - neumorphism tokens applied in theme-neumorphism.css */
 
-/* ── Toast: raised panel ── */
+/* Toast: raised panel */
 .toast {
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.14));
   background: rgba(10, 14, 12, 0.85);
@@ -5337,7 +5337,7 @@ html[data-theme="light"] .toast {
   -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
 
-/* ── Light mode overrides ── */
+/* Light mode overrides */
 html[data-theme="light"] .btn {
   background: var(--imzaqi-btn-face);
   color: var(--imzaqi-btn-text, #032235);
@@ -5387,7 +5387,7 @@ html[data-theme="light"] .card {
   box-shadow: var(--skeu-panel-shadow);
 }
 
-/* Light header — neumorphism in theme-neumorphism.css */
+/* Light header - neumorphism in theme-neumorphism.css */
 
 html[data-theme="light"] .pill,
 html[data-theme="light"] .tab-btn {
@@ -5413,7 +5413,7 @@ html[data-theme="light"] .toast {
   -webkit-backdrop-filter: blur(20px) saturate(160%);
 }
 
-/* ─── Desktop Header Navigation Hover Pill ─── */
+/* Desktop Header Navigation Hover Pill */
 .nav-hover-pill {
   position: absolute;
   inset: 0;
@@ -5429,7 +5429,7 @@ html[data-theme="light"] .nav-hover-pill {
   border: 1px solid rgba(0, 138, 148, 0.04) !important;
 }
 
-/* ── Idle Tease Toast ────────────────────────────────────────────────── */
+/* Idle Tease Toast */
 .idle-tease-toast {
   position: fixed;
   bottom: 24px;
@@ -5473,7 +5473,7 @@ html[data-theme="light"] .idle-tease-toast {
   .idle-tease-toast { animation: none; }
 }
 
-/* ── Rage Click Toast ─────────────────────────────────────────────────── */
+/* Rage Click Toast */
 .rage-toast {
   position: fixed;
   bottom: 100px;
@@ -5526,7 +5526,7 @@ html[data-theme="light"] .rage-toast {
   .rage-toast-char { animation: none; }
 }
 
-/* ── Done Celebration (Status page) ─────────────────────────────────── */
+/* Done Celebration (Status page) */
 .st-doneCelebration {
   position: fixed;
   top: 80px;
@@ -5609,7 +5609,7 @@ html[data-theme="light"] .st-doneCelebration-text span { color: #4a6a5a; }
   .st-doneCelebration-icon { animation: none; }
 }
 
-/* ── Hero Greeting Banner ────────────────────────────────────────────── */
+/* Hero Greeting Banner */
 .hx-greeting {
   display: inline-flex;
   align-items: center;
@@ -5655,7 +5655,7 @@ html[data-theme="light"] .hx-greeting {
   .hx-greeting-wave { animation: none; }
 }
 
-/* ── Achievement Toast ──────────────────────────────────────────── */
+/* Achievement Toast */
 .achievement-toast {
   position: fixed;
   bottom: 90px;
@@ -5699,7 +5699,7 @@ html[data-theme="light"] .achievement-toast-inner {
     inset 0 1px 0 rgba(255, 255, 255, 0.9));
 }
 
-/* Flat brand icon chip — no infinite bounce */
+/* Flat brand icon chip - no infinite bounce */
 .achievement-toast-icon {
   display: grid;
   place-items: center;

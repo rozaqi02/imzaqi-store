@@ -21,7 +21,7 @@ export const PRODUCT_CATEGORIES = [
   { key: "other", label: "Lainnya", icon: Sparkles },
 ];
 
-/** Storefront catalog pills — only two shop lines */
+/** Storefront catalog pills - only two shop lines */
 export const CATALOG_LINE_FILTERS = [
   { key: "app_premium", label: "App Premium", icon: Smartphone },
   { key: "academic", label: "Jasa Akademik", icon: BookOpen },
@@ -59,7 +59,7 @@ export function resolveCatalogLine(product) {
   return isAcademicProduct(product) ? "academic" : "app_premium";
 }
 
-/** Dedicated admin WhatsApp numbers — keep in sync with Footer. */
+/** Dedicated admin WhatsApp numbers - keep in sync with Footer. */
 export const STORE_WHATSAPP = {
   app_premium: "6283136049987",
   academic: "6281232742374",

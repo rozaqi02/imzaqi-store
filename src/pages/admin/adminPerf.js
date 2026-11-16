@@ -1,11 +1,11 @@
 /**
- * Admin performance helpers — page sizes, select shapes, empty memo stubs, debounce.
+ * Admin performance helpers - page sizes, select shapes, empty memo stubs, debounce.
  * Keep AdminDashboard lean; domain load flags live in the dashboard component.
  */
 
 import { LIVE_ORDER_STATUSES } from "../../lib/orderStatus";
 
-/** First page / load-more chunk — was 500 (too heavy). */
+/** First page / load-more chunk - was 500 (too heavy). */
 export const ORDERS_PAGE_SIZE = 40;
 
 /** Stok tipis = hampir habis, tapi masih ada (bukan 0 / abis). Ambang: 0 < stock < 2 → hanya 1. */
@@ -13,7 +13,7 @@ export const STOCK_THIN_BELOW = 2;
 
 export function isThinStock(stock) {
   const n = Number(stock || 0);
-  // Kosong (0) bukan "tipis" — itu abis; tipis = sisa 1
+  // Kosong (0) bukan "tipis" - itu abis; tipis = sisa 1
   return n > 0 && n < STOCK_THIN_BELOW;
 }
 

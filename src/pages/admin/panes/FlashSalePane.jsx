@@ -37,12 +37,12 @@ export default function FlashSalePane({
     <div className="admin-panel admin-panel--fill admin-flashsalePanel admin-workspacePane">
       <div className="admin-panel-head admin-panel-head--split">
         <div>
-          <div className="admin-panel-title">Flash sale</div>
-          <div className="admin-panel-sub">{liveFlashCount} live sekarang</div>
+          <div className="admin-panel-title">Flash Sale</div>
+          <div className="admin-panel-sub">{liveFlashCount} promo sedang live</div>
         </div>
         <div className="admin-panel-headActions">
           <button className="btn btn-sm btn-primary" type="button" onClick={() => setFlashFormOpen(true)}>
-            <Plus size={14} /> Buat
+            <Plus size={14} /> Tambah Flash Sale
           </button>
         </div>
       </div>

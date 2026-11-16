@@ -14,7 +14,7 @@
   box-sizing: border-box;
 }
 
-/* ── Mode Switcher ───────────────────────────────────────── */
+/* Mode Switcher */
 .mmg-modeSwitch {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -120,7 +120,7 @@
   display: none;
 }
 
-/* ── Studio Layout ───────────────────────────────────────── */
+/* Studio Layout */
 .mmg-layout {
   display: grid;
   grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
@@ -139,7 +139,7 @@
   box-shadow: var(--surface-raised);
 }
 
-/* ── Filter Row ──────────────────────────────────────────── */
+/* Filter Row */
 .mmg-filterRow {
   display: flex;
   flex-wrap: wrap;
@@ -176,7 +176,7 @@
   cursor: pointer;
 }
 
-/* ── Fields & Inputs ─────────────────────────────────────── */
+/* Fields & Inputs */
 .mmg-field {
   display: grid;
   gap: 8px;
@@ -225,7 +225,7 @@
   color: var(--surface-text);
 }
 
-/* ── Preset Grid ─────────────────────────────────────────── */
+/* Preset Grid */
 .mmg-presetGrid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -283,7 +283,7 @@
   box-shadow: 0 0 0 1px var(--surface-accent), var(--surface-raised);
 }
 
-/* ── Formats ─────────────────────────────────────────────── */
+/* Formats */
 .mmg-formats {
   display: flex;
   gap: 10px;
@@ -326,7 +326,7 @@
   color: var(--surface-muted);
 }
 
-/* ── Secondary & Buttons ─────────────────────────────────── */
+/* Secondary & Buttons */
 .mmg-secondary {
   display: inline-flex;
   align-items: center;
@@ -382,7 +382,7 @@
   color: #f59e0b;
 }
 
-/* ── Preview Stage ───────────────────────────────────────── */
+/* Preview Stage */
 .mmg-stageWrap {
   display: grid;
   gap: 16px;
@@ -464,7 +464,7 @@
   cursor: pointer;
 }
 
-/* ── Actions Bar ─────────────────────────────────────────── */
+/* Actions Bar */
 .mmg-actionsBar {
   display: flex;
   gap: 12px;
@@ -574,7 +574,7 @@
   cursor: not-allowed;
 }
 
-/* ── Custom Markups Card ─────────────────────────────────── */
+/* Custom Markups Card */
 .mmg-customMarkupsCard {
   display: grid;
   gap: 12px;
@@ -663,7 +663,7 @@
   to { transform: rotate(360deg); }
 }
 
-/* ── Select Dropdown Theming ─────────────────────────────── */
+/* Select Dropdown Theming */
 html[data-theme="dark"] .mmg-field option {
   background: #0d1512;
   color: #eef7f1;
@@ -674,7 +674,7 @@ html[data-theme="light"] .mmg-field option {
   color: #0b1f17;
 }
 
-/* ── Responsive Queries ──────────────────────────────────── */
+/* Responsive Queries */
 @media (max-width: 1060px) {
   .mmg-layout {
     grid-template-columns: minmax(260px, 320px) minmax(0, 1fr);

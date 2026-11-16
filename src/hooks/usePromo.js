@@ -77,7 +77,7 @@ export function usePromo() {
       if (!result.ok) return result;
       setPromo({ code: result.code, percent: result.percent });
 
-      // NOTE: promo_claims insert is NOT done here — it happens once
+      // NOTE: promo_claims insert is NOT done here - it happens once
       // during order creation (create_order_with_stock_check RPC) in Pay.
       // Previously this caused a double-claim bug (slot decremented twice).
 

@@ -1,11 +1,11 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   Hero Text Animations — imzaqi-store
+   Hero Text Animations - imzaqi-store
    Animasi masuk 1x, tidak loop, respects prefers-reduced-motion.
    ═══════════════════════════════════════════════════════════════════════════ */
 
-/* ── Keyframes ────────────────────────────────────────────────────────────── */
+/* Keyframes */
 
-/* H1 reveal — setiap kata muncul dari bawah via clip-path */
+/* H1 reveal - setiap kata muncul dari bawah via clip-path */
 @keyframes heroTitleReveal {
   0% {
     opacity: 0;
@@ -38,7 +38,7 @@
   }
 }
 
-/* ── Shared utility classes ───────────────────────────────────────────────── */
+/* Shared utility classes */
 
 /* Wrapper dekoratif */
 .hero-anim-wrap {
@@ -46,7 +46,7 @@
   overflow: visible;
 }
 
-/* ── Animation trigger classes ───────────────────────────────────────────── */
+/* Animation trigger classes */
 
 .hero-anim-title {
   animation: heroTitleReveal 0.72s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
@@ -56,7 +56,7 @@
   animation: heroSubIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.44s both;
 }
 
-/* ── Specific page delays (agar stagger terasa lebih natural) ────────────── */
+/* Specific page delays (agar stagger terasa lebih natural) */
 
 /* Pay page */
 .pay-shell-title.hero-anim-title  { animation-delay: 0.12s; }
@@ -66,7 +66,7 @@
 .checkout-full-title.hero-anim-title  { animation-delay: 0.10s; }
 .checkout-full-sub.hero-anim-sub      { animation-delay: 0.28s; }
 
-/* ── Reduced motion: disable semua animasi ───────────────────────────────── */
+/* Reduced motion: disable semua animasi */
 @media (prefers-reduced-motion: reduce) {
   .hero-anim-title,
   .hero-anim-sub {
@@ -88,7 +88,7 @@ html[data-motion="off"] .hero-anim-sub {
   filter: none !important;
 }
 
-/* data-motion="lite" — animasi lebih simpel (opacity only, no transform) */
+/* data-motion="lite" - animasi lebih simpel (opacity only, no transform) */
 html[data-motion="lite"] .hero-anim-title {
   animation: heroSubIn 0.45s ease 0.15s both;
 }
@@ -96,7 +96,7 @@ html[data-motion="lite"] .hero-anim-sub {
   animation: heroSubIn 0.4s ease 0.3s both;
 }
 
-/* ── Hero Entrance Keyframes & Stagger ── */
+/* Hero Entrance Keyframes & Stagger */
 @keyframes heroEntranceFadeUp {
   0% {
     opacity: 0;

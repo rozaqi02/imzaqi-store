@@ -182,7 +182,7 @@
   overflow-wrap: anywhere;
 }
 
-/* ── Expandable product description ── */
+/* Expandable product description */
 .pdx-descWrap {
   display: grid;
   gap: 6px;
@@ -412,7 +412,7 @@
   box-shadow: 0 4px 12px rgba(0, 214, 180, 0.28);
 }
 
-/* ── Chip color variants ── */
+/* Chip color variants */
 .chip-duration {
   color: #7dd3fc;
   border-color: rgba(56, 189, 248, 0.22) !important;
@@ -434,7 +434,7 @@
   box-shadow: none !important;
 }
 
-/* ── Light-theme overrides ── */
+/* Light-theme overrides */
 :root[data-theme="light"] .chip-duration {
   color: #0369a1;
   border-color: rgba(14, 116, 194, 0.28) !important;
@@ -520,7 +520,7 @@
   background: currentColor;
   margin-right: 4px;
   flex-shrink: 0;
-  animation: pdxRadarPulse 1.8s cubic-bezier(0.24, 0, 0.38, 1) infinite;
+  /* Clean static dot - no endless radar pulse */
 }
 
 .pdx-variantHead {
@@ -585,7 +585,7 @@
   gap: 8px;
 }
 
-/* ── Structured Benefit List ── */
+/* Structured Benefit List */
 .pdx-benefitList {
   display: grid;
   gap: 4px;
@@ -593,7 +593,7 @@
   word-break: normal;
 }
 
-/* ── Info Rows (structured variant DB fields) ── */
+/* Info Rows (structured variant DB fields) */
 .pdx-infoRows {
   display: flex;
   flex-direction: column;
@@ -606,7 +606,7 @@
 
 .pdx-infoRow {
   display: grid;
-  /* Label pakai lebar natural; value yang wrap — hindari 1fr auto yang menjepit label */
+  /* Label pakai lebar natural; value yang wrap - hindari 1fr auto yang menjepit label */
   grid-template-columns: 20px auto minmax(0, 1fr);
   align-items: start;
   gap: 8px;
@@ -1105,7 +1105,7 @@ html[data-theme="light"] .pdx-skel::after {
   height: 44px;
 }
 
-/* ── Smooth Fade Transition from Skeleton to Loaded Content ── */
+/* Smooth Fade Transition from Skeleton to Loaded Content */
 .pdx-contentLoaded {
   animation: pdxContentFadeIn 0.38s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
@@ -1362,7 +1362,7 @@ html[data-theme="light"] .pdx-skel::after {
   }
 }
 
-/* ── Breadcrumb (item 10) ── */
+/* Breadcrumb (item 10) */
 .pdx-breadcrumb {
   display: flex;
   align-items: center;
@@ -1429,7 +1429,7 @@ html[data-theme="light"] .pdx-skel::after {
 }
 
 
-/* ── Flash Sale price in variant card ── */
+/* Flash Sale price in variant card */
 .pdx-variantPrice--flash {
   color: #ff3c64 !important;
 }
@@ -1482,7 +1482,7 @@ html[data-theme="light"] .pdx-skel::after {
     0 10px 22px rgba(0, 135, 90, 0.34) !important;
 }
 
-/* ─── Product Detail v3: ringkas, gen-Z, neumorphism ───────────────── */
+/* Product Detail v3: ringkas, gen-Z, neumorphism */
 .detail-page-v3 {
   --pdx-panel: var(--uni-neo-panel, var(--pdx-panel));
   --pdx-soft: var(--uni-neo-control, var(--pdx-soft));
@@ -1590,7 +1590,7 @@ html[data-theme="light"] .pdx-skel::after {
   align-items: center;
 }
 
-/* Isolated product icon — do not share catalog-cardIcon styles */
+/* Isolated product icon - do not share catalog-cardIcon styles */
 .detail-page.detail-page-v3 .pdx-productIcon {
   position: relative !important;
   transform: none !important;
@@ -2232,7 +2232,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-countdownStat.is-expired {
   gap: 10px;
 }
 
-/* Pack cards stay "inset" inside variants panel — avoid double outer card look */
+/* Pack cards stay "inset" inside variants panel - avoid double outer card look */
 .detail-page.detail-page-v3 .pdx-packCard {
   padding: clamp(12px, 2vw, 16px);
   display: grid;
@@ -2284,7 +2284,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
   opacity: 1;
 }
 
-/* Head: title row (name | price) then full-width meta — long guarantee never fights price */
+/* Head: title row (name | price) then full-width meta - long guarantee never fights price */
 .detail-page-v3 .pdx-packHead {
   display: flex;
   flex-direction: column;
@@ -2483,7 +2483,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
     -webkit-line-clamp: 3;
   }
 
-  /* Stats strip: stacked layout — price full width, chips in a row */
+  /* Stats strip: stacked layout - price full width, chips in a row */
   .detail-page-v3 .pdx-statsStrip {
     display: flex;
     flex-direction: column;
@@ -2561,9 +2561,26 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
     min-height: 44px !important;
   }
 
-  .detail-page-v3 .pdx-filterChip {
-    min-height: 34px;
-    height: 34px;
+  .detail-page-v3 .pdx-filterChip,
+  .detail-page-v3 .pdx-controlGroup .pdx-filterChip {
+    min-height: 40px !important;
+    height: 40px !important;
+    padding: 0 14px !important;
+  }
+
+  .detail-page-v3 .pdx-backLink {
+    min-height: 40px !important;
+  }
+
+  .detail-page-v3 .pdx-iconBtn {
+    width: 42px !important;
+    height: 42px !important;
+  }
+
+  .detail-page-v3 .pdx-iconBtn::after {
+    content: "";
+    position: absolute;
+    inset: -3px;
   }
 }
 
@@ -2671,7 +2688,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
    Detail Page Overhaul: Premium Glassmorphism & Grid Alignment
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* 1. Top Card — full neumorphism 3D with artistic brand color ambient blur */
+/* 1. Top Card - full neumorphism 3D with artistic brand color ambient blur */
 .detail-page-v3 .pdx-topCard {
   background:
     radial-gradient(ellipse 90% 70% at 15% 25%, var(--brand-color, rgba(0, 214, 180, 0.35)), transparent 75%),
@@ -2760,7 +2777,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
 
 
 /* 2. Redesign Variant Cards for a highly polished tactile feel */
-/* Pack card interaction layer — keep inset surface (no second outer panel) */
+/* Pack card interaction layer - keep inset surface (no second outer panel) */
 .detail-page.detail-page-v3 .pdx-packCard {
   background: var(--pdx-inset) !important;
   border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08)) !important;
@@ -2826,9 +2843,9 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
   border-color: rgba(0, 158, 96, 0.55) !important;
 }
 
-/* ── Neumorphic Depth Enhancements ── */
+/* Neumorphic Depth Enhancements */
 
-/* 1. Text drop shadow — anchors text to glass surface */
+/* 1. Text drop shadow - anchors text to glass surface */
 .detail-page-v3 .pdx-title {
   text-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
@@ -2855,7 +2872,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
   text-shadow: 0 1px 2px rgba(255, 255, 255, 0.6);
 }
 
-/* 2. Press/sink state — card depresses into surface */
+/* 2. Press/sink state - card depresses into surface */
 .detail-page-v3 .pdx-packCard:active:not(.is-out) {
   transform: translateY(1px) scale(0.98);
   box-shadow:
@@ -2863,7 +2880,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
     0 0 0 1px rgba(79, 255, 200, 0.12) inset !important;
 }
 
-/* 3. Focus ring glow — replaces default outline */
+/* 3. Focus ring glow - replaces default outline */
 .detail-page-v3 .pdx-packCard:focus-visible,
 .detail-page-v3 .pdx-backLink:focus-visible,
 .detail-page-v3 .pdx-filterChip:focus-visible,
@@ -2878,7 +2895,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
   border-color: rgba(79, 255, 200, 0.4) !important;
 }
 
-/* 4. Enhanced image depth — product icon sits above glass */
+/* 4. Enhanced image depth - product icon sits above glass */
 .detail-page.detail-page-v3 .pdx-productIcon {
   transition:
     transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1),
@@ -3248,7 +3265,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   font-weight: 900;
   color: #ff7a45;
   white-space: nowrap;
-  animation: pdxUrgencyPulse 1.5s ease-in-out infinite;
+  /* Clean urgency text - no endless pulse */
 }
 
 @keyframes pdxUrgencyPulse {
@@ -3272,7 +3289,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
     padding-inline: 0 !important;
     margin-inline: 0 !important;
     scrollbar-width: none !important;
-    /* Right-edge fade only — left tile stays solid (no clipped CapCut icon) */
+    /* Right-edge fade only - left tile stays solid (no clipped CapCut icon) */
     -webkit-mask-image: linear-gradient(
       90deg,
       #000 0%,
@@ -3334,7 +3351,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
 
 }
 
-/* Side-by-Side main content grid — stack below desktop to avoid crushed cards */
+/* Side-by-Side main content grid - stack below desktop to avoid crushed cards */
 .detail-page-v3 .pdx-mainGrid {
   display: grid;
   grid-template-columns: 1fr;
@@ -3394,7 +3411,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   border: 1px solid var(--brand-line, var(--pdx-line));
   box-shadow: var(--pdx-inset-shadow);
   margin-bottom: 10px;
-  /* --tab-index is set via inline style: 0 = left, 1 = right */
+  /* tab-index is set via inline style: 0 = left, 1 = right */
   --tab-index: 0;
 }
 
@@ -3472,7 +3489,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   color: var(--pdx-text-2);
 }
 
-/* ── Account type strip (Sharing / Private) ── */
+/* Account type strip (Sharing / Private) */
 .pdx-accountStrip {
   display: grid;
   gap: 10px;
@@ -3530,7 +3547,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   background: rgba(255, 237, 213, 0.92) !important;
 }
 
-/* ── Low Stock & Out of Stock Badges ── */
+/* Low Stock & Out of Stock Badges */
 .product-lowStockBadge {
   display: inline-flex;
   align-items: center;
@@ -3563,7 +3580,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
 }
 
 @media (max-width: 920px) {
-  /* app-main-catalog uses overflow:visible — clip at page level instead */
+  /* app-main-catalog uses overflow:visible - clip at page level instead */
   .detail-page.detail-page-v3 {
     overflow-x: clip;
     max-width: 100%;
@@ -3658,7 +3675,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   }
 }
 
-/* ── Final isolation: stop global theme / polish from double-styling cards ── */
+/* Final isolation: stop global theme / polish from double-styling cards */
 .detail-page.detail-page-v3 .pdx-topCard,
 .detail-page.detail-page-v3 .pdx-variantsSection,
 .detail-page.detail-page-v3 .pdx-infoTabsCard {
@@ -3729,7 +3746,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-selected {
     inset 0 -1px 0 rgba(164, 197, 209, 0.22) !important;
 }
 
-/* Light mode outer panels — soft, consistent, no dark neumorph bleed */
+/* Light mode outer panels - soft, consistent, no dark neumorph bleed */
 :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-topCard,
 :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-variantsSection,
 :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-infoTabsCard,
@@ -3745,7 +3762,7 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-infoTabsCard {
     inset 0 -1px 0 rgba(166, 200, 211, 0.28) !important;
 }
 
-/* ── Compare Button ── */
+/* Compare Button */
 .detail-page-v3 .pdx-variantsHeadRight {
   display: flex;
   align-items: center;
@@ -3819,7 +3836,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-compareBtn:hover {
   transform: translateY(-1px);
 }
 
-/* ── Variant Compare Modal ── */
+/* Variant Compare Modal */
 .vcm-backdrop {
   position: fixed;
   inset: 0;
@@ -4235,7 +4252,7 @@ html[data-theme="light"] .vcm-hint--muted {
   }
 }
 
-/* ── Floating Emoji Reactions ─────────────────────────────────────── */
+/* Floating Emoji Reactions */
 .pdx-emojiReactions {
   display: flex;
   align-items: center;
@@ -4288,7 +4305,7 @@ html[data-theme="light"] .pdx-emojiBtn:hover {
   100% { transform: translate(-50%, -100px) scale(0.8); opacity: 0; }
 }
 
-/* ── Compare button — lebih prominent ──────────────────────────────── */
+/* Compare button - lebih prominent */
 .pdx-compareBtn {
   display: inline-flex;
   align-items: center;
@@ -4329,7 +4346,7 @@ html[data-theme="light"] .pdx-compareBtn:hover {
   border-color: rgba(0, 138, 148, 0.5);
 }
 
-/* ── Variant badge Paling Laris / Paling Hemat ─────────────────────── */
+/* Variant badge Paling Laris / Paling Hemat */
 .pdx-packHot,
 .pdx-packHot--value,
 .detail-page-v3 .pdx-packHot,
@@ -4369,7 +4386,7 @@ html[data-theme="dark"] .detail-page-v3 .pdx-packHot--value {
   text-shadow: none !important;
 }
 
-/* ── Title row & Compare button styling ───────────────────────────── */
+/* Title row & Compare button styling */
 .pdx-variantsTitleRow {
   display: flex;
   align-items: center;
@@ -4386,7 +4403,7 @@ html[data-theme="dark"] .detail-page-v3 .pdx-packHot--value {
   }
 }
 
-/* ── Package Scroll Hint / Slider Indicator ────────────────────────── */
+/* Package Scroll Hint / Slider Indicator */
 .pdx-scrollHint {
   display: flex;
   align-items: center;
@@ -4451,7 +4468,7 @@ html[data-theme="light"] .pdx-scrollText {
   font-weight: 900;
   color: #00d6b4;
   display: inline-block;
-  animation: pdxSwipeArrow 1.4s infinite ease-in-out;
+  /* Clean arrow - no perpetual bounce */
 }
 
 html[data-theme="light"] .pdx-scrollArrow {
@@ -4943,11 +4960,15 @@ html[data-theme="light"] .detail-page-v3 .pdx-packCard.is-out .pdx-addBtn {
 
   .pdx-mobileStickyDockBtn {
     border-radius: 999px !important;
-    padding: 9px 18px !important;
+    min-height: 44px !important;
+    padding: 0 20px !important;
     font-size: 13px !important;
     font-weight: 800 !important;
     flex-shrink: 0;
     gap: 6px;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
 
   .pdx-stickyCartInner {
@@ -5059,6 +5080,30 @@ html[data-theme="light"] .detail-page-v3 .pdx-packCard.is-out .pdx-addBtn {
 }
 .detail-page-v3 .pdx-packDetails {
   margin-top: 6px;
+}
+.detail-page-v3 .pdx-packHighlights {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 6px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.detail-page-v3 .pdx-packHighlightItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--brand-text, rgba(255, 255, 255, 0.9));
+}
+html[data-theme="light"] .detail-page-v3 .pdx-packHighlightItem {
+  color: #1a2a3a;
+}
+.detail-page-v3 .pdx-packHighlightIcon {
+  color: var(--brand-icon, #00d6b4);
+  flex-shrink: 0;
+  margin-top: 2px;
 }
 .detail-page-v3 .pdx-packDetails details {
   margin-top: 4px;
@@ -5283,7 +5328,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-restockAdminBtn:hover {
 .detail-page-v3 .pdx-jumpToPacks:hover { text-decoration: underline; }
 .detail-page-v3 .pdx-jumpToPacks:focus-visible { outline: 2px solid var(--brand-icon, #009e60); outline-offset: 3px; }
 
-/* ── Refined modern pack controls & filters ── */
+/* Refined modern pack controls & filters */
 .detail-page.detail-page-v3 .pdx-packControls {
   display: flex !important;
   flex-direction: column !important;
@@ -5388,7 +5433,7 @@ html[data-theme="dark"] .detail-page-v3 .pdx-controlGroup .pdx-filterChip.is-act
   stroke: #ffffff !important;
 }
 
-/* ── Refined pack cards & actions ── */
+/* Refined pack cards & actions */
 .detail-page.detail-page-v3 .pdx-packCard {
   padding: 16px 18px !important;
   border-radius: 18px !important;
@@ -5450,7 +5495,7 @@ html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-packCard.is-recommended
   font-weight: 800 !important;
 }
 
-/* ── Refined compare button ── */
+/* Refined compare button */
 .detail-page-v3 .pdx-compareBtn {
   background: transparent !important;
   border: 1px solid rgba(0, 158, 96, 0.3) !important;
@@ -5474,7 +5519,7 @@ html[data-theme="dark"] .detail-page-v3 .pdx-compareBtn:hover {
   background: rgba(0, 214, 180, 0.1) !important;
 }
 
-/* ── Refined secondary Contact Admin pill ── */
+/* Refined secondary Contact Admin pill */
 .detail-page-v3 .pdx-contactAdmin {
   display: inline-flex !important;
   align-items: center !important;
@@ -5511,7 +5556,7 @@ html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-contactAdmin:hover
   border-color: rgba(0, 214, 180, 0.38) !important;
 }
 
-/* ── Refined modern Info Tabs (Deskripsi & S&K) ── */
+/* Refined modern Info Tabs (Deskripsi & S&K) */
 .detail-page.detail-page-v3 .pdx-infoTabsCard {
   border-radius: 24px !important;
   padding: 16px 20px !important;

@@ -6,7 +6,7 @@
  *
  * Penting:
  * • Aset gambar di `public/mascots/` SENGAJA TETAP DISIMPAN, tidak dihapus.
- * • Tidak ada satu pun call site yang perlu diedit — `BannerGraphic` menjadi
+ * • Tidak ada satu pun call site yang perlu diedit - `BannerGraphic` menjadi
  *   satu-satunya titik render maskot, jadi saklar ini cukup di sini.
  * • Untuk mengaktifkan kembali, ubah nilai di bawah menjadi `true`.
  */

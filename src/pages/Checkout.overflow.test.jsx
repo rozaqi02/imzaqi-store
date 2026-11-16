@@ -21,7 +21,7 @@ import { render, act, screen } from "@testing-library/react";
  * 6. The checkout-item-controls section uses flex-wrap for wrapping
  */
 
-// ── Mocks ──
+// Mocks
 
 const mockNavigate = jest.fn();
 const mockLocation = { state: { backgroundLocation: "/" }, pathname: "/checkout" };
@@ -89,7 +89,7 @@ jest.mock("../components/EmptyState", () => ({
   },
 }));
 
-// ── Cart mock factory ──
+// Cart mock factory
 
 const mockCartItems = { current: [] };
 
@@ -109,7 +109,7 @@ jest.mock("../context/CartContext", () => ({
   useCart: () => mockCreateCart(mockCartItems.current),
 }));
 
-// ── Generators ──
+// Generators
 
 const arbProductName = fc.stringOf(fc.fullUnicode(), { minLength: 1, maxLength: 200 });
 const arbVariantName = fc.stringOf(fc.fullUnicode(), { minLength: 1, maxLength: 150 });
@@ -131,7 +131,7 @@ const arbCartItem = fc.record({
   requires_buyer_email: fc.boolean(),
 });
 
-// ── CSS classes that provide overflow protection for checkout item cards ──
+// CSS classes that provide overflow protection for checkout item cards
 
 const CARD_OVERFLOW_PROTECTED_CLASSES = [
   "checkout-item-card",    // flex-wrap: wrap on the card itself
@@ -145,7 +145,7 @@ const CARD_OVERFLOW_PROTECTED_CLASSES = [
   "checkout-item-remove",  // white-space: nowrap, flex-shrink: 0
 ];
 
-// ── Tests ──
+// Tests
 
 describe("Checkout Page - Property 2: Checkout item controls contained within card boundary", () => {
   beforeEach(() => {
