@@ -1,10 +1,10 @@
 .detail-page-v2 {
   --pdx-panel:
-    linear-gradient(166deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.04) 22%, rgba(255, 255, 255, 0) 52%),
-    radial-gradient(100% 110% at 100% -8%, rgba(0, 245, 196, 0.08), rgba(0, 245, 196, 0) 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 26%, rgba(255, 255, 255, 0) 54%),
+    radial-gradient(100% 110% at 50% -8%, rgba(0, 245, 196, 0.07), rgba(0, 245, 196, 0) 58%),
     var(--skeu-panel-bg);
   --pdx-soft:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.02) 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0.02) 34%),
     var(--skeu-control-bg);
   --pdx-inset:
     linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0) 24%),
@@ -14,28 +14,24 @@
   --pdx-muted: var(--brand-muted);
   --pdx-highlight: var(--brand-icon);
   --pdx-panel-shadow:
-    18px 22px 42px rgba(2, 12, 26, 0.35),
-    -8px -8px 18px rgba(255, 255, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 18px 40px -6px rgba(2, 12, 26, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 -1px 0 rgba(4, 26, 42, 0.32),
     0 0 0 1px rgba(0, 245, 196, 0.08);
   --pdx-soft-shadow:
-    10px 12px 24px rgba(0, 10, 24, 0.24),
-    -4px -4px 10px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.26),
+    0 8px 20px -4px rgba(0, 10, 24, 0.28),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
     inset 0 -1px 0 rgba(3, 32, 52, 0.25);
   --pdx-inset-shadow:
-    inset 8px 10px 18px rgba(0, 0, 0, 0.34),
-    inset -4px -4px 9px rgba(255, 255, 255, 0.04),
+    inset 0 4px 12px rgba(0, 0, 0, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
 }
 
 :root[data-theme="light"] .detail-page-v2 {
   --pdx-panel:
-    linear-gradient(166deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 252, 251, 0.92) 28%, rgba(246, 250, 248, 0.94) 56%, rgba(240, 246, 243, 0.96) 100%),
-    radial-gradient(96% 105% at 100% -8%, rgba(0, 158, 96, 0.06), rgba(0, 158, 96, 0) 58%);
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(250, 252, 251, 0.94) 52%, rgba(244, 249, 246, 0.96) 100%);
   --pdx-soft:
-    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(246, 250, 248, 0.7) 46%, rgba(240, 246, 243, 0.84) 100%);
+    linear-gradient(180deg, #ffffff 0%, #f4f9f6 100%);
   --pdx-inset:
     linear-gradient(180deg, rgba(255, 255, 255, 0.82), rgba(246, 250, 248, 0.22) 24%),
     var(--skeu-inset-bg);
@@ -43,16 +39,16 @@
   --pdx-muted: rgba(15, 23, 42, 0.72);
   --pdx-highlight: #009e60;
   --pdx-panel-shadow:
-    12px 14px 28px rgba(0, 0, 0, 0.06),
+    0 10px 26px -4px rgba(10, 42, 30, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.04),
     0 0 0 1px rgba(0, 158, 96, 0.1);
   --pdx-soft-shadow:
-    8px 10px 18px rgba(0, 0, 0, 0.05),
+    0 6px 14px -2px rgba(10, 42, 30, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 0 rgba(0, 0, 0, 0.03);
   --pdx-inset-shadow:
-    inset 4px 6px 12px rgba(0, 0, 0, 0.06),
+    inset 0 2px 6px rgba(10, 42, 30, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
@@ -2747,14 +2743,13 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-recommende
 /* Light mode top card with vibrant artistic ambient blur */
 :root[data-theme="light"] .detail-page-v3 .pdx-topCard {
   background:
-    radial-gradient(ellipse 90% 70% at 15% 25%, var(--brand-color, rgba(0, 194, 208, 0.35)), transparent 75%),
-    radial-gradient(ellipse 65% 55% at 85% 75%, var(--brand-color, rgba(99, 102, 241, 0.22)), transparent 70%),
-    linear-gradient(166deg, rgba(255, 255, 255, 0.96) 0%, rgba(242, 250, 253, 0.88) 50%, rgba(232, 246, 251, 0.94) 100%) !important;
-  border-color: rgba(0, 138, 148, 0.18) !important;
+    radial-gradient(ellipse 90% 70% at 50% 15%, var(--brand-color, rgba(0, 158, 96, 0.18)), transparent 75%),
+    linear-gradient(180deg, #ffffff 0%, #f6fbf8 100%) !important;
+  border-color: rgba(0, 158, 96, 0.16) !important;
   box-shadow:
-    12px 14px 28px rgba(97, 137, 153, 0.18),
+    0 10px 26px -4px rgba(10, 42, 30, 0.1),
     inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -2px 0 rgba(166, 200, 211, 0.28) !important;
+    inset 0 -2px 0 rgba(0, 158, 96, 0.06) !important;
 }
 
 :root[data-theme="light"] .detail-page-v3 .pdx-topCard::before {
@@ -3482,11 +3477,11 @@ html[data-theme="light"] .detail-page-v3 .pdx-packMetaItem--guarantee {
   height: 22px;
   min-width: 22px;
   border-radius: 50%;
-  background: rgba(0, 194, 208, 0.1);
-  color: var(--brand-icon, #00c2d0);
+  background: rgba(0, 158, 96, 0.12);
+  color: var(--accent, #009e60);
   font-size: 11px;
   font-weight: 800;
-  border: 1px solid rgba(0, 194, 208, 0.2);
+  border: 1px solid rgba(0, 158, 96, 0.24);
 }
 
 .pdx-termText {
@@ -3747,12 +3742,12 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-packCard.is-selected {
 
 :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-productIcon {
   box-shadow:
-    8px 10px 18px rgba(102, 140, 156, 0.14),
+    0 8px 18px -2px rgba(10, 42, 30, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(164, 197, 209, 0.22) !important;
+    inset 0 -1px 0 rgba(0, 158, 96, 0.1) !important;
 }
 
-/* Light mode outer panels - soft, consistent, no dark neumorph bleed */
+/* Light mode outer panels - crisp top-to-bottom lighting, zero horizontal slant */
 :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-topCard,
 :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-variantsSection,
 :root[data-theme="light"] .detail-page.detail-page-v3 .pdx-infoTabsCard,
@@ -3760,12 +3755,11 @@ html[data-theme="light"] .detail-page.detail-page-v3 .pdx-topCard,
 html[data-theme="light"] .detail-page.detail-page-v3 .pdx-variantsSection,
 html[data-theme="light"] .detail-page.detail-page-v3 .pdx-infoTabsCard {
   background:
-    linear-gradient(166deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 253, 255, 0.94) 50%, rgba(236, 246, 251, 0.96) 100%) !important;
-  border-color: rgba(119, 175, 194, 0.22) !important;
+    linear-gradient(180deg, #ffffff 0%, #f8fbf9 100%) !important;
+  border-color: rgba(0, 158, 96, 0.14) !important;
   box-shadow:
-    12px 14px 28px rgba(97, 137, 153, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(166, 200, 211, 0.28) !important;
+    var(--skeu-panel-shadow, 0 10px 26px -4px rgba(10, 42, 30, 0.1)),
+    inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
 /* Compare Button */
@@ -4906,7 +4900,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-packCard.is-out .pdx-addBtn {
     border-color: rgba(0, 138, 148, 0.2);
     box-shadow:
       inset 0 1px 0 rgba(255, 255, 255, 0.8),
-      0 10px 28px rgba(67, 111, 129, 0.16);
+      0 10px 28px rgba(15, 42, 32, 0.12);
   }
 
   .detail-page-v3 {
@@ -5373,7 +5367,9 @@ html[data-theme="light"] .detail-page-v3 .pdx-restockAdminBtn:hover {
   overscroll-behavior-x: contain !important;
   -webkit-overflow-scrolling: touch !important;
   scrollbar-width: none !important;
-  padding: 3px 2px !important;
+  padding: 3px 22px 3px 2px !important;
+  mask-image: linear-gradient(to right, black 0%, black calc(100% - 22px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, black 0%, black calc(100% - 22px), transparent 100%);
 }
 
 .detail-page-v3 .pdx-controlGroup::-webkit-scrollbar {
@@ -5659,9 +5655,9 @@ html[data-theme="dark"] .detail-page-v3 .pdx-infoTabBtn.is-active {
 
 @media (min-width: 1024px) {
   .detail-page-v3 .pdx-mainGrid { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); }
-  .detail-page.detail-page-v3 .pdx-billboard.pdx-topCard { grid-template-columns: minmax(194px, .76fr) minmax(0, 1.24fr) !important; }
-  .detail-page.detail-page-v3 .pdx-billboard .pdx-visual { min-height: 214px; margin: 14px 0 14px 14px; padding: 20px; border-radius: 20px; }
-  .detail-page.detail-page-v3 .pdx-billboard .pdx-visualIcon { width: 112px !important; height: 112px !important; }
+  .detail-page.detail-page-v3 .pdx-billboard.pdx-topCard { grid-template-columns: minmax(210px, .78fr) minmax(0, 1.22fr) !important; }
+  .detail-page.detail-page-v3 .pdx-billboard .pdx-visual { min-height: 240px; margin: 0; padding: 28px 20px; border-radius: 0; }
+  .detail-page.detail-page-v3 .pdx-billboard .pdx-visualIcon { width: 132px !important; height: 132px !important; }
   .detail-page.detail-page-v3 .pdx-billboard .pdx-copy { padding: 22px 24px !important; }
 }
 
@@ -5690,17 +5686,19 @@ html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-packCard:hover:not(.is-
 @media (max-width: 720px) {
   .detail-page-v3 #paket-tersedia { scroll-margin-top: calc(var(--site-header-offset, 64px) + 68px); }
   .detail-page.detail-page-v3 .pdx-billboard .pdx-visual {
-    min-height: 186px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 220px !important;
     aspect-ratio: auto !important;
-    max-height: 220px !important;
-    margin: 12px 12px 0 !important;
-    padding: 24px 20px !important;
-    border-radius: 18px !important;
+    max-height: 260px !important;
+    margin: 0 !important;
+    padding: 28px 20px !important;
+    border-radius: 0 !important;
   }
   .detail-page.detail-page-v3 .pdx-billboard .pdx-visualIcon {
-    width: 108px !important;
-    height: 108px !important;
-    border-radius: 24px !important;
+    width: 118px !important;
+    height: 118px !important;
+    border-radius: 26px !important;
   }
   .detail-page.detail-page-v3 .pdx-billboard .pdx-copy { padding: 16px 18px 20px !important; gap: 0 !important; }
   .detail-page-v3 .pdx-copy .pdx-toolbar { margin-bottom: 12px !important; }
@@ -5737,4 +5735,16 @@ html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-packCard:hover:not(.is-
     font-weight: 800 !important;
   }
   .detail-page-v3 .pdx-variantOriginalPrice { font-size: 11px; }
+}
+
+
+/* Neumorphic emerald pulse when cart/variant updates */
+@keyframes pdxDockPulse {
+  0% { box-shadow: 0 0 0 0 rgba(0, 158, 96, 0.36); }
+  65% { box-shadow: 0 0 0 10px rgba(0, 158, 96, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(0, 158, 96, 0); }
+}
+
+.detail-page-v3 .pdx-mobileStickyDock.is-pulsing {
+  animation: pdxDockPulse 420ms cubic-bezier(0.22, 1, 0.36, 1);
 }

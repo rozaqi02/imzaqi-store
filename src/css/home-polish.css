@@ -44,15 +44,28 @@ html[data-theme="dark"] .home-page .hx-hero-scrim {
 }
 @media (max-width: 720px) {
   html[data-theme="light"] .home-page .hx-hero-scrim {
-    background: radial-gradient(
-      ellipse 90% 54% at 50% 46%,
-      rgba(244, 247, 242, 0.98) 0%,
-      rgba(244, 247, 242, 0.9) 52%,
-      rgba(244, 247, 242, 0) 100%
-    ) !important;
+    background:
+      linear-gradient(
+        180deg,
+        var(--storefront-global-bg, #f5f7f4) 0%,
+        rgba(245, 247, 244, 0.88) 8%,
+        rgba(245, 247, 244, 0) 20%
+      ),
+      radial-gradient(
+        ellipse 90% 54% at 50% 46%,
+        rgba(244, 247, 242, 0.98) 0%,
+        rgba(244, 247, 242, 0.9) 52%,
+        rgba(244, 247, 242, 0) 100%
+      ) !important;
   }
   html[data-theme="dark"] .home-page .hx-hero-scrim {
     background:
+      linear-gradient(
+        180deg,
+        var(--storefront-global-bg, #101715) 0%,
+        rgba(16, 23, 21, 0.88) 8%,
+        rgba(16, 23, 21, 0) 20%
+      ),
       radial-gradient(
         ellipse 90% 54% at 50% 46%,
         rgba(16, 23, 21, 0.96) 0%,
@@ -81,11 +94,9 @@ html[data-theme="dark"] .home-page .hx-hero-scrim {
 @media (max-width: 720px) {
   .home-page .hx-heroZone {
     min-height: 100svh !important;
-    min-height: 100dvh !important;
   }
   .home-page .hx-hero {
     min-height: 100svh !important;
-    min-height: 100dvh !important;
     padding-top: calc(var(--site-header-offset, 64px) + 18px) !important;
     padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
   }
@@ -125,20 +136,22 @@ html[data-theme="dark"] .home-page .hx-hero-scrim {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     gap: 14px !important;
   }
-  .home-page .home-popularList.list-mode > .reveal:first-child:nth-last-child(odd),
-  .home-page .home-popularList.list-mode > .reveal:last-child:nth-child(odd) {
+  .home-page .home-popularList.list-mode > :where(.reveal, div):first-child:nth-last-child(odd),
+  .home-page .home-popularList.list-mode > :where(.reveal, div):last-child:nth-child(odd) {
     grid-column: 1 / -1;
   }
 }
 
-/* 4. Nomor langkah "Cara beli" jadi chip aksen hijau */
+/* 4. Nomor langkah "Cara beli" jadi chip aksen hijau dengan angka putih cerah */
+html[data-theme] .home-page .home-howCard-step,
 .home-page .home-howCard-step {
   width: 42px !important;
   height: 42px !important;
   border-radius: 13px !important;
-  border: none !important;
-  background: var(--imzaqi-btn-face, #009e60) !important;
-  color: var(--imzaqi-btn-text, #fff) !important;
+  border: 1px solid var(--imzaqi-btn-border, #05a867) !important;
+  background: var(--imzaqi-btn-face, linear-gradient(180deg, #05a867 0%, #009e60 100%)) !important;
+  color: #ffffff !important;
+  text-shadow: 0 1px 1px rgba(0, 48, 28, 0.22);
   font-size: 14px !important;
   box-shadow: var(--imzaqi-btn-shadow-compact, 0 3px 4px -2px rgba(0, 0, 0, 0.28)) !important;
 }
@@ -326,11 +339,6 @@ html[data-theme="light"] .site-footer--gopay .site-footerGoContactIcon {
 }
 .site-footer--gopay .site-footerGoCol .site-footerGoList {
   margin-top: 10px;
-}
-
-/* 9. Scroll progress: hijau brand penuh */
-.home-scrollProgress {
-  background: linear-gradient(90deg, #00c277, #009e60 55%, #067a4c);
 }
 
 /* 10. Skeleton ikut palet */

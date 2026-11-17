@@ -28,7 +28,7 @@ function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
         <span className="hx-trust-text">
           <strong>
             {loading || orderCount == null ? (
-              "-"
+              <span className="hx-trust-skeleton" aria-label="Memuat jumlah pesanan" />
             ) : (
               <>
                 <NumberCounter value={orderCount} />+
@@ -46,7 +46,7 @@ function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
         <span className="hx-trust-text">
           <strong>
             {isProductsLoading || productCount == null ? (
-              "-"
+              <span className="hx-trust-skeleton" aria-label="Memuat jumlah produk" />
             ) : (
               <>
                 <NumberCounter value={productCount} />+
@@ -70,7 +70,6 @@ function HeroTrustBar({ activeProductCount, isProductsLoading = false }) {
 }
 
 /* Main Hero */
-const HERO_LOGO_SCROLL_RANGE = 75;
 const HEADLINE_WORDS = ["Akses", "Premium", "Budget", "Pelajar"];
 
 function useHeroVisibility() {
@@ -132,34 +131,8 @@ function HeroHeadline({ active = true, reduced = false } = {}) {
 export default function Hero({ products = [], loading = false }) {
   const caps = useDeviceCapability();
   const isMotionReduced = caps.isReducedMotion || caps.saveData || caps.lowMemory;
-  const logoRef = useRef(null);
   const heroRef = useRef(null);
   const entranceActive = useHeroVisibility(heroRef);
-
-  useEffect(() => {
-    const logo = logoRef.current;
-    if (!logo || typeof window === "undefined") return undefined;
-
-    let frame = 0;
-    const syncLogo = () => {
-      frame = 0;
-      const progress = Math.min(1, Math.max(0, window.scrollY / HERO_LOGO_SCROLL_RANGE));
-      logo.style.setProperty("--logo-progress", progress.toFixed(3));
-    };
-    const onScroll = () => {
-      if (!frame) frame = requestAnimationFrame(syncLogo);
-    };
-
-    syncLogo();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll);
-
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
-    };
-  }, []);
 
   const activeProductCount = useMemo(
     () =>
@@ -173,7 +146,7 @@ export default function Hero({ products = [], loading = false }) {
     <section ref={heroRef} className="hx-hero hx-hero--choreographed" data-hero-active={entranceActive} data-hero-reduced={isMotionReduced} aria-label="Marketplace Hero">
       <HeroCatalogBackdrop />
       <div className="hx-hero-scrim" aria-hidden="true" />
-      <Link ref={logoRef} to="/" className="hx-hero-logo" aria-label="Imzaqi Store">
+      <Link to="/" className="hx-hero-logo" aria-label="Imzaqi Store">
         <img src="/icon.png" alt="Imzaqi Store" width="48" height="48" />
       </Link>
       <div className="container">

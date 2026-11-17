@@ -35,7 +35,7 @@ import {
   Zap,
 } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
-import { formatIDR, toWhatsAppDigits } from "../lib/format";
+import { formatIDR, getProductIconTone, toWhatsAppDigits } from "../lib/format";
 import { fetchSettings, fetchProducts } from "../lib/api";
 import { STORE_WHATSAPP } from "../lib/productCategories";
 import { prettyOrderStatus, getOrderStatusTone } from "../lib/orderStatus";
@@ -1142,7 +1142,7 @@ function TabCekStatus({ settings }) {
             );
           })() : null}
 
-          <main className="st-main">
+          <div className="st-main">
             {/* Header Ringkasan Pesanan Terpadu */}
             <article className="st-card st-orderHeader">
               <div className="st-orderHeader-top">
@@ -1294,7 +1294,7 @@ function TabCekStatus({ settings }) {
                   return (
                     <div key={itemKey} className="st-itemRow st-itemRowDetailed">
                       <div className="st-itemHead">
-                        <div className="st-itemIcon" aria-hidden="true">
+                        <div className="st-itemIcon" data-brand-icon={getProductIconTone(item) || undefined} aria-hidden="true">
                           {iconUrl ? (
                             <img src={iconUrl} alt="" loading="lazy" decoding="async" />
                           ) : (
@@ -1351,7 +1351,7 @@ function TabCekStatus({ settings }) {
             {order && order.status === "done" ? (
               <PostTransactionReview order={order} waUrl={waUrl} toast={toast} />
             ) : null}
-          </main>
+          </div>
 
           <aside className="st-aside">
             <article className="st-card st-payCard">

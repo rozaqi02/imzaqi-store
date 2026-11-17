@@ -425,7 +425,7 @@
 /* Neumorphism Depth Effects & Interactions */
 
 /* Opsi 1: Tactile Click Inset Transition (Efek Tekan Cekung) - full motion only */
-[data-motion="full"] .btn:active,
+[data-motion="full"] .btn.btn-ghost:active,
 [data-motion="full"] .catalog-chip:active,
 [data-motion="full"] .pdx-filterChip:active,
 [data-motion="full"] .home-promoCard:active,
@@ -444,7 +444,7 @@
   transition: box-shadow 0.1s cubic-bezier(0.22, 1, 0.36, 1), transform 0.1s cubic-bezier(0.22, 1, 0.36, 1) !important;
 }
 
-html[data-theme="light"][data-motion="full"] .btn:active,
+html[data-theme="light"][data-motion="full"] .btn.btn-ghost:active,
 html[data-theme="light"][data-motion="full"] .catalog-chip:active,
 html[data-theme="light"][data-motion="full"] .pdx-filterChip:active,
 html[data-theme="light"][data-motion="full"] .home-promoCard:active,
@@ -517,18 +517,28 @@ html[data-theme="light"] .status-commandBox:focus-within {
 /* UX motion layer - interactive polish */
 
 @keyframes uxRouteForward {
-  0% { opacity: 0; transform: translate3d(0, 10px, 0); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  0% { opacity: 0; transform: translate3d(18px, 0, 0) scale(0.992); }
+  100% { opacity: 1; transform: none; }
 }
 
 @keyframes uxRouteBack {
-  0% { opacity: 0; transform: translate3d(0, -8px, 0); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  0% { opacity: 0; transform: translate3d(-18px, 0, 0) scale(0.992); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes uxRouteTabRight {
+  0% { opacity: 0; transform: translate3d(12px, 0, 0); }
+  100% { opacity: 1; transform: none; }
+}
+
+@keyframes uxRouteTabLeft {
+  0% { opacity: 0; transform: translate3d(-12px, 0, 0); }
+  100% { opacity: 1; transform: none; }
 }
 
 @keyframes uxRouteFade {
   0% { opacity: 0; transform: translate3d(0, 6px, 0); }
-  100% { opacity: 1; transform: translate3d(0, 0, 0); }
+  100% { opacity: 1; transform: none; }
 }
 
 @keyframes uxRouteFadeOnly {
@@ -568,19 +578,69 @@ html[data-theme="light"] .status-commandBox:focus-within {
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .app-main:not(.app-main-admin) > .route-transition--forward {
-
-    animation: uxRouteForward 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  .header {
+    view-transition-name: site-header;
   }
 
-  .app-main:not(.app-main-admin) > .route-transition--back {
+  .bottom-nav {
+    view-transition-name: site-bottom-nav;
+  }
 
-    animation: uxRouteBack 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+  ::view-transition-group(*) {
+    animation-duration: 280ms;
+    animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  ::view-transition {
+    background: var(--ux-canvas, var(--bg0, #f4f7f2));
+  }
+
+  ::view-transition-old(site-header),
+  ::view-transition-old(site-bottom-nav) {
+    display: none;
+    animation: none;
+  }
+
+  ::view-transition-new(site-header),
+  ::view-transition-new(site-bottom-nav) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(root) {
+    animation: 180ms cubic-bezier(0.32, 0.72, 0, 1) both uxRouteFadeOut;
+  }
+
+  ::view-transition-new(root) {
+    animation: 220ms cubic-bezier(0.22, 1, 0.36, 1) both uxRouteFadeOnly;
+  }
+
+  .app-main:not(.app-main-admin) > .route-transition--forward,
+  .app-main:not(.app-main-admin) > .route-transition--push {
+    animation: uxRouteForward 0.22s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .app-main:not(.app-main-admin) > .route-transition--back,
+  .app-main:not(.app-main-admin) > .route-transition--pop {
+    animation: uxRouteBack 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .app-main:not(.app-main-admin) > .route-transition--tab-right {
+    animation: uxRouteTabRight 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .app-main:not(.app-main-admin) > .route-transition--tab-left {
+    animation: uxRouteTabLeft 0.18s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   .app-main:not(.app-main-admin) > .route-transition--fade,
   .app-main:not(.app-main-admin) > .route-transition {
-    animation: uxRouteFade 0.22s cubic-bezier(0.16, 1, 0.3, 1) both;
+    animation: uxRouteFade 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  @keyframes uxRouteFadeOut {
+    from { opacity: 1; }
+    to { opacity: 0; }
   }
 
   /* Catalog route: smooth opacity fade without vertical transform to keep sticky filters rock-solid */
@@ -961,7 +1021,6 @@ html[data-theme="light"] .status-commandBox:focus-within {
 
 [data-motion="lite"] .trending-badge,
 [data-motion="lite"] .stock-badge-modern.low-stock,
-[data-motion="lite"] .route-progress-bar,
 [data-motion="lite"] .cursor {
   animation: none !important;
 }
@@ -1094,10 +1153,9 @@ html[data-theme="light"] .status-commandBox:focus-within {
 }
 
 [data-motion="lite"] .home-page .home-popularList .product-tile {
-  /* Skip paint for off-screen tiles while scrolling (same win as catalog) */
-  content-visibility: auto;
-  contain-intrinsic-size: auto 120px;
-  contain: layout paint style;
+  /* Keep Home hero/best-sellers already painted without re-painting on scroll */
+  content-visibility: visible;
+  contain: layout style;
   overflow: visible !important;
   transition-duration: 120ms !important;
   will-change: auto !important;

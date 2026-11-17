@@ -160,15 +160,15 @@ html[data-theme] body .header .header-iconAction::after {
     min-height: 48px;
     padding: 4px 6px;
     margin: 0 !important;
-    border: 1px solid rgba(154, 191, 203, 0.45) !important;
+    border: 1px solid rgba(0, 120, 80, 0.14) !important;
     border-radius: 16px !important;
-    background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 58%, #edf7f2 100%) !important;
     color: var(--pdx-text-1, #0f172a);
     box-shadow:
-      0 12px 28px rgba(67, 111, 129, 0.16),
-      0 4px 10px rgba(80, 115, 130, 0.08),
+      0 12px 28px rgba(15, 42, 32, 0.09),
+      0 4px 10px rgba(0, 120, 80, 0.06),
       inset 0 1.5px 0 rgba(255, 255, 255, 1),
-      inset 0 -2.5px 0 rgba(154, 191, 203, 0.35) !important;
+      inset 0 -2.5px 0 rgba(0, 120, 80, 0.1) !important;
     backdrop-filter: blur(20px) saturate(140%);
     -webkit-backdrop-filter: blur(20px) saturate(140%);
     opacity: 0;
@@ -192,13 +192,13 @@ html[data-theme] body .header .header-iconAction::after {
     visibility: visible !important;
     pointer-events: auto !important;
     transform: translateY(0) !important;
-    border: 1px solid rgba(154, 191, 203, 0.5) !important;
-    background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+    border: 1px solid rgba(0, 120, 80, 0.14) !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 58%, #edf7f2 100%) !important;
     box-shadow:
-      0 14px 34px rgba(67, 111, 129, 0.22),
-      0 6px 14px rgba(80, 115, 130, 0.12),
+      0 14px 34px rgba(15, 42, 32, 0.1),
+      0 6px 14px rgba(0, 120, 80, 0.08),
       inset 0 2px 0 rgba(255, 255, 255, 1),
-      inset 0 -3px 0 rgba(154, 191, 203, 0.35) !important;
+      inset 0 -3px 0 rgba(0, 120, 80, 0.1) !important;
   }
 
   html[data-theme="dark"] body > .pdx-mobileProductBar,
@@ -245,11 +245,11 @@ html[data-theme] body .header .header-iconAction::after {
     padding: 0;
     margin-left: 2px;
     flex-shrink: 0;
-    border: 1px solid rgba(154, 191, 203, 0.4) !important;
+    border: 1px solid rgba(0, 120, 80, 0.14) !important;
     border-radius: 11px;
-    background: rgba(255, 255, 255, 0.85);
+    background: rgba(255, 255, 255, 0.92);
     color: var(--pdx-text-1, #0f172a);
-    box-shadow: 0 1.5px 4px rgba(67, 111, 129, 0.12), inset 0 1px 0 #ffffff;
+    box-shadow: 0 2px 6px rgba(15, 42, 32, 0.08), inset 0 1px 0 #ffffff;
     cursor: pointer;
     transition: transform 0.15s ease, background 0.15s ease;
   }
@@ -351,44 +351,44 @@ html[data-theme] body .header .header-iconAction::after {
     border-radius: 24px !important;
     margin-top: 0 !important;
     overflow: hidden !important;
-    border: 1px solid rgba(154, 191, 203, 0.28) !important;
-    box-shadow: 0 6px 24px rgba(67, 111, 129, 0.07), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid rgba(0, 120, 80, 0.14) !important;
+    box-shadow: 0 8px 24px rgba(15, 42, 32, 0.07), 0 1px 3px rgba(0, 0, 0, 0.03) !important;
   }
 
   .detail-page.detail-page-v3 .pdx-billboard .pdx-visual {
     position: relative !important;
-    min-height: 186px !important;
-    max-height: 220px !important;
-    margin: 12px 12px 0 !important;
-    padding: 24px 20px !important;
-    border-radius: 18px !important;
-    border: 1px solid rgba(0, 158, 96, 0.14) !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 220px !important;
+    max-height: 260px !important;
+    margin: 0 !important;
+    padding: 28px 20px !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
     background:
-      radial-gradient(circle at 50% 35%, rgba(0, 158, 96, 0.14), rgba(0, 158, 96, 0.03) 72%),
-      #edf5f1 !important;
-    box-shadow:
-      inset 0 2px 8px rgba(10, 46, 32, 0.06),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.9) !important;
+      radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.24) 0%, transparent 64%),
+      linear-gradient(180deg, #00b87a 0%, #009e60 54%, #057d4f 100%) !important;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08) !important;
   }
 
   html[data-theme="dark"] .detail-page.detail-page-v3 .pdx-billboard .pdx-visual {
-    border-color: rgba(55, 211, 141, 0.16) !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
     background:
-      radial-gradient(circle at 50% 35%, rgba(0, 214, 150, 0.16), rgba(0, 214, 150, 0.02) 72%),
-      #0d1512 !important;
-    box-shadow:
-      inset 0 4px 16px rgba(0, 0, 0, 0.48),
-      inset 0 -1px 0 rgba(255, 255, 255, 0.05) !important;
+      radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.2) 0%, transparent 64%),
+      linear-gradient(180deg, #00b87a 0%, #009e60 54%, #057d4f 100%) !important;
+    box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.25) !important;
   }
 
   .detail-page.detail-page-v3 .pdx-billboard .pdx-visualIcon {
-    width: 108px !important;
-    height: 108px !important;
-    border-radius: 24px !important;
+    width: 118px !important;
+    height: 118px !important;
+    border-radius: 26px !important;
+    background: #ffffff !important;
     box-shadow:
-      0 14px 28px rgba(8, 38, 26, 0.14),
-      0 4px 10px rgba(0, 158, 96, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+      0 14px 28px rgba(0, 42, 24, 0.24),
+      0 4px 10px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 1) !important;
   }
 
   /* Clean toolbar row matching desktop */

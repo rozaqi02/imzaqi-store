@@ -149,8 +149,6 @@ a.btn:active {
   }
 }
 
-/* 10. Page transition shimmer line (handled cleanly by RouteProgress) */
-
 /* ═══════════════════════════════════════════════════════════════════════
    SHARED SURFACE & MOTION RULES
    ═══════════════════════════════════════════════════════════════════════ */
@@ -298,19 +296,6 @@ textarea,
 html[data-theme="dark"] input,
 html[data-theme="dark"] textarea {
   caret-color: var(--accent, #00f5c4);
-}
-
-/* Scroll progress bar */
-.home-scrollProgress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 3.5px;
-  background: linear-gradient(90deg, #3fe8c8, #00a88c, #006b75);
-  z-index: 9999;
-  width: 0%;
-  pointer-events: none;
-  transition: width 0.08s ease-out;
 }
 
 /* 18. Reveal-on-scroll soft entrance for sections */

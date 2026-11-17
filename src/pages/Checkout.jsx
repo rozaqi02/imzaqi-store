@@ -16,7 +16,7 @@ import {
 } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
-import { formatIDR, validateWhatsApp } from "../lib/format";
+import { formatIDR, getProductIconTone, validateWhatsApp } from "../lib/format";
 import { checkStockAvailability } from "../lib/api";
 import CheckoutSteps from "../components/CheckoutSteps";
 import CheckoutExtrasPanel from "../components/CheckoutExtrasPanel";
@@ -27,6 +27,7 @@ import { useToast } from "../context/ToastContext";
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useDialogA11y } from "../hooks/useDialogA11y";
+import { useSwipeToDismiss } from "../hooks/useSwipeToDismiss";
 import WhatsAppInput from "../components/WhatsAppInput";
 import { loadBuyerDetails, saveBuyerDetails, variantNeedsBuyerEmail } from "../lib/buyerDetails";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
@@ -220,6 +221,12 @@ export default function Checkout() {
     containerRef: drawerRef,
     onClose: requestClose,
     initialFocusSelector: ".checkout-drawerClose",
+  });
+
+  const drawerSwipe = useSwipeToDismiss({
+    containerRef: drawerRef,
+    onClose: requestClose,
+    disabled: !isDrawerCheckout || !isMobileSheet || isMotionOff,
   });
 
   useEffect(() => {
@@ -539,8 +546,17 @@ export default function Checkout() {
   function renderDrawerContent() {
     return (
       <>
-        <div className="checkout-drawerHandle" aria-hidden="true" />
-        <div className="checkout-drawerHead">
+        <div
+          className="checkout-drawerHandle"
+          aria-hidden="true"
+          style={isMobileSheet ? { touchAction: "none" } : undefined}
+          {...(isMobileSheet ? drawerSwipe : {})}
+        />
+        <div
+          className="checkout-drawerHead"
+          style={isMobileSheet ? { touchAction: "none" } : undefined}
+          {...(isMobileSheet ? drawerSwipe : {})}
+        >
           <div className="checkout-drawerCopy">
             <h1 className="h1 checkout-drawerTitle">Pesananmu.</h1>
             <p className="checkout-drawerSub"><BadgeCheck size={14} aria-hidden="true" /><span>Tersimpan otomatis</span></p>
@@ -572,7 +588,7 @@ export default function Checkout() {
                 <div>
                   <div className="checkout-main-kicker">Keranjang</div>
                   <h2 className="h3 checkout-main-title">
-                    {cart.items.length === 0 ? "Belum ada pilihan" : "Pesananmu"}
+                    {cart.items.length === 0 ? "Belum ada pilihan" : "Daftar Paket"}
                   </h2>
                 </div>
                 {cart.items.length > 0 ? <span className="checkout-main-count">x{itemCount}</span> : null}
@@ -676,7 +692,7 @@ export default function Checkout() {
           </div>
 
           <div className={`checkout-full-grid${cart.items.length === 0 ? " is-empty" : ""}`}>
-            <main className="checkout-full-main">
+            <div className="checkout-full-main">
               {cart.items.length === 0 ? (
                 <div className="card pad checkout-panel checkout-full-empty-card">
                   {renderEmptyCheckout()}
@@ -687,7 +703,7 @@ export default function Checkout() {
                     <div className="checkout-main-head">
                       <div>
                         <div className="checkout-main-kicker">Keranjang</div>
-                        <h2 className="h3 checkout-main-title">Pesananmu</h2>
+                        <h2 className="h3 checkout-main-title">Daftar Paket</h2>
                       </div>
                       <span className="checkout-main-count">x{itemCount}</span>
                     </div>
@@ -717,7 +733,7 @@ export default function Checkout() {
                   </section>
                 </div>
               )}
-            </main>
+            </div>
 
             {cart.items.length > 0 && (
               <aside className="checkout-full-side">
@@ -874,7 +890,7 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
       className={`checkout-item-card${pulseKind === "qty" ? " is-qty-pulse" : ""}${pulseKind === "remove" ? " is-removing" : ""}`}
     >
       <div className="checkout-item-left">
-        <div className="checkout-item-icon app-productIcon">
+        <div className="checkout-item-icon app-productIcon" data-brand-icon={getProductIconTone(item) || undefined}>
           {iconUrl ? (
             <img src={iconUrl} alt={`${item.product_name} icon`} loading="lazy" decoding="async" />
           ) : (

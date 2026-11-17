@@ -1,7 +1,6 @@
 import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import Layout from "./components/Layout";
-import RouteProgress from "./components/RouteProgress";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLoader from "./components/AdminLoader";
 import NetworkBridge from "./components/NetworkBridge";
@@ -252,9 +251,18 @@ function ScrollToTop() {
 
     // Scroll instan ke top tanpa animasi smooth-scroll sweep agar transisi
     // halaman baru terasa bersih, konsisten, dan bebas flicker/jolt.
-    window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    if (document.documentElement) document.documentElement.scrollTop = 0;
-    if (document.body) document.body.scrollTop = 0;
+    const jumpTop = () => {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    };
+    jumpTop();
+    const rafId = requestAnimationFrame(jumpTop);
+    return () => cancelAnimationFrame(rafId);
   }, [pathname, showCheckoutOverlay]);
 
   return null;
@@ -423,7 +431,6 @@ export default function App() {
         <AbandonedCartBanner />
         <SwUpdateToast />
         <ScrollToTop />
-        <RouteProgress />
         <FloatingOrderStatus />
         <AppRoutes />
       </PresenceProvider>

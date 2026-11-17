@@ -9,7 +9,6 @@ import ProductTile from "../components/ProductTile";
 import { fetchProducts, fetchTopSellingData, fetchPromoCodes, fetchSettings, peekCachedProducts, fetchActiveFlashSales } from "../lib/api";
 import EmptyState from "../components/EmptyState";
 import { usePageMeta } from "../hooks/usePageMeta";
-import { useRevealOnScroll } from "../hooks/useRevealOnScroll";
 import { isAcademicProduct } from "../lib/productCategories";
 import { isPromoExpired } from "../lib/format";
 
@@ -130,27 +129,6 @@ function HomeProductSkeleton() {
   );
 }
 
-function ScrollProgressBar() {
-  // Use ref + direct DOM mutation instead of setState to avoid re-rendering
-  // the entire Home component tree on every scroll tick.
-  const barRef = useRef(null);
-
-  useEffect(() => {
-    const bar = barRef.current;
-    if (!bar) return undefined;
-    const handleScroll = () => {
-      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (totalScroll > 0) {
-        bar.style.width = `${(window.scrollY / totalScroll) * 100}%`;
-      }
-    };
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  return <div ref={barRef} className="home-scrollProgress" />;
-}
-
 function readSeededProducts() {
   return peekCachedProducts({ ttlMs: 120_000 }) || [];
 }
@@ -181,7 +159,6 @@ export default function Home() {
 
   const toast = useToast();
   const nav = useNavigate();
-  useRevealOnScroll(loading);
 
   usePageMeta({
     title: "Beranda",
@@ -294,9 +271,6 @@ export default function Home() {
 
   return (
     <div className="page home-page">
-      {/* Scroll Progress Bar */}
-      <ScrollProgressBar />
-
       <div className="hx-heroZone">
         <Hero products={products} topIds={topIds} loading={loading} />
       </div>
@@ -338,7 +312,7 @@ export default function Home() {
                 </div>
               ) : (
                 popularProducts.map((p, idx) => (
-                  <div key={p.id} className="reveal reveal-scale" style={{ transitionDelay: `${80 + idx * 70}ms` }}>
+                  <div key={p.id}>
                     <ProductTile
                       product={p}
                       rank={idx + 1}
@@ -347,6 +321,7 @@ export default function Home() {
                       disableFlip={true}
                       overrideSold={salesMap[p.id] != null ? salesMap[p.id] : null}
                       flashSaleMap={flashSaleMap}
+                      eager={true}
                     />
                   </div>
                 ))
@@ -380,18 +355,15 @@ export default function Home() {
                 role="list"
                 aria-label="Semua jasa akademik"
               >
-                {academicProducts.map((p, idx) => (
-                  <div
-                    key={p.id}
-                    className="reveal reveal-scale"
-                    style={{ transitionDelay: `${60 + idx * 55}ms` }}
-                  >
+                {academicProducts.map((p) => (
+                  <div key={p.id}>
                     <ProductTile
                       product={p}
                       layout="list"
                       disableTilt={true}
                       flashSaleMap={flashSaleMap}
                       disableFlip={true}
+                      eager={true}
                     />
                   </div>
                 ))}

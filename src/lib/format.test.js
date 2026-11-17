@@ -7,6 +7,7 @@ import {
   getTimeline,
   normalizeProductRecord,
   packDisplayName,
+  summarizeCatalogCopy,
   isPromoExpired,
   mapPromoResult,
   formatWhatsAppNumber,
@@ -187,5 +188,13 @@ describe("mapPromoResult (Supabase validate_promo RPC mapping)", () => {
     expect(res.ok).toBe(true);
     expect(res.percent).toBe(15);
     expect(res.message).toContain("15%");
+  });
+});
+
+describe("summarizeCatalogCopy", () => {
+  it("cleans admin shorthand and note prefixes cleanly", () => {
+    expect(summarizeCatalogCopy("NOTE: wajib baca\npc admin send mail")).toBe("Kirim detail ke admin");
+    expect(summarizeCatalogCopy("- akses private siap pakai")).toBe("Akses private siap pakai");
+    expect(summarizeCatalogCopy("")).toBe("Pilih paket lalu lanjut ke checkout.");
   });
 });

@@ -74,16 +74,16 @@ html[data-theme="dark"] body .header .header-iconAction {
     0 2px 6px rgba(0, 0, 0, 0.3) !important;
 }
 
-/* Bottom Nav bar surface matching floating bar / navbar body & palette */
+/* Bottom Nav bar surface matching floating bar / crystal emerald palette */
 html[data-theme="light"] body .bottom-nav,
 html:not([data-theme="dark"]) body .bottom-nav {
-  border: 1px solid rgba(154, 191, 203, 0.5) !important;
-  background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+  border: 1px solid rgba(0, 120, 80, 0.14) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 58%, #edf7f2 100%) !important;
   box-shadow:
-    0 14px 34px rgba(67, 111, 129, 0.22),
-    0 6px 14px rgba(80, 115, 130, 0.12),
+    0 14px 34px rgba(15, 42, 32, 0.1),
+    0 6px 14px rgba(0, 120, 80, 0.08),
     inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.35) !important;
+    inset 0 -3px 0 rgba(0, 120, 80, 0.1) !important;
   backdrop-filter: blur(20px) saturate(140%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
 }
@@ -346,11 +346,11 @@ html body .detail-page.detail-page-v3 .pdx-packSignal {
 }
 
 html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-packSignal {
-  border: 1px solid rgba(130, 165, 178, 0.24) !important;
+  border: 1px solid rgba(15, 23, 42, 0.1) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 45%),
-    var(--skeu-inset-bg, #e8eaed) !important;
-  color: var(--brand-muted, #5b6570) !important;
+    var(--skeu-inset-bg, #edf4f0) !important;
+  color: var(--brand-muted, #475569) !important;
   box-shadow: var(--skeu-inset-shadow) !important;
 }
 
@@ -377,7 +377,7 @@ html[data-theme] body .header .theme-toggle {
 
 html[data-theme="light"] body .header .theme-toggle {
   box-shadow:
-    inset 0 2px 5px rgba(67, 111, 129, 0.22),
+    inset 0 2px 5px rgba(15, 42, 32, 0.12),
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
@@ -465,4 +465,94 @@ html[data-theme] body .header .header-iconAction {
   .site-footer.site-footer--gopay .site-footerGoContact {
     grid-template-columns: minmax(0, 1fr);
   }
+}
+
+/* Adaptive framing for horizontal transparent YouTube logo across Light (Option 1) & Dark (Option 3) themes */
+html[data-theme="light"] body :is(
+  .pdx-visualIcon,
+  .product-tile-icon,
+  .catalog-cardIcon,
+  .fsp-visualIcon,
+  .np-popup-iconWrap,
+  .fsd-logo,
+  .fsd-choiceLogo,
+  .checkout-item-icon,
+  .checkout-itemIcon,
+  .st-itemIcon
+)[data-brand-icon="youtube"][data-brand-icon="youtube"] {
+  background: linear-gradient(180deg, #ffffff 0%, #f5f9f7 100%) !important;
+  border: 1px solid rgba(0, 120, 80, 0.14) !important;
+  box-shadow:
+    0 8px 20px rgba(0, 42, 24, 0.14),
+    inset 0 1.5px 0 rgba(255, 255, 255, 1) !important;
+}
+
+html[data-theme="dark"] body :is(
+  .pdx-visualIcon,
+  .product-tile-icon,
+  .catalog-cardIcon,
+  .fsp-visualIcon,
+  .np-popup-iconWrap,
+  .fsd-logo,
+  .fsd-choiceLogo,
+  .checkout-item-icon,
+  .checkout-itemIcon,
+  .st-itemIcon
+)[data-brand-icon="youtube"][data-brand-icon="youtube"] {
+  background: linear-gradient(160deg, #212126 0%, #111114 60%, #08080a 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.16) !important;
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.42),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.22) !important;
+}
+
+html[data-theme="light"] body :is(.pdx-visualIcon, .fsp-visualIcon)[data-brand-icon="youtube"][data-brand-icon="youtube"] {
+  box-shadow:
+    0 14px 28px rgba(0, 42, 24, 0.24),
+    0 4px 10px rgba(0, 0, 0, 0.08),
+    inset 0 1.5px 0 rgba(255, 255, 255, 1) !important;
+}
+
+html[data-theme="dark"] body :is(.pdx-visualIcon, .fsp-visualIcon)[data-brand-icon="youtube"][data-brand-icon="youtube"] {
+  box-shadow:
+    0 16px 32px rgba(0, 0, 0, 0.46),
+    0 4px 12px rgba(0, 0, 0, 0.26),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.22) !important;
+}
+
+html[data-theme] body :is(
+  .pdx-visualIcon,
+  .product-tile-icon,
+  .catalog-cardIcon,
+  .fsp-visualIcon,
+  .np-popup-iconWrap,
+  .fsd-logo,
+  .fsd-choiceLogo,
+  .checkout-item-icon,
+  .checkout-itemIcon,
+  .st-itemIcon
+)[data-brand-icon="youtube"][data-brand-icon="youtube"] > img {
+  width: 72% !important;
+  height: 72% !important;
+  max-width: 72% !important;
+  max-height: 72% !important;
+  object-fit: contain !important;
+  object-position: center !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  display: block !important;
+}
+
+html[data-theme="light"] body .pdx-mobileProductIcon[data-brand-icon="youtube"][data-brand-icon="youtube"] {
+  background: #ffffff !important;
+  padding: 3px !important;
+  box-sizing: border-box !important;
+  object-fit: contain !important;
+}
+
+html[data-theme="dark"] body .pdx-mobileProductIcon[data-brand-icon="youtube"][data-brand-icon="youtube"] {
+  background: linear-gradient(160deg, #212126 0%, #111114 100%) !important;
+  padding: 3px !important;
+  box-sizing: border-box !important;
+  object-fit: contain !important;
 }

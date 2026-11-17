@@ -57,15 +57,15 @@ html[data-theme] body .header .header-inner {
     padding 220ms ease !important;
 }
 
-/* Light mode floating navbar: identical body, palette & bevel to ProductDetail floating bar */
+/* Light mode floating navbar: crystal-white & emerald surface matching storefront palette */
 html[data-theme="light"] body .header .header-inner {
-  border: 1px solid rgba(154, 191, 203, 0.5) !important;
-  background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+  border: 1px solid rgba(0, 120, 80, 0.14) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 58%, #edf7f2 100%) !important;
   box-shadow:
-    0 14px 34px rgba(67, 111, 129, 0.22),
-    0 6px 14px rgba(80, 115, 130, 0.12),
+    0 14px 34px rgba(15, 42, 32, 0.1),
+    0 6px 14px rgba(0, 120, 80, 0.08),
     inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.35) !important;
+    inset 0 -3px 0 rgba(0, 120, 80, 0.1) !important;
 }
 
 html[data-theme] body .header.is-shrunk .header-inner {
@@ -152,12 +152,12 @@ html[data-theme] body .header .nav-active-pill {
 }
 
 html[data-theme="light"] body .header .nav-active-pill {
-  border: 1px solid rgba(154, 191, 203, 0.45) !important;
-  background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 100%) !important;
+  border: 1px solid rgba(0, 120, 80, 0.16) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #edf7f2 100%) !important;
   box-shadow:
-    0 4px 12px rgba(67, 111, 129, 0.12),
+    0 4px 12px rgba(0, 120, 80, 0.1),
     inset 0 1.5px 0 #ffffff,
-    inset 0 -1.5px 0 rgba(154, 191, 203, 0.3) !important;
+    inset 0 -1.5px 0 rgba(0, 120, 80, 0.12) !important;
 }
 
 html[data-theme] body .header .header-actions {
@@ -181,11 +181,11 @@ html[data-theme] body .header .header-iconAction {
 
 html[data-theme="light"] body .header .header-cart,
 html[data-theme="light"] body .header .header-iconAction {
-  border: 1px solid rgba(154, 191, 203, 0.4) !important;
+  border: 1px solid rgba(0, 120, 80, 0.14) !important;
   border-radius: 12px !important;
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: rgba(255, 255, 255, 0.92) !important;
   color: var(--pdx-text-1, #0f172a) !important;
-  box-shadow: 0 1.5px 4px rgba(67, 111, 129, 0.12), inset 0 1px 0 #ffffff !important;
+  box-shadow: 0 2px 6px rgba(15, 42, 32, 0.08), inset 0 1px 0 #ffffff !important;
 }
 
 html[data-theme="light"] body .header .header-cart:hover,
@@ -253,19 +253,19 @@ html[data-theme] body .header .theme-toggle.is-dark .theme-toggleThumb {
     margin: 6px auto 0 !important;
     padding: 7px 12px !important;
     border-radius: 16px !important;
-    backdrop-filter: blur(20px) saturate(140%) !important;
-    -webkit-backdrop-filter: blur(20px) saturate(140%) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
   }
 
-  /* Light mode mobile navbar: identical body, palette & bevel to ProductDetail floating bar (pdx-mobileProductBar) */
+  /* Light mode mobile navbar: matching crystal-white & emerald surface */
   html[data-theme="light"] body .header .header-inner {
-    border: 1px solid rgba(154, 191, 203, 0.5) !important;
-    background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+    border: 1px solid rgba(0, 120, 80, 0.14) !important;
+    background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 58%, #edf7f2 100%) !important;
     box-shadow:
-      0 14px 34px rgba(67, 111, 129, 0.22),
-      0 6px 14px rgba(80, 115, 130, 0.12),
+      0 14px 34px rgba(15, 42, 32, 0.1),
+      0 6px 14px rgba(0, 120, 80, 0.08),
       inset 0 2px 0 rgba(255, 255, 255, 1),
-      inset 0 -3px 0 rgba(154, 191, 203, 0.35) !important;
+      inset 0 -3px 0 rgba(0, 120, 80, 0.1) !important;
   }
 
   /* Dark mode mobile navbar: identical body, palette & bevel to ProductDetail floating bar (pdx-mobileProductBar) */
@@ -282,11 +282,11 @@ html[data-theme] body .header .theme-toggle.is-dark .theme-toggleThumb {
   /* Cart & Admin button in mobile navbar matching pdx-mobileBack button style */
   html[data-theme="light"] body .header .header-cart,
   html[data-theme="light"] body .header .header-iconAction {
-    border: 1px solid rgba(154, 191, 203, 0.4) !important;
+    border: 1px solid rgba(0, 120, 80, 0.14) !important;
     border-radius: 11px !important;
-    background: rgba(255, 255, 255, 0.85) !important;
+    background: rgba(255, 255, 255, 0.92) !important;
     color: var(--pdx-text-1, #0f172a) !important;
-    box-shadow: 0 1.5px 4px rgba(67, 111, 129, 0.12), inset 0 1px 0 #ffffff !important;
+    box-shadow: 0 2px 6px rgba(15, 42, 32, 0.08), inset 0 1px 0 #ffffff !important;
   }
 
   html[data-theme="light"] body .header .header-cart:hover,
@@ -295,10 +295,10 @@ html[data-theme] body .header .theme-toggle.is-dark .theme-toggleThumb {
   }
 
   html[data-theme="light"] body .header .theme-toggle {
-    border: 1px solid rgba(154, 191, 203, 0.4) !important;
+    border: 1px solid rgba(0, 120, 80, 0.14) !important;
     border-radius: 11px !important;
-    background: rgba(154, 191, 203, 0.22) !important;
-    box-shadow: inset 0 1.5px 3px rgba(67, 111, 129, 0.14) !important;
+    background: rgba(0, 158, 96, 0.08) !important;
+    box-shadow: inset 0 1.5px 3px rgba(15, 42, 32, 0.09) !important;
   }
 
   html[data-theme="dark"] body .header .header-cart,

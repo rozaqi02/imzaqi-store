@@ -7,6 +7,7 @@ import {
   Grid2x2,
   Layers3,
   List,
+  ListFilter,
   PackageCheck,
   PackageSearch,
   Search,
@@ -21,10 +22,11 @@ import CatalogFilterSidebar from "../components/CatalogFilterSidebar";
 import EmptyState from "../components/EmptyState";
 import FlashSaleBanner from "../components/FlashSaleBanner";
 import { CatalogHero } from "../components/StorefrontHero";
+import TypewriterSearchInput from "../components/TypewriterSearchInput";
 
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
-import { formatIDR, summarizeCatalogCopy, classifyStock, isKnownOutOfStock } from "../lib/format";
+import { formatIDR, getProductIconTone, summarizeCatalogCopy, classifyStock, isKnownOutOfStock } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import {
   CATALOG_LINE_FILTERS,
@@ -35,6 +37,9 @@ import {
 import { clearSearchHistory, getSearchHistory, pushSearchHistory } from "../lib/searchHistory";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { useDebounce } from "../hooks/useDebounce";
+import { useSwipeToDismiss } from "../hooks/useSwipeToDismiss";
+import { prefetchRoute } from "../lib/routePrefetch";
+import { getTransitionProductSlug, handleViewTransitionLinkClick } from "../lib/viewTransition";
 import {
   peekSavedScroll,
   hasSavedScrollY,
@@ -386,6 +391,11 @@ export default function Products() {
   );
   const openFilters = useCallback(() => setFiltersOpen(true), []);
   const closeFilters = useCallback(() => setFiltersOpen(false), []);
+  const filterSheetSwipe = useSwipeToDismiss({
+    containerRef: sheetRef,
+    onClose: closeFilters,
+    disabled: !filtersSheetVisible,
+  });
   const rememberCatalogScroll = useCallback((slug) => {
     saveScrollY({ slug });
   }, []);
@@ -1046,11 +1056,12 @@ export default function Products() {
                   <span className="hero-search-icon" aria-hidden="true">
                     <Search size={16} />
                   </span>
-                  <input
+                  <TypewriterSearchInput
                     ref={searchRef}
                     className="input hero-search-input"
                     value={query}
-                    placeholder="Cari produk atau paket"
+                    prefix="Ketik "
+                    words={["Netflix", "Canva", "YouTube", "Spotify", "CapCut"]}
                     onFocus={() => setSearchOpen(true)}
                     onChange={(e) => {
                       setQuery(e.target.value);
@@ -1220,13 +1231,12 @@ export default function Products() {
                   <button
                     key={item.key}
                     type="button"
-                    className={`catalog-quickChip catalog-quickChip--line catalog-quickChip--${item.key}${item.active ? " active" : ""}`}
+                    className={`catalog-quickChip${item.active ? " active" : ""}`}
                     onClick={item.onClick}
                     aria-pressed={item.active}
                   >
-                    {Icon ? <Icon size={18} strokeWidth={2.4} aria-hidden="true" /> : null}
+                    {Icon ? <Icon size={18} aria-hidden="true" /> : null}
                     <span>{item.label}</span>
-                    {item.count > 0 ? <em className="catalog-quickChipCount">{item.count}</em> : null}
                   </button>
                 );
               })}
@@ -1244,20 +1254,27 @@ export default function Products() {
                   )}
                 </strong>
                 <span>produk</span>
-                {activeFiltersCount ? <em>{activeFiltersCount} filter aktif</em> : null}
+                {activeFiltersCount ? (
+                  <em>{activeFiltersCount} filter aktif</em>
+                ) : (
+                  <em className="catalog-contentContext">Semua kategori siap dipilih</em>
+                )}
               </div>
 
               <div className="catalog-contentActions">
-                <select
-                  className="input catalog-contentSort"
-                  value={sort}
-                  onChange={(e) => setSort(e.target.value)}
-                  aria-label="Urutkan produk"
-                >
-                  {Object.entries(SORT_LABELS).map(([value, label]) => (
-                    <option key={value} value={value}>{label}</option>
-                  ))}
-                </select>
+                <div className="catalog-contentSortWrap">
+                  <ListFilter size={15} className="catalog-contentSortIcon" aria-hidden="true" />
+                  <select
+                    className="input catalog-contentSort"
+                    value={sort}
+                    onChange={(e) => setSort(e.target.value)}
+                    aria-label="Urutkan produk"
+                  >
+                    {Object.entries(SORT_LABELS).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
                 <div className="catalog-contentViewSwitch" data-view={view} aria-label="Tampilan katalog">
                   <span className="catalog-viewPill" aria-hidden="true" />
                 <button
@@ -1345,6 +1362,7 @@ export default function Products() {
                       product={product}
                       view={view}
                       location={location}
+                      navigate={navigate}
                       revealIndex={idx}
                       onBeforeNavigate={rememberCatalogScroll}
                     />
@@ -1383,8 +1401,8 @@ export default function Products() {
                 aria-modal="true"
                 aria-label="Filter produk"
               >
-                <div className="catalog-sheetHandle" aria-hidden="true" />
-                <div className="catalog-sheetHead">
+                <div className="catalog-sheetHandle" aria-hidden="true" {...filterSheetSwipe} />
+                <div className="catalog-sheetHead" {...filterSheetSwipe}>
                   <div className="catalog-sheetHeadCopy">
                     <div className="catalog-sheetTitle">Filter produk</div>
                     <div className="catalog-sheetSub">
@@ -1442,13 +1460,14 @@ export default function Products() {
   );
 }
 
-const ProductCardMemo = memo(function ProductCard({ product, view, location, revealIndex = 0, onBeforeNavigate }) {
+const ProductCardMemo = memo(function ProductCard({ product, view, location, navigate, revealIndex = 0, onBeforeNavigate }) {
   const isAvailable = product._isAvailable ?? true;
   const hasExplicitStock = product._hasExplicitStock ?? false;
   const stock = Number(product._stock || 0);
   const stockState = !isAvailable ? "out" : hasExplicitStock ? classifyStock(stock) : "ok";
   const displayPrice = product._minPrice ? formatIDR(product._minPrice) : "-";
   const summaryCopy = summarizeCatalogCopy(product.description);
+  const isTransitionTarget = getTransitionProductSlug() === product.slug;
 
   return (
     <Link
@@ -1460,11 +1479,27 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
       role="listitem"
       aria-label={`Buka detail ${product.name}`}
       style={{ "--reveal-i": revealIndex }}
-      onPointerDown={() => onBeforeNavigate?.(product.slug)}
+      onPointerDown={() => {
+        onBeforeNavigate?.(product.slug);
+        prefetchRoute(`/produk/${product.slug}`);
+      }}
+      onMouseEnter={() => prefetchRoute(`/produk/${product.slug}`)}
+      onClick={(e) => {
+        handleViewTransitionLinkClick(e, navigate, `/produk/${product.slug}`, {
+          slug: product.slug,
+          state: { fromCatalog: true, catalogSearch: location.search },
+          iconSelector: ".catalog-cardIcon",
+          titleSelector: ".catalog-cardTitle",
+        });
+      }}
     >
       <div className="catalog-cardTop">
         <div className="catalog-cardBrand">
-          <div className="catalog-cardIcon">
+          <div
+            className="catalog-cardIcon"
+            data-brand-icon={getProductIconTone(product) || undefined}
+            style={isTransitionTarget ? { viewTransitionName: `product-icon-${product.slug}` } : undefined}
+          >
             {product.icon_url ? (
               <img
                 src={product.icon_url}
@@ -1481,7 +1516,13 @@ const ProductCardMemo = memo(function ProductCard({ product, view, location, rev
           </div>
 
           <div className="catalog-cardCopy">
-            <div className="catalog-cardTitle" title={product.name}>{product.name}</div>
+            <div
+              className="catalog-cardTitle"
+              title={product.name}
+              style={isTransitionTarget ? { viewTransitionName: `product-title-${product.slug}` } : undefined}
+            >
+              {product.name}
+            </div>
             <div className="catalog-cardSummary" title={summaryCopy}>{summaryCopy}</div>
           </div>
         </div>

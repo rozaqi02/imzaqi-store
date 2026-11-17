@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronLeft } from "lucide-react";
 import { rafThrottle } from "../utils/throttle";
+import { getProductIconTone } from "../lib/format";
 
 export default function MobileProductBar({ name, icon, onBack }) {
   const [active, setActive] = useState(false);
@@ -60,6 +61,7 @@ export default function MobileProductBar({ name, icon, onBack }) {
         {icon && !imgFailed ? (
           <img
             className="pdx-mobileProductIcon"
+            data-brand-icon={getProductIconTone({ name, icon_url: icon }) || undefined}
             src={icon}
             alt=""
             aria-hidden="true"

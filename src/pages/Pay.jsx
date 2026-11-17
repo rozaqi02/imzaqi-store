@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useReducer, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Check, CheckCircle2, Clock, Copy, Download, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
+import { Check, CheckCircle2, Download, FileText, Gift, Info, Loader, Mail, Phone, ShieldCheck, X } from "lucide-react";
 import { supabase } from "../lib/supabaseClient";
 import { useCart } from "../context/CartContext";
 import { usePromo } from "../hooks/usePromo";
@@ -18,9 +18,8 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import WhatsAppInput from "../components/WhatsAppInput";
 import { addOrderToHistory } from "../lib/orderHistory";
 import { getReferralCode } from "../lib/referral";
-import { copyToClipboard } from "../utils/clipboard";
 import { warn } from "../lib/log";
-import { QRISSkeleton, QRISZoomModal, OrderSuccessModal, ConfirmPaymentModal, useQrisTimer } from "./pay/components/PayModals";
+import { QRISSkeleton, QRISZoomModal, OrderSuccessModal, ConfirmPaymentModal } from "./pay/components/PayModals";
 import { saveBuyerName } from "../lib/greeting";
 import { loadBuyerDetails, saveBuyerDetails } from "../lib/buyerDetails";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
@@ -422,17 +421,13 @@ export default function Pay() {
   const buyerReady = hasValidWhatsApp && !missingBuyerEmailNote;
   const canShowQris = !isFreeOrder && items.length > 0;
 
-  // Start timer when QRIS becomes visible
-  const qrisTimerActive = canShowQris && !isFreeOrder && qris.mode !== "idle";
-  const qrisTimer = useQrisTimer(qrisTimerActive);
-
   const isDynamicQris = qris.mode === "dynamic";
   const qrisFootText = !hasValidWhatsApp
     ? "Masukkan nomor WhatsApp di formulir sebelah untuk konfirmasi pesanan."
     : missingBuyerEmailNote
       ? "Lengkapi email aktivasi untuk paket ini."
       : isDynamicQris
-        ? "Nominal QR sudah otomatis sesuai total tagihan."
+        ? ""
         : "QR statis aktif. Bayar sesuai total di ringkasan.";
   const qrisLockTitle = !hasValidWhatsApp
     ? "Masukkan WhatsApp"
@@ -821,11 +816,11 @@ export default function Pay() {
     return (
       <div className={klass}>
         {renderPayConfirmButton()}
-        <p className="pay-confirmNotice text-muted" style={{ fontSize: "12px", textAlign: "center", margin: "8px 0 0 0", opacity: 0.85, lineHeight: 1.4 }}>
-          {isFreeOrder
-            ? "Order langsung diproses setelah konfirmasi."
-            : "ID order otomatis diterbitkan setelah konfirmasi. Akun diproses dalam 5 sampai 30 menit."}
-        </p>
+        {isFreeOrder ? (
+          <p className="pay-confirmNotice text-muted" style={{ fontSize: "12px", textAlign: "center", margin: "8px 0 0 0", opacity: 0.85, lineHeight: 1.4 }}>
+            Order langsung diproses setelah konfirmasi.
+          </p>
+        ) : null}
       </div>
     );
   }
@@ -838,17 +833,6 @@ export default function Pay() {
             <span className="pay-shell-kicker">Pembayaran QRIS</span>
             <h1 className="h1 pay-shell-title hero-anim-title">Bayar pesanan.</h1>
             <p className="pay-shell-sub hero-anim-sub">Scan QRIS lewat m-banking atau e-wallet.</p>
-            <span
-              className={`pay-shell-status${isFreeOrder ? " is-free" : qrisTimer.expired ? " is-expired" : ""}`}
-              role="status"
-              aria-live="polite"
-            >
-              {isFreeOrder
-                ? "Order gratis: tinggal konfirmasi"
-                : qrisTimer.expired
-                  ? "Sesi QR berakhir: muat ulang QR"
-                  : "Menunggu pembayaran"}
-            </span>
           </div>
         </div>
 
@@ -981,38 +965,15 @@ export default function Pay() {
             <section className="card pad pay-card pay-stageCard reveal" style={{ transitionDelay: "160ms" }}>
               <div className="pay-stageHeading">
                 <div className="pay-stageLabel">Total pembayaran</div>
-                <div style={{ display: "flex", alignItems: "center", gap: "10px", flexWrap: "wrap" }}>
-                  <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
-                  {!isFreeOrder && total > 0 ? (
-                    <button
-                      type="button"
-                      className="btn btn-ghost btn-sm"
-                      style={{ padding: "4px 8px", fontSize: "12px", height: "auto" }}
-                      onClick={() => {
-                        copyToClipboard(String(total)).then(
-                          () => {
-                            if (navigator.vibrate) navigator.vibrate(12);
-                            toast.success("Nominal disalin!", { title: formatIDR(total), duration: 2000 });
-                          },
-                          () => toast.error("Gagal menyalin nominal.")
-                        );
-                      }}
-                      title="Salin nominal untuk m-banking / e-wallet"
-                      aria-label={`Salin nominal tagihan ${formatIDR(total)}`}
-                    >
-                      <Copy size={13} aria-hidden="true" />
-                      <span>Salin nominal</span>
-                    </button>
-                  ) : null}
-                </div>
+                <div className="pay-stageTotal">{isFreeOrder ? "Gratis" : formatIDR(total)}</div>
               </div>
               <div className="pay-stageGrid">
                 <div className="pay-stageMeta">
-                  <div className="pay-stageHint">
-                    {isFreeOrder
-                      ? "Diskon 100%. Langsung konfirmasi pesanan."
-                      : "Scan QRIS, bayar nominal pas, lalu konfirmasi."}
-                  </div>
+                  {isFreeOrder ? (
+                    <div className="pay-stageHint">
+                      Diskon 100%. Langsung konfirmasi pesanan.
+                    </div>
+                  ) : null}
 
 
 
@@ -1059,7 +1020,7 @@ export default function Pay() {
                           </div>
                           <div className="pay-freePanelCheck">
                             <Check size={12} strokeWidth={3} />
-                            <span>Total tagihan: Rp 0</span>
+                            <span>Total tagihan: Rp0</span>
                           </div>
                           <div className="pay-freePanelCheck">
                             <Check size={12} strokeWidth={3} />
@@ -1069,30 +1030,6 @@ export default function Pay() {
                       </div>
                     ) : canShowQris ? (
                       <div className="pay-qrisBox">
-                        {/* QRIS timer - tampil paling atas di atas kartu QR */}
-                        {qris.loaded && !qris.failed && !qrisTimer.expired && (
-                          <div className={`pay-qrisTimer${qrisTimer.urgent ? " is-urgent" : ""}`} aria-live="polite">
-                            <Clock size={13} />
-                            <span>Sesi QR: <strong>{qrisTimer.label}</strong></span>
-                          </div>
-                        )}
-                        {qrisTimer.expired && (
-                          <div className="pay-qrisTimer is-expired" role="alert">
-                            <Clock size={13} />
-                            <span>Sesi QR berakhir. Muat ulang QR untuk melanjutkan pembayaran.</span>
-                            <button
-                              type="button"
-                              className="btn btn-sm pay-qrisRefreshBtn"
-                              onClick={() => {
-                                qrisTimer.reset?.();
-                                dispatchQris({ type: "INIT", notice: "" });
-                              }}
-                            >
-                              Buat QR Baru
-                            </button>
-                          </div>
-                        )}
-
                         {!qris.loaded && !qris.failed ? <QRISSkeleton /> : null}
                         {qris.url ? (
                           <div className="pay-qrisReticleFrame">
@@ -1127,7 +1064,7 @@ export default function Pay() {
                         </div>
                         ) : null}
 
-                        {!qris.failed && qris.url && !qrisTimer.expired && (
+                        {!qris.failed && qris.url ? (
                           <div className="pay-qrisMobileActions">
                             <a
                               href={qris.url}
@@ -1145,7 +1082,7 @@ export default function Pay() {
                               <span className="pay-qrisGuideStep"><strong>3</strong> Bayar dari Galeri</span>
                             </div>
                           </div>
-                        )}
+                        ) : null}
 
                         {qris.failed ? (
                           <div className="hint subtle pay-qrisFailedHint">
@@ -1169,10 +1106,11 @@ export default function Pay() {
                     )}
                   </div>
 
-                  <div className={`pay-stageFoot ${canShowQris && !isDynamicQris && !isFreeOrder ? "warning" : ""}`}>
-                    {isFreeOrder ? "Promo 100% aktif - tidak ada pembayaran yang diperlukan." : qrisFootText}
-                  </div>
-                  {!isFreeOrder ? <p className="pay-sessionHint">Timer adalah batas sesi QR di halaman ini, bukan jaminan reservasi stok. Setelah membayar, konfirmasikan agar admin dapat memeriksa pembayaranmu.</p> : null}
+                  {isFreeOrder || qrisFootText ? (
+                    <div className={`pay-stageFoot ${canShowQris && !isDynamicQris && !isFreeOrder ? "warning" : ""}`}>
+                      {isFreeOrder ? "Promo 100% aktif - tidak ada pembayaran yang diperlukan." : qrisFootText}
+                    </div>
+                  ) : null}
                   {canShowQris && qris.notice && !isFreeOrder ? (
                     <div className={`hint subtle pay-stageNotice ${!isDynamicQris ? "is-warning" : ""}`}>{qris.notice}</div>
                   ) : null}

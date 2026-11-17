@@ -161,13 +161,24 @@ export function calcRevenueForecast(dailyStats) {
 
 // Catalog
 export function summarizeCatalogCopy(text) {
-  const firstLine = String(text || "")
+  const lines = String(text || "")
     .split(/\r?\n+/)
-    .map((line) => line.trim())
-    .find(Boolean);
+    .map((line) =>
+      line
+        .trim()
+        .replace(/^[-*•#>\s]+/, "")
+        .replace(/\bpc\s*admin(?:\s*send\s*mail)?\b/gi, "kirim detail ke admin")
+        .replace(/\s{2,}/g, " ")
+        .trim()
+    )
+    .filter(Boolean);
 
-  if (!firstLine) return "Pilih paket lalu lanjut ke checkout.";
-  return firstLine.length > 58 ? `${firstLine.slice(0, 55).trimEnd()}...` : firstLine;
+  const chosen =
+    lines.find((line) => !/^(note|nb|catatan)\s*[:-]/i.test(line)) || lines[0];
+
+  if (!chosen) return "Pilih paket lalu lanjut ke checkout.";
+  const formatted = chosen.charAt(0).toUpperCase() + chosen.slice(1);
+  return formatted.length > 58 ? `${formatted.slice(0, 55).trimEnd()}...` : formatted;
 }
 
 // Promo
@@ -272,5 +283,25 @@ export function validateWhatsApp(value) {
   const isValid = /^(0|8)\d{8,13}$/.test(rawClean) || /^(\+?62)8\d{8,13}$/.test(normalized);
   if (!isValid) return { valid: false, message: 'Format: 08xxx atau +62xxx' };
   return { valid: true, message: '' };
+}
+
+export function getProductIconTone(itemOrUrl) {
+  if (!itemOrUrl) return '';
+  const haystack = typeof itemOrUrl === 'string'
+    ? itemOrUrl
+    : [
+        itemOrUrl.slug,
+        itemOrUrl.product_slug,
+        itemOrUrl.productSlug,
+        itemOrUrl.name,
+        itemOrUrl.product_name,
+        itemOrUrl.productName,
+        itemOrUrl.icon_url,
+        itemOrUrl.product_icon_url,
+        itemOrUrl.productIconUrl,
+      ]
+        .filter(Boolean)
+        .join(' ');
+  return /youtube/i.test(haystack) ? 'youtube' : '';
 }
 

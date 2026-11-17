@@ -187,7 +187,6 @@ code{
 .testi-miniStat,
 .admin-loginShell,
 .admin-loginAside,
-.admin-loginSignal,
 .admin-sidebar,
 .admin-panel,
 .admin-statCard,
@@ -252,10 +251,6 @@ code{
 .site-footerMeta span{
   background:rgba(255,255,255,.05) !important;
   border-color:rgba(0,194,208,.14) !important;
-}
-
-.route-progress-bar{
-  background:linear-gradient(90deg, rgba(79,255,200,.16), rgba(79,255,200,.95), rgba(0,194,208,.94), rgba(255,255,255,.12)) !important;
 }
 
 .toast{
@@ -562,7 +557,6 @@ select.input {
 .testi-miniStat,
 .admin-loginShell,
 .admin-loginAside,
-.admin-loginSignal,
 .admin-sidebar,
 .admin-panel,
 .admin-statCard,
@@ -714,16 +708,6 @@ html[data-theme="light"] .hm-title-glow {
 .catalog-sheetBackdrop {
   background: rgba(2, 8, 18, 0.62) !important;
   backdrop-filter: none !important;
-}
-
-.route-progress-bar {
-  background: linear-gradient(
-    90deg,
-    rgba(79, 255, 200, 0.16),
-    rgba(79, 255, 200, 0.95),
-    rgba(0, 194, 208, 0.94),
-    rgba(255, 255, 255, 0.12)
-  ) !important;
 }
 
 .theme-toggle {
@@ -1384,22 +1368,22 @@ html[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
   }
 
   html[data-theme="light"] {
-    --brand-shadow: 0 12px 20px rgba(67, 111, 129, 0.12);
-    --brand-shadow-soft: 0 8px 14px rgba(67, 111, 129, 0.1);
+    --brand-shadow: 0 12px 20px rgba(15, 42, 32, 0.08);
+    --brand-shadow-soft: 0 8px 14px rgba(15, 42, 32, 0.06);
     --skeu-panel-shadow:
-      0 6px 10px rgba(67, 111, 129, 0.1),
-      0 12px 22px rgba(67, 111, 129, 0.1),
+      0 6px 10px rgba(15, 42, 32, 0.07),
+      0 12px 22px rgba(15, 42, 32, 0.08),
       inset 0 1.5px 0 rgba(255, 255, 255, 1),
-      inset 0 -2.5px 0 rgba(154, 191, 203, 0.22);
+      inset 0 -2.5px 0 rgba(0, 120, 80, 0.1);
     --skeu-control-shadow:
-      0 6px 10px rgba(67, 111, 129, 0.08),
-      0 8px 16px rgba(67, 111, 129, 0.08),
+      0 6px 10px rgba(15, 42, 32, 0.06),
+      0 8px 16px rgba(15, 42, 32, 0.06),
       inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.2);
+      inset 0 -2px 0 rgba(0, 120, 80, 0.1);
     --skeu-accent-shadow:
-      0 10px 18px rgba(0, 214, 180, 0.16),
+      0 10px 18px rgba(0, 158, 96, 0.16),
       inset 0 1px 0 rgba(255, 255, 255, 0.46),
-      inset 0 -2px 0 rgba(0, 122, 130, 0.16);
+      inset 0 -2px 0 rgba(0, 96, 58, 0.16);
   }
 }
 
@@ -1441,7 +1425,6 @@ html[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
   .testi-miniStat,
   .admin-loginShell,
   .admin-loginAside,
-  .admin-loginSignal,
   .admin-sidebar,
   .admin-panel,
   .admin-statCard,
@@ -1578,23 +1561,23 @@ html[data-theme="dark"] {
 
 html[data-theme="light"] {
   --skeu-panel-shadow:
-    0 6px 10px rgba(67, 111, 129, 0.12),
-    0 28px 54px rgba(67, 111, 129, 0.16),
+    0 6px 10px rgba(15, 42, 32, 0.07),
+    0 24px 48px rgba(15, 42, 32, 0.09),
     inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -4px 0 rgba(154, 191, 203, 0.28);
+    inset 0 -3px 0 rgba(0, 120, 80, 0.12);
   --skeu-control-shadow:
-    0 6px 10px rgba(67, 111, 129, 0.1),
-    0 18px 30px rgba(67, 111, 129, 0.12),
+    0 6px 10px rgba(15, 42, 32, 0.07),
+    0 14px 26px rgba(15, 42, 32, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.3);
+    inset 0 -3px 0 rgba(0, 120, 80, 0.12);
   --skeu-inset-shadow:
-    inset 0 2px 7px rgba(124, 158, 171, 0.2),
+    inset 0 2px 6px rgba(15, 42, 32, 0.09),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     0 1px 0 rgba(255, 255, 255, 0.56);
   --skeu-accent-shadow:
-    0 20px 32px rgba(0, 214, 180, 0.22),
+    0 16px 28px rgba(0, 158, 96, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -3px 0 rgba(0, 122, 130, 0.18);
+    inset 0 -3px 0 rgba(0, 96, 58, 0.18);
 }
 
 .btn,
@@ -1948,15 +1931,15 @@ html[data-theme="light"] .modal-close:hover {
 
   html[data-theme="light"] {
     --skeu-panel-shadow:
-      0 6px 10px rgba(67, 111, 129, 0.1),
-      0 12px 22px rgba(67, 111, 129, 0.08),
+      0 6px 10px rgba(15, 42, 32, 0.07),
+      0 12px 22px rgba(15, 42, 32, 0.06),
       inset 0 1.5px 0 rgba(255, 255, 255, 1),
-      inset 0 -2.5px 0 rgba(154, 191, 203, 0.2);
+      inset 0 -2.5px 0 rgba(0, 120, 80, 0.1);
     --skeu-control-shadow:
-      0 6px 10px rgba(67, 111, 129, 0.08),
-      0 8px 16px rgba(67, 111, 129, 0.06),
+      0 6px 10px rgba(15, 42, 32, 0.06),
+      0 8px 16px rgba(15, 42, 32, 0.05),
       inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(154, 191, 203, 0.18);
+      inset 0 -2px 0 rgba(0, 120, 80, 0.1);
   }
 
   .toast,
@@ -3088,10 +3071,10 @@ html[data-theme="light"] .site-footer--gopay .site-footerBottom {
 .site-footer--gopay .site-footerGoBrand img {
   width: 52px;
   height: 52px;
-  border-radius: 14px;
-  border: 1px solid rgba(209, 228, 255, 0.22);
-  background: rgba(255, 255, 255, 0.06);
-  object-fit: cover;
+  border-radius: 0;
+  border: 0 !important;
+  background: transparent !important;
+  object-fit: contain;
 }
 
 .site-footer--gopay .site-footerGoBrand span {
@@ -3310,54 +3293,54 @@ html[data-theme="light"] .site-footer--gopay .site-footerPanel.site-footerGo {
     inset 0 1px 0 rgba(255, 255, 255, 1) !important;
 }
 
-html[data-theme="light"] .site-footer--gopay .site-footerGoBrand,
+  html[data-theme="light"] .site-footer--gopay .site-footerGoBrand,
 html[data-theme="light"] .site-footer--gopay .site-footerGoBrand span,
 html[data-theme="light"] .site-footer--gopay .site-footerGoTitle,
 html[data-theme="light"] .site-footer--gopay .site-footerGoReach a {
-  color: #123744 !important;
+  color: #0f172a !important;
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoContact a,
 html[data-theme="light"] .site-footer--gopay .site-footerGoLink,
 html[data-theme="light"] .site-footer--gopay .site-footerGoReach p,
 html[data-theme="light"] .site-footer--gopay .site-footerGoLegal p {
-  color: rgba(36, 72, 84, 0.92) !important;
+  color: #475569 !important;
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoContact a {
-  border-color: rgba(0, 138, 148, 0.16);
+  border-color: rgba(0, 120, 80, 0.16);
   background: rgba(255, 255, 255, 0.5);
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoContact a:hover {
-  border-color: rgba(0, 138, 148, 0.3);
-  background: rgba(220, 245, 248, 0.82);
+  border-color: rgba(0, 158, 96, 0.3);
+  background: rgba(235, 248, 241, 0.85);
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoContactIcon {
-  background: rgba(0, 138, 148, 0.1);
-  color: #008a94;
+  background: rgba(0, 158, 96, 0.1);
+  color: #009e60;
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoContactCopy small {
-  color: rgba(36, 72, 84, 0.62);
+  color: #64748b;
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoSocialBtn {
-  border-color: rgba(0, 138, 148, 0.18) !important;
+  border-color: rgba(0, 120, 80, 0.16) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.46), rgba(255, 255, 255, 0) 26%),
-    rgba(246, 252, 255, 0.92) !important;
-  color: rgba(17, 59, 73, 0.92) !important;
+    rgba(246, 251, 248, 0.94) !important;
+  color: #0f172a !important;
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoBrand img {
-  border-color: rgba(0, 138, 148, 0.2) !important;
-  background: rgba(255, 255, 255, 0.88) !important;
+  border: 0 !important;
+  background: transparent !important;
 }
 
 html[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
-  border-top-color: rgba(0, 138, 148, 0.16) !important;
+  border-top-color: rgba(0, 120, 80, 0.14) !important;
 }
 
 /* Mobile navbar uses identical neumorphism as desktop - handled in motion-adaptive.css */
@@ -3492,7 +3475,6 @@ html[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
 .pay-successModal,
 .admin-loginShell,
 .admin-loginAside,
-.admin-loginSignal,
 .admin-sidebar,
 .admin-panel,
 .admin-statCard,
@@ -3503,7 +3485,7 @@ html[data-theme="light"] .site-footer--gopay .site-footerGoLegal {
   border: 1px solid var(--uni-line) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 22%),
-    radial-gradient(circle at top right, rgba(83, 204, 255, 0.16), rgba(83, 204, 255, 0) 52%),
+    radial-gradient(circle at top right, rgba(0, 158, 96, 0.12), rgba(0, 158, 96, 0) 52%),
     var(--uni-panel) !important;
   box-shadow: var(--uni-shadow) !important;
 }
@@ -4231,7 +4213,6 @@ html[data-theme="light"] {
 .qris-wrap,
 .admin-loginShell,
 .admin-loginAside,
-.admin-loginSignal,
 .admin-sidebar,
 .admin-panel,
 .admin-statCard,
@@ -4657,7 +4638,7 @@ html[data-theme="light"] {
 
 .catalog-page .catalog-card.catalog-cardV2,
 .home-page .home-popularList .catalog-card.catalog-cardV2 {
-  overflow: visible !important;
+  overflow: hidden !important;
 }
 
 @media (max-width: 720px) {
@@ -4670,7 +4651,7 @@ html[data-theme="light"] {
   }
 
   .catalog-page .catalog-grid {
-    padding: 4px 2px 10px !important;
+    padding: 4px 0 10px !important;
     margin: 0 !important;
   }
 }
@@ -4683,33 +4664,28 @@ html[data-theme="dark"] {
   --uni-text: #e9f6ff;
   --uni-muted: rgba(199, 223, 240, 0.78);
   --uni-neo-panel:
-    linear-gradient(166deg, rgba(255, 255, 255, 0.14) 0%, rgba(255, 255, 255, 0.04) 24%, rgba(255, 255, 255, 0) 52%),
-    radial-gradient(120% 90% at -10% -14%, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 54%),
-    radial-gradient(86% 90% at 106% -12%, rgba(95, 180, 255, 0.18), rgba(95, 180, 255, 0) 58%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.03) 28%, rgba(255, 255, 255, 0) 56%),
     var(--skeu-panel-bg);
   --uni-neo-panel-soft:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 34%),
     var(--skeu-control-bg);
   --uni-neo-panel-shadow:
-    12px 14px 28px rgba(2, 12, 26, 0.34),
-    -6px -6px 14px rgba(255, 255, 255, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.25),
+    0 14px 30px -4px rgba(2, 12, 26, 0.42),
+    inset 0 1px 0 rgba(255, 255, 255, 0.22),
     inset 0 -1px 0 rgba(4, 26, 42, 0.34),
     0 0 0 1px rgba(117, 178, 214, 0.1);
   --uni-neo-control:
     linear-gradient(180deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.03) 34%),
     var(--skeu-control-bg);
   --uni-neo-control-shadow:
-    6px 8px 16px rgba(0, 10, 22, 0.24),
-    -3px -3px 8px rgba(255, 255, 255, 0.05),
-    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 6px 16px -2px rgba(0, 10, 22, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.24),
     inset 0 -1px 0 rgba(3, 32, 52, 0.28);
   --uni-neo-inset:
     linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0) 24%),
     var(--skeu-inset-bg);
   --uni-neo-inset-shadow:
-    inset 7px 9px 16px rgba(0, 0, 0, 0.34),
-    inset -4px -4px 9px rgba(255, 255, 255, 0.04),
+    inset 0 4px 12px rgba(0, 0, 0, 0.34),
     inset 0 1px 0 rgba(255, 255, 255, 0.06),
     0 1px 0 rgba(255, 255, 255, 0.04);
   --uni-neo-focus:
@@ -4719,39 +4695,36 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="light"] {
-  --uni-line: rgba(119, 175, 194, 0.34);
-  --uni-line-strong: rgba(28, 135, 160, 0.52);
-  --uni-text: #173849;
-  --uni-muted: rgba(62, 91, 103, 0.82);
+  --uni-line: rgba(0, 158, 96, 0.18);
+  --uni-line-strong: rgba(0, 158, 96, 0.42);
+  --uni-text: #0d241b;
+  --uni-muted: rgba(34, 68, 53, 0.78);
   --uni-neo-panel:
-    linear-gradient(166deg, rgba(255, 255, 255, 0.98) 0%, rgba(247, 253, 255, 0.86) 28%, rgba(236, 246, 251, 0.82) 56%, rgba(227, 241, 248, 0.94) 100%),
-    radial-gradient(120% 90% at -10% -14%, rgba(255, 255, 255, 0.88), rgba(255, 255, 255, 0) 54%),
-    radial-gradient(86% 90% at 106% -12%, rgba(126, 194, 224, 0.26), rgba(126, 194, 224, 0) 58%);
+    linear-gradient(180deg, #ffffff 0%, #f8fbf9 100%);
   --uni-neo-panel-soft:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(242, 250, 253, 0.72) 42%, rgba(232, 244, 249, 0.86) 100%);
+    linear-gradient(180deg, #ffffff 0%, #f4f9f6 100%);
   --uni-neo-panel-shadow:
-    10px 12px 24px rgba(102, 140, 156, 0.18),
+    0 10px 26px -4px rgba(10, 42, 30, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(166, 200, 211, 0.34),
-    0 0 0 1px rgba(119, 175, 194, 0.12);
+    inset 0 -1px 0 rgba(0, 158, 96, 0.06),
+    0 0 0 1px rgba(0, 158, 96, 0.1);
   --uni-neo-control:
-    linear-gradient(180deg, rgba(255, 255, 255, 1), rgba(242, 250, 253, 0.7) 46%, rgba(232, 244, 249, 0.84) 100%);
+    linear-gradient(180deg, #ffffff 0%, #f4f9f6 100%);
   --uni-neo-control-shadow:
-    5px 7px 14px rgba(98, 136, 151, 0.14),
+    0 6px 14px -2px rgba(10, 42, 30, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(164, 197, 209, 0.25);
+    inset 0 -1px 0 rgba(0, 158, 96, 0.08);
   --uni-neo-inset:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(245, 252, 255, 0.22) 24%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(244, 249, 246, 0.32) 24%),
     var(--skeu-inset-bg);
   --uni-neo-inset-shadow:
-    inset 6px 8px 14px rgba(156, 184, 195, 0.28),
-    inset -4px -4px 10px rgba(255, 255, 255, 0.74),
+    inset 0 2px 6px rgba(10, 42, 30, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1),
     0 1px 0 rgba(255, 255, 255, 0.58);
   --uni-neo-focus:
-    0 0 0 4px rgba(28, 135, 160, 0.18),
-    0 12px 24px rgba(95, 128, 141, 0.22);
-  --uni-neo-icon: #0b8292;
+    0 0 0 4px rgba(0, 158, 96, 0.18),
+    0 12px 24px rgba(10, 42, 30, 0.16);
+  --uni-neo-icon: #009e60;
 }
 
 .nav a,
@@ -4944,8 +4917,11 @@ html[data-theme="light"] {
     flex-direction: row !important;
     align-items: center !important;
     justify-content: space-between !important;
-    padding: 10px 16px !important;
-    border-radius: 14px !important;
+    padding: 2px 0 !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
     gap: 12px !important;
   }
 
@@ -5550,8 +5526,8 @@ html[data-theme="light"] .detail-page .pdx-shareBtn {
   border: 1px solid var(--brand-line, var(--uni-line)) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.2),
-    0 8px 16px rgba(67, 111, 129, 0.14) !important;
+    inset 0 -2px 0 rgba(0, 120, 80, 0.12),
+    0 8px 16px rgba(15, 42, 32, 0.1) !important;
   transition: transform 0.22s var(--ease-out), box-shadow 0.22s var(--ease-out) !important;
 }
 
@@ -5559,14 +5535,14 @@ html[data-theme="light"] .detail-page .pdx-shareBtn {
   transform: translateY(-1px);
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -2px 0 rgba(154, 191, 203, 0.22),
-    0 12px 22px rgba(67, 111, 129, 0.18) !important;
+    inset 0 -2px 0 rgba(0, 120, 80, 0.16),
+    0 12px 22px rgba(15, 42, 32, 0.12) !important;
 }
 
 .detail-page .pdx-addBtn:active {
   transform: translateY(0) scale(0.96);
   box-shadow:
-    inset 0 3px 8px rgba(67, 111, 129, 0.22),
+    inset 0 3px 8px rgba(15, 42, 32, 0.16),
     inset 0 -1px 0 rgba(255, 255, 255, 0.4) !important;
 }
 

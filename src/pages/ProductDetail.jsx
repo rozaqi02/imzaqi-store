@@ -1,21 +1,18 @@
-import React, { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { productStructuredData } from "../lib/productStructuredData.mjs";
 import {
   ArrowDown,
-  ArrowLeft,
   ArrowLeftRight,
   Check,
   ChevronLeft,
   Clock3,
   Flame,
   LayoutGrid,
-  MessageCircle,
   Share2,
   ShieldCheck,
   ShoppingBag,
   ShoppingCart,
-  Sparkles,
   ThumbsUp,
   UserRound,
   Users,
@@ -23,10 +20,10 @@ import {
   PackageCheck,
 } from "lucide-react";
 
-import { fetchProductBySlug, fetchActiveFlashSales, fetchProducts, fetchTopSellingData } from "../lib/api";
+import { fetchProductBySlug, fetchActiveFlashSales, fetchTopSellingData } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-import { asVariantList, formatGuaranteeLabel, formatIDR, getCatalogPriceRange, isKnownOutOfStock, normalizeProductRecord, packDisplayName } from "../lib/format";
+import { asVariantList, formatGuaranteeLabel, formatIDR, getCatalogPriceRange, getProductIconTone, isKnownOutOfStock, normalizeProductRecord, packDisplayName } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
@@ -40,13 +37,25 @@ import { fireConfetti } from "../components/Confetti";
 import { spawnCartFlyParticle } from "../lib/cartFlyParticle";
 import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory";
 import { buildCatalogAdminWhatsAppUrl, buildSupportWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
-import ProductTile from "../components/ProductTile";
-import RecentlyViewed from "../components/RecentlyViewed";
+import { getTransitionProductSlug, runViewTransition } from "../lib/viewTransition";
 import MobileProductBar from "../components/MobileProductBar";
-import { addRecentlyViewed } from "../lib/recentlyViewed";
 import { supabase } from "../lib/supabaseClient";
 import { getVisitorIdAsUUID } from "../lib/visitor";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
+
+function WhatsAppIcon({ size = 16 }) {
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="currentColor"
+      aria-hidden="true"
+    >
+      <path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2Zm5.82 14.01c-.25.7-1.43 1.33-2 1.42-.51.08-1.15.11-1.85-.11-.43-.14-.98-.32-1.69-.63-2.96-1.28-4.9-4.27-5.05-4.47-.15-.2-1.21-1.61-1.21-3.07s.76-2.18 1.03-2.48c.27-.3.6-.37.8-.37.2 0 .4.01.57.01.18.01.43-.07.67.51.25.6.85 2.08.92 2.23.08.15.13.33.03.53-.1.2-.15.33-.3.5-.15.17-.32.38-.45.51-.15.15-.31.31-.13.61.18.3.79 1.3 1.7 2.11 1.17 1.04 2.15 1.36 2.45 1.51.3.15.48.13.66-.08.18-.2.75-.88.95-1.18.2-.3.4-.25.67-.15.28.1 1.75.83 2.05.98.3.15.5.23.58.35.08.13.08.73-.17 1.43Z" />
+    </svg>
+  );
+}
 
 function normalizeInlineText(text) {
   return String(text || "")
@@ -125,34 +134,18 @@ function VariantBenefitList({ rawText }) {
     if (previewItems.length >= 2) break;
   }
 
+  if (!previewItems.length) return null;
+
   return (
     <div className="pdx-packDetails">
-      {previewItems.length > 0 ? (
-        <ul className="pdx-packHighlights" aria-label="Highlight paket">
-          {previewItems.map((item, i) => (
-            <li key={i} className="pdx-packHighlightItem">
-              <Check size={12} className="pdx-packHighlightIcon" aria-hidden="true" />
-              <span>{normalizeInlineText(item)}</span>
-            </li>
-          ))}
-        </ul>
-      ) : null}
-
-      <details className="pdx-packDetailsToggle">
-        <summary>Lihat rincian paket</summary>
-        <div className="pdx-packDetailsContent">
-          {sections.map((section, index) => (
-            <section className="pdx-detailGroup" key={`${section.label || "rincian"}-${index}`}>
-              {section.label ? <h4>{section.label}</h4> : null}
-              {section.items.length === 1 && !section.label ? (
-                <p>{normalizeInlineText(section.items[0])}</p>
-              ) : (
-                <ul>{section.items.map((item, itemIndex) => <li key={`${itemIndex}-${item}`}>{normalizeInlineText(item)}</li>)}</ul>
-              )}
-            </section>
-          ))}
-        </div>
-      </details>
+      <ul className="pdx-packHighlights" aria-label="Highlight paket">
+        {previewItems.map((item, i) => (
+          <li key={i} className="pdx-packHighlightItem">
+            <Check size={12} className="pdx-packHighlightIcon" aria-hidden="true" />
+            <span>{normalizeInlineText(item)}</span>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -693,18 +686,30 @@ function ProductDetailSkeleton() {
 }
 
 export default function ProductDetail() {
+  const { slug } = useParams();
   const nav = useNavigate();
   const location = useLocation();
   const catalogBackTo = getCatalogReturnPath();
   const goBackToCatalog = useCallback(() => {
     const cameFromCatalog = Boolean(location.state?.fromCatalog) || hasSavedScrollY();
-    if (cameFromCatalog && window.history.length > 1) {
-      nav(-1);
-      return;
+    const targetSlug = slug;
+    if (typeof document !== "undefined") {
+      const iconEl = document.querySelector(".detail-page-v3 .pdx-visualIcon");
+      const titleEl = document.querySelector(".detail-page-v3 .pdx-title");
+      if (iconEl && targetSlug) iconEl.style.viewTransitionName = `product-icon-${targetSlug}`;
+      if (titleEl && targetSlug) titleEl.style.viewTransitionName = `product-title-${targetSlug}`;
     }
-    nav(catalogBackTo);
-  }, [catalogBackTo, location.state, nav]);
-  const { slug } = useParams();
+    runViewTransition(
+      () => {
+        if (cameFromCatalog && window.history.length > 1) {
+          nav(-1);
+          return;
+        }
+        nav(catalogBackTo);
+      },
+      { slug: targetSlug }
+    );
+  }, [catalogBackTo, location.state, nav, slug]);
   const toast = useToast();
   const cart = useCart();
   const { add } = cart;
@@ -723,16 +728,29 @@ export default function ProductDetail() {
 
   const [loading, setLoading] = useState(true);
   const [product, setProduct] = useState(null);
-  const [allProducts, setAllProducts] = useState([]);
-  const [recommendationsReady, setRecommendationsReady] = useState(false);
-  const recommendationsRef = useRef(null);
-  const recommendationsRequestedRef = useRef(false);
   const [error, setError] = useState("");
   const [flashSaleMap, setFlashSaleMap] = useState(new Map());
   const [topSalesMap, setTopSalesMap] = useState({});
   const [activeTab, setActiveTab] = useState("semua");
   const [variantSort, setVariantSort] = useState("reco");
   const [compareOpen, setCompareOpen] = useState(false);
+
+  // Ensure product detail opens cleanly scrolled at top on first entry or slug change.
+  useLayoutEffect(() => {
+    if (typeof window === "undefined" || window.location.hash) return undefined;
+    const scrollTopNow = () => {
+      try {
+        window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+      } catch {
+        window.scrollTo(0, 0);
+      }
+      if (document.documentElement) document.documentElement.scrollTop = 0;
+      if (document.body) document.body.scrollTop = 0;
+    };
+    scrollTopNow();
+    const rafId = requestAnimationFrame(scrollTopNow);
+    return () => cancelAnimationFrame(rafId);
+  }, [slug, loading]);
 
   usePageMeta({
     title: product?.name ? `${product.name} | Detail Produk` : "Detail Produk",
@@ -801,57 +819,6 @@ export default function ProductDetail() {
     };
   }, [slug]);
 
-  useEffect(() => {
-    recommendationsRequestedRef.current = false;
-    setRecommendationsReady(false);
-    setAllProducts([]);
-  }, [slug]);
-
-  useEffect(() => {
-    if (!product || recommendationsReady || recommendationsRequestedRef.current) return;
-    const node = recommendationsRef.current;
-    if (!node) return;
-    let cancelled = false;
-
-    const loadRecommendations = () => {
-      if (cancelled || recommendationsRequestedRef.current) return;
-      recommendationsRequestedRef.current = true;
-      fetchProducts({ useCache: true })
-        .then((productsData) => {
-          if (!cancelled) {
-            setAllProducts(productsData || []);
-            setRecommendationsReady(true);
-          }
-        })
-        .catch(() => {
-          if (!cancelled) {
-            setAllProducts([]);
-            setRecommendationsReady(true);
-          }
-        });
-    };
-
-    if (typeof IntersectionObserver === "undefined") {
-      loadRecommendations();
-      return;
-    }
-
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          loadRecommendations();
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "240px 0px" }
-    );
-    observer.observe(node);
-    return () => {
-      cancelled = true;
-      observer.disconnect();
-    };
-  }, [product, slug, recommendationsReady]);
-
   const variants = useMemo(
     () =>
       asVariantList(product?.product_variants)
@@ -916,14 +883,6 @@ export default function ProductDetail() {
 
   const summary = useMemo(() => getCatalogPriceRange(variants, flashSaleMap), [variants, flashSaleMap]);
 
-  useEffect(() => {
-    if (!product?.id) return;
-    addRecentlyViewed({
-      ...product,
-      _minPrice: summary.minPrice,
-    });
-  }, [product, summary.minPrice]);
-
   const soldTotal = useMemo(() => {
     if (product?.id && topSalesMap && topSalesMap[product.id] != null) {
       return topSalesMap[product.id];
@@ -965,36 +924,6 @@ export default function ProductDetail() {
     const labels = [...new Set(variants.map((variant) => formatGuaranteeLabel(variant.guarantee_text)).filter(Boolean))];
     return labels.length === 1 ? labels[0] : "Garansi sesuai paket";
   }, [variants]);
-
-  const recommendations = useMemo(() => {
-    if (!product || !allProducts.length) return [];
-    const currentLine = resolveCatalogLine(product);
-    const currentCat = resolveProductCategory(product).key;
-
-    return allProducts
-      .filter((item) => item.id !== product.id)
-      .filter((item) => item?.is_active !== false)
-      .filter((item) => resolveCatalogLine(item) === currentLine)
-      .map((item) => {
-        let score = 0;
-        const itemCat = resolveProductCategory(item).key;
-        if (itemCat === currentCat && currentCat !== "other") score += 16;
-
-        const variantsList = asVariantList(item.product_variants);
-        const activeVariants = variantsList.filter((variant) => variant?.is_active !== false);
-        const totalStock = activeVariants.reduce((sum, variant) => sum + Number(variant.stock || 0), 0);
-        const totalSold = activeVariants.reduce((sum, variant) => sum + Number(variant.sold_count || 0), 0);
-
-        if (totalStock > 0) score += 6;
-        else score -= 4;
-        score += Math.min(8, totalSold * 0.02);
-
-        return { product: item, score };
-      })
-      .sort((a, b) => b.score - a.score)
-      .slice(0, 5)
-      .map((item) => item.product);
-  }, [product, allProducts]);
 
   const productDescriptionText = useMemo(
     () => product?.description || "Pilih paket, checkout, selesai.",
@@ -1132,9 +1061,11 @@ export default function ProductDetail() {
   }
 
   const icon = product.icon_url;
+  const activeSlug = product.slug || slug;
+  const isVtActive = getTransitionProductSlug() === activeSlug;
 
   return (
-    <div className="page detail-page detail-page-v3 pdx-contentLoaded with-sticky-cta">
+    <div className="page detail-page detail-page-v3 pdx-contentLoaded">
       <section className="section">
         <div className="container">
           <MobileProductBar name={product.name} icon={icon} onBack={goBackToCatalog} />
@@ -1143,7 +1074,11 @@ export default function ProductDetail() {
               <div className="pdx-leftCol">
                 <header className="pdx-topCard pdx-billboard">
                   <div className="pdx-visual">
-                    <div className="pdx-visualIcon">
+                    <div
+                      className="pdx-visualIcon"
+                      data-brand-icon={getProductIconTone(product) || undefined}
+                      style={isVtActive ? { viewTransitionName: `product-icon-${activeSlug}` } : undefined}
+                    >
                       {icon ? (
                         <img src={icon} alt="" fetchPriority="high" decoding="async" />
                       ) : (
@@ -1175,7 +1110,12 @@ export default function ProductDetail() {
                       </div>
                     </div>
 
-                    <h1 className="pdx-title">{product.name}</h1>
+                    <h1
+                      className="pdx-title"
+                      style={isVtActive ? { viewTransitionName: `product-title-${activeSlug}` } : undefined}
+                    >
+                      {product.name}
+                    </h1>
 
                   <div className="pdx-statsStrip">
                     <div className="pdx-heroPrice">
@@ -1201,7 +1141,7 @@ export default function ProductDetail() {
                         target="_blank"
                         rel="noopener noreferrer"
                       >
-                        <MessageCircle size={16} aria-hidden="true" />
+                        <WhatsAppIcon size={16} />
                         <span>Tanya Admin!</span>
                       </a>
                     ) : null}
@@ -1339,82 +1279,9 @@ export default function ProductDetail() {
               </section>
             </div>
           </div>
-
-          <RecentlyViewed currentProductId={product.id} currentSlug={product.slug} />
-
-          <section className="pdx-recommendations" ref={recommendationsRef} aria-label="Rekomendasi produk">
-            <div className="pdx-recommendationsHead">
-              <h2 className="pdx-sectionTitle">Rekomendasi</h2>
-            </div>
-            {recommendations.length > 0 ? (
-              <div className="product-grid-container grid-mode pdx-recommendationsGrid" role="list">
-                {recommendations.map((p) => (
-                  <ProductTile key={p.id} product={p} layout="grid" disableTilt={true} />
-                ))}
-              </div>
-            ) : recommendationsReady ? (
-              <p className="pdx-recommendationsEmpty">Belum ada rekomendasi lain untuk produk ini.</p>
-            ) : null}
-          </section>
         </div>
       </div>
     </section>
-
-
-    {/* Mobile Sticky Purchase Dock */}
-    {(() => {
-      const isSingleVariant = variants.length === 1;
-      const singleVariant = isSingleVariant ? variants[0] : null;
-      const singleOutOfStock = singleVariant ? isKnownOutOfStock(singleVariant) : false;
-      const singlePrice = singleVariant ? getVariantEffectivePrice(singleVariant, flashSaleMap) : null;
-
-      return (
-        <div className="pdx-mobileStickyDock" aria-label="Aksi pembelian cepat">
-          <div className="pdx-mobileStickyDockPrice">
-            <span className="pdx-mobileStickyDockLabel">
-              {isSingleVariant && singleVariant.name ? singleVariant.name : "Mulai dari"}
-            </span>
-            <strong className="pdx-mobileStickyDockValue">
-              {isSingleVariant && singlePrice
-                ? formatIDR(singlePrice)
-                : summary.minPrice
-                  ? formatIDR(summary.minPrice)
-                  : "-"}
-            </strong>
-          </div>
-          {isSingleVariant && !singleOutOfStock ? (
-            <button
-              type="button"
-              className="btn btn-primary pdx-mobileStickyDockBtn"
-              onClick={(e) => {
-                const isAlreadyInCart = (cart.items || []).some((it) => it.variant_id === singleVariant.id);
-                if (!isAlreadyInCart) {
-                  handleAdd(singleVariant, 1, e);
-                }
-                nav("/checkout", { state: { backgroundLocation: location } });
-              }}
-            >
-              <span>Beli Sekarang</span>
-              <ShoppingBag size={15} />
-            </button>
-          ) : (
-            <button
-              type="button"
-              className="btn btn-primary pdx-mobileStickyDockBtn"
-              onClick={() => {
-                const variantsSection = document.getElementById("paket-tersedia") || document.getElementById("pdx-variants-section") || document.querySelector(".pdx-variantsSection");
-                if (variantsSection) {
-                  variantsSection.scrollIntoView({ behavior: "smooth", block: "start" });
-                }
-              }}
-            >
-              <span>Pilih Paket</span>
-              <ArrowDown size={15} />
-            </button>
-          )}
-        </div>
-      );
-    })()}
 
     <VariantCompareModal
       open={compareOpen}

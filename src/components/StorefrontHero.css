@@ -131,21 +131,21 @@
 /* Decorative product icons stack anchored to the right side of hero */
 .catalog-productStack {
   position: absolute;
-  right: -24px;
+  right: -12px;
   top: 50%;
-  width: 375px;
-  height: 260px;
-  transform: translateY(-50%) scale(0.95);
+  width: 390px;
+  height: 270px;
+  transform: translateY(-50%) scale(1.02);
   transform-origin: center right;
-  opacity: .24;
+  opacity: .34;
   pointer-events: none;
-  mask-image: linear-gradient(108deg, transparent 10%, rgba(0, 0, 0, 0.36) 44%, rgba(0, 0, 0, 0.88) 84%, transparent 100%);
-  -webkit-mask-image: linear-gradient(108deg, transparent 10%, rgba(0, 0, 0, 0.36) 44%, rgba(0, 0, 0, 0.88) 84%, transparent 100%);
+  mask-image: linear-gradient(108deg, transparent 6%, rgba(0, 0, 0, 0.44) 38%, rgba(0, 0, 0, 0.92) 82%, transparent 100%);
+  -webkit-mask-image: linear-gradient(108deg, transparent 6%, rgba(0, 0, 0, 0.44) 38%, rgba(0, 0, 0, 0.92) 82%, transparent 100%);
 }
 .catalog-stackCard {
   position: absolute;
-  width: 144px;
-  height: 174px;
+  width: 152px;
+  height: 184px;
   padding: 0;
   border: 0;
   border-radius: 0;
@@ -158,8 +158,8 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
-  border-radius: 0;
-  filter: drop-shadow(0 12px 18px #173b282e);
+  border-radius: 22px;
+  filter: drop-shadow(0 14px 22px #173b2838);
 }
 .catalog-stackCard--1 { left: 0; top: 76px; transform: rotate(-24deg); z-index: 1; }
 .catalog-stackCard--2 { left: 57px; top: 0px; transform: rotate(-13deg); z-index: 2; }
@@ -169,52 +169,51 @@
 
 @media (max-width: 1150px) {
   .catalog-productStack {
-    right: -25px;
-    transform: translateY(-50%) scale(.88);
-    opacity: .32;
-    mask-image: linear-gradient(to right, transparent 0%, #000 38%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 38%);
+    right: -14px;
+    transform: translateY(-50%) scale(.94);
+    opacity: .36;
+    mask-image: linear-gradient(to right, transparent 0%, #000 34%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 34%);
   }
 }
 @media (max-width: 960px) {
   .catalog-productStack {
-    /* Keep the desktop fan composition; only scale it to the viewport. */
-    top: 50%;
+    top: 46%;
     bottom: auto;
-    right: -20px;
+    right: -10px;
     transform-origin: center right;
-    transform: translateY(-50%) scale(.72);
-    opacity: .32;
-    mask-image: linear-gradient(to right, transparent 0%, #000 35%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 35%);
+    transform: translateY(-50%) scale(.84);
+    opacity: .36;
+    mask-image: linear-gradient(to right, transparent 0%, #000 32%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 32%);
   }
 }
 @media (max-width: 720px) {
   .catalog-productStack {
-    top: 50% !important;
+    top: 42% !important;
     bottom: auto !important;
-    right: -20px !important;
-    width: 375px !important;
-    height: 260px !important;
+    right: -10px !important;
+    width: 390px !important;
+    height: 270px !important;
     transform-origin: center right !important;
-    transform: translateY(-50%) scale(.62) !important;
-    opacity: .32 !important;
-    mask-image: linear-gradient(to right, transparent 0%, #000 35%) !important;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 35%) !important;
+    transform: translateY(-50%) scale(.76) !important;
+    opacity: .36 !important;
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.55) 28%, #000 62%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.55) 28%, #000 62%) !important;
   }
 }
-@media (max-width: 380px) {
+@media (max-width: 480px) {
   .catalog-productStack {
-    top: 50% !important;
+    top: 40% !important;
     bottom: auto !important;
-    right: -20px !important;
-    width: 375px !important;
-    height: 260px !important;
-    transform: translateY(-50%) scale(.54) !important;
+    right: -6px !important;
+    width: 390px !important;
+    height: 270px !important;
+    transform: translateY(-50%) scale(.68) !important;
     transform-origin: center right !important;
-    opacity: .30 !important;
-    mask-image: linear-gradient(to right, transparent 0%, #000 35%) !important;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 35%) !important;
+    opacity: .32 !important;
+    mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 26%, #000 64%) !important;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, rgba(0, 0, 0, 0.5) 26%, #000 64%) !important;
   }
 }
 

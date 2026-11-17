@@ -249,17 +249,18 @@ describe("ProductDetail render", () => {
     expect(within(screen.getByRole("dialog", { name: "Bandingkan" })).getByText("Tersedia")).toBeInTheDocument();
   });
 
-  it("keeps expanded package details open when sorting and uses explicit controls", async () => {
+  it("shows open package highlights without collapsible Lihat rincian paket disclosure", async () => {
     renderDetail();
     await screen.findByRole("heading", { name: "Netflix Premium", level: 1 });
     const card = document.querySelector(".pdx-packCard");
     expect(card).not.toHaveAttribute("role", "button");
-    const disclosure = card.querySelector("summary");
-    fireEvent.click(disclosure);
-    expect(disclosure.closest("details")).toHaveAttribute("open");
-    expect(card.querySelector(".pdx-detailGroup h4")).toHaveTextContent("Benefit");
+    expect(card.querySelector("details")).toBeNull();
+    expect(screen.queryByText("Lihat rincian paket")).toBeNull();
+    expect(screen.queryByRole("region", { name: "Rekomendasi produk" })).toBeNull();
+    expect(screen.queryByRole("region", { name: "Baru kamu lihat" })).toBeNull();
+    expect(document.querySelector(".pdx-mobileStickyDock")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "Termurah" }));
-    expect(disclosure.closest("details")).toHaveAttribute("open");
+    expect(screen.getByRole("button", { name: "Termurah" })).toHaveAttribute("aria-pressed", "true");
   });
 
   it("does not present a generic Pro package as Private", async () => {

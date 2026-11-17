@@ -1066,43 +1066,40 @@ html[data-theme="dark"] .detail-page-v3 .pdx-billboard.pdx-topCard {
   position: relative;
   display: grid;
   place-items: center;
-  min-height: 224px;
-  margin: 14px 0 14px 14px;
-  padding: 28px 22px;
-  border-radius: 22px;
-  border: 1px solid rgba(55, 211, 141, 0.16);
+  min-height: 240px;
+  margin: 0;
+  padding: 32px 24px;
+  border-radius: 0;
+  border: 0;
+  border-right: 1px solid rgba(0, 0, 0, 0.08);
   background:
-    radial-gradient(circle at 50% 35%, rgba(0, 214, 150, 0.16), rgba(0, 214, 150, 0.02) 72%),
-    #0d1512;
-  box-shadow:
-    inset 0 4px 16px rgba(0, 0, 0, 0.48),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+    radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.24) 0%, transparent 64%),
+    linear-gradient(180deg, #00b87a 0%, #009e60 54%, #057d4f 100%);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
 }
 
 html[data-theme="light"] .pdx-visual {
-  border-color: rgba(0, 158, 96, 0.14);
+  border-right-color: rgba(0, 80, 46, 0.14);
   background:
-    radial-gradient(circle at 50% 35%, rgba(0, 158, 96, 0.14), rgba(0, 158, 96, 0.03) 72%),
-    #edf5f1;
-  box-shadow:
-    inset 0 2px 8px rgba(10, 46, 32, 0.06),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.9);
+    radial-gradient(circle at 50% 28%, rgba(255, 255, 255, 0.24) 0%, transparent 64%),
+    linear-gradient(180deg, #00b87a 0%, #009e60 54%, #057d4f 100%);
+  box-shadow: inset 0 -1px 0 rgba(0, 0, 0, 0.08);
 }
 
 .pdx-visualIcon {
-  width: 132px !important;
-  height: 132px !important;
+  width: 136px !important;
+  height: 136px !important;
   aspect-ratio: 1 / 1;
   flex: 0 0 auto;
   max-width: none;
   max-height: none;
   border-radius: 28px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.04) !important;
+  background: #ffffff !important;
   box-shadow:
-    0 16px 34px rgba(0, 0, 0, 0.34),
-    0 4px 12px rgba(0, 158, 96, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
+    0 14px 28px rgba(0, 42, 24, 0.24),
+    0 4px 10px rgba(0, 0, 0, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1);
   display: grid;
   place-items: center;
 }
@@ -1110,8 +1107,8 @@ html[data-theme="light"] .pdx-visual {
 html[data-theme="light"] .pdx-visualIcon {
   background: #ffffff !important;
   box-shadow:
-    0 14px 30px rgba(8, 38, 26, 0.14),
-    0 4px 10px rgba(0, 158, 96, 0.1),
+    0 14px 28px rgba(0, 42, 24, 0.24),
+    0 4px 10px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1);
 }
 
@@ -1487,19 +1484,21 @@ html[data-theme="dark"] .rv-icon {
   .pdx-visual {
     width: 100% !important;
     max-width: 100% !important;
-    min-width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    border-right: 0 !important;
+    border-radius: 0 !important;
     flex: 0 0 auto !important;
-    min-height: 240px;
-    aspect-ratio: 1.05 / 1;
-    padding: 32px 24px;
+    min-height: 220px;
+    padding: 28px 20px;
     box-sizing: border-box !important;
   }
 
   .pdx-visualIcon {
-    width: 140px !important;
-    height: 140px !important;
+    width: 118px !important;
+    height: 118px !important;
     aspect-ratio: 1 / 1 !important;
-    border-radius: 28px;
+    border-radius: 26px;
   }
 
   .pdx-copy {
@@ -2653,7 +2652,6 @@ html[data-theme="dark"] .header-iconAction {
 html[data-theme="dark"] .catalog-card.catalog-cardV2,
 html[data-theme="dark"] .product-tile,
 html[data-theme="dark"] .catalog-filterShell,
-html[data-theme="dark"] .catalog-contentBar,
 html[data-theme="dark"] .pdx-billboard.pdx-topCard,
 html[data-theme="dark"] .pdx-accountStrip,
 html[data-theme="dark"] .testi-card,

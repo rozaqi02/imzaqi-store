@@ -4,7 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 import { Clock, X } from "lucide-react";
 import { fetchActiveFlashSales, fetchProducts, fetchSettings } from "../lib/api";
-import { formatIDR, isKnownOutOfStock } from "../lib/format";
+import { formatIDR, getProductIconTone, isKnownOutOfStock } from "../lib/format";
 import { OVERLAY_TIMING } from "../lib/overlayScheduler";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import useOverlaySlot from "../hooks/useOverlaySlot";
@@ -249,7 +249,7 @@ export default function FlashSalePopup() {
         <article className="fsp-billboard">
           <div className="fsp-visual">
             <span className="fsp-off">-{featured.discountPercent}%</span>
-            <div className="fsp-visualIcon">
+            <div className="fsp-visualIcon" data-brand-icon={getProductIconTone(featured) || undefined}>
               {featuredIcon ? (
                 <img src={featuredIcon} alt="" fetchPriority="high" decoding="async" />
               ) : (

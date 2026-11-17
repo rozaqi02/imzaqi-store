@@ -5,6 +5,7 @@ import {
   CircleCheck,
   CircleHelp,
   ClipboardList,
+  Clock,
   CreditCard,
   MessageCircle,
   PackageSearch,
@@ -212,9 +213,11 @@ function FaqItem({ item, open, onToggle, idPrefix = "faq" }) {
       >
         <span className="help-itemQuestion">
           <span className="help-itemCategory">{categoryLabel}</span>
-          <span>{item.question}</span>
+          <span className="help-itemTitle">{item.question}</span>
         </span>
-        <ChevronDown size={17} />
+        <span className="help-itemChevron" aria-hidden="true">
+          <ChevronDown size={17} />
+        </span>
       </button>
 
       <div id={answerId} className="help-itemBodyWrap" hidden={!open} role="region" aria-labelledby={questionId}>
@@ -316,42 +319,231 @@ export default function FaqPageContent() {
           <div className="help-heroCopy">
             <span className="help-eyebrow">
               <BannerGraphic name="headset_support" height={22} className="help-mascot" />
-              <CircleHelp size={16} /> PUSAT BANTUAN
+              <CircleHelp size={14} aria-hidden="true" />
+              <span>PUSAT BANTUAN</span>
             </span>
-            <h1>Ada yang ingin <span>ditanyakan?</span></h1>
-            <p>Cari jawaban tentang pembayaran, paket, dan pesananmu.</p>
+            <h1>
+              Ada yang ingin <span>ditanyakan?</span>
+            </h1>
+            <p>Cari jawaban cepat tentang pembayaran QRIS, aktivasi akun, dan pantauan pesananmu.</p>
             <div className="help-search">
-              <Search size={21} aria-hidden="true" />
-              <input value={query} onChange={(e) => handleQueryChange(e.target.value)} placeholder="Cari QRIS, promo, aktivasi…" aria-label="Cari FAQ" type="search" />
-              {query && <button type="button" onClick={() => handleQueryChange("")} aria-label="Hapus pencarian"><X size={18} /></button>}
+              <Search size={19} aria-hidden="true" />
+              <input
+                value={query}
+                onChange={(e) => handleQueryChange(e.target.value)}
+                placeholder="Cari QRIS, promo, aktivasi…"
+                aria-label="Cari FAQ"
+                type="search"
+              />
+              {query ? (
+                <button
+                  type="button"
+                  className="help-searchClear"
+                  onClick={() => handleQueryChange("")}
+                  aria-label="Hapus pencarian"
+                >
+                  <X size={16} />
+                </button>
+              ) : null}
             </div>
-            <div className="help-popular"><span>Sering dicari:</span>{["QRIS", "ID order", "email"].map(term => <button className="btn btn-ghost btn-sm" key={term} type="button" onClick={() => { handleQueryChange(term); setActiveCategory("all"); }}>{term}</button>)}</div>
+            <div className="help-popular">
+              <span>Sering dicari:</span>
+              {["QRIS", "ID order", "email"].map((term) => {
+                const isSelected = query.trim().toLowerCase() === term.toLowerCase();
+                return (
+                  <button
+                    key={term}
+                    type="button"
+                    className={`help-popularChip${isSelected ? " is-active" : ""}`}
+                    onClick={() => {
+                      handleQueryChange(isSelected ? "" : term);
+                      setActiveCategory("all");
+                    }}
+                  >
+                    {term}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className="help-heroAsidePanel" aria-label="Ringkasan layanan">
+            <div className="help-asideBadge">
+              <Clock size={13} aria-hidden="true" />
+              <span>Layanan 08.00–22.00 WIB</span>
+            </div>
+            <ul className="help-asideHighlights">
+              <li>
+                <span className="help-asideIcon" aria-hidden="true">
+                  <CreditCard size={16} />
+                </span>
+                <div>
+                  <strong>Proses 5–30 menit</strong>
+                  <small>Pesanan diverifikasi segera setelah konfirmasi QRIS.</small>
+                </div>
+              </li>
+              <li>
+                <span className="help-asideIcon" aria-hidden="true">
+                  <ShieldCheck size={16} />
+                </span>
+                <div>
+                  <strong>Garansi sesuai paket</strong>
+                  <small>Sertakan ID order jika butuh pengecekan atau kendala akun.</small>
+                </div>
+              </li>
+            </ul>
+            <Link className="help-asideStatusBtn" to="/status">
+              <span>Buka halaman Cek Status</span>
+              <ArrowUpRight size={16} aria-hidden="true" />
+            </Link>
           </div>
         </header>
 
-
         <div className="help-workspace">
           <aside className="help-sidebar">
-            <span className="help-eyebrow">JELAJAHI TOPIK</span>
-            <div className="help-categories" role="group" aria-label="Filter kategori FAQ">
-              {FAQ_CATEGORIES.map(category => <button className="btn btn-ghost" key={category.key} type="button" aria-pressed={category.key === activeCategory} onClick={() => setActiveCategory(category.key)}><span>{category.label}</span>{" "}<span className="help-count">{categoryCounts[category.key] || 0}</span></button>)}
+            <div className="help-sidebarHeader">
+              <span className="help-eyebrow">JELAJAHI TOPIK</span>
             </div>
-            <Link className="help-orderLink" to="/status"><ClipboardList size={22} /><span><strong>Sudah punya order?</strong><small>Pantau status pesananmu</small></span><ArrowUpRight size={18} /></Link>
+            <div className="help-categories" role="group" aria-label="Filter kategori FAQ">
+              {FAQ_CATEGORIES.map((category) => (
+                <button
+                  className="help-catBtn"
+                  key={category.key}
+                  type="button"
+                  aria-pressed={category.key === activeCategory}
+                  onClick={() => setActiveCategory(category.key)}
+                >
+                  <span className="help-catLabel">{category.label}</span>{" "}
+                  <span className="help-count">{categoryCounts[category.key] || 0}</span>
+                </button>
+              ))}
+            </div>
+            <Link className="help-orderLink" to="/status">
+              <span className="help-orderLinkIcon" aria-hidden="true">
+                <ClipboardList size={18} />
+              </span>
+              <span className="help-orderLinkCopy">
+                <strong>Sudah punya order?</strong>
+                <small>Pantau status pesananmu</small>
+              </span>
+              <ArrowUpRight size={17} aria-hidden="true" />
+            </Link>
           </aside>
+
           <section className="help-answers" aria-labelledby="help-results-title">
-            <div className="help-listHead"><div><span className="help-eyebrow">JAWABAN UNTUKMU</span><h2 id="help-results-title">{query.trim() ? "Hasil pencarian" : activeCategory === "all" ? "Pertanyaan yang sering ditanya" : CATEGORY_LABELS[activeCategory]}</h2></div><span className="help-resultCount" role="status">{filteredFaq.length} pertanyaan</span></div>
-            {filteredFaq.length ? <div className="help-list">{filteredFaq.map(item => <FaqItem key={item.id} item={item} open={item.id === openId} onToggle={handleToggle} />)}</div> : <div className="help-empty"><PackageSearch size={38} /><h3>Jawabannya belum ketemu</h3><p>Coba kata kunci lain atau kirim pencarian ini ke admin.</p><button className="help-button" type="button" onClick={() => { handleQueryChange(""); setActiveCategory("all"); }}>Lihat semua pertanyaan</button><a className="help-button help-button--secondary" href={waUrl} target="_blank" rel="noreferrer">Tanya admin</a></div>}
+            <div className="help-listHead">
+              <div>
+                <span className="help-eyebrow">JAWABAN UNTUKMU</span>
+                <h2 id="help-results-title">
+                  {query.trim()
+                    ? "Hasil pencarian"
+                    : activeCategory === "all"
+                      ? "Pertanyaan yang sering ditanya"
+                      : CATEGORY_LABELS[activeCategory]}
+                </h2>
+              </div>
+              <span className="help-resultCount" role="status">
+                {filteredFaq.length} pertanyaan
+              </span>
+            </div>
+
+            {filteredFaq.length ? (
+              <div className="help-list">
+                {filteredFaq.map((item) => (
+                  <FaqItem key={item.id} item={item} open={item.id === openId} onToggle={handleToggle} />
+                ))}
+              </div>
+            ) : (
+              <div className="help-empty">
+                <span className="help-emptyIcon" aria-hidden="true">
+                  <PackageSearch size={30} />
+                </span>
+                <h3>Jawabannya belum ketemu</h3>
+                <p>Coba kata kunci lain atau kirim pencarian ini ke admin.</p>
+                <div className="help-emptyActions">
+                  <button
+                    className="help-button"
+                    type="button"
+                    onClick={() => {
+                      handleQueryChange("");
+                      setActiveCategory("all");
+                    }}
+                  >
+                    Lihat semua pertanyaan
+                  </button>
+                  <a className="help-button help-button--secondary" href={waUrl} target="_blank" rel="noreferrer">
+                    Tanya admin
+                  </a>
+                </div>
+              </div>
+            )}
           </section>
         </div>
 
         <details className="help-howto">
-          <summary>Pertama kali belanja? Lihat langkahnya</summary>
-          <div className="help-sectionHead"><div><span className="help-eyebrow">BARU PERTAMA BELANJA?</span><h2 id="help-howto-title">Dari pilih sampai siap pakai.</h2></div><Link to="/produk">Jelajahi produk <ArrowUpRight size={18} /></Link></div>
-          <div className="help-steps">{HOWTO_STEPS.map(step => { const Icon = step.icon; return <div className="help-step" key={step.num}><div className="help-stepTop"><Icon size={23} /><span>{step.num}</span></div><h3>{step.title}</h3><p>{step.desc}</p></div>; })}</div>
+          <summary className="help-howtoSummary">
+            <span className="help-howtoSummaryLeft">
+              <span className="help-howtoSummaryIcon" aria-hidden="true">
+                <ShoppingBag size={18} />
+              </span>
+              <span className="help-howtoSummaryCopy">
+                <strong>Pertama kali belanja?</strong>
+                <small>Lihat 4 langkah ringkas dari pilih paket sampai akun aktif.</small>
+              </span>
+            </span>
+            <span className="help-howtoChevron" aria-hidden="true">
+              <ChevronDown size={18} />
+            </span>
+          </summary>
+
+          <div className="help-howtoBody">
+            <div className="help-sectionHead">
+              <div>
+                <span className="help-eyebrow">BARU PERTAMA BELANJA?</span>
+                <h2 id="help-howto-title">Dari pilih sampai siap pakai.</h2>
+              </div>
+              <Link to="/produk" className="help-exploreLink">
+                <span>Jelajahi produk</span>
+                <ArrowUpRight size={16} aria-hidden="true" />
+              </Link>
+            </div>
+            <div className="help-steps">
+              {HOWTO_STEPS.map((step) => {
+                const Icon = step.icon;
+                return (
+                  <div className="help-step" key={step.num}>
+                    <div className="help-stepTop">
+                      <span className="help-stepIconWrap" aria-hidden="true">
+                        <Icon size={20} />
+                      </span>
+                      <span className="help-stepNum">{step.num}</span>
+                    </div>
+                    <h3>{step.title}</h3>
+                    <p>{step.desc}</p>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </details>
 
         <section className="help-support" aria-labelledby="help-support-title">
-          <div className="help-supportIcon"><ShieldCheck size={30} /></div><div><span className="help-eyebrow">KAMI BANTU SAMPAI JELAS</span><h2 id="help-support-title">Masih ada yang mengganjal?</h2><p>Kirim ID order dan ceritakan kendalamu. Jangan bagikan password atau kode OTP saat meminta bantuan.</p></div><a className="help-button" href={waUrl} target="_blank" rel="noreferrer"><MessageCircle size={18} /> Chat admin</a>
+          <div className="help-supportMain">
+            <div className="help-supportIcon" aria-hidden="true">
+              <ShieldCheck size={26} />
+            </div>
+            <div className="help-supportCopy">
+              <span className="help-eyebrow">KAMI BANTU SAMPAI JELAS</span>
+              <h2 id="help-support-title">Masih ada yang mengganjal?</h2>
+              <p>
+                Kirim ID order dan ceritakan kendalamu. Jangan bagikan password atau kode OTP saat meminta bantuan.
+              </p>
+            </div>
+          </div>
+          <a className="help-button help-supportBtn" href={waUrl} target="_blank" rel="noreferrer">
+            <MessageCircle size={17} aria-hidden="true" />
+            <span>Chat admin</span>
+          </a>
         </section>
       </div>
     </div>

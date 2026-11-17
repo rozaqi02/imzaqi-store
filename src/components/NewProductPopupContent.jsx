@@ -1,6 +1,6 @@
 import React from "react";
 import { ShoppingBag, Tag } from "lucide-react";
-import { formatIDR } from "../lib/format";
+import { formatIDR, getProductIconTone } from "../lib/format";
 import { resolvePromotionCopy } from "../lib/storefrontPromotions";
 import BannerGraphic from "./BannerGraphic";
 
@@ -12,7 +12,7 @@ export default function NewProductPopupContent({ config, product, onNavigate, on
       <BannerGraphic name={config?.graphic || "sparkle_celebration"} height={26} className="np-popup-mascot" />
     </div>
     <div className="np-popup-body">
-      <div className="np-popup-iconWrap">
+      <div className="np-popup-iconWrap" data-brand-icon={getProductIconTone(product) || undefined}>
         {product?.icon_url ? <img src={product.icon_url} alt={product.name} className="np-popup-iconImg" width="56" height="56" /> : <ShoppingBag size={32} aria-hidden="true" />}
       </div>
       <div className="np-popup-copy">

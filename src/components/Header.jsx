@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation, useNavigate } from "react-router-dom";
 import { Moon, Shield, SunMedium } from "lucide-react";
 import { isNavItemActive, SITE_DESKTOP_NAV } from "../lib/siteNav";
 import { prefetchRoute } from "../lib/routePrefetch";
+import { handleViewTransitionLinkClick } from "../lib/viewTransition";
 import { useCart } from "../context/CartContext";
 import { checkAdminAccess } from "../lib/adminAuth";
 import { supabase } from "../lib/supabaseClient";
@@ -65,6 +66,7 @@ export default function Header() {
   const headerRef = useRef(null);
   const navRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
   const [canAccessAdmin, setCanAccessAdmin] = useState(false);
   const isOnAdminRoute = location.pathname.startsWith("/admin");
   const isHome = location.pathname === "/";
@@ -199,6 +201,7 @@ export default function Header() {
                     onMouseEnter={() => prefetchRoute(link.to)}
                     onFocus={() => prefetchRoute(link.to)}
                     onTouchStart={() => prefetchRoute(link.to)}
+                    onClick={(event) => handleViewTransitionLinkClick(event, navigate, link.to)}
                   >
                     {link.label}
                   </Link>

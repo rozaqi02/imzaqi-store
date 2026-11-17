@@ -53,27 +53,26 @@ export default function Promosi() {
         <header className="store-hero store-hero--promosi">
           <div className="store-heroCopy">
             <span className="store-heroEyebrow">
-              <Megaphone size={14} />
-              STUDIO PROMOSI & RESELLER
+              <Megaphone size={13} aria-hidden="true" />
+              <span>STUDIO PROMOSI &amp; RESELLER</span>
             </span>
             <h1>
-              Bikin Materi Promosi <br />
-              <span>Hitungan Detik.</span>
+              Bikin Materi Promosi <span>Hitungan Detik.</span>
             </h1>
             <p>
-              Generator poster produk premium, pricelist katalog harga resmi, dan materi promosi siap unduh resolusi tinggi untuk status WhatsApp, Instagram, dan media sosial Anda.
+              Poster produk HD &amp; pricelist katalog siap unduh untuk status WhatsApp, Instagram, dan Telegram.
             </p>
             <div className="store-heroFacts" aria-label="Ringkasan studio promosi">
               <span>
-                <Layers size={13} />
+                <Layers size={13} aria-hidden="true" />
                 <strong>{loading ? "…" : products.length}</strong> produk aktif
               </span>
               <span>
-                <ImageIcon size={13} />
-                <strong>Square & Story</strong> format HD
+                <ImageIcon size={13} aria-hidden="true" />
+                <strong>1:1, 9:16 &amp; 16:9</strong> HD
               </span>
               <span>
-                <CheckCircle2 size={13} />
+                <CheckCircle2 size={13} aria-hidden="true" />
                 <strong>100% Gratis</strong> siap bagikan
               </span>
             </div>
@@ -81,33 +80,29 @@ export default function Promosi() {
 
           <div className="store-statusArt store-statusArt--promosi">
             <span className="store-artLabel">PANDUAN 3 LANGKAH STUDIO</span>
-            <ol className="store-guideSteps">
+            <ol className="promosi-quickSteps">
               <li>
-                <span className="store-guideNumber">01</span>
+                <span className="promosi-quickNum">01</span>
                 <div>
                   <strong>Pilih Mode Materi</strong>
-                  <span>Poster satuan produk atau pricelist katalog lengkap.</span>
+                  <small>Poster satuan atau pricelist</small>
                 </div>
               </li>
               <li>
-                <span className="store-guideNumber">02</span>
+                <span className="promosi-quickNum">02</span>
                 <div>
                   <strong>Kustomisasi Desain</strong>
-                  <span>Atur tema warna, diskon aktif, dan margin reseller.</span>
+                  <small>Tema, ukuran &amp; harga reseller</small>
                 </div>
               </li>
               <li>
-                <span className="store-guideNumber">03</span>
+                <span className="promosi-quickNum">03</span>
                 <div>
-                  <strong>Unduh & Bagikan</strong>
-                  <span>Simpan PNG resolusi HD atau salin teks promosi instan.</span>
+                  <strong>Unduh &amp; Bagikan</strong>
+                  <small>PNG HD &amp; QR WhatsApp instan</small>
                 </div>
               </li>
             </ol>
-            <div className="store-statusTip">
-              <Palette size={14} />
-              <span>Kanvas HD otomatis memuat QR WhatsApp resmi pesanan Anda.</span>
-            </div>
           </div>
         </header>
 
@@ -115,17 +110,17 @@ export default function Promosi() {
           <div className="promosi-studioHeader">
             <div className="promosi-studioTitleGroup">
               <span className="promosi-studioKicker">
-                <Palette size={13} aria-hidden="true" /> KANVAS DESAIN & PRATINJAU REALTIME
+                <Palette size={13} aria-hidden="true" />
+                <span>PRATINJAU REALTIME</span>
               </span>
               <h2>Kustomisasi Materi Promosi</h2>
-              <p>Pilih mode pembuatan di bawah ini, lalu sesuaikan format, warna, dan unduh materinya.</p>
             </div>
           </div>
 
           {loading ? (
             <div className="promosi-loading" role="status" aria-live="polite">
               <div className="promosi-loadingSpinner" />
-              <p>Menyiapkan data produk & katalog resmi...</p>
+              <p>Menyiapkan data produk &amp; katalog resmi...</p>
             </div>
           ) : (
             <MarketingMediaGenerator products={products} settings={settings} />

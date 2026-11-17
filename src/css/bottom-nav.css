@@ -74,18 +74,47 @@ html[data-theme="light"] .bottom-nav::before {
 }
 
 .bottom-nav-list {
+  position: relative;
+  --nav-pill-gap: 6px;
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 6px;
+  gap: var(--nav-pill-gap);
   max-width: 480px;
   margin-inline: auto;
 }
 
+.bottom-nav-activePill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: calc((100% - 3 * var(--nav-pill-gap, 6px)) / 4);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.08));
+  box-shadow: var(--skeu-inset-shadow, inset 0 1.5px 3px rgba(0, 0, 0, 0.4));
+  transform: translate3d(calc(var(--active-nav-index, 0) * 100% + var(--active-nav-index, 0) * var(--nav-pill-gap, 6px)), 0, 0);
+  transition: transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+  z-index: 0;
+}
+
+html[data-theme="light"] .bottom-nav-activePill {
+  border-color: rgba(0, 120, 80, 0.18);
+  background: linear-gradient(180deg, #edf6f1 0%, #ffffff 100%);
+  box-shadow:
+    inset 0 2px 5px rgba(15, 42, 32, 0.1),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.9),
+    0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
 .bottom-nav-itemWrap {
   min-width: 0;
+  position: relative;
+  z-index: 1;
 }
 
 .bottom-nav-item {
@@ -214,9 +243,10 @@ html[data-theme="light"] .bottom-nav-badge {
 
   .bottom-nav-list {
     max-width: 680px;
-    gap: 8px;
+    --nav-pill-gap: 8px;
   }
 
+  .bottom-nav-activePill,
   .bottom-nav-item {
     min-height: 56px;
     gap: 4px;
@@ -268,8 +298,8 @@ html[data-motion="off"] .bottom-nav {
 html[data-theme="light"][data-motion="lite"] .bottom-nav,
 html[data-theme="light"][data-motion="off"] .bottom-nav {
   box-shadow:
-    0 -12px 26px rgba(67, 111, 129, 0.26),
-    0 -5px 12px rgba(80, 115, 130, 0.18),
+    0 -12px 26px rgba(15, 42, 32, 0.12),
+    0 -5px 12px rgba(15, 42, 32, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
 }
 
@@ -280,7 +310,8 @@ html[data-motion="off"] .bottom-nav::before {
 
 @media (prefers-reduced-motion: reduce) {
   .bottom-nav-item,
-  .bottom-nav-icon {
+  .bottom-nav-icon,
+  .bottom-nav-activePill {
     transition: none;
   }
 }
@@ -319,13 +350,13 @@ html[data-theme] body .bottom-nav.bottom-nav--neumorphic {
 }
 
 html[data-theme="light"] body .bottom-nav.bottom-nav--neumorphic {
-  border: 1px solid rgba(154, 191, 203, 0.5) !important;
-  background: linear-gradient(180deg, #ffffff 0%, #ecf7fb 55%, #ddf0f6 100%) !important;
+  border: 1px solid rgba(0, 120, 80, 0.14) !important;
+  background: linear-gradient(180deg, #ffffff 0%, #f7fbf8 58%, #edf7f2 100%) !important;
   box-shadow:
-    0 14px 34px rgba(67, 111, 129, 0.22),
-    0 6px 14px rgba(80, 115, 130, 0.12),
+    0 14px 34px rgba(15, 42, 32, 0.1),
+    0 6px 14px rgba(0, 120, 80, 0.08),
     inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.35) !important;
+    inset 0 -3px 0 rgba(0, 120, 80, 0.1) !important;
 }
 
 html[data-theme] body .bottom-nav .bottom-nav-item.is-active {
@@ -333,15 +364,21 @@ html[data-theme] body .bottom-nav .bottom-nav-item.is-active {
   border: 1px solid rgba(255, 255, 255, 0.12) !important;
   box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.4) !important;
   border-radius: 999px !important;
-  color: var(--accent, #3ee6c0) !important;
+  color: var(--accent, #00e694) !important;
 }
 
 html[data-theme="light"] body .bottom-nav .bottom-nav-item.is-active {
-  background: rgba(154, 191, 203, 0.22) !important;
-  border: 1px solid rgba(154, 191, 203, 0.45) !important;
-  box-shadow: inset 0 1.5px 3px rgba(67, 111, 129, 0.14) !important;
+  background: var(--skeu-inset-bg, #edf4f0) !important;
+  border: 1px solid rgba(0, 120, 80, 0.18) !important;
+  box-shadow: var(--skeu-inset-shadow, inset 0 1.5px 3px rgba(15, 42, 32, 0.1)) !important;
   border-radius: 999px !important;
   color: var(--accent, #009e60) !important;
+}
+
+html[data-theme] body .bottom-nav-list:has(.bottom-nav-activePill) .bottom-nav-item.is-active {
+  background: transparent !important;
+  border-color: transparent !important;
+  box-shadow: none !important;
 }
 html[data-theme] body .bottom-nav .bottom-nav-item.is-active::before,
 html[data-theme] body .bottom-nav .bottom-nav-item.is-active::after,

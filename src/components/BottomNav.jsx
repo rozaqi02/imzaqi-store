@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   CircleHelp,
   House,
@@ -13,6 +13,7 @@ import { isFunnelPath } from "../hooks/useFunnelRoute";
 import { BOTTOM_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
 import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
 import { prefetchRoute } from "../lib/routePrefetch";
+import { handleViewTransitionLinkClick } from "../lib/viewTransition";
 import { useCart } from "../context/CartContext";
 
 const ICONS = {
@@ -38,6 +39,7 @@ function scrollActiveNavToTop() {
 
 export default function BottomNav() {
   const location = useLocation();
+  const navigate = useNavigate();
   const showBottomNav = useIsMobile(BOTTOM_NAV_MEDIA);
   const isPhone = useIsMobile(PHONE_LAYOUT_MEDIA);
   const [shrunk, setShrunk] = useState(false);
@@ -45,6 +47,10 @@ export default function BottomNav() {
   const hidden = !showBottomNav || isBottomNavHidden(location.pathname);
   const { items = [] } = useCart();
   const cartCount = useMemo(() => items.reduce((sum, item) => sum + Number(item?.qty || 0), 0), [items]);
+  const activeIndex = useMemo(
+    () => SITE_BOTTOM_NAV.findIndex((item) => isNavItemActive(location.pathname, item.to)),
+    [location.pathname]
+  );
 
   useEffect(() => {
     setShrunk(false);
@@ -100,7 +106,11 @@ export default function BottomNav() {
 
   return createPortal(
     <nav ref={navRef} className={`bottom-nav bottom-nav--neumorphic${isPhone && shrunk ? " is-shrunk" : ""}`} aria-label="Navigasi utama">
-      <ul className="bottom-nav-list">
+      <ul
+        className="bottom-nav-list"
+        style={activeIndex >= 0 ? { "--active-nav-index": activeIndex } : undefined}
+      >
+        {activeIndex >= 0 ? <span className="bottom-nav-activePill" aria-hidden="true" /> : null}
         {SITE_BOTTOM_NAV.map((item) => {
           const Icon = ICONS[item.to] || House;
           const active = isNavItemActive(location.pathname, item.to);
@@ -121,9 +131,12 @@ export default function BottomNav() {
                 onFocus={() => prefetchRoute(item.to)}
                 onTouchStart={() => prefetchRoute(item.to)}
                 onClick={(event) => {
-                  if (!active) return;
-                  event.preventDefault();
-                  scrollActiveNavToTop();
+                  if (active) {
+                    event.preventDefault();
+                    scrollActiveNavToTop();
+                    return;
+                  }
+                  handleViewTransitionLinkClick(event, navigate, item.to);
                 }}
               >
                 <span className="bottom-nav-icon" aria-hidden="true">

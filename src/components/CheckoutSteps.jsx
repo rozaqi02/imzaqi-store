@@ -69,7 +69,7 @@ export default function CheckoutSteps({ current = "checkout", readOnly = false }
             </div>
             <div className="step-text">
               <div className="step-title">{step.title}</div>
-              <div className="step-sub">{isClickable ? "kembali" : step.subtitle}</div>
+              <div className="step-sub">{isClickable ? "Edit item" : step.subtitle}</div>
             </div>
           </button>
         );

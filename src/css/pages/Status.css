@@ -81,7 +81,7 @@
   width: 260px;
   height: 260px;
   border-radius: 50%;
-  background: radial-gradient(circle, rgba(98, 205, 255, 0.16), rgba(98, 205, 255, 0));
+  background: radial-gradient(circle, rgba(0, 158, 96, 0.14), rgba(0, 158, 96, 0));
   pointer-events: none;
 }
 
@@ -1299,7 +1299,7 @@ html[data-theme="light"] .status-shell::before {
     var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 6px 14px rgba(67, 111, 129, 0.1);
+    0 6px 14px rgba(15, 42, 32, 0.08);
 }
 
 .st-itemHead {
@@ -1321,7 +1321,7 @@ html[data-theme="light"] .status-shell::before {
   flex-shrink: 0;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.5),
-    0 4px 8px rgba(67, 111, 129, 0.08);
+    0 4px 8px rgba(15, 42, 32, 0.06);
 }
 
 .st-itemIcon img {
@@ -1968,9 +1968,9 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
   padding: 14px 18px;
   border-radius: 18px;
   margin-bottom: 16px;
-  background: linear-gradient(135deg, rgba(0, 214, 180, 0.12), rgba(0, 194, 208, 0.08));
-  border: 1px solid rgba(0, 214, 180, 0.24);
-  box-shadow: 0 4px 16px rgba(0, 214, 180, 0.08);
+  background: linear-gradient(135deg, rgba(0, 230, 148, 0.12), rgba(0, 158, 96, 0.08));
+  border: 1px solid rgba(0, 230, 148, 0.24);
+  box-shadow: 0 4px 16px rgba(0, 158, 96, 0.08);
   animation: streakSlideIn 0.5s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -2011,8 +2011,8 @@ html[data-theme="light"] .st-helpCard .st-helpActions .btn-ghost {
 }
 
 html[data-theme="light"] .st-streakBadge {
-  background: linear-gradient(135deg, rgba(0, 180, 150, 0.1), rgba(0, 160, 175, 0.06));
-  border-color: rgba(0, 123, 136, 0.2);
+  background: linear-gradient(135deg, rgba(0, 158, 96, 0.1), rgba(0, 158, 96, 0.05));
+  border-color: rgba(0, 158, 96, 0.22);
 }
 
 .st-etaBanner {
@@ -2194,17 +2194,7 @@ html[data-theme="light"] .status-page button.st-checkBtn,
 .st-helpCard .st-helpActions .btn:first-child,
 html[data-theme="light"] .st-helpCard .st-helpActions .btn:first-child,
 .st-empty .st-emptyActions .btn:not(.btn-ghost) {
-  background: var(--imzaqi-btn-face) !important;
   color: var(--imzaqi-btn-text) !important;
-  border: 1px solid var(--imzaqi-btn-border) !important;
-  box-shadow: var(--imzaqi-btn-shadow) !important;
-  border-radius: 28px !important;
-}
-
-.st-helpCard .st-helpActions .btn:first-child:hover,
-html[data-theme="light"] .st-helpCard .st-helpActions .btn:first-child:hover {
-  box-shadow: var(--imzaqi-btn-shadow-hover, var(--imzaqi-btn-shadow)) !important;
-  transform: none !important;
 }
 
 .st-pasteBtn,
@@ -2461,7 +2451,7 @@ html[data-theme="light"] .st-progressBar-label {
   }
 
   body.has-bottom-nav .status-shell {
-    padding-bottom: calc(24px + var(--site-bottom-nav-clearance, 82px)) !important;
+    padding-bottom: calc(32px + var(--site-bottom-nav-offset, var(--site-bottom-nav-clearance, 84px))) !important;
   }
 }
 
@@ -2927,9 +2917,9 @@ html[data-theme="dark"] .st-discountVal {
   font-weight: 700;
   padding: 2px 7px;
   border-radius: 10px;
-  background: rgba(0, 214, 180, 0.12);
+  background: rgba(0, 158, 96, 0.14);
   color: var(--accent);
-  border: 1px solid rgba(0, 214, 180, 0.25);
+  border: 1px solid rgba(0, 158, 96, 0.28);
 }
 
 .st-reviewShareRow {
@@ -2944,3 +2934,40 @@ html[data-theme="dark"] .st-discountVal {
   border-radius: 12px;
 }
 
+
+
+/* Unified Support Helper Bar & Mobile Bottom Clearance */
+.st-searchSupport {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  padding: 14px 18px;
+  border-radius: var(--radius-card, 18px);
+  border: 1px solid var(--st-line);
+  background: var(--st-panel-soft);
+}
+
+.st-searchSupport p {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--st-muted);
+}
+
+@media (max-width: 860px) {
+  .status-page {
+    padding-bottom: calc(var(--site-bottom-nav-offset, 84px) + 32px);
+  }
+
+  .st-searchSupport {
+    padding: 14px 16px;
+  }
+
+  .st-searchSupport .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}

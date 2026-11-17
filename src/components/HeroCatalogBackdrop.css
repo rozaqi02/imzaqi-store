@@ -1,7 +1,7 @@
 /* Netflix-style drifting catalog wall - hero background only */
 .hx-catalog-backdrop {
   position: absolute;
-  /* No top fade - tiles stay fully visible from the header down. Fade only at the bottom. */
+  /* Soft top & bottom vertical fade so edge tiles never clip sharply behind the floating header. */
   inset: 0 -12% 0;
   z-index: 0;
   overflow: hidden;
@@ -13,7 +13,9 @@
   visibility: visible;
   -webkit-mask-image: linear-gradient(
     180deg,
-    #000 0%,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 7%,
+    #000 16%,
     #000 58%,
     rgba(0, 0, 0, 0.74) 74%,
     rgba(0, 0, 0, 0.28) 88%,
@@ -21,7 +23,9 @@
   );
   mask-image: linear-gradient(
     180deg,
-    #000 0%,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 7%,
+    #000 16%,
     #000 58%,
     rgba(0, 0, 0, 0.74) 74%,
     rgba(0, 0, 0, 0.28) 88%,
@@ -133,8 +137,7 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  /* Avoid blank tiles while network resolves icons */
-  content-visibility: auto;
+  content-visibility: visible;
 }
 
 .hx-catalog-tile.is-compact {
@@ -219,14 +222,17 @@ html[data-theme="light"] .hx-hero-scrim {
   animation-play-state: paused;
 }
 
-/* Mobile: 4 rows, calibrated tiles, matching 3D perspective and speed */
+/* Mobile: 4 rows, calibrated tiles, clean edge masking without 3D/blur corner boxes */
 .hx-catalog-backdrop.is-mobile {
   inset: 0 -18% 0;
-  opacity: 0.44;
+  opacity: 0.38;
   filter: none;
   -webkit-mask-image: linear-gradient(
     180deg,
-    #000 0%,
+    transparent 0%,
+    transparent 7%,
+    rgba(0, 0, 0, 0.28) 14%,
+    #000 23%,
     #000 56%,
     rgba(0, 0, 0, 0.52) 74%,
     rgba(0, 0, 0, 0.18) 88%,
@@ -235,7 +241,10 @@ html[data-theme="light"] .hx-hero-scrim {
   );
   mask-image: linear-gradient(
     180deg,
-    #000 0%,
+    transparent 0%,
+    transparent 7%,
+    rgba(0, 0, 0, 0.28) 14%,
+    #000 23%,
     #000 56%,
     rgba(0, 0, 0, 0.52) 74%,
     rgba(0, 0, 0, 0.18) 88%,
@@ -247,16 +256,41 @@ html[data-theme="light"] .hx-hero-scrim {
 .hx-catalog-backdrop.is-mobile .hx-catalog-stage {
   width: 120vw;
   max-width: 1400px;
-  top: 8px;
+  top: 28px;
   gap: 10px;
   /* Exact same receding wall angle and perspective as desktop */
-  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.05);
+  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.02);
   transform-origin: center top;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-row {
-  mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
-  -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 6%, #000 94%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0%, transparent 10%, #000 22%, #000 78%, transparent 90%, transparent 100%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0%, transparent 10%, #000 22%, #000 78%, transparent 90%, transparent 100%);
+}
+
+.hx-catalog-backdrop.is-mobile .hx-catalog-row:nth-child(n) {
+  filter: none;
+  transform: none;
+}
+
+.hx-catalog-backdrop.is-mobile .hx-catalog-row:nth-child(1) {
+  opacity: 0.55;
+}
+
+.hx-catalog-backdrop.is-mobile .hx-catalog-row:nth-child(2) {
+  opacity: 0.78;
+}
+
+.hx-catalog-backdrop.is-mobile .hx-catalog-row:nth-child(3) {
+  opacity: 1;
+}
+
+.hx-catalog-backdrop.is-mobile .hx-catalog-row:nth-child(4) {
+  opacity: 0.85;
+}
+
+.hx-catalog-backdrop.is-mobile .hx-catalog-row:nth-child(n+5) {
+  opacity: 0.65;
 }
 
 .hx-catalog-backdrop.is-mobile .hx-catalog-track {
@@ -296,8 +330,13 @@ html[data-theme="light"] .hx-hero-scrim {
   }
 
   .hx-catalog-backdrop .hx-catalog-stage {
-    top: 8px;
-    transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.05);
+    top: 28px;
+    transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.02);
+  }
+
+  .hx-catalog-backdrop .hx-catalog-row:nth-child(n) {
+    filter: none;
+    transform: none;
   }
 }
 
@@ -318,7 +357,7 @@ html[data-theme="light"] .hx-hero-scrim {
 }
 
 [data-motion="lite"] .hx-catalog-backdrop.is-mobile .hx-catalog-stage {
-  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.05);
+  transform: translate(-50%, 0) perspective(1100px) rotateX(12deg) scale(1.02);
 }
 
 [data-motion="lite"] .hx-catalog-track {

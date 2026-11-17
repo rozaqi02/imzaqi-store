@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
-import { Check, CheckCircle2, MessageCircle, Phone, ShieldCheck, X } from "lucide-react";
+import { Check, CheckCircle2, MessageCircle, ShieldCheck, X } from "lucide-react";
 import { useDialogA11y } from "../../../hooks/useDialogA11y";
 import { copyToClipboard } from "../../../utils/clipboard";
 import { formatIDR } from "../../../lib/format";
@@ -321,12 +321,7 @@ export function ConfirmPaymentModal({ open, onConfirm, onCancel, total, items, i
                 <span>{itemCount} item</span>
                 {isFree ? (
                   <span className="pay-confirmTotalBadge is-promo">Promo 100%</span>
-                ) : (
-                  <span className="pay-confirmTotalBadge is-qris">
-                    <Phone size={11} />
-                    QRIS
-                  </span>
-                )}
+                ) : null}
               </div>
             </div>
           </aside>

@@ -21,7 +21,7 @@
   gap: 16px;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.02)),
-    radial-gradient(circle at top left, rgba(0, 214, 180, 0.12), rgba(0, 214, 180, 0) 48%);
+    radial-gradient(circle at top left, rgba(0, 158, 96, 0.14), rgba(0, 158, 96, 0) 52%);
   border-right: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
   color: var(--brand-text, #eef4ff);
 }
@@ -57,24 +57,31 @@
 
 .admin-loginSignals {
   display: grid;
-  gap: 10px;
+  gap: 8px;
+  margin-top: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--brand-line, rgba(255, 255, 255, 0.08));
 }
 
-.admin-loginSignal {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  min-height: 42px;
-  padding: 0 12px;
-  border-radius: 16px;
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1));
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 28%),
-    var(--skeu-control-bg, rgba(255, 255, 255, 0.04));
-  box-shadow: var(--skeu-control-shadow, none);
-  color: var(--brand-text, rgba(234, 255, 245, 0.84));
-  font-size: 13px;
-  font-weight: 800;
+.admin-loginSignal,
+html[data-theme] .admin-loginSignal {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-height: 28px !important;
+  padding: 2px 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  color: var(--brand-muted, rgba(234, 255, 245, 0.8)) !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+}
+
+.admin-loginSignal svg {
+  color: var(--accent, #009e60);
+  flex-shrink: 0;
 }
 
 .admin-loginFormWrap {
@@ -144,3 +151,24 @@ html[data-theme="light"] .admin-loginBadge {
   }
 }
 
+
+
+@media (min-width: 761px) {
+  .admin-login-page {
+    min-height: calc(100dvh - 240px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-block: 36px;
+  }
+
+  .admin-login-page > .section {
+    width: 100%;
+  }
+}
+
+@media (max-width: 860px) {
+  .admin-login-page {
+    padding-bottom: calc(var(--site-bottom-nav-offset, 84px) + 32px);
+  }
+}

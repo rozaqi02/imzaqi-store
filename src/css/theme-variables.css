@@ -38,8 +38,8 @@ html[data-theme="dark"] {
   --card: rgba(255, 255, 255, 0.08);
   --card2: rgba(255, 255, 255, 0.12);
   --line: rgba(255, 255, 255, 0.18);
-  --accent: #00f5c4;
-  --accent-cyan: #38bdf8;
+  --accent: #00e694;
+  --accent-cyan: #34d399;
   --accent2: #0a0a0a;
   --danger: #e11d3a;
   --shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
@@ -55,18 +55,18 @@ html[data-theme="dark"] {
   --brand-bg-start: #0a0e0c;
   --brand-bg-end: #0a0e0c;
   --brand-bg-mid: #101613;
-  --brand-aurora-a: rgba(0, 245, 196, 0.1);
-  --brand-aurora-b: rgba(56, 189, 248, 0.08);
+  --brand-aurora-a: rgba(0, 230, 148, 0.09);
+  --brand-aurora-b: rgba(0, 158, 96, 0.07);
   --brand-card-top: rgba(255, 255, 255, 0.06);
   --brand-card-bottom: rgba(255, 255, 255, 0.02);
-  --brand-card-spot: rgba(0, 245, 196, 0.09);
+  --brand-card-spot: rgba(0, 230, 148, 0.08);
   --brand-surface: rgba(16, 22, 19, 0.96);
   --brand-surface-strong: rgba(10, 14, 12, 0.98);
   --brand-line: rgba(255, 255, 255, 0.12);
   --brand-text: #f8fafc;
   --brand-muted: rgba(248, 250, 252, 0.72);
   --brand-subtle: rgba(248, 250, 252, 0.46);
-  --brand-icon: #00f5c4;
+  --brand-icon: #00e694;
   --brand-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
   --brand-shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.35);
   --brand-overlay: rgba(4, 8, 14, 0.72);
@@ -90,7 +90,7 @@ html[data-theme="dark"] {
     inset 0 1px 0 rgba(255, 255, 255, 0.18);
   --skeu-control-shadow-hover:
     0 5px 12px -2px rgba(0, 3, 10, 0.5),
-    0 0 0 1px rgba(0, 214, 180, 0.22),
+    0 0 0 1px rgba(0, 230, 148, 0.24),
     inset 0 1px 0 rgba(255, 255, 255, 0.24);
   --skeu-inset-bg: linear-gradient(180deg, #090e14, #0e151e);
   --skeu-inset-shadow:
@@ -101,33 +101,40 @@ html[data-theme="dark"] {
     linear-gradient(170deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02)),
     #131a24;
   --skeu-accent-shadow:
-    0 12px 30px rgba(0, 245, 196, 0.32),
-    0 4px 12px rgba(56, 189, 248, 0.2),
+    0 12px 30px rgba(0, 230, 148, 0.28),
+    0 4px 12px rgba(0, 158, 96, 0.22),
     inset 0 1.5px 0 rgba(255, 255, 255, 0.6),
-    inset 0 -2px 0 rgba(0, 60, 50, 0.48);
+    inset 0 -2px 0 rgba(0, 60, 42, 0.48);
 
-  /* Primary button - soft neumorphic pillow matching white control contrast (Dark Mode) */
-  --imzaqi-btn-face: linear-gradient(180deg, #05a867 0%, #009e60 100%);
-  --imzaqi-btn-border: #05a867;
+  /* Primary button - luminous jade-emerald with crisp mint top catchlight (Dark Mode) */
+  --imzaqi-btn-face: linear-gradient(180deg, #06b370 0%, #00a566 100%);
+  --imzaqi-btn-face-hover:
+    radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 62%),
+    linear-gradient(180deg, #0cc17b 0%, #02ae6d 100%);
+  --imzaqi-btn-face-active: linear-gradient(180deg, #008c57 0%, #029c62 100%);
+  --imzaqi-btn-border: #07a174;
   --imzaqi-btn-text: #ffffff;
+  --imzaqi-btn-text-shadow: 0 1px 1.5px rgba(0, 44, 30, 0.24);
   --imzaqi-btn-shadow:
-    0 6px 10px rgba(0, 0, 0, 0.22),
-    0 18px 30px rgba(0, 140, 84, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -3px 0 rgba(0, 76, 44, 0.24);
+    0 8px 16px rgba(0, 0, 0, 0.32),
+    0 12px 26px -6px rgba(6, 174, 124, 0.46),
+    inset 0 2px 0 rgba(224, 255, 246, 0.92),
+    inset 0 -2px 0 rgba(0, 50, 36, 0.34);
   --imzaqi-btn-shadow-compact:
-    0 4px 8px rgba(0, 0, 0, 0.2),
-    0 10px 18px rgba(0, 140, 84, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -2px 0 rgba(0, 76, 44, 0.22);
+    0 4px 10px -2px rgba(0, 0, 0, 0.28),
+    0 8px 16px -4px rgba(6, 174, 124, 0.38),
+    inset 0 1.5px 0 rgba(224, 255, 246, 0.88),
+    inset 0 -1.5px 0 rgba(0, 50, 36, 0.3);
   --imzaqi-btn-shadow-hover:
-    0 8px 14px rgba(0, 0, 0, 0.26),
-    0 20px 34px rgba(0, 158, 96, 0.2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -3px 0 rgba(0, 76, 44, 0.28);
+    0 10px 20px rgba(0, 0, 0, 0.34),
+    0 16px 32px -6px rgba(12, 200, 140, 0.56),
+    inset 0 2px 0 rgba(242, 255, 251, 1),
+    inset 0 -2px 0 rgba(0, 50, 36, 0.34);
   --imzaqi-btn-shadow-active:
-    inset 0 2px 6px rgba(0, 76, 44, 0.32),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 0 0 2px rgba(16, 208, 138, 0.28),
+    0 2px 8px rgba(0, 0, 0, 0.32),
+    inset 0 3px 7px rgba(0, 40, 26, 0.52),
+    inset 0 -1.5px 0 rgba(167, 255, 224, 0.58);
 
   /* Unified Layout Design Tokens (Dark Mode) */
   --uni-panel:
@@ -135,7 +142,7 @@ html[data-theme="dark"] {
   --uni-panel-soft: linear-gradient(180deg, rgba(20, 28, 24, 0.92), rgba(14, 20, 17, 0.94));
   --uni-inset: linear-gradient(180deg, rgba(6, 10, 8, 0.96), rgba(10, 15, 12, 0.92));
   --uni-line: rgba(255, 255, 255, 0.12);
-  --uni-line-strong: rgba(0, 214, 180, 0.4);
+  --uni-line-strong: rgba(0, 230, 148, 0.4);
   --uni-text: #f8fafc;
   --uni-muted: rgba(248, 250, 252, 0.72);
   --uni-shadow:
@@ -151,11 +158,7 @@ html[data-theme="dark"] {
 
   /* Home Page Bento Custom Mappings */
   --home-neo-panel: var(--skeu-panel-bg);
-  --home-neo-panel-shadow:
-    16px 18px 36px rgba(0, 0, 0, 0.38),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    inset 0 -2px 0 rgba(0, 0, 0, 0.28),
-    0 0 0 1px rgba(255, 255, 255, 0.08);
+  --home-neo-panel-shadow: var(--skeu-panel-shadow);
   --home-neo-control: var(--uni-neo-control);
   --home-neo-control-shadow: var(--uni-neo-control-shadow);
   --home-neo-inset: var(--uni-neo-inset);
@@ -221,79 +224,85 @@ html[data-theme="light"] {
   --brand-header-bg: #ffffff;
   --brand-menu-bg: #ffffff;
 
-  /* Solid Frosted Glass Panels (Light Mode - Crystal Quartz) */
+  /* Solid Frosted Glass Panels (Light Mode - Crystal Emerald) */
   --skeu-panel-bg:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(248, 252, 250, 0.96) 100%),
+    linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 251, 248, 0.96) 100%),
     #ffffff;
   --skeu-panel-shadow:
-    0 12px 32px -6px rgba(45, 85, 100, 0.12),
+    0 12px 32px -6px rgba(15, 42, 32, 0.09),
     0 0 0 1px rgba(0, 158, 96, 0.12),
     inset 0 1.5px 0 #ffffff,
     inset 0 -1px 0 rgba(0, 0, 0, 0.04),
-    0 0 14px -2px rgba(0, 158, 96, 0.06);
+    0 0 14px -2px rgba(0, 158, 96, 0.05);
   --skeu-control-bg: #ffffff;
   --skeu-control-shadow:
-    0 6px 10px rgba(67, 111, 129, 0.1),
-    0 18px 30px rgba(67, 111, 129, 0.12),
+    0 6px 12px rgba(15, 42, 32, 0.07),
+    0 14px 26px rgba(15, 42, 32, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.3);
+    inset 0 -3px 0 rgba(0, 120, 80, 0.12);
   --skeu-control-shadow-hover:
-    0 8px 14px rgba(67, 111, 129, 0.14),
-    0 20px 34px rgba(67, 111, 129, 0.15),
+    0 8px 16px rgba(15, 42, 32, 0.1),
+    0 18px 30px rgba(0, 120, 80, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(154, 191, 203, 0.36);
-  --skeu-inset-bg: linear-gradient(180deg, #edf4f1 0%, #f5f8f6 100%);
+    inset 0 -3px 0 rgba(0, 120, 80, 0.18);
+  --skeu-inset-bg: linear-gradient(180deg, #edf4f0 0%, #f5f9f6 100%);
   --skeu-inset-shadow:
-    inset 0 2px 5px rgba(45, 85, 100, 0.12),
+    inset 0 2px 5px rgba(15, 42, 32, 0.09),
     inset 0 0 0 1px rgba(0, 158, 96, 0.08),
     inset 0 1px 0 #ffffff;
   --skeu-pill-bg: #ffffff;
   --skeu-accent-shadow:
-    0 14px 28px rgba(0, 158, 96, 0.22),
-    0 4px 10px rgba(0, 194, 208, 0.16),
+    0 14px 28px rgba(0, 158, 96, 0.2),
+    0 4px 10px rgba(0, 158, 96, 0.12),
     inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
     inset 0 -2px 0 rgba(0, 90, 50, 0.24);
 
-  /* Primary button - soft neumorphic pillow matching white control contrast (Light Mode) */
-  --imzaqi-btn-face: linear-gradient(180deg, #05a867 0%, #009e60 100%);
-  --imzaqi-btn-border: #05a867;
+  /* Primary button - luminous jade-emerald with crisp mint top catchlight (Light Mode) */
+  --imzaqi-btn-face: linear-gradient(180deg, #06b370 0%, #00a566 100%);
+  --imzaqi-btn-face-hover:
+    radial-gradient(120% 80% at 50% 0%, rgba(255, 255, 255, 0.16) 0%, transparent 62%),
+    linear-gradient(180deg, #0cc17b 0%, #02ae6d 100%);
+  --imzaqi-btn-face-active: linear-gradient(180deg, #008c57 0%, #029c62 100%);
+  --imzaqi-btn-border: #07a174;
   --imzaqi-btn-text: #ffffff;
+  --imzaqi-btn-text-shadow: 0 1px 1.5px rgba(0, 44, 30, 0.24);
   --imzaqi-btn-shadow:
-    0 6px 10px rgba(67, 111, 129, 0.1),
-    0 18px 30px rgba(67, 111, 129, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -3px 0 rgba(0, 76, 44, 0.22);
+    0 12px 24px -6px rgba(6, 174, 124, 0.44),
+    0 4px 10px rgba(0, 50, 36, 0.14),
+    inset 0 2px 0 rgba(224, 255, 246, 0.92),
+    inset 0 -2px 0 rgba(0, 50, 36, 0.34);
   --imzaqi-btn-shadow-compact:
-    0 4px 8px rgba(67, 111, 129, 0.1),
-    0 10px 18px rgba(67, 111, 129, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08),
-    inset 0 -2px 0 rgba(0, 76, 44, 0.2);
+    0 5px 12px -2px rgba(6, 174, 124, 0.36),
+    inset 0 1.5px 0 rgba(224, 255, 246, 0.88),
+    inset 0 -1.5px 0 rgba(0, 50, 36, 0.3);
   --imzaqi-btn-shadow-hover:
-    0 8px 14px rgba(67, 111, 129, 0.14),
-    0 20px 34px rgba(67, 111, 129, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12),
-    inset 0 -3px 0 rgba(0, 76, 44, 0.26);
+    0 16px 32px -6px rgba(12, 200, 140, 0.56),
+    0 5px 12px rgba(0, 50, 36, 0.16),
+    inset 0 2px 0 rgba(242, 255, 251, 1),
+    inset 0 -2px 0 rgba(0, 50, 36, 0.34);
   --imzaqi-btn-shadow-active:
-    inset 0 2px 6px rgba(0, 76, 44, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    0 0 0 2px rgba(10, 196, 132, 0.24),
+    0 2px 6px rgba(0, 50, 36, 0.2),
+    inset 0 3px 6px rgba(0, 44, 28, 0.46),
+    inset 0 -1.5px 0 rgba(167, 255, 224, 0.55);
 
   /* Unified Layout Design Tokens (Light Mode) */
   --uni-panel: #ffffff;
-  --uni-panel-soft: #f8fafc;
-  --uni-inset: #f1f5f9;
+  --uni-panel-soft: #f8faf9;
+  --uni-inset: #f1f5f3;
   --uni-line: rgba(15, 23, 42, 0.08);
   --uni-line-strong: rgba(0, 158, 96, 0.4);
   --uni-text: #0f172a;
   --uni-muted: rgba(15, 23, 42, 0.72);
   --uni-shadow:
-    0 18px 42px rgba(60, 105, 120, 0.16),
+    0 18px 42px rgba(15, 42, 32, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 0 0 1px rgba(13, 124, 144, 0.08);
+    0 0 0 1px rgba(0, 120, 80, 0.08);
   --uni-soft-shadow:
-    0 12px 26px rgba(60, 105, 120, 0.13),
+    0 12px 26px rgba(15, 42, 32, 0.07),
     inset 0 1px 0 rgba(255, 255, 255, 1);
   --uni-inset-shadow:
-    inset 0 2px 6px rgba(124, 158, 171, 0.16),
+    inset 0 2px 6px rgba(15, 42, 32, 0.09),
     inset 0 1px 0 rgba(255, 255, 255, 1);
 
   /* Home Page Bento Custom Mappings */
@@ -325,8 +334,13 @@ html {
   --site-sticky-cta-height: 72px;
 }
 
-/* Radius Tokens */
+/* Radius & Responsive Breakpoint Discipline
+   Canonical breakpoints: 640px (mobile), 860px (tablet/drawer), 1024px (desktop). */
 html {
+  --radius-pill: 8px;
+  --radius-control: 12px;
+  --radius-card: 18px;
+  --radius-shell: 24px;
   --radius-sm: 14px;
   --radius-md: 18px;
   --radius-lg: 24px;
@@ -343,6 +357,6 @@ html[data-motion="lite"] {
 }
 
 html[data-theme="light"][data-motion="lite"] {
-  --shadow-lite: 0 8px 20px rgba(20, 50, 70, 0.12);
-  --shadow-lite-soft: 0 4px 12px rgba(20, 50, 70, 0.08);
+  --shadow-lite: 0 8px 20px rgba(15, 42, 32, 0.08);
+  --shadow-lite-soft: 0 4px 12px rgba(15, 42, 32, 0.05);
 }

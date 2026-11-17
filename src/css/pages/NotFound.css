@@ -59,19 +59,19 @@ html[data-theme="light"] .nf-card {
   min-height: 28px;
   padding: 0 12px;
   border-radius: 8px;
-  border: 1px solid rgba(0, 194, 208, 0.28);
+  border: 1px solid rgba(0, 158, 96, 0.28);
   background:
-    linear-gradient(180deg, rgba(0, 214, 180, 0.18), rgba(0, 194, 208, 0.08));
-  color: var(--brand-icon, #00c2d0);
+    linear-gradient(180deg, rgba(0, 230, 148, 0.16), rgba(0, 158, 96, 0.08));
+  color: var(--accent, #009e60);
   font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.04em;
 }
 
 html[data-theme="light"] .nf-badge {
-  color: #0b8292;
+  color: #067a4c;
   border-color: rgba(0, 138, 148, 0.24);
-  background: rgba(0, 194, 208, 0.1);
+  background: rgba(0, 158, 96, 0.1);
 }
 
 .nf-visual {
@@ -87,7 +87,7 @@ html[data-theme="light"] .nf-badge {
   position: absolute;
   inset: 0;
   border-radius: 50%;
-  border: 1px dashed rgba(0, 194, 208, 0.28);
+  border: 1px dashed rgba(0, 158, 96, 0.28);
   pointer-events: none;
 }
 
@@ -98,7 +98,7 @@ html[data-theme="light"] .nf-badge {
 .nf-orbit--inner {
   inset: 12px;
   border-style: solid;
-  border-color: rgba(0, 194, 208, 0.16);
+  border-color: rgba(0, 158, 96, 0.16);
   animation: nfSpin 12s linear infinite reverse;
 }
 
@@ -112,7 +112,7 @@ html[data-theme="light"] .nf-badge {
   place-items: center;
   color: #032235 !important;
   background:
-    linear-gradient(160deg, #6dffd8, #00b8a8 55%, #008a94) !important;
+    linear-gradient(160deg, #34d399, #009e60 55%, #057d4f) !important;
   box-shadow:
     0 10px 22px rgba(0, 140, 140, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.45) !important;
@@ -133,7 +133,7 @@ html[data-theme="light"] .nf-badge {
 }
 
 html[data-theme="light"] .nf-kicker {
-  color: #0b8292;
+  color: #067a4c;
 }
 
 .nf-title {
@@ -242,7 +242,7 @@ html[data-theme="light"] .nf-linkCard {
 
 .nf-linkCard:hover {
   transform: translateY(-1px);
-  border-color: rgba(0, 194, 208, 0.35);
+  border-color: rgba(0, 158, 96, 0.35);
 }
 
 .nf-linkIcon {
@@ -253,11 +253,11 @@ html[data-theme="light"] .nf-linkCard {
   place-items: center;
   /* !important: neumorphic-depth overrides background to dark skeu-control - dark glyph on dark chip = invisible */
   color: #032235 !important;
-  background: linear-gradient(160deg, #6dffd8, #00b8a8) !important;
+  background: linear-gradient(160deg, #34d399, #009e60) !important;
   box-shadow:
     0 6px 14px rgba(0, 140, 140, 0.22),
     inset 0 1px 0 rgba(255, 255, 255, 0.4) !important;
-  border: 1px solid rgba(0, 194, 208, 0.22) !important;
+  border: 1px solid rgba(0, 158, 96, 0.22) !important;
   flex-shrink: 0;
 }
 
@@ -322,7 +322,7 @@ html[data-theme="light"] .nf-linkCopy small {
 }
 
 .nf-helpLink:hover {
-  border-color: rgba(0, 194, 208, 0.35);
+  border-color: rgba(0, 158, 96, 0.35);
   color: var(--brand-icon, #4effda);
 }
 
@@ -352,7 +352,7 @@ html[data-theme="light"] .nf-helpLink {
 }
 
 html[data-theme="light"] .nf-popularKicker {
-  color: #0b8292;
+  color: #067a4c;
 }
 
 .nf-popularTitle {
@@ -379,7 +379,7 @@ html[data-theme="light"] .nf-popularTitle {
 }
 
 html[data-theme="light"] .nf-popularAll {
-  color: #0b8292;
+  color: #067a4c;
 }
 
 .nf-popularGrid {
@@ -427,5 +427,39 @@ html[data-theme="light"] .nf-popularAll {
   .nf-orbit--outer,
   .nf-orbit--inner {
     animation: none;
+  }
+}
+
+
+/* Visual Polish: Balanced Grid Heights, Clean Emerald Tiles & Mobile Clearance */
+.nf-layout {
+  align-items: stretch;
+}
+
+.nf-heroCard,
+.nf-linksCard {
+  height: 100%;
+}
+
+.nf-popularGrid .product-tile {
+  border-radius: var(--radius-card, 18px) !important;
+  box-shadow: var(--skeu-panel-shadow) !important;
+}
+
+.nf-popularGrid .product-tile::before,
+.nf-popularGrid .product-tile::after,
+.nf-popularGrid .product-tile-iconWrap::before,
+.nf-popularGrid .product-tile-iconWrap::after {
+  display: none !important;
+  box-shadow: none !important;
+}
+
+.nf-popularGrid .product-tile-icon {
+  box-shadow: none !important;
+}
+
+@media (max-width: 860px) {
+  .nf-page {
+    padding-bottom: calc(var(--site-bottom-nav-offset, 84px) + 36px);
   }
 }

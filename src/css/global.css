@@ -51,6 +51,30 @@ body {
   width: 100%;
   max-width: 100%;
   overflow-x: clip;
+  overscroll-behavior-y: none;
+}
+
+a,
+button,
+summary,
+[role="button"],
+[role="tab"],
+input,
+select {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+a,
+button,
+summary,
+[role="button"],
+[role="tab"],
+.nav a,
+.bottom-nav-item,
+.catalog-quickChip,
+.pdx-filterChip {
+  user-select: none;
 }
 
 body::before {
@@ -219,6 +243,10 @@ html[data-theme="light"] body {
 .container {
   min-width: 0;
   max-width: 100%;
+}
+
+.app-shell {
+  overflow-x: clip;
 }
 
 .app-main {
@@ -1542,50 +1570,6 @@ body {
 @keyframes blink {
   50% {
     opacity: 0
-  }
-}
-
-.route-progress {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: rgba(255, 255, 255, .06);
-  z-index: 90;
-}
-
-.route-progress-bar {
-  height: 100%;
-  width: 100%;
-  background: linear-gradient(90deg, rgba(29, 131, 255, .15), rgba(29, 131, 255, .95), rgba(255, 255, 255, .10));
-  transform-origin: left
-    /**/
-    center;
-  animation: routebar
-    /**/
-    500ms
-    /**/
-    var(--ease-out)both;
-}
-
-@keyframes routebar {
-  0% {
-    transform: scaleX(.05)
-  }
-
-  60% {
-    transform: scaleX(.75)
-  }
-
-  100% {
-    transform: scaleX(1)
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .route-progress-bar {
-    animation: none;
   }
 }
 
@@ -3744,7 +3728,6 @@ body {
   .trending-badge,
   .stock-badge-modern.low-stock,
   .stock-progress-fill::after,
-  .route-progress-bar,
   .cursor {
     animation: none !important;
   }

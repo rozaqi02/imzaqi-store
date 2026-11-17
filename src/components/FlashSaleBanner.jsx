@@ -4,6 +4,7 @@ import { ArrowUpRight, ChevronLeft, ChevronRight, Clock3, PackageCheck, Zap } fr
 import { fetchActiveFlashSales } from "../lib/api";
 import { warn } from "../lib/log";
 import { buildFlashOffers, flashCountdown, flashPrice } from "../lib/flashOffers";
+import { getProductIconTone } from "../lib/format";
 
 function ProductLogo({ product }) {
   const [failed, setFailed] = useState(false);
@@ -111,7 +112,7 @@ export default function FlashSaleBanner({ products = [], compact = false }) {
       <div className="fsd-ticket" id={offerId}>
         <div className="fsd-offer">
           <div className="fsd-art" aria-hidden="true">
-            <div className="fsd-logo" key={`${offer.product.id}-${offer.product.icon_url}`}><ProductLogo product={offer.product} /></div>
+            <div className="fsd-logo" data-brand-icon={getProductIconTone(offer.product) || undefined} key={`${offer.product.id}-${offer.product.icon_url}`}><ProductLogo product={offer.product} /></div>
             <div className="fsd-seal"><small>DISKON</small><strong>{offer.discountPercent}<span>%</span></strong></div>
           </div>
           <div className="fsd-details">
@@ -137,7 +138,7 @@ export default function FlashSaleBanner({ products = [], compact = false }) {
         <div className="fsd-rail" ref={railRef} role="group" aria-label="Pilihan promo flash sale">
           {offers.map(item => <button type="button" className="btn btn-ghost fsd-choice" key={item.id} data-selected={item.id === offer.id}
             aria-pressed={item.id === offer.id} aria-controls={offerId} onClick={() => setSelectedId(item.id)}>
-            <span className="fsd-choiceLogo"><ProductLogo product={item.product} /></span>
+            <span className="fsd-choiceLogo" data-brand-icon={getProductIconTone(item.product) || undefined}><ProductLogo product={item.product} /></span>
             <span className="fsd-choiceCopy"><strong>{item.product.name}</strong><small>{[item.variant.name, item.variant.duration_label].filter(Boolean).join(" · ")}</small></span>
             <span className="fsd-choiceDiscount">−{item.discountPercent}%</span>
           </button>)}

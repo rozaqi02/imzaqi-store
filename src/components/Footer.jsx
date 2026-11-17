@@ -1,6 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { STORE_WHATSAPP } from "../lib/productCategories";
+import { prefetchRoute } from "../lib/routePrefetch";
 import { useIsMobile } from "../hooks/useIsMobile";
 
 const footerColumns = [
@@ -10,6 +11,7 @@ const footerColumns = [
       { label: "Beranda", to: "/" },
       { label: "Katalog", to: "/produk" },
       { label: "Ulasan", to: "/testimoni" },
+      { label: "Tentang Toko", to: "/tentang" },
       { label: "Bantuan", to: "/faq" },
       { label: "Media Promosi", to: "/promosi" },
     ],
@@ -47,6 +49,8 @@ function FooterLink({ item, className = "" }) {
       className={className}
       to={item.to}
       state={item.overlay && location.pathname !== "/checkout" ? { backgroundLocation: location } : undefined}
+      onMouseEnter={() => prefetchRoute(item.to)}
+      onTouchStart={() => prefetchRoute(item.to)}
     >
       {item.label}
     </Link>
@@ -63,7 +67,7 @@ export default function Footer() {
         <div className="site-footerPanel site-footerGo">
           <div className="site-footerGoIntro">
             <Link className="site-footerGoBrand" to="/" aria-label="Kembali ke beranda">
-              <img src="/imzaqistore_logo.png" alt="imzaqi.store" />
+              <img src="/icon.png" alt="imzaqi.store" />
               <span>imzaqi.store</span>
             </Link>
           </div>

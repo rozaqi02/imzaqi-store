@@ -1,12 +1,15 @@
 import { useMemo, useCallback, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { ArrowUpRight, Flame, Layers3, PackageCheck, ShoppingBag } from "lucide-react";
 import { useTilt } from "../hooks/useTilt";
 import { useIsMobile } from "../hooks/useIsMobile";
-import { formatIDR, classifyStock, isKnownOutOfStock, summarizeCatalogCopy, detectAccountTypes, getCatalogPriceRange } from "../lib/format";
+import { formatIDR, classifyStock, getProductIconTone, isKnownOutOfStock, summarizeCatalogCopy, detectAccountTypes, getCatalogPriceRange } from "../lib/format";
+import { prefetchRoute } from "../lib/routePrefetch";
+import { handleViewTransitionLinkClick } from "../lib/viewTransition";
 
-export default function ProductTile({ product, rank, layout = "list", disableTilt = true, disableFlip = false, overrideSold = null, flashSaleMap = null }) {
+export default function ProductTile({ product, rank, layout = "list", disableTilt = true, disableFlip = false, overrideSold = null, flashSaleMap = null, eager = false }) {
   if (!product) return null;
+  const navigate = useNavigate();
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
   // Flip card dinonaktifkan: semua info tampil langsung di depan
@@ -14,7 +17,9 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
   const prefetchedRef = useRef(false);
 
   const prefetchDetail = useCallback(() => {
-    if (prefetchedRef.current || !product?.slug) return;
+    if (!product?.slug) return;
+    prefetchRoute(`/produk/${product.slug}`);
+    if (prefetchedRef.current) return;
     prefetchedRef.current = true;
     import("../pages/ProductDetail").catch(() => {});
   }, [product?.slug]);
@@ -70,15 +75,16 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
         <div className="product-tile-iconWrap" style={{ "--brand-color": brandColor }}>
           <div
             className="product-tile-icon"
+            data-brand-icon={getProductIconTone(product) || undefined}
             aria-hidden="true"
           >
             {product?.icon_url ? (
               <img
                 src={product.icon_url}
                 alt=""
-                loading="lazy"
+                loading={eager ? "eager" : "lazy"}
                 decoding="async"
-                fetchPriority="low"
+                fetchPriority={eager ? "high" : "low"}
                 width="48"
                 height="48"
               />
@@ -161,6 +167,14 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
         aria-label={`Buka detail ${productName}`}
         onMouseEnter={prefetchDetail}
         onFocus={prefetchDetail}
+        onTouchStart={prefetchDetail}
+        onClick={(event) => {
+          handleViewTransitionLinkClick(event, navigate, `/produk/${product?.slug || ""}`, {
+            slug: product?.slug,
+            iconSelector: ".product-tile-icon",
+            titleSelector: ".product-tile-nameText",
+          });
+        }}
       >
         <div ref={disableTilt ? null : tiltRef} className="product-tile-tiltWrap">
           {useFlipCard ? (

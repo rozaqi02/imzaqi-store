@@ -101,7 +101,7 @@ function buildRows(pool, config) {
   });
 }
 
-function CatalogTile({ product, eager = false }) {
+function CatalogTile({ product }) {
   if (!product?.icon_url) return null;
   return (
     <article className="hx-catalog-tile" aria-hidden="true">
@@ -109,9 +109,9 @@ function CatalogTile({ product, eager = false }) {
         <img
           src={product.icon_url}
           alt=""
-          loading={eager ? "eager" : "lazy"}
+          loading="eager"
           decoding="async"
-          fetchPriority={eager ? "high" : "low"}
+          fetchPriority="low"
           draggable={false}
         />
       </div>
@@ -125,6 +125,10 @@ export default function HeroCatalogBackdrop({ products = BACKDROP_PRODUCTS } = {
   const [viewportHeight, setViewportHeight] = useState(() =>
     typeof window === "undefined" ? 900 : window.innerHeight
   );
+  const lastSizeRef = useRef({
+    width: typeof window === "undefined" ? 1200 : window.innerWidth,
+    height: typeof window === "undefined" ? 900 : window.innerHeight,
+  });
   const config = useMemo(
     () => getBackdropConfig(caps, isNarrowViewport, viewportHeight),
     [isNarrowViewport, viewportHeight, caps.isReducedMotion, caps.saveData, caps.lowMemory]
@@ -135,7 +139,17 @@ export default function HeroCatalogBackdrop({ products = BACKDROP_PRODUCTS } = {
     let frame = 0;
     const handleResize = () => {
       cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => setViewportHeight(window.innerHeight));
+      frame = requestAnimationFrame(() => {
+        const nextWidth = window.innerWidth;
+        const nextHeight = window.innerHeight;
+        const prev = lastSizeRef.current;
+        // Ignore small vertical height deltas caused by mobile URL bar show/hide while scrolling.
+        const widthChanged = Math.abs(nextWidth - prev.width) > 4;
+        const majorHeightChanged = Math.abs(nextHeight - prev.height) > 160;
+        if (!widthChanged && !majorHeightChanged) return;
+        lastSizeRef.current = { width: nextWidth, height: nextHeight };
+        setViewportHeight(nextHeight);
+      });
     };
     window.addEventListener("resize", handleResize, { passive: true });
     return () => {
@@ -163,7 +177,7 @@ export default function HeroCatalogBackdrop({ products = BACKDROP_PRODUCTS } = {
       ([entry]) => {
         root.classList.toggle("is-paused", !entry?.isIntersecting || document.hidden);
       },
-      { threshold: 0.08, rootMargin: "40px 0px" }
+      { threshold: 0, rootMargin: "160px 0px" }
     );
 
     observer.observe(hero);
@@ -204,7 +218,6 @@ export default function HeroCatalogBackdrop({ products = BACKDROP_PRODUCTS } = {
                 <CatalogTile
                   key={`${row.id}-a-${product.id}-${idx}`}
                   product={product}
-                  eager={row.id < 2 && idx < 4}
                 />
               ))}
               {!config.motionOff ? (
@@ -212,7 +225,6 @@ export default function HeroCatalogBackdrop({ products = BACKDROP_PRODUCTS } = {
                   <CatalogTile
                     key={`${row.id}-b-${product.id}-${idx}`}
                     product={product}
-                    eager={false}
                   />
                 ))
               ) : null}

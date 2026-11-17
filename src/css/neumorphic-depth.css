@@ -34,7 +34,6 @@
 .pay-freePanelBadge,
 .pay-emailState,
 .pay-noteState,
-.pay-shell-kicker,
 .st-statePill,
 .st-copyNoteBtn,
 .st-pasteBtn,
@@ -56,7 +55,7 @@
 .nf-linkCard .nf-icon,
 .layout-toggles button:not(.active),
 .layout-toggles .tab-btn:not(.active) {
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.16)) !important;
+  border: 1px solid var(--brand-line, rgba(0, 158, 96, 0.16)) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
     var(--skeu-control-bg, var(--uni-neo-control, rgba(20, 34, 64, 0.92))) !important;
@@ -224,7 +223,7 @@ html[data-theme="light"] .detail-page-v3 .pdx-accountStrip-chip {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -2px 0 rgba(100, 130, 150, 0.16),
-    4px 6px 12px rgba(60, 100, 120, 0.1),
+    0 5px 12px rgba(60, 100, 120, 0.1),
     0 0 0 1px color-mix(in srgb, var(--chip-color, var(--accent)) 18%, transparent) !important;
   color: var(--chip-color, var(--accent)) !important;
 }
@@ -446,7 +445,7 @@ html[data-theme="light"] .product-typeBadge {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -2px 0 rgba(120, 150, 165, 0.22),
-    4px 6px 12px rgba(60, 100, 120, 0.1),
+    0 4px 10px rgba(60, 100, 120, 0.1),
     0 0 0 1px color-mix(in srgb, var(--type-color, var(--accent)) 22%, transparent) !important;
 }
 
@@ -454,19 +453,19 @@ html[data-theme="light"] .product-lowStockBadge {
   color: #9a5b00 !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
-    linear-gradient(165deg, #fff3d6, #ffe8b0) !important;
+    linear-gradient(180deg, #fff3d6, #ffe8b0) !important;
   border-color: rgba(180, 120, 20, 0.28) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -2px 0 rgba(180, 130, 40, 0.2),
-    4px 6px 12px rgba(160, 100, 20, 0.1) !important;
+    0 4px 10px rgba(160, 100, 20, 0.1) !important;
 }
 
 html[data-theme="light"] .product-lowStockBadge.out {
   color: #b91c1c !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
-    linear-gradient(165deg, #ffe4e8, #ffd0d6) !important;
+    linear-gradient(180deg, #ffe4e8, #ffd0d6) !important;
   border-color: rgba(185, 28, 28, 0.28) !important;
 }
 
@@ -474,44 +473,44 @@ html[data-theme="light"] .product-tile-rankBadge--1 {
   color: #8b6200 !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
-    linear-gradient(155deg, #ffe9a0, #ffd060) !important;
+    linear-gradient(180deg, #ffe9a0, #ffd060) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     inset 0 -2px 0 rgba(180, 120, 20, 0.25),
-    4px 6px 12px rgba(200, 140, 20, 0.16) !important;
+    0 4px 10px rgba(200, 140, 20, 0.16) !important;
 }
 
 html[data-theme="light"] .product-tile-rankBadge--2 {
   color: #4a626e !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 35%),
-    linear-gradient(155deg, #f0f4f7, #d5dee4) !important;
+    linear-gradient(180deg, #f0f4f7, #d5dee4) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -2px 0 rgba(120, 140, 150, 0.22),
-    4px 6px 12px rgba(80, 100, 120, 0.1) !important;
+    0 4px 10px rgba(80, 100, 120, 0.1) !important;
 }
 
 html[data-theme="light"] .product-tile-rankBadge--3 {
   color: #804310 !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
-    linear-gradient(155deg, #fce8d6, #f0c9a0) !important;
+    linear-gradient(180deg, #fce8d6, #f0c9a0) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     inset 0 -2px 0 rgba(160, 90, 30, 0.22),
-    4px 6px 12px rgba(160, 90, 30, 0.12) !important;
+    0 4px 10px rgba(160, 90, 30, 0.12) !important;
 }
 
 html[data-theme="light"] .product-tile-rankBadge--4 {
   color: #006b74 !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 35%),
-    linear-gradient(155deg, #d8f7f4, #a8ebe4) !important;
+    linear-gradient(180deg, #d8f7f4, #a8ebe4) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
     inset 0 -2px 0 rgba(0, 120, 120, 0.18),
-    4px 6px 12px rgba(0, 140, 140, 0.12) !important;
+    0 4px 10px rgba(0, 140, 140, 0.12) !important;
 }
 
 html[data-theme="light"] .st-progressBar {
@@ -766,19 +765,10 @@ html[data-theme="light"] .rv-card {
   background: transparent;
 }
 
-/* Home how-step badges */
-.home-howCard-step,
+/* Home how-step badges keep crisp emerald surface & bright white text (see home-polish.css) */
 .home-sectionBadge,
 .home-kicker {
   /* kicker is text - only step */
-}
-
-.home-howCard-step {
-  border: 1px solid var(--brand-line) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
-    var(--skeu-control-bg) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
 }
 
 /* Social / trust strips */
@@ -832,8 +822,7 @@ html[data-theme="light"] .catalog-quickChip:not(.active):not(.catalog-quickChip-
 html[data-theme="light"] .catalog-filterClear,
 html[data-theme="light"] .faq-searchClear,
 html[data-theme="light"] .rv-card,
-html[data-theme="light"] .testi-filterChip:not(.active),
-html[data-theme="light"] .home-howCard-step {
+html[data-theme="light"] .testi-filterChip:not(.active) {
   color: var(--brand-text, #123744) !important;
   border-color: rgba(13, 124, 144, 0.14) !important;
 }
@@ -857,7 +846,6 @@ html[data-theme="light"] .faq-chipCount {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-.pay-shell-kicker,
 .pay-statePill:not(.live),
 .pay-noteState:not(.warn):not(.ok),
 .pay-emailState:not(.warn):not(.ok),
@@ -923,7 +911,6 @@ html[data-theme="light"] .faq-chipCount {
   box-shadow: var(--skeu-control-shadow) !important;
 }
 
-html[data-theme="light"] .pay-shell-kicker,
 html[data-theme="light"] .pay-statePill:not(.live),
 html[data-theme="light"] .pay-orderPromo,
 html[data-theme="light"] .pay-orderItem {
@@ -1072,8 +1059,7 @@ html[data-theme="light"] .floating-order-btn {
 .adm-navItemIcon,
 .adm-footBtn:not(.adm-footBtn--danger),
 .adm-sidebarLogo,
-.admin-loginBadge,
-.admin-loginSignal {
+.admin-loginBadge {
   border: 1px solid var(--brand-line) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0) 30%),
@@ -1150,45 +1136,45 @@ html[data-theme="light"] .adm-statPill,
 html[data-theme="light"] .adm-navItemIcon,
 html[data-theme="light"] .adm-footBtn:not(.adm-footBtn--danger),
 html[data-theme="light"] .adm-sidebarLogo {
-  border-color: rgba(13, 124, 144, 0.18) !important;
+  border-color: rgba(0, 120, 80, 0.18) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0) 34%),
-    linear-gradient(165deg, #eef8fb, #e0f2f6) !important;
+    linear-gradient(165deg, #f3faf6, #e6f4ec) !important;
   box-shadow:
-    0 3px 8px rgba(40, 94, 117, 0.1),
+    0 3px 8px rgba(15, 42, 32, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1) !important;
-  color: #0d7a88 !important;
+  color: #008250 !important;
 }
 
 html[data-theme="light"] .adm-navItem {
-  color: #1a4554 !important;
+  color: #1e293b !important;
 }
 
 html[data-theme="light"] .adm-navItem.is-active {
-  border-color: rgba(0, 138, 148, 0.28) !important;
+  border-color: rgba(0, 158, 96, 0.28) !important;
   background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.75), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.22), rgba(0, 194, 208, 0.12)) !important;
-  color: #053840 !important;
+    linear-gradient(180deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0) 36%),
+    linear-gradient(165deg, rgba(0, 158, 96, 0.18), rgba(0, 158, 96, 0.08)) !important;
+  color: #064e3b !important;
   box-shadow:
-    0 4px 12px rgba(0, 138, 148, 0.1),
+    0 4px 12px rgba(0, 158, 96, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.85) !important;
 }
 
 html[data-theme="light"] .adm-navItem.is-active .adm-navItemIcon {
-  color: #056b76 !important;
-  border-color: rgba(0, 138, 148, 0.28) !important;
+  color: #007043 !important;
+  border-color: rgba(0, 158, 96, 0.28) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.14)) !important;
+    linear-gradient(165deg, rgba(0, 158, 96, 0.22), rgba(0, 158, 96, 0.1)) !important;
 }
 
 html[data-theme="light"] .adm-statPill strong {
-  color: #0f3d4a !important;
+  color: #0f172a !important;
 }
 
 html[data-theme="light"] .adm-footBtn:not(.adm-footBtn--danger) {
-  color: #1a4a58 !important;
+  color: #1e293b !important;
 }
 
 html[data-theme="light"] .adm-footBtn--danger {
@@ -1387,7 +1373,6 @@ html[data-theme="light"] .admin-orderListItem {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-.home-page .home-howCard-step,
 .home-page .home-howCard-icon {
   border: 1px solid var(--brand-line) !important;
   background:
@@ -1601,7 +1586,6 @@ html[data-theme="light"] .catalog-page .catalog-metric {
   border-color: var(--brand-line) !important;
 }
 
-.catalog-page .catalog-contentBar,
 .catalog-page .catalog-filterHead,
 .catalog-page .catalog-sheetFoot {
   border-color: var(--brand-line) !important;
@@ -1688,15 +1672,15 @@ html[data-theme="light"] .catalog-page .catalog-metric {
 }
 
 html[data-theme="light"] .catalog-page .catalog-status.ok {
-  border-color: rgba(0, 138, 148, 0.32) !important;
+  border-color: rgba(0, 158, 96, 0.32) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.12)) !important;
+    linear-gradient(165deg, rgba(0, 158, 96, 0.18), rgba(0, 158, 96, 0.08)) !important;
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(0, 100, 110, 0.12),
-    0 3px 8px rgba(0, 138, 148, 0.14) !important;
-  color: var(--accent, #067b88) !important;
+    inset 0 -1px 0 rgba(0, 100, 60, 0.12),
+    0 3px 8px rgba(0, 158, 96, 0.12) !important;
+  color: var(--accent, #067a4c) !important;
 }
 
 html[data-theme="light"] .catalog-page .catalog-status.hot {
@@ -1715,8 +1699,8 @@ html[data-theme="light"] .catalog-page .catalog-status.soldout {
 }
 
 html[data-theme="light"] .catalog-page .catalog-status.muted {
-  color: #5a7580 !important;
-  border-color: rgba(0, 138, 148, 0.14) !important;
+  color: #475569 !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
 }
 
 .catalog-page .catalog-searchHistoryClear,
@@ -1768,7 +1752,7 @@ html[data-theme="light"] .catalog-page .catalog-status.muted {
       0 8px 20px rgba(0, 0, 0, 0.24),
       inset 0 2px 0 rgba(255, 255, 255, 0.14),
       inset 0 -3px 0 rgba(0, 0, 0, 0.3),
-      0 0 0 1px rgba(0, 194, 208, 0.1) !important;
+      0 0 0 1px rgba(0, 158, 96, 0.12) !important;
   }
 }
 
@@ -1776,7 +1760,6 @@ html[data-theme="light"] .catalog-page .catalog-card,
 html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2,
 html[data-theme="light"] .catalog-page .catalog-cardSkeleton,
 html[data-theme="light"] .catalog-page .catalog-emptyResult,
-html[data-theme="light"] .catalog-page .catalog-contentBar,
 html[data-theme="light"] .catalog-page .catalog-filterHead,
 html[data-theme="light"] .catalog-page .catalog-sheetFoot,
 html[data-theme="light"] .catalog-page .catalog-filter.is-sheet .catalog-filterSection,
@@ -1794,7 +1777,6 @@ html[data-theme="light"] .catalog-page .catalog-emptyResult {
   box-shadow: var(--skeu-panel-shadow) !important;
 }
 
-html[data-theme="light"] .catalog-page .catalog-contentBar,
 html[data-theme="light"] .catalog-page .catalog-filterHead,
 html[data-theme="light"] .catalog-page .catalog-sheetFoot,
 html[data-theme="light"] .catalog-page .catalog-filter.is-sheet .catalog-filterSection,
@@ -1821,7 +1803,7 @@ html[data-theme="light"] .catalog-page .catalog-activeReset {
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 1),
     inset 0 -1px 0 rgba(180, 40, 70, 0.12),
-    4px 6px 12px rgba(200, 40, 70, 0.1) !important;
+    0 4px 10px rgba(200, 40, 70, 0.1) !important;
   color: #8f2c42 !important;
 }
 
@@ -1851,9 +1833,8 @@ html[data-theme="light"] .header-cart .pill {
   transform: scale(0.97) translateY(1px) !important;
   border-color: rgba(0, 214, 180, 0.28) !important;
   box-shadow:
-    inset 6px 8px 16px rgba(0, 0, 0, 0.28),
-    inset -3px -3px 10px rgba(255, 255, 255, 0.06),
-    inset 0 2px 0 rgba(0, 0, 0, 0.2),
+    inset 0 4px 12px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(0, 0, 0, 0.18),
     0 1px 2px rgba(0, 0, 0, 0.12) !important;
   transition:
     transform 0.12s ease,
@@ -1863,12 +1844,11 @@ html[data-theme="light"] .header-cart .pill {
 
 html[data-theme="light"] .catalog-page .catalog-card:active,
 html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
-  border-color: rgba(0, 138, 148, 0.28) !important;
+  border-color: rgba(0, 158, 96, 0.28) !important;
   box-shadow:
-    inset 5px 7px 14px rgba(40, 90, 110, 0.16),
-    inset -2px -2px 8px rgba(255, 255, 255, 0.85),
-    inset 0 2px 0 rgba(24, 96, 122, 0.08),
-    0 1px 2px rgba(40, 94, 117, 0.08) !important;
+    inset 0 4px 10px rgba(10, 42, 30, 0.14),
+    inset 0 1px 0 rgba(10, 42, 30, 0.08),
+    0 1px 2px rgba(10, 42, 30, 0.08) !important;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1927,9 +1907,8 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 [data-motion="off"] .catalog-page .catalog-card.catalog-cardV2:active {
   transform: scale(0.97) translateY(1px) !important;
   box-shadow:
-    inset 6px 8px 16px rgba(0, 0, 0, 0.28),
-    inset -3px -3px 10px rgba(255, 255, 255, 0.06),
-    inset 0 2px 0 rgba(0, 0, 0, 0.2),
+    inset 0 4px 12px rgba(0, 0, 0, 0.28),
+    inset 0 1px 0 rgba(0, 0, 0, 0.18),
     0 1px 2px rgba(0, 0, 0, 0.12) !important;
 }
 
@@ -1938,9 +1917,8 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   .catalog-page .catalog-card.catalog-cardV2:active {
     transform: scale(0.97) translateY(1px) !important;
     box-shadow:
-      inset 6px 8px 16px rgba(0, 0, 0, 0.28),
-      inset -3px -3px 10px rgba(255, 255, 255, 0.06),
-      inset 0 2px 0 rgba(0, 0, 0, 0.2),
+      inset 0 4px 12px rgba(0, 0, 0, 0.28),
+      inset 0 1px 0 rgba(0, 0, 0, 0.18),
       0 1px 2px rgba(0, 0, 0, 0.12) !important;
   }
 }
@@ -2000,8 +1978,8 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   }
 
   .home-page .home-popularList .product-tile {
-    content-visibility: auto;
-    contain: layout paint style;
+    content-visibility: visible;
+    contain: layout style;
   }
 
   .home-page .home-popularList .product-tile::after,
@@ -2223,12 +2201,12 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
   min-height: 28px !important;
   padding: 4px 12px !important;
   border-radius: 8px !important;
-  border: 1px solid var(--brand-line, rgba(0, 194, 208, 0.18)) !important;
+  border: 1px solid var(--brand-line, rgba(0, 158, 96, 0.18)) !important;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.14), rgba(255, 255, 255, 0) 30%),
     var(--skeu-control-bg, rgba(255, 255, 255, 0.05)) !important;
   box-shadow: var(--skeu-control-shadow, inset 0 1px 0 rgba(255, 255, 255, 0.15)) !important;
-  color: var(--brand-text, #8ae7ff) !important;
+  color: var(--brand-text, #d1fae5) !important;
   font-size: 11px !important;
   font-weight: 800 !important;
   letter-spacing: 0.02em !important;
@@ -2376,57 +2354,60 @@ html[data-theme="light"] .catalog-page .catalog-card.catalog-cardV2:active {
 }
 
 
-/* Tactile Micro-Interactions: Physics-based button depression */
-.btn:active,
+/* Tactile Micro-Interactions: Physics-based extruded -> recessed button depression */
+.btn:not(.btn-ghost):not(.btn-danger):active,
 .btn-primary:active,
+.hx-btn-primary:active,
+.hero-cta-primary:active {
+  transform: translateY(1.5px) scale(0.978) !important;
+  background: var(--imzaqi-btn-face-active, var(--imzaqi-btn-face)) !important;
+  box-shadow: var(--imzaqi-btn-shadow-active) !important;
+  transition: transform 80ms cubic-bezier(0.2, 0, 0, 1), box-shadow 80ms ease, background 80ms ease !important;
+}
+
 .btn-ghost:active,
 .btn-secondary:active,
-.hx-btn-primary:active,
 .hx-btn-secondary:active,
-.hero-cta-primary:active,
 .hero-cta-secondary:active,
 .catalog-viewBtn:active,
 .tab-btn:active,
-.toggle-btn:active {
-  transform: scale(0.975) translateY(1px) !important;
-  box-shadow:
-    inset 0 2px 6px rgba(0, 0, 0, 0.4),
-    0 2px 4px rgba(0, 0, 0, 0.15) !important;
-  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+.toggle-btn:active,
+.nf-linkCard:active,
+.header .header-cart:active,
+.header .header-iconAction:active {
+  transform: translateY(1.5px) scale(0.985) !important;
+  box-shadow: var(--skeu-inset-shadow) !important;
+  transition: transform 80ms cubic-bezier(0.2, 0, 0, 1), box-shadow 80ms ease !important;
 }
 
-html[data-theme="light"] .btn:active,
-html[data-theme="light"] .btn-primary:active,
-html[data-theme="light"] .hx-btn-primary:active,
-html[data-theme="light"] .hero-cta-primary:active {
-  box-shadow:
-    inset 0 2px 6px rgba(0, 80, 50, 0.35),
-    0 2px 4px rgba(0, 0, 0, 0.08) !important;
-}
-
-/* Tactile press response on chips, tabs, and interactive variant cards */
+/* Tactile press response on chips, tabs, bottom nav, and interactive variant cards */
 .catalog-chip:active,
+.catalog-quickChip:active,
 .pdx-filterChip:active,
 .pdx-chip:active,
 .pdx-variantCard:active,
+.pdx-packCard:active:not(.is-out),
 .admin-chip:active,
 .admin-chipRow button:active,
 .st-tab:active,
-.faq-categoryChip:active {
-  transform: scale(0.98) translateY(1px) !important;
+.faq-categoryChip:active,
+.bottom-nav-item:active {
+  transform: translateY(1.5px) scale(0.985) !important;
   box-shadow: var(--skeu-inset-shadow) !important;
-  transition: transform 0.08s ease, box-shadow 0.08s ease !important;
+  transition: transform 80ms cubic-bezier(0.2, 0, 0, 1), box-shadow 80ms ease !important;
 }
 
 html[data-theme="light"] .catalog-chip:active,
+html[data-theme="light"] .catalog-quickChip:active,
 html[data-theme="light"] .pdx-filterChip:active,
 html[data-theme="light"] .pdx-chip:active,
 html[data-theme="light"] .pdx-variantCard:active,
+html[data-theme="light"] .pdx-packCard:active:not(.is-out),
 html[data-theme="light"] .admin-chip:active,
 html[data-theme="light"] .st-tab:active,
 html[data-theme="light"] .faq-categoryChip:active {
   box-shadow:
-    inset 0 2px 4px rgba(67, 111, 129, 0.2),
+    inset 0 2px 5px rgba(15, 42, 32, 0.14),
     0 1px 2px rgba(0, 0, 0, 0.04) !important;
 }
 
@@ -2483,7 +2464,6 @@ html[data-theme] body :is(
   .np-popup-card,
   .rv-card,
   .social-proof-card,
-  .catalog-contentBar,
   .catalog-filterShell,
   .catalog-filter.is-sheet,
   .catalog-card,
@@ -2521,7 +2501,6 @@ html[data-theme] body :is(
   .oh-empty,
   .help-hero,
   .help-sidebar,
-  .help-list,
   .help-item,
   .help-howto,
   .help-step,
@@ -2642,7 +2621,6 @@ html[data-theme] body :is(
   .pay-emailState,
   .pay-qrisTimer,
   .pay-qrisRefreshBtn,
-  .pay-qrisGuideStep,
   .pay-confirmCloseBtn,
   .pay-successClose,
   .pay-confirmModalHeaderIcon,
@@ -2976,7 +2954,6 @@ html[data-theme] body :is(
   .help-button--secondary,
   .help-popular button,
   .help-categories button,
-  .help-itemHead,
   .reviews-button--secondary,
   .reviews-filters button,
   .reviews-view button,
@@ -3024,7 +3001,7 @@ html[data-theme] body :is(
     .help-item
   ) {
     box-shadow:
-      0 5px 12px rgba(67, 111, 129, 0.12),
+      0 5px 14px rgba(15, 42, 32, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.92) !important;
   }
 }

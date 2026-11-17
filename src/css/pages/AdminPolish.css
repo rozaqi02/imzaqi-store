@@ -467,7 +467,6 @@ button.admin-loginSubmit:active:not(:disabled) {
 .admin-page .admin-topbar-current,
 .admin-page .admin-alert,
 .admin-page .admin-stockAlertBanner,
-.admin-loginSignal,
 .admin-loginBadge,
 .admin-page ~ .modal-backdrop .modal-close {
   background: var(--adm-surface-soft, var(--skeu-control-bg)) !important;

@@ -32,7 +32,12 @@ const PATH_TO_PAGE = {
   "/produk": "products",
   "/faq": "faq",
   "/testimoni": "testimonials",
+  "/promosi": "promosi",
+  "/tentang": "about",
   "/status": "status",
+  "/checkout": "checkout",
+  "/bayar": "pay",
+  "/admin": "adminLogin",
 };
 
 export function prefetchRoute(path) {
@@ -44,5 +49,5 @@ export function prefetchRoute(path) {
 }
 
 export function prefetchPrimaryRoutes() {
-  ["/produk", "/faq", "/testimoni", "/status"].forEach(prefetchRoute);
+  ["/produk", "/faq", "/testimoni", "/status", "/checkout"].forEach(prefetchRoute);
 }

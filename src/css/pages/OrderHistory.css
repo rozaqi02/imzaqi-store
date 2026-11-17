@@ -31,7 +31,7 @@
   border: 1px solid var(--uni-line);
   background: var(--uni-neo-control);
   box-shadow: var(--uni-neo-control-shadow);
-  color: #9fe0ff;
+  color: var(--accent, #00e694);
 }
 
 .oh-kicker {
@@ -66,7 +66,7 @@
   width: 8px;
   height: 8px;
   border-radius: 999px;
-  background: rgba(29, 131, 255, 0.6);
+  background: rgba(0, 158, 96, 0.65);
   animation: oh-pulse 1.2s ease-in-out infinite;
 }
 
@@ -637,4 +637,11 @@ html[data-theme="dark"] .oh-cardActions {
   border: 1px solid var(--imzaqi-btn-border) !important;
   box-shadow: var(--imzaqi-btn-shadow) !important;
   border-radius: 14px !important;
+}
+
+
+@media (max-width: 860px) {
+  .oh-shell {
+    padding-bottom: calc(var(--site-bottom-nav-offset, 84px) + 36px);
+  }
 }
