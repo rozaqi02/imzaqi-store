@@ -28,19 +28,19 @@ export default function TestimonialsPane({
 
       <div className="admin-panel-body admin-panel-body--scroll">
         <div
-          className="admin-notice admin-notice--warning"
+          className="admin-notice admin-notice--neutral"
           style={{
             marginBottom: 14,
             padding: "10px 14px",
             borderRadius: 8,
-            background: "rgba(234, 179, 8, 0.12)",
-            border: "1px solid rgba(234, 179, 8, 0.35)",
+            background: "var(--adm-surface-soft)",
+            border: "1px solid var(--adm-border-strong)",
             display: "flex",
             gap: 10,
             alignItems: "flex-start",
           }}
         >
-          <AlertTriangle size={18} style={{ color: "#eab308", flexShrink: 0, marginTop: 2 }} />
+          <AlertTriangle size={18} style={{ color: "var(--adm-accent, #009e60)", flexShrink: 0, marginTop: 2 }} />
           <div style={{ fontSize: "13px", lineHeight: "1.4" }}>
             <strong>Privasi Pelanggan:</strong> Sensor email, nomor HP, dan data sensitif sebelum diunggah.
           </div>
@@ -73,8 +73,8 @@ export default function TestimonialsPane({
             style={{
               width: "100%",
               marginTop: 4,
-              color: privacyConfirmed ? "inherit" : "#eab308",
-              fontWeight: 500,
+              color: privacyConfirmed ? "inherit" : "var(--adm-text)",
+              fontWeight: privacyConfirmed ? 500 : 700,
             }}
           >
             <input

@@ -1,0 +1,1763 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   AdminLaravelShell.css
+   Classic Laravel / Filament / CodeIgniter-inspired Admin Dashboard Shell
+   Strict Palette: Black (#0a0a0a), White & Neutral Greys, Brand Green (#009e60)
+   Sidebar: Solid Black | Scrollbars: Neutral Grey | Mobile: Native Vertical Scroll
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* 1. Root Admin Palette Tokens (Light & Dark strictly Black / White / Brand Green) */
+html body.is-admin-app .admin-page.admin-page--app,
+body.is-admin-app {
+  --brand: #009e60;
+  --brand-2: #00a86b;
+  --brand-ink: #0a0a0a;
+  --brand-text: #0a0a0a;
+  --brand-muted: #525252;
+  --brand-line: #e5e5e5;
+  --brand-icon: #009e60;
+  --brand-glow: rgba(0, 158, 96, 0.14);
+
+  --adm-canvas: #f5f5f5;
+  --adm-surface: #ffffff;
+  --adm-surface-soft: #fafafa;
+  --adm-surface-inset: #f0f0f0;
+  --adm-head-bg: #fafafa;
+  --adm-border: #e5e5e5;
+  --adm-border-strong: #d4d4d4;
+  --adm-line: #e5e5e5;
+
+  --adm-text: #0a0a0a;
+  --adm-text-2: #262626;
+  --adm-text-3: #525252;
+  --adm-muted: #525252;
+  --adm-faint: #737373;
+
+  --adm-accent: #009e60;
+  --adm-accent-strong: #007a49;
+  --adm-accent-text: #007a49;
+  --adm-accent-soft: rgba(0, 158, 96, 0.12);
+  --adm-accent-mid: rgba(0, 158, 96, 0.22);
+
+  --adm-warn: #009e60;
+  --adm-danger: #0a0a0a;
+  --adm-info: #525252;
+
+  --adm-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --adm-shadow-soft: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --adm-shadow-inset: inset 0 1px 2px rgba(0, 0, 0, 0.05);
+  --adm-radius: 10px;
+  --adm-radius-lg: 12px;
+
+  --card-bg: #ffffff;
+  --text: #0a0a0a;
+  --muted: #525252;
+  --line: #e5e5e5;
+
+  --skeu-panel-bg: #ffffff;
+  --skeu-control-bg: #fafafa;
+  --skeu-inset-bg: #f0f0f0;
+  --skeu-panel-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --skeu-control-shadow: none;
+  --skeu-inset-shadow: none;
+  --bg0: #f5f5f5;
+  --bg1: #ffffff;
+  --bg2: #fafafa;
+
+  /* Off-white / Light Grey Sidebar Tokens (Light Mode) */
+  --adm-side-bg: #f4f4f5;
+  --adm-side-foot-bg: #ececef;
+  --adm-side-surface: #ffffff;
+  --adm-side-hover: #e4e4e7;
+  --adm-side-border: #e4e4e7;
+  --adm-side-border-strong: #d4d4d8;
+  --adm-side-ink: #0a0a0a;
+  --adm-side-muted: #52525b;
+  --adm-side-faint: #71717a;
+  --adm-side-nav-ink: #27272a;
+  --adm-side-active-bg: rgba(0, 158, 96, 0.12);
+  --adm-side-active-border: rgba(0, 158, 96, 0.38);
+  --adm-side-active-ink: #007a49;
+  --adm-side-stat-accent: #007a49;
+  --adm-side-badge-bg: #e4e4e7;
+  --adm-side-badge-ink: #18181b;
+  --adm-side-badge-border: #d4d4d8;
+  --adm-side-danger-hover-bg: #0a0a0a;
+  --adm-side-danger-hover-ink: #ffffff;
+
+  /* Neutral Grey Scrollbar Tokens */
+  --adm-scroll-thumb: #9ca3af;
+  --adm-scroll-thumb-hover: #6b7280;
+  --adm-side-scroll-thumb: #a1a1aa;
+  --adm-side-scroll-thumb-hover: #71717a;
+
+  background: var(--adm-canvas) !important;
+  color: var(--adm-text) !important;
+}
+
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app,
+html[data-theme="dark"] body.is-admin-app {
+  --brand: #009e60;
+  --brand-2: #34d399;
+  --brand-ink: #fafafa;
+  --brand-text: #fafafa;
+  --brand-muted: #a3a3a3;
+  --brand-line: rgba(255, 255, 255, 0.12);
+  --brand-icon: #34d399;
+  --brand-glow: rgba(0, 158, 96, 0.22);
+
+  --adm-canvas: #0f0f0f;
+  --adm-surface: #161616;
+  --adm-surface-soft: #1d1d1d;
+  --adm-surface-inset: #101010;
+  --adm-head-bg: #1a1a1a;
+  --adm-border: rgba(255, 255, 255, 0.11);
+  --adm-border-strong: rgba(255, 255, 255, 0.2);
+  --adm-line: rgba(255, 255, 255, 0.11);
+
+  --adm-text: #fafafa;
+  --adm-text-2: #d4d4d4;
+  --adm-text-3: #a3a3a3;
+  --adm-muted: #a3a3a3;
+  --adm-faint: #737373;
+
+  --adm-accent: #009e60;
+  --adm-accent-strong: #10b981;
+  --adm-accent-text: #34d399;
+  --adm-accent-soft: rgba(0, 158, 96, 0.18);
+  --adm-accent-mid: rgba(0, 158, 96, 0.28);
+
+  --adm-warn: #34d399;
+  --adm-danger: #fafafa;
+  --adm-info: #a3a3a3;
+
+  --adm-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --adm-shadow-soft: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --adm-shadow-inset: inset 0 1px 3px rgba(0, 0, 0, 0.45);
+
+  --card-bg: #161616;
+  --text: #fafafa;
+  --muted: #a3a3a3;
+  --line: rgba(255, 255, 255, 0.12);
+
+  --skeu-panel-bg: #161616;
+  --skeu-control-bg: #1d1d1d;
+  --skeu-inset-bg: #101010;
+  --skeu-panel-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --skeu-control-shadow: none;
+  --skeu-inset-shadow: none;
+  --bg0: #0f0f0f;
+  --bg1: #161616;
+  --bg2: #1d1d1d;
+
+  /* Solid Black Sidebar Tokens (Dark Mode) */
+  --adm-side-bg: #0a0a0a;
+  --adm-side-foot-bg: #080808;
+  --adm-side-surface: #141414;
+  --adm-side-hover: #1c1c1c;
+  --adm-side-border: #222222;
+  --adm-side-border-strong: #3f3f46;
+  --adm-side-ink: #ffffff;
+  --adm-side-muted: #a3a3a3;
+  --adm-side-faint: #737373;
+  --adm-side-nav-ink: #d4d4d8;
+  --adm-side-active-bg: rgba(0, 158, 96, 0.2);
+  --adm-side-active-border: rgba(0, 158, 96, 0.5);
+  --adm-side-active-ink: #ffffff;
+  --adm-side-stat-accent: #34d399;
+  --adm-side-badge-bg: #27272a;
+  --adm-side-badge-ink: #fafafa;
+  --adm-side-badge-border: #3f3f46;
+  --adm-side-danger-hover-bg: #ffffff;
+  --adm-side-danger-hover-ink: #0a0a0a;
+
+  --adm-scroll-thumb: #52525b;
+  --adm-scroll-thumb-hover: #71717a;
+  --adm-side-scroll-thumb: #52525b;
+  --adm-side-scroll-thumb-hover: #71717a;
+}
+
+/* Override selection & focus rings inside Admin (kill global.css blue focus/selection) */
+body.is-admin-app ::selection {
+  background: rgba(0, 158, 96, 0.25) !important;
+  color: inherit !important;
+}
+
+body.is-admin-app :focus-visible {
+  outline: 2px solid var(--adm-accent, #009e60) !important;
+  outline-offset: 2px !important;
+}
+
+/* 2. Neutral Grey Scrollbars across Admin Shell, Workspace, Modals & Black Sidebar */
+html:has(body.is-admin-app),
+body.is-admin-app,
+body.is-admin-app * {
+  scrollbar-width: thin !important;
+  scrollbar-color: var(--adm-scroll-thumb, #9ca3af) transparent !important;
+}
+
+html:has(body.is-admin-app)::-webkit-scrollbar,
+body.is-admin-app::-webkit-scrollbar,
+body.is-admin-app *::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+html:has(body.is-admin-app)::-webkit-scrollbar-track,
+body.is-admin-app::-webkit-scrollbar-track,
+body.is-admin-app *::-webkit-scrollbar-track {
+  background: transparent !important;
+}
+
+html:has(body.is-admin-app)::-webkit-scrollbar-thumb,
+body.is-admin-app::-webkit-scrollbar-thumb,
+body.is-admin-app *::-webkit-scrollbar-thumb {
+  background: var(--adm-scroll-thumb, #9ca3af) !important;
+  border-radius: 999px !important;
+  border: 2px solid transparent !important;
+  background-clip: content-box !important;
+}
+
+html:has(body.is-admin-app)::-webkit-scrollbar-thumb:hover,
+body.is-admin-app::-webkit-scrollbar-thumb:hover,
+body.is-admin-app *::-webkit-scrollbar-thumb:hover {
+  background: var(--adm-scroll-thumb-hover, #6b7280) !important;
+  background-clip: content-box !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar,
+.admin-page.admin-page--app .adm-sidebar * {
+  scrollbar-color: var(--adm-side-scroll-thumb, #52525b) transparent !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar::-webkit-scrollbar,
+.admin-page.admin-page--app .adm-sidebar *::-webkit-scrollbar {
+  width: 6px !important;
+  height: 6px !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar::-webkit-scrollbar-thumb,
+.admin-page.admin-page--app .adm-sidebar *::-webkit-scrollbar-thumb {
+  background: var(--adm-side-scroll-thumb, #52525b) !important;
+  border-radius: 999px !important;
+  border: 1px solid transparent !important;
+  background-clip: content-box !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar::-webkit-scrollbar-thumb:hover,
+.admin-page.admin-page--app .adm-sidebar *::-webkit-scrollbar-thumb:hover {
+  background: var(--adm-side-scroll-thumb-hover, #71717a) !important;
+  background-clip: content-box !important;
+}
+
+/* 3. Edge-to-Edge App Section & Shell Layout */
+html body.is-admin-app .admin-page.admin-page--app {
+  background: var(--adm-canvas) !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app > .admin-section,
+body.is-admin-app .admin-page.admin-page--app > .admin-section {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  height: 100% !important;
+  max-height: 100% !important;
+  background: var(--adm-canvas) !important;
+}
+
+.admin-page.admin-page--app .admin-shell {
+  display: grid !important;
+  grid-template-columns: 256px minmax(0, 1fr) !important;
+  gap: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: var(--adm-canvas) !important;
+  overflow: hidden !important;
+  transition: grid-template-columns 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.admin-page.admin-page--app .admin-shell.is-collapsed {
+  grid-template-columns: 74px minmax(0, 1fr) !important;
+}
+
+/* 4. Solid Black Left Sidebar (Laravel / Filament Style) */
+html body.is-admin-app .admin-page.admin-page--app .adm-sidebar {
+  display: flex !important;
+  flex-direction: column !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border: 0 !important;
+  border-right: 1px solid var(--adm-side-border) !important;
+  background: var(--adm-side-bg) !important;
+  background-image: none !important;
+  color: var(--adm-side-ink) !important;
+  box-shadow: none !important;
+  overflow: hidden !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarHead {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 10px !important;
+  min-height: 60px !important;
+  padding: 12px 14px !important;
+  border-bottom: 1px solid var(--adm-side-border) !important;
+  background: var(--adm-side-bg) !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar.is-collapsed .adm-sidebarHead {
+  justify-content: center !important;
+  padding: 12px 10px !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarBrandWrap {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  min-width: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarLogo {
+  width: 34px !important;
+  height: 34px !important;
+  flex-shrink: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 9px !important;
+  background: #009e60 !important;
+  background-image: none !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+  border: 1px solid rgba(255, 255, 255, 0.14) !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarBrand {
+  display: flex !important;
+  flex-direction: column !important;
+  min-width: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarBrand strong,
+.admin-page.admin-page--app .adm-sidebarGreeting {
+  margin: 0 !important;
+  font-size: 13.5px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.015em !important;
+  color: var(--adm-side-ink) !important;
+  line-height: 1.2 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarBrand span {
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  color: var(--adm-side-muted) !important;
+  line-height: 1.25 !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarCollapseBtn {
+  width: 30px !important;
+  height: 30px !important;
+  flex-shrink: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--adm-side-border) !important;
+  background: var(--adm-side-surface) !important;
+  color: var(--adm-side-muted) !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarCollapseBtn:hover {
+  background: var(--adm-side-hover) !important;
+  color: var(--adm-side-ink) !important;
+  border-color: var(--adm-side-border-strong) !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar.is-collapsed .adm-desktopToggle,
+.admin-page.admin-page--app .adm-mobileDrawerClose {
+  display: none !important;
+}
+
+/* Live Stats Strip inside Sidebar */
+.admin-page.admin-page--app .adm-sidebarStats {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 8px !important;
+  padding: 12px 14px !important;
+  border-bottom: 1px solid var(--adm-side-border) !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-statPill {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  background: var(--adm-side-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--adm-side-border) !important;
+  box-shadow: none !important;
+}
+
+.admin-page.admin-page--app .adm-statPill span {
+  font-size: 10.5px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.04em !important;
+  color: var(--adm-side-muted) !important;
+}
+
+.admin-page.admin-page--app .adm-statPill strong {
+  font-size: 14px !important;
+  font-weight: 800 !important;
+  color: var(--adm-side-ink) !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.admin-page.admin-page--app .adm-statPill:last-child strong {
+  color: var(--adm-side-stat-accent) !important;
+}
+
+/* Black Sidebar Navigation Groups */
+.admin-page.admin-page--app .adm-sidebarNav {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  padding: 12px 10px !important;
+  background: var(--adm-side-bg) !important;
+}
+
+.admin-page.admin-page--app .adm-navGroup + .adm-navGroup {
+  margin-top: 14px !important;
+}
+
+.admin-page.admin-page--app .adm-navGroupLabel {
+  padding: 0 10px 6px !important;
+  font-size: 10.5px !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.08em !important;
+  text-transform: uppercase !important;
+  color: var(--adm-side-faint) !important;
+}
+
+.admin-page.admin-page--app .adm-navGroupDivider {
+  height: 1px !important;
+  margin: 4px 10px 10px !important;
+  background: var(--adm-side-border) !important;
+}
+
+.admin-page.admin-page--app .adm-navGroupItems {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 3px !important;
+}
+
+.admin-page.admin-page--app .adm-navItem {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  width: 100% !important;
+  padding: 8px 10px !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  background: transparent !important;
+  background-image: none !important;
+  color: var(--adm-side-nav-ink) !important;
+  font-size: 13.5px !important;
+  font-weight: 500 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar.is-collapsed .adm-navItem {
+  justify-content: center !important;
+  padding: 10px 8px !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar.is-collapsed .adm-navItemCopy {
+  display: none !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-navItem:hover:not(.is-active),
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-navItem:hover:not(.is-active),
+html body.is-admin-app .admin-page.admin-page--app .adm-navItem:hover:not(.is-active) {
+  background: var(--adm-side-hover) !important;
+  background-image: none !important;
+  color: var(--adm-side-ink) !important;
+  border-color: var(--adm-side-border) !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-navItem.is-active,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-navItem.is-active,
+html body.is-admin-app .admin-page.admin-page--app .adm-navItem.is-active {
+  background: var(--adm-side-active-bg) !important;
+  background-image: none !important;
+  color: var(--adm-side-active-ink) !important;
+  border: 1px solid var(--adm-side-active-border) !important;
+  box-shadow: inset 3px 0 0 #009e60 !important;
+  font-weight: 700 !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-navItemIcon,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-navItemIcon,
+html body.is-admin-app .admin-page.admin-page--app .adm-navItemIcon {
+  position: relative !important;
+  width: 28px !important;
+  height: 28px !important;
+  flex-shrink: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 7px !important;
+  background: var(--adm-side-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--adm-side-border) !important;
+  color: var(--adm-side-muted) !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-navItem:hover:not(.is-active) .adm-navItemIcon,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-navItem:hover:not(.is-active) .adm-navItemIcon,
+html body.is-admin-app .admin-page.admin-page--app .adm-navItem:hover:not(.is-active) .adm-navItemIcon {
+  color: var(--adm-side-ink) !important;
+  border-color: var(--adm-side-border-strong) !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-navItem.is-active .adm-navItemIcon,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-navItem.is-active .adm-navItemIcon,
+html body.is-admin-app .admin-page.admin-page--app .adm-navItem.is-active .adm-navItemIcon {
+  background: #009e60 !important;
+  background-image: none !important;
+  border-color: #009e60 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.admin-page.admin-page--app .adm-navItemCopy {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-navItemLabel {
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  font-size: 13.5px !important;
+  line-height: 1.3 !important;
+}
+
+.admin-page.admin-page--app .adm-navItem.is-active .adm-navItemLabel {
+  font-weight: 700 !important;
+  color: var(--adm-side-active-ink) !important;
+}
+
+/* Right-aligned Badge Pills inside Black Sidebar (Strictly Brand Green or Neutral Grey) */
+.admin-page.admin-page--app .adm-navBadge {
+  flex-shrink: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 22px !important;
+  height: 20px !important;
+  padding: 0 7px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  font-weight: 700 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+.admin-page.admin-page--app .adm-navBadge--accent,
+.admin-page.admin-page--app .adm-navBadge--urgent {
+  background: #009e60 !important;
+  color: #ffffff !important;
+  border: 1px solid #05a867 !important;
+}
+
+.admin-page.admin-page--app .adm-navBadge--neutral,
+.admin-page.admin-page--app .adm-navBadge--info,
+.admin-page.admin-page--app .adm-navBadge--warn {
+  background: var(--adm-side-badge-bg) !important;
+  color: var(--adm-side-badge-ink) !important;
+  border: 1px solid var(--adm-side-badge-border) !important;
+}
+
+/* Sidebar Footer */
+.admin-page.admin-page--app .adm-sidebarFoot {
+  padding: 12px !important;
+  border-top: 1px solid var(--adm-side-border) !important;
+  background: var(--adm-side-foot-bg) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-profileCard {
+  display: flex !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 8px !important;
+  border-radius: 8px !important;
+  background: var(--adm-side-surface) !important;
+  border: 1px solid var(--adm-side-border) !important;
+}
+
+.admin-page.admin-page--app .adm-profileAvatar {
+  width: 32px !important;
+  height: 32px !important;
+  flex-shrink: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 8px !important;
+  background: #009e60 !important;
+  color: #ffffff !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  border: 1px solid rgba(0, 158, 96, 0.35) !important;
+}
+
+.admin-page.admin-page--app .adm-profileCopy {
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+.admin-page.admin-page--app .adm-profileCopy strong {
+  display: block !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  color: var(--adm-side-ink) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.admin-page.admin-page--app .adm-profileCopy span {
+  display: block !important;
+  font-size: 11px !important;
+  color: var(--adm-side-muted) !important;
+}
+
+.admin-page.admin-page--app .adm-sidebarFootActions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 6px !important;
+}
+
+.admin-page.admin-page--app .adm-sidebar.is-collapsed .adm-sidebarFootActions {
+  grid-template-columns: minmax(0, 1fr) !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn,
+html body.is-admin-app .admin-page.admin-page--app .adm-footBtn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+  height: 34px !important;
+  padding: 0 10px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--adm-side-border) !important;
+  background: var(--adm-side-surface) !important;
+  background-image: none !important;
+  color: var(--adm-side-ink) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: background-color 0.14s ease, color 0.14s ease, border-color 0.14s ease !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn:hover,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn:hover,
+html body.is-admin-app .admin-page.admin-page--app .adm-footBtn:hover {
+  background: var(--adm-side-hover) !important;
+  background-image: none !important;
+  border-color: var(--adm-side-border-strong) !important;
+  color: var(--adm-side-ink) !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn--danger,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn--danger,
+html body.is-admin-app .admin-page.admin-page--app .adm-footBtn--danger {
+  background: var(--adm-side-surface) !important;
+  background-image: none !important;
+  color: var(--adm-side-ink) !important;
+  border-color: var(--adm-side-border) !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn--danger:hover,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .adm-footBtn--danger:hover,
+html body.is-admin-app .admin-page.admin-page--app .adm-footBtn--danger:hover {
+  background: var(--adm-side-danger-hover-bg) !important;
+  background-image: none !important;
+  color: var(--adm-side-danger-hover-ink) !important;
+  border-color: var(--adm-side-danger-hover-bg) !important;
+}
+
+/* 5. Main Column + Persistent Topbar */
+.admin-page.admin-page--app .admin-main {
+  display: flex !important;
+  flex-direction: column !important;
+  flex: 1 1 auto !important;
+  width: 100% !important;
+  height: 100% !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  background: var(--adm-canvas) !important;
+  overflow: hidden !important;
+}
+
+.admin-page.admin-page--app .adm-topbar {
+  position: relative !important;
+  z-index: 20 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+  min-height: 60px !important;
+  padding: 10px 22px !important;
+  background: var(--adm-surface) !important;
+  border-bottom: 1px solid var(--adm-border) !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-topbarLeft {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-width: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-mobileMenuBtn {
+  display: none !important;
+}
+
+.admin-page.admin-page--app .adm-topbarTitleGroup {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 1px !important;
+  min-width: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-breadcrumb {
+  display: flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  font-size: 12px !important;
+  color: var(--adm-text-3) !important;
+}
+
+.admin-page.admin-page--app .adm-breadcrumb strong {
+  font-size: 15px !important;
+  font-weight: 800 !important;
+  color: var(--adm-text) !important;
+  letter-spacing: -0.015em !important;
+}
+
+.admin-page.admin-page--app .adm-topbarSub {
+  font-size: 12px !important;
+  color: var(--adm-text-3) !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.admin-page.admin-page--app .adm-topbarRight {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-topbarSync {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 7px !important;
+  height: 32px !important;
+  padding: 0 11px !important;
+  border-radius: 999px !important;
+  background: var(--adm-surface-soft) !important;
+  border: 1px solid var(--adm-border) !important;
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--adm-text-2) !important;
+  box-shadow: none !important;
+}
+
+.admin-page.admin-page--app .adm-liveSyncDot {
+  width: 7px !important;
+  height: 7px !important;
+  border-radius: 999px !important;
+  background: #009e60 !important;
+  box-shadow: 0 0 0 3px rgba(0, 158, 96, 0.2) !important;
+}
+
+.admin-page.admin-page--app .adm-topbarBtn,
+.admin-page.admin-page--app .adm-topbarIconBtn {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 7px !important;
+  height: 34px !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--adm-border) !important;
+  background: var(--adm-surface) !important;
+  color: var(--adm-text-2) !important;
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  text-decoration: none !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  transition: background-color 0.14s ease, border-color 0.14s ease, color 0.14s ease !important;
+}
+
+.admin-page.admin-page--app .adm-topbarBtn {
+  padding: 0 12px !important;
+}
+
+.admin-page.admin-page--app .adm-topbarIconBtn {
+  width: 34px !important;
+  padding: 0 !important;
+}
+
+.admin-page.admin-page--app .adm-topbarIconBtn.is-active {
+  background: var(--adm-accent-soft) !important;
+  color: var(--adm-accent-text) !important;
+  border-color: rgba(0, 158, 96, 0.4) !important;
+}
+
+.admin-page.admin-page--app .adm-topbarBtn:hover:not(:disabled),
+.admin-page.admin-page--app .adm-topbarIconBtn:hover:not(:disabled) {
+  background: var(--adm-surface-soft) !important;
+  border-color: var(--adm-border-strong) !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app .adm-topbarBtn:disabled {
+  opacity: 0.6 !important;
+  cursor: wait !important;
+}
+
+.admin-page.admin-page--app .adm-spin {
+  animation: admSpin 0.9s linear infinite;
+}
+
+@keyframes admSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* 6. Single Unified Workspace Scroll Area (Desktop) */
+.admin-page.admin-page--app .admin-workspace {
+  flex: 1 1 auto !important;
+  min-height: 0 !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  padding: 20px 24px 32px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+.admin-page.admin-page--app .admin-workspaceScroll,
+.admin-page.admin-page--app .admin-workspacePane {
+  overflow: visible !important;
+  height: auto !important;
+  max-height: none !important;
+}
+
+.admin-page.admin-page--app .admin-panel-body--scroll {
+  overflow: visible !important;
+  max-height: none !important;
+}
+
+@media (min-width: 1101px) {
+  .admin-page.admin-page--app .admin-products {
+    display: grid !important;
+    grid-template-columns: minmax(320px, 380px) minmax(0, 1fr) !important;
+    gap: 16px !important;
+    align-items: start !important;
+  }
+
+  .admin-page.admin-page--app .admin-products-list,
+  .admin-page.admin-page--app .admin-products-editor {
+    max-height: calc(100vh - 120px) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    overflow: hidden !important;
+  }
+
+  .admin-page.admin-page--app .admin-products-list .admin-panel-body--scroll,
+  .admin-page.admin-page--app .admin-products-editor .admin-panel-body--scroll {
+    overflow-y: auto !important;
+    flex: 1 1 auto !important;
+  }
+}
+
+/* 7. Classic Framework Panels & Surfaces */
+.admin-page.admin-page--app .admin-panel,
+.admin-page.admin-page--app .admin-card,
+.admin-page.admin-page--app .admin-kpiCard,
+.admin-page.admin-page--app .admin-actionShortcut,
+.admin-page.admin-page--app .admin-initialLoadCard {
+  content-visibility: visible !important;
+  contain-intrinsic-size: none !important;
+  background: var(--adm-surface) !important;
+  border: 1px solid var(--adm-border) !important;
+  border-radius: var(--adm-radius) !important;
+  box-shadow: var(--adm-shadow) !important;
+  color: var(--adm-text) !important;
+  backdrop-filter: none !important;
+}
+
+.admin-page.admin-page--app .admin-panel-head {
+  padding: 14px 18px !important;
+  border-bottom: 1px solid var(--adm-border) !important;
+  background: var(--adm-head-bg) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 12px !important;
+}
+
+.admin-page.admin-page--app .admin-panel-title {
+  margin: 0 !important;
+  font-size: 14.5px !important;
+  font-weight: 800 !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app .admin-panel-sub {
+  font-size: 12px !important;
+  color: var(--adm-text-3) !important;
+  margin-top: 2px !important;
+}
+
+.admin-page.admin-page--app .admin-panel-body {
+  padding: 16px 18px !important;
+}
+
+/* 8. Classic 4-Column KPI Cards (Strictly Monochrome + Brand Green) */
+.admin-page.admin-page--app .admin-kpiStrip {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 14px !important;
+  margin-bottom: 16px !important;
+}
+
+.admin-page.admin-page--app .admin-kpiCard {
+  padding: 15px 16px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 6px !important;
+}
+
+.admin-page.admin-page--app .admin-kpiTop {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  gap: 8px !important;
+}
+
+.admin-page.admin-page--app .admin-kpiLabel {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+  color: var(--adm-text-3) !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.03em !important;
+}
+
+.admin-page.admin-page--app .admin-kpiIcon {
+  width: 32px !important;
+  height: 32px !important;
+  border-radius: 8px !important;
+  display: grid !important;
+  place-items: center !important;
+  flex-shrink: 0 !important;
+}
+
+.admin-page.admin-page--app .admin-kpiIcon.is-emerald {
+  background: rgba(0, 158, 96, 0.14) !important;
+  color: #00824f !important;
+  border: 1px solid rgba(0, 158, 96, 0.25) !important;
+}
+
+.admin-page.admin-page--app .admin-kpiIcon.is-neutral,
+.admin-page.admin-page--app .admin-kpiIcon.is-blue,
+.admin-page.admin-page--app .admin-kpiIcon.is-amber,
+.admin-page.admin-page--app .admin-kpiIcon.is-purple {
+  background: #f4f4f5 !important;
+  color: #0a0a0a !important;
+  border: 1px solid #e4e4e7 !important;
+}
+
+html[data-theme="dark"] .admin-page.admin-page--app .admin-kpiIcon.is-emerald {
+  background: rgba(0, 158, 96, 0.2) !important;
+  color: #34d399 !important;
+  border: 1px solid rgba(52, 211, 153, 0.28) !important;
+}
+
+html[data-theme="dark"] .admin-page.admin-page--app .admin-kpiIcon.is-neutral,
+html[data-theme="dark"] .admin-page.admin-page--app .admin-kpiIcon.is-blue,
+html[data-theme="dark"] .admin-page.admin-page--app .admin-kpiIcon.is-amber,
+html[data-theme="dark"] .admin-page.admin-page--app .admin-kpiIcon.is-purple {
+  background: #27272a !important;
+  color: #fafafa !important;
+  border: 1px solid #3f3f46 !important;
+}
+
+.admin-page.admin-page--app .admin-kpiValue {
+  font-size: 20px !important;
+  font-weight: 800 !important;
+  letter-spacing: -0.02em !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app .admin-kpiSub {
+  font-size: 12px !important;
+  color: var(--adm-text-3) !important;
+}
+
+/* Action shortcuts */
+.admin-page.admin-page--app .admin-actionShortcuts {
+  gap: 10px !important;
+  margin-bottom: 16px !important;
+}
+
+.admin-page.admin-page--app .admin-actionShortcut {
+  padding: 12px 14px !important;
+}
+
+.admin-page.admin-page--app .admin-actionShortcut.is-warn {
+  border-color: var(--adm-border-strong) !important;
+  background: var(--adm-surface-soft) !important;
+}
+
+.admin-page.admin-page--app .admin-actionShortcut.is-warn .admin-actionShortcutIcon {
+  background: #0a0a0a !important;
+  color: #ffffff !important;
+  border-color: #0a0a0a !important;
+}
+
+html[data-theme="dark"] .admin-page.admin-page--app .admin-actionShortcut.is-warn .admin-actionShortcutIcon {
+  background: #fafafa !important;
+  color: #0a0a0a !important;
+  border-color: #fafafa !important;
+}
+
+.admin-page.admin-page--app .admin-actionShortcutLabel {
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app .admin-actionShortcutCount {
+  color: var(--adm-text-3) !important;
+}
+
+.admin-page.admin-page--app .admin-overviewMainTitle {
+  font-size: 18px !important;
+  font-weight: 800 !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app .admin-overviewMainSub {
+  color: var(--adm-text-3) !important;
+}
+
+/* 9. Clean Controls, Inputs, Chips, Buttons & Links (Zero Blue/Amber/Red) */
+.admin-page.admin-page--app :is(.input, select, textarea) {
+  background: var(--adm-surface-inset) !important;
+  border: 1px solid var(--adm-border) !important;
+  border-radius: 8px !important;
+  box-shadow: none !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app :is(.input, select, textarea):focus {
+  border-color: var(--adm-accent, #009e60) !important;
+  box-shadow: 0 0 0 2px rgba(0, 158, 96, 0.2) !important;
+  outline: none !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-chip:not(.active):not(.is-active) {
+  background: var(--adm-surface) !important;
+  border: 1px solid var(--adm-border) !important;
+  color: var(--adm-text-2) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-chip:not(.active):not(.is-active):hover {
+  background: var(--adm-surface-soft) !important;
+  border-color: var(--adm-border-strong) !important;
+  color: var(--adm-text) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-chip.active,
+html body.is-admin-app .admin-page.admin-page--app .admin-chip.is-active {
+  background: #009e60 !important;
+  border-color: #009e60 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.admin-page.admin-page--app .admin-chipDivider {
+  background: var(--adm-border) !important;
+}
+
+.admin-page.admin-page--app .admin-chipMeta {
+  color: var(--adm-text-3) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled) {
+  background: #009e60 !important;
+  border-color: #008a53 !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .btn:not(.btn-ghost):not(.btn-danger):not(.btn-disabled):hover:not(:disabled) {
+  background: #00824f !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .btn-ghost {
+  background: var(--adm-surface) !important;
+  border-color: var(--adm-border-strong) !important;
+  color: var(--adm-text) !important;
+  box-shadow: none !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .btn-ghost:hover:not(:disabled) {
+  background: var(--adm-surface-soft) !important;
+  border-color: var(--adm-text-3) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .btn-danger,
+html body.is-admin-app .modal-backdrop .btn-danger {
+  background: #0a0a0a !important;
+  border: 1px solid #0a0a0a !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .btn-danger,
+html[data-theme="dark"] body.is-admin-app .modal-backdrop .btn-danger {
+  background: #27272a !important;
+  border-color: #52525b !important;
+  color: #fafafa !important;
+}
+
+/* 10. Status Pills, Tags, Links, Banners & Alerts (Strictly Black / White / Brand Green) */
+html body.is-admin-app .admin-page.admin-page--app .admin-status,
+html body.is-admin-app .admin-page.admin-page--app .admin-product-pill,
+html body.is-admin-app .admin-page.admin-page--app .admin-promoBadge,
+html body.is-admin-app .modal .admin-status {
+  box-shadow: none !important;
+  font-weight: 700 !important;
+}
+
+/* Pending / Neutral Draft -> Crisp Grey/Black outline pill */
+html body.is-admin-app .admin-page.admin-page--app .admin-status.pending,
+html body.is-admin-app .modal .admin-status.pending {
+  background: var(--adm-surface-inset) !important;
+  border: 1px solid var(--adm-border-strong) !important;
+  color: var(--adm-text-2) !important;
+}
+
+/* Reported (Needs Verification) -> High-contrast Monochrome Inverted Badge */
+html body.is-admin-app .admin-page.admin-page--app .admin-status.reported,
+html body.is-admin-app .modal .admin-status.reported {
+  background: #0a0a0a !important;
+  border: 1px solid #0a0a0a !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .admin-status.reported,
+html[data-theme="dark"] body.is-admin-app .modal .admin-status.reported {
+  background: #fafafa !important;
+  border: 1px solid #fafafa !important;
+  color: #0a0a0a !important;
+}
+
+/* Processing -> Brand Green Soft Pill */
+html body.is-admin-app .admin-page.admin-page--app .admin-status.processing,
+html body.is-admin-app .modal .admin-status.processing {
+  background: rgba(0, 158, 96, 0.1) !important;
+  border: 1px solid rgba(0, 158, 96, 0.4) !important;
+  color: var(--adm-accent-text) !important;
+}
+
+/* Done / On / Active Promo -> Brand Green Filled/Accent Pill */
+html body.is-admin-app .admin-page.admin-page--app .admin-status.done,
+html body.is-admin-app .admin-page.admin-page--app .admin-product-pill.on,
+html body.is-admin-app .admin-page.admin-page--app .admin-promoBadge.active,
+html body.is-admin-app .modal .admin-status.done {
+  background: rgba(0, 158, 96, 0.16) !important;
+  border: 1px solid rgba(0, 158, 96, 0.45) !important;
+  color: var(--adm-accent-text) !important;
+}
+
+/* Cancelled / Off / Expired -> Muted Dashed Monochrome */
+html body.is-admin-app .admin-page.admin-page--app .admin-status.cancelled,
+html body.is-admin-app .admin-page.admin-page--app .admin-product-pill.off,
+html body.is-admin-app .admin-page.admin-page--app .admin-promoBadge.off,
+html body.is-admin-app .admin-page.admin-page--app .admin-promoBadge.expired,
+html body.is-admin-app .modal .admin-status.cancelled {
+  background: transparent !important;
+  border: 1px dashed var(--adm-border-strong) !important;
+  color: var(--adm-text-3) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-orderTag,
+html body.is-admin-app .admin-page.admin-page--app .admin-categoryTag {
+  background: var(--adm-accent-soft) !important;
+  border: 1px solid rgba(0, 158, 96, 0.28) !important;
+  color: var(--adm-accent-text) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-orderLink,
+html body.is-admin-app .modal .admin-orderMetaCard a {
+  color: var(--adm-accent-text) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-alert,
+html body.is-admin-app .admin-page.admin-page--app .admin-alert.is-error,
+html body.is-admin-app .admin-page.admin-page--app .admin-stockAlertBanner,
+html body.is-admin-app .admin-page.admin-page--app .admin-filterBanner,
+html body.is-admin-app .admin-page.admin-page--app .admin-capBanner {
+  background: var(--adm-surface) !important;
+  border: 1px solid var(--adm-border-strong) !important;
+  border-left: 3px solid var(--adm-accent, #009e60) !important;
+  color: var(--adm-text) !important;
+  box-shadow: var(--adm-shadow) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-stockAlertBanner strong,
+html body.is-admin-app .admin-page.admin-page--app .admin-inlineStatChip.is-warn,
+html body.is-admin-app .admin-page.admin-page--app .admin-inlineStats > span.is-warn,
+html body.is-admin-app .admin-page.admin-page--app .admin-inlineStats > span.is-warn strong,
+html body.is-admin-app .admin-page.admin-page--app .is-warn,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .admin-inlineStats > span.is-warn,
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .admin-inlineStats > span.is-warn {
+  background: var(--adm-surface-soft) !important;
+  background-image: none !important;
+  color: var(--adm-text) !important;
+  border-color: var(--adm-border-strong) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-inlineStatChip.is-warn {
+  background: var(--adm-surface-soft) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-inlineStatChip.is-warn.is-active {
+  background: #0a0a0a !important;
+  border-color: #0a0a0a !important;
+  color: #ffffff !important;
+}
+
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .admin-inlineStatChip.is-warn.is-active {
+  background: #fafafa !important;
+  border-color: #fafafa !important;
+  color: #0a0a0a !important;
+}
+
+/* Charts, Progress Bars, Rankings, Modals, Pickers */
+html body.is-admin-app .admin-page.admin-page--app .admin-chartBar.orders,
+html body.is-admin-app .admin-page.admin-page--app .admin-chartBar.revenue,
+html body.is-admin-app .admin-page.admin-page--app .admin-progress > span,
+html body.is-admin-app .admin-page.admin-page--app .admin-progress span.orders {
+  background: linear-gradient(90deg, #009e60, #10b981) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-rankIndex {
+  background: var(--adm-accent-soft) !important;
+  color: var(--adm-accent-text) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-bulkBar {
+  background: var(--adm-surface) !important;
+  border: 1px solid #009e60 !important;
+  color: var(--adm-text) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-bulkCount,
+html body.is-admin-app .admin-page.admin-page--app .admin-promo-previewPrice {
+  color: var(--adm-text) !important;
+}
+
+/* Modals (including portaled modals when body.is-admin-app is active) */
+html body.is-admin-app .modal .admin-orderTimeline,
+html body.is-admin-app .modal .admin-orderMetaCard,
+html body.is-admin-app .modal .admin-orderDetailFact,
+html body.is-admin-app .modal .admin-order-item,
+html body.is-admin-app .modal .admin-order-notes,
+html body.is-admin-app .modal .admin-order-adminNote {
+  background: var(--adm-surface-soft) !important;
+  border-color: var(--adm-border) !important;
+  color: var(--adm-text) !important;
+}
+
+html body.is-admin-app .modal .admin-orderMetaCard span,
+html body.is-admin-app .modal .admin-orderDetailFact span,
+html body.is-admin-app .modal .admin-orderDetailFact small,
+html body.is-admin-app .modal .admin-orderItemsHead span,
+html body.is-admin-app .modal .admin-order-itemMeta,
+html body.is-admin-app .modal .admin-timelineLabel small {
+  color: var(--adm-text-3) !important;
+}
+
+html body.is-admin-app .modal .admin-orderMetaCard strong,
+html body.is-admin-app .modal .admin-orderDetailFact strong,
+html body.is-admin-app .modal .admin-order-item b,
+html body.is-admin-app .modal .admin-orderItemsHead strong,
+html body.is-admin-app .modal .admin-timelineLabel strong {
+  color: var(--adm-text) !important;
+}
+
+html body.is-admin-app .modal .admin-timelineDot {
+  border: 2px solid var(--adm-border-strong) !important;
+  background: var(--adm-surface) !important;
+  color: var(--adm-text-3) !important;
+  box-shadow: none !important;
+}
+
+html body.is-admin-app .modal .admin-timelineDot.is-active,
+html body.is-admin-app .modal .admin-timelineDot.is-done {
+  border-color: #009e60 !important;
+  background: #009e60 !important;
+  color: #ffffff !important;
+  box-shadow: 0 0 0 3px rgba(0, 158, 96, 0.2) !important;
+}
+
+html body.is-admin-app .modal .admin-timelineLine {
+  background: var(--adm-border-strong) !important;
+}
+
+/* Override AdminPicker neutral palette (remove blue-slate tint in light mode) */
+body.is-admin-app .admin-picker,
+body.is-admin-app .ap-popover {
+  --ap-bg: var(--adm-surface);
+  --ap-control: var(--adm-surface-soft);
+  --ap-inset: var(--adm-surface-inset);
+  --ap-ink: var(--adm-text);
+  --ap-muted: var(--adm-text-3);
+  --ap-line: var(--adm-border);
+  --ap-accent: #009e60;
+  --ap-selected: rgba(0, 158, 96, 0.14);
+}
+
+/* 11. Orders, Products, Promos, Testimonials Rows */
+.admin-page.admin-page--app .admin-orderToolbar {
+  background: var(--adm-surface-soft) !important;
+  border: 1px solid var(--adm-border) !important;
+  border-radius: 9px !important;
+  padding: 10px 12px !important;
+  margin-bottom: 10px !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .admin-orderListItem,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .admin-orderListItem,
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem {
+  background: var(--adm-surface) !important;
+  background-image: none !important;
+  border: 1px solid var(--adm-border) !important;
+  border-radius: 9px !important;
+  box-shadow: none !important;
+  transition: border-color 0.14s ease, background-color 0.14s ease !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem::before {
+  background: var(--adm-border-strong) !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem:is(.status-paid, .status-paid_reported, .status-processing, .status-done)::before {
+  background: #009e60 !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem:is(.status-cancelled, .status-expired)::before {
+  background: #525252 !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .admin-orderListItem:hover,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .admin-orderListItem:hover,
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem:hover {
+  border-color: var(--adm-border-strong) !important;
+  background: var(--adm-surface-soft) !important;
+  background-image: none !important;
+}
+
+html[data-theme="light"] body.is-admin-app .admin-page.admin-page--app .admin-orderListItem.is-selected,
+html[data-theme="dark"] body.is-admin-app .admin-page.admin-page--app .admin-orderListItem.is-selected,
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem.is-selected {
+  background: var(--adm-accent-soft) !important;
+  background-image: none !important;
+  border-color: #009e60 !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem .admin-status,
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem select,
+html body.is-admin-app .admin-page.admin-page--app .admin-orderListItem .btn-ghost {
+  background-image: none !important;
+}
+
+.admin-page.admin-page--app .admin-order-code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace !important;
+  font-weight: 700 !important;
+  color: var(--adm-text) !important;
+}
+
+.admin-page.admin-page--app .admin-product-row,
+.admin-page.admin-page--app .admin-variant-row,
+.admin-page.admin-page--app .admin-promo-card,
+.admin-page.admin-page--app .admin-testimonialRow,
+.admin-page.admin-page--app .admin-miniCard,
+.admin-page.admin-page--app .admin-rankItem,
+.admin-page.admin-page--app .admin-alertItem {
+  background: var(--adm-surface-soft) !important;
+  border: 1px solid var(--adm-border) !important;
+  border-radius: 9px !important;
+  box-shadow: none !important;
+}
+
+.admin-page.admin-page--app .admin-product-row.active {
+  background: var(--adm-accent-soft) !important;
+  border-color: #009e60 !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app .admin-check,
+html body.is-admin-app .admin-page.admin-page--app .admin-ordersPanel label:has(> input[type="checkbox"]) {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  cursor: pointer !important;
+}
+
+html body.is-admin-app .admin-page.admin-page--app input[type="checkbox"] {
+  accent-color: #009e60 !important;
+}
+
+/* 12. Collapsed Desktop Icon Rail Badge Dots */
+.admin-page.admin-page--app .adm-navItem .adm-navDot {
+  top: -4px !important;
+  right: -5px !important;
+}
+
+.admin-page.admin-page--app .adm-navDot--accent,
+.admin-page.admin-page--app .adm-navDot--urgent {
+  background: #009e60 !important;
+  color: #ffffff !important;
+}
+
+.admin-page.admin-page--app .adm-navDot--neutral,
+.admin-page.admin-page--app .adm-navDot--info,
+.admin-page.admin-page--app .adm-navDot--warn {
+  background: #27272a !important;
+  color: #ffffff !important;
+}
+
+/* 13. Tablet & Mobile Drawer + Native Document Vertical Scroll (<= 1100px matches AdminApp.shell.css) */
+@media (max-width: 1100px) {
+  /* Unlock ALL fixed-height/overflow containers so mobile window scrolls vertically without traps */
+  html:has(body.is-admin-app),
+  html[data-theme="light"]:has(body.is-admin-app),
+  html[data-theme="dark"]:has(body.is-admin-app) {
+    height: auto !important;
+    min-height: 100% !important;
+    max-height: none !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    scroll-behavior: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  body.is-admin-app {
+    position: static !important;
+    height: auto !important;
+    min-height: 100dvh !important;
+    max-height: none !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    overscroll-behavior-y: auto !important;
+  }
+
+  body.is-admin-app .app-shell--admin,
+  body.is-admin-app .app-main-admin,
+  body.is-admin-app .app-main-admin > .route-transition,
+  body.is-admin-app .app-main-admin > .route-transition > .admin-page,
+  body.is-admin-app .app-main-admin > .route-transition > .admin-page > .admin-section,
+  html body.is-admin-app .admin-page.admin-page--app,
+  html body.is-admin-app .admin-page.admin-page--app > .admin-section,
+  html body.is-admin-app .admin-page.admin-page--app .admin-shell,
+  html body.is-admin-app .admin-page.admin-page--app .admin-shell.is-collapsed,
+  html body.is-admin-app .admin-page.admin-page--app .admin-main,
+  html body.is-admin-app .admin-page.admin-page--app .admin-main:has(> .admin-panel--fill),
+  html body.is-admin-app .admin-page.admin-page--app .admin-main:has(> .admin-ordersPanel) {
+    position: static !important;
+    display: flex !important;
+    flex-direction: column !important;
+    grid-template-columns: none !important;
+    flex: 1 0 auto !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+  }
+
+  html body.is-admin-app .admin-page.admin-page--app .admin-workspace,
+  html body.is-admin-app .admin-page.admin-page--app .admin-workspaceScroll,
+  html body.is-admin-app .admin-page.admin-page--app .admin-workspacePane,
+  html body.is-admin-app .admin-page.admin-page--app .admin-overview,
+  html body.is-admin-app .admin-page.admin-page--app .admin-overviewGrid,
+  html body.is-admin-app .admin-page.admin-page--app .admin-overviewGrid > .admin-panel,
+  html body.is-admin-app .admin-page.admin-page--app .admin-overviewGrid > .admin-panelWide,
+  html body.is-admin-app .admin-page.admin-page--app .admin-panel--fill,
+  html body.is-admin-app .admin-page.admin-page--app .admin-ordersPanel,
+  html body.is-admin-app .admin-page.admin-page--app .admin-split,
+  html body.is-admin-app .admin-page.admin-page--app .admin-products,
+  html body.is-admin-app .admin-page.admin-page--app .admin-panel--list,
+  html body.is-admin-app .admin-page.admin-page--app .admin-detailPanel,
+  html body.is-admin-app .admin-page.admin-page--app .admin-panel-body--scroll {
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    overflow-x: clip !important;
+    overflow-y: visible !important;
+    flex: 0 0 auto !important;
+  }
+
+  html body.is-admin-app .admin-page.admin-page--app .admin-overviewGrid {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .admin-page.admin-page--app .adm-desktopMenuBtn,
+  .admin-page.admin-page--app .adm-desktopToggle {
+    display: none !important;
+  }
+
+  .admin-page.admin-page--app .adm-mobileMenuBtn,
+  .admin-page.admin-page--app .adm-mobileDrawerClose {
+    display: grid !important;
+  }
+
+  html body.is-admin-app .admin-page.admin-page--app .adm-topbar {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 40 !important;
+    padding: 10px 14px !important;
+  }
+
+  .admin-page.admin-page--app .adm-topbarSub,
+  .admin-page.admin-page--app .adm-topbarSync,
+  .admin-page.admin-page--app .adm-topbarBtnLabel,
+  .admin-page.admin-page--app .adm-topbarStoreLink span {
+    display: none !important;
+  }
+
+  html body.is-admin-app .admin-page.admin-page--app .admin-workspace {
+    padding: 14px 12px 92px !important;
+  }
+
+  .admin-page.admin-page--app .adm-drawerBackdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 90 !important;
+    background: rgba(0, 0, 0, 0.58) !important;
+    border: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  html body.is-admin-app .admin-page.admin-page--app .adm-sidebar {
+    display: flex !important;
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    width: min(290px, 86vw) !important;
+    height: 100dvh !important;
+    max-height: 100dvh !important;
+    z-index: 100 !important;
+    transform: translateX(-104%) !important;
+    pointer-events: none !important;
+    visibility: hidden !important;
+    overflow: hidden !important;
+    transition: transform 0.22s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.22s !important;
+  }
+
+  html body.is-admin-app .admin-page.admin-page--app .adm-sidebar.is-mobile-open {
+    transform: translateX(0) !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    box-shadow: 12px 0 36px rgba(0, 0, 0, 0.45) !important;
+  }
+
+  .admin-page.admin-page--app .admin-kpiStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .admin-page.admin-page--app .admin-ordersList--virtual {
+    max-height: min(62vh, 520px) !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+  }
+}
+
+/* 14. Mobile Bottom Dock (Portaled to document.body, <= 720px, Strictly Monochrome + Brand Green) */
+@media (max-width: 720px) {
+  body.is-admin-app .adm-dock {
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 60 !important;
+    display: grid !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+    gap: 4px !important;
+    padding: 6px 8px calc(6px + env(safe-area-inset-bottom, 0px)) !important;
+    background: #ffffff !important;
+    border-top: 1px solid #e5e5e5 !important;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.06) !important;
+  }
+
+  html[data-theme="dark"] body.is-admin-app .adm-dock {
+    background: #0a0a0a !important;
+    border-top-color: #222222 !important;
+    box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.5) !important;
+  }
+
+  body.is-admin-app .adm-dock .adm-dockBtn {
+    position: relative !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 3px !important;
+    min-height: 46px !important;
+    border-radius: 8px !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #525252 !important;
+    font-size: 11px !important;
+    font-weight: 600 !important;
+    cursor: pointer !important;
+  }
+
+  html[data-theme="dark"] body.is-admin-app .adm-dock .adm-dockBtn {
+    color: #a3a3a3 !important;
+  }
+
+  body.is-admin-app .adm-dock .adm-dockBtn.is-active {
+    background: rgba(0, 158, 96, 0.14) !important;
+    color: #007a49 !important;
+    font-weight: 700 !important;
+  }
+
+  html[data-theme="dark"] body.is-admin-app .adm-dock .adm-dockBtn.is-active {
+    background: rgba(0, 158, 96, 0.22) !important;
+    color: #34d399 !important;
+  }
+
+  body.is-admin-app .adm-dock .adm-dockBtn.is-active::before {
+    content: "" !important;
+    position: absolute !important;
+    top: 2px !important;
+    width: 20px !important;
+    height: 3px !important;
+    border-radius: 999px !important;
+    background: #009e60 !important;
+  }
+
+  body.is-admin-app .adm-dock .adm-navDot,
+  .admin-page.admin-page--app .adm-navDot {
+    position: absolute !important;
+    top: -4px !important;
+    right: -7px !important;
+    min-width: 15px !important;
+    height: 15px !important;
+    padding: 0 4px !important;
+    border-radius: 999px !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    display: grid !important;
+    place-items: center !important;
+    border: 2px solid #ffffff !important;
+  }
+
+  html[data-theme="dark"] body.is-admin-app .adm-dock .adm-navDot,
+  html[data-theme="dark"] .admin-page.admin-page--app .adm-navDot {
+    border-color: #0a0a0a !important;
+  }
+
+  body.is-admin-app .adm-dock .adm-navDot--accent,
+  body.is-admin-app .adm-dock .adm-navDot--urgent,
+  .admin-page.admin-page--app .adm-navDot--accent,
+  .admin-page.admin-page--app .adm-navDot--urgent {
+    background: #009e60 !important;
+    color: #ffffff !important;
+  }
+
+  body.is-admin-app .adm-dock .adm-navDot--neutral,
+  body.is-admin-app .adm-dock .adm-navDot--info,
+  body.is-admin-app .adm-dock .adm-navDot--warn,
+  .admin-page.admin-page--app .adm-navDot--neutral,
+  .admin-page.admin-page--app .adm-navDot--info,
+  .admin-page.admin-page--app .adm-navDot--warn {
+    background: #27272a !important;
+    color: #ffffff !important;
+  }
+}
+
+@media (max-width: 560px) {
+  .admin-page.admin-page--app .admin-kpiStrip {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px !important;
+  }
+
+  .admin-page.admin-page--app .admin-panel-head,
+  .admin-page.admin-page--app .admin-panel-body {
+    padding: 12px 14px !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .admin-page.admin-page--app .admin-kpiStrip {
+    grid-template-columns: minmax(0, 1fr) !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .admin-page.admin-page--app .admin-shell,
+  .admin-page.admin-page--app .adm-sidebar,
+  .admin-page.admin-page--app .adm-spin {
+    transition: none !important;
+    animation: none !important;
+  }
+}

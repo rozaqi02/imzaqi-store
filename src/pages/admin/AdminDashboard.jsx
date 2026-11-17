@@ -17,7 +17,6 @@ import {
   ClipboardList,
   Copy,
   Eye,
-  Filter,
   LayoutDashboard,
   MapPin,
   Pencil,
@@ -47,7 +46,7 @@ import {
   LIVE_ORDER_STATUSES,
   prettyOrderStatus,
 } from "../../lib/orderStatus";
-import { AdminSidebar, AdminMobileNav } from "./components/AdminNav";
+import { AdminSidebar, AdminTopbar, AdminMobileNav } from "./components/AdminNav";
 import VirtualList from "./components/VirtualList";
 import AdminOrderListItem from "./components/AdminOrderListItem";
 import AdminPicker from "./components/AdminPicker";
@@ -60,6 +59,7 @@ import {
   ADMIN_PRODUCTS_CACHE_TTL_MS,
   EMPTY_ANALYTICS_SUMMARY,
   ORDERS_PAGE_SIZE,
+  ORDER_SEARCH_BATCH_SIZE,
   ORDER_SELECT_DETAIL,
   ORDER_SELECT_LIST,
   ORDER_SELECT_LIST_FALLBACK,
@@ -68,6 +68,12 @@ import {
   isThinStock,
   statusFilterForBucket,
 } from "./adminPerf";
+import {
+  fetchAllOrdersForSearch,
+  mergeOrdersById,
+  orderMatchesAdminQuery,
+  patchOrderInList,
+} from "./adminOrderSearch";
 import "../../css/pages/AdminDashboard.css";
 import "../../css/pages/AdminDashboard.light.css";
 import "../../css/pages/AdminDashboard.fixes.css";
@@ -75,6 +81,7 @@ import "../../css/pages/AdminNav.css";
 import "../../css/pages/AdminUI.overhaul.css";
 import "../../css/pages/AdminApp.shell.css";
 import "../../css/pages/AdminPolish.css";
+import "../../css/pages/AdminLaravelShell.css";
 
 import { supabase } from "../../lib/supabaseClient";
 import {
@@ -152,6 +159,12 @@ const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders
 /** Tabs that need orders list. */
 const TABS_NEED_ORDERS = new Set(["overview", "orders"]);
 
+function isMissingOrderColumnError(error) {
+  return /(notes|admin_note|payment_proof|reservation_expires_at|payment_reference|verification_status|does not exist|column|schema|42703)/i.test(
+    String(error?.message || error?.code || "")
+  );
+}
+
 function clampPercent(value) {
   const n = Number(value);
   if (!Number.isFinite(n)) return 0;
@@ -168,6 +181,24 @@ export default function AdminDashboard() {
   });
 
   const [tab, setTab] = useState("overview");
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem("imzaqi_admin_sidebar_collapsed") === "1";
+    } catch {
+      return false;
+    }
+  });
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
+  function toggleSidebarCollapse() {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem("imzaqi_admin_sidebar_collapsed", next ? "1" : "0");
+      } catch {}
+      return next;
+    });
+  }
   const [loading, setLoading] = useState(true);
   const [msg, setMsg] = useState("");
   const [lastSyncedAt, setLastSyncedAt] = useState("");
@@ -216,7 +247,6 @@ export default function AdminDashboard() {
   const [orderBucket, setOrderBucket] = useState("all");
   /** Catalog line: all | app_premium | academic */
   const [orderCatalogFilter, setOrderCatalogFilter] = useState("all");
-  const [orderStatusFilterOpen, setOrderStatusFilterOpen] = useState(false);
   const [orderToolsOpen, setOrderToolsOpen] = useState(false);
   const [activeOrderId, setActiveOrderId] = useState("");
 
@@ -315,58 +345,63 @@ export default function AdminDashboard() {
   const deferredProductQuery = useDeferredValue(productQuery);
   const deferredOrderQuery = useDeferredValue(orderQuery);
   const [orderSearchingServer, setOrderSearchingServer] = useState(false);
+  /** Full unlimited order snapshot loaded on demand when admin searches orders. */
+  const [searchOrdersCorpus, setSearchOrdersCorpus] = useState(null);
 
-  // Server-side historical order search for Admin (Recommendation No. 2)
+  const syncOrderPatch = useCallback((orderId, patch) => {
+    setOrders((prev) => patchOrderInList(prev || [], orderId, patch));
+    if (ordersRef.current) {
+      ordersRef.current = patchOrderInList(ordersRef.current, orderId, patch);
+    }
+    setSearchOrdersCorpus((prev) => (Array.isArray(prev) ? patchOrderInList(prev, orderId, patch) : prev));
+  }, []);
+
+  // Unlimited full-database search corpus loader (notes, dates, items, WA, email, codes)
   useEffect(() => {
     const q = String(deferredOrderQuery || "").trim();
-    if (q.length < 2) return;
+    if (!q || searchOrdersCorpus !== null) return;
 
     let active = true;
     const timer = setTimeout(async () => {
       setOrderSearchingServer(true);
       try {
-        const clean = q.replace(/[%_]/g, "");
-        if (!clean) return;
-        const { data, error } = await supabase
-          .from("orders")
-          .select(ORDER_SELECT_DETAIL)
-          .or(`order_code.ilike.%${clean}%,customer_whatsapp.ilike.%${clean}%,buyer_email.ilike.%${clean}%,promo_code.ilike.%${clean}%`)
-          .order("created_at", { ascending: false })
-          .limit(60);
+        const allRows = await fetchAllOrdersForSearch({
+          batchSize: ORDER_SEARCH_BATCH_SIZE,
+          isCancelled: () => !active,
+          onBatch: (accumulated) => {
+            if (active) setSearchOrdersCorpus(accumulated);
+          },
+          fetchBatch: async (from, to) => {
+            let { data, error } = await supabase
+              .from("orders")
+              .select(ORDER_SELECT_LIST)
+              .order("created_at", { ascending: false })
+              .range(from, to);
 
-        if (error) {
-          const { data: fallbackData } = await supabase
-            .from("orders")
-            .select(ORDER_SELECT_LIST_FALLBACK)
-            .or(`order_code.ilike.%${clean}%,customer_whatsapp.ilike.%${clean}%,buyer_email.ilike.%${clean}%,promo_code.ilike.%${clean}%`)
-            .order("created_at", { ascending: false })
-            .limit(60);
-          if (active && fallbackData?.length) {
-            setOrders((prev) => {
-              const existingIds = new Set((prev || []).map((o) => o.id));
-              const missing = fallbackData.filter((o) => !existingIds.has(o.id));
-              return missing.length ? [...missing, ...(prev || [])] : prev;
-            });
-          }
-        } else if (active && data?.length) {
-          setOrders((prev) => {
-            const existingIds = new Set((prev || []).map((o) => o.id));
-            const missing = data.filter((o) => !existingIds.has(o.id));
-            return missing.length ? [...missing, ...(prev || [])] : prev;
-          });
-        }
+            if (error && isMissingOrderColumnError(error)) {
+              ({ data, error } = await supabase
+                .from("orders")
+                .select(ORDER_SELECT_LIST_FALLBACK)
+                .order("created_at", { ascending: false })
+                .range(from, to));
+            }
+            if (error) throw error;
+            return data || [];
+          },
+        });
+        if (active) setSearchOrdersCorpus(allRows);
       } catch (err) {
-        warn("Gagal pencarian server-side order:", err);
+        warn("Gagal pencarian penuh order:", err);
       } finally {
         if (active) setOrderSearchingServer(false);
       }
-    }, 350);
+    }, 200);
 
     return () => {
       active = false;
       clearTimeout(timer);
     };
-  }, [deferredOrderQuery]);
+  }, [deferredOrderQuery, searchOrdersCorpus]);
 
   const waNumber = settings?.whatsapp?.number || "";
   const savedQrisBase = String(settings?.qris?.base_payload || "").trim();
@@ -471,7 +506,7 @@ export default function AdminDashboard() {
     );
     let { data, error } = await query;
 
-    if (error && /(notes|admin_note|payment_proof|reservation_expires_at|payment_reference|verification_status|does not exist|column|schema|42703)/i.test(String(error?.message || error?.code || ""))) {
+    if (error && isMissingOrderColumnError(error)) {
       query = applyStatus(
         supabase
           .from("orders")
@@ -494,7 +529,7 @@ export default function AdminDashboard() {
       .select(ORDER_SELECT_DETAIL)
       .eq("id", orderId)
       .maybeSingle();
-    if (error && /(notes|admin_note|payment_proof|reservation_expires_at|payment_reference|verification_status|does not exist|column|schema|42703)/i.test(String(error?.message || error?.code || ""))) {
+    if (error && isMissingOrderColumnError(error)) {
       ({ data, error } = await supabase
         .from("orders")
         .select(ORDER_SELECT_LIST_FALLBACK)
@@ -639,7 +674,10 @@ export default function AdminDashboard() {
     return nextProducts;
   }
 
-  async function refreshOrders({ force = false } = {}) {
+  async function refreshOrders({ force = false, resetSearch = false } = {}) {
+    if (resetSearch) {
+      setSearchOrdersCorpus(null);
+    }
     if (!force && loadedRef.current.orders && ordersBucketRef.current === orderBucket) {
       return ordersRef.current;
     }
@@ -892,16 +930,20 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [analyticsWindow, tab]);
 
-  // Hydrate order detail fields when opening a row
+  const allKnownOrders = useMemo(() => {
+    return Array.isArray(searchOrdersCorpus) ? mergeOrdersById(orders, searchOrdersCorpus) : orders || [];
+  }, [orders, searchOrdersCorpus]);
+
+  // Hydrate order detail fields (e.g. payment proof URL) when opening a row
   useEffect(() => {
     if (!activeOrderId) return;
-    const existing = (orders || []).find((o) => o.id === activeOrderId);
-    if (existing?.payment_proof_url !== undefined || existing?.notes !== undefined) return;
+    const existing = allKnownOrders.find((o) => o.id === activeOrderId);
+    if (existing?.payment_proof_url !== undefined && existing?.notes !== undefined) return;
     let cancelled = false;
     fetchOrderDetail(activeOrderId)
       .then((row) => {
         if (cancelled || !row) return;
-        setOrders((prev) => (prev || []).map((o) => (o.id === row.id ? { ...o, ...row } : o)));
+        syncOrderPatch(row.id, row);
       })
       .catch((e) => warn("fetchOrderDetail:", e));
     return () => {
@@ -926,7 +968,7 @@ export default function AdminDashboard() {
   useEffect(() => {
     setAdminNoteDrafts((prev) => {
       const next = { ...(prev || {}) };
-      (orders || []).forEach((order) => {
+      allKnownOrders.forEach((order) => {
         const serverNote = String(order.admin_note || "");
         const draft = prev?.[order.id];
         if (draft === undefined || draft === serverNote) {
@@ -937,7 +979,7 @@ export default function AdminDashboard() {
       });
       return next;
     });
-  }, [orders]);
+  }, [allKnownOrders]);
 
   const lowStockProductIds = useMemo(() => {
     const ids = new Set();
@@ -1350,10 +1392,13 @@ export default function AdminDashboard() {
     return items.some((item) => !isAcademicOrderItem(item));
   }
 
-  const filteredOrders = useMemo(() => {
-    const query = String(deferredOrderQuery || "").trim().toLowerCase();
+  const isSearchingOrders = Boolean(String(deferredOrderQuery || "").trim());
 
-    return (orders || []).filter((order) => {
+  const filteredOrders = useMemo(() => {
+    const query = String(deferredOrderQuery || "").trim();
+    const pool = query ? allKnownOrders : orders || [];
+
+    return pool.filter((order) => {
       const status = String(order?.status || "pending");
       const matchesBucket =
         orderBucket === "all"
@@ -1371,31 +1416,20 @@ export default function AdminDashboard() {
       }
 
       if (!query) return true;
-
-      const haystacks = [
-        order?.order_code,
-        order?.customer_whatsapp,
-        order?.buyer_email,
-        order?.promo_code,
-        order?.notes,
-        order?.admin_note,
-        ...getSafeOrderItems(order).flatMap((item) => [item?.product_name, item?.variant_name, item?.duration_label]),
-      ];
-
-      return haystacks.some((value) => String(value || "").toLowerCase().includes(query));
+      return orderMatchesAdminQuery(order, query);
     });
-  }, [deferredOrderQuery, orderBucket, orderCatalogFilter, orders, productCategoryById]);
+  }, [allKnownOrders, deferredOrderQuery, orderBucket, orderCatalogFilter, orders, productCategoryById]);
 
   const activeOrder = useMemo(() => {
-    return (orders || []).find((order) => order.id === activeOrderId) || null;
-  }, [activeOrderId, orders]);
+    return allKnownOrders.find((order) => order.id === activeOrderId) || null;
+  }, [activeOrderId, allKnownOrders]);
 
   useEffect(() => {
     if (!activeOrderId) return;
-    if (!(orders || []).some((order) => order.id === activeOrderId)) {
+    if (!allKnownOrders.some((order) => order.id === activeOrderId)) {
       setActiveOrderId("");
     }
-  }, [activeOrderId, orders]);
+  }, [activeOrderId, allKnownOrders]);
 
   // Keep an editable form in sync with the selected product
   useEffect(() => {
@@ -1437,6 +1471,10 @@ export default function AdminDashboard() {
               return [newOrder, ...(prev || [])];
             });
           }
+          setSearchOrdersCorpus((prev) => {
+            if (!Array.isArray(prev) || prev.some((o) => o.id === newOrder.id)) return prev;
+            return [newOrder, ...prev];
+          });
           setNewOrderCount((prev) => prev + 1);
           setStorePulse((prev) => ({
             ...prev,
@@ -1475,16 +1513,8 @@ export default function AdminDashboard() {
         (payload) => {
           const updated = payload.new;
           if (!updated?.id || !loadedRef.current.orders) return;
-          // Minimal patch - merge only changed row; do not recompute analytics here
-          setOrders((prev) => {
-            const list = prev || [];
-            const idx = list.findIndex((o) => o.id === updated.id);
-            if (idx < 0) return list;
-            if (list[idx] === updated) return list;
-            const next = list.slice();
-            next[idx] = { ...list[idx], ...updated };
-            return next;
-          });
+          // Minimal patch - merge only changed row across loaded & searched order lists
+          syncOrderPatch(updated.id, updated);
         }
       )
       .subscribe();
@@ -2077,6 +2107,10 @@ export default function AdminDashboard() {
     const succeeded = succeededIds.length;
     const failed = failedIds.length;
 
+    if (succeededIds.length > 0) {
+      succeededIds.forEach((id) => syncOrderPatch(id, { status: newStatus }));
+    }
+
     if (failed === 0) {
       toast.success(`${succeeded} order diperbarui`);
       setSelectedOrderIds(new Set());
@@ -2086,7 +2120,7 @@ export default function AdminDashboard() {
       setSelectedOrderIds(new Set(failedIds));
     }
 
-    await refreshOrders();
+    await refreshOrders({ force: true });
   }
 
   async function copyStatusLink(orderCode) {
@@ -2132,15 +2166,12 @@ export default function AdminDashboard() {
     setMsg("");
 
     try {
-      // Find the order to get whatsapp number for notification
-      const orderToUpdate = orders.find((o) => o.id === orderId);
+      // Find the order (including full-DB search corpus) to get whatsapp number for notification
+      const orderToUpdate = allKnownOrders.find((o) => o.id === orderId);
       const customerWa = orderToUpdate?.customer_whatsapp || "";
 
       // Optimistic update so UI reflects change immediately
-      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status } : o)));
-      if (ordersRef.current) {
-        ordersRef.current = ordersRef.current.map((o) => (o.id === orderId ? { ...o, status } : o));
-      }
+      syncOrderPatch(orderId, { status });
 
       if (status === "cancelled") {
         let extra = "";
@@ -2252,10 +2283,7 @@ export default function AdminDashboard() {
 
     try {
       const admin_note = String(adminNoteDrafts[orderId] || "").trim() || null;
-      setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, admin_note } : o)));
-      if (ordersRef.current) {
-        ordersRef.current = ordersRef.current.map((o) => (o.id === orderId ? { ...o, admin_note } : o));
-      }
+      syncOrderPatch(orderId, { admin_note });
       const { error } = await supabase.from("orders").update({ admin_note }).eq("id", orderId);
       if (error) throw error;
 
@@ -2682,41 +2710,52 @@ export default function AdminDashboard() {
   return (
     <div className="page admin-page admin-page--app">
       <section className="section admin-section">
-        <div className="admin-shell">
+        <div className={`admin-shell${sidebarCollapsed ? " is-collapsed" : ""}`}>
           <AdminSidebar
             tabs={tabs}
             activeTabId={tab}
             onSelectTab={handleSelectTab}
             icons={TAB_ICONS}
             greetingName={adminGreetingName}
+            adminEmail={adminEmail}
             todayOrders={analyticsSummary.todayOrders}
-            todayRevenue={formatIDR(analyticsSummary.todayRevenue)}
             liveOrders={orderStats.live}
             newOrderCount={newOrderCount}
             stockAlertCount={analyticsSummary.stockAlerts.length}
             flashSaleEndingSoon={flashSaleEndingSoon}
-            onRefresh={refreshAll}
             onLogout={logout}
-            syncLabel={syncCopy}
-            soundEnabled={soundEnabled}
-            onToggleSound={toggleSound}
+            collapsed={sidebarCollapsed}
+            onToggleCollapse={toggleSidebarCollapse}
+            mobileOpen={mobileNavOpen}
+            onCloseMobile={() => setMobileNavOpen(false)}
           />
 
           <main className="admin-main">
+            <AdminTopbar
+              activeTab={activeTab}
+              loading={loading}
+              syncLabel={syncCopy}
+              soundEnabled={soundEnabled}
+              onToggleSound={toggleSound}
+              onRefresh={refreshAll}
+              collapsed={sidebarCollapsed}
+              onToggleCollapse={toggleSidebarCollapse}
+              onOpenMobileMenu={() => setMobileNavOpen(true)}
+            />
+
             <AdminMobileNav
               tabs={tabs}
               activeTabId={tab}
               onSelectTab={handleSelectTab}
               icons={TAB_ICONS}
+              liveOrders={orderStats.live}
               newOrderCount={newOrderCount}
               stockAlertCount={analyticsSummary.stockAlerts.length}
               flashSaleEndingSoon={flashSaleEndingSoon}
-              onRefresh={refreshAll}
-              onLogout={logout}
-              soundEnabled={soundEnabled}
-              onToggleSound={toggleSound}
+              onOpenDrawer={() => setMobileNavOpen(true)}
             />
 
+            <div className="admin-workspace">
             {msg ? (
               <div className={`admin-alert${msgIsError ? " is-error" : ""}`} role="alert">
                 <b>{msgIsError ? "Perlu diperbaiki" : "Info"}</b>
@@ -2763,22 +2802,34 @@ export default function AdminDashboard() {
 
                 <div className="admin-kpiStrip">
                   <div className="admin-kpiCard">
-                    <span className="admin-kpiLabel">Omzet ({analyticsWindow === "7d" ? "7 Hari" : "30 Hari"})</span>
+                    <div className="admin-kpiTop">
+                      <span className="admin-kpiLabel">Omzet ({analyticsWindow === "7d" ? "7 Hari" : "30 Hari"})</span>
+                      <span className="admin-kpiIcon is-emerald" aria-hidden="true"><Wallet size={16} /></span>
+                    </div>
                     <strong className="admin-kpiValue">{formatIDR(analyticsSummary.revenueTotal)}</strong>
                     <span className="admin-kpiSub">{analyticsSummary.doneOrders} transaksi selesai</span>
                   </div>
                   <div className="admin-kpiCard">
-                    <span className="admin-kpiLabel">Omzet Hari Ini</span>
+                    <div className="admin-kpiTop">
+                      <span className="admin-kpiLabel">Omzet Hari Ini</span>
+                      <span className="admin-kpiIcon is-neutral" aria-hidden="true"><TrendingUp size={16} /></span>
+                    </div>
                     <strong className="admin-kpiValue">{formatIDR(analyticsSummary.todayRevenue)}</strong>
                     <span className="admin-kpiSub">{analyticsSummary.todayOrders} pesanan masuk</span>
                   </div>
                   <div className="admin-kpiCard">
-                    <span className="admin-kpiLabel">Rata-rata Order</span>
+                    <div className="admin-kpiTop">
+                      <span className="admin-kpiLabel">Rata-rata Order</span>
+                      <span className="admin-kpiIcon is-neutral" aria-hidden="true"><ClipboardList size={16} /></span>
+                    </div>
                     <strong className="admin-kpiValue">{formatIDR(analyticsSummary.averageOrderValue)}</strong>
-                    <span className="admin-kpiSub">Nilai keranjang</span>
+                    <span className="admin-kpiSub">Nilai per transaksi</span>
                   </div>
                   <div className="admin-kpiCard">
-                    <span className="admin-kpiLabel">Konversi & Kunjungan</span>
+                    <div className="admin-kpiTop">
+                      <span className="admin-kpiLabel">Konversi & Kunjungan</span>
+                      <span className="admin-kpiIcon is-emerald" aria-hidden="true"><Eye size={16} /></span>
+                    </div>
                     <strong className="admin-kpiValue">{formatPercent(analyticsSummary.conversionRatio, 1)}</strong>
                     <span className="admin-kpiSub">{formatCompactNumber(storePulse.total_views)} total tayangan</span>
                   </div>
@@ -3638,11 +3689,15 @@ export default function AdminDashboard() {
                       {orderBucket === "attention"
                         ? `${orderStats.live} pesanan perlu diproses`
                         : `${orderStats.total} total pesanan`}
-                      {orderSearchingServer ? <span className="admin-orderSearchHint"> · Mencari...</span> : null}
+                      {orderSearchingServer ? <span className="admin-orderSearchHint"> · Mencari semua pesanan...</span> : null}
                     </div>
                   </div>
                   <div className="admin-panel-headActions">
-                    <button className="btn btn-ghost btn-sm" onClick={refreshOrders} type="button">
+                    <button
+                      className="btn btn-ghost btn-sm"
+                      onClick={() => refreshOrders({ force: true, resetSearch: true })}
+                      type="button"
+                    >
                       Refresh
                     </button>
                     <button className="btn btn-sm btn-primary admin-desktopOnly" type="button" onClick={handleExportCSV}>
@@ -3658,100 +3713,69 @@ export default function AdminDashboard() {
                       type="search"
                       value={orderQuery}
                       onChange={(e) => setOrderQuery(e.target.value)}
-                      placeholder="Cari kode / WA / produk..."
+                      placeholder="Cari kode / WA / item / catatan / tanggal..."
                       autoComplete="off"
                     />
 
                     <div className="admin-orderFilterBar" aria-label="Filter order">
-                      <div className="admin-chipRow admin-chipRow--scroll" role="tablist" aria-label="Katalog pesanan">
+                      <div className="admin-chipRow admin-chipRow--scroll" role="tablist" aria-label="Filter status pesanan">
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderBucket === "all" ? "active" : ""}`}
+                          onClick={() => setOrderBucket("all")}
+                        >
+                          Semua Status
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderBucket === "attention" ? "active" : ""}`}
+                          onClick={() => setOrderBucket("attention")}
+                        >
+                          Perlu Aksi {orderStats.live > 0 ? `(${orderStats.live})` : ""}
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderBucket === "done" ? "active" : ""}`}
+                          onClick={() => setOrderBucket("done")}
+                        >
+                          Selesai
+                        </button>
+                        <button
+                          type="button"
+                          className={`admin-chip ${orderBucket === "cancelled" ? "active" : ""}`}
+                          onClick={() => setOrderBucket("cancelled")}
+                        >
+                          Batal
+                        </button>
+
+                        <span className="admin-chipDivider" aria-hidden="true" />
+
                         <button
                           type="button"
                           className={`admin-chip ${orderCatalogFilter === "all" ? "active" : ""}`}
-                          onClick={() => {
-                            setOrderCatalogFilter("all");
-                            setOrderBucket("all");
-                            setOrderStatusFilterOpen(false);
-                          }}
+                          onClick={() => setOrderCatalogFilter("all")}
                         >
-                          Semua
+                          Semua Katalog
                         </button>
                         <button
                           type="button"
                           className={`admin-chip ${orderCatalogFilter === "app_premium" ? "active" : ""}`}
-                          onClick={() => {
-                            setOrderCatalogFilter((prev) => (prev === "app_premium" ? "all" : "app_premium"));
-                          }}
+                          onClick={() =>
+                            setOrderCatalogFilter((prev) => (prev === "app_premium" ? "all" : "app_premium"))
+                          }
                         >
-                          App premium
+                          App Premium
                         </button>
                         <button
                           type="button"
                           className={`admin-chip ${orderCatalogFilter === "academic" ? "active" : ""}`}
-                          onClick={() => {
-                            setOrderCatalogFilter((prev) => (prev === "academic" ? "all" : "academic"));
-                          }}
+                          onClick={() =>
+                            setOrderCatalogFilter((prev) => (prev === "academic" ? "all" : "academic"))
+                          }
                         >
                           Jasa Akademik
                         </button>
-                        <button
-                          type="button"
-                          className={`admin-chip admin-chip--filter${orderStatusFilterOpen || orderBucket !== "all" ? " active" : ""}`}
-                          aria-expanded={orderStatusFilterOpen}
-                          onClick={() => setOrderStatusFilterOpen((v) => !v)}
-                        >
-                          <Filter size={14} />
-                          Filter
-                          {orderBucket !== "all" ? (
-                            <span className="admin-chipMeta">
-                              {orderBucket === "attention"
-                                ? "Aksi"
-                                : orderBucket === "done"
-                                  ? "Selesai"
-                                  : orderBucket === "cancelled"
-                                    ? "Batal"
-                                    : ""}
-                            </span>
-                          ) : null}
-                        </button>
                       </div>
-
-                      {orderStatusFilterOpen ? (
-                        <div className="admin-orderStatusMenu" role="group" aria-label="Filter status">
-                          <button
-                            type="button"
-                            className={`admin-chip ${orderBucket === "attention" ? "active" : ""}`}
-                            onClick={() => setOrderBucket("attention")}
-                          >
-                            Aksi {orderStats.live > 0 ? `(${orderStats.live})` : ""}
-                          </button>
-                          <button
-                            type="button"
-                            className={`admin-chip ${orderBucket === "done" ? "active" : ""}`}
-                            onClick={() => setOrderBucket("done")}
-                          >
-                            Selesai
-                          </button>
-                          <button
-                            type="button"
-                            className={`admin-chip ${orderBucket === "cancelled" ? "active" : ""}`}
-                            onClick={() => setOrderBucket("cancelled")}
-                          >
-                            Batal
-                          </button>
-                          {orderBucket !== "all" ? (
-                            <button
-                              type="button"
-                              className="admin-chip"
-                              onClick={() => {
-                                setOrderBucket("all");
-                                setOrderStatusFilterOpen(false);
-                              }}
-                            >
-                              Reset status
-                            </button>
-                          ) : null}
-                        </div>
-                      ) : null}
                     </div>
 
                     <div className="admin-inlineStats admin-orderQuickStats">
@@ -3806,16 +3830,34 @@ export default function AdminDashboard() {
                     <div className="admin-emptyWrap">
                       <EmptyState
                         icon="ORD"
-                        title={orderBucket === "attention" ? "Tidak ada order yang perlu aksi" : "Order tidak ditemukan"}
+                        title={
+                          orderSearchingServer
+                            ? "Mencari di seluruh pesanan..."
+                            : orderBucket === "attention"
+                              ? "Tidak ada order yang perlu aksi"
+                              : "Order tidak ditemukan"
+                        }
                         description={
-                          orderBucket === "attention"
-                            ? "Semua antrean bersih. Buka filter Semua untuk melihat riwayat."
-                            : "Coba ubah filter atau kata kunci."
+                          orderSearchingServer
+                            ? "Sedang memeriksa riwayat pesanan tanpa batas halaman."
+                            : isSearchingOrders && (orderBucket !== "all" || orderCatalogFilter !== "all")
+                              ? "Tidak ada hasil pada filter aktif. Coba cari di semua status & katalog."
+                              : orderBucket === "attention"
+                                ? "Semua antrean bersih. Buka filter Semua untuk melihat riwayat."
+                                : "Coba ubah filter atau kata kunci."
                         }
                         primaryAction={
-                          orderBucket === "attention"
-                            ? { label: "Lihat semua order", onClick: () => setOrderBucket("all") }
-                            : undefined
+                          isSearchingOrders && (orderBucket !== "all" || orderCatalogFilter !== "all")
+                            ? {
+                                label: "Cari di semua status & katalog",
+                                onClick: () => {
+                                  setOrderBucket("all");
+                                  setOrderCatalogFilter("all");
+                                },
+                              }
+                            : orderBucket === "attention"
+                              ? { label: "Lihat semua order", onClick: () => setOrderBucket("all") }
+                              : undefined
                         }
                       />
                     </div>
@@ -3881,14 +3923,20 @@ export default function AdminDashboard() {
                         )}
                       />
 
-                      {ordersHasMore ? (
+                      {isSearchingOrders ? (
+                        <div className="admin-capBanner" role="status">
+                          {orderSearchingServer
+                            ? `Sedang mencari di seluruh database pesanan (${allKnownOrders.length} diperiksa)...`
+                            : `Menampilkan ${filteredOrders.length} hasil pencarian dari seluruh database (${allKnownOrders.length} pesanan).`}
+                        </div>
+                      ) : ordersHasMore ? (
                         <div className="admin-capBanner" role="status">
                           Menampilkan {orders.length} order terbaru. Masih ada order lebih lama di database.
                         </div>
                       ) : null}
 
                       <div className="admin-loadMore">
-                        {ordersHasMore ? (
+                        {!isSearchingOrders && ordersHasMore ? (
                           <button
                             className="btn btn-ghost"
                             type="button"
@@ -4273,6 +4321,7 @@ export default function AdminDashboard() {
                 analyticsSummary={analyticsSummary}
               />
             ) : null}
+            </div>
           </main>
         </div>
       </section>

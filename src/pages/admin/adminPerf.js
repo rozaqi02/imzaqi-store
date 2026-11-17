@@ -8,6 +8,9 @@ import { LIVE_ORDER_STATUSES } from "../../lib/orderStatus";
 /** First page / load-more chunk - was 500 (too heavy). */
 export const ORDERS_PAGE_SIZE = 40;
 
+/** Supabase/PostgREST max single range batch size for full unlimited search pagination. */
+export const ORDER_SEARCH_BATCH_SIZE = 1000;
+
 /** Stok tipis = hampir habis, tapi masih ada (bukan 0 / abis). Ambang: 0 < stock < 2 → hanya 1. */
 export const STOCK_THIN_BELOW = 2;
 
@@ -17,9 +20,9 @@ export function isThinStock(stock) {
   return n > 0 && n < STOCK_THIN_BELOW;
 }
 
-/** List row: enough for cards + filters; skip heavy detail fields. */
+/** List row: includes notes/items for instant search; skips heavy proof/verification blobs. */
 export const ORDER_SELECT_LIST =
-  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,customer_whatsapp,admin_note,buyer_email";
+  "id,order_code,created_at,status,items,subtotal_idr,discount_percent,total_idr,promo_code,customer_whatsapp,notes,admin_note,buyer_email";
 
 /** Full row for detail drawer / notes / proof. */
 export const ORDER_SELECT_DETAIL =

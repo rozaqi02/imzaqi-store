@@ -2834,6 +2834,7 @@ html[data-theme] body :is(
   .faq-searchWrap input.faq-searchInput,
   .catalog-filterSearch input,
   .st-search .st-searchInputRow input,
+  .st-search .st-inputWrap input,
   .hero-search input
 ) {
   background: transparent !important;
@@ -2858,7 +2859,8 @@ html[data-theme] body :is(
   .help-search,
   .reviews-search,
   .faq-searchWrap,
-  .catalog-filterSearch
+  .catalog-filterSearch,
+  .st-inputWrap
 ):focus-within {
   border-color: rgba(0, 180, 130, 0.55) !important;
   box-shadow:
