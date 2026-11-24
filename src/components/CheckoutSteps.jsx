@@ -1,12 +1,12 @@
 import React from "react";
-import { PackageSearch, QrCode } from "lucide-react";
+import { Check, PackageSearch, QrCode } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CartIcon from "./CartIcon";
 
 /**
  * 3-step helper to reduce anxiety in checkout flow.
  * current: "checkout" | "pay" | "status"
- * Step yang sudah selesai (done) bisa diklik untuk navigasi balik.
+ * Step yang sudah selesai (done) bisa diklik untuk navigasi balik saat readOnly=false.
  */
 
 const STEP_ROUTES = {
@@ -17,9 +17,9 @@ const STEP_ROUTES = {
 
 // Konstanta di module level agar tidak dibuat ulang tiap render
 const STEPS = [
-  { key: "checkout", title: "Keranjang", subtitle: "Cek item", icon: CartIcon },
-  { key: "pay", title: "Bayar", subtitle: "Scan QRIS", icon: QrCode },
-  { key: "status", title: "Lacak", subtitle: "ID order", icon: PackageSearch },
+  { key: "checkout", title: "Keranjang", subtitle: "Cek item", backSubtitle: "Edit item", icon: CartIcon },
+  { key: "pay", title: "Bayar", subtitle: "Scan QRIS", backSubtitle: "Cek bayar", icon: QrCode },
+  { key: "status", title: "Lacak", subtitle: "ID order", backSubtitle: "Status", icon: PackageSearch },
 ];
 
 export default function CheckoutSteps({ current = "checkout", readOnly = false }) {
@@ -37,7 +37,8 @@ export default function CheckoutSteps({ current = "checkout", readOnly = false }
         const active = idx === currentIndex;
         const isClickable = done && !readOnly;
         const cls = isClickable ? "step done step--clickable" : done ? "step done" : active ? "step active" : "step";
-        const Icon = step.icon;
+        const Icon = done ? Check : step.icon;
+        const subText = isClickable ? step.backSubtitle : done ? "Selesai" : step.subtitle;
 
         const handleClick = () => {
           if (isClickable && STEP_ROUTES[step.key]) {
@@ -45,33 +46,44 @@ export default function CheckoutSteps({ current = "checkout", readOnly = false }
           }
         };
 
-        const handleKeyDown = (e) => {
-          if (isClickable && (e.key === "Enter" || e.key === " ")) {
-            e.preventDefault();
-            handleClick();
-          }
-        };
+        const content = (
+          <>
+            <div className="step-dot" aria-hidden="true">
+              <Icon size={16} strokeWidth={done ? 2.5 : 2.2} />
+            </div>
+            <div className="step-text">
+              <div className="step-title">{step.title}</div>
+              <div className="step-sub">{subText}</div>
+            </div>
+          </>
+        );
+
+        if (isClickable) {
+          return (
+            <button
+              type="button"
+              key={step.key}
+              className={cls}
+              aria-posinset={idx + 1}
+              aria-setsize={STEPS.length}
+              onClick={handleClick}
+              title={`Kembali ke ${step.title}`}
+            >
+              {content}
+            </button>
+          );
+        }
 
         return (
-          <button
-            type="button"
+          <div
             key={step.key}
             className={cls}
             aria-current={active ? "step" : undefined}
             aria-posinset={idx + 1}
             aria-setsize={STEPS.length}
-            disabled={!isClickable}
-            onClick={isClickable ? handleClick : undefined}
-            title={isClickable ? `Kembali ke ${step.title}` : undefined}
           >
-            <div className="step-dot" aria-hidden="true">
-              <Icon size={16} strokeWidth={2.2} />
-            </div>
-            <div className="step-text">
-              <div className="step-title">{step.title}</div>
-              <div className="step-sub">{isClickable ? "Edit item" : step.subtitle}</div>
-            </div>
-          </button>
+            {content}
+          </div>
         );
       })}
     </div>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ArrowUpRight, Send, Star } from "lucide-react";
 import { fireConfetti } from "../../components/Confetti";
 import { trackFunnelEvent } from "../../lib/funnelAnalytics";
@@ -39,6 +39,23 @@ export default function StatusReviewStrip({ order, waUrl, toast }) {
       return null;
     }
   });
+
+  useEffect(() => {
+    try {
+      const saved =
+        typeof window !== "undefined" && window.localStorage
+          ? localStorage.getItem(`imzaqi_review_${order?.order_code}`)
+          : null;
+      setExistingReview(saved ? JSON.parse(saved) : null);
+    } catch {
+      setExistingReview(null);
+    }
+    setRating(5);
+    setHoverRating(0);
+    setExpanded(false);
+    setReviewText("");
+    setAuthorName("");
+  }, [order?.order_code]);
 
   const activeStarCount = hoverRating || rating;
 
@@ -86,23 +103,16 @@ export default function StatusReviewStrip({ order, waUrl, toast }) {
       if (typeof supabase?.from === "function") {
         const firstItem = getSafeOrderItems(order?.items)[0];
         const iconUrl = firstItem?.product_icon_url || "/icon.png";
-        const basePayload = {
+        const productName = String(firstItem?.product_name || "").trim();
+        const productTag = productName ? ` (${productName})` : "";
+        // Sync with public.testimonials schema: (id, image_url, caption, is_active, sort_order, created_at)
+        const payload = {
           image_url: iconUrl,
-          caption: `[${rating}/5] "${effectiveText}", ${effectiveAuthor} (#${order.order_code})`,
+          caption: `[${rating}/5] "${effectiveText}" · Dari ${effectiveAuthor}${productTag}`,
           is_active: false,
           sort_order: 100,
         };
-        const richPayload = {
-          ...basePayload,
-          product_name: String(firstItem?.product_name || "").trim() || null,
-          customer_name: effectiveAuthor,
-          rating,
-          is_verified: true,
-        };
-        const res = await supabase.from("testimonials").insert([richPayload]);
-        if (res?.error) {
-          await supabase.from("testimonials").insert([basePayload]);
-        }
+        await supabase.from("testimonials").insert([payload]);
       }
 
       setExistingReview(reviewData);

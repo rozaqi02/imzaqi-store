@@ -1,23 +1,9 @@
 import React from "react";
 import {
-  ArrowUpRight, Check, ClipboardList, History,
-  PackageCheck, Search,
+  History,
+  PackageCheck,
+  Search,
 } from "lucide-react";
-
-function CatalogProductStack({ products }) {
-  const preferred = ["netflix", "spotify", "canva", "youtube", "gemini"];
-  const available = products.filter(product => product.is_active !== false && product.icon_url);
-  const icons = [...available].sort((a, b) => {
-    const rank = product => { const index = preferred.findIndex(name => String(product.slug).includes(name)); return index < 0 ? preferred.length : index; };
-    return rank(a) - rank(b);
-  }).slice(0, 5);
-  if (!icons.length) return null;
-  return <div className="catalog-productStack" aria-hidden="true">
-    {icons.map((product, index) => <div className={`catalog-stackCard catalog-stackCard--${index + 1}`} key={product.id}>
-      <img className={/canva|gemini/i.test(product.slug || "") ? "catalog-stackIcon--rounded" : undefined} src={product.icon_url} alt="" width="52" height="52" decoding="async" onError={event => { event.currentTarget.style.display = "none"; }} />
-    </div>)}
-  </div>;
-}
 
 export function CatalogHero({
   loading,
@@ -25,22 +11,18 @@ export function CatalogHero({
   productCount,
   readyCount,
   onSearch,
-  products = [],
   children,
   search,
 }) {
   return (
     <header className="store-hero store-hero--catalog">
       <div className="store-heroCopy">
-        <h1>Pilih paket <span>andalanmu.</span></h1>
-        <p>Aplikasi premium untuk kebutuhanmu.</p>
+        <h1>Katalog Produk</h1>
+        <p>Aplikasi premium dan layanan akademik siap pakai.</p>
         <div className="store-heroFacts" aria-label="Ringkasan katalog">
           <span><strong>{loading ? "…" : error ? "-" : productCount}</strong> produk</span>
           <span><strong>{loading ? "…" : error ? "-" : readyCount}</strong> varian tersedia</span>
         </div>
-      </div>
-      <div className="store-heroStackClip" aria-hidden="true">
-        <CatalogProductStack products={products} />
       </div>
       <div className="store-heroActions store-heroActions--search">
         {search || children || (
@@ -73,17 +55,6 @@ export function StatusHero({ history = false, hasOrder = false }) {
             ? "Riwayat order di perangkat ini."
             : "Cek perkembangan order dan data akun dari admin."}
         </p>
-      </div>
-
-      <div className="store-heroAside">
-        <div className="store-statusTip">
-          <ClipboardList size={14} aria-hidden="true" />
-          <span>
-            {history
-              ? "Riwayat tersimpan di perangkat ini."
-              : "Siapkan ID order dari konfirmasi pembayaran."}
-          </span>
-        </div>
       </div>
     </header>
   );

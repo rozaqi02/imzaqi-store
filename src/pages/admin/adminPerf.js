@@ -73,6 +73,7 @@ export function liveStatusesArray() {
 export function statusFilterForBucket(orderBucket) {
   if (!orderBucket || orderBucket === "all") return null;
   if (orderBucket === "attention") return { type: "in", values: liveStatusesArray() };
+  if (orderBucket === "cancelled") return { type: "in", values: ["cancelled", "expired"] };
   return { type: "eq", value: orderBucket };
 }
 

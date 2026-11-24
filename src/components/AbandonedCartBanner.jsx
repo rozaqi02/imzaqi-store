@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ShoppingCart, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useCart } from "../context/CartContext";
 import { shouldShowAbandonedCartReminder, dismissAbandonedCartReminder } from "../lib/cartReminder";
 import { useStorefrontOverlayBlocked } from "../hooks/useFunnelRoute";
 import { useOverlayBusy } from "../hooks/useOverlaySlot";
 import BannerGraphic from "./BannerGraphic";
+import CartIcon from "./CartIcon";
 
 export default function AbandonedCartBanner() {
   const location = useLocation();
@@ -27,11 +28,13 @@ export default function AbandonedCartBanner() {
         <span>Itemmu masih tersimpan, lanjut checkout kapan saja.</span>
       </div>
       <Link
-        className="btn btn-sm"
+        className="btn btn-icon abandoned-cart-cta"
         to="/checkout"
         state={{ backgroundLocation: location }}
+        aria-label={`Lanjut checkout (${count} item)`}
+        title="Lanjut checkout"
       >
-        Checkout
+        <CartIcon size={18} strokeWidth={2.2} />
       </Link>
       <button
         type="button"

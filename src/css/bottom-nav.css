@@ -22,7 +22,7 @@ html {
   z-index: 9995;
   isolation: isolate;
   contain: layout style;
-  padding: 5px 8px;
+  padding: 5px;
   border-radius: 999px;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background:
@@ -92,7 +92,7 @@ html[data-theme="light"] .bottom-nav::before {
   bottom: 0;
   left: 0;
   width: calc((100% - 3 * var(--nav-pill-gap, 6px)) / 4);
-  border-radius: 999px;
+  border-radius: 999px !important;
   border: 1px solid rgba(255, 255, 255, 0.14);
   background: var(--skeu-inset-bg, rgba(255, 255, 255, 0.08));
   box-shadow: var(--skeu-inset-shadow, inset 0 1.5px 3px rgba(0, 0, 0, 0.4));
@@ -202,8 +202,8 @@ html[data-theme="light"] .bottom-nav-badge {
 }
 
 .bottom-nav-label {
-  font-size: 11px;
-  font-weight: 800;
+  font-size: 10px;
+  font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1.1;
   max-width: 100%;
@@ -214,7 +214,7 @@ html[data-theme="light"] .bottom-nav-badge {
 
 .bottom-nav-item.is-active .bottom-nav-label {
   color: var(--brand-text) !important;
-  font-weight: 900 !important;
+  font-weight: 700 !important;
 }
 
 @media (max-width: 1024px) {
@@ -250,7 +250,7 @@ html[data-theme="light"] .bottom-nav-badge {
   .bottom-nav-item {
     min-height: 56px;
     gap: 4px;
-    border-radius: 16px;
+    border-radius: 999px !important;
   }
 
   .bottom-nav-icon {
@@ -259,7 +259,7 @@ html[data-theme="light"] .bottom-nav-badge {
   }
 
   .bottom-nav-label {
-    font-size: 11.5px;
+    font-size: 10.5px;
   }
 }
 

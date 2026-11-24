@@ -9,7 +9,7 @@ const SESSION_KEY = "imzaqi_funnel_session_v1";
 // setiap request pasti gagal (42P01 undefined_table / 42883 undefined_function).
 // Kita deteksi sekali lalu berhenti mengirim request sia-sia.
 // Setelah migration diterapkan, status pulih otomatis setelah TTL atau reset cache.
-const UNAVAILABLE_KEY = "imzaqi_funnel_unavailable_v1";
+const UNAVAILABLE_KEY = "imzaqi_funnel_unavailable_v2";
 
 function checkBackendUnavailable() {
   try {

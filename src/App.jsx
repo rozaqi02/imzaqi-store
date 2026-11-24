@@ -1,14 +1,46 @@
 import React, { Suspense, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import AdminLoader from "./components/AdminLoader";
+import PageLoader from "./components/PageLoader";
 import NetworkBridge from "./components/NetworkBridge";
 import Confetti from "./components/Confetti";
-import FlashSalePopup from "./components/FlashSalePopup";
-import AcademicPopup from "./components/AcademicPopup";
-import NewProductPopup from "./components/NewProductPopup";
+import FloatingOrderStatus from "./components/FloatingOrderStatus";
+import PageErrorBoundary from "./components/PageErrorBoundary";
+import Home from "./pages/Home";
 import { PresenceProvider } from "./context/PresenceContext";
+import { usePageView } from "./hooks/usePageView";
+import { useGlobalShortcuts } from "./hooks/useGlobalShortcuts";
+import { useLongTaskMonitor } from "./hooks/usePerformanceMonitor";
+import { useDeviceCapability } from "./hooks/useIsMobile";
+import { useGlobalInteractionFeedback } from "./hooks/useGlobalInteractionFeedback";
+import { shouldSkipCatalogScrollToTop } from "./hooks/useScrollMemory";
+import { useStorefrontOverlayBlocked } from "./hooks/useFunnelRoute";
+import { captureReferralFromUrl } from "./lib/referral";
+import { lazyPage, prefetchPrimaryRoutes } from "./lib/routePrefetch";
+
+// Lazy-loaded pages (non-critical, reduces initial bundle)
+const Faq = lazyPage("faq");
+const Products = lazyPage("products");
+const ProductDetail = lazyPage("productDetail");
+const Status = lazyPage("status");
+const NotFound = lazyPage("notFound");
+const About = lazyPage("about");
+const Testimonials = lazyPage("testimonials");
+const Promosi = lazyPage("promosi");
+const Checkout = lazyPage("checkout");
+const Pay = lazyPage("pay");
+const AdminLogin = lazyPage("adminLogin");
+const AdminDashboard = lazyPage("adminDashboard");
+
+// Lazy-loaded storefront overlays & background toasts (keeps initial JS bundle lean)
+const FlashSalePopup = React.lazy(() => import("./components/FlashSalePopup"));
+const AcademicPopup = React.lazy(() => import("./components/AcademicPopup"));
+const NewProductPopup = React.lazy(() => import("./components/NewProductPopup"));
+const AchievementToast = React.lazy(() => import("./components/AchievementToast"));
+const AbandonedCartBanner = React.lazy(() => import("./components/AbandonedCartBanner"));
+const SwUpdateToast = React.lazy(() => import("./components/SwUpdateToast"));
 
 const DEFER_OVERLAY_MS = 2000;
 
@@ -38,164 +70,17 @@ function useDeferredOverlayMount(delayMs = DEFER_OVERLAY_MS) {
 
   return ready;
 }
-import { usePageView } from "./hooks/usePageView";
-import { useGlobalShortcuts, useTitleTicker } from "./hooks/useGlobalShortcuts";
-import { useLongTaskMonitor } from "./hooks/usePerformanceMonitor";
-import { useDeviceCapability } from "./hooks/useIsMobile";
-import { ArrowRight, X } from "lucide-react";
-import AchievementToast from "./components/AchievementToast";
-import AbandonedCartBanner from "./components/AbandonedCartBanner";
-import SwUpdateToast from "./components/SwUpdateToast";
-import PageErrorBoundary from "./components/PageErrorBoundary";
-import { shouldSkipCatalogScrollToTop } from "./hooks/useScrollMemory";
-import { getOrderHistory } from "./lib/orderHistory";
-import { captureReferralFromUrl } from "./lib/referral";
-import { lazyPage, prefetchPrimaryRoutes } from "./lib/routePrefetch";
-import { useStorefrontOverlayBlocked } from "./hooks/useFunnelRoute";
-
-// Eager-loaded pages (critical path)
-import Home from "./pages/Home";
-
-// Lazy-loaded pages (non-critical, reduces initial bundle)
-const Faq = lazyPage("faq");
-const Products = lazyPage("products");
-const ProductDetail = lazyPage("productDetail");
-const Status = lazyPage("status");
-const NotFound = lazyPage("notFound");
-const About = lazyPage("about");
-const Testimonials = lazyPage("testimonials");
-const Promosi = lazyPage("promosi");
-const Checkout = lazyPage("checkout");
-const Pay = lazyPage("pay");
-const AdminLogin = lazyPage("adminLogin");
-const AdminDashboard = lazyPage("adminDashboard");
-
-const LOADER_QUOTES = [
-  "Nyiapin yang terbaik buat kamu...",
-  "Stok fresh, harga pelajar.",
-  "Sebentar ya, lagi ngambil dari gudang...",
-  "Premium terjangkau, bukan mimpi.",
-  "Muat sebentar, worth the wait!",
-  "Loading... tapi cepet kok.",
-  "Akun ready, tinggal checkout.",
-];
-
-// Branded page loading fallback
-function PageLoader() {
-  const [text, setText] = React.useState("");
-  const [quoteIdx] = React.useState(() => Math.floor(Math.random() * LOADER_QUOTES.length));
-  const quote = LOADER_QUOTES[quoteIdx];
-  const charRef = React.useRef(0);
-
-  React.useEffect(() => {
-    charRef.current = 0;
-    setText("");
-    const interval = setInterval(() => {
-      charRef.current += 1;
-      setText(quote.slice(0, charRef.current));
-      if (charRef.current >= quote.length) clearInterval(interval);
-    }, 38);
-    return () => clearInterval(interval);
-  }, [quote]);
-
-  return (
-    <div className="page-loader" aria-label="Memuat halaman" role="status">
-      <div className="page-loader-inner">
-        <img className="page-loader-logo" src="/icon.png" alt="imzaqi.store" />
-        <div className="page-loader-dots">
-          <span />
-          <span />
-          <span />
-        </div>
-        <p className="page-loader-quote" aria-live="polite">{text}<span className="page-loader-cursor" aria-hidden="true">|</span></p>
-      </div>
-    </div>
-  );
-}
 
 function StorefrontOverlays() {
   const blocked = useStorefrontOverlayBlocked();
   if (blocked) return null;
   return (
-    <>
+    <Suspense fallback={null}>
       <FlashSalePopup />
       <AcademicPopup />
       <NewProductPopup />
-    </>
+    </Suspense>
   );
-}
-
-// Floating recent order button
-function FloatingOrderStatus() {
-  const navigate = useNavigate();
-  const location = useLocation();
-  const overlayBlocked = useStorefrontOverlayBlocked();
-  const isStatusPage = location.pathname === "/status";
-  const [order, setOrder] = useState(null);
-  const [dismissed, setDismissed] = useState(false);
-
-  useEffect(() => {
-    try {
-      const history = getOrderHistory();
-      if (history.length > 0 && history[0]?.order_code) {
-        const last = history[0];
-        const age = Date.now() - new Date(last.created_at).getTime();
-        if (age < 86400000) setOrder(last);
-        else setOrder(null);
-      } else {
-        setOrder(null);
-      }
-    } catch {}
-  }, [location.pathname]);
-
-  useEffect(() => {
-    if (typeof document === "undefined") return undefined;
-    const active = Boolean(order && !dismissed && !overlayBlocked && !isStatusPage);
-    document.body.classList.toggle("has-floating-order", active);
-    return () => document.body.classList.remove("has-floating-order");
-  }, [order, dismissed, overlayBlocked, isStatusPage]);
-
-  if (overlayBlocked || isStatusPage || !order || dismissed) return null;
-
-  return (
-    <div className="floating-order-status">
-      <button
-        className="floating-order-btn"
-        type="button"
-        onClick={() => {
-          navigate(`/status?order=${encodeURIComponent(order.order_code)}`);
-        }}
-      >
-        <span className="floating-order-label">Order terbaru Anda:</span>
-        <span className="floating-order-code">{order.order_code}</span>
-        <span className="floating-order-arrow"><ArrowRight size={13} /></span>
-      </button>
-      <button
-        className="floating-order-dismiss"
-        type="button"
-        onClick={() => setDismissed(true)}
-        aria-label="Tutup"
-      >
-        <X size={13} strokeWidth={2.4} />
-      </button>
-    </div>
-  );
-}
-
-// Smooth scroll to top on route change
-function SuspenseReadyNotifier({ onReady, routeKey }) {
-  React.useEffect(() => {
-    // Double rAF ensures browser has painted before showing footer
-    let id2 = null;
-    const id1 = requestAnimationFrame(() => {
-      id2 = requestAnimationFrame(() => onReady());
-    });
-    return () => {
-      cancelAnimationFrame(id1);
-      if (id2 !== null) cancelAnimationFrame(id2);
-    };
-  }, [routeKey, onReady]);
-  return null;
 }
 
 function ReferralCapture() {
@@ -210,6 +95,17 @@ function ReferralCapture() {
 
 function BoundedRoute({ pageName, children }) {
   return <PageErrorBoundary pageName={pageName}>{children}</PageErrorBoundary>;
+}
+
+export function buildRedirectTarget(to, currentSearch = "") {
+  const incoming = String(currentSearch || "").replace(/^\?/, "");
+  if (!incoming) return to;
+  return to.includes("?") ? `${to}&${incoming}` : `${to}?${incoming}`;
+}
+
+function RedirectKeepingSearch({ to }) {
+  const location = useLocation();
+  return <Navigate to={buildRedirectTarget(to, location.search)} replace />;
 }
 
 export function useCheckoutOverlayLocation(location) {
@@ -237,20 +133,14 @@ function ScrollToTop() {
 
     if (showCheckoutOverlay) return;
 
-    if (pathname === "/produk") {
-      // URL filter sync can re-run this effect - never scroll-to-top for that.
-      if (shouldSkipCatalogScrollToTop()) return;
+    if (pathname === "/produk" && shouldSkipCatalogScrollToTop()) {
+      return;
     }
 
-    // Saat navigasi ke halaman non-katalog, pastikan scrollRestoration kembali
-    // ke "auto" - kalau tidak, iOS Safari akan ingat posisi scroll katalog
-    // dan menerapkannya ke halaman baru (biasanya footer/bawah halaman).
     if (pathname !== "/produk" && typeof history !== "undefined") {
       history.scrollRestoration = "auto";
     }
 
-    // Scroll instan ke top tanpa animasi smooth-scroll sweep agar transisi
-    // halaman baru terasa bersih, konsisten, dan bebas flicker/jolt.
     const jumpTop = () => {
       try {
         window.scrollTo({ top: 0, left: 0, behavior: "instant" });
@@ -288,16 +178,16 @@ function AppRoutes() {
             <Route path="/testimoni" element={<BoundedRoute pageName="Ulasan"><Testimonials /></BoundedRoute>} />
             <Route path="/promosi" element={<BoundedRoute pageName="Media Promosi"><Promosi /></BoundedRoute>} />
             <Route path="/checkout" element={<BoundedRoute pageName="Checkout"><Checkout /></BoundedRoute>} />
-            <Route path="/cart" element={<Navigate to="/checkout" replace />} />
-            <Route path="/keranjang" element={<Navigate to="/checkout" replace />} />
+            <Route path="/cart" element={<RedirectKeepingSearch to="/checkout" />} />
+            <Route path="/keranjang" element={<RedirectKeepingSearch to="/checkout" />} />
             <Route path="/bayar" element={<BoundedRoute pageName="Bayar"><Pay /></BoundedRoute>} />
-            <Route path="/pay" element={<Navigate to="/bayar" replace />} />
+            <Route path="/pay" element={<RedirectKeepingSearch to="/bayar" />} />
             <Route path="/status" element={<BoundedRoute pageName="Status Pesanan"><Status /></BoundedRoute>} />
-            <Route path="/order" element={<Navigate to="/status" replace />} />
-            <Route path="/orders" element={<Navigate to="/status" replace />} />
-            <Route path="/riwayat" element={<Navigate to="/status?tab=riwayat" replace />} />
+            <Route path="/order" element={<RedirectKeepingSearch to="/status" />} />
+            <Route path="/orders" element={<RedirectKeepingSearch to="/status" />} />
+            <Route path="/riwayat" element={<RedirectKeepingSearch to="/status?tab=riwayat" />} />
             <Route path="/admin" element={<BoundedRoute pageName="Admin Login"><AdminLogin /></BoundedRoute>} />
-            <Route path="/admin/login" element={<Navigate to="/admin" replace />} />
+            <Route path="/admin/login" element={<RedirectKeepingSearch to="/admin" />} />
             <Route
               path="/admin/dashboard"
               element={
@@ -314,11 +204,13 @@ function AppRoutes() {
       </PageErrorBoundary>
 
       {showCheckoutOverlay ? (
-        <Suspense fallback={null}>
-          <Routes>
-            <Route path="/checkout" element={<Checkout />} />
-          </Routes>
-        </Suspense>
+        <BoundedRoute pageName="Checkout">
+          <Suspense fallback={null}>
+            <Routes>
+              <Route path="/checkout" element={<Checkout />} />
+            </Routes>
+          </Suspense>
+        </BoundedRoute>
       ) : null}
     </Layout>
   );
@@ -328,10 +220,14 @@ export default function App() {
   const caps = useDeviceCapability();
   const overlayReady = useDeferredOverlayMount();
   useLongTaskMonitor();
-  useTitleTicker();
+  useGlobalInteractionFeedback();
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
+    if (caps.saveData || caps.lowMemory || window.location.pathname.startsWith("/admin")) {
+      return undefined;
+    }
+
     let cancelled = false;
     const run = () => {
       if (!cancelled) prefetchPrimaryRoutes();
@@ -350,71 +246,7 @@ export default function App() {
       cancelled = true;
       window.clearTimeout(timerId);
     };
-  }, []);
-
-  // Rage Click Detector
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const RAGE_SELECTOR = "button:disabled, button[disabled], .btn-disabled, [disabled]";
-    const clicks = [];
-    let activeToast = null;
-
-    function handleRageClick(e) {
-      const target = e.target?.closest?.(RAGE_SELECTOR);
-      if (!target) return;
-      const now = Date.now();
-      clicks.push(now);
-      while (clicks.length > 0 && now - clicks[0] > 2000) clicks.shift();
-      if (clicks.length >= 3 && !activeToast) {
-        const el = document.createElement("div");
-        el.className = "rage-toast";
-        el.setAttribute("role", "status");
-
-        const text = document.createElement("span");
-        text.textContent = "Sabar ya, lagi diproses...";
-
-        el.appendChild(text);
-        document.body.appendChild(el);
-        activeToast = el;
-
-        setTimeout(() => {
-          if (activeToast) {
-            activeToast.remove();
-            activeToast = null;
-          }
-          clicks.length = 0;
-        }, 2800);
-      }
-    }
-
-    document.addEventListener("click", handleRageClick, { passive: true });
-    return () => {
-      document.removeEventListener("click", handleRageClick);
-      if (activeToast) activeToast.remove();
-    };
-  }, []);
-
-  // Targeted Haptic Feedback (only on key interactive controls, never on text input / typing)
-  useEffect(() => {
-    if (typeof window === "undefined" || !navigator.vibrate) return;
-    let lastVibrate = 0;
-
-    function handleInteractiveClick(e) {
-      const target = e.target?.closest?.(
-        "button:not([disabled]), .btn, .pdx-variantCard, .hc-statCard, .ai-chip, .st-tab, .st-pasteBtn, .oh-cekBtn, [role='switch'], [role='tab']"
-      );
-      if (!target) return;
-      const now = Date.now();
-      if (now - lastVibrate < 120) return; // Prevent excessive rapid vibration
-      lastVibrate = now;
-      try {
-        navigator.vibrate(10);
-      } catch {}
-    }
-
-    document.addEventListener("click", handleInteractiveClick, { passive: true });
-    return () => document.removeEventListener("click", handleInteractiveClick);
-  }, []);
+  }, [caps.saveData, caps.lowMemory]);
 
   return (
     <BrowserRouter>
@@ -427,9 +259,11 @@ export default function App() {
             <StorefrontOverlays />
           </>
         ) : null}
-        <AchievementToast />
-        <AbandonedCartBanner />
-        <SwUpdateToast />
+        <Suspense fallback={null}>
+          <AchievementToast />
+          <AbandonedCartBanner />
+          <SwUpdateToast />
+        </Suspense>
         <ScrollToTop />
         <FloatingOrderStatus />
         <AppRoutes />

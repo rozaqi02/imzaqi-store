@@ -1,7 +1,7 @@
 /* Storefront chrome: Sociolla-like ticker/header/popup + green-white-black palette. */
 
 html {
-  --storefront-global-bg: #101715;
+  --storefront-global-bg: #0b0f0d;
 }
 
 html,
@@ -11,13 +11,13 @@ body {
 }
 
 html[data-theme="light"] {
-  --storefront-global-bg: #f5f7f4;
+  --storefront-global-bg: #f7f8f7;
 }
 
 html[data-theme="light"],
 html[data-theme="light"] body {
   background: var(--storefront-global-bg) !important;
-  color: #0a0a0a !important;
+  color: #0f172a !important;
 }
 
 /* Zero Flash Theme Transitions */
@@ -600,37 +600,43 @@ html[data-theme="light"] .theme-toggle {
 .catalog-page .catalog-quickChip.catalog-quickChip--line:active,
 .catalog-page .catalog-quickChip.catalog-quickChip--app_premium:active,
 .catalog-page .catalog-quickChip.catalog-quickChip--academic:active {
-  transform: translateY(1px) scale(0.98) !important;
-  box-shadow: var(--skeu-inset-shadow) !important;
+  box-shadow: none !important;
 }
 
 .catalog-page .catalog-quickChip.catalog-quickChip--line.active,
 .catalog-page .catalog-quickChip.catalog-quickChip--app_premium.active,
 .catalog-page .catalog-quickChip.catalog-quickChip--academic.active {
-  border: none !important;
+  border: 1px solid rgba(0, 230, 148, 0.34) !important;
   outline: none !important;
-  background: var(--imzaqi-btn-face) !important;
-  color: var(--imzaqi-btn-text) !important;
-  box-shadow: var(--imzaqi-btn-shadow) !important;
+  background: rgba(0, 230, 148, 0.14) !important;
+  color: #34d399 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--line.active,
+html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--app_premium.active,
+html[data-theme="light"] .catalog-page .catalog-quickChip.catalog-quickChip--academic.active {
+  border-color: rgba(0, 158, 96, 0.3) !important;
+  background: rgba(0, 158, 96, 0.1) !important;
+  color: #076a44 !important;
 }
 
 .catalog-page .catalog-quickChip.catalog-quickChip--line.active svg,
 .catalog-page .catalog-quickChip.catalog-quickChip--app_premium.active svg,
 .catalog-page .catalog-quickChip.catalog-quickChip--academic.active svg {
-  color: var(--imzaqi-btn-text) !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
 }
 
-/* 3D Neumorphic Filter Button (Search Bar Anchor) - Web Design Tokens (Outline-Free) */
+/* Flat hairline Filter Button (Search Bar Anchor) */
 .catalog-heroFilterBtn {
-  border: none !important;
+  border: 1px solid var(--brand-line) !important;
   outline: none !important;
   border-radius: 14px !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.16), rgba(255, 255, 255, 0) 30%),
-    var(--skeu-control-bg) !important;
+  background: var(--skeu-control-bg) !important;
   color: var(--brand-text) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
-  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease !important;
+  box-shadow: none !important;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease !important;
 }
 
 .catalog-heroFilterBtn svg {
@@ -638,25 +644,31 @@ html[data-theme="light"] .theme-toggle {
 }
 
 .catalog-heroFilterBtn:hover {
-  transform: translateY(-1px) !important;
-  filter: brightness(1.06) !important;
+  border-color: rgba(0, 158, 96, 0.24) !important;
+  box-shadow: var(--skeu-control-shadow-hover) !important;
 }
 
 .catalog-heroFilterBtn:active {
-  transform: translateY(1px) scale(0.98) !important;
-  box-shadow: var(--skeu-inset-shadow) !important;
+  box-shadow: none !important;
 }
 
 .catalog-heroFilterBtn.active {
-  border: none !important;
+  border: 1px solid rgba(0, 230, 148, 0.34) !important;
   outline: none !important;
-  background: var(--imzaqi-btn-face) !important;
-  color: var(--imzaqi-btn-text) !important;
-  box-shadow: var(--imzaqi-btn-shadow) !important;
+  background: rgba(0, 230, 148, 0.14) !important;
+  color: #34d399 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] .catalog-heroFilterBtn.active {
+  border-color: rgba(0, 158, 96, 0.3) !important;
+  background: rgba(0, 158, 96, 0.1) !important;
+  color: #076a44 !important;
 }
 
 .catalog-heroFilterBtn.active svg {
-  color: var(--imzaqi-btn-text) !important;
+  color: currentColor !important;
+  stroke: currentColor !important;
 }
 
 html[data-theme="light"] .pdx-packHot,

@@ -62,12 +62,8 @@ export default function TestimonialsPane({
             Pilih gambar
           </label>
           <input name="caption" className="input" placeholder="Caption (opsional)" />
-          <input name="customer_name" className="input" placeholder="Nama pelanggan" />
-          <input name="product_name" className="input" placeholder="Produk yang dibeli" />
-          <input name="purchased_at" className="input" type="date" aria-label="Tanggal pembelian" />
-          <label className="admin-check">
-            <input name="is_verified" type="checkbox" /> Pembelian terverifikasi
-          </label>
+          <input name="customer_name" className="input" placeholder="Nama pelanggan (opsional)" />
+          <input name="product_name" className="input" placeholder="Produk yang dibeli (opsional)" />
           <label
             className="admin-check"
             style={{
@@ -115,13 +111,6 @@ export default function TestimonialsPane({
                     onClick={() => onUpdateTestimonial(t.id, { is_active: !t.is_active })}
                   >
                     {t.is_active ? "Off" : "On"}
-                  </button>
-                  <button
-                    className={"btn btn-sm " + (t.is_verified ? "btn-primary" : "btn-ghost")}
-                    type="button"
-                    onClick={() => onUpdateTestimonial(t.id, { is_verified: !t.is_verified })}
-                  >
-                    {t.is_verified ? "Verified" : "Verifikasi"}
                   </button>
                   <button
                     className="btn btn-ghost btn-sm"

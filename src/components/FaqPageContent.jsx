@@ -3,7 +3,6 @@ import { Link, useSearchParams } from "react-router-dom";
 import {
   ChevronDown,
   CircleCheck,
-  CircleHelp,
   ClipboardList,
   Clock,
   CreditCard,
@@ -20,7 +19,6 @@ import { toWhatsAppDigits } from "../lib/format";
 import { STORE_WHATSAPP } from "../lib/productCategories";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "./EmptyState";
-import BannerGraphic from "./BannerGraphic";
 
 const FAQ_ITEMS = [
   {
@@ -317,15 +315,9 @@ export default function FaqPageContent() {
       <div className="help-wrap">
         <header className="help-hero">
           <div className="help-heroCopy">
-            <span className="help-eyebrow">
-              <BannerGraphic name="headset_support" height={22} className="help-mascot" />
-              <CircleHelp size={14} aria-hidden="true" />
-              <span>PUSAT BANTUAN</span>
-            </span>
-            <h1>
-              Ada yang ingin <span>ditanyakan?</span>
-            </h1>
-            <p>Cari jawaban cepat tentang pembayaran QRIS, aktivasi akun, dan pantauan pesananmu.</p>
+            <h1>Pusat Bantuan</h1>
+            <p>Panduan pembayaran QRIS, aktivasi akun, dan garansi pesanan.</p>
+            <p className="help-mobileMeta">08.00–22.00 WIB · Proses 5–30 menit · Garansi sesuai paket</p>
             <div className="help-search">
               <Search size={19} aria-hidden="true" />
               <input
@@ -432,16 +424,13 @@ export default function FaqPageContent() {
 
           <section className="help-answers" aria-labelledby="help-results-title">
             <div className="help-listHead">
-              <div>
-                <span className="help-eyebrow">JAWABAN UNTUKMU</span>
-                <h2 id="help-results-title">
-                  {query.trim()
-                    ? "Hasil pencarian"
-                    : activeCategory === "all"
-                      ? "Pertanyaan yang sering ditanya"
-                      : CATEGORY_LABELS[activeCategory]}
-                </h2>
-              </div>
+              <h2 id="help-results-title">
+                {query.trim()
+                  ? "Hasil pencarian"
+                  : activeCategory === "all"
+                    ? "Pertanyaan umum"
+                    : CATEGORY_LABELS[activeCategory]}
+              </h2>
               <span className="help-resultCount" role="status">
                 {filteredFaq.length} pertanyaan
               </span>

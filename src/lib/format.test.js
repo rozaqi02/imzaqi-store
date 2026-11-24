@@ -177,6 +177,12 @@ describe("mapPromoResult (Supabase validate_promo RPC mapping)", () => {
     expect(res.message).toBe("Kuota kode promo sudah habis.");
   });
 
+  it("maps -4 to rate limited message", () => {
+    const res = mapPromoResult(-4);
+    expect(res.ok).toBe(false);
+    expect(res.message).toBe("Terlalu banyak percobaan kode promo. Coba lagi nanti.");
+  });
+
   it("maps 0 to invalid/inactive code", () => {
     const res = mapPromoResult(0);
     expect(res.ok).toBe(false);

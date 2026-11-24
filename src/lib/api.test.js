@@ -1,11 +1,12 @@
 import * as fc from "fast-check";
 import { describe, it, expect, vi } from "vitest";
-import { csvEscapeValue, buildOrdersCSV, checkStockAvailability } from "./api";
+import { csvEscapeValue, buildOrdersCSV, checkStockAvailability, fetchTopSellingData } from "./api";
 import { supabase } from "./supabaseClient";
 
 vi.mock("./supabaseClient", () => ({
   supabase: {
     from: vi.fn(),
+    rpc: vi.fn(),
   },
 }));
 
@@ -81,6 +82,23 @@ describe("buildOrdersCSV", () => {
       expect(result.outOfStock).toHaveLength(1);
       expect(result.outOfStock[0].variant_id).toBe("v-zero-stock");
       expect(result.insufficient).toHaveLength(0);
+    });
+  });
+
+  describe("fetchTopSellingData", () => {
+    it("reads the `sold` column returned by Supabase get_top_products RPC", async () => {
+      supabase.rpc.mockResolvedValueOnce({
+        data: [
+          { product_id: "p-1", name: "Netflix", sold: 42 },
+          { product_id: "p-2", name: "Canva", total_sold: 18 },
+        ],
+        error: null,
+      });
+
+      const result = await fetchTopSellingData({ useCache: false });
+      expect(result.topIds).toEqual(["p-1", "p-2"]);
+      expect(result.salesMap["p-1"]).toBe(42);
+      expect(result.salesMap["p-2"]).toBe(18);
     });
   });
 });

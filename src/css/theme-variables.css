@@ -31,18 +31,18 @@ html[data-theme="dark"] {
   --ink: #f8fafc;
 
   /* Storefront palette: Obsidian Emerald */
-  --paper: #0a0e0c;
-  --bg0: #0a0e0c;
+  --paper: #0b0f0d;
+  --bg0: #0b0f0d;
   --bg1: #101613;
-  --bg2: #16201b;
-  --card: rgba(255, 255, 255, 0.08);
-  --card2: rgba(255, 255, 255, 0.12);
-  --line: rgba(255, 255, 255, 0.18);
+  --bg2: #161e1a;
+  --card: rgba(255, 255, 255, 0.06);
+  --card2: rgba(255, 255, 255, 0.1);
+  --line: rgba(255, 255, 255, 0.07);
   --accent: #00e694;
   --accent-cyan: #34d399;
   --accent2: #0a0a0a;
   --danger: #e11d3a;
-  --shadow: 0 24px 70px rgba(0, 0, 0, 0.52);
+  --shadow: 0 14px 36px rgba(0, 0, 0, 0.4);
 
   /* Frosted Glass Tokens:
      Values must be full filter functions - consumers concatenate them
@@ -51,55 +51,37 @@ html[data-theme="dark"] {
   --liquid-glass-blur: blur(16px);
   --liquid-glass-saturate: saturate(140%);
 
-  /* Neumorphic Skeuomorphic Tokens (Dark Mode: Obsidian Emerald) */
-  --brand-bg-start: #0a0e0c;
-  --brand-bg-end: #0a0e0c;
+  /* Unified Surface Tokens (Dark Mode: Obsidian Emerald) */
+  --brand-bg-start: #0b0f0d;
+  --brand-bg-end: #0b0f0d;
   --brand-bg-mid: #101613;
-  --brand-aurora-a: rgba(0, 230, 148, 0.09);
-  --brand-aurora-b: rgba(0, 158, 96, 0.07);
-  --brand-card-top: rgba(255, 255, 255, 0.06);
-  --brand-card-bottom: rgba(255, 255, 255, 0.02);
-  --brand-card-spot: rgba(0, 230, 148, 0.08);
-  --brand-surface: rgba(16, 22, 19, 0.96);
-  --brand-surface-strong: rgba(10, 14, 12, 0.98);
-  --brand-line: rgba(255, 255, 255, 0.12);
+  --brand-aurora-a: rgba(0, 230, 148, 0.06);
+  --brand-aurora-b: rgba(0, 158, 96, 0.04);
+  --brand-card-top: rgba(255, 255, 255, 0.03);
+  --brand-card-bottom: rgba(255, 255, 255, 0.015);
+  --brand-card-spot: rgba(0, 230, 148, 0.05);
+  --brand-surface: #131916;
+  --brand-surface-strong: #0e1311;
+  --brand-line: rgba(255, 255, 255, 0.07);
   --brand-text: #f8fafc;
-  --brand-muted: rgba(248, 250, 252, 0.72);
+  --brand-muted: rgba(248, 250, 252, 0.68);
   --brand-subtle: rgba(248, 250, 252, 0.46);
   --brand-icon: #00e694;
-  --brand-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
-  --brand-shadow-soft: 0 12px 30px rgba(0, 0, 0, 0.35);
-  --brand-overlay: rgba(4, 8, 14, 0.72);
-  --brand-header-bg: rgba(10, 14, 12, 0.82);
-  --brand-menu-bg: #101613;
+  --brand-shadow: 0 12px 32px rgba(0, 0, 0, 0.42);
+  --brand-shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.28);
+  --brand-overlay: rgba(4, 8, 6, 0.72);
+  --brand-header-bg: rgba(11, 15, 13, 0.85);
+  --brand-menu-bg: #131916;
 
-  /* Solid Frosted Glass Panels (iOS 27 Liquid Glass - High Readability) */
-  --skeu-panel-bg:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.07) 0%, rgba(255, 255, 255, 0.02) 42%, rgba(0, 245, 196, 0.025) 100%),
-    #111822;
-  --skeu-panel-shadow:
-    0 16px 40px -10px rgba(0, 0, 0, 0.6),
-    0 0 0 1px rgba(255, 255, 255, 0.1),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.5),
-    0 0 18px -4px rgba(0, 245, 196, 0.08);
-  --skeu-control-bg: linear-gradient(180deg, #202c3a 0%, #172230 100%);
-  --skeu-control-shadow:
-    0 3px 8px -2px rgba(0, 3, 10, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.09),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  --skeu-control-shadow-hover:
-    0 5px 12px -2px rgba(0, 3, 10, 0.5),
-    0 0 0 1px rgba(0, 230, 148, 0.24),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24);
-  --skeu-inset-bg: linear-gradient(180deg, #090e14, #0e151e);
-  --skeu-inset-shadow:
-    inset 0 2px 6px rgba(0, 0, 0, 0.65),
-    inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.04);
-  --skeu-pill-bg:
-    linear-gradient(170deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.02)),
-    #131a24;
+  /* Flat Clean Panels & Smooth Controls (Dark Mode - Obsidian Emerald) */
+  --skeu-panel-bg: #131916;
+  --skeu-panel-shadow: none;
+  --skeu-control-bg: #19221e;
+  --skeu-control-shadow: none;
+  --skeu-control-shadow-hover: 0 8px 20px -6px rgba(0, 0, 0, 0.46);
+  --skeu-inset-bg: #0d1210;
+  --skeu-inset-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --skeu-pill-bg: #19221e;
   --skeu-accent-shadow:
     0 12px 30px rgba(0, 230, 148, 0.28),
     0 4px 12px rgba(0, 158, 96, 0.22),
@@ -189,68 +171,50 @@ html[data-theme="light"] {
   --muted: rgba(15, 23, 42, 0.72);
   --ink: #0f172a;
 
-  /* Storefront palette: white + black + green */
-  --paper: #ffffff;
-  --bg0: #ffffff;
-  --bg1: #f8fafc;
-  --bg2: #f1f5f9;
+  /* Storefront palette: warm/sage canvas + crisp white cards + emerald accent */
+  --paper: #f7f8f7;
+  --bg0: #f7f8f7;
+  --bg1: #f2f5f3;
+  --bg2: #eaeef0;
   --card: #ffffff;
   --card2: #f8fafc;
-  --line: rgba(15, 23, 42, 0.08);
+  --line: rgba(0, 0, 0, 0.06);
   --accent: #009e60;
   --accent2: #0f172a;
   --danger: #c81e3a;
-  --shadow: 0 18px 44px rgba(0, 0, 0, 0.08);
+  --shadow: 0 10px 26px rgba(15, 23, 42, 0.06);
 
-  /* Neumorphic Skeuomorphic Tokens (Light Mode) */
-  --brand-bg-start: #ffffff;
-  --brand-bg-end: #f8fafc;
-  --brand-bg-mid: #f8fafc;
-  --brand-aurora-a: rgba(0, 158, 96, 0.05);
+  /* Unified Surface Tokens (Light Mode) */
+  --brand-bg-start: #f7f8f7;
+  --brand-bg-end: #f7f8f7;
+  --brand-bg-mid: #f2f5f3;
+  --brand-aurora-a: rgba(0, 158, 96, 0.03);
   --brand-aurora-b: rgba(0, 0, 0, 0);
   --brand-card-top: #ffffff;
-  --brand-card-bottom: #f8fafc;
-  --brand-card-spot: rgba(0, 158, 96, 0.06);
+  --brand-card-bottom: #ffffff;
+  --brand-card-spot: rgba(0, 158, 96, 0.03);
   --brand-surface: #ffffff;
   --brand-surface-strong: #ffffff;
-  --brand-line: rgba(15, 23, 42, 0.08);
+  --brand-line: rgba(0, 0, 0, 0.06);
   --brand-text: #0f172a;
-  --brand-muted: rgba(15, 23, 42, 0.72);
+  --brand-muted: rgba(15, 23, 42, 0.66);
   --brand-subtle: rgba(15, 23, 42, 0.46);
   --brand-icon: #009e60;
-  --brand-shadow: 0 18px 44px rgba(0, 0, 0, 0.08);
-  --brand-shadow-soft: 0 10px 24px rgba(0, 0, 0, 0.05);
-  --brand-overlay: rgba(0, 0, 0, 0.45);
-  --brand-header-bg: #ffffff;
+  --brand-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+  --brand-shadow-soft: 0 6px 16px rgba(15, 23, 42, 0.04);
+  --brand-overlay: rgba(15, 23, 42, 0.42);
+  --brand-header-bg: rgba(255, 255, 255, 0.92);
   --brand-menu-bg: #ffffff;
 
-  /* Solid Frosted Glass Panels (Light Mode - Crystal Emerald) */
-  --skeu-panel-bg:
-    linear-gradient(165deg, rgba(255, 255, 255, 0.98) 0%, rgba(246, 251, 248, 0.96) 100%),
-    #ffffff;
-  --skeu-panel-shadow:
-    0 12px 32px -6px rgba(15, 42, 32, 0.09),
-    0 0 0 1px rgba(0, 158, 96, 0.12),
-    inset 0 1.5px 0 #ffffff,
-    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
-    0 0 14px -2px rgba(0, 158, 96, 0.05);
-  --skeu-control-bg: #ffffff;
-  --skeu-control-shadow:
-    0 6px 12px rgba(15, 42, 32, 0.07),
-    0 14px 26px rgba(15, 42, 32, 0.07),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(0, 120, 80, 0.12);
-  --skeu-control-shadow-hover:
-    0 8px 16px rgba(15, 42, 32, 0.1),
-    0 18px 30px rgba(0, 120, 80, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(0, 120, 80, 0.18);
-  --skeu-inset-bg: linear-gradient(180deg, #edf4f0 0%, #f5f9f6 100%);
-  --skeu-inset-shadow:
-    inset 0 2px 5px rgba(15, 42, 32, 0.09),
-    inset 0 0 0 1px rgba(0, 158, 96, 0.08),
-    inset 0 1px 0 #ffffff;
-  --skeu-pill-bg: #ffffff;
+  /* Flat Crisp Solid Panels & Smooth Controls (Light Mode) */
+  --skeu-panel-bg: #ffffff;
+  --skeu-panel-shadow: none;
+  --skeu-control-bg: #f6f8f7;
+  --skeu-control-shadow: none;
+  --skeu-control-shadow-hover: 0 6px 16px -4px rgba(15, 23, 42, 0.08);
+  --skeu-inset-bg: #f2f5f3;
+  --skeu-inset-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  --skeu-pill-bg: #f6f8f7;
   --skeu-accent-shadow:
     0 14px 28px rgba(0, 158, 96, 0.2),
     0 4px 10px rgba(0, 158, 96, 0.12),

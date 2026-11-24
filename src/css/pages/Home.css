@@ -2071,7 +2071,7 @@ html[data-theme="light"] .home-promoCard-punch {
   height: 28px !important;
   padding: 0 11px !important;
   font-size: 11px !important;
-  border: none !important;
+  border: 1px solid var(--brand-line) !important;
   border-radius: 8px !important;
   background: var(--skeu-control-bg) !important;
   box-shadow: var(--skeu-control-shadow) !important;

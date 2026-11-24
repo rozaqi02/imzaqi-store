@@ -6,6 +6,7 @@ import {
   orderMatchesAdminQuery,
   patchOrderInList,
 } from "./adminOrderSearch";
+import { statusFilterForBucket } from "./adminPerf";
 
 const sampleOrder = {
   id: "ord-uuid-1",
@@ -87,5 +88,12 @@ describe("adminOrderSearch", () => {
     const patched = patchOrderInList(merged, "b", { status: "done" });
     expect(patched[1].status).toBe("done");
     expect(merged[1].status).toBe("pending");
+  });
+
+  it("includes expired orders in the cancelled admin bucket filter", () => {
+    expect(statusFilterForBucket("cancelled")).toEqual({
+      type: "in",
+      values: ["cancelled", "expired"],
+    });
   });
 });

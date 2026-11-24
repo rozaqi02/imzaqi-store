@@ -41,7 +41,14 @@ export default function FlashSalePane({
           <div className="admin-panel-sub">{liveFlashCount} promo sedang live</div>
         </div>
         <div className="admin-panel-headActions">
-          <button className="btn btn-sm btn-primary" type="button" onClick={() => setFlashFormOpen(true)}>
+          <button
+            className="btn btn-sm btn-primary"
+            type="button"
+            onClick={() => {
+              setFlashForm({ variant_id: "", discount_percent: "", starts_at: "", ends_at: "" });
+              setFlashFormOpen(true);
+            }}
+          >
             <Plus size={14} /> Tambah Flash Sale
           </button>
         </div>

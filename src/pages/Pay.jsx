@@ -21,12 +21,10 @@ import { getReferralCode } from "../lib/referral";
 import { warn } from "../lib/log";
 import { QRISSkeleton, QRISZoomModal, OrderSuccessModal, ConfirmPaymentModal } from "./pay/components/PayModals";
 import { saveBuyerName } from "../lib/greeting";
-import { loadBuyerDetails, saveBuyerDetails } from "../lib/buyerDetails";
+import { loadBuyerDetails, saveBuyerDetails, variantNeedsBuyerEmail } from "../lib/buyerDetails";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
-const EMAIL_IN_TEXT_REGEX = /\b[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}\b/i;
-const BUYER_EMAIL_REQUIREMENT_REGEX =
-  /(akun\s*buyer|buyer\s*akun|email\s*(buyer|pembeli)|wajib\s*email|butuh\s*email|email\s*aktivasi|aktivasi\s*akun|account\s*activation|send\s*email)/i;
+const STRICT_EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const COPY_TIMEOUT_MS = 1800;
 const STORAGE_KEY_BUYER_EMAIL = "imzaqi_last_buyer_email";
 const STORAGE_KEY_NOTES = "imzaqi_last_notes";
@@ -65,34 +63,6 @@ function qrisReducer(state, action) {
 function calcTotal(subtotal, percent) {
   const discount = Math.round((subtotal * (percent || 0)) / 100);
   return { discount, total: Math.max(0, subtotal - discount) };
-}
-
-function variantNeedsBuyerEmail(item) {
-  if (!item) return false;
-
-  if (
-    item?.requires_note ||
-    item?.require_note ||
-    item?.requires_buyer_email ||
-    item?.require_buyer_email ||
-    item?.needs_buyer_email
-  ) {
-    return true;
-  }
-
-  const blob = [
-    item?.product_name,
-    item?.variant_name,
-    item?.name,
-    item?.description,
-    item?.duration_label,
-    item?.guarantee_text,
-  ]
-    .filter(Boolean)
-    .join(" ")
-    .toLowerCase();
-
-  return BUYER_EMAIL_REQUIREMENT_REGEX.test(blob);
 }
 
 function toFriendlyPayError(error, { hasNotes = false } = {}) {
@@ -393,7 +363,7 @@ export default function Pay() {
   const hasValidWhatsApp = Boolean(customerWhatsApp && isWaValid);
   const requiredBuyerEmailItems = useMemo(() => items.filter((item) => variantNeedsBuyerEmail(item)), [items]);
   const requiresBuyerEmailNote = requiredBuyerEmailItems.length > 0;
-  const hasEmailInNotes = EMAIL_IN_TEXT_REGEX.test(String(buyerEmail || "").trim());
+  const hasEmailInNotes = STRICT_EMAIL_REGEX.test(String(buyerEmail || "").trim());
   const missingBuyerEmailNote = requiresBuyerEmailNote && !hasEmailInNotes;
   const [contactOpen, setContactOpen] = useState(() => !hasValidWhatsApp || missingBuyerEmailNote);
   const [notesOpen, setNotesOpen] = useState(() => Boolean(notes));
@@ -518,6 +488,7 @@ export default function Pay() {
       : basePayload;
 
     let res = await supabase.rpc("create_order_with_stock_check", rpcPayload);
+    let usedBuyerEmailFallback = false;
 
     // Fallback: if database function has not been re-deployed with p_buyer_email yet,
     // retry with base payload so checkout never breaks
@@ -529,6 +500,7 @@ export default function Pay() {
         errLower.includes("schema cache") ||
         errLower.includes("could not find")
       ) {
+        usedBuyerEmailFallback = true;
         res = await supabase.rpc("create_order_with_stock_check", basePayload);
       }
     }
@@ -546,18 +518,10 @@ export default function Pay() {
     if (!data || data.length === 0) throw new Error("Gagal membuat order.");
     const created = data[0];
 
-    // Best-effort direct update to orders.buyer_email / referral_code in case RPC did not set them
-    const refCode = String(getReferralCode() || "").trim().slice(0, 64);
-    if (created?.id && (trimmedBuyerEmail || refCode)) {
-      const patch = {
-        ...(trimmedBuyerEmail ? { buyer_email: trimmedBuyerEmail } : {}),
-        ...(refCode ? { referral_code: refCode } : {}),
-      };
+    // Best-effort direct update to orders.buyer_email only when RPC fell back to 10-arg overload
+    if (created?.id && trimmedBuyerEmail && usedBuyerEmailFallback) {
       try {
-        const upRes = await supabase.from("orders").update(patch).eq("id", created.id);
-        if (upRes?.error && trimmedBuyerEmail && refCode) {
-          await supabase.from("orders").update({ buyer_email: trimmedBuyerEmail }).eq("id", created.id);
-        }
+        await supabase.from("orders").update({ buyer_email: trimmedBuyerEmail }).eq("id", created.id);
       } catch {}
     }
 
@@ -624,6 +588,11 @@ export default function Pay() {
       setSnapshot(canonicalOrder.items);
       cart.backup(canonicalOrder.items);
       cart.clear();
+      clearPromo();
+      setNotes("");
+      try {
+        localStorage.removeItem(STORAGE_KEY_NOTES);
+      } catch {}
       // Save buyer name from WA number prefix for greeting
       if (customerWhatsApp) {
         try {

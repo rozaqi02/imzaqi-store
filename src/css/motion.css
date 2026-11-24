@@ -402,7 +402,7 @@
     html[data-motion="lite"] .header.is-shrunk .nav-active-pill,
     html[data-motion="full"] .header.is-shrunk .nav-hover-pill,
     html[data-motion="lite"] .header.is-shrunk .nav-hover-pill {
-      border-radius: 11px !important;
+      border-radius: 999px !important;
     }
   }
 }
@@ -1097,9 +1097,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
 [data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardMeta > span,
 [data-motion="lite"] .catalog-page .catalog-card.catalog-cardV2 .catalog-cardFoot,
 [data-motion="lite"] .catalog-page .catalog-status {
-  box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.12) !important;
+  box-shadow: none !important;
 }
 
 [data-motion="lite"] .catalog-page .catalog-grid--animate .catalog-card,
@@ -1142,9 +1140,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
 [data-motion="lite"] .home-page .flow-assist,
 [data-motion="lite"] .home-page .home-popularList .product-tile,
 [data-motion="lite"] .home-page .home-popularList .product-tile-pill {
-  box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
 }
 
 [data-motion="lite"] .home-page .home-popularList {
@@ -1169,9 +1165,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
 [data-motion="lite"] .home-page .home-promoCard,
 [data-motion="lite"] .home-page .home-faqItem.faq-item,
 [data-motion="lite"] .home-page .hx-stat-item {
-  box-shadow:
-    0 6px 14px rgba(0, 0, 0, 0.14),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
 }
 
 [data-motion="lite"] .home-page .hx-live-eye-icon {
@@ -1372,8 +1366,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
 
 /* Home page: kill expensive gradients/shadows on product tiles in lite mode */
 [data-motion="lite"] .home-page .product-tile {
-  background: var(--skeu-panel-bg, rgba(11, 18, 32, 0.96)) !important;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  box-shadow: none !important;
   transition-duration: 120ms !important;
 }
 [data-motion="lite"] .home-page .product-tile-tiltWrap {
@@ -1383,13 +1376,11 @@ html[data-theme="light"] .status-commandBox:focus-within {
   text-shadow: none !important;
 }
 [data-motion="lite"] .home-page .home-howCard {
-  background: var(--skeu-panel-bg, rgba(11, 18, 32, 0.96)) !important;
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  box-shadow: none !important;
   transition: transform 0.15s ease !important;
 }
 [data-motion="lite"] .home-page .home-howCard-icon {
-  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.06)) !important;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: none !important;
   transition: transform 0.12s ease !important;
 }
 [data-motion="lite"] .home-page .home-tileSkeleton::after {
@@ -1399,12 +1390,11 @@ html[data-theme="light"] .status-commandBox:focus-within {
 [data-motion="lite"] .checkout-page .checkout-panel,
 [data-motion="lite"] .pay-page .pay-stageCard,
 [data-motion="lite"] .status-page .st-card {
-  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: none !important;
   backdrop-filter: none !important;
 }
 [data-motion="lite"] .pay-page .pay-qrisFrame {
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: none !important;
 }
 [data-motion="lite"] .pay-page .pay-confirmModal,
 [data-motion="lite"] .pay-page .pay-confirmOverlay,
@@ -1414,8 +1404,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
   backdrop-filter: none !important;
 }
 [data-motion="lite"] .pay-page .pay-card {
-  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) !important;
+  box-shadow: none !important;
   backdrop-filter: none !important;
 }
 
@@ -1424,16 +1413,13 @@ html[data-theme="light"] .status-commandBox:focus-within {
   backdrop-filter: none !important;
 }
 [data-motion="lite"] .hx-stat-item {
-  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.14) !important;
+  box-shadow: none !important;
 }
 
 /* Product Detail: strip all expensive effects in lite mode */
 [data-motion="lite"] .detail-page-v3 .pdx-topCard {
   backdrop-filter: none !important;
-  background: var(--uni-neo-panel, rgba(11, 18, 32, 0.98)) !important;
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
 }
 [data-motion="lite"] .detail-page-v3 .pdx-heroPanel,
 [data-motion="lite"] .detail-page-v3 .pdx-summaryPanel,
@@ -1442,9 +1428,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
 [data-motion="lite"] .detail-page-v3 .pdx-variantCard,
 [data-motion="lite"] .detail-page-v3 .pdx-infoTabsCard,
 [data-motion="lite"] .detail-page-v3 .pdx-flowCard {
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
   transition: border-color 0.15s ease !important;
   will-change: auto !important;
 }
@@ -1457,10 +1441,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
 [data-motion="lite"] .detail-page-v3 .pdx-compareBtn,
 [data-motion="lite"] .detail-page-v3 .pdx-iconBtn,
 [data-motion="lite"] .detail-page-v3 .pdx-variantBadge {
-  box-shadow:
-    0 3px 8px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-  background: var(--skeu-control-bg) !important;
+  box-shadow: none !important;
 }
 [data-motion="lite"] .detail-page-v3 {
   contain: layout style;
@@ -1470,9 +1451,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
   contain-intrinsic-size: auto 220px;
 }
 [data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile {
-  box-shadow:
-    0 4px 12px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
   will-change: auto !important;
   transform: none !important;
   content-visibility: auto;
@@ -1488,9 +1467,7 @@ html[data-theme="light"] .status-commandBox:focus-within {
 [data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-typeBadge,
 [data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-arrow,
 [data-motion="lite"] .detail-page-v3 .pdx-recommendationsGrid .product-tile-favBtn {
-  box-shadow:
-    0 2px 6px rgba(0, 0, 0, 0.12),
-    inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }

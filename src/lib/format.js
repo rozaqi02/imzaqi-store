@@ -184,6 +184,7 @@ export function summarizeCatalogCopy(text) {
 // Promo
 export function mapPromoResult(rpcValue) {
   const v = Number(rpcValue);
+  if (v === -4) return { ok: false, message: "Terlalu banyak percobaan kode promo. Coba lagi nanti.", percent: 0 };
   if (v === -3) return { ok: false, message: "Kuota kode promo sudah habis.", percent: 0 };
   if (v === -2) return { ok: false, message: "Kamu sudah pernah menggunakan kode promo ini.", percent: 0 };
   if (v === -1) return { ok: false, message: "Kode promo sudah kedaluwarsa.", percent: 0 };

@@ -164,17 +164,6 @@ export default function Header() {
       >
         <PromoTicker />
         <div className="container header-inner">
-          <div className="header-mobile-left">
-            <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-            {canAccessAdmin ? (
-              <AdminHeaderLink
-                to="/admin/dashboard"
-                isActive={isOnAdminRoute}
-                title="Admin Dashboard"
-              />
-            ) : null}
-          </div>
-
           <Link to="/" className="brand" aria-label="Beranda Imzaqi Store">
             <img className="brand-img" src="/icon.png" alt="imzaqi.store" width="36" height="36" />
           </Link>
@@ -211,6 +200,17 @@ export default function Header() {
           ) : null}
 
           <div className="header-actions">
+            <div className="header-toggles">
+              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
+              {canAccessAdmin ? (
+                <AdminHeaderLink
+                  to="/admin/dashboard"
+                  isActive={isOnAdminRoute}
+                  title="Admin Dashboard"
+                />
+              ) : null}
+            </div>
+
             <div className="header-cart-container">
               <Link
                 to="/checkout"
@@ -229,17 +229,6 @@ export default function Header() {
                   </span>
                 ) : null}
               </Link>
-            </div>
-
-            <div className="desktop-only header-desktop-toggles">
-              <ThemeToggleButton onToggle={toggleTheme} isDark={isDark} />
-              {canAccessAdmin ? (
-                <AdminHeaderLink
-                  to="/admin/dashboard"
-                  isActive={isOnAdminRoute}
-                  title="Admin Dashboard"
-                />
-              ) : null}
             </div>
           </div>
         </div>

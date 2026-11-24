@@ -339,7 +339,7 @@ export async function fetchTopSellingData({ useCache = true, ttlMs = 30000 } = {
       const id = x.product_id || x.id;
       if (id) {
         topIds.push(id);
-        salesMap[id] = Number(x.total_sold || x.sold_count || 0);
+        salesMap[id] = Number(x.total_sold ?? x.sold ?? x.sold_count ?? 0);
       }
     });
   } catch {}

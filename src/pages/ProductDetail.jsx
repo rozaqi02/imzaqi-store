@@ -39,8 +39,6 @@ import { getCatalogReturnPath, hasSavedScrollY } from "../hooks/useScrollMemory"
 import { buildCatalogAdminWhatsAppUrl, buildSupportWhatsAppUrl, resolveCatalogLine, resolveProductCategory } from "../lib/productCategories";
 import { getTransitionProductSlug, runViewTransition } from "../lib/viewTransition";
 import MobileProductBar from "../components/MobileProductBar";
-import { supabase } from "../lib/supabaseClient";
-import { getVisitorIdAsUUID } from "../lib/visitor";
 import { trackFunnelEvent } from "../lib/funnelAnalytics";
 
 function WhatsAppIcon({ size = 16 }) {
@@ -150,12 +148,12 @@ function VariantBenefitList({ rawText }) {
   );
 }
 
-function RestockRequest({ variant, adminUrl }) {
+function RestockRequest({ product, variant, adminUrl }) {
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState("");
   const [state, setState] = useState("idle");
 
-  async function submit(event) {
+  function submit(event) {
     event.preventDefault();
     let digits = phone.replace(/\D/g, "");
     if (digits.startsWith("08")) {
@@ -163,41 +161,30 @@ function RestockRequest({ variant, adminUrl }) {
     } else if (digits.startsWith("8")) {
       digits = "628" + digits.slice(1);
     }
-    if (digits.length < 10) { setState("invalid"); return; }
-    setState("loading");
-    const { error } = await supabase.from("restock_requests").insert({
-      visitor_id: getVisitorIdAsUUID(), product_id: variant.product_id,
-      variant_id: variant.id, customer_whatsapp: digits,
-    });
-    if (error && error.code !== "23505") {
-      const isMissingTable =
-        error.code === "42P01" ||
-        error.status === 404 ||
-        /does not exist|not found|schema cache|42P01/i.test(String(error.message || ""));
-      if (isMissingTable) {
-        const msg = `Halo Admin Imzaqi Store, saya ingin info saat paket *${variant.name || "produk"}* ready ya (WA: ${digits}).`;
-        const waFallback = adminUrl
-          ? `${adminUrl}?text=${encodeURIComponent(msg)}`
-          : buildSupportWhatsAppUrl(msg, resolveCatalogLine(product));
-        const base = targetUrl.split("?")[0];
-        const waLink = `${base}?text=${encodeURIComponent(msg)}`;
-        try {
-          window.open(waLink, "_blank", "noopener,noreferrer");
-        } catch {}
-        setState("done");
-        return;
-      }
-      setState("error");
+    if (digits.length < 10) {
+      setState("invalid");
       return;
     }
+
+    const productLabel = product?.name ? `${product.name} - ` : "";
+    const packLabel = [variant?.name, variant?.duration_label].filter(Boolean).join(" · ") || "produk";
+    const msg = `Halo Admin Imzaqi Store, mohon kabari saat paket *${productLabel}${packLabel}* ready kembali ya (WA saya: ${digits}).`;
+    const baseUrl = adminUrl ? adminUrl.split("?")[0] : "";
+    const waLink = baseUrl
+      ? `${baseUrl}?text=${encodeURIComponent(msg)}`
+      : buildSupportWhatsAppUrl(msg, resolveCatalogLine(product));
+
+    try {
+      window.open(waLink, "_blank", "noopener,noreferrer");
+    } catch {}
     setState("done");
-    trackFunnelEvent("restock_request", { productId: variant.product_id, variantId: variant.id });
+    trackFunnelEvent("restock_request", { productId: variant?.product_id || product?.id, variantId: variant?.id });
   }
 
   if (state === "done") {
     return (
       <div className="pdx-restockDone">
-        <Bell size={14} /> Siap, kami kabari saat stok kembali.
+        <Bell size={14} /> Permintaan restock diteruskan ke WhatsApp admin.
       </div>
     );
   }
@@ -403,6 +390,7 @@ function LazyProductImage({ src, alt, className, fetchPriority }) {
 }
 
 const VariantCard = React.memo(({
+  product,
   variant,
   siblingVariants,
   isRecommended,
@@ -499,7 +487,7 @@ const VariantCard = React.memo(({
         rawText={descriptionBody}
       />
 
-      {out ? <RestockRequest variant={variant} adminUrl={adminUrl} /> : <div className="pdx-packActions">
+      {out ? <RestockRequest product={product} variant={variant} adminUrl={adminUrl} /> : <div className="pdx-packActions">
         <button
           className={`btn btn-sm btn-ghost pdx-addBtn ${out ? "btn-disabled" : ""}`}
           type="button"
@@ -884,11 +872,12 @@ export default function ProductDetail() {
   const summary = useMemo(() => getCatalogPriceRange(variants, flashSaleMap), [variants, flashSaleMap]);
 
   const soldTotal = useMemo(() => {
-    if (product?.id && topSalesMap && topSalesMap[product.id] != null) {
-      return topSalesMap[product.id];
-    }
     const allVars = asVariantList(product?.product_variants);
-    return allVars.reduce((sum, v) => sum + Math.max(0, Number(v?.sold_count || 0)), 0);
+    const variantSold = allVars.reduce((sum, v) => sum + Math.max(0, Number(v?.sold_count || 0)), 0);
+    const rpcSold = product?.id && topSalesMap && topSalesMap[product.id] != null
+      ? Math.max(0, Number(topSalesMap[product.id] || 0))
+      : 0;
+    return Math.max(rpcSold, variantSold);
   }, [product, topSalesMap]);
 
   useEffect(() => {
@@ -1251,6 +1240,7 @@ export default function ProductDetail() {
                       return (
                         <VariantCard
                           key={variant.id}
+                          product={product}
                           variant={variant}
                           siblingVariants={variants}
                           isRecommended={isRecommended}

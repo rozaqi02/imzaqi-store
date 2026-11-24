@@ -13,17 +13,17 @@ html[data-theme] body .header .promo-ticker .promo-tickerClose::after {
   content: none !important;
 }
 
-/* Shared raised icon controls: preserve the white cart finish in light mode. */
+/* Shared flat icon controls with ultra-thin borders. */
 :root {
-  --store-icon-face: #fff;
-  --store-icon-border: #fff;
-  --store-icon-ink: #0a0a0a;
+  --store-icon-face: #f6f8f7;
+  --store-icon-border: rgba(0, 0, 0, 0.06);
+  --store-icon-ink: #0f172a;
 }
 
 html[data-theme="dark"] {
   --store-icon-face: var(--skeu-control-bg);
-  --store-icon-border: rgba(255, 255, 255, 0.08);
-  --store-icon-ink: #f2f5f7;
+  --store-icon-border: rgba(255, 255, 255, 0.07);
+  --store-icon-ink: #f8fafc;
 }
 
 html[data-theme] body .detail-page.detail-page-v3 .pdx-iconBtn,
@@ -33,14 +33,12 @@ html[data-theme] body .catalog-page .catalog-heroFilterBtn:not(.active) {
   background: var(--store-icon-face) !important;
   border: 1px solid var(--store-icon-border) !important;
   color: var(--store-icon-ink) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
+  box-shadow: none !important;
 }
 
-/* Nav Active Pill, Header Cart & Admin Icon: 3D Neumorphic tactile surface with vertical white-to-faded-green gradient */
-html[data-theme="light"] body .header .nav-active-pill,
+/* Header Cart & Admin Icon: 3D Neumorphic tactile surface (active nav pill owned by header-nav.css) */
 html[data-theme="light"] body .header .header-cart,
 html[data-theme="light"] body .header .header-iconAction,
-html:not([data-theme="dark"]) body .header .nav-active-pill,
 html:not([data-theme="dark"]) body .header .header-cart,
 html:not([data-theme="dark"]) body .header .header-iconAction {
   background:
@@ -57,7 +55,6 @@ html:not([data-theme="dark"]) body .header .header-iconAction {
     0 1px 3px rgba(0, 120, 80, 0.08) !important;
 }
 
-html[data-theme="dark"] body .header .nav-active-pill,
 html[data-theme="dark"] body .header .header-cart,
 html[data-theme="dark"] body .header .header-iconAction {
   background:
@@ -128,8 +125,7 @@ html[data-theme="dark"] body .header .header-iconAction:hover {
     0 3px 8px rgba(0, 0, 0, 0.35) !important;
 }
 
-/* Product Cards: 3D Neumorphic tactile surface with vertical white-to-faded-green gradient */
-/* Product Cards: 3D Neumorphic tactile surface with vertical white-to-faded-green gradient */
+/* Product Cards: flat solid surface, ultra-thin hairline border, soft hover shadow only */
 html[data-theme="light"] body .catalog-page .catalog-card,
 html[data-theme="light"] body .catalog-page .catalog-card.catalog-cardV2,
 html[data-theme="light"] body .catalog-card,
@@ -142,16 +138,9 @@ html:not([data-theme="dark"]) body .catalog-card,
 html:not([data-theme="dark"]) body .catalog-card.catalog-cardV2,
 html:not([data-theme="dark"]) body .product-tile,
 html:not([data-theme="dark"]) body .product-tile-front {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 35%),
-    linear-gradient(180deg, #ffffff 0%, #ffffff 50%, #f0f9f5 78%, #e4f5ed 100%) !important;
-  border: 1px solid rgba(0, 158, 96, 0.12) !important;
-  box-shadow:
-    inset 0 2px 0 #ffffff,
-    inset 1px 0 0 rgba(255, 255, 255, 0.7),
-    inset 0 -3px 0 rgba(0, 120, 80, 0.05),
-    0 10px 24px rgba(0, 0, 0, 0.05),
-    0 2px 6px rgba(0, 120, 80, 0.04) !important;
+  background: #ffffff !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme="light"] body .catalog-page .catalog-card:hover,
@@ -160,15 +149,9 @@ html[data-theme="light"] body .product-tile:hover,
 html:not([data-theme="dark"]) body .catalog-page .catalog-card:hover,
 html:not([data-theme="dark"]) body .catalog-card:hover,
 html:not([data-theme="dark"]) body .product-tile:hover {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.85) 0%, rgba(255, 255, 255, 0) 35%),
-    linear-gradient(180deg, #ffffff 0%, #ffffff 42%, #e9f7f0 75%, #dbf2e6 100%) !important;
-  border-color: rgba(0, 158, 96, 0.22) !important;
-  box-shadow:
-    inset 0 2px 0 #ffffff,
-    inset 0 -3px 0 rgba(0, 120, 80, 0.08),
-    0 16px 36px rgba(0, 158, 96, 0.08),
-    0 4px 10px rgba(0, 0, 0, 0.04) !important;
+  background: #ffffff !important;
+  border-color: rgba(0, 158, 96, 0.24) !important;
+  box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.08) !important;
 }
 
 html[data-theme="dark"] body .catalog-page .catalog-card,
@@ -176,23 +159,17 @@ html[data-theme="dark"] body .catalog-page .catalog-card.catalog-cardV2,
 html[data-theme="dark"] body .catalog-card,
 html[data-theme="dark"] body .product-tile,
 html[data-theme="dark"] body .product-tile-front {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0) 35%),
-    linear-gradient(180deg, #1c1c1c 0%, #161616 40%, #0f251e 100%) !important;
-  border: 1px solid rgba(0, 214, 180, 0.18) !important;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.2),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.6),
-    0 18px 40px rgba(0, 0, 0, 0.45) !important;
+  background: #131916 !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme="dark"] body .catalog-page .catalog-card:hover,
 html[data-theme="dark"] body .catalog-card:hover,
 html[data-theme="dark"] body .product-tile:hover {
-  border-color: rgba(0, 214, 180, 0.32) !important;
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, 0.25),
-    0 22px 48px rgba(0, 214, 180, 0.18) !important;
+  background: #161d19 !important;
+  border-color: rgba(0, 230, 148, 0.24) !important;
+  box-shadow: 0 10px 24px -8px rgba(0, 0, 0, 0.45) !important;
 }
 
 /* Catalog Card Price Row: Borderless clean text row without box/border across all devices */
@@ -240,7 +217,8 @@ html:not([data-theme="dark"]) body .catalog-card .catalog-cardPrice,
 html:not([data-theme="dark"]) body .catalog-card.catalog-cardV2 .catalog-cardPrice,
 html:not([data-theme="dark"]) body .catalog-card.grid .catalog-cardPrice,
 html:not([data-theme="dark"]) body .catalog-page .catalog-cardPrice {
-  color: #009e60 !important;
+  color: #0f172a !important;
+  font-variant-numeric: tabular-nums;
   border: none !important;
   border-width: 0 !important;
   outline: none !important;
@@ -255,11 +233,11 @@ html:not([data-theme="dark"]) body .catalog-page .catalog-cardPrice {
 
 html[data-theme="light"] body .catalog-card .catalog-cardPriceLabel,
 html:not([data-theme="dark"]) body .catalog-card .catalog-cardPriceLabel {
-  color: #5b6570 !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  font-size: 10px !important;
-  letter-spacing: 0.04em !important;
+  color: rgba(15, 23, 42, 0.56) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  font-size: 11px !important;
+  letter-spacing: 0 !important;
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -269,7 +247,8 @@ html[data-theme="dark"] body .catalog-card .catalog-cardPrice,
 html[data-theme="dark"] body .catalog-card.catalog-cardV2 .catalog-cardPrice,
 html[data-theme="dark"] body .catalog-card.grid .catalog-cardPrice,
 html[data-theme="dark"] body .catalog-page .catalog-cardPrice {
-  color: #00d6b4 !important;
+  color: #f8fafc !important;
+  font-variant-numeric: tabular-nums;
   border: none !important;
   border-width: 0 !important;
   outline: none !important;
@@ -283,88 +262,91 @@ html[data-theme="dark"] body .catalog-page .catalog-cardPrice {
 }
 
 html[data-theme="dark"] body .catalog-card .catalog-cardPriceLabel {
-  color: rgba(255, 255, 255, 0.55) !important;
-  font-weight: 700 !important;
-  text-transform: uppercase !important;
-  font-size: 10px !important;
-  letter-spacing: 0.04em !important;
+  color: rgba(248, 250, 252, 0.56) !important;
+  font-weight: 500 !important;
+  text-transform: none !important;
+  font-size: 11px !important;
+  letter-spacing: 0 !important;
   border: none !important;
   background: transparent !important;
   box-shadow: none !important;
 }
 
-/* Compact, downward shadows keep filter chips clear of their scroll containers. */
+/* Flat, smooth filter chips & supporting pills (no bevel shadows) */
 html body .catalog-page .catalog-quickFilters .catalog-quickChip.catalog-quickChip--line:not(.active),
 html body .detail-page.detail-page-v3 .pdx-filterChip:not(.is-active) {
-  box-shadow: 0 3px 4px -3px rgba(20, 45, 50, 0.28) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme="dark"] body .catalog-page .catalog-quickFilters .catalog-quickChip.catalog-quickChip--line:not(.active),
 html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-filterChip:not(.is-active) {
-  box-shadow: 0 3px 4px -3px rgba(0, 0, 0, 0.65) !important;
+  box-shadow: none !important;
 }
 
-/* Hero Stats & Contact Admin Chips: 3D Neumorphic tactile surface with vertical white-to-faded-green gradient */
+/* Hero Stats & Contact Admin Chips: flat solid surface, ultra-thin border, shadow on hover only */
 html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-heroStat,
 html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-contactAdmin,
-html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-heroStat,
 html:not([data-theme="dark"]) body .detail-page.detail-page-v3 .pdx-heroStat,
 html:not([data-theme="dark"]) body .detail-page.detail-page-v3 .pdx-contactAdmin {
-  background: var(--skeu-control-bg, #ffffff) !important;
-  border: 1px solid var(--brand-line, rgba(10, 10, 10, 0.1)) !important;
-  color: var(--store-icon-ink, #0a0a0a) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
+  background: #f6f8f7 !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  color: var(--store-icon-ink, #0f172a) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-contactAdmin:hover,
 html:not([data-theme="dark"]) body .detail-page.detail-page-v3 .pdx-contactAdmin:hover {
-  background: var(--skeu-panel-bg, #f2faf6) !important;
-  border-color: rgba(0, 158, 96, 0.3) !important;
-  box-shadow: var(--skeu-panel-shadow) !important;
+  background: #ffffff !important;
+  border-color: rgba(0, 158, 96, 0.24) !important;
+  box-shadow: 0 6px 16px -4px rgba(15, 23, 42, 0.08) !important;
 }
 
 html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-heroStat,
 html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-contactAdmin {
-  background: var(--skeu-control-bg, #1c1c1c) !important;
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.14)) !important;
-  color: var(--store-icon-ink, #ececec) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
+  background: #19221e !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  color: var(--store-icon-ink, #f8fafc) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme="dark"] body .detail-page.detail-page-v3 .pdx-contactAdmin:hover {
-  border-color: rgba(0, 214, 180, 0.34) !important;
-  box-shadow: var(--skeu-panel-shadow) !important;
+  border-color: rgba(0, 230, 148, 0.26) !important;
+  box-shadow: 0 8px 20px -6px rgba(0, 0, 0, 0.45) !important;
 }
 
 html body .detail-page.detail-page-v3 .pdx-packSignal {
-  border: 1px solid var(--brand-line, rgba(255, 255, 255, 0.1)) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0) 35%),
-    var(--skeu-inset-bg, #2c3035) !important;
-  color: var(--brand-muted, #c1c6cc) !important;
-  box-shadow: var(--skeu-inset-shadow) !important;
+  border: 1px solid rgba(255, 255, 255, 0.07) !important;
+  background: var(--skeu-inset-bg, #0d1210) !important;
+  color: var(--brand-muted) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-packSignal {
-  border: 1px solid rgba(15, 23, 42, 0.1) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0) 45%),
-    var(--skeu-inset-bg, #edf4f0) !important;
-  color: var(--brand-muted, #475569) !important;
-  box-shadow: var(--skeu-inset-shadow) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+  background: #f6f8f7 !important;
+  color: var(--brand-muted) !important;
+  box-shadow: none !important;
 }
 
 html body .detail-page.detail-page-v3 .pdx-packSignal .pdx-packSignalIcon {
   color: inherit !important;
 }
 
-/* Keep the global inset 3D finish with a compact outer shadow on chips. */
+/* Active filter chips stay flat and clean (strong 3D emphasis reserved for primary CTA & nav capsules) */
 html[data-theme] body .detail-page.detail-page-v3 .pdx-filterChip.is-active,
 html[data-theme] body .catalog-page .catalog-quickFilters .catalog-quickChip.active {
-  background: var(--imzaqi-btn-face) !important;
-  border-color: var(--imzaqi-btn-border) !important;
-  color: var(--imzaqi-btn-text) !important;
-  box-shadow: var(--imzaqi-btn-shadow-compact) !important;
+  background: rgba(0, 230, 148, 0.14) !important;
+  border: 1px solid rgba(0, 230, 148, 0.34) !important;
+  color: #34d399 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] body .detail-page.detail-page-v3 .pdx-filterChip.is-active,
+html[data-theme="light"] body .catalog-page .catalog-quickFilters .catalog-quickChip.active {
+  background: rgba(0, 158, 96, 0.1) !important;
+  border: 1px solid rgba(0, 158, 96, 0.3) !important;
+  color: #076a44 !important;
+  box-shadow: none !important;
 }
 
 html[data-theme] body .header .theme-toggle {

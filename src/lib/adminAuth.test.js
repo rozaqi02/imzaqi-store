@@ -24,9 +24,11 @@ describe("adminAuth", () => {
     mockRpc.mockResolvedValue({ data: null, error: { message: "not found" } });
   });
 
-  it("hasAdminRoleMetadata detects app_metadata.role", () => {
+  it("hasAdminRoleMetadata detects app_metadata.role and ignores user_metadata.role", () => {
     expect(hasAdminRoleMetadata({ app_metadata: { role: "admin" } })).toBe(true);
     expect(hasAdminRoleMetadata({ app_metadata: { role: "user" } })).toBe(false);
+    expect(hasAdminRoleMetadata({ user_metadata: { role: "admin" } })).toBe(false);
+    expect(hasAdminRoleMetadata({ app_metadata: {}, user_metadata: { role: "admin" } })).toBe(false);
   });
 
   it("checkIsAdmin returns true when user is in admin_users", async () => {

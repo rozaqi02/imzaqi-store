@@ -39,10 +39,10 @@ html[data-theme] body :is(.btn-ghost, .hx-btn-secondary, .help-button--secondary
   --action-face-hover: var(--skeu-control-bg);
   --action-face-active: var(--skeu-inset-bg);
   --action-ink: var(--brand-text);
-  --action-edge: var(--store-icon-border, var(--brand-line));
+  --action-edge: var(--brand-line);
   --action-text-shadow: none;
-  --action-depth: var(--skeu-control-shadow);
-  --action-depth-hover: var(--skeu-control-shadow-hover, var(--skeu-control-shadow));
+  --action-depth: none;
+  --action-depth-hover: var(--skeu-control-shadow-hover, none);
   --action-depth-active: var(--skeu-inset-shadow);
 }
 
@@ -88,50 +88,55 @@ html[data-theme] body .btn-sm { font-size: 13px; padding: 8px 12px; }
 html[data-theme] body .btn-icon { width: 44px; min-width: 44px; padding: 10px; }
 html[data-theme] body .btn svg { flex-shrink: 0; }
 
-/* Compact controls share the same neutral raised/pressed treatment. Navigation
-   docks and the theme switch keep their dedicated geometry and semantics. */
-html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-viewBtn, .catalog-quickChip, .catalog-filterBtn, .catalog-sheetClose, .pdx-filterChip, .pdx-addBtn, .qty-btn, .checkout-item-remove, .reviews-iconButton, .hero-search-clear) {
+/* Compact chips and secondary icon controls stay flat & smooth with hairline border */
+html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-quickChip, .catalog-filterBtn, .catalog-sheetClose, .pdx-filterChip, .pdx-addBtn, .qty-btn, .checkout-item-remove, .reviews-iconButton, .hero-search-clear) {
   background: var(--skeu-control-bg) !important;
   color: var(--brand-text) !important;
-  border: 1px solid var(--store-icon-border, var(--brand-line)) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
+  border: 1px solid var(--brand-line) !important;
+  box-shadow: none !important;
   font-family: var(--font-sans);
   cursor: pointer;
-  transition: box-shadow 180ms ease, transform 180ms ease;
+  transition: border-color 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
 }
 
-/* Horizontal scroll chip rails need tighter shadow clearance so shadows never clip */
 html[data-theme] body :where(.catalog-quickFilters, .pdx-packControls) {
-  padding-block: 6px;
+  padding-block: 4px;
 }
 
-html[data-theme] body :where(.catalog-quickFilters, .pdx-packControls) :is(.catalog-quickChip, .pdx-filterChip):not(.active):not(.is-active) {
-  box-shadow:
-    0 3px 6px -2px rgba(20, 45, 50, 0.22),
-    -1px -1px 3px rgba(255, 255, 255, 0.72),
-    inset 0 1.5px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1.5px 1px rgba(20, 45, 50, 0.1) !important;
+html[data-theme] body :where(.catalog-quickFilters, .pdx-packControls) :is(.catalog-quickChip, .pdx-filterChip):not(.active):not(.is-active):hover {
+  border-color: rgba(0, 230, 148, 0.24) !important;
+  box-shadow: var(--skeu-control-shadow-hover) !important;
 }
 
-html[data-theme="dark"] body :where(.catalog-quickFilters, .pdx-packControls) :is(.catalog-quickChip, .pdx-filterChip):not(.active):not(.is-active) {
-  box-shadow:
-    0 3px 7px -2px rgba(0, 0, 0, 0.56),
-    inset 0 1px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -1.5px 1px rgba(0, 0, 0, 0.4) !important;
+html[data-theme="light"] body :where(.catalog-quickFilters, .pdx-packControls) :is(.catalog-quickChip, .pdx-filterChip):not(.active):not(.is-active):hover {
+  border-color: rgba(0, 158, 96, 0.24) !important;
+  box-shadow: var(--skeu-control-shadow-hover) !important;
 }
 
-html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-viewBtn, .catalog-quickChip, .catalog-filterBtn, .pdx-filterChip)[aria-pressed="true"],
-html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-viewBtn, .catalog-quickChip, .catalog-filterBtn, .pdx-filterChip):active {
+html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-quickChip, .catalog-filterBtn, .pdx-filterChip)[aria-pressed="true"],
+html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.catalog-quickChip, .catalog-filterBtn, .pdx-filterChip):active {
   background: var(--skeu-inset-bg) !important;
-  box-shadow: var(--skeu-inset-shadow) !important;
+  box-shadow: none !important;
   color: var(--brand-text) !important;
 }
 
 html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.pdx-filterChip.is-active, .catalog-quickChip.active) {
-  background: var(--imzaqi-btn-face) !important;
-  border-color: var(--imzaqi-btn-border) !important;
-  color: var(--imzaqi-btn-text) !important;
-  box-shadow: var(--imzaqi-btn-shadow-compact) !important;
+  background: rgba(0, 230, 148, 0.14) !important;
+  border-color: rgba(0, 230, 148, 0.34) !important;
+  color: #34d399 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme="light"] body :where(.app-shell, .checkout-overlay) :is(.pdx-filterChip.is-active, .catalog-quickChip.active) {
+  background: rgba(0, 158, 96, 0.1) !important;
+  border-color: rgba(0, 158, 96, 0.3) !important;
+  color: #076a44 !important;
+  box-shadow: none !important;
+}
+
+html[data-theme] body :where(.app-shell, .checkout-overlay) :is(.pdx-filterChip.is-active, .catalog-quickChip.active) svg {
+  color: currentColor !important;
+  stroke: currentColor !important;
 }
 html[data-theme] body :where(.app-shell, .checkout-overlay) .catalog-quickChip[aria-pressed="true"] :is(svg, .catalog-quickChipCount) { color: inherit !important; }
 

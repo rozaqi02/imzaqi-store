@@ -3,6 +3,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import Pay from "./Pay";
+import { OrderSuccessModal } from "./pay/components/PayModals";
 import { ToastProvider } from "../context/ToastContext";
 import { CartProvider } from "../context/CartContext";
 
@@ -98,5 +99,30 @@ describe("Pay page component", () => {
     await waitFor(() => {
       expect(screen.getByText("Selesai")).toBeInTheDocument();
     });
+  });
+
+  it("renders OrderSuccessModal steps cleanly without disabled state", () => {
+    render(
+      <MemoryRouter>
+        <OrderSuccessModal
+          open
+          orderCode="IMZ-S3Z4XZV7"
+          statusUrl="/status?code=IMZ-S3Z4XZV7"
+          adminWaUrl="https://wa.me/6283136049987"
+          onClose={() => {}}
+        />
+      </MemoryRouter>
+    );
+
+    const stepsContainer = document.querySelector(".pay-successFunnelSteps .steps.steps--visual");
+    expect(stepsContainer).not.toBeNull();
+    const steps = Array.from(stepsContainer.querySelectorAll(".step"));
+    expect(steps).toHaveLength(3);
+    expect(steps[0]).toHaveClass("done");
+    expect(steps[1]).toHaveClass("done");
+    expect(steps[2]).toHaveClass("active");
+    expect(stepsContainer.querySelectorAll(".step:disabled")).toHaveLength(0);
+    expect(screen.getAllByText("Selesai")).toHaveLength(2);
+    expect(screen.getByText("ID order")).toBeInTheDocument();
   });
 });

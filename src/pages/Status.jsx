@@ -399,18 +399,37 @@ function TabCekStatus({ settings, onOrderLoadedChange }) {
   function handleReorder() {
     if (!orderItems.length || typeof cart?.add !== "function") return;
     let addedCount = 0;
+    let conflictMessage = "";
     for (const item of orderItems) {
       const product =
         (item?.product_id ? productLookup.get(item.product_id) : null) ||
         (item?.product_name ? productLookup.get(String(item.product_name).toLowerCase().trim()) : null);
-      const activeVariants = Array.isArray(product?.variants) ? product.variants : [];
+      const activeVariants = Array.isArray(product?.product_variants)
+        ? product.product_variants.filter((v) => v?.is_active !== false)
+        : [];
       const matchedVariant =
         activeVariants.find((v) => item?.variant_id && v.id === item.variant_id) ||
         activeVariants.find(
+          (v) =>
+            String(v.name || "").trim().toLowerCase() === String(item?.variant_name || "").trim().toLowerCase() &&
+            (!item?.duration_label ||
+              String(v.duration_label || "").trim().toLowerCase() ===
+                String(item.duration_label).trim().toLowerCase())
+        ) ||
+        activeVariants.find(
           (v) => String(v.name || "").trim().toLowerCase() === String(item?.variant_name || "").trim().toLowerCase()
         );
+
+      // If live catalog loaded and this product/variant is no longer active or out of stock, skip it
+      if (products.length > 0 && product && !matchedVariant) {
+        continue;
+      }
+
+      const resolvedVariantId = matchedVariant?.id || item?.variant_id || null;
+      if (!resolvedVariantId) continue;
+
       const variantPayload = {
-        variant_id: matchedVariant?.id || item?.variant_id || `${item?.product_name || "item"}-${addedCount}`,
+        variant_id: resolvedVariantId,
         product_id: matchedVariant?.product_id || product?.id || item?.product_id || null,
         product_name: product?.name || item?.product_name || "Produk",
         variant_name: matchedVariant?.name || item?.variant_name || "",
@@ -428,13 +447,19 @@ function TabCekStatus({ settings, onOrderLoadedChange }) {
       };
       const qty = Math.max(1, Number(item?.qty || 1));
       const res = cart.add(variantPayload, qty);
-      if (res?.success !== false) addedCount += 1;
+      if (res?.conflict && res?.message) {
+        conflictMessage = res.message;
+      } else if (res?.success !== false) {
+        addedCount += 1;
+      }
     }
     if (addedCount > 0) {
       toast.success("Paket ditambahkan ke keranjang");
       navigate("/checkout");
+    } else if (conflictMessage) {
+      toast.warning(conflictMessage, { title: "Pesanan Harus Terpisah", duration: 5000 });
     } else {
-      toast.error("Stok paket sedang kosong, cek produk lain ya.");
+      toast.error("Stok paket sedang kosong atau tidak tersedia, cek produk lain ya.");
     }
   }
 
@@ -537,7 +562,7 @@ function TabCekStatus({ settings, onOrderLoadedChange }) {
           />
 
           {order.status === "done" ? (
-            <StatusReviewStrip order={order} waUrl={waUrl} toast={toast} />
+            <StatusReviewStrip key={order.order_code} order={order} waUrl={waUrl} toast={toast} />
           ) : null}
         </div>
       )}

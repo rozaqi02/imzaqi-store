@@ -1289,11 +1289,10 @@ html[data-theme="light"] .lightbox-nav {
 
 /* Catalog stock pill uses brand teal - not generic slate text/border */
 html[data-theme="light"] .catalog-status.ok {
-  color: var(--accent, #067b88) !important;
-  border-color: rgba(0, 138, 148, 0.32) !important;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.85), rgba(255, 255, 255, 0) 36%),
-    linear-gradient(165deg, rgba(0, 214, 180, 0.28), rgba(0, 194, 208, 0.12)) !important;
+  color: #076a44 !important;
+  border-color: rgba(0, 158, 96, 0.24) !important;
+  background: rgba(0, 158, 96, 0.08) !important;
+  box-shadow: none !important;
 }
 
 html[data-theme="light"] .catalog-status.hot {
@@ -1349,18 +1348,10 @@ html[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
 @media (max-width: 720px) {
   html,
   html[data-theme="dark"] {
-    --brand-shadow: 0 14px 28px rgba(0, 0, 0, 0.24);
+    --brand-shadow: 0 12px 24px rgba(0, 0, 0, 0.24);
     --brand-shadow-soft: 0 8px 16px rgba(0, 0, 0, 0.14);
-    --skeu-panel-shadow:
-      0 6px 10px rgba(0, 0, 0, 0.22),
-      0 14px 28px rgba(0, 0, 0, 0.18),
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -2.5px 0 rgba(0, 0, 0, 0.3);
-    --skeu-control-shadow:
-      0 6px 10px rgba(0, 0, 0, 0.16),
-      0 10px 18px rgba(0, 0, 0, 0.12),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.26);
+    --skeu-panel-shadow: none;
+    --skeu-control-shadow: none;
     --skeu-accent-shadow:
       0 12px 20px rgba(0, 214, 180, 0.18),
       inset 0 1px 0 rgba(255, 255, 255, 0.34),
@@ -1368,18 +1359,10 @@ html[data-theme="light"] .admin-nav-btn.active .admin-nav-icon {
   }
 
   html[data-theme="light"] {
-    --brand-shadow: 0 12px 20px rgba(15, 42, 32, 0.08);
-    --brand-shadow-soft: 0 8px 14px rgba(15, 42, 32, 0.06);
-    --skeu-panel-shadow:
-      0 6px 10px rgba(15, 42, 32, 0.07),
-      0 12px 22px rgba(15, 42, 32, 0.08),
-      inset 0 1.5px 0 rgba(255, 255, 255, 1),
-      inset 0 -2.5px 0 rgba(0, 120, 80, 0.1);
-    --skeu-control-shadow:
-      0 6px 10px rgba(15, 42, 32, 0.06),
-      0 8px 16px rgba(15, 42, 32, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(0, 120, 80, 0.1);
+    --brand-shadow: 0 10px 20px rgba(15, 42, 32, 0.06);
+    --brand-shadow-soft: 0 6px 12px rgba(15, 42, 32, 0.04);
+    --skeu-panel-shadow: none;
+    --skeu-control-shadow: none;
     --skeu-accent-shadow:
       0 10px 18px rgba(0, 158, 96, 0.16),
       inset 0 1px 0 rgba(255, 255, 255, 0.46),
@@ -1538,21 +1521,9 @@ html[data-theme="light"] {
 
 html,
 html[data-theme="dark"] {
-  --skeu-panel-shadow:
-    0 8px 14px rgba(0, 0, 0, 0.28),
-    0 34px 74px rgba(0, 0, 0, 0.34),
-    -16px -16px 38px rgba(255, 255, 255, 0.08),
-    inset 0 2px 0 rgba(255, 255, 255, 0.16),
-    inset 0 -4px 0 rgba(0, 0, 0, 0.42);
-  --skeu-control-shadow:
-    0 8px 12px rgba(0, 0, 0, 0.22),
-    0 18px 32px rgba(0, 0, 0, 0.22),
-    inset 0 2px 0 rgba(255, 255, 255, 0.18),
-    inset 0 -3px 0 rgba(0, 0, 0, 0.38);
-  --skeu-inset-shadow:
-    inset 0 3px 9px rgba(0, 0, 0, 0.46),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05),
-    0 1px 0 rgba(255, 255, 255, 0.03);
+  --skeu-panel-shadow: none;
+  --skeu-control-shadow: none;
+  --skeu-inset-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   --skeu-accent-shadow:
     0 22px 38px rgba(0, 214, 180, 0.28),
     inset 0 1px 0 rgba(255, 255, 255, 0.44),
@@ -1560,20 +1531,9 @@ html[data-theme="dark"] {
 }
 
 html[data-theme="light"] {
-  --skeu-panel-shadow:
-    0 6px 10px rgba(15, 42, 32, 0.07),
-    0 24px 48px rgba(15, 42, 32, 0.09),
-    inset 0 2px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(0, 120, 80, 0.12);
-  --skeu-control-shadow:
-    0 6px 10px rgba(15, 42, 32, 0.07),
-    0 14px 26px rgba(15, 42, 32, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -3px 0 rgba(0, 120, 80, 0.12);
-  --skeu-inset-shadow:
-    inset 0 2px 6px rgba(15, 42, 32, 0.09),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 1px 0 rgba(255, 255, 255, 0.56);
+  --skeu-panel-shadow: none;
+  --skeu-control-shadow: none;
+  --skeu-inset-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
   --skeu-accent-shadow:
     0 16px 28px rgba(0, 158, 96, 0.2),
     inset 0 1px 0 rgba(255, 255, 255, 0.6),
@@ -1917,29 +1877,13 @@ html[data-theme="light"] .modal-close:hover {
 @media (max-width: 720px) {
   html,
   html[data-theme="dark"] {
-    --skeu-panel-shadow:
-      0 6px 10px rgba(0, 0, 0, 0.2),
-      0 14px 28px rgba(0, 0, 0, 0.16),
-      inset 0 1.5px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -2.5px 0 rgba(0, 0, 0, 0.28);
-    --skeu-control-shadow:
-      0 6px 10px rgba(0, 0, 0, 0.14),
-      0 10px 18px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1),
-      inset 0 -2px 0 rgba(0, 0, 0, 0.24);
+    --skeu-panel-shadow: none;
+    --skeu-control-shadow: none;
   }
 
   html[data-theme="light"] {
-    --skeu-panel-shadow:
-      0 6px 10px rgba(15, 42, 32, 0.07),
-      0 12px 22px rgba(15, 42, 32, 0.06),
-      inset 0 1.5px 0 rgba(255, 255, 255, 1),
-      inset 0 -2.5px 0 rgba(0, 120, 80, 0.1);
-    --skeu-control-shadow:
-      0 6px 10px rgba(15, 42, 32, 0.06),
-      0 8px 16px rgba(15, 42, 32, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 1),
-      inset 0 -2px 0 rgba(0, 120, 80, 0.1);
+    --skeu-panel-shadow: none;
+    --skeu-control-shadow: none;
   }
 
   .toast,
@@ -3789,9 +3733,9 @@ html[data-theme="light"] .home-page .home-popularList .home-popularSold {
 }
 
 .catalog-page .catalog-card.catalog-cardV2 {
-  border-radius: 26px !important;
+  border-radius: 24px !important;
   padding: 14px !important;
-  gap: 10px !important;
+  gap: 0 !important;
 }
 
 .catalog-page .catalog-card.catalog-cardV2 .catalog-cardTop {
@@ -4669,58 +4613,28 @@ html[data-theme="dark"] {
   --uni-neo-panel-soft:
     linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.02) 34%),
     var(--skeu-control-bg);
-  --uni-neo-panel-shadow:
-    0 14px 30px -4px rgba(2, 12, 26, 0.42),
-    inset 0 1px 0 rgba(255, 255, 255, 0.22),
-    inset 0 -1px 0 rgba(4, 26, 42, 0.34),
-    0 0 0 1px rgba(117, 178, 214, 0.1);
-  --uni-neo-control:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.17), rgba(255, 255, 255, 0.03) 34%),
-    var(--skeu-control-bg);
-  --uni-neo-control-shadow:
-    0 6px 16px -2px rgba(0, 10, 22, 0.3),
-    inset 0 1px 0 rgba(255, 255, 255, 0.24),
-    inset 0 -1px 0 rgba(3, 32, 52, 0.28);
-  --uni-neo-inset:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0) 24%),
-    var(--skeu-inset-bg);
-  --uni-neo-inset-shadow:
-    inset 0 4px 12px rgba(0, 0, 0, 0.34),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06),
-    0 1px 0 rgba(255, 255, 255, 0.04);
+  --uni-neo-panel-shadow: none;
+  --uni-neo-control: var(--skeu-control-bg);
+  --uni-neo-control-shadow: none;
+  --uni-neo-inset: var(--skeu-inset-bg);
+  --uni-neo-inset-shadow: var(--skeu-inset-shadow);
   --uni-neo-focus:
-    0 0 0 4px rgba(111, 220, 255, 0.22),
-    0 12px 24px rgba(0, 10, 20, 0.26);
-  --uni-neo-icon: #76dbff;
+    0 0 0 3px rgba(0, 230, 148, 0.22);
+  --uni-neo-icon: #00e694;
 }
 
 html[data-theme="light"] {
-  --uni-line: rgba(0, 158, 96, 0.18);
-  --uni-line-strong: rgba(0, 158, 96, 0.42);
-  --uni-text: #0d241b;
-  --uni-muted: rgba(34, 68, 53, 0.78);
-  --uni-neo-panel:
-    linear-gradient(180deg, #ffffff 0%, #f8fbf9 100%);
-  --uni-neo-panel-soft:
-    linear-gradient(180deg, #ffffff 0%, #f4f9f6 100%);
-  --uni-neo-panel-shadow:
-    0 10px 26px -4px rgba(10, 42, 30, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(0, 158, 96, 0.06),
-    0 0 0 1px rgba(0, 158, 96, 0.1);
-  --uni-neo-control:
-    linear-gradient(180deg, #ffffff 0%, #f4f9f6 100%);
-  --uni-neo-control-shadow:
-    0 6px 14px -2px rgba(10, 42, 30, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(0, 158, 96, 0.08);
-  --uni-neo-inset:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.8), rgba(244, 249, 246, 0.32) 24%),
-    var(--skeu-inset-bg);
-  --uni-neo-inset-shadow:
-    inset 0 2px 6px rgba(10, 42, 30, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    0 1px 0 rgba(255, 255, 255, 0.58);
+  --uni-line: rgba(0, 0, 0, 0.06);
+  --uni-line-strong: rgba(0, 158, 96, 0.34);
+  --uni-text: #0f172a;
+  --uni-muted: rgba(15, 23, 42, 0.66);
+  --uni-neo-panel: #ffffff;
+  --uni-neo-panel-soft: #f6f8f7;
+  --uni-neo-panel-shadow: none;
+  --uni-neo-control: var(--skeu-control-bg);
+  --uni-neo-control-shadow: none;
+  --uni-neo-inset: var(--skeu-inset-bg);
+  --uni-neo-inset-shadow: var(--skeu-inset-shadow);
   --uni-neo-focus:
     0 0 0 4px rgba(0, 158, 96, 0.18),
     0 12px 24px rgba(10, 42, 30, 0.16);
@@ -5955,8 +5869,8 @@ html[data-theme="light"] .catalog-filterSection {
 }
 
 html[data-theme="light"] .catalog-toggleGroup {
-  background: rgba(255, 255, 255, 0.5) !important;
-  border-color: rgba(0, 138, 148, 0.1) !important;
+  background: transparent !important;
+  border-color: transparent !important;
 }
 
 html[data-theme="light"] .catalog-toggleItemTitle {

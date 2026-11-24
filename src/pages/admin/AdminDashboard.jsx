@@ -155,7 +155,9 @@ const TAB_ICONS = {
 };
 
 /** Tabs that need products in memory (stock / variants / category map). */
-const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders", "marketing"]);
+const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders", "marketing", "settings"]);
+/** Tabs that need flash sales in memory (KPIs, sidebar badge, promotions settings). */
+const TABS_NEED_FLASHSALE = new Set(["overview", "flashsale", "settings"]);
 /** Tabs that need orders list. */
 const TABS_NEED_ORDERS = new Set(["overview", "orders"]);
 
@@ -229,7 +231,6 @@ export default function AdminDashboard() {
   const [cohortReturn, setCohortReturn] = useState(0);
   const [funnelSummary, setFunnelSummary] = useState({ days: 7, steps: [] });
   const [funnelUnavailable, setFunnelUnavailable] = useState(false);
-  const [restockRequests, setRestockRequests] = useState([]);
 
   // Bulk Actions state
   const [selectedOrderIds, setSelectedOrderIds] = useState(new Set());
@@ -300,6 +301,8 @@ export default function AdminDashboard() {
       return true;
     }
   });
+  const soundEnabledRef = useRef(soundEnabled);
+  soundEnabledRef.current = soundEnabled;
 
   const toggleSound = () => {
     setSoundEnabled((prev) => {
@@ -339,6 +342,7 @@ export default function AdminDashboard() {
     claims: false,
   });
   const ordersBucketRef = useRef(orderBucket);
+  const analyticsWindowLoadedRef = useRef(null);
   const realtimeToastAtRef = useRef(0);
   const ordersRef = useRef(orders);
   ordersRef.current = orders;
@@ -746,6 +750,7 @@ export default function AdminDashboard() {
         warn("get_funnel_summary gagal:", funnelResult.reason || funnelResult.value?.error);
       }
       loadedRef.current.analytics = true;
+      analyticsWindowLoadedRef.current = days === 30 ? "30d" : "7d";
     } catch (e) {
       warn("Gagal memuat analytics:", e);
     } finally {
@@ -781,12 +786,6 @@ export default function AdminDashboard() {
       tasks.push(refreshAnalytics(days, { force: true }));
       // Counts for KPI even if orders page already loaded
       if (!orderDbStats.loaded || force) tasks.push(fetchOrderDbStats());
-      tasks.push(
-        supabase.from("restock_requests")
-          .select("id,customer_whatsapp,created_at,notified_at,product_id,variant_id,products(name),product_variants(name,duration_label)")
-          .order("created_at", { ascending: false }).limit(30)
-          .then(({ data, error }) => { if (!error) setRestockRequests(data || []); })
-      );
     }
 
     if (tabId === "promos" && (!loadedRef.current.promos || force)) {
@@ -806,7 +805,7 @@ export default function AdminDashboard() {
       }
     }
 
-    if (tabId === "flashsale" && (!loadedRef.current.flashsale || force)) {
+    if (TABS_NEED_FLASHSALE.has(tabId) && (!loadedRef.current.flashsale || force)) {
       tasks.push(
         fetchAllFlashSales()
           .catch(() => [])
@@ -922,9 +921,11 @@ export default function AdminDashboard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderBucket]);
 
-  // Analytics window: only while on overview
+  // Analytics window: only re-fetch when admin changes the window after initial load
   useEffect(() => {
     if (tab !== "overview") return;
+    if (!loadedRef.current.analytics) return;
+    if (analyticsWindowLoadedRef.current === analyticsWindow) return;
     const days = analyticsWindow === "30d" ? 30 : 7;
     refreshAnalytics(days, { force: true });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -1405,7 +1406,9 @@ export default function AdminDashboard() {
           ? true
           : orderBucket === "attention"
             ? LIVE_ORDER_STATUSES.has(status)
-            : status === orderBucket;
+            : orderBucket === "cancelled"
+              ? status === "cancelled" || status === "expired"
+              : status === orderBucket;
 
       if (!matchesBucket) return false;
 
@@ -1491,12 +1494,12 @@ export default function AdminDashboard() {
               total: prev.total + 1,
               live: prev.live + liveDelta,
               done: status === "done" ? prev.done + 1 : prev.done,
-              cancelled: status === "cancelled" ? prev.cancelled + 1 : prev.cancelled,
+              cancelled: status === "cancelled" || status === "expired" ? prev.cancelled + 1 : prev.cancelled,
               paidReported: status === "paid_reported" ? prev.paidReported + 1 : prev.paidReported,
               byStatus,
             };
           });
-          if (soundEnabled) {
+          if (soundEnabledRef.current) {
             playOrderAlertChime();
           }
           notifyAdminNewOrder(newOrder, waNumber);
@@ -2366,12 +2369,18 @@ export default function AdminDashboard() {
     if (!code) { toast.error("Kode promo wajib diisi"); return; }
     if (!Number.isFinite(percent) || percent <= 0 || percent > 100) { toast.error("Diskon harus 1–100%"); return; }
 
+    const existingPromo = promoFormMode === "edit" ? promos.find((p) => p.code === code) : null;
+    const rawExpired = String(promoForm.expired_at || "").trim();
+    const expiredAtIso = rawExpired
+      ? (/^\d{4}-\d{2}-\d{2}$/.test(rawExpired) ? `${rawExpired}T23:59:59+07:00` : rawExpired)
+      : null;
+
     const row = {
       code,
       percent,
-      is_active: true,
+      is_active: promoFormMode === "edit" && existingPromo ? !!existingPromo.is_active : true,
       updated_at: new Date().toISOString(),
-      ...(promoForm.expired_at ? { expired_at: promoForm.expired_at } : { expired_at: null }),
+      expired_at: expiredAtIso,
       ...(promoForm.max_uses !== "" && promoForm.max_uses != null
         ? { max_uses: Number(promoForm.max_uses) }
         : { max_uses: null }),
@@ -2468,7 +2477,7 @@ export default function AdminDashboard() {
     setPromoForm({
       code: p.code,
       percent: String(p.percent),
-      expired_at: p.expired_at ? p.expired_at.slice(0, 10) : "",
+      expired_at: p.expired_at ? toDateKeyWIB(p.expired_at) || p.expired_at.slice(0, 10) : "",
       max_uses: p.max_uses != null ? String(p.max_uses) : "",
     });
     setPromoFormMode("edit");
@@ -2487,11 +2496,9 @@ export default function AdminDashboard() {
     setMsg("");
 
     const files = Array.from(e.target.elements.files.files || []);
-    const caption = e.target.elements.caption.value || "";
-    const customerName = e.target.elements.customer_name.value || "";
-    const productName = e.target.elements.product_name.value || "";
-    const purchasedAt = e.target.elements.purchased_at.value || null;
-    const isVerified = Boolean(e.target.elements.is_verified?.checked);
+    const caption = e.target.elements.caption?.value || "";
+    const customerName = e.target.elements.customer_name?.value || "";
+    const productName = e.target.elements.product_name?.value || "";
     const privacyConfirmed = e.target.elements.privacy_confirmed ? e.target.elements.privacy_confirmed.checked : true;
     if (!privacyConfirmed) {
       toast.error("Wajib konfirmasi bahwa gambar tidak memuat data sensitif pelanggan.");
@@ -2515,30 +2522,19 @@ export default function AdminDashboard() {
         urls.push(await uploadToBucket(BUCKET_TESTIMONIALS, f, "testimonials"));
       }
 
+      // Sync with public.testimonials schema: (id, image_url, caption, is_active, sort_order, created_at)
+      const metaInfo = [customerName.trim() ? `Dari ${customerName.trim()}` : "", productName.trim() ? `(${productName.trim()})` : ""]
+        .filter(Boolean)
+        .join(" ");
+      const finalCaption = [caption.trim(), metaInfo].filter(Boolean).join(" · ") || null;
       const payload = urls.map((u) => ({
         image_url: u,
-        caption: caption.trim() || null,
-        customer_name: customerName.trim() || null,
-        product_name: productName.trim() || null,
-        purchased_at: purchasedAt ? new Date(purchasedAt).toISOString() : null,
-        is_verified: isVerified,
+        caption: finalCaption,
         is_active: true,
         sort_order: 100,
       }));
 
-      let { error } = await supabase.from("testimonials").insert(payload);
-      if (error && /column|schema cache|does not exist/i.test(String(error.message || ""))) {
-        const metaInfo = [customerName ? `Dari ${customerName.trim()}` : "", productName ? `(${productName.trim()})` : ""].filter(Boolean).join(" ");
-        const finalCaption = [caption.trim(), metaInfo].filter(Boolean).join(" · ") || null;
-        const fallbackPayload = urls.map((u) => ({
-          image_url: u,
-          caption: finalCaption,
-          is_active: true,
-          sort_order: 100,
-        }));
-        const res = await supabase.from("testimonials").insert(fallbackPayload);
-        error = res.error;
-      }
+      const { error } = await supabase.from("testimonials").insert(payload);
       if (error) throw error;
 
       invalidateTestimonialsCache();
@@ -2806,7 +2802,7 @@ export default function AdminDashboard() {
                       <span className="admin-kpiLabel">Omzet ({analyticsWindow === "7d" ? "7 Hari" : "30 Hari"})</span>
                       <span className="admin-kpiIcon is-emerald" aria-hidden="true"><Wallet size={16} /></span>
                     </div>
-                    <strong className="admin-kpiValue">{formatIDR(analyticsSummary.revenueTotal)}</strong>
+                    <strong className="admin-kpiValue">{formatIDR(analyticsSummary.revenueWindow)}</strong>
                     <span className="admin-kpiSub">{analyticsSummary.doneOrders} transaksi selesai</span>
                   </div>
                   <div className="admin-kpiCard">
@@ -2915,7 +2911,8 @@ export default function AdminDashboard() {
                     <div className="admin-panel-body admin-stack">
                       {ORDER_STATUS_OPTIONS.map((option) => {
                         const count = analyticsSummary.statusMap[option.value] || 0;
-                        const ratio = orders.length ? (count / orders.length) * 100 : 0;
+                        const statusTotal = orderStats.total || orders.length;
+                        const ratio = statusTotal ? (count / statusTotal) * 100 : 0;
                         return (
                           <div key={option.value} className="admin-statusMetric">
                             <div className="admin-statusMetricTop">
@@ -3047,27 +3044,6 @@ export default function AdminDashboard() {
                       ) : (
                         <div className="admin-emptyInline">Belum ada stok kritis. Kondisi katalog cukup aman.</div>
                       )}
-                    </div>
-                  </div>
-
-                  <div className="admin-panel">
-                    <div className="admin-panel-head"><div className="admin-panel-title">Permintaan Restock</div></div>
-                    <div className="admin-panel-body admin-stack">
-                      {restockRequests.length ? restockRequests.map((request) => (
-                        <div className="admin-alertItem" key={request.id}>
-                          <div><strong>{request.products?.name || "Produk"} · {request.product_variants?.name || "Varian"}</strong><small>{request.customer_whatsapp} · {request.notified_at ? "Sudah dikabari" : "Belum dikabari"}</small></div>
-                          <div style={{ display: "flex", gap: 8 }}>
-                            <a className="btn btn-ghost btn-sm" href={`https://wa.me/${normalizeWhatsApp(request.customer_whatsapp)}`} target="_blank" rel="noreferrer">WhatsApp</a>
-                            {!request.notified_at ? <button className="btn btn-sm" type="button" onClick={async () => {
-                              const notifiedAt = new Date().toISOString();
-                              const { error } = await supabase.from("restock_requests").update({ notified_at: notifiedAt }).eq("id", request.id);
-                              if (error) return toast.error("Gagal menandai permintaan");
-                              setRestockRequests((current) => current.map((item) => item.id === request.id ? { ...item, notified_at: notifiedAt } : item));
-                              toast.success("Ditandai sudah dikabari");
-                            }}>Tandai dikabari</button> : null}
-                          </div>
-                        </div>
-                      )) : <div className="admin-emptyInline">Belum ada pelanggan yang meminta notifikasi restock.</div>}
                     </div>
                   </div>
 
@@ -3280,10 +3256,10 @@ export default function AdminDashboard() {
                           <span>Konversi keseluruhan</span>
                           <strong>
                             {storePulse.total_views
-                              ? `${calcConversionRate(orders.length, storePulse.total_views).toFixed(2)}%`
+                              ? `${calcConversionRate(orderStats.total || orders.length, storePulse.total_views).toFixed(2)}%`
                               : "-"}
                           </strong>
-                          <small>{orders.length} order dari {storePulse.total_views} views</small>
+                          <small>{orderStats.total || orders.length} order dari {storePulse.total_views} views</small>
                         </div>
                         <div className="admin-miniCard">
                           <span>Konversi hari ini</span>
@@ -4635,7 +4611,7 @@ export default function AdminDashboard() {
                 <button
                   className="btn btn-danger"
                   type="button"
-                  onClick={() => updateOrderStatus(activeOrder.id, "cancelled")}
+                  onClick={() => requestOrderStatusChange(activeOrder.id, "cancelled", activeOrder.status)}
                 >
                   Batalkan
                 </button>

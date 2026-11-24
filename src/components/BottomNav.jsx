@@ -14,7 +14,6 @@ import { BOTTOM_NAV_MEDIA, PHONE_LAYOUT_MEDIA } from "../lib/breakpoints";
 import { isNavItemActive, SITE_BOTTOM_NAV } from "../lib/siteNav";
 import { prefetchRoute } from "../lib/routePrefetch";
 import { handleViewTransitionLinkClick } from "../lib/viewTransition";
-import { useCart } from "../context/CartContext";
 
 const ICONS = {
   "/": House,
@@ -45,8 +44,6 @@ export default function BottomNav() {
   const [shrunk, setShrunk] = useState(false);
   const navRef = useRef(null);
   const hidden = !showBottomNav || isBottomNavHidden(location.pathname);
-  const { items = [] } = useCart();
-  const cartCount = useMemo(() => items.reduce((sum, item) => sum + Number(item?.qty || 0), 0), [items]);
   const activeIndex = useMemo(
     () => SITE_BOTTOM_NAV.findIndex((item) => isNavItemActive(location.pathname, item.to)),
     [location.pathname]
@@ -114,11 +111,7 @@ export default function BottomNav() {
         {SITE_BOTTOM_NAV.map((item) => {
           const Icon = ICONS[item.to] || House;
           const active = isNavItemActive(location.pathname, item.to);
-          const isKatalog = item.to === "/produk";
           const navLabel = item.shortLabel || item.label;
-          const ariaLabel = isKatalog && cartCount > 0
-            ? `${navLabel} (${cartCount} item di keranjang)`
-            : navLabel;
 
           return (
             <li key={item.to} className="bottom-nav-itemWrap">
@@ -126,12 +119,12 @@ export default function BottomNav() {
                 to={item.to}
                 className={`bottom-nav-item${active ? " is-active" : ""}`}
                 aria-current={active ? "page" : undefined}
-                aria-label={ariaLabel}
+                aria-label={navLabel}
                 onMouseEnter={() => prefetchRoute(item.to)}
                 onFocus={() => prefetchRoute(item.to)}
                 onTouchStart={() => prefetchRoute(item.to)}
                 onClick={(event) => {
-                  if (active) {
+                  if (location.pathname === item.to) {
                     event.preventDefault();
                     scrollActiveNavToTop();
                     return;
@@ -141,11 +134,6 @@ export default function BottomNav() {
               >
                 <span className="bottom-nav-icon" aria-hidden="true">
                   <Icon size={20} strokeWidth={active ? 2.3 : 2} />
-                  {isKatalog && cartCount > 0 ? (
-                    <span className="bottom-nav-badge">
-                      {cartCount > 9 ? "9+" : cartCount}
-                    </span>
-                  ) : null}
                 </span>
                 <span className="bottom-nav-label">{navLabel}</span>
               </NavLink>

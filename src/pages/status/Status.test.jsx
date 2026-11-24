@@ -244,5 +244,79 @@ describe("Status page composition", () => {
     fireEvent.click(screen.getByRole("button", { name: "5 bintang" }));
     expect(container.querySelector(".st-reviewForm")).not.toBeNull();
     expect(screen.getByRole("button", { name: /Kirim Ulasan/i })).toBeTruthy();
+
+    // Submitting a review inserts only columns that exist in public.testimonials
+    const insertMock = vi.fn().mockResolvedValue({ error: null });
+    supabase.from.mockReturnValueOnce({ insert: insertMock });
+    fireEvent.click(screen.getByRole("button", { name: /Kirim Ulasan/i }));
+    await waitFor(() => {
+      expect(insertMock).toHaveBeenCalledTimes(1);
+    });
+    const insertedRow = insertMock.mock.calls[0][0][0];
+    expect(Object.keys(insertedRow).sort()).toEqual(["caption", "image_url", "is_active", "sort_order"]);
+    expect(insertedRow.caption).toContain("Canva Pro");
+  });
+
+  it("uses live product_variants when reordering a completed order", async () => {
+    const { fetchProducts } = await import("../../lib/api");
+    fetchProducts.mockResolvedValueOnce([
+      {
+        id: "prod-canva",
+        name: "Canva Pro",
+        category: "design",
+        icon_url: "/canva.png",
+        is_active: true,
+        product_variants: [
+          {
+            id: "var-canva-1m",
+            product_id: "prod-canva",
+            name: "Invite Tim",
+            duration_label: "1 Bulan",
+            price_idr: 35000,
+            stock: 4,
+            is_active: true,
+            requires_buyer_email: true,
+          },
+        ],
+      },
+    ]);
+    supabase.rpc.mockResolvedValueOnce({
+      data: [
+        {
+          order_code: "IMZ-REOR1111",
+          status: "done",
+          created_at: "2026-11-17T10:00:00Z",
+          subtotal_idr: 30000,
+          discount_percent: 0,
+          total_idr: 30000,
+          items: [
+            {
+              product_id: "prod-canva",
+              variant_id: "var-canva-1m",
+              product_name: "Canva Pro",
+              variant_name: "Invite Tim",
+              duration_label: "1 Bulan",
+              price_idr: 30000,
+              qty: 1,
+            },
+          ],
+        },
+      ],
+      error: null,
+    });
+
+    const { container } = renderStatus("/status?order=IMZ-REOR1111");
+    await waitFor(() => {
+      expect(container.querySelector(".st-orderCodeText")?.textContent).toBe("IMZ-REOR1111");
+    });
+    fireEvent.click(screen.getByRole("button", { name: /Pesan Lagi/i }));
+
+    await waitFor(() => {
+      const savedCart = JSON.parse(localStorage.getItem("imzaqi_store_cart_v1") || "[]");
+      expect(savedCart).toHaveLength(1);
+      expect(savedCart[0].variant_id).toBe("var-canva-1m");
+      expect(savedCart[0].price_idr).toBe(35000);
+      expect(savedCart[0].stock).toBe(4);
+    });
   });
 });

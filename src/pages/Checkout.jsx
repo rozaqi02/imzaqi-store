@@ -143,7 +143,10 @@ export default function Checkout() {
   }, [promo]);
 
   useEffect(() => {
-    if (cart.items.length === 0) return;
+    if (cart.items.length === 0) {
+      setStockWarnings({});
+      return undefined;
+    }
     let active = true;
     const timer = setTimeout(() => {
       checkStockAvailability(cart.items).then((result) => {
@@ -875,6 +878,9 @@ function CheckoutItemCard({ item, cart, toast, stockWarnings }) {
               price_idr: item.price_idr,
               description: item.description || "",
               guarantee_text: item.guarantee_text || "",
+              category: item.category || undefined,
+              catalog_line: item.catalog_line || undefined,
+              stock: item.stock ?? null,
               requires_buyer_email: !!item.requires_buyer_email,
             },
             item.qty

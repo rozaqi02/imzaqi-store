@@ -217,8 +217,10 @@ export default function Home() {
     if (products.length === 0) return [];
     const activeProducts = products.filter((p) => p && p.is_active !== false && (p.product_variants || []).some((v) => v?.is_active !== false));
     const sorted = [...activeProducts].sort((a, b) => {
-      const soldA = salesMap[a.id] ?? (a.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
-      const soldB = salesMap[b.id] ?? (b.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
+      const variantSoldA = (a.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
+      const variantSoldB = (b.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0);
+      const soldA = Math.max(Number(salesMap[a.id] || 0), variantSoldA);
+      const soldB = Math.max(Number(salesMap[b.id] || 0), variantSoldB);
 
       if (soldA !== soldB) return soldB - soldA;
 
@@ -319,7 +321,10 @@ export default function Home() {
                       layout="list"
                       disableTilt={true}
                       disableFlip={true}
-                      overrideSold={salesMap[p.id] != null ? salesMap[p.id] : null}
+                      overrideSold={Math.max(
+                        Number(salesMap[p.id] || 0),
+                        (p.product_variants || []).reduce((sum, v) => sum + Number(v?.sold_count || 0), 0)
+                      )}
                       flashSaleMap={flashSaleMap}
                       eager={true}
                     />

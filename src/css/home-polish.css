@@ -18,28 +18,28 @@
 html[data-theme="light"] .home-page .hx-hero-scrim {
   background: radial-gradient(
     ellipse 68% 58% at 50% 47%,
-    rgba(244, 247, 242, 0.98) 0%,
-    rgba(244, 247, 242, 0.92) 48%,
-    rgba(244, 247, 242, 0.56) 76%,
-    rgba(244, 247, 242, 0) 100%
+    rgba(247, 248, 247, 0.98) 0%,
+    rgba(247, 248, 247, 0.92) 48%,
+    rgba(247, 248, 247, 0.56) 76%,
+    rgba(247, 248, 247, 0) 100%
   ) !important;
 }
 html[data-theme="dark"] .home-page .hx-hero-scrim {
   background:
     radial-gradient(
       ellipse 68% 58% at 50% 47%,
-      rgba(16, 23, 21, 0.96) 0%,
-      rgba(16, 23, 21, 0.86) 48%,
-      rgba(16, 23, 21, 0.44) 76%,
-      rgba(16, 23, 21, 0) 100%
+      rgba(11, 15, 13, 0.96) 0%,
+      rgba(11, 15, 13, 0.86) 48%,
+      rgba(11, 15, 13, 0.44) 76%,
+      rgba(11, 15, 13, 0) 100%
     ),
     linear-gradient(
       180deg,
       transparent 0%,
       transparent 55%,
-      rgba(14, 22, 18, 0.62) 78%,
-      rgba(14, 22, 18, 0.9) 92%,
-      var(--storefront-global-bg, #101715) 100%
+      rgba(11, 15, 13, 0.62) 78%,
+      rgba(11, 15, 13, 0.9) 92%,
+      var(--storefront-global-bg, #0b0f0d) 100%
     ) !important;
 }
 @media (max-width: 720px) {
@@ -47,37 +47,37 @@ html[data-theme="dark"] .home-page .hx-hero-scrim {
     background:
       linear-gradient(
         180deg,
-        var(--storefront-global-bg, #f5f7f4) 0%,
-        rgba(245, 247, 244, 0.88) 8%,
-        rgba(245, 247, 244, 0) 20%
+        var(--storefront-global-bg, #f7f8f7) 0%,
+        rgba(247, 248, 247, 0.88) 8%,
+        rgba(247, 248, 247, 0) 20%
       ),
       radial-gradient(
         ellipse 90% 54% at 50% 46%,
-        rgba(244, 247, 242, 0.98) 0%,
-        rgba(244, 247, 242, 0.9) 52%,
-        rgba(244, 247, 242, 0) 100%
+        rgba(247, 248, 247, 0.98) 0%,
+        rgba(247, 248, 247, 0.9) 52%,
+        rgba(247, 248, 247, 0) 100%
       ) !important;
   }
   html[data-theme="dark"] .home-page .hx-hero-scrim {
     background:
       linear-gradient(
         180deg,
-        var(--storefront-global-bg, #101715) 0%,
-        rgba(16, 23, 21, 0.88) 8%,
-        rgba(16, 23, 21, 0) 20%
+        var(--storefront-global-bg, #0b0f0d) 0%,
+        rgba(11, 15, 13, 0.88) 8%,
+        rgba(11, 15, 13, 0) 20%
       ),
       radial-gradient(
         ellipse 90% 54% at 50% 46%,
-        rgba(16, 23, 21, 0.96) 0%,
-        rgba(16, 23, 21, 0.84) 52%,
-        rgba(16, 23, 21, 0) 100%
+        rgba(11, 15, 13, 0.96) 0%,
+        rgba(11, 15, 13, 0.84) 52%,
+        rgba(11, 15, 13, 0) 100%
       ),
       linear-gradient(
         180deg,
         transparent 0%,
         transparent 58%,
-        rgba(14, 22, 18, 0.68) 82%,
-        var(--storefront-global-bg, #101715) 100%
+        rgba(11, 15, 13, 0.68) 82%,
+        var(--storefront-global-bg, #0b0f0d) 100%
       ) !important;
   }
 }
@@ -115,10 +115,10 @@ html[data-theme="dark"] .home-page .hx-hero-scrim {
 .home-page .home-sectionTitle,
 .home-page .home-sectionTitle.h2 {
   font-family: var(--font-display, var(--font-sans));
-  font-size: clamp(26px, 3.4vw, 38px) !important;
-  font-weight: 900;
-  letter-spacing: -0.035em;
-  line-height: 1.08;
+  font-size: clamp(26px, 3.4vw, 36px) !important;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
   color: var(--brand-text, var(--text));
 }
 .home-page .home-sectionSub {
@@ -126,8 +126,9 @@ html[data-theme="dark"] .home-page .hx-hero-scrim {
   max-width: 52ch;
 }
 .home-page .home-sectionHead .home-kicker {
-  font-size: 10.5px;
-  letter-spacing: 0.14em;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
 }
 
 /* 3. Daftar produk: grid 2 kolom seimbang di desktop tanpa celah ganjil */
@@ -182,31 +183,26 @@ html[data-theme] .home-page .home-howCard-step,
   border-color: rgba(0, 158, 96, 0.24) !important;
   color: var(--ux-accent-dark, #076a44) !important;
   background: rgba(0, 158, 96, 0.1) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
+  box-shadow: none !important;
 }
 html[data-theme="dark"] .home-page .home-faqSection .faq-itemCategory {
   border-color: rgba(0, 245, 196, 0.28) !important;
   color: #4ef0c4 !important;
   background: rgba(0, 245, 196, 0.1) !important;
-  box-shadow: var(--skeu-control-shadow) !important;
+  box-shadow: none !important;
 }
 
-/* 6. Dark mode: warna senada brand
-   Token --skeu-panel-bg / --skeu-control-bg dipakai luas di home
-   (kartu, pill, search, ghost btn). Nilai bawaannya bernuansa navy
-   (#111822 / #17202c) yang bentrok dengan canvas hijau #101715. */
-html[data-theme="dark"] .home-page {
-  --skeu-panel-bg: linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 42%, rgba(0, 245, 196, 0.03) 100%), #141a17;
-  --skeu-control-bg: linear-gradient(180deg, #232f2a 0%, #1b231f 100%);
-  --skeu-inset-bg: linear-gradient(180deg, #0d1210, #121816);
-  --brand-line: rgba(255, 255, 255, 0.12);
+/* 6. Dark mode: warna senada brand (now inherited cleanly from theme-variables.css) */
+.home-page .home-howCard,
+.home-page .home-promoCard,
+.home-page .home-faqItem.faq-item {
+  border-color: var(--brand-line, rgba(15, 23, 42, 0.08)) !important;
 }
-/* Breadcrumb kartu dark: shadow lembut senada */
 html[data-theme="dark"] .home-page .home-howCard,
 html[data-theme="dark"] .home-page .home-promoCard,
 html[data-theme="dark"] .home-page .home-faqItem.faq-item,
 html[data-theme="dark"] .home-page .home-popularList .product-tile {
-  border-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: var(--brand-line, rgba(255, 255, 255, 0.08)) !important;
 }
 
 /* 7. Mobile hero: CTA stack rapi & tombol sejajar berukuran seragam */

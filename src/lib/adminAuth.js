@@ -9,7 +9,7 @@ import { warn } from "./log";
  */
 export function hasAdminRoleMetadata(user) {
   if (!user) return false;
-  const role = user.app_metadata?.role ?? user.user_metadata?.role;
+  const role = user.app_metadata?.role;
   return String(role || "").toLowerCase() === "admin";
 }
 

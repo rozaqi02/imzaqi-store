@@ -1,28 +1,24 @@
-/* Light mode: flatter, more readable product surfaces */
+/* Light mode: flat, clean product surfaces with soft hover shadow only */
 html[data-theme="light"] .product-tile {
-  box-shadow:
-    0 10px 28px rgba(40, 90, 105, 0.1),
-    0 0 0 1px rgba(0, 138, 148, 0.08);
+  box-shadow: none;
 }
 
 html[data-theme="light"] .product-tile:hover {
-  box-shadow:
-    0 14px 32px rgba(40, 90, 105, 0.14),
-    0 0 0 1px rgba(0, 138, 148, 0.12);
+  box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.08);
 }
 
 html[data-theme="light"] .card.pad {
-  box-shadow: var(--uni-shadow);
+  box-shadow: none;
 }
 
 html[data-theme="light"] .catalog-emptyResult {
-  box-shadow: var(--skeu-panel-shadow, var(--uni-shadow));
+  box-shadow: none;
 }
 
 html[data-theme="light"] .product-tile-pill {
-  box-shadow: var(--skeu-control-shadow);
-  border: 1px solid var(--brand-line, rgba(0, 138, 148, 0.14));
-  background: var(--skeu-control-bg, rgba(255, 255, 255, 0.88));
+  box-shadow: none;
+  border: 1px solid var(--brand-line, rgba(0, 0, 0, 0.06));
+  background: var(--skeu-control-bg, #f6f8f7);
 }
 
 html[data-theme="light"] h1,

@@ -8,7 +8,6 @@ import { prefetchRoute } from "../lib/routePrefetch";
 import { handleViewTransitionLinkClick } from "../lib/viewTransition";
 
 export default function ProductTile({ product, rank, layout = "list", disableTilt = true, disableFlip = false, overrideSold = null, flashSaleMap = null, eager = false }) {
-  if (!product) return null;
   const navigate = useNavigate();
   const tiltRef = useTilt({ max: 6, scale: 1.008 });
   const isGrid = layout === "grid";
@@ -63,10 +62,13 @@ export default function ProductTile({ product, rank, layout = "list", disableTil
     return "rgba(255, 255, 255, 0.1)";
   }, [product?.name]);
 
+  const accountTypes = useMemo(() => detectAccountTypes(product?.product_variants), [product]);
+
+  if (!product) return null;
+
   const stock = Number(summary.stock || 0);
   const sold = Number(summary.sold || 0);
   const displayPrice = summary.minPrice ? formatIDR(summary.minPrice) : "-";
-  const accountTypes = useMemo(() => detectAccountTypes(product?.product_variants), [product]);
   const productName = product?.name || "produk";
 
   const frontContent = (

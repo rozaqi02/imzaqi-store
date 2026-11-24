@@ -278,4 +278,45 @@ describe("ProductDetail render", () => {
     fireEvent.click(within(screen.getByRole("group", { name: "Jenis paket" })).getByRole("button", { name: "Private" }));
     expect([...document.querySelectorAll(".pdx-packName")].map((node) => node.textContent)).toEqual(["Private"]);
   });
+
+  it("handles out-of-stock restock request via WhatsApp without crashing or querying missing table", async () => {
+    const openSpy = vi.spyOn(window, "open").mockImplementation(() => null);
+    const { fetchProductBySlug } = await import("../lib/api");
+    fetchProductBySlug.mockResolvedValueOnce({
+      ...mockProduct,
+      product_variants: [
+        { ...mockProduct.product_variants[0], stock: 0, name: "Sharing Out" },
+      ],
+    });
+    renderDetail();
+    await screen.findByRole("heading", { name: "Netflix Premium", level: 1 });
+
+    fireEvent.click(screen.getByRole("button", { name: /Kabari saat ready/i }));
+    fireEvent.change(screen.getByLabelText("WhatsApp untuk notifikasi restock"), {
+      target: { value: "081234567890" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Ingatkan saya" }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/diteruskan ke WhatsApp admin/i)).toBeInTheDocument();
+    });
+    expect(openSpy).toHaveBeenCalledTimes(1);
+    const calledUrl = openSpy.mock.calls[0][0];
+    expect(calledUrl).toContain("https://wa.me/6283136049987?text=");
+    expect(calledUrl.split("?text=")).toHaveLength(2);
+    expect(decodeURIComponent(calledUrl)).toContain("Netflix Premium");
+    expect(decodeURIComponent(calledUrl)).toContain("Sharing Out");
+    openSpy.mockRestore();
+  });
+
+  it("preserves variant sold_count when get_top_products RPC returns 0", async () => {
+    const { fetchTopSellingData } = await import("../lib/api");
+    fetchTopSellingData.mockResolvedValueOnce({
+      topIds: [mockProduct.id],
+      salesMap: { [mockProduct.id]: 0 },
+    });
+    renderDetail();
+    await screen.findByRole("heading", { name: "Netflix Premium", level: 1 });
+    expect(screen.getByText("13 terjual")).toBeInTheDocument();
+  });
 });

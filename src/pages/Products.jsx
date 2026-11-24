@@ -15,7 +15,7 @@ import {
   X,
 } from "lucide-react";
 
-import { fetchProducts } from "../lib/api";
+import { fetchActiveFlashSales, fetchProducts } from "../lib/api";
 import { warn } from "../lib/log";
 import CatalogCardSkeleton from "../components/CatalogCardSkeleton";
 import CatalogFilterSidebar from "../components/CatalogFilterSidebar";
@@ -26,7 +26,7 @@ import TypewriterSearchInput from "../components/TypewriterSearchInput";
 
 import { usePageMeta } from "../hooks/usePageMeta";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
-import { formatIDR, getProductIconTone, summarizeCatalogCopy, classifyStock, isKnownOutOfStock } from "../lib/format";
+import { formatIDR, getCatalogPriceRange, getProductIconTone, summarizeCatalogCopy, classifyStock, isKnownOutOfStock } from "../lib/format";
 import { buildStoreInsights } from "../lib/storeInsights";
 import {
   CATALOG_LINE_FILTERS,
@@ -108,7 +108,8 @@ function Range({ min, max, valueMin, valueMax, step = 1000, onChange }) {
   const left = max <= min ? 0 : ((valueMin - min) / (max - min)) * 100;
   const right = max <= min ? 100 : ((valueMax - min) / (max - min)) * 100;
   const trackStyle = {
-    background: `linear-gradient(90deg, rgba(255,255,255,.12) 0%, rgba(255,255,255,.12) ${left}%, rgba(22,199,166,.78) ${left}%, rgba(22,199,166,.78) ${right}%, rgba(255,255,255,.12) ${right}%, rgba(255,255,255,.12) 100%)`,
+    "--range-left": `${left}%`,
+    "--range-right": `${right}%`,
   };
 
   return (
@@ -340,6 +341,7 @@ export default function Products() {
   const [params, setParams] = useSearchParams();
   const [loading, setLoading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [flashSaleMap, setFlashSaleMap] = useState(() => new Map());
   const [error, setError] = useState("");
   const [cats, setCats] = useState(() => {
     if (params.get("cats")) return params.get("cats").split(",").filter(Boolean);
@@ -516,10 +518,20 @@ export default function Products() {
     (async () => {
       try {
         if (!cached) setLoading(true);
-        const data = await fetchProducts();
+        const [data, flashSales] = await Promise.all([
+          fetchProducts(),
+          fetchActiveFlashSales({ useCache: true }).catch(() => []),
+        ]);
         if (!alive) return;
         setProducts(data);
         setCatalogProductsCache(data);
+        const nextFlash = new Map();
+        (flashSales || []).forEach((sale) => {
+          if (sale?.variant_id && !nextFlash.has(sale.variant_id)) {
+            nextFlash.set(sale.variant_id, sale.discount_percent);
+          }
+        });
+        setFlashSaleMap(nextFlash);
       } catch (e) {
         warn(e);
         if (!alive) return;
@@ -642,9 +654,7 @@ export default function Products() {
         .filter((variant) => variant?.is_active !== false)
         .sort((a, b) => (a?.sort_order || 0) - (b?.sort_order || 0));
 
-      const prices = vars
-        .map((variant) => Number(variant?.price_idr || 0))
-        .filter((value) => Number.isFinite(value) && value > 0);
+      const priceRange = getCatalogPriceRange(vars, flashSaleMap);
 
       const isAvailable = vars.some((v) => !isKnownOutOfStock(v));
       const hasExplicitStock = vars.some((v) => v?.stock != null && v?.stock !== "");
@@ -664,8 +674,8 @@ export default function Products() {
         _vars: vars,
         _isAvailable: isAvailable,
         _hasExplicitStock: hasExplicitStock,
-        _minPrice: prices.length ? Math.min(...prices) : 0,
-        _maxPrice: prices.length ? Math.max(...prices) : 0,
+        _minPrice: priceRange.minPrice,
+        _maxPrice: priceRange.maxPrice,
         _stock: totalStock ?? 0,
         _sold: vars.reduce((sum, variant) => sum + Number(variant?.sold_count || 0), 0),
         _category: inferCategory(product),
@@ -673,7 +683,7 @@ export default function Products() {
         _latestInStockUpdateTs: latestInStockUpdateTs,
       };
     });
-  }, [products]);
+  }, [products, flashSaleMap]);
 
   const priceBounds = useMemo(() => {
     const minPrices = enriched.map((item) => item._minPrice).filter((value) => Number.isFinite(value) && value > 0);
@@ -1222,7 +1232,7 @@ export default function Products() {
 
           <div className="catalog-content">
             <div className="catalog-quickFilters" aria-label="Kategori toko">
-              <button type="button" className={`catalog-quickChip${inStockOnly ? " active" : ""}`} aria-pressed={inStockOnly} onClick={() => setInStockOnly(value => !value)}>
+              <button type="button" className={`catalog-quickChip catalog-quickChip--stockToggle${inStockOnly ? " active" : ""}`} aria-pressed={inStockOnly} onClick={() => setInStockOnly(value => !value)}>
                 <PackageCheck size={18} aria-hidden="true" /> Tersedia
               </button>
               {quickFilters.map((item) => {

@@ -353,7 +353,7 @@ html[data-theme="light"] .product-tile {
   font-weight: 800;
   letter-spacing: 0.01em;
   white-space: nowrap;
-  border: none;
+  border: 1px solid var(--brand-line);
   border-radius: 8px;
   background: var(--skeu-control-bg);
   box-shadow: var(--skeu-control-shadow);
@@ -535,11 +535,11 @@ html[data-theme="light"] .product-lowStockBadge.out {
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.03em;
-  color: var(--accent, #00f5c4);
+  color: #f8fafc;
 }
 
 html[data-theme="light"] .product-tile-price {
-  color: #008753 !important;
+  color: #0f172a !important;
 }
 
 .product-tile--grid .product-tile-price {

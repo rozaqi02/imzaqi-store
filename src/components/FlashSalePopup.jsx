@@ -121,6 +121,18 @@ export default function FlashSalePopup() {
     };
   }, []);
 
+  const featured = useMemo(() => {
+    const live = salesItems.filter((item) => !isKnownOutOfStock(item));
+    const pool = live.length ? live : [];
+    if (!pool.length) return null;
+    return [...pool].sort((a, b) => Number(b.discountPercent || 0) - Number(a.discountPercent || 0))[0];
+  }, [salesItems]);
+
+  const extras = useMemo(
+    () => salesItems.filter((item) => item.saleId !== featured?.saleId).slice(0, 3),
+    [salesItems, featured]
+  );
+
   // Kelayakan tampil. Dulu popup ini memeriksa window.__imzaqi_academic_popup_active
   // serta DOM popup lain, lalu menunggu event "closed" untuk naik. Kini scheduler
   // terpusat yang menggilir overlay, jadi tidak ada lagi tumpukan popup.
@@ -132,7 +144,7 @@ export default function FlashSalePopup() {
     !sessionDismissed &&
     !wasHandledThisSession() &&
     location.pathname === "/" &&
-    salesItems.length > 0
+    featured
   );
 
   // Jeda bawaan (OVERLAY_TIMING.flashSaleMs) sebelum ikut antrean.
@@ -197,18 +209,6 @@ export default function FlashSalePopup() {
       document.body.style.overflow = previous;
     };
   }, [isOpen, overlayBlocked]);
-
-  const featured = useMemo(() => {
-    const live = salesItems.filter((item) => !isKnownOutOfStock(item));
-    const pool = live.length ? live : [];
-    if (!pool.length) return null;
-    return [...pool].sort((a, b) => Number(b.discountPercent || 0) - Number(a.discountPercent || 0))[0];
-  }, [salesItems]);
-
-  const extras = useMemo(
-    () => salesItems.filter((item) => item.saleId !== featured?.saleId).slice(0, 3),
-    [salesItems, featured]
-  );
 
   if (
     overlayBlocked ||

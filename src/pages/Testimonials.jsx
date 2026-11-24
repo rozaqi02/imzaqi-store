@@ -11,7 +11,6 @@ import { usePageMeta } from "../hooks/usePageMeta";
 import { useDialogA11y } from "../hooks/useDialogA11y";
 import { buildStoreInsights } from "../lib/storeInsights";
 import { warn } from "../lib/log";
-import BannerGraphic from "../components/BannerGraphic";
 
 function ReviewImage({ src, alt, eager = false, isViewer = false }) {
   const [failed, setFailed] = useState(false);
@@ -165,25 +164,22 @@ export default function Testimonials() {
       <div className="reviews-wrap">
         <header className="reviews-hero">
           <div className="reviews-heroCopy">
-            <span className="reviews-eyebrow">
-              <BannerGraphic name="sparkle_celebration" height={22} className="reviews-mascot" />
-              <MessageSquareText size={16} /> CERITA PELANGGAN
-            </span>
-            <h1>Ulasan asli. <span>Pilih lebih yakin.</span></h1>
-            <p>Lihat pengalaman pelanggan. Ketuk gambar untuk membaca percakapannya.</p>
-            <Link className="hx-btn-primary" to="/produk">Temukan paketmu <ArrowUpRight size={18} /></Link>
+            <div className="reviews-heroHeadRow">
+              <h1>Ulasan Pelanggan</h1>
+              <span className="reviews-result" role="status">{loading ? "Memuat galeri…" : error ? "Galeri belum tersedia" : `${filtered.length} testimoni`}</span>
+            </div>
+            <p>Bukti transaksi dan pengalaman asli pembeli di Imzaqi Store.</p>
           </div>
         </header>
 
         {verifiedStories.length ? (
           <section className="reviews-verifiedStories" aria-labelledby="verified-stories-title">
-            <div className="reviews-sectionHead"><div><span className="reviews-eyebrow">PEMBELIAN TERVERIFIKASI</span><h2 id="verified-stories-title">Cerita singkat pelanggan.</h2></div></div>
-            <div className="reviews-storyGrid">{verifiedStories.map(item => <article key={item.id} className="reviews-storyCard"><BadgeCheck size={20} /><p>“{item.display_caption || item.caption.trim()}”</p><div><strong>{item.customer_name || "Pelanggan"}</strong><span>{item.product_name || "Pesanan Imzaqi Store"}</span></div></article>)}</div>
+            <div className="reviews-sectionHead"><h2 id="verified-stories-title">Cerita singkat pelanggan</h2></div>
+            <div className="reviews-storyGrid">{verifiedStories.map(item => <article key={item.id} className="reviews-storyCard"><BadgeCheck size={18} /><p>“{item.display_caption || item.caption.trim()}”</p><div><strong>{item.customer_name || "Pelanggan"}</strong><span>{item.product_name || "Pesanan Imzaqi Store"}</span></div></article>)}</div>
           </section>
         ) : null}
 
-        <section className="reviews-gallery" aria-labelledby="reviews-gallery-title">
-          <div className="reviews-sectionHead"><div><span className="reviews-eyebrow">LIHAT LEBIH DEKAT</span><h2 id="reviews-gallery-title">Galeri pengalaman pelanggan</h2></div><span className="reviews-result" role="status">{loading ? "Memuat galeri…" : error ? "Galeri belum tersedia" : `${filtered.length} testimoni`}</span></div>
+        <section className="reviews-gallery" aria-label="Galeri pengalaman pelanggan">
           <div className="reviews-tools">
             {(loading || insights.captionedTestimonialsCount > 0) ? <div className="reviews-search"><Search size={20} /><input type="search" aria-label="Cari testimoni" placeholder="Cari cerita atau nama produk…" value={q} onChange={e => setQ(e.target.value)} />{q && <button type="button" onClick={() => setQ("")} aria-label="Hapus pencarian"><X size={18} /></button>}</div> : <p className="reviews-galleryHint"><ZoomIn size={19} /> Ketuk screenshot untuk membaca pengalaman lengkap.</p>}
             {insights.captionedTestimonialsCount > 0 && <div className="reviews-filters" role="group" aria-label="Filter testimoni">
