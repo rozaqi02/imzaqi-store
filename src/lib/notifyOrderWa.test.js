@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import notifyOrderWa from "../../netlify/functions/notify-order-wa.js";
 
-const { handler, buildOrderMessage, normalizeWaPhone, shouldNotifyEvent } = notifyOrderWa;
+const { handler, buildOrderMessage, normalizeWaPhone, normalizeWaTarget, shouldNotifyEvent } = notifyOrderWa;
 
 const sampleInsertPayload = {
   type: "INSERT",
@@ -38,9 +38,32 @@ describe("notify-order-wa function", () => {
     process.env = originalEnv;
   });
 
-  it("normalizes Indonesian phone numbers to 62 prefix", () => {
+  it("normalizes Indonesian phone numbers and preserves WhatsApp group JIDs", () => {
     expect(normalizeWaPhone("083136049987")).toBe("6283136049987");
     expect(normalizeWaPhone("+62 831-3604-9987")).toBe("6283136049987");
+    expect(normalizeWaTarget("120363022293150720@g.us")).toBe("120363022293150720@g.us");
+  });
+
+  it("sends WhatsApp notification to a group JID via WA_TARGET", async () => {
+    process.env.WA_TARGET = "120363022293150720@g.us";
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({ status: true, id: "msg-grp-1" }),
+    });
+
+    const res = await handler(
+      {
+        httpMethod: "POST",
+        headers: { "x-webhook-secret": "secret-123" },
+        body: JSON.stringify(sampleInsertPayload),
+      },
+      {},
+      { fetchImpl: fetchMock }
+    );
+
+    expect(res.statusCode).toBe(200);
+    const sentBody = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(sentBody.target).toBe("120363022293150720@g.us");
   });
 
   it("formats order details into a clear WhatsApp message", () => {

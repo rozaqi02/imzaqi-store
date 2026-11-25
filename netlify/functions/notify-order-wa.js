@@ -2,8 +2,19 @@ const crypto = require("crypto");
 
 const DEFAULT_ADMIN_PHONE = "6283136049987";
 
-function normalizeWaPhone(raw) {
-  let digits = String(raw || "").replace(/\D/g, "");
+function normalizeWaTarget(raw) {
+  const value = String(raw || "").trim();
+  if (!value) return "";
+  // Preserve WhatsApp Group JIDs (e.g. 120363022293150720@g.us) and comma-separated targets
+  if (value.includes("@g.us")) {
+    return value
+      .split(",")
+      .map((part) => part.trim())
+      .filter(Boolean)
+      .map((part) => (part.includes("@g.us") ? part : normalizeWaTarget(part)))
+      .join(",");
+  }
+  let digits = value.replace(/\D/g, "");
   if (!digits) return "";
   if (digits.startsWith("0")) digits = `62${digits.slice(1)}`;
   return digits;
@@ -187,7 +198,8 @@ async function dispatchWhatsApp({ provider, phone, message, token, phoneNumberId
   return sendViaFonnte({ phone, message, token, fetchImpl });
 }
 
-exports.normalizeWaPhone = normalizeWaPhone;
+exports.normalizeWaTarget = normalizeWaTarget;
+exports.normalizeWaPhone = normalizeWaTarget;
 exports.buildOrderMessage = buildOrderMessage;
 exports.shouldNotifyEvent = shouldNotifyEvent;
 exports.dispatchWhatsApp = dispatchWhatsApp;
@@ -231,7 +243,9 @@ exports.handler = async (event, _context, deps = {}) => {
     };
   }
 
-  const phone = normalizeWaPhone(process.env.WA_ADMIN_PHONE || DEFAULT_ADMIN_PHONE);
+  const phone = normalizeWaTarget(
+    process.env.WA_TARGET || process.env.WA_ADMIN_PHONE || DEFAULT_ADMIN_PHONE
+  );
   const provider = process.env.WA_PROVIDER || "fonnte";
   const phoneNumberId = process.env.WA_META_PHONE_NUMBER_ID || "";
   const message = buildOrderMessage(payload);
