@@ -155,7 +155,7 @@ const TAB_ICONS = {
 };
 
 /** Tabs that need products in memory (stock / variants / category map). */
-const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders", "marketing", "settings"]);
+const TABS_NEED_PRODUCTS = new Set(["overview", "products", "flashsale", "orders", "marketing", "testimonials", "settings"]);
 /** Tabs that need flash sales in memory (KPIs, sidebar badge, promotions settings). */
 const TABS_NEED_FLASHSALE = new Set(["overview", "flashsale", "settings"]);
 /** Tabs that need orders list. */
@@ -1297,11 +1297,6 @@ export default function AdminDashboard() {
     storePulse.total_views,
     testimonials,
   ]);
-
-  const testimonialsWithoutCaption = useMemo(
-    () => (testimonials || []).filter((item) => item.is_active && !String(item.caption || "").trim()).length,
-    [testimonials]
-  );
 
   const dashboardStats = useMemo(() => {
     return [
@@ -2490,25 +2485,47 @@ export default function AdminDashboard() {
     setTimeout(() => setCopiedCode(""), 1800);
   }
 
+  function isMissingTestimonialColumnError(error) {
+    return /(product_id|category|product_name|purchased_at|does not exist|could not find|schema|42703)/i.test(
+      String(error?.message || error?.code || "")
+    );
+  }
+
   // Testimonials actions (multi)
-  async function addTestimonials(e) {
-    e.preventDefault();
+  async function addTestimonials(submission) {
+    if (submission?.preventDefault) submission.preventDefault();
     setMsg("");
 
-    const files = Array.from(e.target.elements.files.files || []);
-    const caption = e.target.elements.caption?.value || "";
-    const customerName = e.target.elements.customer_name?.value || "";
-    const productName = e.target.elements.product_name?.value || "";
-    const privacyConfirmed = e.target.elements.privacy_confirmed ? e.target.elements.privacy_confirmed.checked : true;
-    if (!privacyConfirmed) {
-      toast.error("Wajib konfirmasi bahwa gambar tidak memuat data sensitif pelanggan.");
-      return;
-    }
+    const isFormEvent = Boolean(submission?.target?.elements);
+    const files = isFormEvent
+      ? Array.from(submission.target.elements.files?.files || [])
+      : Array.from(submission?.files || []);
+    const productId = isFormEvent
+      ? String(submission.target.elements.product_id?.value || "").trim()
+      : String(submission?.productId || "").trim();
+    const productName = isFormEvent
+      ? String(submission.target.elements.product_name?.value || "").trim()
+      : String(submission?.productName || "").trim();
+    const category = isFormEvent
+      ? String(submission.target.elements.category?.value || "").trim()
+      : String(submission?.category || "").trim();
+    const rawPurchasedAt = isFormEvent
+      ? String(submission.target.elements.purchased_at?.value || "").trim()
+      : String(submission?.purchasedAt || "").trim();
+    const purchasedAt = /^\d{4}-\d{2}-\d{2}$/.test(rawPurchasedAt)
+      ? `${rawPurchasedAt}T12:00:00.000Z`
+      : (rawPurchasedAt || null);
 
     if (files.length === 0) {
       toast.error("Pilih minimal 1 gambar");
-      return;
+      return false;
     }
+
+    const matchedProduct = productId
+      ? (products || []).find((item) => String(item?.id) === productId)
+      : null;
+    const resolvedProductName = productName || matchedProduct?.name || null;
+    const resolvedCategory = category || (matchedProduct ? String(matchedProduct.category || "").trim() || null : null);
 
     const tid = toast.loading("Upload testimoni");
 
@@ -2522,27 +2539,43 @@ export default function AdminDashboard() {
         urls.push(await uploadToBucket(BUCKET_TESTIMONIALS, f, "testimonials"));
       }
 
-      // Sync with public.testimonials schema: (id, image_url, caption, is_active, sort_order, created_at)
-      const metaInfo = [customerName.trim() ? `Dari ${customerName.trim()}` : "", productName.trim() ? `(${productName.trim()})` : ""]
-        .filter(Boolean)
-        .join(" ");
-      const finalCaption = [caption.trim(), metaInfo].filter(Boolean).join(" · ") || null;
       const payload = urls.map((u) => ({
         image_url: u,
-        caption: finalCaption,
+        caption: null,
+        product_id: productId || null,
+        product_name: resolvedProductName || null,
+        category: resolvedCategory || null,
+        purchased_at: purchasedAt,
         is_active: true,
         sort_order: 100,
       }));
 
-      const { error } = await supabase.from("testimonials").insert(payload);
+      let { error } = await supabase.from("testimonials").insert(payload);
+      let usedLegacyFallback = false;
+      if (error && isMissingTestimonialColumnError(error)) {
+        usedLegacyFallback = true;
+        const fallbackPayload = urls.map((u) => ({
+          image_url: u,
+          caption: null,
+          product_name: resolvedProductName || null,
+          purchased_at: purchasedAt,
+          is_active: true,
+          sort_order: 100,
+        }));
+        ({ error } = await supabase.from("testimonials").insert(fallbackPayload));
+      }
       if (error) throw error;
 
       invalidateTestimonialsCache();
       setTestimonials(await fetchTestimonials({ includeInactive: true }));
 
-      e.target.reset();
+      if (isFormEvent) submission.target.reset();
       toast.remove(tid);
-      toast.success("Testimoni ditambah", { duration: 1400 });
+      if (usedLegacyFallback && (productId || resolvedCategory)) {
+        toast.warning("Testimoni ditambah, namun kolom kategori/product_id belum ada di DB. Jalankan migration 0010.");
+      } else {
+        toast.success("Testimoni ditambah", { duration: 1400 });
+      }
       return true;
     } catch (e2) {
       toast.remove(tid);
@@ -2555,20 +2588,42 @@ export default function AdminDashboard() {
   async function updateTestimonial(id, patch) {
     const tid = toast.loading("Update testimoni");
     try {
-      const { error } = await supabase.from("testimonials").update(patch).eq("id", id);
+      let { error } = await supabase.from("testimonials").update(patch).eq("id", id);
       if (error && patch.is_verified !== undefined && String(error.message || "").includes("is_verified")) {
         toast.remove(tid);
         toast.warning("Kolom is_verified belum tersedia di database.");
-        return;
+        return false;
+      }
+      let usedLegacyFallback = false;
+      if (error && isMissingTestimonialColumnError(error)) {
+        usedLegacyFallback = true;
+        const fallbackPatch = {};
+        if ("is_active" in patch) fallbackPatch.is_active = patch.is_active;
+        if ("product_name" in patch) fallbackPatch.product_name = patch.product_name;
+        if ("purchased_at" in patch) fallbackPatch.purchased_at = patch.purchased_at;
+        if ("caption" in patch) fallbackPatch.caption = patch.caption;
+        if (Object.keys(fallbackPatch).length === 0) {
+          toast.remove(tid);
+          toast.warning("Kolom kategori/product_id belum tersedia di database. Jalankan migration 0010.");
+          return false;
+        }
+        ({ error } = await supabase.from("testimonials").update(fallbackPatch).eq("id", id));
       }
       if (error) throw error;
       invalidateTestimonialsCache();
       setTestimonials(await fetchTestimonials({ includeInactive: true }));
       toast.remove(tid);
+      if (usedLegacyFallback) {
+        toast.warning("Sebagian perubahan tersimpan; jalankan migration 0010 untuk simpan kolom kategori/product_id.");
+      } else {
+        toast.success("Testimoni diperbarui", { duration: 1200 });
+      }
+      return true;
     } catch (e) {
       toast.remove(tid);
       toast.error("Gagal update testimoni");
       setMsg(e?.message || String(e));
+      return false;
     }
   }
 
@@ -4263,10 +4318,10 @@ export default function AdminDashboard() {
               <TestimonialsPane
                 activeCount={analyticsSummary.activeTestimonials}
                 testimonials={testimonials}
+                products={products}
                 onAddTestimonials={addTestimonials}
                 onUpdateTestimonial={updateTestimonial}
                 onDeleteTestimonial={deleteTestimonial}
-                openConfirm={openConfirm}
               />
             ) : null}
 

@@ -25,8 +25,7 @@ SELECT * FROM public.admin_users;
 | `migrations/0007_security_and_stock_hardening.sql` | Hardening RLS produksi (`is_admin()` SECURITY DEFINER, tutup semua policy `allow_*`), perbaikan bug +2× double-restore stok, validasi harga/promo/total server-side, kunci RPC analitik & legacy | ✅ DITERAPKAN di produksi |
 | `migrations/0008_stage2_features_cleanup_and_business.sql` | `funnel_events` + `get_funnel_summary` (`jsonb`), `report_order_payment`, kolom testimoni & `referral_code`, hapus sampah `/__vitals/*` + retention helper, fondasi HPP (`variant_costs`), masa aktif/renewal H-3, & `admin_audit_logs` | ✅ DITERAPKAN di produksi (sumber bug `id` ambiguous sudah dipatch juga) |
 | `migrations/0009_fix_create_order_ambiguous_id.sql` | Hotfix RPC `create_order_with_stock_check`: kualifikasi alias tabel (`pv`, `pc`, `pcl`) agar `WHERE pv.id = v_variant.id` tidak error `42702: column reference "id" is ambiguous` | Siap dijalankan di SQL Editor |
-| `migrations/_archived/20260909_secure_checkout_funnel.sql` | Redesign "secure checkout" yang **ditinggalkan** | ❌ JANGAN diterapkan (me-REVOKE `get_order_public`) |
-| `migrations/_archived/20260910_order_lookup_by_id.sql` | Varian `get_order_public_by_code` yang tak dipakai frontend | ❌ JANGAN diterapkan |
+| `migrations/0010_testimonials_product_category.sql` | Tambah kolom opsional `product_id` & `category` beserta index pada `public.testimonials` | Siap dijalankan di SQL Editor |
 
 > Catatan: migration lama bernomor `001`–`004` yang dulu tercantum di dokumen
 > ini **tidak pernah ada** di repo, jadi referensinya dihapus.

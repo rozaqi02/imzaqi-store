@@ -1,13 +1,17 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { Link, useNavigate, useParams, useLocation } from "react-router-dom";
 import { productStructuredData } from "../lib/productStructuredData.mjs";
 import {
   ArrowDown,
   ArrowLeftRight,
+  ArrowUpRight,
   Check,
   ChevronLeft,
+  ChevronRight,
   Clock3,
   Flame,
+  Images,
   LayoutGrid,
   Share2,
   ShieldCheck,
@@ -18,18 +22,21 @@ import {
   Users,
   Bell,
   PackageCheck,
+  X,
+  ZoomIn,
 } from "lucide-react";
 
-import { fetchProductBySlug, fetchActiveFlashSales, fetchTopSellingData } from "../lib/api";
+import { fetchProductBySlug, fetchActiveFlashSales, fetchTopSellingData, fetchTestimonials } from "../lib/api";
 import { useCart } from "../context/CartContext";
 import { useToast } from "../context/ToastContext";
-import { asVariantList, formatGuaranteeLabel, formatIDR, getCatalogPriceRange, getProductIconTone, isKnownOutOfStock, normalizeProductRecord, packDisplayName } from "../lib/format";
+import { asVariantList, formatGuaranteeLabel, formatIDR, formatTestimonialDate, getCatalogPriceRange, getProductIconTone, isKnownOutOfStock, normalizeProductRecord, packDisplayName } from "../lib/format";
 import { usePageMeta } from "../hooks/usePageMeta";
 import EmptyState from "../components/EmptyState";
 import { useAdaptiveMotion } from "../hooks/useAdaptiveMotion";
 import { useDeviceCapability } from "../hooks/useIsMobile";
 import VariantCompareModal from "../components/VariantCompareModal";
 import { useLongTaskMonitor } from "../hooks/usePerformanceMonitor";
+import { useDialogA11y } from "../hooks/useDialogA11y";
 import { warn } from "../lib/log";
 import { fireConfetti } from "../components/Confetti";
 
@@ -722,6 +729,10 @@ export default function ProductDetail() {
   const [activeTab, setActiveTab] = useState("semua");
   const [variantSort, setVariantSort] = useState("reco");
   const [compareOpen, setCompareOpen] = useState(false);
+  const [testimonials, setTestimonials] = useState([]);
+  const [previewTestimonialIdx, setPreviewTestimonialIdx] = useState(-1);
+  const testimonialDialogRef = useRef(null);
+  const closeTestimonialViewer = useCallback(() => setPreviewTestimonialIdx(-1), []);
 
   // Ensure product detail opens cleanly scrolled at top on first entry or slug change.
   useLayoutEffect(() => {
@@ -908,6 +919,67 @@ export default function ProductDetail() {
 
   const productCategory = useMemo(() => resolveProductCategory(product), [product]);
   const CategoryIcon = productCategory.icon;
+
+  useEffect(() => {
+    let alive = true;
+    if (typeof fetchTestimonials !== "function") return undefined;
+    fetchTestimonials()
+      .then((rows) => {
+        if (alive) setTestimonials(Array.isArray(rows) ? rows : []);
+      })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, []);
+
+  const productTestimonials = useMemo(() => {
+    if (!product || !Array.isArray(testimonials) || testimonials.length === 0) return [];
+    const productNameLower = String(product.name || "").trim().toLowerCase();
+    return testimonials.filter((item) => {
+      if (!item?.image_url) return false;
+      if (item.product_id && String(item.product_id) === String(product.id)) return true;
+      const itemProductName = String(item.product_name || "").trim().toLowerCase();
+      if (productNameLower && itemProductName === productNameLower) return true;
+      if (productNameLower && item.caption) {
+        return String(item.caption).toLowerCase().includes(`(${productNameLower})`);
+      }
+      return false;
+    });
+  }, [product, testimonials]);
+
+  const activeTestimonial =
+    previewTestimonialIdx >= 0 ? productTestimonials[previewTestimonialIdx] || null : null;
+
+  useEffect(() => {
+    setPreviewTestimonialIdx(-1);
+  }, [slug]);
+
+  useDialogA11y({
+    open: Boolean(activeTestimonial),
+    containerRef: testimonialDialogRef,
+    onClose: closeTestimonialViewer,
+  });
+
+  useEffect(() => {
+    if (!activeTestimonial) return undefined;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    function onKey(event) {
+      if (productTestimonials.length > 1 && event.key === "ArrowLeft") {
+        event.preventDefault();
+        setPreviewTestimonialIdx(
+          (i) => (i - 1 + productTestimonials.length) % productTestimonials.length
+        );
+      } else if (productTestimonials.length > 1 && event.key === "ArrowRight") {
+        event.preventDefault();
+        setPreviewTestimonialIdx((i) => (i + 1) % productTestimonials.length);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [Boolean(activeTestimonial), productTestimonials.length]);
 
   const guaranteePreview = useMemo(() => {
     const labels = [...new Set(variants.map((variant) => formatGuaranteeLabel(variant.guarantee_text)).filter(Boolean))];
@@ -1269,6 +1341,55 @@ export default function ProductDetail() {
               </section>
             </div>
           </div>
+
+          <section className="pdx-variantsSection pdx-testimoniSection" aria-labelledby="pdx-testimoni-title">
+            <div className="pdx-testimoniHead">
+              <div className="pdx-testimoniCopy">
+                <h2 id="pdx-testimoni-title" className="pdx-sectionTitle">Lihat Testimoni {product.name}</h2>
+                <p className="pdx-testimoniDesc">
+                  {productTestimonials.length > 0
+                    ? `${productTestimonials.length} bukti transaksi ${product.name} dari pembeli. Klik foto untuk lihat full.`
+                    : `Belum ada testimoni khusus ${product.name}. Kamu tetap bisa cek ulasan produk lainnya.`}
+                </p>
+              </div>
+            </div>
+
+            {productTestimonials.length > 0 ? (
+              <div className="pdx-testimoniGrid">
+                {productTestimonials.slice(0, 4).map((item, idx) => {
+                  const dateLabel = formatTestimonialDate(item.purchased_at);
+                  return (
+                    <button
+                      key={item.id || idx}
+                      type="button"
+                      className="pdx-testimoniThumb"
+                      onClick={() => setPreviewTestimonialIdx(idx)}
+                      aria-label={`Perbesar testimoni ${product.name} ${idx + 1}${dateLabel ? ` (${dateLabel})` : ""}`}
+                    >
+                      <img
+                        src={item.image_url}
+                        alt={`Testimoni ${product.name}${dateLabel ? ` · ${dateLabel}` : ""}`}
+                        loading="lazy"
+                        decoding="async"
+                      />
+                      <span className="pdx-testimoniThumbZoom" aria-hidden="true">
+                        <ZoomIn size={15} />
+                      </span>
+                      {dateLabel ? <span className="pdx-testimoniThumbDate">{dateLabel}</span> : null}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
+
+            <div className="pdx-testimoniFoot">
+              <Link className="btn pdx-testimoniCta" to="/testimoni">
+                <Images size={16} aria-hidden="true" />
+                <span>Lihat Testimoni Semua Produk</span>
+                <ArrowUpRight size={15} aria-hidden="true" />
+              </Link>
+            </div>
+          </section>
         </div>
       </div>
     </section>
@@ -1279,6 +1400,81 @@ export default function ProductDetail() {
       flashSaleMap={flashSaleMap}
       onClose={() => setCompareOpen(false)}
     />
+
+    {activeTestimonial && createPortal(
+      <div
+        className="reviews-backdrop"
+        onMouseDown={(e) => { if (e.target === e.currentTarget) closeTestimonialViewer(); }}
+      >
+        <div
+          ref={testimonialDialogRef}
+          className="reviews-lightbox"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="pdx-testimoni-viewer-title"
+        >
+          <div className="reviews-viewerHead">
+            <div>
+              <span className="reviews-eyebrow">TESTIMONI PRODUK</span>
+              <h2 id="pdx-testimoni-viewer-title">
+                {product.name} · {previewTestimonialIdx + 1} dari {productTestimonials.length}
+              </h2>
+            </div>
+            <button
+              className="reviews-iconButton"
+              type="button"
+              onClick={closeTestimonialViewer}
+              aria-label="Tutup testimoni"
+            >
+              <X size={21} />
+            </button>
+          </div>
+          <div className="reviews-viewerImage">
+            <img
+              src={activeTestimonial.image_url}
+              alt={`Testimoni penuh ${product.name}`}
+            />
+          </div>
+          <div className="reviews-viewerFoot">
+            <div>
+              <p>{product.name}</p>
+              {formatTestimonialDate(activeTestimonial.purchased_at) ? (
+                <span className="reviews-verifiedMeta">
+                  Dibeli {formatTestimonialDate(activeTestimonial.purchased_at)}
+                </span>
+              ) : null}
+            </div>
+            {productTestimonials.length > 1 ? (
+              <div className="reviews-viewerNav">
+                <button
+                  className="reviews-iconButton"
+                  type="button"
+                  onClick={() =>
+                    setPreviewTestimonialIdx(
+                      (i) => (i - 1 + productTestimonials.length) % productTestimonials.length
+                    )
+                  }
+                  aria-label="Testimoni sebelumnya"
+                >
+                  <ChevronLeft size={22} />
+                </button>
+                <button
+                  className="reviews-iconButton"
+                  type="button"
+                  onClick={() =>
+                    setPreviewTestimonialIdx((i) => (i + 1) % productTestimonials.length)
+                  }
+                  aria-label="Testimoni berikutnya"
+                >
+                  <ChevronRight size={22} />
+                </button>
+              </div>
+            ) : null}
+          </div>
+        </div>
+      </div>,
+      document.body
+    )}
   </div>
   );
 }

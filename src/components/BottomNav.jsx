@@ -105,7 +105,10 @@ export default function BottomNav() {
     <nav ref={navRef} className={`bottom-nav bottom-nav--neumorphic${isPhone && shrunk ? " is-shrunk" : ""}`} aria-label="Navigasi utama">
       <ul
         className="bottom-nav-list"
-        style={activeIndex >= 0 ? { "--active-nav-index": activeIndex } : undefined}
+        style={{
+          "--nav-count": SITE_BOTTOM_NAV.length,
+          ...(activeIndex >= 0 ? { "--active-nav-index": activeIndex } : {}),
+        }}
       >
         {activeIndex >= 0 ? <span className="bottom-nav-activePill" aria-hidden="true" /> : null}
         {SITE_BOTTOM_NAV.map((item) => {

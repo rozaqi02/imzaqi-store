@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { ArrowRight, ChevronDown, Search, X } from "lucide-react";
+import { ArrowRight, ChevronDown, Images, Search, X } from "lucide-react";
 
 import Hero from "../components/Hero";
 
@@ -476,6 +476,30 @@ export default function Home() {
                   </button>
                 );
               })}
+            </div>
+          </div>
+        </section>
+
+        {/* ── Testimoni Pelanggan ── */}
+        <section
+          className="home-section home-testimoniSection"
+          aria-label="Testimoni pelanggan"
+        >
+          <div className="container home-sectionInner">
+            <div className="reveal" style={{ transitionDelay: "60ms" }}>
+              <HomeSectionHead
+                kicker="Kata pembeli"
+                title="Testimoni"
+                sub="Bukti transaksi asli dari pembeli di Imzaqi Store."
+              />
+            </div>
+
+            <div className="home-sectionCta reveal" style={{ transitionDelay: "120ms" }}>
+              <Link className="btn" to="/testimoni">
+                <Images size={17} aria-hidden="true" />
+                <span>Lihat Testimoni</span>
+                <ArrowRight size={16} aria-hidden="true" />
+              </Link>
             </div>
           </div>
         </section>

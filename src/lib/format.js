@@ -77,6 +77,47 @@ export function slugify(input) {
     .replace(/(^-|-$)+/g, "");
 }
 
+export function formatTestimonialDate(isoDate) {
+  if (!isoDate) return null;
+  try {
+    const d = new Date(isoDate);
+    if (isNaN(d.getTime())) return null;
+    return new Intl.DateTimeFormat("id-ID", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(d);
+  } catch {
+    return null;
+  }
+}
+
+export function toDateInputValue(isoDate) {
+  if (!isoDate) return "";
+  const raw = String(isoDate).trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+  const d = new Date(raw);
+  if (isNaN(d.getTime())) return "";
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(d);
+  const year = parts.find((p) => p.type === "year")?.value;
+  const month = parts.find((p) => p.type === "month")?.value;
+  const day = parts.find((p) => p.type === "day")?.value;
+  return year && month && day ? `${year}-${month}-${day}` : "";
+}
+
+export function dateInputToIso(dateStr) {
+  const raw = String(dateStr || "").trim();
+  if (!raw) return null;
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(raw)) return null;
+  const d = new Date(`${raw}T12:00:00Z`);
+  return isNaN(d.getTime()) ? null : d.toISOString();
+}
+
 // Order Status Timeline
 export function getTimeline(status) {
   const value = String(status || "pending");

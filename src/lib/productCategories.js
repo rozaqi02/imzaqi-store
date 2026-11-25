@@ -41,6 +41,12 @@ function inferCategoryFromName(name) {
   return "other";
 }
 
+export function getProductCategoryMeta(categoryKey) {
+  const key = String(categoryKey || "").trim().toLowerCase();
+  if (!key) return null;
+  return PRODUCT_CATEGORIES.find((item) => item.key === key) || null;
+}
+
 export function resolveProductCategory(product) {
   const explicit = String(product?.category || "").trim().toLowerCase();
   const key = PRODUCT_CATEGORIES.some((item) => item.key === explicit)
@@ -48,6 +54,35 @@ export function resolveProductCategory(product) {
     : inferCategoryFromName(product?.name);
 
   return PRODUCT_CATEGORIES.find((item) => item.key === key) || PRODUCT_CATEGORIES.at(-1);
+}
+
+/**
+ * Resolve optional category metadata for a testimonial item.
+ * Returns null when neither category, product_id, nor product_name is set.
+ */
+export function resolveTestimonialCategory(testimonial, products = []) {
+  const explicit = getProductCategoryMeta(testimonial?.category);
+  if (explicit) return explicit;
+
+  const productId = testimonial?.product_id;
+  if (productId && Array.isArray(products) && products.length > 0) {
+    const matchedById = products.find((item) => String(item?.id) === String(productId));
+    if (matchedById) return resolveProductCategory(matchedById);
+  }
+
+  const productName = String(testimonial?.product_name || "").trim();
+  if (productName) {
+    if (Array.isArray(products) && products.length > 0) {
+      const lowered = productName.toLowerCase();
+      const matchedByName = products.find(
+        (item) => String(item?.name || "").trim().toLowerCase() === lowered
+      );
+      if (matchedByName) return resolveProductCategory(matchedByName);
+    }
+    return resolveProductCategory({ name: productName });
+  }
+
+  return null;
 }
 
 export function isAcademicProduct(product) {

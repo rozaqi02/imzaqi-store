@@ -4,7 +4,7 @@ export const SITE_PRIMARY_NAV = [
   { to: "/", label: "Beranda", shortLabel: "Beranda" },
   { to: "/produk", label: "Katalog", shortLabel: "Katalog" },
   { to: "/faq", label: "Bantuan", shortLabel: "Bantuan" },
-  { to: "/testimoni", label: "Ulasan", shortLabel: "Ulasan" },
+  { to: "/testimoni", label: "Testimoni", shortLabel: "Testimoni" },
 ];
 
 export const SITE_DESKTOP_NAV = [
@@ -12,13 +12,8 @@ export const SITE_DESKTOP_NAV = [
   { to: "/status", label: "Cek Status", shortLabel: "Status" },
 ];
 
-// Bottom nav memprioritaskan bantuan saat pengguna mobile membutuhkan jawaban cepat.
-export const SITE_BOTTOM_NAV = [
-  { to: "/", label: "Beranda", shortLabel: "Beranda" },
-  { to: "/produk", label: "Katalog", shortLabel: "Katalog" },
-  { to: "/faq", label: "Bantuan", shortLabel: "Bantuan" },
-  { to: "/status", label: "Cek Status", shortLabel: "Status" },
-];
+// Bottom nav menyertakan Testimoni dengan label ringkas agar tetap rapi di layar ponsel.
+export const SITE_BOTTOM_NAV = [...SITE_DESKTOP_NAV];
 
 export function isNavItemActive(pathname, to) {
   if (to === "/") return pathname === "/";

@@ -54,6 +54,7 @@ vi.mock("../lib/api", () => ({
   fetchActiveFlashSales: vi.fn(() => Promise.resolve([])),
   fetchProducts: vi.fn(() => Promise.resolve([mockProduct])),
   fetchTopSellingData: vi.fn(() => Promise.resolve({ topIds: [], salesMap: {} })),
+  fetchTestimonials: vi.fn(() => Promise.resolve([])),
 }));
 
 vi.mock("../context/ToastContext", () => ({
@@ -318,5 +319,44 @@ describe("ProductDetail render", () => {
     renderDetail();
     await screen.findByRole("heading", { name: "Netflix Premium", level: 1 });
     expect(screen.getByText("13 terjual")).toBeInTheDocument();
+  });
+
+  it("renders Lihat Testimoni section for that product and opens full photo lightbox on click", async () => {
+    const { fetchTestimonials } = await import("../lib/api");
+    fetchTestimonials.mockResolvedValueOnce([
+      {
+        id: "t-1",
+        image_url: "/proof-1.png",
+        product_name: "Netflix Premium",
+        category: "streaming",
+        purchased_at: "2026-11-25T12:00:00.000Z",
+      },
+      {
+        id: "t-other-streaming",
+        image_url: "/proof-other.png",
+        product_name: "Disney+ Hotstar",
+        category: "streaming",
+      },
+    ]);
+    renderDetail();
+    const section = await screen.findByRole("region", { name: "Lihat Testimoni Netflix Premium" });
+    // Only shows testimonial for Netflix Premium, NOT Disney+ Hotstar
+    const thumbs = within(section).getAllByRole("img");
+    expect(thumbs).toHaveLength(1);
+    expect(thumbs[0]).toHaveAttribute("src", "/proof-1.png");
+    expect(within(section).getByText("25 Nov 2026")).toBeInTheDocument();
+
+    const cta = within(section).getByRole("link", { name: "Lihat Testimoni Semua Produk" });
+    expect(cta).toHaveAttribute("href", "/testimoni");
+
+    // Clicking the testimonial thumbnail opens full-screen lightbox right on ProductDetail
+    fireEvent.click(within(section).getByRole("button", { name: /Perbesar testimoni Netflix Premium 1/i }));
+    const dialog = screen.getByRole("dialog", { name: /Netflix Premium · 1 dari 1/i });
+    expect(dialog).toBeVisible();
+    expect(within(dialog).getByRole("img")).toHaveAttribute("src", "/proof-1.png");
+    expect(within(dialog).getByText("Dibeli 25 Nov 2026")).toBeVisible();
+
+    fireEvent.click(within(dialog).getByRole("button", { name: "Tutup testimoni" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 });

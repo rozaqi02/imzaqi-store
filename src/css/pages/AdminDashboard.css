@@ -1213,6 +1213,147 @@ html[data-theme="light"] .admin-advancedToggle {
   object-fit: cover;
 }
 
+.admin-thumb-previewBtn {
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+  overflow: hidden;
+}
+
+.admin-thumb-previewBtn img {
+  display: block;
+  transition: transform 0.2s ease;
+}
+
+.admin-thumb-previewBtn:hover img {
+  transform: scale(1.03);
+}
+
+.admin-thumb-previewBtn:focus-visible {
+  outline: 2px solid var(--adm-accent, #00c2d0);
+  outline-offset: -2px;
+}
+
+.admin-thumb-zoom {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  background: rgba(7, 46, 33, 0.85);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+}
+
+.admin-thumb-meta {
+  padding: 0 12px;
+}
+
+.admin-thumb-meta .admin-categoryTag {
+  gap: 6px;
+  max-width: 100%;
+}
+
+.admin-thumb-meta .admin-categoryTag span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-testimonial-form {
+  align-items: flex-end;
+}
+
+.admin-testimonial-form > .admin-picker {
+  flex: 1 1 220px;
+}
+
+.admin-testimonial-form > .admin-picker .ap-trigger {
+  min-height: 44px;
+  padding: 6px 12px;
+}
+
+.admin-testimonial-form > .admin-field {
+  flex: 1 1 180px;
+  min-width: 0;
+}
+
+.admin-testimonial-dateRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.admin-testimonial-dateRow .input {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.admin-testimonial-form .admin-field-full {
+  flex: 1 1 100%;
+}
+
+.admin-testimonial-queue {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.admin-testimonial-queueItem {
+  position: relative;
+  width: 68px;
+  height: 68px;
+}
+
+.admin-testimonial-queueItem .admin-icon-preview {
+  width: 68px;
+  height: 68px;
+  border-radius: 14px;
+}
+
+.admin-testimonial-queueRemove {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 24px !important;
+  min-width: 24px !important;
+  min-height: 24px !important;
+  height: 24px !important;
+  padding: 0 !important;
+  border-radius: 999px !important;
+}
+
+.admin-testimonial-fullImgWrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 220px;
+  max-height: 70dvh;
+  padding: 8px;
+  border-radius: 14px;
+  background: var(--adm-surface-inset, rgba(0, 0, 0, 0.2));
+  border: 1px solid var(--adm-line, rgba(255, 255, 255, 0.1));
+  overflow: auto;
+}
+
+.admin-testimonial-fullImgWrap img {
+  display: block;
+  max-width: 100%;
+  max-height: calc(70dvh - 16px);
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  border-radius: 10px;
+}
+
 .admin-thumb-actions {
   display: flex;
   gap: 8px;
